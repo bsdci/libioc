@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+
+# PROVIDE: ioc
+# REQUIRE: LOGIN cleanvar sshd ZFS
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following lines to /etc/rc.conf to enable ioc (libiocage experiments):
+#
+# ioc_enable="YES"
+#
+#
+
+. /etc/rc.subr
+
+name="ioc"
+rcvar=ioc_enable
+
+# read configuration and set defaults
+load_rc_config "$name"
+: ${ioc_enable="NO"}
+: ${ioc_lang="en_US.UTF-8"}
+
+start_cmd="ioc_start"
+stop_cmd="ioc_stop"
+export LANG=$ioc_lang
+
+ioc_start()
+{
+    if checkyesno ${rcvar}; then
+        echo "* [I|O|C] starting jails... "
+        /usr/local/bin/ioc start --rc
+    fi
+}
+
+ioc_stop()
+{
+    if checkyesno ${rcvar}; then
+        echo "* [I|O|C] stopping jails... "
+        /usr/local/bin/ioc stop --rc
+    fi
+}
+
+run_rc_command "$1"

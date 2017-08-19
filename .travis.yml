@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.6"
+sudo: required
+install:
+  - pip3 install flake8
+script:
+  - ".travis/flake8.sh"
