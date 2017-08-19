@@ -44,7 +44,7 @@ class Distribution:
         elif distribution == "HardenedBSD":
             return f"http://jenkins.hardenedbsd.org/builds"
         else:
-            raise iocage.lib.errors.DistributionUnknwon(distribution)
+            raise iocage.lib.errors.DistributionUnknown(distribution)
 
     @property
     def hash_file(self):
