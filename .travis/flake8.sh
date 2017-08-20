@@ -2,7 +2,7 @@
 # Run pep8 on all .py files in all subfolders
 
 tmpafter=$(mktemp)
-find ./iocage/cli ./iocage/lib -name \*.py -exec flake8 {} + > ${tmpafter}
+find ./libiocage/ -name \*.py -exec flake8 {} + > ${tmpafter}
 num_errors_after=`cat ${tmpafter} | wc -l`
 echo "Current Error Count: ${num_errors_after}"
 
@@ -15,7 +15,7 @@ echo "Comparing with last stable release: ${last_release}"
 git checkout ${last_release}
 
 tmpbefore=$(mktemp)
-find ./iocage/cli ./iocage/lib -name \*.py -exec flake8 {} + > ${tmpbefore}
+find ./libiocage/ -name \*.py -exec flake8 {} + > ${tmpbefore}
 num_errors_before=`cat ${tmpbefore} | wc -l`
 echo "${last_release}'s Error Count: ${num_errors_before}"
 
