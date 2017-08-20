@@ -10,6 +10,8 @@
 .cache/
 .idea/
 .coverage
+.eggs/
+dist/
 venv/
 build/
 venv-*/
