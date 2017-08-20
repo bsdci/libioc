@@ -7,9 +7,11 @@ import libiocage.lib.Jail
 
 import helper_functions
 
+
 def read_jail_config_json(config_file):
     with open(config_file, "r") as conf:
         return json.load(conf)
+
 
 class TestJail(object):
 
@@ -27,8 +29,8 @@ class TestJail(object):
 
         del release
 
-
-    def test_can_be_created(self, host, local_release, logger, zfs, root_dataset, capsys):
+    def test_can_be_created(self, host, local_release, logger, zfs,
+                            root_dataset, capsys):
 
         jail = libiocage.lib.Jail.Jail(host=host, logger=logger, zfs=zfs)
         jail.create(local_release.name)
@@ -41,7 +43,7 @@ class TestJail(object):
         try:
             uuid.UUID(jail.name)
             assert len(str(jail.name)) == 36
-            assert jail.config["basejail"] == False
+            assert not jail.config["basejail"]
             assert not jail.config["basejail_type"]
 
             assert dataset.mountpoint is not None
@@ -66,7 +68,7 @@ class TestJail(object):
 
         cleanup()
 
-        
+
 class TestNullFSBasejail(object):
 
     @pytest.fixture
@@ -83,7 +85,8 @@ class TestNullFSBasejail(object):
 
         del release
 
-    def test_can_be_created(self, host, local_release, logger, zfs, root_dataset):
+    def test_can_be_created(self, host, local_release, logger, zfs,
+                            root_dataset):
 
         jail = libiocage.lib.Jail.Jail({
             "basejail": True
@@ -98,7 +101,7 @@ class TestNullFSBasejail(object):
         try:
             uuid.UUID(jail.name)
             assert len(str(jail.name)) == 36
-            assert jail.config["basejail"] == True
+            assert jail.config["basejail"]
             assert jail.config["basejail_type"] == "nullfs"
 
             assert dataset.mountpoint is not None

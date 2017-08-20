@@ -1,6 +1,4 @@
 import pytest
-import sys
-import os
 
 import helper_functions
 
@@ -13,21 +11,27 @@ import helper_functions
 #     sys.path = [iocage_lib_dir] + sys.path
 
 _force_clean = False
+
+
 def pytest_addoption(parser):
     parser.addoption("--force-clean", action="store_true",
-        help="Force cleaning the /iocage-test dataset")
+                     help="Force cleaning the /iocage-test dataset")
+
 
 def pytest_generate_tests(metafunc):
-    _force_clean = metafunc.config.getoption("force_clean")
+    metafunc.config.getoption("force_clean")
+
 
 @pytest.fixture
 def force_clean():
     return _force_clean
 
+
 @pytest.fixture
 def zfs():
     import libzfs
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
+
 
 @pytest.fixture
 def pool(zfs, logger):
@@ -50,10 +54,12 @@ def pool(zfs, logger):
 
     return active_pool
 
+
 @pytest.fixture
 def logger():
     import libiocage.lib.Logger
     return libiocage.lib.Logger.Logger()
+
 
 @pytest.fixture
 def root_dataset(force_clean, zfs, pool):
@@ -63,7 +69,7 @@ def root_dataset(force_clean, zfs, pool):
     if force_clean:
         try:
             dataset = zfs.get_dataset(dataset_name)
-            helper_functionsunmount_and_destroy_dataset_recursive(dataset)
+            helper_functions.unmount_and_destroy_dataset_recursive(dataset)
         except:
             pass
 
@@ -81,7 +87,8 @@ def root_dataset(force_clean, zfs, pool):
     yield dataset
 
     if force_clean:
-        helper_functionsunmount_and_destroy_dataset_recursive(dataset)
+        helper_functions.unmount_and_destroy_dataset_recursive(dataset)
+
 
 @pytest.fixture
 def host(root_dataset, logger, zfs):
@@ -89,7 +96,8 @@ def host(root_dataset, logger, zfs):
     host = libiocage.lib.Host.Host(root_dataset=root_dataset, logger=logger, zfs=zfs)
     yield host
     del host
-    
+
+
 @pytest.fixture
 def release(host, logger, zfs):
     import libiocage.lib.Release
