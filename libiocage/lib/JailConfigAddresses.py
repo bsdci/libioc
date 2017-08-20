@@ -38,7 +38,6 @@ class JailConfigAddresses(dict):
         ip_addresses = config_line.split(" ")
         for ip_address_string in ip_addresses:
 
-            print(ip_address_string)
             try:
                 nic, address = ip_address_string.split("|", maxsplit=1)
                 self.add(nic, address)
