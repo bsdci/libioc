@@ -21,17 +21,40 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
+"""set module for the cli."""
 import click
 
-from libiocage.cli import cli
+import libiocage.lib.Jail
+import libiocage.lib.Logger
 
-if __name__ == "__main__":
-    cli(prog_name="iocage")
+
+__rootcmd__ = True
+
+
+@click.command(context_settings=dict(
+    max_content_width=400, ), name="set", help="Sets the specified property.")
+@click.pass_context
+@click.argument("props", nargs=-1)
+@click.argument("jail", nargs=1)
+@click.option("--log-level", "-d", default=None)
+def cli(ctx, props, jail, log_level):
+    """Get a list of jails and print the property."""
+
+    logger = ctx.parent.logger
+    logger.print_level = log_level
+
+    jail = libiocage.lib.Jail.Jail(jail, logger=logger)
+    for prop in props:
+
+        if _is_setter_property(prop):
+            key, value = prop.split("=", maxsplit=1)
+            jail.config[key] = value
+        else:
+            key = prop
+            del jail.config[key]
+
+    jail.config.save()
+
+
+def _is_setter_property(property_string):
+    return "=" in property_string

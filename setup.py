@@ -45,7 +45,7 @@ if sys.version_info < (3, 6):
 setup(
     name='libiocage',
     license='BSD',
-    version='0.1.0',
+    version='0.1.1',
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='Stefan Grönke, Brandon Schneider and Peter Toth',
@@ -59,7 +59,7 @@ setup(
     setup_requires=['pytest-runner'],
     entry_points={
         'console_scripts': [
-            'ioc=iocage.cli:cli'
+            'ioc=libiocage.cli:cli'
         ]
     },
     data_files=_data,

@@ -21,17 +21,35 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+"""console module for the cli."""
 
 import click
 
-from libiocage.cli import cli
+import libiocage.lib.Jail
+import libiocage.lib.Logger
 
-if __name__ == "__main__":
-    cli(prog_name="iocage")
+__rootcmd__ = True
+
+
+@click.command(name="console", help="Login to a jail.")
+@click.pass_context
+@click.argument("jail")
+@click.option("--log-level", "-d", default=None)
+def cli(ctx, jail, log_level):
+    """
+    Runs jexec to login into the specified jail.
+    """
+    logger = ctx.parent.logger
+    logger.print_level = log_level
+
+    jail = libiocage.lib.Jail.Jail(jail, logger=logger)
+    jail.update_jail_state()
+
+    if not jail.exists:
+        logger.error(f"The jail {jail.humanreadable_name} does not exist")
+        exit(1)
+    if not jail.running:
+        logger.error(f"The jail {jail.humanreadable_name} is not running")
+        exit(1)
+    else:
+        jail.exec_console()

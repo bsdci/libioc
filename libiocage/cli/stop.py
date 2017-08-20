@@ -21,17 +21,40 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
+"""stop module for the cli."""
 import click
 
-from libiocage.cli import cli
+import libiocage.lib.Jails
+import libiocage.lib.Logger
 
-if __name__ == "__main__":
-    cli(prog_name="iocage")
+
+__rootcmd__ = True
+
+
+@click.command(name="stop", help="Stops the specified jails or ALL.")
+@click.pass_context
+@click.option("--rc", default=False, is_flag=True,
+              help="Will stop all jails with boot=on, in the specified"
+                   " order with higher value for priority stopping first.")
+@click.option("--log-level", "-d", default=None)
+@click.option("--force", "-f", is_flag=True, default=False,
+              help="Skip checks and enforce jail shutdown")
+@click.argument("jails", nargs=-1)
+def cli(ctx, rc, log_level, force, jails):
+    """
+    Looks for the jail supplied and passes the uuid, path and configuration
+    location to stop_jail.
+    """
+    logger = ctx.parent.logger
+    logger.print_level = log_level
+    ioc_jails = libiocage.lib.Jails.Jails(logger=logger)
+
+    for jail in ioc_jails.list(filters=jails):
+        logger.log(f"Stopping jail {jail.humanreadable_name}")
+        try:
+            jail.stop(force=force)
+        except:
+            exit(1)
+
+        logger.log("done")
+        exit(0)
