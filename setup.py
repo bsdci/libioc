@@ -28,8 +28,11 @@ from setuptools import find_packages, setup
 from pip.req import parse_requirements
 
 reqs = list(parse_requirements("requirements.txt", session="libiocage"))
-install_requires = map(lambda x: f"{x.name}{x.specifier}", reqs)
-dependency_links = map(lambda x: x.link, filter(lambda x: x.link, reqs))
+install_requires = list(map(lambda x: f"{x.name}{x.specifier}", reqs))
+dependency_links = list(map(
+    lambda x: str(x.link), 
+    filter(lambda x: x.link, reqs)
+))
 
 if os.path.isdir("/usr/local/etc/init.d"):
     _data = [('/usr/local/etc/init.d', ['rc.d/ioc'])]
