@@ -5,7 +5,10 @@ class IocageException(Exception):
             logger.__getattribute__(level)(message)
             if append_warning is True:
                 logger.warn(warning)
-        super().__init__(message, errors)
+        if errors is not None:
+            super().__init__(message, errors)
+        else:
+            super().__init__(message)
 
 # Jails
 
@@ -126,6 +129,14 @@ class IocageNotActivated(IocageException):
             "please run `iocage activate` first and select a pool"
         )
         super().__init__(msg, *args, **kwargs)
+
+class MustBeRoot(IocageException):
+
+    def __init__(self, msg, *args, **kwargs):
+        _msg = (
+            f"Must be root to {msg}"
+        )
+        super().__init__(_msg, *args, **kwargs)
 
 
 class CommandFailure(IocageException):
