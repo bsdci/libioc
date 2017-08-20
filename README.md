@@ -13,7 +13,7 @@ libiocage
 
 iocage is a jail/container manager amalgamating some of the best features and technologies the FreeBSD operating system has to offer. It is geared for ease of use with a simple and easy to understand command syntax.
 
-This library provides programmatic access to iocage features and jails, while being compatible with iocage-legacy (sh), iocage-zfs and libiocage.
+This library provides programmatic access to iocage features and jails, while being compatible with iocage-legacy, and the current Python 3 version of iocage.
 
 ## Install
 
