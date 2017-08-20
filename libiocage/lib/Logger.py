@@ -148,7 +148,7 @@ class Logger:
 
     def _create_log_directory(self):
         if os.geteuid() != 0:
-            raise libiocage.lib.errors.MustBeRoot(f"create {log_directory}")
+            raise libiocage.lib.errors.MustBeRoot(f"create {self.log_directory}")
         os.makedirs(self.log_directory, 0x600)
         self.log(f"Log directory '{self.log_directory}' created", level="info")
 
