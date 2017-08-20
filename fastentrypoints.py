@@ -39,6 +39,8 @@ from setuptools.command import easy_install
 import re
 TEMPLATE = '''\
 # -*- coding: utf-8 -*-
+# EASY-INSTALL-ENTRY-SCRIPT: '{3}','{4}','{5}'
+__requires__ = '{3}'
 import re
 import sys
 
@@ -57,6 +59,7 @@ def get_args(cls, dist, header=None):
     """
     if header is None:
         header = cls.get_header()
+    spec = str(dist.as_requirement())
     for type_ in 'console', 'gui':
         group = type_ + '_scripts'
         for name, ep in dist.get_entry_map(group).items():
@@ -64,7 +67,8 @@ def get_args(cls, dist, header=None):
             if re.search(r'[\\/]', name):
                 raise ValueError("Path separators not allowed in script names")
             script_text = TEMPLATE.format(
-                          ep.module_name, ep.attrs[0], '.'.join(ep.attrs))
+                          ep.module_name, ep.attrs[0], '.'.join(ep.attrs),
+                          spec, group, name)
             args = cls._get_script_args(type_, name, header, script_text)
             for res in args:
                 yield res
@@ -98,10 +102,9 @@ def main():
         with open(setup_path, 'a+') as setup:
             setup.seek(0)
             setup_content = setup.read()
-            if 'import fastentrypoints' not in setup_content:
+            if not 'import fastentrypoints' in setup_content:
                 setup.seek(0)
                 setup.truncate()
                 setup.write('import fastentrypoints\n' + setup_content)
-
 
 print(__name__)
