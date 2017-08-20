@@ -112,6 +112,6 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
 
 def _lookup_jail_value(jail, key):
     if key in libiocage.lib.Jails.Jails.JAIL_KEYS:
-        return jail.getattr_str(key)
+        return jail.getstring(key)
     else:
         return str(jail.config.__getitem__(key))

@@ -63,7 +63,7 @@ class JailConfig(dict, object):
             libiocage.lib.JailConfigJSON.JailConfigJSON.read(self)
             self["legacy"] = False
             self.logger.log("Configuration loaded from JSON", level="verbose")
-            return
+            return "json"
 
         elif libiocage.lib.JailConfigLegacy.JailConfigLegacy.exists(self):
 
@@ -71,6 +71,7 @@ class JailConfig(dict, object):
             self["legacy"] = True
             self.logger.verbose(
                 "Configuration loaded from UCL config file (iocage-legacy)")
+            return "ucl"
 
         elif libiocage.lib.JailConfigZFS.JailConfigZFS.exists(self): 
 
@@ -78,10 +79,12 @@ class JailConfig(dict, object):
             self["legacy"] = True
             self.logger.verbose(
                 "Configuration loaded from ZFS properties (iocage-legacy)")
+            return "zfs"
 
         else:
 
             self.logger.debug("No configuration was found")
+            return None
 
     def update_special_property(self, name, new_property_handler=None):
 

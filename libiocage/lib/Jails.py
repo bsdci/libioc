@@ -115,7 +115,7 @@ class Jails:
 
     def _lookup_jail_value(self, jail, key):
         if key in Jails.JAIL_KEYS:
-            return jail.getattr_str(key)
+            return jail.getstring(key)
         else:
             return str(jail.config["__getattr__"](key))
 
