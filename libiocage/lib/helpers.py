@@ -72,7 +72,7 @@ def exec(command, logger=None, ignore_error=False):
     if child.returncode > 0:
 
         if logger:
-            log_level = "spam" if ignore_error else "warning"
+            log_level = "spam" if ignore_error else "warn"
             logger.log(
                 f"Command exited with {child.returncode}: {command_str}",
                 level=log_level

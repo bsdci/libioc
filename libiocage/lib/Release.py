@@ -319,7 +319,7 @@ class Release:
             host=self.host
         )
 
-        jail.set_dataset_name(self.dataset_name)
+        jail.dataset_name = self.dataset_name
 
         local_update_mountpoint = f"{self.root_dir}/var/db/freebsd-update"
         if not os.path.isdir(local_update_mountpoint):
@@ -374,7 +374,7 @@ class Release:
             self.logger.verbose(
                 "There was an error updating the Jail - reverting the changes"
             )
-            jail.force_stop()
+            jail.stop(force=True)
             self.zfs.get_snapshot(snapshot_name).rollback(force=True)
             raise
 

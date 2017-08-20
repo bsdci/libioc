@@ -18,8 +18,67 @@ import os
 
 
 class Jail:
+    """
+    Iocage unit orchestrates a jail's configuration and manages state
+
+    Jails are represented as zfs dataset `zpool/iocage/jails/<NAME>`
+
+    Directory Structure:
+
+        zpool/iocage/jails/<NAME>: The jail's dataset containing it's
+            configuration and root directory. Iocage legacy used to store
+            a jails configuration as ZFS properties on this dataset. Even
+            though the modern JSON config mechanism is preferred.
+
+        zpool/iocage/jails/<NAME>/root: This directory is the dataset
+            used as jail path when starting a jail. Usually the origin
+            or a root dataset is a release root directory
+
+        zpool/iocage/jails/<NAME>/config.json: Jails configured with the latest
+            configuration style store their information in a JSON file. When
+            this file is found in the jail's dataset, libiocage assumes
+            the jail to be a JSON-style jail and ignores other configuration
+            mechanisms
+
+        zpool/iocage/jails/<NAME>/config: Another supported configuration
+            mechanism is a UCL file. It's content is only taken into account if
+            no JSON or ZFS configuration was found
+
+    Jail Types:
+
+        Standalone: The /root dataset gets cloned from a release at creation
+            time. It it not affected by changes to the Release and persists all
+            data within the jail
+
+        NullFS Basejail: The fastest method to spawn a basejail by mounting
+            read-only directories from the release's root dataset by creating
+            a snapshot of the release on each boot of the jail. When a release
+            was updated, the jail is updated as well on the next reboot. This
+            type is the one used by the Python implementation of iocage.
+
+        ZFS Basejail: Legacy basejails used to clone individual datasets from a
+            release (stored in `zpool/iocage/base/<RELEASE>)
+    """
 
     def __init__(self, data={}, zfs=None, host=None, logger=None, new=False):
+        """
+        Initializes a Jail
+
+        Args:
+
+            data (string|dict):
+                Jail configuration dict or jail name as string identifier.
+
+            zfs (libzfs.ZFS): (optional)
+                Inherit an existing libzfs.ZFS() instance from ancestor classes
+
+            host (libiocage.lib.Host): (optional)
+                Inherit an existing Host instance from ancestor classes
+
+            logger (libiocage.lib.Logger): (optional)
+                Inherit an existing Logger instance from ancestor classes
+
+        """
 
         libiocage.lib.helpers.init_logger(self, logger)
         libiocage.lib.helpers.init_zfs(self, zfs)
@@ -44,19 +103,27 @@ class Jail:
         self._dataset_name = None
         self._rc_conf = None
 
-        if new is False:
-            self.config.read()
+        self.config.read()
 
     @property
     def zfs_pool_name(self):
+        """
+        Name of the ZFS pool the jail is stored on
+        """
         return self.host.datasets.root.name.split("/", maxsplit=1)[0]
 
     @property
     def _rc_conf_path(self):
+        """
+        Absolute path to the jail's rc.conf file
+        """
         return f"{self.path}/root/etc/rc.conf"
 
     @property
     def rc_conf(self):
+        """
+        The jail's libiocage.RCConf instance (lazy-loaded on first access)
+        """
         if self._rc_conf is None:
             self._rc_conf = libiocage.lib.RCConf.RCConf(
                 path=self._rc_conf_path,
@@ -66,6 +133,10 @@ class Jail:
         return self._rc_conf
 
     def start(self):
+        """
+        Start the jail.
+        """
+
         self.require_jail_existing()
         self.require_jail_stopped()
 
@@ -84,13 +155,13 @@ class Jail:
 
         self.config.fstab.read_file()
         self.config.fstab.save_with_basedirs()
-        self.launch_jail()
+        self._launch_jail()
 
         if self.config["vnet"]:
-            self.start_vimage_network()
-            self.set_routes()
+            self._start_vimage_network()
+            self._configure_routes()
 
-        self.set_nameserver()
+        self._configure_nameserver()
 
         if self.config["jail_zfs"] is True:
             libiocage.lib.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares(
@@ -98,19 +169,37 @@ class Jail:
             )
 
     def stop(self, force=False):
+        """
+        Stop a jail.
+
+        Args:
+
+            force (bool): (default=False)
+                Ignores failures and enforces teardown if True
+        """
 
         if force is True:
-            return self.force_stop()
+            return self._force_stop()
 
         self.require_jail_existing()
         self.require_jail_running()
-        self.destroy_jail()
+        self._destroy_jail()
         if self.config["vnet"]:
-            self.stop_vimage_network()
+            self._stop_vimage_network()
         self._teardown_mounts()
         self.update_jail_state()
 
     def destroy(self, force=False):
+        """
+        Destroy a Jail and it's datasets
+
+        Args:
+
+            force (bool): (default=False)
+                This flag enables whether an existing jail should be shut down
+                before destroying the dataset. By default destroying a jail
+                requires it to be stopped.
+        """
 
         self.update_jail_state()
 
@@ -121,25 +210,28 @@ class Jail:
 
         self.storage.delete_dataset_recursive(self.dataset)
 
-    def force_stop(self):
+    def _force_stop(self):
 
         successful = True
 
         try:
-            self.destroy_jail()
+            self._destroy_jail()
+            self.logger.debug(f"{self.humanreadable_name}: jail destroyed")
         except Exception as e:
             successful = False
             self.logger.warn(str(e))
 
         if self.config["vnet"]:
             try:
-                self.stop_vimage_network()
+                self._stop_vimage_network()
+                self.logger.debug(f"{self.humanreadable_name}: VNET stopped")
             except Exception as e:
                 successful = False
                 self.logger.warn(str(e))
 
         try:
             self._teardown_mounts()
+            self.logger.debug(f"{self.humanreadable_name}: mounts destroyed")
         except Exception as e:
             successful = False
             self.logger.warn(str(e))
@@ -153,6 +245,20 @@ class Jail:
         return successful
 
     def create(self, release_name, auto_download=False):
+        """
+        Create a Jail from a Release
+
+        Args:
+
+            release_name (string):
+                The jail is created from the release matching the name provided
+
+            auto_download (bool): (default=False)
+                When no local release was found, but one with the matching name
+                is available on remote servers, the release is automatically
+                fetched.
+        """
+
         self.require_jail_not_existing()
 
         # check if release exists
@@ -208,13 +314,35 @@ class Jail:
         self.config.save()
 
     def exec(self, command, **kwargs):
+        """
+        Execute a command in a started jail
+
+        command (list):
+            A list of command and it's arguments
+
+            Example: ["/usr/bin/whoami"]
+        """
+
         command = [
             "/usr/sbin/jexec",
             self.identifier
         ] + command
-        return libiocage.lib.helpers.exec(command, logger=self.logger, **kwargs)
+
+        return libiocage.lib.helpers.exec(
+            command,
+            logger=self.logger,
+            **kwargs
+        )
 
     def passthru(self, command):
+        """
+        Execute a command in a started jail ans passthrough STDIN and STDOUT
+
+        command (list):
+            A list of command and it's arguments
+
+            Example: ["/bin/sh"]
+        """
 
         if isinstance(command, str):
             command = [command]
@@ -228,11 +356,14 @@ class Jail:
         )
 
     def exec_console(self):
+        """
+        Shortcut to drop into a shell of a started jail
+        """
         return self.passthru(
             ["/usr/bin/login"] + self.config["login_flags"]
         )
 
-    def destroy_jail(self):
+    def _destroy_jail(self):
 
         command = ["jail", "-r"]
         command.append(self.identifier)
@@ -243,7 +374,7 @@ class Jail:
             stderr=subprocess.DEVNULL
         )
 
-    def launch_jail(self):
+    def _launch_jail(self):
 
         command = ["jail", "-c"]
 
@@ -338,7 +469,7 @@ class Jail:
             )
             raise
 
-    def start_vimage_network(self):
+    def _start_vimage_network(self):
 
         self.logger.log("Starting VNET/VIMAGE", jail=self)
 
@@ -368,15 +499,15 @@ class Jail:
             net.setup()
             self.networks.append(net)
 
-    def stop_vimage_network(self):
+    def _stop_vimage_network(self):
         for network in self.networks:
             network.teardown()
             self.networks.remove(network)
 
-    def set_nameserver(self):
+    def _configure_nameserver(self):
         self.config["resolver"].apply(self)
 
-    def set_routes(self):
+    def _configure_routes(self):
 
         defaultrouter = self.config["defaultrouter"]
         defaultrouter6 = self.config["defaultrouter6"]
@@ -390,12 +521,12 @@ class Jail:
                 f"setting default IPv4 gateway to {defaultrouter}",
                 jail=self
             )
-            self._set_route(defaultrouter)
+            self._configure_route(defaultrouter)
 
         if defaultrouter6:
-            self._set_route(defaultrouter6, ipv6=True)
+            self._configure_route(defaultrouter6, ipv6=True)
 
-    def _set_route(self, gateway, ipv6=False):
+    def _configure_route(self, gateway, ipv6=False):
 
         ip_version = 4 + 2 * (ipv6 is True)
 
@@ -415,6 +546,9 @@ class Jail:
         self.exec(command)
 
     def require_jail_not_existing(self):
+        """
+        Raise JailAlreadyExists exception if the jail already exists
+        """
         if self.exists:
             raise libiocage.lib.errors.JailAlreadyExists(
                 jail=self,
@@ -422,6 +556,9 @@ class Jail:
             )
 
     def require_jail_existing(self):
+        """
+        Raise JailDoesNotExist exception if the jail does not exist
+        """
         if not self.exists:
             raise libiocage.lib.errors.JailDoesNotExist(
                 jail=self,
@@ -429,6 +566,9 @@ class Jail:
             )
 
     def require_jail_stopped(self):
+        """
+        Raise JailAlreadyRunning exception if the jail is runninhg
+        """
         if self.running:
             raise libiocage.lib.errors.JailAlreadyRunning(
                 jail=self,
@@ -436,6 +576,9 @@ class Jail:
             )
 
     def require_jail_running(self):
+        """
+        Raise JailNotRunning exception if the jail is stopped
+        """
         if not self.running:
             raise libiocage.lib.errors.JailNotRunning(
                 jail=self,
@@ -443,6 +586,9 @@ class Jail:
             )
 
     def update_jail_state(self):
+        """
+        Invoke update of the jail state from jls output
+        """
         try:
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
@@ -479,6 +625,7 @@ class Jail:
                 libiocage.lib.helpers.umount(
                     mountpoint,
                     force=True,
+                    logger=self.logger,
                     ignore_error=True  # maybe it was not mounted
                 )
 
@@ -499,10 +646,21 @@ class Jail:
 
         raise libiocage.lib.errors.JailNotFound(text, logger=self.logger)
 
-    def _get_name(self):
+    @property
+    def name(self):
+        """
+        The name (formerly UUID) of the Jail
+        """
         return self.config["id"]
 
-    def _get_humanreadable_name(self):
+    @property
+    def humanreadable_name(self):
+        """
+        A human-readable identifier to print in logs and CLI output
+
+        Whenever a Jail is found to have a UUID as identifier,
+        a shortened string of the first 8 characters is returned
+        """
 
         try:
             uuid.UUID(self.name)
@@ -517,13 +675,25 @@ class Jail:
 
         raise libiocage.lib.errors.JailUnknownIdentifier(logger=self.logger)
 
-    def _get_stopped(self):
+    @property
+    def stopped(self):
+        """
+        Boolean value that is True if a jail is stopped
+        """
         return self.running is not True
 
-    def _get_running(self):
-        return self._get_jid() is not None
+    @property
+    def running(self):
+        """
+        Boolean value that is True if a jail is running
+        """
+        return self.jid is not None
 
-    def _get_jid(self):
+    @property
+    def jid(self):
+        """
+        The JID of a running jail or None if the jail is not running
+        """
         try:
             return self.jail_state["jid"]
         except (TypeError, AttributeError, KeyError):
@@ -535,17 +705,29 @@ class Jail:
         except (TypeError, AttributeError, KeyError):
             return None
 
-    def _get_identifier(self):
+    @property
+    def identifier(self):
+        """
+        Used internally to identify jails (in snapshots, jls, etc)
+        """
         return f"ioc-{self.config['id']}"
 
-    def _get_exists(self):
+    @property
+    def exists(self):
+        """
+        Boolean value that is True if the Jail datset exists locally
+        """
         try:
             self.dataset
             return True
         except:
             return False
 
-    def _get_release(self):
+    @property
+    def release(self):
+        """
+        The libiocage.Release instance linked with the jail
+        """
         return libiocage.lib.Release.Release(
             name=self.config["release"],
             logger=self.logger,
@@ -553,25 +735,39 @@ class Jail:
             zfs=self.zfs
         )
 
-    def _get_jail_type(self):
-        return self.config["type"]
-
-    def set_dataset_name(self, value=None):
-        self._dataset_name = value
-
-    def _get_dataset_name(self):
+    @property
+    def dataset_name(self):
+        """
+        Name of the jail's base ZFS dataset
+        """
         if self._dataset_name is not None:
             return self._dataset_name
         else:
             return f"{self.host.datasets.root.name}/jails/{self.config['id']}"
 
-    def _get_dataset(self):
-        return self.zfs.get_dataset(self._get_dataset_name())
+    @dataset_name.setter
+    def dataset_name(self, value=None):
+        self._dataset_name = value
 
-    def _get_path(self):
+    @property
+    def dataset(self):
+        """
+        The jail's base ZFS dataset
+        """
+        return self.zfs.get_dataset(self.dataset_name)
+
+    @property
+    def path(self):
+        """
+        Mountpoint of the jail's base ZFS dataset
+        """
         return self.dataset.mountpoint
 
-    def _get_logfile_path(self):
+    @property
+    def logfile_path(self):
+        """
+        Absolute path of the jail log file
+        """
         return f"{self.host.datasets.logs.mountpoint}-console.log"
 
     def __getattr__(self, key):
@@ -601,7 +797,14 @@ class Jail:
 
         raise AttributeError(f"Jail property {key} not found")
 
-    def getattr_str(self, key):
+    def getstring(self, key):
+        """
+        Returns a jail properties string or '-'
+
+        Args:
+            key (string):
+                Name of the jail property to return
+        """
         try:
             return str(self.__getattr__(key))
         except AttributeError:
