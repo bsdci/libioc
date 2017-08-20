@@ -148,9 +148,9 @@ class Logger:
 
     def _create_log_directory(self):
         if os.geteuid() != 0:
-            raise libiocage.lib.errors.MustBeRoot(f"create {self.log_directory}")
+            raise libiocage.lib.errors.MustBeRoot(f"create {log_directory}")
         os.makedirs(self.log_directory, 0x600)
-        self.log("Log directory '{log_directory}' created", level="info")
+        self.log(f"Log directory '{self.log_directory}' created", level="info")
 
     def _get_color_code(self, color_name):
         return Logger.COLORS.index(color_name) + 30
