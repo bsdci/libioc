@@ -31,6 +31,8 @@ cd libiocage
 make install
 ```
 
+Please note: this will build `py-libzfs` from source, which will require `/usr/src` to be populated.
+
 ## Usage
 
 ### Library

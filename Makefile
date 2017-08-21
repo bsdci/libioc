@@ -3,7 +3,7 @@ SERVER=""
 
 install:
 	python3.6 -m ensurepip
-	pkg install -q -y libgit2
+	pkg install -q -y libgit2 libucl cython3
 	pip3.6 install -U .
 uninstall:
 	pip3.6 uninstall -y libiocage
