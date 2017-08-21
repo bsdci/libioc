@@ -19,20 +19,20 @@ import os
 
 class Jail:
     """
-    Iocage unit orchestrates a jail's configuration and manages state
+    iocage unit orchestrates a jail's configuration and manages state
 
-    Jails are represented as zfs dataset `zpool/iocage/jails/<NAME>`
+    Jails are represented as a zfs dataset `zpool/iocage/jails/<NAME>`
 
     Directory Structure:
 
         zpool/iocage/jails/<NAME>: The jail's dataset containing it's
-            configuration and root directory. Iocage legacy used to store
+            configuration and root dataset. iocage-legacy used to store
             a jails configuration as ZFS properties on this dataset. Even
             though the modern JSON config mechanism is preferred.
 
         zpool/iocage/jails/<NAME>/root: This directory is the dataset
-            used as jail path when starting a jail. Usually the origin
-            or a root dataset is a release root directory
+            used as jail's root when starting a jail. Usually the clone source
+            of a root dataset is a snapshot of the release's root dataset.
 
         zpool/iocage/jails/<NAME>/config.json: Jails configured with the latest
             configuration style store their information in a JSON file. When
@@ -40,7 +40,7 @@ class Jail:
             the jail to be a JSON-style jail and ignores other configuration
             mechanisms
 
-        zpool/iocage/jails/<NAME>/config: Another supported configuration
+        zpool/iocage/jails/<NAME>/config: Another compatible configuration
             mechanism is a UCL file. It's content is only taken into account if
             no JSON or ZFS configuration was found
 
@@ -53,7 +53,7 @@ class Jail:
         NullFS Basejail: The fastest method to spawn a basejail by mounting
             read-only directories from the release's root dataset by creating
             a snapshot of the release on each boot of the jail. When a release
-            was updated, the jail is updated as well on the next reboot. This
+            is updated, the jail is updated as well on the next reboot. This
             type is the one used by the Python implementation of iocage.
 
         ZFS Basejail: Legacy basejails used to clone individual datasets from a
