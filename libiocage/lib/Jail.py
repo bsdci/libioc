@@ -444,17 +444,17 @@ class Jail:
 
     def update_jail_state(self):
         try:
+            import json
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
                 "-j",
                 self.identifier,
                 "-v",
-                "-h"
+                "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)
             output = stdout.decode().strip()
 
-            keys, values = [x.split(" ") for x in output.split("\n")]
-            self.jail_state = dict(zip(keys, values))
+            self.jail_state = json.loads(output)["jail-information"]["jail"][0]
 
         except:
             self.jail_state = None
