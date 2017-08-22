@@ -200,8 +200,7 @@ class JailConfig(dict, object):
         return True
 
     def _set_clonejail(self, value, **kwargs):
-        self.data["clonejail"] = "on" if (
-                                             value is True) or (
+        self.data["clonejail"] = "on" if (value is True) or (
                                          value == "on") else "off"
 
     def _get_ip4_addr(self):

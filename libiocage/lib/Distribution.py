@@ -23,6 +23,8 @@ class Distribution:
         libiocage.lib.helpers.init_zfs(self, zfs)
         self.host = host
         self.available_releases = None
+        self.zfs = zfs
+        self.logger = logger
 
     @property
     def name(self):
@@ -63,9 +65,7 @@ class Distribution:
             host=self.host,
             zfs=self.zfs,
             logger=self.logger
-        ),
-                                      self._parse_links(response)
-                                      ))
+        ), self._parse_links(response)))
 
         available_releases = sorted(
             available_releases,
