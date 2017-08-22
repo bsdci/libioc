@@ -244,7 +244,7 @@ class Jail:
 
         return successful
 
-    def create(self, release_name, auto_download=False):
+    def create(self, release_name):
         """
         Create a Jail from a Release
 
@@ -252,11 +252,6 @@ class Jail:
 
             release_name (string):
                 The jail is created from the release matching the name provided
-
-            auto_download (bool): (default=False)
-                When no local release was found, but one with the matching name
-                is available on remote servers, the release is automatically
-                fetched.
         """
 
         self.require_jail_not_existing()
