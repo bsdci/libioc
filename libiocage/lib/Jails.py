@@ -117,7 +117,7 @@ class Jails:
         if key in Jails.JAIL_KEYS:
             return jail.getstring(key)
         else:
-            return str(jail.config["__getattr__"](key))
+            return str(jail.config[key])
 
     def _split_filter_values(self, value):
         values = []
