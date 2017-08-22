@@ -1,13 +1,12 @@
-import libiocage.lib.NetworkInterface
-import libiocage.lib.helpers
-import libiocage.lib.errors
-
 import subprocess
 from hashlib import md5
 
+import libiocage.lib.NetworkInterface
+import libiocage.lib.errors
+import libiocage.lib.helpers
+
 
 class Network:
-
     def __init__(self, jail,
                  nic="vnet0",
                  ipv4_addresses=[],

@@ -24,11 +24,10 @@
 """fetch module for the cli."""
 import click
 
-import libiocage.lib.Release
 import libiocage.lib.Host
 import libiocage.lib.Logger
 import libiocage.lib.Prompts
-
+import libiocage.lib.Release
 
 __rootcmd__ = True
 
@@ -69,7 +68,7 @@ __rootcmd__ = True
 # Compat files
 @click.option("--files", multiple=True,
               help="Specify the files to fetch from the mirror. "
-              "(Deprecared: renamed to --file)")
+                   "(Deprecared: renamed to --file)")
 @click.option("--log-level", "-d", default=None)
 # @click.option("--auth", "-a", default=None, help="Authentication method for "
 #                                                 "HTTP fetching. Valid "
@@ -78,7 +77,6 @@ __rootcmd__ = True
 #               help="Enable or disable verifying SSL cert for HTTP fetching.")
 # def cli(url, files, release, update):
 def cli(ctx, **kwargs):
-
     logger = ctx.parent.logger
     logger.print_level = kwargs["log_level"]
     host = libiocage.lib.Host.Host(logger=logger)
@@ -141,7 +139,6 @@ def cli(ctx, **kwargs):
 
 
 def is_option_enabled(args, name):
-
     try:
         value = args[name]
         if value:

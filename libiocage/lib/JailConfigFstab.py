@@ -4,7 +4,6 @@ import libiocage.lib.helpers
 
 
 class FstabLine(dict):
-
     def __init__(self, data):
         keys = data.keys()
         if "comment" not in keys:
@@ -19,7 +18,6 @@ class FstabLine(dict):
 
 
 class JailConfigFstab(set):
-
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
 
     def __init__(self, jail, logger=None):
@@ -62,13 +60,13 @@ class JailConfigFstab(set):
             destination = os.path.abspath(fragments[1])
 
             new_line = FstabLine({
-                "source": fragments[0],
+                "source"     : fragments[0],
                 "destination": fragments[1],
-                "type": fragments[2],
-                "options": fragments[3],
-                "dump": fragments[4],
-                "passnum": fragments[5],
-                "comment": comment
+                "type"       : fragments[2],
+                "options"    : fragments[3],
+                "dump"       : fragments[4],
+                "passnum"    : fragments[5],
+                "comment"    : comment
             })
 
             if new_line in self:
@@ -108,13 +106,13 @@ class JailConfigFstab(set):
             comment=None):
 
         line = FstabLine({
-            "source": source,
+            "source"     : source,
             "destination": destination,
-            "type": type,
-            "options": options,
-            "dump": dump,
-            "passnum": passnum,
-            "comment": comment
+            "type"       : type,
+            "options"    : options,
+            "dump"       : dump,
+            "passnum"    : passnum,
+            "comment"    : comment
         })
 
         return self.add_line(line)
@@ -140,13 +138,13 @@ class JailConfigFstab(set):
             source = f"{release_directory}/{cloned_release}/root/{basedir}"
             destination = f"{self.jail.path}/root/{basedir}"
             fstab_basejail_lines.append({
-                "source": source,
+                "source"     : source,
                 "destination": destination,
-                "type": "nullfs",
-                "options": "ro",
-                "dump": "0",
-                "passnum": "0",
-                "comment": "iocage-auto"
+                "type"       : "nullfs",
+                "options"    : "ro",
+                "dump"       : "0",
+                "passnum"    : "0",
+                "comment"    : "iocage-auto"
             })
 
         return fstab_basejail_lines

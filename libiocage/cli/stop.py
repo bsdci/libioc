@@ -27,7 +27,6 @@ import click
 import libiocage.lib.Jails
 import libiocage.lib.Logger
 
-
 __rootcmd__ = True
 
 

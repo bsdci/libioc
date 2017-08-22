@@ -3,7 +3,6 @@ import libiocage.lib.helpers
 
 
 class Releases:
-
     def __init__(self, host=None, zfs=None, logger=None):
         libiocage.lib.helpers.init_host(self, host)
         self.logger = logger

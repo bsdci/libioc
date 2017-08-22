@@ -2,7 +2,6 @@ import libiocage.lib.errors
 
 
 class ZFSShareStorage:
-
     @property
     def zfs_datasets(self):
         return self._get_zfs_datasets(auto_create=self.auto_create)

@@ -1,12 +1,12 @@
-import libzfs
 import re
+
+import libzfs
 
 import libiocage.lib.Jail
 import libiocage.lib.helpers
 
 
 class Jails:
-
     # Keys that are stored on the Jail object, not the configuration
     JAIL_KEYS = [
         "jid",

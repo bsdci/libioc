@@ -1,11 +1,10 @@
-import libiocage.lib.helpers
-import libiocage.lib.errors
-
 import libzfs
+
+import libiocage.lib.errors
+import libiocage.lib.helpers
 
 
 class Datasets:
-
     ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc:active"
 
     def __init__(self, root=None, pool=None, zfs=None, logger=None):

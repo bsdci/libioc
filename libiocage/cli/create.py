@@ -24,10 +24,10 @@
 """create module for the cli."""
 import click
 
-import libiocage.lib.Release
+import libiocage.lib.Host
 import libiocage.lib.Jail
 import libiocage.lib.Logger
-import libiocage.lib.Host
+import libiocage.lib.Release
 import libiocage.lib.helpers
 
 __rootcmd__ = True
@@ -80,7 +80,6 @@ def validate_count(ctx, param, value):
 @click.argument("props", nargs=-1)
 def cli(release, template, count, props, pkglist, basejail, basejail_type,
         empty, name, no_fetch, force, log_level):
-
     zfs = libiocage.lib.helpers.get_zfs()
     logger = libiocage.lib.Logger.Logger()
     host = libiocage.lib.Host.Host(logger=logger, zfs=zfs)

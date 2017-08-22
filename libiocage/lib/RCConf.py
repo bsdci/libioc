@@ -1,10 +1,11 @@
 import os
+
 import ucl
 
 import libiocage.lib.helpers
 
-class RCConf(dict):
 
+class RCConf(dict):
     def __init__(self, path, data={}, logger=None, jail=None):
 
         dict.__init__(self, {})
@@ -23,7 +24,7 @@ class RCConf(dict):
     @path.setter
     def path(self, value):
         if self.path != value:
-            new_path = None if value is None else os.path.realpath(value) 
+            new_path = None if value is None else os.path.realpath(value)
             dict.__setattr__(self, "_path", new_path)
             self._read_file()
 
@@ -71,7 +72,6 @@ class RCConf(dict):
             return
 
         with open(self.path, "w") as rcconf:
-
             output = ucl.dump(self, ucl.UCL_EMIT_CONFIG)
             output = output.replace(" = \"", "=\"")
             output = output.replace("\";\n", "\"\n")

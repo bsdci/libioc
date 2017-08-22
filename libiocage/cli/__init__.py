@@ -32,6 +32,7 @@ import sys
 import click
 
 from ..lib.Logger import Logger
+
 logger = Logger()
 
 click.core._verify_python3_env = lambda: None

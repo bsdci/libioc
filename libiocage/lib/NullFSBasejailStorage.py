@@ -3,7 +3,6 @@ import libiocage.lib.helpers
 
 
 class NullFSBasejailStorage:
-
     def apply(self, release=None):
         NullFSBasejailStorage._create_nullfs_directories(self)
 
@@ -33,5 +32,6 @@ class NullFSBasejailStorage:
                     pass
 
     def _create_nullfs_directories(self):
-        for basedir in libiocage.lib.helpers.get_basedir_list() + ["dev", "etc"]:
+        for basedir in libiocage.lib.helpers.get_basedir_list() + ["dev",
+                                                                   "etc"]:
             self.create_jail_mountpoint(basedir)

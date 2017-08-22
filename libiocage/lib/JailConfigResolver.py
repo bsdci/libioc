@@ -1,10 +1,9 @@
-import libiocage.lib.helpers
-
 import shutil
+
+import libiocage.lib.helpers
 
 
 class JailConfigResolver(list):
-
     def __init__(self, jail_config, logger=None):
         list.__init__(self, [])
         libiocage.lib.helpers.init_logger(self, logger)

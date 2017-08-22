@@ -1,10 +1,10 @@
 import json
 import os.path
+
 import libiocage.lib.helpers
 
 
 class JailConfigJSON:
-
     def toJSON(self):
         data = self.data
         for key in data.keys():

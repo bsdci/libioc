@@ -1,7 +1,7 @@
 import libiocage.lib.errors
 
-class AddressSet(set):
 
+class AddressSet(set):
     def __init__(self, jail_config=None, property_name="ip4_address"):
         self.jail_config = jail_config
         set.__init__(self)
@@ -22,8 +22,8 @@ class AddressSet(set):
 
 
 class JailConfigAddresses(dict):
-
-    def __init__(self, value, jail_config=None, property_name="ip4_address", logger=None, skip_on_error=False):
+    def __init__(self, value, jail_config=None, property_name="ip4_address",
+                 logger=None, skip_on_error=False):
         dict.__init__(self, {})
         dict.__setattr__(self, 'logger', logger)
         dict.__setattr__(self, 'jail_config', jail_config)

@@ -1,5 +1,4 @@
 class StandaloneJailStorage:
-
     def apply(self, release):
         self.logger.warn(
             "Standalone jails do not require storage operations to start",

@@ -1,27 +1,26 @@
-import libiocage.lib.helpers
-import libiocage.lib.errors
-
-import os
-import tarfile
-import hashlib
-import libzfs
-import urllib.request
-import shutil
-import uuid
 import datetime
+import hashlib
+import os
+import shutil
+import tarfile
+import urllib.request
+import uuid
 from urllib.parse import urlparse
 
+import libzfs
+
 import libiocage.lib.Jail
+import libiocage.lib.errors
+import libiocage.lib.helpers
 
 
 class Release:
-
     DEFAULT_RC_CONF_SERVICES = {
-        "netif": False,
-        "sendmail": False,
-        "sendmail_submit": False,
+        "netif"             : False,
+        "sendmail"          : False,
+        "sendmail_submit"   : False,
         "sendmail_msp_queue": False,
-        "sendmail_outbound": False
+        "sendmail_outbound" : False
     }
 
     def __init__(self, name=None,
@@ -253,7 +252,7 @@ class Release:
         os.makedirs(release_update_download_dir)
 
         files = {
-            "freebsd-update.sh": "usr.sbin/freebsd-update/freebsd-update.sh",
+            "freebsd-update.sh"  : "usr.sbin/freebsd-update/freebsd-update.sh",
             "freebsd-update.conf": "etc/freebsd-update.conf",
         }
 
@@ -308,11 +307,11 @@ class Release:
         dataset.snapshot(snapshot_name, recursive=True)
 
         jail = libiocage.lib.Jail.Jail({
-            "uuid": str(uuid.uuid4()),
-            "basejail": False,
+            "uuid"              : str(uuid.uuid4()),
+            "basejail"          : False,
             "allow_mount_nullfs": "1",
-            "release": self.name,
-            "securelevel": "0"
+            "release"           : self.name,
+            "securelevel"       : "0"
         },
             logger=self.logger,
             zfs=self.zfs,

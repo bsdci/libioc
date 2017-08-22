@@ -2,7 +2,6 @@ import libiocage.lib.helpers
 
 
 class ZFSBasejailStorage:
-
     def prepare(self):
         self._delete_clone_target_datasets()
 
@@ -21,7 +20,6 @@ class ZFSBasejailStorage:
 
         current_basejail_type = self.jail.config["basejail_type"]
         if not current_basejail_type == "zfs":
-
             raise libiocage.lib.errors.InvalidJailConfigValue(
                 property_name="basejail_type",
                 reason="Expected ZFS, but saw {current_basejail_type}",

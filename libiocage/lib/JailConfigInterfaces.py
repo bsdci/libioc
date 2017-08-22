@@ -1,5 +1,4 @@
 class BridgeSet(set):
-
     def __init__(self, jail_config=None):
         self.jail_config = jail_config
         set.__init__(self)
@@ -22,7 +21,6 @@ class BridgeSet(set):
 
 
 class JailConfigInterfaces(dict):
-
     def __init__(self, value, jail_config=None, property_name="interfaces"):
         dict.__init__(self, {})
         dict.__setattr__(self, 'jail_config', jail_config)

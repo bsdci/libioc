@@ -1,13 +1,12 @@
-import libiocage.lib.Distribution
-import libiocage.lib.Datasets
-import libiocage.lib.helpers
-
 import os
 import platform
 
+import libiocage.lib.Datasets
+import libiocage.lib.Distribution
+import libiocage.lib.helpers
+
 
 class Host:
-
     def __init__(self, root_dataset=None, zfs=None, logger=None):
 
         libiocage.lib.helpers.init_logger(self, logger)

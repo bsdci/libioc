@@ -1,18 +1,17 @@
 import re
 
-import libiocage.lib.JailConfigJSON
-import libiocage.lib.JailConfigInterfaces
 import libiocage.lib.JailConfigAddresses
-import libiocage.lib.JailConfigResolver
 import libiocage.lib.JailConfigFstab
+import libiocage.lib.JailConfigInterfaces
+import libiocage.lib.JailConfigJSON
 import libiocage.lib.JailConfigLegacy
+import libiocage.lib.JailConfigResolver
 import libiocage.lib.JailConfigZFS
-import libiocage.lib.helpers
 import libiocage.lib.errors
+import libiocage.lib.helpers
 
 
 class JailConfig(dict, object):
-
     def __init__(self, data={}, jail=None, logger=None, new=False):
 
         dict.__init__(self)
@@ -55,7 +54,6 @@ class JailConfig(dict, object):
         for key in data:
             self.__setitem__(key, data[key], skip_on_error=skip_on_error)
 
-
     def read(self):
 
         if libiocage.lib.JailConfigJSON.JailConfigJSON.exists(self):
@@ -73,7 +71,7 @@ class JailConfig(dict, object):
                 "Configuration loaded from UCL config file (iocage-legacy)")
             return "ucl"
 
-        elif libiocage.lib.JailConfigZFS.JailConfigZFS.exists(self): 
+        elif libiocage.lib.JailConfigZFS.JailConfigZFS.exists(self):
 
             libiocage.lib.JailConfigZFS.JailConfigZFS.read(self)
             self["legacy"] = True
@@ -203,7 +201,8 @@ class JailConfig(dict, object):
 
     def _set_clonejail(self, value, **kwargs):
         self.data["clonejail"] = "on" if (
-            value is True) or (value == "on") else "off"
+                                             value is True) or (
+                                         value == "on") else "off"
 
     def _get_ip4_addr(self):
         try:
@@ -632,6 +631,5 @@ class JailConfig(dict, object):
 
 
 class JailConfigList(list):
-
     def __str__(self):
         return " ".join(self)

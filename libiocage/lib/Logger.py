@@ -1,9 +1,9 @@
 import os
+
 import libiocage.lib.errors
 
 
 class Logger:
-
     COLORS = (
         "black",
         "red",
@@ -19,14 +19,14 @@ class Logger:
     BOLD_SEQ = "\033[1m"
 
     LOG_LEVEL_SETTINGS = {
-        "info": {"color": None},
-        "notice": {"color": "magenta"},
-        "verbose": {"color": "blue"},
-        "spam": {"color": "green"},
+        "info"    : {"color": None},
+        "notice"  : {"color": "magenta"},
+        "verbose" : {"color": "blue"},
+        "spam"    : {"color": "green"},
         "critical": {"color": "red", "bold": True},
-        "error": {"color": "red"},
-        "debug": {"color": "green"},
-        "warn": {"color": "yellow"}
+        "error"   : {"color": "red"},
+        "debug"   : {"color": "green"},
+        "warn"    : {"color": "yellow"}
     }
 
     LOG_LEVELS = (
@@ -148,7 +148,8 @@ class Logger:
 
     def _create_log_directory(self):
         if os.geteuid() != 0:
-            raise libiocage.lib.errors.MustBeRoot(f"create {self.log_directory}")
+            raise libiocage.lib.errors.MustBeRoot(
+                f"create {self.log_directory}")
         os.makedirs(self.log_directory, 0x600)
         self.log(f"Log directory '{self.log_directory}' created", level="info")
 

@@ -1,9 +1,9 @@
 import libzfs
+
 import libiocage.lib.errors
 
 
 class JailConfigZFS:
-
     property_prefix = "org.freebsd.iocage:"
 
     def read(self):

@@ -1,9 +1,9 @@
-import ucl
 import os.path
+
+import ucl
 
 
 class JailConfigLegacy:
-
     def read(self):
         self.clone(JailConfigLegacy.read_data(self), skip_on_error=True)
 

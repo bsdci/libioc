@@ -1,12 +1,11 @@
-import libiocage.lib.helpers
-
-import pwd
 import grp
 import os
+import pwd
+
+import libiocage.lib.helpers
 
 
 class Storage:
-
     def __init__(self, jail,
                  zfs=None,
                  auto_create=False,

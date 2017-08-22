@@ -25,8 +25,8 @@
 import click
 import texttable
 
-import libiocage.lib.Jails
 import libiocage.lib.Host
+import libiocage.lib.Jails
 import libiocage.lib.Logger
 
 
@@ -53,7 +53,6 @@ import libiocage.lib.Logger
 @click.argument("filters", nargs=-1)
 def cli(ctx, dataset_type, header, _long, remote, plugins,
         _sort, quick, log_level, output, filters):
-
     logger = ctx.parent.logger
     logger.print_level = log_level
 

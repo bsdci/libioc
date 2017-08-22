@@ -1,15 +1,14 @@
-import libiocage.lib.Release
-import libiocage.lib.helpers
-import libiocage.lib.errors
-
 import os
 import platform
 import re
 import urllib.request
 
+import libiocage.lib.Release
+import libiocage.lib.errors
+import libiocage.lib.helpers
+
 
 class Distribution:
-
     release_name_blacklist = [
         "",
         ".",
@@ -65,8 +64,8 @@ class Distribution:
             zfs=self.zfs,
             logger=self.logger
         ),
-            self._parse_links(response)
-        ))
+                                      self._parse_links(response)
+                                      ))
 
         available_releases = sorted(
             available_releases,

@@ -2,7 +2,6 @@ import libiocage.lib.helpers
 
 
 class Prompts:
-
     def __init__(self, host=None):
         libiocage.lib.helpers.init_host(self, host)
 

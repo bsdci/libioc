@@ -2,7 +2,6 @@ import libiocage.lib.helpers
 
 
 class NetworkInterface:
-
     ifconfig_command = "/sbin/ifconfig"
 
     def __init__(self,

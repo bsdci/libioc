@@ -1,9 +1,10 @@
-import libiocage.lib.Host
-import libiocage.lib.Datasets
-import libiocage.lib.Logger
+import subprocess
 
 import libzfs
-import subprocess
+
+import libiocage.lib.Datasets
+import libiocage.lib.Host
+import libiocage.lib.Logger
 
 
 def init_zfs(self, zfs):
@@ -18,7 +19,6 @@ def get_zfs():
 
 
 def init_host(self, host=None):
-
     if host:
         self.host = host
     else:
@@ -46,7 +46,6 @@ def init_logger(self, logger=None):
 
 
 def exec(command, logger=None, ignore_error=False):
-
     if isinstance(command, str):
         command = [command]
 
@@ -97,7 +96,6 @@ def _prettify_output(output):
 
 
 def exec_passthru(command, logger=None):
-
     if isinstance(command, str):
         command = [command]
 
@@ -125,7 +123,6 @@ def shell(command, logger=None):
 
 # ToDo: replace with (u)mount library
 def umount(mountpoint, force=False, ignore_error=False, logger=None):
-
     cmd = ["/sbin/umount"]
 
     if force is True:

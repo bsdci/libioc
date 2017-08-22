@@ -24,9 +24,9 @@
 """get module for the cli."""
 import click
 
-import libiocage.lib.Logger
-import libiocage.lib.Jail
 import libiocage.lib.Host
+import libiocage.lib.Jail
+import libiocage.lib.Logger
 
 
 @click.command(context_settings=dict(
