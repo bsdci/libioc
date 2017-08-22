@@ -806,6 +806,13 @@ class Jail:
         try:
             if key == "jid" and self.__getattr__(key) is None:
                 return "-"
+
+            if key == "running":
+                if self.__getattr__(key):
+                    return "up"
+                else:
+                    return "down"
+
             return str(self.__getattr__(key))
         except AttributeError:
             return "-"
