@@ -135,6 +135,9 @@ class Datasets:
                                pool=None,
                                mountpoint=None):
 
+        if not libiocage.lib.helpers.validate_name(name):
+            raise NameError(f"Invalid 'name' for Dataset: {name}")
+
         try:
             return self.datasets[name]
         except (AttributeError, KeyError):

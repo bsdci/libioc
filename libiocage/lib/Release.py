@@ -36,6 +36,9 @@ class Release:
         libiocage.lib.helpers.init_zfs(self, zfs)
         libiocage.lib.helpers.init_host(self, host)
 
+        if not libiocage.lib.helpers.validate_name(name):
+            raise NameError(f"Invalid 'name' for Release: '{name}'")
+
         self.name = name
         self._hashes = None
         self._dataset = None
