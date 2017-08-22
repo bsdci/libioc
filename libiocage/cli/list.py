@@ -37,7 +37,7 @@ import libiocage.lib.Logger
               flag_value="base", help="List all bases.")
 @click.option("--template", "-t", "dataset_type", flag_value="template",
               help="List all templates.")
-@click.option("--header", "-h", "-H", is_flag=True, default=True,
+@click.option("--header", "-h", "-H", is_flag=True, default=False,
               help="For scripting, use tabs for separators.")
 @click.option("--long", "-l", "_long", is_flag=True, default=False,
               help="Show the full uuid and ip4 address.")
@@ -105,7 +105,12 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
             table_data.sort(key=lambda x: x[sort_index])
 
         table.add_rows([table_head] + table_data)
-        print(table.draw())
+
+        if header:
+            for item in table._rows:
+                print("\t".join(item))
+        else:
+            print(table.draw())
 
     return
 
