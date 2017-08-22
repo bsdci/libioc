@@ -591,6 +591,7 @@ class Jail:
                 "-j",
                 self.identifier,
                 "-v",
+                "-h",
                 "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)
             output = stdout.decode().strip()
