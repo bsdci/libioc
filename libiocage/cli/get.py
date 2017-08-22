@@ -54,10 +54,7 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
         exit(1)
 
     if jail == "":
-        jail_identifier = prop
         prop = ""
-    else:
-        jail_identifier = jail
 
     jail_identifier = jail
     jail = libiocage.lib.Jail.Jail(

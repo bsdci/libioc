@@ -59,9 +59,6 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
     host = libiocage.lib.Host.Host(logger=logger)
     jails = libiocage.lib.Jails.Jails(logger=logger)
 
-    if dataset_type is None:
-        dataset_type = "all"
-
     if remote and not plugins:
 
         available_releases = host.distribution.releases
@@ -106,6 +103,7 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         table.add_rows([table_head] + table_data)
 
         if header:
+            # TODO: This sucks since it's a protected member
             for item in table._rows:
                 print("\t".join(item))
         else:
