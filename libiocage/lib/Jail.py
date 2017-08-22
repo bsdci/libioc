@@ -640,6 +640,9 @@ class Jail:
             self.logger.debug(f"Resolved {text} to uuid {dataset_name}")
             return best_guess
 
+        if not best_guess:
+            raise libiocage.lib.errors.JailNotSupplied(logger=self.logger)
+
         raise libiocage.lib.errors.JailNotFound(text, logger=self.logger)
 
     @property

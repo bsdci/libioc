@@ -48,8 +48,13 @@ class JailNotFound(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
-class JailUnknownIdentifier(IocageException):
+class JailNotSupplied(IocageException):
+    def __init__(self, *args, **kwargs):
+        msg = f"Please supply a jail"
+        super().__init__(msg, *args, **kwargs)
 
+
+class JailUnknownIdentifier(IocageException):
     def __init__(self, *args, **kwargs):
         msg = "The jail has not identifier yet"
         super().__init__(msg, *args, **kwargs)
