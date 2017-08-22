@@ -804,6 +804,8 @@ class Jail:
                 Name of the jail property to return
         """
         try:
+            if key == "jid" and self.__getattr__(key) is None:
+                return "-"
             return str(self.__getattr__(key))
         except AttributeError:
             return "-"
