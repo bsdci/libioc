@@ -160,7 +160,6 @@ def cli(release, template, count, props, pkglist, basejail, basejail_type,
             msg = f"{jail.humanreadable_name} successfully created!{suffix}"
             logger.log(msg)
         except:
-            errors = True
             msg = f"{jail.humanreadable_name} could not be created!{suffix}"
             logger.warn(msg)
             raise
