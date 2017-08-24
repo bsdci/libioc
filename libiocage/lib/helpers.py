@@ -98,7 +98,7 @@ def _prettify_output(output):
 
 # helper function to validate names
 def validate_name(name):
-    validate = re.compile(r'[a-z0-9][a-z0-9\.-_-]{0,31}', re.I)
+    validate = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
 
     return bool(validate.fullmatch(name))
 
