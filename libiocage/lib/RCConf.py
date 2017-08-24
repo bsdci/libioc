@@ -98,15 +98,15 @@ class RCConf(dict):
         if value is True:
             dict.__setitem__(self, key, "YES")
         elif value is False:
-            dict.__setitem__(self, key, "No")
+            dict.__setitem__(self, key, "NO")
         else:
             dict.__setitem__(self, key, str(value))
 
     def __getitem__(self, key):
         value = dict.__getitem__(self, key)
-        if value.lower() == "YES":
+        if value.lower() == "yes":
             return True
-        elif value.lower() == "NO":
+        elif value.lower() == "no":
             return False
         else:
             return value
