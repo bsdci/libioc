@@ -212,15 +212,13 @@ class JailConfig(dict, object):
             self.data["type"] = value
 
     def _get_basejail(self):
-        value = self.data["basejail"]
-        return (value == "on") or (value == "yes")
+        return libiocage.lib.helpers.parse_bool(self.data["basejail"])
 
     def _default_basejail(self):
         return False
 
     def _set_basejail(self, value, **kwargs):
-        # ToDo: generalize boolean value inputs
-        enabled = (value is True) or (value == "on") or (value == "yes")
+        enabled = libiocage.lib.helpers.parse_bool(value)
         if self["legacy"]:
             self.data["basejail"] = "on" if enabled else "off"
         else:
