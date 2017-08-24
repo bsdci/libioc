@@ -144,9 +144,10 @@ def parse_bool(data, default=False):
     return default
 
 
-def try_parse_bool(data):
+def parse_user_input(data):
     """
-    like parse_bool(), but returns the input itself if parsing fails
+    uses parse_bool() to partially return Boolean and NoneType values
+    All other types as returned as-is
 
     >>> parse_bool("YES")
     True
