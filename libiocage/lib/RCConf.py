@@ -89,7 +89,7 @@ class RCConf(dict):
 
     def __setitem__(self, key, value):
 
-        val = libiocage.lib.helpers.try_parse_bool(value)
+        val = libiocage.lib.helpers.parse_user_input(value)
         # normalize booleans
         if isinstance(value, bool):
             dict.__setitem__(self, key,
@@ -100,4 +100,4 @@ class RCConf(dict):
 
     def __getitem__(self, key):
         val = dict.__getitem__(self, key)
-        return libiocage.lib.helpers.try_parse_bool(val)
+        return libiocage.lib.helpers.parse_user_input(val)
