@@ -34,6 +34,7 @@ class Logger:
         "error",
         "warn",
         "info",
+        "notice",
         "verbose",
         "debug",
         "spam",
