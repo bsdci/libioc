@@ -106,7 +106,6 @@ def cli(release, template, count, props, pkglist, basejail, basejail_type,
         zfs=zfs
     )
     if not release.fetched:
-        name = release.name
         if not release.available:
             logger.error(
                 f"The release '{release.name}' does not exist"
