@@ -144,6 +144,23 @@ def try_parse_bool(data):
     return parse_bool(data, data)
 
 
+def get_str_bool(data, true="yes", false="no"):
+    """
+    return a string boolean value using parse_bool(), of specified style
+
+    >>> get_str_bool(True)
+    "yes"
+    >>> get_str_bool(False)
+    "no"
+
+    >>> get_str_bool(True, true="yip", false="nope")
+    "yip"
+    >>> get_str_bool(False, true="yip", false="nope")
+    "nope"
+    """
+    return true if parse_bool(data) else false
+
+
 def exec_passthru(command, logger=None):
     if isinstance(command, str):
         command = [command]

@@ -89,15 +89,15 @@ class RCConf(dict):
 
     def __setitem__(self, key, value):
 
-        value = libiocage.lib.helpers.try_parse_bool(value)
-
-        if value is True:
-            dict.__setitem__(self, key, "YES")
-        elif value is False:
-            dict.__setitem__(self, key, "NO")
+        val = libiocage.lib.helpers.try_parse_bool(value)
+        # normalize booleans
+        if isinstance(value, bool):
+            dict.__setitem__(self, key,
+                             libiocage.lib.helpers.get_str_bool(
+                                 value, true="YES", false="NO"))
         else:
-            dict.__setitem__(self, key, str(value))
+            dict.__setitem__(self, key, str(val))
 
     def __getitem__(self, key):
-        value = dict.__getitem__(self, key)
-        return libiocage.lib.helpers.try_parse_bool(value)
+        val = dict.__getitem__(self, key)
+        return libiocage.lib.helpers.try_parse_bool(val)
