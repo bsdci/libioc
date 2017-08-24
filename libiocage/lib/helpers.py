@@ -116,14 +116,28 @@ def parse_bool(data, default=False):
     True
     >>> parse_bool("false")
     False
-    >>> parse_bool("-")
+    >>> parse_bool("/opt/android-studio/build.txt")
     False
+
+    Note that "-" gets a special treatment:
+
+    >>> parse_bool("-")
+    None
+
+    The behavior of the default parameter can be used to create a
+    pass-thru function:
+
+    >>> data = "/opt/android-studio/build.txt"
+    >>> parse_bool(data, data)
+    "/opt/android-studio/build.txt"
     """
 
     if isinstance(data, bool):
         return data
     if isinstance(data, str):
-        if data.lower() in ["yes", "true", "on", "1"]:
+        if data == "-":
+            return None
+        elif data.lower() in ["yes", "true", "on", "1"]:
             return True
         elif data.lower() in ["no", "false", "off", "0"]:
             return False
