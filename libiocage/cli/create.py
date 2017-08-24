@@ -113,8 +113,8 @@ def cli(release, template, count, props, pkglist, basejail, basejail_type,
             exit(1)
 
         msg = (
-            f"The release '{release.name}' is available,"
-            "but not downloaded yet"
+            f"The release '{release.name}' is available, but not downloaded"
+            " yet"
         )
         if no_fetch:
             logger.error(msg)
