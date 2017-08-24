@@ -89,11 +89,7 @@ class RCConf(dict):
 
     def __setitem__(self, key, value):
 
-        if isinstance(value, str):
-            if value.lower() == "yes":
-                value = True
-            elif value.lower() == "no":
-                value = False
+        value = libiocage.lib.helpers.try_parse_bool(value)
 
         if value is True:
             dict.__setitem__(self, key, "YES")
@@ -104,9 +100,4 @@ class RCConf(dict):
 
     def __getitem__(self, key):
         value = dict.__getitem__(self, key)
-        if value.lower() == "yes":
-            return True
-        elif value.lower() == "no":
-            return False
-        else:
-            return value
+        return libiocage.lib.helpers.try_parse_bool(value)

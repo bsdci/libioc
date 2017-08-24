@@ -103,6 +103,47 @@ def validate_name(name):
     return bool(validate.fullmatch(name))
 
 
+# data -> bool | default
+def parse_bool(data, default=False):
+    """
+    try to parse booleans from strings
+
+    On success, it returns the parsed boolean
+    on failure it returns the `default`.
+    By default, `default` is `False`.
+
+    >>> parse_bool("YES")
+    True
+    >>> parse_bool("false")
+    False
+    >>> parse_bool("-")
+    False
+    """
+
+    if isinstance(data, bool):
+        return data
+    if isinstance(data, str):
+        if data.lower() in ["yes", "true", "on", "1"]:
+            return True
+        elif data.lower() in ["no", "false", "off", "0"]:
+            return False
+    return default
+
+
+def try_parse_bool(data):
+    """
+    like parse_bool(), but returns the input itself if parsing fails
+
+    >>> parse_bool("YES")
+    True
+    >>> parse_bool("false")
+    False
+    >>> parse_bool(8.4)
+    8.4
+    """
+    return parse_bool(data, data)
+
+
 def exec_passthru(command, logger=None):
     if isinstance(command, str):
         command = [command]
