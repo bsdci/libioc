@@ -156,7 +156,7 @@ def cli(release, template, count, props, pkglist, basejail, basejail_type,
 
         suffix = f" ({i}/{count})" if count > 1 else ""
         try:
-            jail.create(release.name, auto_download=True)
+            jail.create(release.name)
             msg = f"{jail.humanreadable_name} successfully created!{suffix}"
             logger.log(msg)
         except:
