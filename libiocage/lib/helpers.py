@@ -114,6 +114,39 @@ def exec_passthru(command, logger=None):
     return subprocess.Popen(command).communicate()
 
 
+def exec_raw(command, logger=None, **kwargs):
+    if isinstance(command, str):
+        command = [command]
+
+    command_str = " ".join(command)
+    if logger:
+        logger.spam(f"Executing (raw): {command_str}")
+
+    return subprocess.Popen(
+        command,
+        **kwargs
+    )
+
+
+def exec_iter(command, logger=None):
+
+    process = exec_raw(
+        command,
+        logger=logger,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True
+    )
+
+    for stdout_line in iter(process.stdout.readline, ""):
+        yield stdout_line
+
+    process.stdout.close()
+
+    return_code = process.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
 def shell(command, logger=None):
     if not isinstance(command, str):
         command = " ".join(command)
@@ -153,8 +186,9 @@ def umount(mountpoint, force=False, ignore_error=False, logger=None):
             raise libiocage.lib.errors.UnmountFailed(logger=logger)
 
 
-def get_basedir_list():
-    return [
+def get_basedir_list(distribution_name="FreeBSD"):
+
+    basedirs = [
         "bin",
         "boot",
         "lib",
@@ -168,5 +202,9 @@ def get_basedir_list():
         "usr/sbin",
         "usr/share",
         "usr/libdata",
-        "usr/lib32"
     ]
+
+    if distribution_name == "FreeBSD":
+        basedirs.append("usr/lib32")
+
+    return basedirs

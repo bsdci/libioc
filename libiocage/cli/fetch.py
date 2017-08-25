@@ -80,11 +80,14 @@ def cli(ctx, **kwargs):
     logger = ctx.parent.logger
     logger.print_level = kwargs["log_level"]
     host = libiocage.lib.Host.Host(logger=logger)
-    prompts = libiocage.lib.Prompts.Prompts(host=host)
+    prompts = libiocage.lib.Prompts.Prompts(host=host, logger=logger)
 
     release_input = kwargs["release"]
     if release_input is None:
-        release = prompts.release()
+        try:
+            release = prompts.release()
+        except DefaultReleaseNotFound:
+            exit(1)
     else:
         try:
             release = libiocage.lib.Release.Release(

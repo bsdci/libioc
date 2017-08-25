@@ -35,6 +35,11 @@ class JailConfigAddresses(dict):
 
     def read(self, config_line):
 
+        config_line = config_line.strip()
+
+        if config_line == "" or config_line == "-" or config_line == "none":
+            return
+
         ip_addresses = config_line.split(" ")
         for ip_address_string in ip_addresses:
 
@@ -62,7 +67,7 @@ class JailConfigAddresses(dict):
             addresses = [addresses]
 
         try:
-            prop = dict.__getitem__(self, nic)
+            prop = self[nic]
         except KeyError:
             prop = self.__empty_prop(nic)
 

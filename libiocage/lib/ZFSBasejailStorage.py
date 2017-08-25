@@ -28,7 +28,11 @@ class ZFSBasejailStorage:
 
         ZFSBasejailStorage._create_mountpoints(self)
 
-        for basedir in libiocage.lib.helpers.get_basedir_list():
+        basedirs = libiocage.lib.helpers.get_basedir_list(
+            distribution_name=self.jail.host.distribution.name
+        )
+
+        for basedir in basedirs:
             source_dataset_name = f"{release.base_dataset.name}/{basedir}"
             target_dataset_name = f"{self.jail_root_dataset_name}/{basedir}"
             self.clone_zfs_dataset(source_dataset_name, target_dataset_name)

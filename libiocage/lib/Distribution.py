@@ -21,7 +21,7 @@ class Distribution:
     def __init__(self, host, zfs=None, logger=None):
         libiocage.lib.helpers.init_logger(self, logger)
         libiocage.lib.helpers.init_zfs(self, zfs)
-        self.host = host
+        libiocage.lib.helpers.init_host(self, host)
         self.available_releases = None
         self.zfs = zfs
         self.logger = logger
@@ -56,32 +56,57 @@ class Distribution:
 
     def fetch_releases(self):
 
+        self.logger.spam(f"Fetching release list from '{self.mirror_url}'")
+
         resource = urllib.request.urlopen(self.mirror_url)
         charset = resource.headers.get_content_charset()
         response = resource.read().decode(charset if charset else "UTF-8")
 
-        available_releases = list(map(lambda x: libiocage.lib.Release.Release(
-            name=x,
-            host=self.host,
-            zfs=self.zfs,
-            logger=self.logger
-        ), self._parse_links(response)))
+        found_releases = self._parse_links(response)
 
         available_releases = sorted(
-            available_releases,
-            key=lambda x: float(x.name.partition("-")[0])
+            map( # map long HardenedBSD release names
+                self._map_available_release,
+                filter( # filter out other CPU architectures on HardenedBSD
+                    self._filter_available_releases,
+                    found_releases
+                )
+            )
         )
 
-        self.available_releases = available_releases
-        return available_releases
+        self.available_releases = list(map(
+            lambda x: libiocage.lib.Release.Release(
+                name=x,
+                host=self.host,
+                zfs=self.zfs,
+                logger=self.logger
+            ),
+            available_releases
+        ))
+        return self.available_releases
+
+    def _map_available_release(self, release_name):
+        if self.name == "HardenedBSD":
+            # e.g. HardenedBSD-11-STABLE-libressl-amd64-LATEST
+            return "-".join(release_name.split("-")[1:-2])
+        return release_name        
+
+    def _filter_available_releases(self, release_name):
+        if self.name != "HardenedBSD":
+            return True
+        arch = release_name.split("-")[-2:][0]
+        return self.host.processor == arch
 
     def get_release_trunk_file_url(self, release, filename):
 
         if self.host.distribution.name == "HardenedBSD":
-            # ToDo: implement HardenedBSD release updates
-            raise libiocage.lib.errors.MissingFeature(
-                "Updates of HardenedBSD releases not supported yet"
-            )
+
+            return "/".join([
+                "https://raw.githubusercontent.com/HardenedBSD/hardenedBSD",
+                release.hbds_release_branch,
+                filename
+            ])
+
         elif self.host.distribution.name == "FreeBSD":
 
             if release.name == "11.0-RELEASE":
@@ -95,24 +120,19 @@ class Distribution:
 
     @property
     def releases(self):
-        if not self.available_releases:
+        if self.available_releases is None:
             self.fetch_releases()
         return self.available_releases
 
     def _parse_links(self, text):
         blacklisted_releases = Distribution.release_name_blacklist
         matches = filter(lambda y: y not in blacklisted_releases,
-                         map(lambda z: z.strip("\"/"),
-                             re.findall(
-                                 Distribution.mirror_link_pattern,
-                                 text,
-                                 re.MULTILINE)
-                             )
-                         )
-
-        if self.name == "HardenedBSD":
-            matches = filter(
-                lambda x: x.endswith(f"-{self.host.processor}-LATEST")
+            map(lambda z: z.strip("\"/"),
+                re.findall(
+                Distribution.mirror_link_pattern,
+                text,
+                re.MULTILINE)
             )
+         )
 
         return matches
