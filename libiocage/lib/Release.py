@@ -8,6 +8,7 @@ import uuid
 from urllib.parse import urlparse
 
 import libzfs
+import ucl
 
 import libiocage.lib.Jail
 import libiocage.lib.errors
@@ -36,8 +37,8 @@ class Release:
         libiocage.lib.helpers.init_zfs(self, zfs)
         libiocage.lib.helpers.init_host(self, host)
 
-        if not libiocage.lib.helpers.validate_name(name):
-            raise NameError(f"Invalid 'name' for Release: '{name}'")
+        # if not libiocage.lib.helpers.validate_name(name):
+        #     raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name
         self._hashes = None
@@ -47,6 +48,7 @@ class Release:
         self.check_hashes = check_hashes is True
         self.auto_fetch_updates = auto_fetch_updates is True
         self.auto_update = auto_update is True
+        self._hbsd_release_branch = None
 
         self._assets = ["base"]
         if self.host.distribution.name != "HardenedBSD":
@@ -138,6 +140,12 @@ class Release:
         )
 
     @property
+    def real_name(self):
+        if self.host.distribution.name == "HardenedBSD":
+            return f"HardenedBSD-{self.name}-{self.host.processor}-LATEST"
+        return self.name
+
+    @property
     def mirror_url(self):
         try:
             if self._mirror_url:
@@ -155,7 +163,7 @@ class Release:
 
     @property
     def remote_url(self):
-        return f"{self.mirror_url}/{self.name}"
+        return f"{self.mirror_url}/{self.real_name}"
 
     @property
     def available(self):
@@ -197,7 +205,7 @@ class Release:
     def hashes(self):
         if not self._hashes:
             if not os.path.isfile(self.__get_hashfile_location()):
-                self.logger.spam("hashes have not yet been downloaded.")
+                self.logger.spam("hashes have not yet been downloaded")
                 self._fetch_hashes()
             self._hashes = self.read_hashes()
 
@@ -210,6 +218,33 @@ class Release:
     @property
     def release_updates_dir(self):
         return f"{self.dataset.mountpoint}/updates"
+
+    @property
+    def hbds_release_branch(self):
+
+        if self._hbsd_release_branch is not None:
+            return self._hbsd_release_branch
+
+        if self.fetched is False:
+            raise libiocage.lib.errors.ReleaseNotFetched(
+                release_name=self.name,
+                logger=self.logger
+            )
+
+        source_file = f"{self.root_dataset.mountpoint}/etc/hbsd-update.conf"
+
+        if not os.path.isfile(source_file):
+            raise libiocage.lib.errors.ReleaseUpdateBranchLookup(
+                release_name=self.name,
+                reason=f"{source_file} not found",
+                logger=self.logger
+            )
+
+        with open(source_file, "r") as f:
+            hbsd_update_conf = ucl.load(f.read())
+            self._hbsd_release_branch = hbsd_update_conf["branch"]
+            return self._hbsd_release_branch
+
 
     def fetch(self, update=None, fetch_updates=None):
 
@@ -254,9 +289,18 @@ class Release:
 
         os.makedirs(release_update_download_dir)
 
+        if self.host.distribution.name == "HardenedBSD":
+            update_name = "hbsd-update"
+            update_script_name = "hbsd-update"
+            update_conf_name = "hbsd-update.conf"
+        else:
+            update_name = "freebsd-update"
+            update_script_name = "freebsd-update.sh"
+            update_conf_name = "freebsd-update.conf"
+
         files = {
-            "freebsd-update.sh"  : "usr.sbin/freebsd-update/freebsd-update.sh",
-            "freebsd-update.conf": "etc/freebsd-update.conf",
+            update_script_name: f"usr.sbin/{update_name}/{update_script_name}",
+            update_conf_name: f"etc/{update_conf_name}",
         }
 
         for key in files.keys():
@@ -275,15 +319,20 @@ class Release:
             self.logger.verbose(f"Downloading {url}")
             urllib.request.urlretrieve(url, local_path)
 
-            if key == "freebsd-update.sh":
+            if key == update_script_name:
                 os.chmod(local_path, 0o755)
-            elif key == "freebsd-update.conf":
-                with open(local_path, "r+") as f:
-                    content = f.read()
-                    f.seek(0)
-                    f.write(content.replace("Components src", "Components"))
-                    f.truncate()
-                    f.close()
+            elif key == update_conf_name:
+
+                if self.host.distribution.name == "FreeBSD":
+                    with open(local_path, "r+") as f:
+                        content = f.read()
+                        f.seek(0)
+                        f.write(content.replace(
+                            "Components src",
+                            "Components"
+                        ))
+                        f.truncate()
+                        f.close()
                 os.chmod(local_path, 0o644)
 
             self.logger.debug(
@@ -291,13 +340,23 @@ class Release:
                 f" saved to {local_path}"
             )
 
+        if self.host.distribution.name == "HardenedBSD":
+            """
+            Updates in Hardened BSD are directly executed in a jail, so that we
+            do not need to pre-fetch the updates
+            """
+            self.logger.debug(
+                "No pre-fetching of HardenedBSD updates required - skipping"
+            )
+            return
+
         self.logger.verbose(f"Fetching updates for release '{self.name}'")
         libiocage.lib.helpers.exec([
-            f"{self.release_updates_dir}/freebsd-update.sh",
+            f"{self.release_updates_dir}/{update_script_name}",
             "-d",
             release_update_download_dir,
             "-f",
-            f"{self.release_updates_dir}/freebsd-update.conf",
+            f"{self.release_updates_dir}/{update_conf_name}",
             "--not-running-from-cron",
             "fetch"
         ], logger=self.logger)
@@ -310,18 +369,79 @@ class Release:
         dataset.snapshot(snapshot_name, recursive=True)
 
         jail = libiocage.lib.Jail.Jail({
-            "uuid"              : str(uuid.uuid4()),
-            "basejail"          : False,
-            "allow_mount_nullfs": "1",
-            "release"           : self.name,
-            "securelevel"       : "0"
-        },
+                "uuid"              : str(uuid.uuid4()),
+                "basejail"          : False,
+                "allow_mount_nullfs": "1",
+                "release"           : self.name,
+                "securelevel"       : "0"
+            },
+            new=True,
             logger=self.logger,
             zfs=self.zfs,
             host=self.host
         )
 
         jail.dataset_name = self.dataset_name
+
+        changed = False
+        try:
+            if self.host.distribution.name == "HardenedBSD":
+                changed = self._update_hbsd_jail(jail)
+            else:
+                changed = self._update_freebsd_jail(jail)
+        except:
+            self.logger.verbose(
+                "There was an error updating the Jail - reverting the changes"
+            )
+            jail.stop(force=True)
+            self.zfs.get_snapshot(snapshot_name).rollback(force=True)
+            raise
+
+        return changed
+
+
+    def _update_hbsd_jail(self, jail):
+
+        jail.start()
+
+        update_script_path = f"{self.release_updates_dir}/hbsd-update"
+        update_conf_path = f"{self.release_updates_dir}/hbsd-update.conf"
+
+        try:
+
+            # ToDo: as bad as print() - replace passthru with a nice progress bar
+            stdout = libiocage.lib.helpers.exec_iter([
+                update_script_path,
+                "-c",
+                update_conf_path,
+                "-j",
+                jail.identifier,
+                "-V"
+            ], logger=self.logger)
+
+            for stdout_line in stdout:
+                self.logger.verbose(stdout_line.strip("\n"), indent=1)
+
+            self.logger.debug(f"Update of release '{self.name}' finished")
+            changed = True
+
+        except:
+
+            raise
+            raise libiocage.lib.errors.ReleaseUpdateFailure(
+                release_name=self.name,
+                reason=(
+                    "hbsd-update failed"
+                ),
+                logger=self.logger
+            )
+
+        jail.stop()
+
+        self.logger.verbose(f"Release '{self.name}' updated")
+        return changed
+
+    def _update_freebsd_jail(self, jail):
 
         local_update_mountpoint = f"{self.root_dir}/var/db/freebsd-update"
         if not os.path.isdir(local_update_mountpoint):
@@ -330,55 +450,48 @@ class Release:
             )
             os.makedirs(local_update_mountpoint)
 
-        try:
+        jail.config.fstab.add(
+            self.release_updates_dir,
+            local_update_mountpoint,
+            "nullfs",
+            "rw"
+        )
+        jail.config.fstab.save()
 
-            jail.config.fstab.add(
-                self.release_updates_dir,
-                local_update_mountpoint,
-                "nullfs",
-                "rw"
-            )
-            jail.config.fstab.save()
+        jail.start()
 
-            jail.start()
+        child, stdout, stderr = jail.exec([
+            "/var/db/freebsd-update/freebsd-update.sh",
+            "-d",
+            "/var/db/freebsd-update",
+            "-f",
+            "/var/db/freebsd-update/freebsd-update.conf",
+            "install"
+        ], ignore_error=True, logger=self.logger)
 
-            child, stdout, stderr = jail.exec([
-                "/var/db/freebsd-update/freebsd-update.sh",
-                "-d",
-                "/var/db/freebsd-update",
-                "-f",
-                "/var/db/freebsd-update/freebsd-update.conf",
-                "install"
-            ], ignore_error=True)
-
-            if child.returncode == 1:
-                if "No updates are available to install." in stdout:
-                    self.logger.debug("Already up to date")
-                    changed = True
-                else:
-                    raise libiocage.lib.errors.ReleaseUpdateFailure(
-                        reason=(
-                            "freebsd-update.sh exited "
-                            "with returncode {child.returncode}"
-                        ),
-                        logger=self.logger
-                    )
-            else:
-                self.logger.debug(f"Update of release '{self.name}' finished")
+        if child.returncode == 1:
+            if "No updates are available to install." in stdout:
+                self.logger.debug("Already up to date")
                 changed = True
+            else:
+                raise libiocage.lib.errors.ReleaseUpdateFailure(
+                    release_name=self.name,
+                    reason=(
+                        "freebsd-update.sh exited "
+                        f"with returncode {child.returncode}"
+                    ),
+                    logger=self.logger
+                )
+        else:
+            self.logger.debug(f"Update of release '{self.name}' finished")
+            changed = True
 
-            jail.stop()
+        jail.stop()
 
-            self.logger.verbose(f"Release '{self.name}' updated")
-            return changed
+        self.logger.verbose(f"Release '{self.name}' updated")
+        return changed
 
-        except:
-            self.logger.verbose(
-                "There was an error updating the Jail - reverting the changes"
-            )
-            jail.stop(force=True)
-            self.zfs.get_snapshot(snapshot_name).rollback(force=True)
-            raise
+        
 
     def _append_datetime(self, text):
         now = datetime.datetime.utcnow()
@@ -460,6 +573,7 @@ class Release:
                 fingerprint = None
                 asset = None
                 for x in s:
+                    x = x.strip("()")
                     if len(x) == 64:
                         fingerprint = x
                     elif x.endswith(".txz"):
@@ -531,7 +645,11 @@ class Release:
         base_dataset = self.base_dataset
         pool = self.host.datasets.base.pool
 
-        for folder in libiocage.lib.helpers.get_basedir_list():
+        basedirs = libiocage.lib.helpers.get_basedir_list(
+            distribution_name=self.host.distribution.name
+        )
+
+        for folder in basedirs:
             try:
                 pool.create(
                     f"{base_dataset.name}/{folder}",

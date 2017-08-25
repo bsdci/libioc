@@ -2,7 +2,8 @@ import libiocage.lib.helpers
 
 
 class Prompts:
-    def __init__(self, host=None):
+    def __init__(self, host=None, logger=None):
+        self.logger = logger
         libiocage.lib.helpers.init_host(self, host)
 
     def release(self):
@@ -17,10 +18,19 @@ class Prompts:
                 print(f"[{i}] {available_release.name}")
             i += 1
 
-        default_release = available_releases[default]
-        selection = input(f"Release ({default_release.name}) [{default}]: ")
+        if default is not None:
+            default_release = available_releases[default]
+            selection = input(f"Release ({default_release.name}) [{default}]: ")
+        else:
+            default_release = None
+            selection = input("Your selection: ")
 
         if selection == "":
+            if default_release is None:
+                raise libiocage.lib.errors.DefaultReleaseNotFound(
+                    host_release_name=self.host.release_version,
+                    logger=self.logger
+                )
             return default_release
         else:
             return available_releases[int(selection)]

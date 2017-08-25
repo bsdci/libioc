@@ -130,8 +130,12 @@ class JailConfigFstab(set):
         if not (basejail and basejail_type == "nullfs"):
             return []
 
+        basedirs = libiocage.lib.helpers.get_basedir_list(
+            distribution_name=self.jail.host.distribution.name
+        )
+
         fstab_basejail_lines = []
-        for basedir in libiocage.lib.helpers.get_basedir_list():
+        for basedir in basedirs:
             release_directory = self.jail.host.datasets.releases.mountpoint
 
             cloned_release = self.jail.config["cloned_release"]

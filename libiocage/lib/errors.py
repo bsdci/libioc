@@ -253,6 +253,31 @@ class IllegalReleaseAssetContent(ReleaseUpdateFailure):
         super().__init__(release_name, reason=msg, *args, **kwargs)
 
 
+class ReleaseNotFetched(IocageException):
+    def __init__(self, release_name, *args, **kwargs):
+        msg = f"Release '{release_name}' is not fetched locally"
+        super.__init__(msg, *args, **kwargs)
+
+
+class ReleaseUpdateBranchLookup(IocageException):
+    def __init__(self, release_name, reason=None, *args, **kwargs):
+        msg = f"Update source of release '{release_name}' not found"
+        if reason is not None:
+            msg += ": {reason}"
+        super.__init__(msg, *args, **kwargs)
+
+# Prompts
+
+
+class DefaultReleaseNotFound(IocageException):
+    def __init__(self, host_release_name, *args, **kwargs):
+        msg = (
+            f"Release '{host_release_name}' not found: "
+            "Could not determine a default source"
+        )
+        super().__init__(msg, *args, **kwargs)
+
+
 # Missing Features
 
 

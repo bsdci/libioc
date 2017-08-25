@@ -102,7 +102,8 @@ class Jail:
         self._dataset_name = None
         self._rc_conf = None
 
-        self.config.read()
+        if new is False:
+            self.config.read()
 
     @property
     def zfs_pool_name(self):
