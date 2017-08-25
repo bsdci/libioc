@@ -51,7 +51,6 @@ def cli(ctx, rc, jails, log_level):
         try:
             jail.start()
         except Exception:
-            raise
             exit(1)
 
         logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")
