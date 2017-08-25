@@ -85,6 +85,7 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
 
         if value:
             print(value)
+            return
         else:
             logger.error(f"Unknown property '{prop}'")
             exit(1)
