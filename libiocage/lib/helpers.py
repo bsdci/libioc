@@ -116,7 +116,7 @@ def parse_bool(data, default=False):
     True
     >>> parse_bool("false")
     False
-    >>> parse_bool("/opt/android-studio/build.txt")
+    >>> parse_bool("/etc/passwd")
     False
 
     Note that "-" gets a special treatment:
@@ -127,9 +127,9 @@ def parse_bool(data, default=False):
     The behavior of the default parameter can be used to create a
     pass-thru function:
 
-    >>> data = "/opt/android-studio/build.txt"
-    >>> parse_bool(data, data)
-    "/opt/android-studio/build.txt"
+    >>> default = "/etc/passwd"
+    >>> parse_bool(default, default)
+    "/etc/passwd"
     """
 
     if isinstance(data, bool):
