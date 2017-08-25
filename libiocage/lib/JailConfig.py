@@ -12,6 +12,39 @@ import libiocage.lib.helpers
 
 
 class JailConfig(dict, object):
+    """
+    Represents an iocage jail's configuration
+
+    A jail configuration can be loaded from various formats that were used
+    by different versions of iocage. Technically it is possible to store
+    set properties in deprecated formats, but this might break when using
+    newer features than the legacy version of iocage supports. It is
+    recommended to use the reading capabilities to migrate to the JSON
+    config format.
+
+    Supported Configuration Formats:
+
+        JSON: (current)
+            Since the Python 3 implementation iocage stored jail configs in
+            a file called `config.json` within the jail's root dataset
+
+        ZFS:
+            iocage-legacy written in Bash used to save jail configurations
+            as ZFS properties on the jail's root dataset. Due to poor
+            performance and easier readability this format later was replaced
+            with a file based config storage. Even though it is a deprecated
+            format, libiocage is compatible to read a jail config from ZFS.
+
+        UCL:
+            Yet another deprecated configuration format, that libiocage also
+            supports reading from. A legacy version of iocage used this format.
+
+    Special Properties:
+
+        Special properties are 
+
+    """
+
     def __init__(self, data={}, jail=None, logger=None, new=False):
 
         dict.__init__(self)
