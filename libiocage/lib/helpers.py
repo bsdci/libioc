@@ -103,6 +103,79 @@ def validate_name(name):
     return bool(validate.fullmatch(name))
 
 
+# data -> bool | default
+def parse_bool(data, default=False):
+    """
+    try to parse booleans from strings
+
+    On success, it returns the parsed boolean
+    on failure it returns the `default`.
+    By default, `default` is `False`.
+
+    >>> parse_bool("YES")
+    True
+    >>> parse_bool("false")
+    False
+    >>> parse_bool("/etc/passwd")
+    False
+
+    Note that "-" gets a special treatment:
+
+    >>> parse_bool("-")
+    None
+
+    The behavior of the default parameter can be used to create a
+    pass-thru function:
+
+    >>> default = "/etc/passwd"
+    >>> parse_bool(default, default)
+    "/etc/passwd"
+    """
+
+    if isinstance(data, bool):
+        return data
+    if isinstance(data, str):
+        if data == "-":
+            return None
+        elif data.lower() in ["yes", "true", "on", "1"]:
+            return True
+        elif data.lower() in ["no", "false", "off", "0"]:
+            return False
+    return default
+
+
+def parse_user_input(data):
+    """
+    uses parse_bool() to partially return Boolean and NoneType values
+    All other types as returned as-is
+
+    >>> parse_bool("YES")
+    True
+    >>> parse_bool("false")
+    False
+    >>> parse_bool(8.4)
+    8.4
+    """
+    return parse_bool(data, data)
+
+
+def get_str_bool(data, true="yes", false="no"):
+    """
+    return a string boolean value using parse_bool(), of specified style
+
+    >>> get_str_bool(True)
+    "yes"
+    >>> get_str_bool(False)
+    "no"
+
+    >>> get_str_bool(True, true="yip", false="nope")
+    "yip"
+    >>> get_str_bool(False, true="yip", false="nope")
+    "nope"
+    """
+    return true if parse_bool(data) else false
+
+
 def exec_passthru(command, logger=None):
     if isinstance(command, str):
         command = [command]
