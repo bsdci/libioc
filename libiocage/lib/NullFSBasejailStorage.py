@@ -35,6 +35,6 @@ class NullFSBasejailStorage:
         basedirs = libiocage.lib.helpers.get_basedir_list(
             distribution_name=self.jail.host.distribution.name
         ) + ["dev", "etc"]
-        
+
         for basedir in basedirs:
             self.create_jail_mountpoint(basedir)

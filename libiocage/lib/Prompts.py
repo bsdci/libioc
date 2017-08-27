@@ -21,7 +21,9 @@ class Prompts:
 
         if default is not None:
             default_release = available_releases[default]
-            selection = input(f"Release ({default_release.name}) [{default}]: ")
+            selection = input(
+                f"Release ({default_release.name}) [{default}]: "
+            )
         else:
             default_release = None
             selection = input("Your selection: ")

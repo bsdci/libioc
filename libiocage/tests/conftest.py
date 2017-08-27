@@ -1,6 +1,10 @@
+import helper_functions
+import libzfs
 import pytest
 
-import helper_functions
+import libiocage.lib.Host
+import libiocage.lib.Logger
+import libiocage.lib.Release
 
 # Inject lib directory to path
 # iocage_lib_dir = os.path.abspath(os.path.join(
@@ -29,13 +33,11 @@ def force_clean():
 
 @pytest.fixture
 def zfs():
-    import libzfs
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
 
 
 @pytest.fixture
 def pool(zfs, logger):
-
     # find active zpool
     active_pool = None
     for pool in zfs.pools:
@@ -49,7 +51,8 @@ def pool(zfs, logger):
 
     if active_pool is None:
         logger.error("No ZFS pool was activated."
-            "Please activate or specify a pool using the --pool option")
+                     " Please activate or specify a pool using the"
+                     " --pool option")
         exit(1)
 
     return active_pool
@@ -57,13 +60,11 @@ def pool(zfs, logger):
 
 @pytest.fixture
 def logger():
-    import libiocage.lib.Logger
     return libiocage.lib.Logger.Logger()
 
 
 @pytest.fixture
 def root_dataset(force_clean, zfs, pool):
-
     dataset_name = f"{pool.name}/iocage-test"
 
     if force_clean:
@@ -92,13 +93,15 @@ def root_dataset(force_clean, zfs, pool):
 
 @pytest.fixture
 def host(root_dataset, logger, zfs):
-    import libiocage.lib.Host
-    host = libiocage.lib.Host.Host(root_dataset=root_dataset, logger=logger, zfs=zfs)
+    host = libiocage.lib.Host.Host(
+        root_dataset=root_dataset, logger=logger, zfs=zfs
+    )
     yield host
     del host
 
 
 @pytest.fixture
 def release(host, logger, zfs):
-    import libiocage.lib.Release
-    return libiocage.lib.Release.Release(name=host.release_version, host=host, logger=logger, zfs=zfs)
+    return libiocage.lib.Release.Release(
+        name=host.release_version, host=host, logger=logger, zfs=zfs
+    )

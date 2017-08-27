@@ -318,15 +318,10 @@ class Jail:
             Example: ["/usr/bin/whoami"]
         """
 
-        command = [
-                      "/usr/sbin/jexec",
-                      self.identifier
-                  ] + command
+        command = ["/usr/sbin/jexec", self.identifier] + command
 
         return libiocage.lib.helpers.exec(
-            command,
-            logger=self.logger,
-            **kwargs
+            command, logger=self.logger, **kwargs
         )
 
     def passthru(self, command):
@@ -530,13 +525,8 @@ class Jail:
             jail=self
         )
 
-        command = [
-                      "/sbin/route",
-                      "add"
-                  ] + (["-6"] if (ipv6 is True) else []) + [
-                      "default",
-                      gateway
-                  ]
+        command = ["/sbin/route", "add"] + \
+            (["-6"] if (ipv6 is True) else []) + ["default", gateway]
 
         self.exec(command)
 
@@ -546,8 +536,7 @@ class Jail:
         """
         if self.exists:
             raise libiocage.lib.errors.JailAlreadyExists(
-                jail=self,
-                logger=self.logger
+                jail=self, logger=self.logger
             )
 
     def require_jail_existing(self):

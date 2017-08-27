@@ -108,15 +108,6 @@ class JailConfigNotFound(Exception):
         Exception.__init__(self, msg, *args, **kwargs)
 
 
-# Releases
-
-
-class ReleaseNotFetched(IocageException):
-    def __init__(self, name, *args, **kwargs):
-        msg = f"Release '{name}' does not exist or is not fetched locally"
-        super().__init__(msg, *args, **kwargs)
-
-
 # General
 
 

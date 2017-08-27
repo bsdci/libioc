@@ -110,4 +110,3 @@ def _lookup_jail_value(jail, key):
         val = str(jail.config.__getitem__(key))
 
         return val if val is not None else False
-
