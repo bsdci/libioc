@@ -271,7 +271,7 @@ class Jail:
 
         if len(filteres_released) == 0:
             raise libiocage.lib.errors.ReleaseNotFetched(
-                release_name,
+                name=release_name,
                 logger=self.logger
             )
 
@@ -557,10 +557,6 @@ class Jail:
             return
 
         if defaultrouter:
-            self.logger.verbose(
-                f"setting default IPv4 gateway to {defaultrouter}",
-                jail=self
-            )
             self._configure_route(defaultrouter)
 
         if defaultrouter6:

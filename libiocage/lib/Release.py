@@ -227,7 +227,7 @@ class Release:
 
         if self.fetched is False:
             raise libiocage.lib.errors.ReleaseNotFetched(
-                release_name=self.name,
+                name=self.name,
                 logger=self.logger
             )
 
