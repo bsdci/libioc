@@ -7,6 +7,7 @@ import libiocage.lib.JailConfigJSON
 import libiocage.lib.JailConfigLegacy
 import libiocage.lib.JailConfigResolver
 import libiocage.lib.JailConfigZFS
+import libiocage.lib.JailConfigDefaults
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
@@ -45,7 +46,12 @@ class JailConfig(dict, object):
 
     """
 
-    def __init__(self, data={}, jail=None, logger=None, new=False):
+    def __init__(self,
+                 data={},
+                 jail=None,
+                 logger=None,
+                 new=False,
+                 defaults_file=None):
 
         dict.__init__(self)
 
@@ -59,7 +65,9 @@ class JailConfig(dict, object):
         if jail:
             self.jail = jail
             fstab = libiocage.lib.JailConfigFstab.JailConfigFstab(
-                jail=jail, logger=self.logger)
+                jail=jail,
+                logger=self.logger
+            )
             self.fstab = fstab
         else:
             self.jail = None
@@ -81,9 +89,40 @@ class JailConfig(dict, object):
         except:
             self["legacy"] = False
 
+        self.defaults_file = defaults_file
+        self.defaults = None
+
         self.clone(data)
 
+    def load_defaults(self, defaults_file=None):
+
+        if defaults_file is not None:
+            self.defaults_file = defaults_file
+
+        if defaults_file is None and self.jail is not None:
+            root_mountpoint = self.jail.host.datasets.root.mountpoint
+            defaults_file = f"{root_mountpoint}/defaults.json"
+
+        self.defaults = libiocage.lib.JailConfigDefaults.JailConfigDefaults(
+            file=defaults_file,
+            logger=self.logger
+        )
+
     def clone(self, data, skip_on_error=False):
+        """
+        Apply data from a data dictionary to the JailConfig
+
+        Existing jail configuration is not emptied using.
+
+        Args:
+
+            data (dict):
+                Dictionary containing the configuration to apply
+
+            skip_on_error (bool):
+                Passed to __setitem__
+
+        """
         for key in data:
             self.__setitem__(key, data[key], skip_on_error=skip_on_error)
 
@@ -291,9 +330,6 @@ class JailConfig(dict, object):
             value = 'none'
         self.data['defaultrouter'] = value
 
-    def _default_defaultrouter(self):
-        return None
-
     def _get_defaultrouter6(self):
         value = self.data['defaultrouter6']
         return value if (value != "none" and value is not None) else None
@@ -302,9 +338,6 @@ class JailConfig(dict, object):
         if value is None:
             value = 'none'
         self.data['defaultrouter6'] = value
-
-    def _default_defaultrouter6(self):
-        return None
 
     def _get_vnet(self):
         return libiocage.lib.helpers.parse_user_input(self.data["vnet"])
@@ -316,16 +349,21 @@ class JailConfig(dict, object):
     def _get_jail_zfs_dataset(self):
         try:
             return self.data["jail_zfs_dataset"].split()
-        except:
-            pass
-        return []
+        except KeyError:
+            return []
 
     def _set_jail_zfs_dataset(self, value, **kwargs):
         value = [value] if isinstance(value, str) else value
         self.data["jail_zfs_dataset"] = " ".join(value)
 
     def _get_jail_zfs(self):
-        enabled = libiocage.lib.helpers.parse_user_input(self.data["jail_zfs"])
+        try:
+            enabled = libiocage.lib.helpers.parse_user_input(
+                self.data["jail_zfs"]
+            )
+        except:
+            enabled = self._default_jail_zfs()
+
         if not enabled:
             if len(self.jail_zfs_dataset) > 0:
                 raise libiocage.lib.errors.JailConigZFSIsNotAllowed(
@@ -340,15 +378,12 @@ class JailConfig(dict, object):
             value, true="on", false="off")
 
     def _default_jail_zfs(self):
-        # if self.data["jail_zfs"] does not explicitly exist, _get_jail_zfs
-        # would raise
+        # if self.data["jail_zfs"] does not explicitly exist,
+        # _get_jail_zfs would raise
         try:
-            return len(self.jail_zfs_dataset) > 0
+            return len(self["jail_zfs_dataset"]) > 0
         except:
             return False
-
-    def _default_mac_prefix(self):
-        return "02ff60"
 
     def _get_resolver(self):
         return self.__create_special_property_resolver()
@@ -370,18 +405,28 @@ class JailConfig(dict, object):
             return self["release"]
 
     def _get_basejail_type(self):
-        return self.data["basejail_type"]
 
-    def _default_basejail_type(self):
+        # first see if basejail_type was explicitly set
+        try:
+            return self.data["basejail_type"]
+        except:
+            pass
+
+        # if it was not, the default for is 'nullfs' if the jail is a basejail
         try:
             if self["basejail"]:
                 return "nullfs"
         except:
             pass
+
+        # otherwise the jail does not have a basejail_type
         return None
 
     def _get_login_flags(self):
-        return JailConfigList(self.data["login_flags"].split())
+        try:
+            return JailConfigList(self.data["login_flags"].split())
+        except KeyError:
+            return JailConfigList(["-f", "root"])
 
     def _set_login_flags(self, value, **kwargs):
         if value is None:
@@ -413,128 +458,17 @@ class JailConfig(dict, object):
                 logger=self.logger
             )
 
-    def _default_login_flags(self):
-        return JailConfigList(["-f", "root"])
+    def _get_host_hostname(self):
+        try:
+            return self.data["host_hostname"]
+        except KeyError:
+            return self.jail.humanreadable_name
 
-    def _default_vnet(self):
-        return False
-
-    def _default_ip4_saddrsel(self):
-        return 1
-
-    def _default_ip6_saddrsel(self):
-        return 1
-
-    def _default_ip4(self):
-        return "new"
-
-    def _default_ip6(self):
-        return "new"
-
-    def _default_host_hostname(self):
-        return self.jail.humanreadable_name
-
-    def _default_host_hostuuid(self):
-        return self["id"]
-
-    def _default_host_domainname(self):
-        return "none"
-
-    def _default_devfs_ruleset(self):
-        return "4"
-
-    def _default_enforce_statfs(self):
-        return "2"
-
-    def _default_children_max(self):
-        return "0"
-
-    def _default_allow_set_hostname(self):
-        return "1"
-
-    def _default_allow_sysvipc(self):
-        return "0"
-
-    def _default_allow_raw_sockets(self):
-        return "0"
-
-    def _default_allow_chflags(self):
-        return "0"
-
-    def _default_allow_mount(self):
-        return "0"
-
-    def _default_allow_mount_devfs(self):
-        return "0"
-
-    def _default_allow_mount_nullfs(self):
-        return "0"
-
-    def _default_allow_mount_procfs(self):
-        return "0"
-
-    def _default_allow_mount_zfs(self):
-        return "0"
-
-    def _default_allow_mount_tmpfs(self):
-        return "0"
-
-    def _default_allow_quotas(self):
-        return "0"
-
-    def _default_allow_socket_af(self):
-        return "0"
-
-    def _default_sysvmsg(self):
-        return "new"
-
-    def _default_sysvsem(self):
-        return "new"
-
-    def _default_sysvshm(self):
-        return "new"
-
-    def _default_exec_clean(self):
-        return "1"
-
-    def _default_exec_fib(self):
-        return "0"
-
-    def _default_exec_prestart(self):
-        return "/usr/bin/true"
-
-    def _default_exec_start(self):
-        return "/bin/sh /etc/rc"
-
-    def _default_exec_poststart(self):
-        return "/usr/bin/true"
-
-    def _default_exec_prestop(self):
-        return "/usr/bin/true"
-
-    def _default_exec_stop(self):
-        return "/bin/sh /etc/rc.shutdown"
-
-    def _default_exec_poststop(self):
-        return "/usr/bin/true"
-
-    def _default_exec_timeout(self):
-        return "60"
-
-    def _default_stop_timeout(self):
-        return "30"
-
-    def _default_mount_devfs(self):
-        return "1"
-
-    def _default_mount_fdescfs(self):
-        return "1"
-
-    def _default_securelevel(self):
-        return "2"
-
-    def _default_tags(self):
-        return []
+    def _get_host_hostuuid(self):
+        try:
+            return self.data["host_hostuuid"]
+        except KeyError:
+            return self["id"]
 
     def __create_special_property_resolver(self):
 
@@ -557,6 +491,9 @@ class JailConfig(dict, object):
         return self.__getitem__(key, string=True)
 
     def _skip_on_error(self, **kwargs):
+        """
+        A helper to resolve skip_on_error attribute
+        """
         try:
             return kwargs["skip_on_error"] is True
         except AttributeError:
@@ -586,8 +523,7 @@ class JailConfig(dict, object):
 
         # then fall back to default
         try:
-            fallback_method = self.__getattribute__(f"_default_{key}")
-            return self.stringify(fallback_method(), string)
+            return self.defaults[key]
         except:
             raise KeyError(f"Config variable {key} not found")
 
@@ -661,5 +597,6 @@ class JailConfig(dict, object):
 
 
 class JailConfigList(list):
+
     def __str__(self):
         return " ".join(self)

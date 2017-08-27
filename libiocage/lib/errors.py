@@ -100,12 +100,17 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
         )
 
 
-class JailConfigNotFound(Exception):
-    # This is a silent error internally used
-
+class JailConfigNotFound(IocageException):
     def __init__(self, config_type, *args, **kwargs):
         msg = f"Could not read {config_type} config"
+        # This is a silent error internally used
         Exception.__init__(self, msg, *args, **kwargs)
+
+
+class DefaultConfigNotFound(IocageException, FileNotFoundError):
+    def __init__(self, config_file_path, *args, **kwargs):
+        msg = f"Default configuration not found at {config_file_path}"
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 # General
@@ -245,9 +250,9 @@ class IllegalReleaseAssetContent(ReleaseUpdateFailure):
 
 
 class ReleaseNotFetched(IocageException):
-    def __init__(self, release_name, *args, **kwargs):
-        msg = f"Release '{release_name}' is not fetched locally"
-        super.__init__(msg, *args, **kwargs)
+    def __init__(self, name, *args, **kwargs):
+        msg = f"Release '{name}' does not exist or is not fetched locally"
+        super().__init__(msg, *args, **kwargs)
 
 
 class ReleaseUpdateBranchLookup(IocageException):
