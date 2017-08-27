@@ -212,27 +212,27 @@ class JailConfig(dict, object):
             self.data["type"] = value
 
     def _get_basejail(self):
-        return libiocage.lib.helpers.parse_bool(self.data["basejail"])
+        return libiocage.lib.helpers.parse_user_input(self.data["basejail"])
 
     def _default_basejail(self):
         return False
 
     def _set_basejail(self, value, **kwargs):
         if self["legacy"]:
-            self.data["basejail"] = libiocage.lib.helpers.get_str_bool(
+            self.data["basejail"] = libiocage.lib.helpers.to_string(
                 value, true="on", false="off")
         else:
-            self.data["basejail"] = libiocage.lib.helpers.get_str_bool(
+            self.data["basejail"] = libiocage.lib.helpers.to_string(
                 value, true="yes", false="no")
 
     def _get_clonejail(self):
-        return libiocage.lib.helpers.parse_bool(self.data["clonejail"])
+        return libiocage.lib.helpers.parse_user_input(self.data["clonejail"])
 
     def _default_clonejail(self):
         return True
 
     def _set_clonejail(self, value, **kwargs):
-        self.data["clonejail"] = libiocage.lib.helpers.get_str_bool(
+        self.data["clonejail"] = libiocage.lib.helpers.to_string(
             value, true="on", false="off")
 
     def _get_ip4_addr(self):
@@ -307,10 +307,10 @@ class JailConfig(dict, object):
         return None
 
     def _get_vnet(self):
-        return libiocage.lib.helpers.parse_bool(self.data["vnet"])
+        return libiocage.lib.helpers.parse_user_input(self.data["vnet"])
 
     def _set_vnet(self, value, **kwargs):
-        self.data["vnet"] = libiocage.lib.helpers.get_str_bool(
+        self.data["vnet"] = libiocage.lib.helpers.to_string(
             value, true="on", false="off")
 
     def _get_jail_zfs_dataset(self):
@@ -325,7 +325,7 @@ class JailConfig(dict, object):
         self.data["jail_zfs_dataset"] = " ".join(value)
 
     def _get_jail_zfs(self):
-        enabled = libiocage.lib.helpers.parse_bool(self.data["jail_zfs"])
+        enabled = libiocage.lib.helpers.parse_user_input(self.data["jail_zfs"])
         if not enabled:
             if len(self.jail_zfs_dataset) > 0:
                 raise libiocage.lib.errors.JailConigZFSIsNotAllowed(
@@ -336,7 +336,7 @@ class JailConfig(dict, object):
         if (value is None) or (value == ""):
             del self.data["jail_zfs"]
             return
-        self.data["jail_zfs"] = libiocage.lib.helpers.get_str_bool(
+        self.data["jail_zfs"] = libiocage.lib.helpers.to_string(
             value, true="on", false="off")
 
     def _default_jail_zfs(self):

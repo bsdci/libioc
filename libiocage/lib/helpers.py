@@ -99,82 +99,124 @@ def _prettify_output(output):
 # helper function to validate names
 def validate_name(name):
     validate = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
-
     return bool(validate.fullmatch(name))
 
 
-# data -> bool | default
-def parse_bool(data, default=False):
+def _parse_none(data):
+
+    if data is None:
+        return None
+
+    if data in ["none", "-"]:
+        return None
+
+    raise TypeError("Value is not None")
+
+
+def _parse_bool(data):
     """
     try to parse booleans from strings
 
-    On success, it returns the parsed boolean
-    on failure it returns the `default`.
-    By default, `default` is `False`.
+    On success, it returns the parsed boolean on failure it raises a TypeError.
 
-    >>> parse_bool("YES")
-    True
-    >>> parse_bool("false")
-    False
-    >>> parse_bool("/etc/passwd")
-    False
-
-    Note that "-" gets a special treatment:
-
-    >>> parse_bool("-")
-    None
-
-    The behavior of the default parameter can be used to create a
-    pass-thru function:
-
-    >>> default = "/etc/passwd"
-    >>> parse_bool(default, default)
-    "/etc/passwd"
+    Usage:
+        
+        >>> _parse_bool("YES")
+        True
+        >>> _parse_bool("false")
+        False
+        >>> _parse_bool("/etc/passwd")
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: Not a boolean value
+    
     """
 
     if isinstance(data, bool):
         return data
     if isinstance(data, str):
-        if data == "-":
-            return None
-        elif data.lower() in ["yes", "true", "on"]:
+        val = data.lower()
+        if val in ["yes", "true", "on"]:
             return True
-        elif data.lower() in ["no", "false", "off"]:
+        elif val in ["no", "false", "off"]:
             return False
-    return default
+    
+    raise TypeError("Value is not a boolean")
 
 
 def parse_user_input(data):
     """
-    uses parse_bool() to partially return Boolean and NoneType values
+    uses _parse_bool() to partially return Boolean and NoneType values
     All other types as returned as-is
 
-    >>> parse_bool("YES")
+    >>> parse_user_input("YES")
     True
-    >>> parse_bool("false")
+    >>> parse_user_input("false")
     False
-    >>> parse_bool(8.4)
+    >>> parse_user_input("notfalse")
+    'notfalse'
+    >>> parse_user_input(8.4)
     8.4
     """
-    return parse_bool(data, data)
+
+    try:
+        return _parse_bool(data)
+    except TypeError:
+        pass
+
+    try:
+        return _parse_none(data)
+    except TypeError:
+        pass
+
+    return data
 
 
-def get_str_bool(data, true="yes", false="no"):
+def to_string(data, true="yes", false="no", none="-"):
     """
-    return a string boolean value using parse_bool(), of specified style
+    return a string boolean value using _parse_bool(), of specified style
 
-    >>> get_str_bool(True)
-    "yes"
-    >>> get_str_bool(False)
-    "no"
+    Args:
 
-    >>> get_str_bool(True, true="yip", false="nope")
-    "yip"
-    >>> get_str_bool(False, true="yip", false="nope")
-    "nope"
+        true (string):
+            The expected return value when data is True
+
+        false (string):
+            The expected return value when data is False
+
+        none (string):
+            The expected return value when data is None
+
+    Returns:
+
+        string: Map input according to arguments or stringified input
+
+    Usage:
+
+        >>> to_string(True)
+        "yes"
+        >>> to_string(False)
+        "no"
+
+        >>> to_string(True, true="yip", false="nope")
+        "yip"
+        >>> to_string(False, true="yip", false="nope")
+        "nope"
+
+        >>> to_string(None)
+        "-"
     """
-    return true if parse_bool(data) else false
 
+    data = parse_user_input(data)
+
+    if data is None:
+        return none
+    elif data is True:
+        return true
+    elif data is False:
+        return false
+
+    return str(data)
 
 def exec_passthru(command, logger=None):
     if isinstance(command, str):
