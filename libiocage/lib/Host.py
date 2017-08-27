@@ -2,6 +2,7 @@ import os
 import platform
 
 import libiocage.lib.Datasets
+import libiocage.lib.DevfsRules
 import libiocage.lib.Distribution
 import libiocage.lib.helpers
 
@@ -21,7 +22,19 @@ class Host:
             logger=self.logger
         )
 
+        self._devfs = None
         self.releases_dataset = None
+
+    @property
+    def devfs(self):
+        """
+        Lazy-loaded DevfsRules instance
+        """
+        if self._devfs is None:
+            self._devfs = libiocage.lib.DevfsRules.DevfsRules(
+                logger=self.logger
+            )
+        return self._devfs
 
     @property
     def userland_version(self):

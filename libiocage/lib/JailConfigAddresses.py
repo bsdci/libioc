@@ -77,6 +77,16 @@ class JailConfigAddresses(dict):
         if notify:
             self.__notify()
 
+    @property
+    def networks(self):
+        """
+        Flat list of all networks configured across all nics
+        """
+        networks = []
+        for nic, addresses in self.items():
+            networks += addresses
+        return networks
+
     def __setitem__(self, key, values):
 
         try:
