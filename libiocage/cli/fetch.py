@@ -28,6 +28,7 @@ import libiocage.lib.Host
 import libiocage.lib.Logger
 import libiocage.lib.Prompts
 import libiocage.lib.Release
+import libiocage.lib.errors
 
 __rootcmd__ = True
 
@@ -86,7 +87,7 @@ def cli(ctx, **kwargs):
     if release_input is None:
         try:
             release = prompts.release()
-        except DefaultReleaseNotFound:
+        except libiocage.lib.errors.DefaultReleaseNotFound:
             exit(1)
     else:
         try:

@@ -37,8 +37,8 @@ class Release:
         libiocage.lib.helpers.init_zfs(self, zfs)
         libiocage.lib.helpers.init_host(self, host)
 
-        # if not libiocage.lib.helpers.validate_name(name):
-        #     raise NameError(f"Invalid 'name' for Release: '{name}'")
+        if not libiocage.lib.helpers.validate_name(name):
+            raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name
         self._hashes = None
@@ -390,6 +390,7 @@ class Release:
             else:
                 changed = self._update_freebsd_jail(jail)
         except:
+            # kill the helper jail and roll back if anything went wrong
             self.logger.verbose(
                 "There was an error updating the Jail - reverting the changes"
             )
@@ -423,11 +424,9 @@ class Release:
                 self.logger.verbose(stdout_line.strip("\n"), indent=1)
 
             self.logger.debug(f"Update of release '{self.name}' finished")
-            changed = True
 
         except:
 
-            raise
             raise libiocage.lib.errors.ReleaseUpdateFailure(
                 release_name=self.name,
                 reason=(
@@ -439,7 +438,7 @@ class Release:
         jail.stop()
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return changed
+        return True # ToDo: return False if nothing was updated
 
     def _update_freebsd_jail(self, jail):
 
@@ -469,10 +468,9 @@ class Release:
             "install"
         ], ignore_error=True, logger=self.logger)
 
-        if child.returncode == 1:
+        if child.returncode != 0:
             if "No updates are available to install." in stdout:
                 self.logger.debug("Already up to date")
-                changed = True
             else:
                 raise libiocage.lib.errors.ReleaseUpdateFailure(
                     release_name=self.name,
@@ -484,12 +482,11 @@ class Release:
                 )
         else:
             self.logger.debug(f"Update of release '{self.name}' finished")
-            changed = True
 
         jail.stop()
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return changed
+        return True # ToDo: return False if nothing was updated
 
         
 
