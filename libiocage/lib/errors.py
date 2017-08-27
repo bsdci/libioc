@@ -257,6 +257,7 @@ class ReleaseUpdateBranchLookup(IocageException):
             msg += ": {reason}"
         super.__init__(msg, *args, **kwargs)
 
+
 # Prompts
 
 
@@ -266,6 +267,30 @@ class DefaultReleaseNotFound(IocageException):
             f"Release '{host_release_name}' not found: "
             "Could not determine a default source"
         )
+        super().__init__(msg, *args, **kwargs)
+
+
+# DevfsRules
+
+
+class DevfsRuleException(IocageException):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class InvalidDevfsRulesSyntax(DevfsRuleException):
+    def __init__(self, devfs_rules_file, reason=None, *args, **kwargs):
+        msg = f"Invalid devfs rules in {devfs_rules_file}"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class DuplicateDevfsRuleset(DevfsRuleException):
+    def __init__(self, devfs_rules_file, reason=None, *args, **kwargs):
+        msg = "Cannot add duplicate ruleset"
+        if reason is not None:
+            msg += f": {reason}"
         super().__init__(msg, *args, **kwargs)
 
 

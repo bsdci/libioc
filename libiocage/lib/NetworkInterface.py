@@ -3,6 +3,7 @@ import libiocage.lib.helpers
 
 class NetworkInterface:
     ifconfig_command = "/sbin/ifconfig"
+    dhclient_command = "/sbin/dhclient"
 
     def __init__(self,
                  name="vnet0",
@@ -81,7 +82,10 @@ class NetworkInterface:
     def __apply_addresses(self, addresses, ipv6=False):
         family = "inet6" if ipv6 else "inet"
         for address in addresses:
-            command = [self.ifconfig_command, self.name, family, address]
+            if address.lower() == "dhcp":
+                command = [self.dhclient_command, self.name]
+            else:
+                command = [self.ifconfig_command, self.name, family, address]
             self.exec(command)
 
     def exec(self, command, force_local=False):

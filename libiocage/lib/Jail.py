@@ -12,6 +12,7 @@ import libiocage.lib.StandaloneJailStorage
 import libiocage.lib.Storage
 import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
+import libiocage.lib.DevfsRules
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
@@ -364,6 +365,55 @@ class Jail:
             stderr=subprocess.DEVNULL
         )
 
+    @property
+    def _dhcp_enabled(self):
+        """
+        True if any ip4_addr uses DHCP
+        """
+        if self.config["ip4_addr"] is None:
+            return False
+
+        return ("dhcp" in self.config["ip4_addr"].networks)
+
+    @property
+    def devfs_ruleset(self):
+        """
+        The number of the jails devfs ruleset
+
+        When a new combination of the base ruleset specified in
+        jail.config["devfs_ruleset"] and rules automatically added by iocage
+        appears, the according rule is automatically created and added to the
+        /etc/devfs.rules file on the host
+        """
+
+        # users may reference a rule by numeric identifier or name
+        # numbers are automatically selected, so it's advisable to use names
+        try:
+            configured_devfs_ruleset = self.host.devfs.find_by_number(
+                int(self.config["devfs_ruleset"])
+            )
+        except ValueError:
+            configured_devfs_ruleset = self.host.devfs.find_by_name(
+                self.config["devfs_ruleset"]
+            )
+
+        devfs_ruleset = libiocage.lib.DevfsRules.DevfsRuleset()
+        devfs_ruleset.clone(configured_devfs_ruleset)
+
+        if self._dhcp_enabled:
+            devfs_ruleset.append("add path 'bpf*' unhide")
+
+        # create if the final rule combination does not exist as ruleset
+        if devfs_ruleset not in self.host.devfs:
+            self.logger.verbose("New devfs ruleset combination")
+            # note: name and number of devfs_ruleset are both None
+            new_ruleset_number = self.host.devfs.new_ruleset(devfs_ruleset)
+            self.host.devfs.save()
+            return new_ruleset_number
+        else:
+            ruleset_line_position = self.host.devfs.index(devfs_ruleset)
+            return self.host.devfs[ruleset_line_position].number
+
     def _launch_jail(self):
 
         command = ["jail", "-c"]
@@ -395,7 +445,7 @@ class Jail:
             f"path={self.path}/root",
             f"securelevel={self.config['securelevel']}",
             f"host.hostuuid={self.name}",
-            f"devfs_ruleset={self.config['devfs_ruleset']}",
+            f"devfs_ruleset={self.devfs_ruleset}",
             f"enforce_statfs={self.config['enforce_statfs']}",
             f"children.max={self.config['children_max']}",
             f"allow.set_hostname={self.config['allow_set_hostname']}",

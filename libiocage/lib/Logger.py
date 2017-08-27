@@ -138,7 +138,7 @@ class Logger:
 
     def _indent(self, message, level):
         indent = Logger.INDENT_PREFIX * level
-        return f"{indent}{message}"
+        return "\n".join(map(lambda x: f"{indent}{x}", message.split("\n")))
 
     # ToDo: support file logging
     # def _write(self, message, level, jail=None):
