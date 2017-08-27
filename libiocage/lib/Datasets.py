@@ -89,7 +89,7 @@ class Datasets:
         )
 
     def _is_pool_active(self, pool):
-        return libiocage.lib.helpers.parse_bool(self._get_pool_property(
+        return libiocage.lib.helpers.parse_user_input(self._get_pool_property(
             pool,
             self.ZFS_POOL_ACTIVE_PROPERTY
         ))

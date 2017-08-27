@@ -88,15 +88,14 @@ class RCConf(dict):
             self.logger.spam(output[:-1], jail=self.jail, indent=1)
 
     def __setitem__(self, key, value):
+       
+        val = libiocage.lib.helpers.to_string(
+            libiocage.lib.helpers.parse_user_input(value),
+            true="YES",
+            false="NO"
+        )
 
-        val = libiocage.lib.helpers.parse_user_input(value)
-        # normalize booleans
-        if isinstance(value, bool):
-            dict.__setitem__(self, key,
-                             libiocage.lib.helpers.get_str_bool(
-                                 value, true="YES", false="NO"))
-        else:
-            dict.__setitem__(self, key, str(val))
+        dict.__setitem__(self, key, val)
 
     def __getitem__(self, key):
         val = dict.__getitem__(self, key)
