@@ -1,4 +1,5 @@
 import libiocage.lib.helpers
+import libiocage.lib.errors
 
 
 class Prompts:
