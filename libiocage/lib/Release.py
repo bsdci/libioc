@@ -245,7 +245,6 @@ class Release:
             self._hbsd_release_branch = hbsd_update_conf["branch"]
             return self._hbsd_release_branch
 
-
     def fetch(self, update=None, fetch_updates=None):
 
         release_changed = False
@@ -300,7 +299,7 @@ class Release:
 
         files = {
             update_script_name: f"usr.sbin/{update_name}/{update_script_name}",
-            update_conf_name: f"etc/{update_conf_name}",
+            update_conf_name  : f"etc/{update_conf_name}",
         }
 
         for key in files.keys():
@@ -369,12 +368,12 @@ class Release:
         dataset.snapshot(snapshot_name, recursive=True)
 
         jail = libiocage.lib.Jail.Jail({
-                "uuid"              : str(uuid.uuid4()),
-                "basejail"          : False,
-                "allow_mount_nullfs": "1",
-                "release"           : self.name,
-                "securelevel"       : "0"
-            },
+            "uuid"              : str(uuid.uuid4()),
+            "basejail"          : False,
+            "allow_mount_nullfs": "1",
+            "release"           : self.name,
+            "securelevel"       : "0"
+        },
             new=True,
             logger=self.logger,
             zfs=self.zfs,
@@ -400,7 +399,6 @@ class Release:
 
         return changed
 
-
     def _update_hbsd_jail(self, jail):
 
         jail.start()
@@ -410,7 +408,7 @@ class Release:
 
         try:
 
-            # ToDo: as bad as print() - replace passthru with a nice progress bar
+            # ToDo: as bad as print() replace passthru with a nice progress bar
             stdout = libiocage.lib.helpers.exec_iter([
                 update_script_path,
                 "-c",
@@ -438,7 +436,7 @@ class Release:
         jail.stop()
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return True # ToDo: return False if nothing was updated
+        return True  # ToDo: return False if nothing was updated
 
     def _update_freebsd_jail(self, jail):
 
@@ -486,9 +484,7 @@ class Release:
         jail.stop()
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return True # ToDo: return False if nothing was updated
-
-        
+        return True  # ToDo: return False if nothing was updated
 
     def _append_datetime(self, text):
         now = datetime.datetime.utcnow()

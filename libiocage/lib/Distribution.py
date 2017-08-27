@@ -65,9 +65,9 @@ class Distribution:
         found_releases = self._parse_links(response)
 
         available_releases = sorted(
-            map( # map long HardenedBSD release names
+            map(  # map long HardenedBSD release names
                 self._map_available_release,
-                filter( # filter out other CPU architectures on HardenedBSD
+                filter(  # filter out other CPU architectures on HardenedBSD
                     self._filter_available_releases,
                     found_releases
                 )
@@ -89,7 +89,7 @@ class Distribution:
         if self.name == "HardenedBSD":
             # e.g. HardenedBSD-11-STABLE-libressl-amd64-LATEST
             return "-".join(release_name.split("-")[1:-2])
-        return release_name        
+        return release_name
 
     def _filter_available_releases(self, release_name):
         if self.name != "HardenedBSD":
@@ -127,12 +127,12 @@ class Distribution:
     def _parse_links(self, text):
         blacklisted_releases = Distribution.release_name_blacklist
         matches = filter(lambda y: y not in blacklisted_releases,
-            map(lambda z: z.strip("\"/"),
-                re.findall(
-                Distribution.mirror_link_pattern,
-                text,
-                re.MULTILINE)
-            )
-         )
+                         map(lambda z: z.strip("\"/"),
+                             re.findall(
+                                 Distribution.mirror_link_pattern,
+                                 text,
+                                 re.MULTILINE)
+                             )
+                         )
 
         return matches

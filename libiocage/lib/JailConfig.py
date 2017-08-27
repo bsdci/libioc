@@ -41,7 +41,7 @@ class JailConfig(dict, object):
 
     Special Properties:
 
-        Special properties are 
+        Special properties are
 
     """
 

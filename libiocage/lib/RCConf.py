@@ -88,7 +88,6 @@ class RCConf(dict):
             self.logger.spam(output[:-1], jail=self.jail, indent=1)
 
     def __setitem__(self, key, value):
-       
         val = libiocage.lib.helpers.to_string(
             libiocage.lib.helpers.parse_user_input(value),
             true="YES",

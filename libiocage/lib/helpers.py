@@ -1,5 +1,5 @@
-import subprocess
 import re
+import subprocess
 
 import libzfs
 
@@ -103,7 +103,6 @@ def validate_name(name):
 
 
 def _parse_none(data):
-
     if data is None:
         return None
 
@@ -120,7 +119,6 @@ def _parse_bool(data):
     On success, it returns the parsed boolean on failure it raises a TypeError.
 
     Usage:
-        
         >>> _parse_bool("YES")
         True
         >>> _parse_bool("false")
@@ -129,7 +127,6 @@ def _parse_bool(data):
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
         TypeError: Not a boolean value
-    
     """
 
     if isinstance(data, bool):
@@ -140,7 +137,7 @@ def _parse_bool(data):
             return True
         elif val in ["no", "false", "off"]:
             return False
-    
+
     raise TypeError("Value is not a boolean")
 
 
@@ -218,6 +215,7 @@ def to_string(data, true="yes", false="no", none="-"):
 
     return str(data)
 
+
 def exec_passthru(command, logger=None):
     if isinstance(command, str):
         command = [command]
@@ -244,7 +242,6 @@ def exec_raw(command, logger=None, **kwargs):
 
 
 def exec_iter(command, logger=None):
-
     process = exec_raw(
         command,
         logger=logger,
@@ -260,7 +257,8 @@ def exec_iter(command, logger=None):
 
     return_code = process.wait()
     if return_code:
-        raise subprocess.CalledProcessError(return_code, cmd)
+        raise subprocess.CalledProcessError(return_code, command)
+
 
 def shell(command, logger=None):
     if not isinstance(command, str):
@@ -302,7 +300,6 @@ def umount(mountpoint, force=False, ignore_error=False, logger=None):
 
 
 def get_basedir_list(distribution_name="FreeBSD"):
-
     basedirs = [
         "bin",
         "boot",
