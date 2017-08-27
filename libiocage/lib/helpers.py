@@ -137,9 +137,9 @@ def parse_bool(data, default=False):
     if isinstance(data, str):
         if data == "-":
             return None
-        elif data.lower() in ["yes", "true", "on", "1"]:
+        elif data.lower() in ["yes", "true", "on"]:
             return True
-        elif data.lower() in ["no", "false", "off", "0"]:
+        elif data.lower() in ["no", "false", "off"]:
             return False
     return default
 
