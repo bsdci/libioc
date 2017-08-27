@@ -5,6 +5,8 @@ tmpafter=$(mktemp)
 find ./libiocage/ -name \*.py -exec flake8 {} + > ${tmpafter}
 num_errors_after=`cat ${tmpafter} | wc -l`
 echo "Current Error Count: ${num_errors_after}"
+echo "Current Errors:"
+cat "${tmpafter}"
 
 # Get new tags from remote
 git fetch --tags --quiet
