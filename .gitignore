@@ -18,3 +18,4 @@ venv-*/
 .python-version
 python3.6.core
 man/*.gz
+.mypy_cache/
