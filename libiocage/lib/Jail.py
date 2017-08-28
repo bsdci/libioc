@@ -2,6 +2,8 @@ import os
 import subprocess
 import uuid
 
+import libzfs
+
 import libiocage.lib.DevfsRules
 import libiocage.lib.JailConfig
 import libiocage.lib.Network
@@ -67,11 +69,11 @@ class JailGenerator:
     _class_storage = libiocage.lib.Storage.Storage
 
     def __init__(self,
-                 data: Union[str, dict]={},
-                 zfs: Optional[libzfs.ZFS]=None,
-                 host: Optional[libiocage.lib.Host]=None,
-                 logger: Optional[libiocage.lib.Logger]=None,
-                 new=False) -> None:
+                 data:   Union[str, dict]={},
+                 zfs:    Optional[libzfs.ZFS]=None,
+                 host:   Optional[libiocage.lib.Host.Host]=None,
+                 logger: Optional[libiocage.lib.Logger.Logger]=None,
+                 new:    bool=False) -> None:
         """
         Initializes a Jail
 
@@ -86,7 +88,7 @@ class JailGenerator:
             host:
                 Inherit an existing Host instance from ancestor classes
 
-            logger (libiocage.lib.Logger): (optional)
+            logger:
                 Inherit an existing Logger instance from ancestor classes
 
         """
@@ -363,34 +365,31 @@ class JailGenerator:
         self.config.data["release"] = release.name
         self.config.save()
 
-    def exec(self, command, **kwargs):
+    def exec(self, command: List[str], **kwargs):
         """
         Execute a command in a started jail
 
-        command (list):
+        command:
             A list of command and it's arguments
 
             Example: ["/usr/bin/whoami"]
         """
 
-        command = ["/usr/sbin/jexec", self.identifier] + command
+        jexec_command = ["/usr/sbin/jexec", self.identifier] + command
 
         return libiocage.lib.helpers.exec(
-            command, logger=self.logger, **kwargs
+            jexec_command, logger=self.logger, **kwargs
         )
 
-    def passthru(self, command):
+    def passthru(self, command: List[str]):
         """
         Execute a command in a started jail ans passthrough STDIN and STDOUT
 
-        command (list):
+        command:
             A list of command and it's arguments
 
             Example: ["/bin/sh"]
         """
-
-        if isinstance(command, str):
-            command = [command]
 
         return libiocage.lib.helpers.exec_passthru(
             [
