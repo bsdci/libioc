@@ -17,6 +17,8 @@ import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
 
+from typing import Union, Optional, List
+
 
 class JailGenerator:
     """
@@ -64,19 +66,24 @@ class JailGenerator:
     _class_host = libiocage.lib.Host.HostGenerator
     _class_storage = libiocage.lib.Storage.Storage
 
-    def __init__(self, data={}, zfs=None, host=None, logger=None, new=False):
+    def __init__(self,
+                 data: Union[str, dict]={},
+                 zfs: Optional[libzfs.ZFS]=None,
+                 host: Optional[libiocage.lib.Host]=None,
+                 logger: Optional[libiocage.lib.Logger]=None,
+                 new=False) -> None:
         """
         Initializes a Jail
 
         Args:
 
-            data (string|dict):
+            data:
                 Jail configuration dict or jail name as string identifier.
 
-            zfs (libzfs.ZFS): (optional)
+            zfs:
                 Inherit an existing libzfs.ZFS() instance from ancestor classes
 
-            host (libiocage.lib.Host): (optional)
+            host:
                 Inherit an existing Host instance from ancestor classes
 
             logger (libiocage.lib.Logger): (optional)
@@ -99,7 +106,7 @@ class JailGenerator:
             logger=self.logger
         )
 
-        self.networks = []
+        self.networks: List[str] = []
 
         self.storage = self._class_storage(
             auto_create=True,
@@ -209,13 +216,13 @@ class JailGenerator:
         self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
         self.exec(command)
 
-    def stop(self, force=False):
+    def stop(self, force: bool=False) -> None:
         """
         Stop a jail.
 
         Args:
 
-            force (bool): (default=False)
+            force:
                 Ignores failures and enforces teardown if True
         """
 
@@ -245,13 +252,13 @@ class JailGenerator:
 
         self.update_jail_state()
 
-    def destroy(self, force=False):
+    def destroy(self, force: bool=False) -> None:
         """
         Destroy a Jail and it's datasets
 
         Args:
 
-            force (bool): (default=False)
+            force:
                 This flag enables whether an existing jail should be shut down
                 before destroying the dataset. By default destroying a jail
                 requires it to be stopped.
