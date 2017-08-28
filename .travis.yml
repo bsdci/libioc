@@ -1,8 +1,11 @@
 language: python
 python:
   - "3.6"
-sudo: required
+sudo: false
+env:
+  - MYPYPATH="$TRAVIS_BUILD_DIR/.travis/mypy-stubs"
 install:
-  - pip3 install flake8
+  - pip3 install flake8 mypy
 script:
   - ".travis/flake8.sh"
+  - mypy libiocage
