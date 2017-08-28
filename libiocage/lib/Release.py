@@ -250,6 +250,7 @@ class Release:
         release_changed = False
 
         if not self.fetched:
+
             self._clean_dataset()
             self._create_dataset()
             self._ensure_dataset_mounted()
@@ -464,7 +465,7 @@ class Release:
             "-f",
             "/var/db/freebsd-update/freebsd-update.conf",
             "install"
-        ], ignore_error=True, logger=self.logger)
+        ], ignore_error=True)
 
         if child.returncode != 0:
             if "No updates are available to install." in stdout:

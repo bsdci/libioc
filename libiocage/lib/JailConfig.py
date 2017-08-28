@@ -90,11 +90,17 @@ class JailConfig(dict, object):
             self["legacy"] = False
 
         self.defaults_file = defaults_file
-        self.defaults = None
+        self._defaults = None
 
         self.clone(data)
 
-    def load_defaults(self, defaults_file=None):
+    @property
+    def defaults(self):
+        if self._defaults is None:
+            self._load_defaults()
+        return self._defaults
+
+    def _load_defaults(self, defaults_file=None):
 
         if defaults_file is not None:
             self.defaults_file = defaults_file
@@ -103,7 +109,7 @@ class JailConfig(dict, object):
             root_mountpoint = self.jail.host.datasets.root.mountpoint
             defaults_file = f"{root_mountpoint}/defaults.json"
 
-        self.defaults = libiocage.lib.JailConfigDefaults.JailConfigDefaults(
+        self._defaults = libiocage.lib.JailConfigDefaults.JailConfigDefaults(
             file=defaults_file,
             logger=self.logger
         )
@@ -365,9 +371,10 @@ class JailConfig(dict, object):
             enabled = self._default_jail_zfs()
 
         if not enabled:
-            if len(self.jail_zfs_dataset) > 0:
+            if len(self["jail_zfs_dataset"]) > 0:
                 raise libiocage.lib.errors.JailConigZFSIsNotAllowed(
-                    logger=self.logger)
+                    logger=self.logger
+                )
         return enabled
 
     def _set_jail_zfs(self, value, **kwargs):
@@ -375,7 +382,10 @@ class JailConfig(dict, object):
             del self.data["jail_zfs"]
             return
         self.data["jail_zfs"] = libiocage.lib.helpers.to_string(
-            value, true="on", false="off")
+            value,
+            true="on",
+            false="off"
+        )
 
     def _default_jail_zfs(self):
         # if self.data["jail_zfs"] does not explicitly exist,
@@ -395,7 +405,8 @@ class JailConfig(dict, object):
             resolver = self["resolver"]
         else:
             resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
-                jail_config=self)
+                jail_config=self
+            )
             resolver.update(value, notify=True)
 
     def _get_cloned_release(self):

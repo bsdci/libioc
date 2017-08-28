@@ -55,7 +55,10 @@ class JailConfigDefaults(dict):
         self.logger = logger
         dict.__init__(self, JailConfigDefaults.DEFAULTS)
         self.file = file
-        self.read(file)
+        try:
+            self.read()
+        except:
+            pass
 
     def read(self):
 
@@ -67,7 +70,7 @@ class JailConfigDefaults(dict):
         if not os.path.isfile(self.file):
             raise libiocage.lib.errors.DefaultConfigNotFound(
                 config_file_path=self.file,
-                logger=self.logger
+                logger=None
             )
 
         if self.logger:
