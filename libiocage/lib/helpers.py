@@ -298,6 +298,55 @@ def umount(mountpoint, force=False, ignore_error=False, logger=None):
         if ignore_error is False:
             raise libiocage.lib.errors.UnmountFailed(logger=logger)
 
+def print_event_generator(generator, logger):
+    lines = {}
+    last_event = None
+    for event in generator:
+
+        if event.identifier is None:
+            identifier = "generic"
+        else:
+            identifier = event.identifier
+        
+        if event.type not in lines:
+            lines[event.type] = {}
+
+        # output fragments
+        running_indicator = "+" if (event.done or event.skipped) else "-"
+        name = event.type
+        if event.identifier is not None:
+            name += f"@{event.identifier}"
+
+        output = f"[{running_indicator}] {name}: "
+
+        if event.message is not None:
+            output += event.message
+        else:
+            output += event.get_state_string(
+                done="OK",
+                error="failed",
+                skipped="skipped",
+                pending="..."
+            )
+
+        if event.duration is not None:
+            output += " [" + str(round(event.duration, 3)) + "s]"
+
+        indent = event.parent_count
+        # new line or update of previous
+        if identifier not in lines[event.type]:
+            # Indent if previous task is not finished
+            lines[event.type][identifier] = logger.screen(
+                output,
+                indent=event.parent_count
+            )
+        else:
+            lines[event.type][identifier].edit(
+                output,
+                indent=event.parent_count
+            )
+
+        last_event = event
 
 def get_basedir_list(distribution_name="FreeBSD"):
     basedirs = [

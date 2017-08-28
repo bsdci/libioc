@@ -1,9 +1,37 @@
 import os
+import sys
 
 import libiocage.lib.errors
 
 
+class LogEntry:
+
+    def __init__(self, message, level, indent=0, logger=None, **kwargs):
+        self.message = message
+        self.level = level
+        self.indent = indent
+        self.logger = logger
+
+        for key in kwargs.keys():
+            object.__setattr__(self, key, kwargs[key])
+
+    def edit(self, message=None, indent=None):
+
+        if self.logger is None:
+            raise libiocage.lib.errors.CannotRedrawLine(
+                reason="No logger available"
+            )
+
+        if message is not None:
+            self.message = message
+
+        if indent is not None:
+            self.indent = indent
+
+        self.logger.redraw(self)
+
 class Logger:
+
     COLORS = (
         "black",
         "red",
@@ -17,8 +45,10 @@ class Logger:
 
     RESET_SEQ = "\033[0m"
     BOLD_SEQ = "\033[1m"
+    LINE_UP_SEQ = "\033[F"
 
     LOG_LEVEL_SETTINGS = {
+        "screen"  : {"color": None},
         "info"    : {"color": None},
         "notice"  : {"color": "magenta"},
         "verbose" : {"color": "blue"},
@@ -38,9 +68,12 @@ class Logger:
         "verbose",
         "debug",
         "spam",
+        "screen"
     )
 
     INDENT_PREFIX = "  "
+
+    PRINT_HISTORY = []
 
     def __init__(self, print_level=None, log_directory="/var/log/iocage"):
         self._print_level = print_level
@@ -80,69 +113,94 @@ class Logger:
         if "level" not in kwargs:
             kwargs["level"] = "info"
 
-        self._print(**kwargs)
-        # self._write(**kwargs)
+        log_entry = LogEntry(logger=self, **kwargs)
 
-    def verbose(self, message, jail=None, indent=0):
-        self.log(
-            message=message,
-            level="verbose",
-            jail=jail,
-            indent=indent
-        )
+        if self._should_print_log_entry(log_entry):
+            self._print_log_entry(log_entry)
+            self.PRINT_HISTORY.append(log_entry)
+        
+        return log_entry
 
-    def error(self,
-              message,
-              jail=None,
-              indent=0):
+    def verbose(self, message, indent=0, **kwargs):
+        return self.log(message, level="verbose", indent=indent, **kwargs)
 
-        self.log(message, level="error", jail=jail, indent=indent)
+    def error(self, message, indent=0, **kwargs):
+        return self.log(message, level="error", indent=indent, **kwargs)
 
-    def warn(self,
-             message,
-             jail=None,
-             indent=0):
+    def warn(self, message, indent=0, **kwargs):
+        return self.log(message, level="warn", indent=indent, **kwargs)
 
-        self.log(message, level="warn", jail=jail, indent=indent)
+    def debug(self, message, indent=0, **kwargs):
+        return self.log(message, level="debug", indent=indent, **kwargs)
 
-    def debug(self,
-              message,
-              jail=None,
-              indent=0):
+    def spam(self, message, indent=0, **kwargs):
+        return self.log(message, level="spam", indent=indent, **kwargs)
 
-        self.log(message, level="debug", jail=jail, indent=indent)
+    def screen(self, message, indent=0, **kwargs):
+        """
+        Screen does never get printed to log files
+        """
+        return self.log(message, level="screen", indent=indent, **kwargs)
 
-    def spam(self,
-             message,
-             jail=None,
-             indent=0):
+    def redraw(self, log_entry):
 
-        self.log(message, level="spam", jail=jail, indent=indent)
+        if log_entry not in self.PRINT_HISTORY:
+            raise libiocage.lib.errors.CannotRedrawLine(
+                reason="Log entry not found in history"
+            )
 
-    def _print(self, message, level, jail=None, indent=0):
+        if log_entry.level != "screen":
+            raise libiocage.lib.errors.CannotRedrawLine(
+                reason=(
+                    "Log level 'screen' is required to redraw, "
+                    f"but got '{self.level}'"
+                )
+            )
+
+        line_number = self.PRINT_HISTORY.index(log_entry)
+        delta = len(self.PRINT_HISTORY) - line_number
+
+        # ToDo: Handle redrawig of multiline entries with different line count
+
+        output = "".join([
+            #"\033[s",            # SCP - Save Cursor Position
+            f"\033[{delta}F",  # CPL - Cursor Previous Line
+            "\r",               # CR - Carriage Return
+            self._indent(log_entry.message, log_entry.indent),
+            "\033[K",           # EL - Erease in Line
+            "\n" * delta
+            #"\033[s"            # RCP - Restore Cursor Position
+        ])
+
+        sys.stdout.write(output)
+        #print(log_entry.message)
+
+    def _should_print_log_entry(self, log_entry):
+
+        if log_entry.level == "screen":
+            return True
+
         if self.print_level is False:
-            return
+            return False
 
         print_level = Logger.LOG_LEVELS.index(self.print_level)
-        if Logger.LOG_LEVELS.index(level) > print_level:
-            return
+        return Logger.LOG_LEVELS.index(log_entry.level) <= print_level
 
-        try:
-            color = Logger.LOG_LEVEL_SETTINGS[level]["color"]
-        except:
-            color = "none"
-
+    def _beautify_message(self, message, level, indent=0):
+        color = self._get_level_color(level)
         message = self._indent(message, indent)
         message = self._colorize(message, color)
-        print(message)
+        return message
+
+    def _print(self, message, level, indent=0):
+        print(self._beautify_message(message, level, indent))
+
+    def _print_log_entry(self, log_entry):
+        return self._print(log_entry.message, log_entry.level, log_entry.indent)
 
     def _indent(self, message, level):
         indent = Logger.INDENT_PREFIX * level
         return "\n".join(map(lambda x: f"{indent}{x}", message.split("\n")))
-
-    # ToDo: support file logging
-    # def _write(self, message, level, jail=None):
-    #     log_file = self._get_log_file_path(level=level, jail=jail)
 
     def _get_log_file_path(self, level, jail=None):
         return self.log_directory
@@ -156,6 +214,12 @@ class Logger:
 
     def _get_color_code(self, color_name):
         return Logger.COLORS.index(color_name) + 30
+
+    def _get_level_color(self, log_level):
+        try:
+            return Logger.LOG_LEVEL_SETTINGS[log_level]["color"]
+        except KeyError:
+            return "none"
 
     def _colorize(self, message, color_name=None):
         try:

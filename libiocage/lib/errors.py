@@ -299,6 +299,21 @@ class DuplicateDevfsRuleset(DevfsRuleException):
         super().__init__(msg, *args, **kwargs)
 
 
+# Logger
+
+class LogException(IocageException):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class CannotRedrawLine(LogException):
+    def __init__(self, reason, *args, **kwargs):
+        msg = "Logger can't redraw line"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
 # Missing Features
 
 
