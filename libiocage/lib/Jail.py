@@ -273,15 +273,12 @@ class JailGenerator:
 
         self.storage.delete_dataset_recursive(self.dataset)
 
-    def _force_stop(self):
-
-        successful = True
+    def _force_stop(self) -> None:
 
         try:
             self._destroy_jail()
             self.logger.debug(f"{self.humanreadable_name}: jail destroyed")
         except Exception as e:
-            successful = False
             self.logger.warn(str(e))
 
         if self.config["vnet"]:
@@ -289,31 +286,26 @@ class JailGenerator:
                 self._stop_vimage_network()
                 self.logger.debug(f"{self.humanreadable_name}: VNET stopped")
             except Exception as e:
-                successful = False
                 self.logger.warn(str(e))
 
         try:
             self._teardown_mounts()
             self.logger.debug(f"{self.humanreadable_name}: mounts destroyed")
         except Exception as e:
-            successful = False
             self.logger.warn(str(e))
 
         try:
             self.update_jail_state()
         except Exception as e:
-            successful = False
             self.logger.warn(str(e))
 
-        return successful
-
-    def create(self, release_name):
+    def create(self, release_name: str) -> None:
         """
         Create a Jail from a Release
 
         Args:
 
-            release_name (string):
+            release_name:
                 The jail is created from the release matching the name provided
         """
 
