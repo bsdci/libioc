@@ -21,6 +21,9 @@ find ./libiocage/ -name \*.py -exec flake8 --ignore=E203,W391 {} + | grep -v "./
 num_errors_before=`cat ${tmpbefore} | wc -l`
 echo "${last_release}'s Error Count: ${num_errors_before}"
 
+# restore whichever branch we were on previously
+git checkout -
+
 # The number may be lower then the last release, but that doesn't tell them that they're not higher than they should be.
 num_errors_adjusted=$((num_errors_before-num_errors_after))
 
