@@ -25,10 +25,10 @@
 import click
 
 import libiocage.lib.Host
-import libiocage.lib.Logger
 import libiocage.lib.Prompts
 import libiocage.lib.Release
 import libiocage.lib.errors
+
 
 __rootcmd__ = True
 
@@ -59,8 +59,7 @@ __rootcmd__ = True
               # type=release_choice(),
               help="The FreeBSD release to fetch.")
 @click.option("--update/--no-update", "-U/-NU", default=True,
-              help="Decide whether or not to update the fetch to the latest "
-                   "patch level.")
+              help="Update the release to the latest patch level.")
 @click.option("--fetch-updates/--no-fetch-updates", default=True,
               help="Skip fetching release updates")
 # Compat
@@ -71,17 +70,14 @@ __rootcmd__ = True
               help="Specify the files to fetch from the mirror. "
                    "(Deprecared: renamed to --file)")
 @click.option("--log-level", "-d", default=None)
-# @click.option("--auth", "-a", default=None, help="Authentication method for "
-#                                                 "HTTP fetching. Valid "
-#                                                 "values: basic, digest")
-# @click.option("--verify/--noverify", "-V/-NV", default=True,
-#               help="Enable or disable verifying SSL cert for HTTP fetching.")
-# def cli(url, files, release, update):
 def cli(ctx, **kwargs):
     logger = ctx.parent.logger
     logger.print_level = kwargs["log_level"]
     host = libiocage.lib.Host.Host(logger=logger)
     prompts = libiocage.lib.Prompts.Prompts(host=host, logger=logger)
+
+    if kwargs["log_level"] is not None:
+        logger.print_level = kwargs["log_level"]
 
     release_input = kwargs["release"]
     if release_input is None:
@@ -100,9 +96,6 @@ def cli(ctx, **kwargs):
             logger.error(f"Invalid Release '{release_input}'")
             exit(1)
 
-    if kwargs["log_level"] is not None:
-        logger.print_level = kwargs["log_level"]
-
     url_or_files_selected = False
 
     if is_option_enabled(kwargs, "url"):
@@ -117,28 +110,12 @@ def cli(ctx, **kwargs):
         logger.error(f"The release '{release.name}' is not available")
         exit(1)
 
-    if release.fetched:
-        msg = f"Release '{release.name}' is already fetched"
-        if kwargs["update"] is True:
-            logger.log(f"{msg} - updating only")
-        else:
-            logger.log(f"{msg} - skipping download and updates")
-            exit(0)
-    else:
-        logger.log(
-            f"Fetching release '{release.name}' from '{release.mirror_url}'"
-        )
-        release.fetch(update=False, fetch_updates=False)
+    fetch_updates = bool(kwargs["fetch_updates"])
+    release.fetch(
+        update=kwargs["update"],
+        fetch_updates=fetch_updates
+    )
 
-    if kwargs["fetch_updates"] is True:
-        logger.log("Fetching updates")
-        release.fetch_updates()
-
-    if kwargs["update"] is True:
-        logger.log("Updating release")
-        release.update()
-
-    logger.log('done')
     exit(0)
 
 

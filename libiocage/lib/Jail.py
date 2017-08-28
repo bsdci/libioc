@@ -18,7 +18,7 @@ import libiocage.lib.events
 import libiocage.lib.helpers
 
 
-class Jail:
+class JailGenerator:
     """
     iocage unit orchestrates a jail's configuration and manages state
 
@@ -134,7 +134,7 @@ class Jail:
             )
         return self._rc_conf
 
-    def start(self, yields=False):
+    def start(self):
         """
         Start the jail.
         """
@@ -143,6 +143,14 @@ class Jail:
         self.require_jail_stopped()
 
         release = self.release
+
+        events = libiocage.lib.events
+        jailLaunchEvent = events.JailLaunch(jail=self)
+        jailVnetConfigurationEvent = events.JailVnetConfiguration(jail=self)
+        JailZfsShareMount = events.JailZfsShareMount(jail=self)
+        jailServicesStartEvent = events.JailServicesStart(jail=self)
+
+        # Determine backend
 
         backend = None
 
@@ -155,32 +163,33 @@ class Jail:
         if backend is not None:
             backend.apply(self.storage, release)
 
+        yield jailLaunchEvent.begin()
+
         self.config.fstab.read_file()
         self.config.fstab.save_with_basedirs()
         self._launch_jail()
 
-        if yields is True:
-            yield libiocage.lib.events.JailStarted(jail=self)
+        yield jailLaunchEvent.end()
 
         if self.config["vnet"]:
+            yield jailVnetConfigurationEvent.begin()
             self._start_vimage_network()
             self._configure_routes()
-            if yields is True:
-                yield libiocage.lib.events.JailVnetConfigured(jail=self)
+            yield jailVnetConfigurationEvent.end()
 
         self._configure_nameserver()
 
         if self.config["jail_zfs"] is True:
+            yield JailZfsShareMount.begin()
             libiocage.lib.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares(
                 self.storage
             )
-            if yields is True:
-                yield libiocage.lib.events.JailZfsSharesMounted(jail=self)
+            yield JailZfsShareMount.end()
 
         if self.config["exec_start"] is not None:
+            yield jailServicesStartEvent.begin()
             self._start_services()
-            if yields is True:
-                yield libiocage.lib.events.JailServicesStarted(jail=self)
+            yield jailServicesStartEvent.end()
 
     def _start_services(self):
         command = self.config["exec_start"].strip().split()
@@ -202,10 +211,25 @@ class Jail:
 
         self.require_jail_existing()
         self.require_jail_running()
+
+        events = libiocage.lib.events
+        jailDestroyEvent = events.JailDestroy(self)
+        jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
+        jailMountTeardownEvent = events.JailMountTeardown(self)
+
+        yield jailDestroyEvent.begin()
         self._destroy_jail()
+        yield jailDestroyEvent.end()
+
         if self.config["vnet"]:
+            yield jailNetworkTeardownEvent.begin()
             self._stop_vimage_network()
+            yield jailNetworkTeardownEvent.end()
+
+        yield jailMountTeardownEvent.begin()
         self._teardown_mounts()
+        yield jailMountTeardownEvent.end()
+
         self.update_jail_state()
 
     def destroy(self, force=False):
@@ -875,3 +899,18 @@ class Jail:
                 properties.add(prop)
 
         return list(properties)
+
+
+class Jail(JailGenerator):
+
+    def start(self, *args, **kwargs):
+        libiocage.lib.helpers.print_event_generator(
+            super().start(*args, **kwargs),
+            logger=self.logger
+        )
+
+    def stop(self, *args, **kwargs):
+        libiocage.lib.helpers.print_event_generator(
+            super().stop(*args, **kwargs),
+            logger=self.logger
+        )

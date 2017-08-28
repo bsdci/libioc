@@ -49,8 +49,8 @@ def cli(ctx, rc, jails, log_level):
     for jail in ioc_jails.list(filters=jails):
         logger.log(f"Starting {jail.humanreadable_name}")
         try:
-            for i in jail.start(yields=True):
-                print(f"[+] {i.action} OK")
+            for event in jail.start(yields=True):
+                print(event.name)
 
         except Exception:
             raise

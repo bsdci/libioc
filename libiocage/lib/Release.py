@@ -13,9 +13,10 @@ import ucl
 import libiocage.lib.Jail
 import libiocage.lib.errors
 import libiocage.lib.helpers
+import libiocage.lib.events
 
 
-class Release:
+class ReleaseGenerator:
     DEFAULT_RC_CONF_SERVICES = {
         "netif"             : False,
         "sendmail"          : False,
@@ -30,8 +31,6 @@ class Release:
                  zfs=None,
                  logger=None,
                  check_hashes=True,
-                 auto_fetch_updates=True,
-                 auto_update=True,
                  eol=False):
 
         libiocage.lib.helpers.init_logger(self, logger)
@@ -48,8 +47,6 @@ class Release:
         self._root_dataset = None
         self.dataset = dataset
         self.check_hashes = check_hashes is True
-        self.auto_fetch_updates = auto_fetch_updates is True
-        self.auto_update = auto_update is True
         self._hbsd_release_branch = None
 
         self._assets = ["base"]
@@ -263,27 +260,68 @@ class Release:
 
         release_changed = False
 
+        events = libiocage.lib.events
+        fetchReleaseEvent = events.FetchRelease(self)
+        releasePrepareStorageEvent = events.ReleasePrepareStorage(self)
+        releaseDownloadEvent = events.ReleaseDownload(self)
+        releaseExtractionEvent = events.ReleaseExtraction(self)
+        releaseConfigurationEvent = events.ReleaseConfiguration(self)
+
         if not self.fetched:
+
+            yield fetchReleaseEvent.begin()
+            yield releasePrepareStorageEvent.begin()
 
             self._clean_dataset()
             self._create_dataset()
             self._ensure_dataset_mounted()
+
+            yield releasePrepareStorageEvent.end()
+            yield releaseDownloadEvent.begin()
+
             self._fetch_assets()
-            self._extract_assets()
+
+            yield releaseDownloadEvent.end()
+            yield releaseExtractionEvent.begin()
+
+            try:
+                self._extract_assets()
+            except Exception as e:
+                yield releaseExtractionEvent.fail(e)
+                raise
+
+            yield releaseExtractionEvent.end()
+            yield releaseConfigurationEvent.begin()
+
             self._create_default_rcconf()
+
+            yield releaseConfigurationEvent.end()
+
             release_changed = True
+
+            yield fetchReleaseEvent.end()
+
         else:
-            self.logger.warn(
+
+            yield fetchReleaseEvent.skip(
+                message="already downloaded"
+            )
+
+            self.logger.verbose(
                 "Release was already downloaded. Skipping download."
             )
 
-        fetch_updates_on = self.auto_fetch_updates and fetch_updates
-        if fetch_updates_on or fetch_updates:
-            self.fetch_updates()
+        if fetch_updates is True:
+            for event in ReleaseGenerator.fetch_updates(self):
+                yield event
 
-        auto_update_on = self.auto_update and update is not False
-        if auto_update_on or update:
-            release_changed = self.update()
+        if update is True:
+            for event in ReleaseGenerator.update(self):
+                if isinstance(event, libiocage.lib.events.IocageEvent):
+                    yield event
+                else:
+                    # the only non-IocageEvent is out return value
+                    release_changed = event
 
         if release_changed:
             self._update_zfs_base()
@@ -291,6 +329,10 @@ class Release:
         self._cleanup()
 
     def fetch_updates(self):
+
+        events = libiocage.lib.events
+        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
+        yield releaseUpdateDownloadEvent.begin()
 
         release_updates_dir = self.release_updates_dir
         release_update_download_dir = f"{release_updates_dir}"
@@ -335,6 +377,7 @@ class Release:
 
             if key == update_script_name:
                 os.chmod(local_path, 0o755)
+
             elif key == update_conf_name:
 
                 if self.host.distribution.name == "FreeBSD":
@@ -346,7 +389,7 @@ class Release:
                             "Components"
                         ))
                         f.truncate()
-                        f.close()
+
                 os.chmod(local_path, 0o644)
 
             self.logger.debug(
@@ -362,33 +405,41 @@ class Release:
             self.logger.debug(
                 "No pre-fetching of HardenedBSD updates required - skipping"
             )
-            return
+            yield releaseUpdateDownloadEvent.skip(
+                message="pre-fetching not supported on HardenedBSD"
+            )
+        
+        else:
+            self.logger.verbose(f"Fetching updates for release '{self.name}'")
+            libiocage.lib.helpers.exec([
+                f"{self.release_updates_dir}/{update_script_name}",
+                "-d",
+                release_update_download_dir,
+                "-f",
+                f"{self.release_updates_dir}/{update_conf_name}",
+                "--not-running-from-cron",
+                "fetch"
+            ], logger=self.logger)
 
-        self.logger.verbose(f"Fetching updates for release '{self.name}'")
-        libiocage.lib.helpers.exec([
-            f"{self.release_updates_dir}/{update_script_name}",
-            "-d",
-            release_update_download_dir,
-            "-f",
-            f"{self.release_updates_dir}/{update_conf_name}",
-            "--not-running-from-cron",
-            "fetch"
-        ], logger=self.logger)
+            yield releaseUpdateDownloadEvent.end()
 
     def update(self):
         dataset = self.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
+        runReleaseUpdateEvent = libiocage.lib.events.RunReleaseUpdate(self)
+        yield runReleaseUpdateEvent.begin()
+
         # create snapshot before the changes
         dataset.snapshot(snapshot_name, recursive=True)
 
-        jail = libiocage.lib.Jail.Jail({
-            "uuid"              : str(uuid.uuid4()),
-            "basejail"          : False,
-            "allow_mount_nullfs": "1",
-            "release"           : self.name,
-            "securelevel"       : "0"
-        },
+        jail = libiocage.lib.Jail.JailGenerator({
+                "uuid"              : str(uuid.uuid4()),
+                "basejail"          : False,
+                "allow_mount_nullfs": "1",
+                "release"           : self.name,
+                "securelevel"       : "0"
+            },
             new=True,
             logger=self.logger,
             zfs=self.zfs,
@@ -398,25 +449,42 @@ class Release:
         jail.dataset_name = self.dataset_name
 
         changed = False
+
         try:
             if self.host.distribution.name == "HardenedBSD":
-                changed = self._update_hbsd_jail(jail)
+                for event in self._update_hbsd_jail(jail):
+                    if isinstance(event, libiocage.lib.events.IocageEvent):
+                        yield event
+                    else:
+                        changed = event
             else:
-                changed = self._update_freebsd_jail(jail)
-        except:
+                for event in self._update_freebsd_jail(jail):
+                    if isinstance(event, libiocage.lib.events.IocageEvent):
+                        yield event
+                    else:
+                        changed = event
+            yield runReleaseUpdateEvent.end()
+        except Exception as e:
             # kill the helper jail and roll back if anything went wrong
             self.logger.verbose(
                 "There was an error updating the Jail - reverting the changes"
             )
             jail.stop(force=True)
             self.zfs.get_snapshot(snapshot_name).rollback(force=True)
-            raise
+            yield runReleaseUpdateEvent.fail(e)
+            raise e
 
         return changed
 
     def _update_hbsd_jail(self, jail):
 
-        jail.start()
+        events = libiocage.lib.events
+        executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
+
+        for event in jail.start():
+            yield event
+
+        yield executeReleaseUpdateEvent.begin()
 
         update_script_path = f"{self.release_updates_dir}/hbsd-update"
         update_conf_path = f"{self.release_updates_dir}/hbsd-update.conf"
@@ -448,12 +516,18 @@ class Release:
                 logger=self.logger
             )
 
-        jail.stop()
+        yield executeReleaseUpdateEvent.end()
+
+        for event in jail.stop():
+            yield event
 
         self.logger.verbose(f"Release '{self.name}' updated")
         return True  # ToDo: return False if nothing was updated
 
     def _update_freebsd_jail(self, jail):
+
+        events = libiocage.lib.events
+        executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
 
         local_update_mountpoint = f"{self.root_dir}/var/db/freebsd-update"
         if not os.path.isdir(local_update_mountpoint):
@@ -470,8 +544,10 @@ class Release:
         )
         jail.config.fstab.save()
 
-        jail.start()
+        for event in jail.start():
+            yield event
 
+        yield executeReleaseUpdateEvent.begin()
         child, stdout, stderr = jail.exec([
             "/var/db/freebsd-update/freebsd-update.sh",
             "-d",
@@ -483,8 +559,12 @@ class Release:
 
         if child.returncode != 0:
             if "No updates are available to install." in stdout:
+                yield executeReleaseUpdateEvent.skip(
+                    message="already up to date"
+                )
                 self.logger.debug("Already up to date")
             else:
+                yield executeReleaseUpdateEvent.failed()
                 raise libiocage.lib.errors.ReleaseUpdateFailure(
                     release_name=self.name,
                     reason=(
@@ -494,12 +574,14 @@ class Release:
                     logger=self.logger
                 )
         else:
+            yield executeReleaseUpdateEvent.end()
             self.logger.debug(f"Update of release '{self.name}' finished")
 
-        jail.stop()
+        for event in jail.stop():
+            yield event
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return True  # ToDo: return False if nothing was updated
+        yield True  # ToDo: return False if nothing was updated
 
     def _append_datetime(self, text):
         now = datetime.datetime.utcnow()
@@ -783,3 +865,19 @@ class Release:
             reason=reason,
             logger=self.logger
         )
+
+
+class Release(ReleaseGenerator):
+
+    def fetch(self, *args, **kwargs):
+        libiocage.lib.helpers.print_event_generator(
+            super().fetch(*args, **kwargs),
+            logger=self.logger
+        )
+
+    def update(self, *args, **kwargs):
+        libiocage.lib.helpers.print_event_generator(
+            super().update(*args, **kwargs),
+            logger=self.logger
+        )
+
