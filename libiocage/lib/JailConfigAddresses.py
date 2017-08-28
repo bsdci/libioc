@@ -61,7 +61,10 @@ class JailConfigAddresses(dict):
                 if self.skip_on_error is False:
                     exit(1)
 
-    def add(self, nic, addresses=[], notify=True):
+    def add(self, nic, addresses=None, notify=True):
+
+        if addresses is None or addresses == [] or addresses == "":
+            return
 
         if isinstance(addresses, str):
             addresses = [addresses]

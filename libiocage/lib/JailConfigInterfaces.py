@@ -33,7 +33,10 @@ class JailConfigInterfaces(dict):
             jail_if, bridge_if = nic_pair.split(":", maxsplit=1)
             self.add(jail_if, bridge_if, notify=False)
 
-    def add(self, jail_if, bridges=[], notify=True):
+    def add(self, jail_if, bridges=None, notify=True):
+
+        if bridges is None or bridges == [] or bridges == "":
+            return
 
         if isinstance(bridges, str):
             bridges = [bridges]
