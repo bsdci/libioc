@@ -14,6 +14,7 @@ import libiocage.lib.Storage
 import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
 import libiocage.lib.errors
+import libiocage.lib.events
 import libiocage.lib.helpers
 
 
@@ -133,7 +134,7 @@ class Jail:
             )
         return self._rc_conf
 
-    def start(self):
+    def start(self, yields=False):
         """
         Start the jail.
         """
@@ -158,9 +159,14 @@ class Jail:
         self.config.fstab.save_with_basedirs()
         self._launch_jail()
 
+        if yields is True:
+            yield libiocage.lib.events.JailStarted(jail=self)
+
         if self.config["vnet"]:
             self._start_vimage_network()
             self._configure_routes()
+            if yields is True:
+                yield libiocage.lib.events.JailVnetConfigured(jail=self)
 
         self._configure_nameserver()
 
@@ -168,6 +174,18 @@ class Jail:
             libiocage.lib.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares(
                 self.storage
             )
+            if yields is True:
+                yield libiocage.lib.events.JailZfsSharesMounted(jail=self)
+
+        if self.config["exec_start"] is not None:
+            self._start_services()
+            if yields is True:
+                yield libiocage.lib.events.JailServicesStarted(jail=self)
+
+    def _start_services(self):
+        command = self.config["exec_start"].strip().split()
+        self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
+        self.exec(command)
 
     def stop(self, force=False):
         """
@@ -472,7 +490,6 @@ class Jail:
             f"exec.prestart={self.config['exec_prestart']}",
             f"exec.poststart={self.config['exec_poststart']}",
             f"exec.prestop={self.config['exec_prestop']}",
-            f"exec.start={self.config['exec_start']}",
             f"exec.stop={self.config['exec_stop']}",
             f"exec.clean={self.config['exec_clean']}",
             f"exec.timeout={self.config['exec_timeout']}",
@@ -511,7 +528,7 @@ class Jail:
 
     def _start_vimage_network(self):
 
-        self.logger.log("Starting VNET/VIMAGE", jail=self)
+        self.logger.debug("Starting VNET/VIMAGE", jail=self)
 
         nics = self.config["interfaces"]
         for nic in nics:
