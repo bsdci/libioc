@@ -12,6 +12,7 @@ I use PyCharm for all of my programming, and these are what I use for my setting
 - Squash commits before opening a pull request.
 - Test and then test again! Make sure it works with the latest changes in 
 `master`.
+- If adding a function, it must have a type signature. Examples can be found [here](https://www.python.org/dev/peps/pep-0484/) and [here](https://www.python.org/dev/peps/pep-3107/)
 - Spaces instead of Tabs
 - 4 spaces for first indent and each from then on.
 - Spaces around Assignment `(=, +=, …)`, Equality `(==, !=)`, Relational `(<, >, <=, >=)`, Bitwise `(*, |,^)`, Additive  `(+, -)`, Multiplicative `(*, @, /, %)`, Shift `(<<, >>, >>>)` and Power operators `(**)`.
