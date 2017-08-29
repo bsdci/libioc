@@ -49,8 +49,11 @@ def cli(ctx, rc, jails, log_level):
     for jail in ioc_jails.list(filters=jails):
         logger.log(f"Starting {jail.humanreadable_name}")
         try:
-            jail.start()
+            for i in jail.start(yields=True):
+                print(f"[+] {i.action} OK")
+
         except Exception:
+            raise
             exit(1)
 
         logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")
