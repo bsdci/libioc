@@ -2,6 +2,9 @@ import os
 import platform
 import re
 import urllib.request
+from typing import List
+
+import requests
 
 import libiocage.lib.Release
 import libiocage.lib.errors
@@ -63,6 +66,7 @@ class Distribution:
         response = resource.read().decode(charset if charset else "UTF-8")
 
         found_releases = self._parse_links(response)
+        eol_list = self._get_eol_list()
 
         available_releases = sorted(
             map(  # map long HardenedBSD release names
@@ -79,7 +83,8 @@ class Distribution:
                 name=x,
                 host=self.host,
                 zfs=self.zfs,
-                logger=self.logger
+                logger=self.logger,
+                eol=self._check_eol(x, eol_list)
             ),
             available_releases
         ))
@@ -96,6 +101,35 @@ class Distribution:
             return True
         arch = release_name.split("-")[-2:][0]
         return self.host.processor == arch
+
+    def _get_eol_list(self) -> List[str]:
+        """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
+        _eol = "https://www.freebsd.org/security/unsupported.html"
+        req = requests.get(_eol)
+        status = req.status_code == requests.codes.ok
+        eol_releases = []
+        if not status:
+            req.raise_for_status()
+
+        for eol in req.content.decode("iso-8859-1").split():
+            eol = eol.strip("href=").strip("/").split(">")
+            # We want a dynamic EOL
+            try:
+                if "-RELEASE" in eol[1]:
+                    eol = eol[1].strip('</td')
+                    if eol not in eol_releases:
+                        eol_releases.append(eol)
+            except IndexError:
+                pass
+
+        return eol_releases
+
+    def _check_eol(self, release: str, eol: List[str]) -> bool:
+        if self.host.distribution.name == "FreeBSD":
+            if release in eol:
+                return True
+
+        return False
 
     def get_release_trunk_file_url(self, release, filename):
 

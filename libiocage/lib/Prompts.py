@@ -8,21 +8,24 @@ class Prompts:
         libiocage.lib.helpers.init_host(self, host)
 
     def release(self):
-        i = 0
         default = None
         available_releases = self.host.distribution.releases
-        for available_release in available_releases:
+        for i, available_release in enumerate(available_releases):
             if available_release.name == self.host.release_version:
                 default = i
-                print(f"[{i}] \033[1m{available_release.name}\033[0m")
+                print(
+                    f"[{i}] \033[1m{available_release.annotated_name}\033[0m"
+                )
             else:
-                print(f"[{i}] {available_release.name}")
-            i += 1
+                print(f"[{i}] {available_release.annotated_name}")
 
         if default is not None:
             default_release = available_releases[default]
             selection = input(
-                f"Release ({default_release.name}) [{default}]: "
+                # f"Release ({default_release.name}) [{default}]: "
+                "\nType the number of the desired RELEASE\n"
+                "Press [Enter] to fetch the default selection"
+                f" ({default_release.name}) [{default}]: "
             )
         else:
             default_release = None
