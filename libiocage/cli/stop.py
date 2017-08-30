@@ -50,11 +50,17 @@ def cli(ctx, rc, log_level, force, jails):
         filters=jails
     )
 
+    failed_jails = []
     for jail in ioc_jails:
         try:
             ctx.parent.print_events(jail.stop(force=force))
         except:
-            exit(1)
+            failed_jails.append(jail)
+            continue
 
         logger.log(f"{jail.name} stopped")
-        exit(0)
+
+    if len(failed_jails) > 0:
+        exit(1)
+
+    exit(0)
