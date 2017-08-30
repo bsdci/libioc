@@ -18,11 +18,11 @@ import libiocage.lib.events
 
 class ReleaseGenerator:
     DEFAULT_RC_CONF_SERVICES = {
-        "netif"             : False,
-        "sendmail"          : False,
-        "sendmail_submit"   : False,
+        "netif": False,
+        "sendmail": False,
+        "sendmail_submit": False,
         "sendmail_msp_queue": False,
-        "sendmail_outbound" : False
+        "sendmail_outbound": False
     }
 
     def __init__(self, name=None,
@@ -356,7 +356,7 @@ class ReleaseGenerator:
 
         files = {
             update_script_name: f"usr.sbin/{update_name}/{update_script_name}",
-            update_conf_name  : f"etc/{update_conf_name}",
+            update_conf_name: f"etc/{update_conf_name}",
         }
 
         for key in files.keys():
@@ -408,7 +408,7 @@ class ReleaseGenerator:
             yield releaseUpdateDownloadEvent.skip(
                 message="pre-fetching not supported on HardenedBSD"
             )
-        
+
         else:
             self.logger.verbose(f"Fetching updates for release '{self.name}'")
             libiocage.lib.helpers.exec([
@@ -434,12 +434,12 @@ class ReleaseGenerator:
         dataset.snapshot(snapshot_name, recursive=True)
 
         jail = libiocage.lib.Jail.JailGenerator({
-                "uuid"              : str(uuid.uuid4()),
-                "basejail"          : False,
-                "allow_mount_nullfs": "1",
-                "release"           : self.name,
-                "securelevel"       : "0"
-            },
+            "uuid": str(uuid.uuid4()),
+            "basejail": False,
+            "allow_mount_nullfs": "1",
+            "release": self.name,
+            "securelevel": "0"
+        },
             new=True,
             logger=self.logger,
             zfs=self.zfs,
@@ -876,4 +876,3 @@ class Release(ReleaseGenerator):
 
     def update(self, *args, **kwargs):
         return list(ReleaseGenerator.update(self, *args, **kwargs))
-

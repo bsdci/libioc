@@ -1,18 +1,18 @@
-from typing import List, Union, Set, Iterable
+from typing import List, Union, Iterable
 import re
 import libiocage.lib.Jail
 
 
-def match_filter(value:str, filter_string:str):
-        escaped_characters = [".", "$", "^", "(", ")", "?"]
-        for character in escaped_characters:
-            filter_string = filter_string.replace(character, f"\\{character}")
-        filter_string = filter_string.replace("*", ".*")
-        filter_string = filter_string.replace("+", ".+")
-        print
-        pattern = f"^{filter_string}$"
-        match = re.match(pattern, value)
-        return match is not None
+def match_filter(value: str, filter_string: str):
+    escaped_characters = [".", "$", "^", "(", ")", "?"]
+    for character in escaped_characters:
+        filter_string = filter_string.replace(character, f"\\{character}")
+    filter_string = filter_string.replace("*", ".*")
+    filter_string = filter_string.replace("+", ".+")
+    print
+    pattern = f"^{filter_string}$"
+    match = re.match(pattern, value)
+    return match is not None
 
 
 class Term(list):
@@ -29,7 +29,7 @@ class Term(list):
 
         list.__init__(self, data)
 
-    def matches_jail(self, jail:libiocage.lib.Jail.JailGenerator) -> bool:
+    def matches_jail(self, jail: libiocage.lib.Jail.JailGenerator) -> bool:
         jail_value = jail.getstring(self.key)
         return self.matches(jail_value)
 
@@ -42,7 +42,7 @@ class Term(list):
                 return True
         return False
 
-    def _split_filter_values(self, user_input:str) -> List[str]:
+    def _split_filter_values(self, user_input: str) -> List[str]:
         values = []
         escaped_comma_blocks = map(
             lambda block: block.split(","),
@@ -68,7 +68,7 @@ class Terms(list):
     This can be interpreted as logical AND
     """
 
-    def __init__(self, terms:Iterable[Union[Term,str]]=None):
+    def __init__(self, terms: Iterable[Union[Term, str]]=None):
 
         data = []
 
@@ -116,7 +116,7 @@ class Terms(list):
 
         return True
 
-    def _parse_term(self, user_input:Iterable[str]) -> List[Term]:
+    def _parse_term(self, user_input: Iterable[str]) -> List[Term]:
 
         terms = []
 

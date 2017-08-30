@@ -174,6 +174,7 @@ class DistributionGenerator:
 
         return matches
 
+
 class Distribution(DistributionGenerator):
 
     _class_release = libiocage.lib.Release.Release
