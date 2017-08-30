@@ -320,7 +320,7 @@ class ReleaseGenerator:
                 if isinstance(event, libiocage.lib.events.IocageEvent):
                     yield event
                 else:
-                    # the only non-IocageEvent is out return value
+                    # the only non-IocageEvent is our return value
                     release_changed = event
 
         if release_changed:
@@ -710,7 +710,6 @@ class ReleaseGenerator:
         with open(file, "w") as f:
             f.write(content)
             f.truncate()
-            f.close()
 
     def _generate_default_rcconf_line(self, service_name):
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:

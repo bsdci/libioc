@@ -138,7 +138,7 @@ class Logger:
 
     def screen(self, message, indent=0, **kwargs):
         """
-        Screen does never get printed to log files
+        Screen never gets printed to log files
         """
         return self.log(message, level="screen", indent=indent, **kwargs)
 
@@ -160,20 +160,17 @@ class Logger:
         line_number = self.PRINT_HISTORY.index(log_entry)
         delta = len(self.PRINT_HISTORY) - line_number
 
-        # ToDo: Handle redrawig of multiline entries with different line count
+        # ToDo: Handle redrawing of multiline entries with different line count
 
         output = "".join([
-            #"\033[s",            # SCP - Save Cursor Position
             f"\033[{delta}F",  # CPL - Cursor Previous Line
             "\r",               # CR - Carriage Return
             self._indent(log_entry.message, log_entry.indent),
-            "\033[K",           # EL - Erease in Line
+            "\033[K",           # EL - Erase in Line
             "\n" * delta
-            #"\033[s"            # RCP - Restore Cursor Position
         ])
 
         sys.stdout.write(output)
-        #print(log_entry.message)
 
     def _should_print_log_entry(self, log_entry):
 
