@@ -266,6 +266,7 @@ class ReleaseGenerator:
         releaseDownloadEvent = events.ReleaseDownload(self)
         releaseExtractionEvent = events.ReleaseExtraction(self)
         releaseConfigurationEvent = events.ReleaseConfiguration(self)
+        releaseCopyBaseEvent = events.ReleaseCopyBase(self)
 
         if not self.fetched:
 
@@ -324,7 +325,11 @@ class ReleaseGenerator:
                     release_changed = event
 
         if release_changed:
+            yield releaseCopyBaseEvent.begin()
             self._update_zfs_base()
+            yield releaseCopyBaseEvent.end()
+        else:
+            yield releaseCopyBaseEvent.skip(message="release unchanged")
 
         self._cleanup()
 

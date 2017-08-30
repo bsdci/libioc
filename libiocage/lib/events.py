@@ -38,7 +38,7 @@ class IocageEvent:
 
         self.data = kwargs
         self.number = len(IocageEvent.HISTORY) + 1
-        self.parent_count = IocageEvent.PENDING_COUNT + 0
+        self.parent_count = IocageEvent.PENDING_COUNT
 
         self.message = message
 
@@ -111,6 +111,7 @@ class IocageEvent:
         self._update_message(**kwargs)
         self.pending = True
         self.done = False
+        self.parent_count = IocageEvent.PENDING_COUNT - 1
         return self
 
     def end(self, **kwargs):
@@ -118,22 +119,26 @@ class IocageEvent:
         self.done = True
         self.pending = False
         self.done = True
+        self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
     def step(self, **kwargs):
         self._update_message(**kwargs)
+        self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
     def skip(self, **kwargs):
         self._update_message(**kwargs)
         self.skipped = True
         self.pending = False
+        self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
     def fail(self, exception=True, **kwargs):
         self._update_message(**kwargs)
         self.error = exception
         self.pending = False
+        self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
     def __hash__(self):
@@ -229,6 +234,12 @@ class ReleaseDownload(FetchRelease):
 
 
 class ReleaseExtraction(FetchRelease):
+
+    def __init__(self, release, **kwargs):
+        FetchRelease.__init__(self, release, **kwargs)
+
+
+class ReleaseCopyBase(FetchRelease):
 
     def __init__(self, release, **kwargs):
         FetchRelease.__init__(self, release, **kwargs)
