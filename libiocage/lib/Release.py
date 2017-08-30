@@ -31,7 +31,8 @@ class Release:
                  logger=None,
                  check_hashes=True,
                  auto_fetch_updates=True,
-                 auto_update=True):
+                 auto_update=True,
+                 eol=False):
 
         libiocage.lib.helpers.init_logger(self, logger)
         libiocage.lib.helpers.init_zfs(self, zfs)
@@ -41,6 +42,7 @@ class Release:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name
+        self.eol = eol
         self._hashes = None
         self._dataset = None
         self._root_dataset = None
@@ -144,6 +146,18 @@ class Release:
         if self.host.distribution.name == "HardenedBSD":
             return f"HardenedBSD-{self.name}-{self.host.processor}-LATEST"
         return self.name
+
+    @property
+    def annotated_name(self):
+        annotations = set()
+
+        if self.eol is True:
+            annotations.add("EOL")
+
+        if len(annotations) > 0:
+            return f"{self.name} ({', ('.join(annotations)})"
+
+        return f"{self.name}"
 
     @property
     def mirror_url(self):
