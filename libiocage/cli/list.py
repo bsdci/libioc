@@ -24,10 +24,14 @@
 """list module for the cli."""
 import click
 import texttable
+import typing
 
 import libiocage.lib.Host
 import libiocage.lib.Jails
+import libiocage.lib.JailFilter
 import libiocage.lib.Logger
+
+supported_output_formats = ['table', 'csv', 'list']
 
 
 @click.command(name="list", help="List a specified dataset type, by default"
@@ -37,27 +41,26 @@ import libiocage.lib.Logger
               flag_value="base", help="List all bases.")
 @click.option("--template", "-t", "dataset_type", flag_value="template",
               help="List all templates.")
-@click.option("--header", "-h", "-H", is_flag=True, default=False,
-              help="For scripting, use tabs for separators.")
 @click.option("--long", "-l", "_long", is_flag=True, default=False,
               help="Show the full uuid and ip4 address.")
 @click.option("--remote", "-R", is_flag=True, help="Show remote's available "
                                                    "RELEASEs.")
 @click.option("--plugins", "-P", is_flag=True, help="Show available plugins.")
-@click.option("--sort", "-s", "_sort", default="name", nargs=1,
+@click.option("--sort", "-s", "_sort", default=None, nargs=1,
               help="Sorts the list by the given type")
 @click.option("--quick", "-q", is_flag=True, default=False,
               help="Lists all jails with less processing and fields.")
-@click.option("--log-level", "-d", default="info")
 @click.option("--output", "-o", default=None)
+@click.option("--output-format", "-f", default="table", 
+              type=click.Choice(supported_output_formats))
+@click.option("--header/--no-header", "-H/-NH", is_flag=True, default=True,
+              help="Show or hide column name heading.")
 @click.argument("filters", nargs=-1)
 def cli(ctx, dataset_type, header, _long, remote, plugins,
-        _sort, quick, log_level, output, filters):
+        _sort, quick, output, output_format, filters):
     logger = ctx.parent.logger
-    logger.print_level = log_level
 
     host = libiocage.lib.Host.Host(logger=logger)
-    jails = libiocage.lib.Jails.Jails(logger=logger)
 
     if remote and not plugins:
 
@@ -68,52 +71,120 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
 
     if plugins and remote:
         raise Exception("ToDo: Plugins")
+
+    if output is not None and _long is True:
+        logger.error("--output and --long can't be used together")
+        exit(1)
+
+    if output_format != "table" and _sort is not None:
+        # Sorting destroys the ability to stream generators
+        # ToDo: Figure out if we need to sort other output formats as well
+        raise Exception("Sorting only allowed for tables")
+
+    jails = libiocage.lib.Jails.JailsGenerator(
+        logger=logger,
+        host=host,
+        filters=filters # ToDo: allow quoted whitespaces from user input
+    )
+
+    columns = _list_output_comumns(output, _long)
+
+    if output_format == "list":
+        _print_list(jails, columns, header, "\t")
+    elif output_format == "csv":
+        _print_list(jails, columns, header, ";")
     else:
+        _print_table(jails, columns, header, _sort)
 
-        if output:
-            columns = output.strip().split(',')
-        else:
-            columns = ["jid", "name"]
 
-            if _long:
-                columns += ["running",
-                            "release", "ip4.addr", "ip6.addr"]
-            else:
-                columns += ["running", "release", "ip4.addr"]
+def _print_table(
+        jails:typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+        columns:list,
+        show_header:bool,
+        sort_key:str=None
+    ) -> None:
 
-        table = texttable.Texttable(max_width=0)
-        table.set_cols_dtype(["t"] * len(columns))
+    table = texttable.Texttable(max_width=0)
+    table.set_cols_dtype(["t"] * len(columns))
 
-        table_head = (list(x.upper() for x in columns))
-        table_data = []
+    table_head = (list(x.upper() for x in columns))
+    table_data = []
 
-        try:
-            sort_index = columns.index(_sort)
-        except ValueError:
-            sort_index = None
+    try:
+        sort_index = columns.index(sort_key)
+    except ValueError:
+        sort_index = None
 
-        for jail in jails.list(filters=filters):
-            table_data.append(
-                [_lookup_jail_value(jail, x) for x in columns]
-            )
+    for jail in jails:
+        table_data.append(_lookup_jail_values(jail, columns))
 
-        if sort_index is not None:
-            table_data.sort(key=lambda x: x[sort_index])
+    if sort_index is not None:
+        table_data.sort(key=lambda x: x[sort_index])
 
+    if show_header:
         table.add_rows([table_head] + table_data)
+    else:
+        table.add_rows(table_data)
+    
+    print(table.draw())
 
-        if header:
-            # TODO: This sucks since it's a protected member
-            for item in table._rows:
-                print("\t".join(item))
+
+def _print_list(
+        jails:typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+        columns:list,
+        show_header:bool,
+        separator:str=";"
+    ) -> None:
+
+    if show_header is True:
+        print(separator.join(columns).upper())
+
+    for jail in jails:
+        print(separator.join(_lookup_jail_values(jail, columns)))
+
+
+def _list_output_comumns(
+        user_input:str="",
+        long_mode:bool=False
+    ) -> list:
+
+    if user_input:
+        return user_input.strip().split(',')
+    else:
+        columns = ["jid", "name"]
+
+        if long_mode is True:
+            columns += [
+                "running",
+                "release",
+                "ip4.addr",
+                "ip6.addr"
+            ]
         else:
-            print(table.draw())
+            columns += [
+                "running",
+                "release",
+                "ip4.addr"
+            ]
 
-    return
+        return columns
 
 
-def _lookup_jail_value(jail, key):
-    if key in libiocage.lib.Jails.Jails.JAIL_KEYS:
+def _lookup_jail_values(
+        jail:libiocage.lib.Jail.JailGenerator,
+        keys:str
+    ) -> list:
+
+    return [_lookup_jail_value(jail, x) for x in keys]
+
+
+def _lookup_jail_value(
+        jail:libiocage.lib.Jail.JailGenerator,
+        key:str
+    ) -> str:
+
+    # ToDo: Move this into lib/Jails ?
+    if key in libiocage.lib.Jails.JailsGenerator.JAIL_KEYS:
         return jail.getstring(key)
     else:
         return str(jail.config.__getitem__(key))

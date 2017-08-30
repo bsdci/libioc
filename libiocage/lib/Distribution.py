@@ -11,7 +11,10 @@ import libiocage.lib.errors
 import libiocage.lib.helpers
 
 
-class Distribution:
+class DistributionGenerator:
+
+    _class_release = libiocage.lib.Release.ReleaseGenerator
+
     release_name_blacklist = [
         "",
         ".",
@@ -79,7 +82,7 @@ class Distribution:
         )
 
         self.available_releases = list(map(
-            lambda x: libiocage.lib.Release.Release(
+            lambda x: self._class_release(
                 name=x,
                 host=self.host,
                 zfs=self.zfs,
@@ -170,3 +173,7 @@ class Distribution:
                          )
 
         return matches
+
+class Distribution(DistributionGenerator):
+
+    _class_release = libiocage.lib.Release.Release

@@ -33,19 +33,6 @@ import libiocage.lib.errors
 __rootcmd__ = True
 
 
-# ToDo: remove disabled feature
-# def _prettify_release_names(x):
-#     if x.name == host.release_version:
-#         return f"\033[1m{x.name}\033[0m"
-#     else:
-#         return x.name
-# def release_choice():
-#     version =
-#     return click.Choice(list(map(
-#         _prettify_release_names,
-#         host.distribution.releases
-#     )))
-
 @click.command(context_settings=dict(
     max_content_width=400, ),
     name="fetch", help="Fetch a version of FreeBSD for jail usage or a"
@@ -69,15 +56,10 @@ __rootcmd__ = True
 @click.option("--files", multiple=True,
               help="Specify the files to fetch from the mirror. "
                    "(Deprecared: renamed to --file)")
-@click.option("--log-level", "-d", default=None)
 def cli(ctx, **kwargs):
     logger = ctx.parent.logger
-    logger.print_level = kwargs["log_level"]
     host = libiocage.lib.Host.Host(logger=logger)
     prompts = libiocage.lib.Prompts.Prompts(host=host, logger=logger)
-
-    if kwargs["log_level"] is not None:
-        logger.print_level = kwargs["log_level"]
 
     release_input = kwargs["release"]
     if release_input is None:
@@ -87,7 +69,7 @@ def cli(ctx, **kwargs):
             exit(1)
     else:
         try:
-            release = libiocage.lib.Release.Release(
+            release = libiocage.lib.Release.ReleaseGenerator(
                 name=release_input,
                 host=host,
                 logger=logger
@@ -111,10 +93,10 @@ def cli(ctx, **kwargs):
         exit(1)
 
     fetch_updates = bool(kwargs["fetch_updates"])
-    release.fetch(
+    ctx.parent.print_events(release.fetch(
         update=kwargs["update"],
         fetch_updates=fetch_updates
-    )
+    ))
 
     exit(0)
 

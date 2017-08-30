@@ -866,18 +866,15 @@ class ReleaseGenerator:
             logger=self.logger
         )
 
+    def __str__(self):
+        return self.name
+
 
 class Release(ReleaseGenerator):
 
     def fetch(self, *args, **kwargs):
-        libiocage.lib.helpers.print_event_generator(
-            super().fetch(*args, **kwargs),
-            logger=self.logger
-        )
+        return list(ReleaseGenerator.fetch(self, *args, **kwargs))
 
     def update(self, *args, **kwargs):
-        libiocage.lib.helpers.print_event_generator(
-            super().update(*args, **kwargs),
-            logger=self.logger
-        )
+        return list(ReleaseGenerator.update(self, *args, **kwargs))
 

@@ -61,6 +61,9 @@ class JailGenerator:
             release (stored in `zpool/iocage/base/<RELEASE>)
     """
 
+    _class_host = libiocage.lib.Host.HostGenerator
+    _class_storage = libiocage.lib.Storage.Storage
+
     def __init__(self, data={}, zfs=None, host=None, logger=None, new=False):
         """
         Initializes a Jail
@@ -96,7 +99,7 @@ class JailGenerator:
 
         self.networks = []
 
-        self.storage = libiocage.lib.Storage.Storage(
+        self.storage = self._class_storage(
             auto_create=True, safe_mode=False,
             jail=self, logger=self.logger, zfs=self.zfs)
 
@@ -853,12 +856,6 @@ class JailGenerator:
             pass
 
         try:
-            method = object.__getattribute__(self, f"_get_{key}")
-            return method()
-        except:
-            pass
-
-        try:
             jail_state = object.__getattribute__(self, "jail_state")
         except:
             jail_state = None
@@ -893,9 +890,7 @@ class JailGenerator:
         properties = set()
 
         for prop in dict.__dir__(self):
-            if prop.startswith("_get_"):
-                properties.add(prop[5:])
-            elif not prop.startswith("_"):
+            if not prop.startswith("_"):
                 properties.add(prop)
 
         return list(properties)
@@ -903,14 +898,18 @@ class JailGenerator:
 
 class Jail(JailGenerator):
 
+    _class_host = libiocage.lib.Host.HostGenerator
+
     def start(self, *args, **kwargs):
-        libiocage.lib.helpers.print_event_generator(
-            super().start(*args, **kwargs),
-            logger=self.logger
-        )
+        return list(JailGenerator.start(self, *args, **kwargs))
+        # libiocage.lib.helpers.print_event_generator(
+        #     JailGenerator.start(self, *args, **kwargs),
+        #     logger=self.logger
+        # )
 
     def stop(self, *args, **kwargs):
-        libiocage.lib.helpers.print_event_generator(
-            super().stop(*args, **kwargs),
-            logger=self.logger
-        )
+        return list(JailGenerator.start(self, *args, **kwargs))
+        # libiocage.lib.helpers.print_event_generator(
+        #     JailGenerator.stop(self, *args, **kwargs),
+        #     logger=self.logger
+        # )
