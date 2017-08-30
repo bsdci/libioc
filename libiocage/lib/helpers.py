@@ -31,7 +31,8 @@ def init_host(self, host=None):
         try:
             self.host = self._class_host(logger=logger)
         except:
-            self.host = libiocage.lib.Host.HostGenerator(logger=logger)    
+            self.host = libiocage.lib.Host.HostGenerator(logger=logger)
+
 
 def init_datasets(self, datasets=None):
     if datasets:

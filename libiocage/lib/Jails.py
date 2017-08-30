@@ -1,5 +1,4 @@
-import re
-from typing import Generator, List, Union, Iterable
+from typing import Generator, Union, Iterable
 
 import libzfs
 
@@ -62,13 +61,13 @@ class JailsGenerator(list):
 
     @filters.setter
     def filters(
-            self,
-            value:Union[
-                str,
-                Iterable[Union[libiocage.lib.JailFilter.Terms,str]]
-            ]
-        ):
-        
+        self,
+        value: Union[
+            str,
+            Iterable[Union[libiocage.lib.JailFilter.Terms, str]]
+        ]
+    ):
+
         if isinstance(value, libiocage.lib.JailFilter.Terms):
             self._filters = value
         else:
@@ -80,19 +79,19 @@ class JailsGenerator(list):
         return list(jails_dataset.children)
 
     def _load_jail_from_dataset(
-            self,
-            dataset: libzfs.ZFSDataset
-        ) -> Generator[libiocage.lib.Jail.JailGenerator, None, None]:
+        self,
+        dataset: libzfs.ZFSDataset
+    ) -> Generator[libiocage.lib.Jail.JailGenerator, None, None]:
 
         return self._create_jail({
-                "name": self._get_name_from_jail_dataset(dataset)
-            }
+            "name": self._get_name_from_jail_dataset(dataset)
+        }
         )
 
     def _get_name_from_jail_dataset(
-            self,
-            dataset:libzfs.ZFSDataset
-        ) -> str:
+        self,
+        dataset: libzfs.ZFSDataset
+    ) -> str:
 
         return dataset.name.split("/").pop()
 
@@ -110,4 +109,3 @@ class Jails(JailsGenerator):
 
     def __iter__(self):
         return list(JailsGenerator.__iter__(self))
-

@@ -51,7 +51,7 @@ supported_output_formats = ['table', 'csv', 'list']
 @click.option("--quick", "-q", is_flag=True, default=False,
               help="Lists all jails with less processing and fields.")
 @click.option("--output", "-o", default=None)
-@click.option("--output-format", "-f", default="table", 
+@click.option("--output-format", "-f", default="table",
               type=click.Choice(supported_output_formats))
 @click.option("--header/--no-header", "-H/-NH", is_flag=True, default=True,
               help="Show or hide column name heading.")
@@ -84,7 +84,7 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
     jails = libiocage.lib.Jails.JailsGenerator(
         logger=logger,
         host=host,
-        filters=filters # ToDo: allow quoted whitespaces from user input
+        filters=filters  # ToDo: allow quoted whitespaces from user input
     )
 
     columns = _list_output_comumns(output, _long)
@@ -98,11 +98,11 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
 
 
 def _print_table(
-        jails:typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
-        columns:list,
-        show_header:bool,
-        sort_key:str=None
-    ) -> None:
+    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    columns: list,
+    show_header: bool,
+    sort_key: str=None
+) -> None:
 
     table = texttable.Texttable(max_width=0)
     table.set_cols_dtype(["t"] * len(columns))
@@ -125,16 +125,16 @@ def _print_table(
         table.add_rows([table_head] + table_data)
     else:
         table.add_rows(table_data)
-    
+
     print(table.draw())
 
 
 def _print_list(
-        jails:typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
-        columns:list,
-        show_header:bool,
-        separator:str=";"
-    ) -> None:
+    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    columns: list,
+    show_header: bool,
+    separator: str=";"
+) -> None:
 
     if show_header is True:
         print(separator.join(columns).upper())
@@ -144,9 +144,9 @@ def _print_list(
 
 
 def _list_output_comumns(
-        user_input:str="",
-        long_mode:bool=False
-    ) -> list:
+    user_input: str="",
+    long_mode: bool=False
+) -> list:
 
     if user_input:
         return user_input.strip().split(',')
@@ -171,17 +171,17 @@ def _list_output_comumns(
 
 
 def _lookup_jail_values(
-        jail:libiocage.lib.Jail.JailGenerator,
-        keys:str
-    ) -> list:
+    jail: libiocage.lib.Jail.JailGenerator,
+    keys: str
+) -> list:
 
     return [_lookup_jail_value(jail, x) for x in keys]
 
 
 def _lookup_jail_value(
-        jail:libiocage.lib.Jail.JailGenerator,
-        key:str
-    ) -> str:
+    jail: libiocage.lib.Jail.JailGenerator,
+    key: str
+) -> str:
 
     # ToDo: Move this into lib/Jails ?
     if key in libiocage.lib.Jails.JailsGenerator.JAIL_KEYS:

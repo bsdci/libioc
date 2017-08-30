@@ -1,4 +1,5 @@
 from timeit import default_timer as timer
+import libiocage.lib.errors
 
 EVENT_STATUS = (
     "pending",
@@ -49,10 +50,10 @@ class IocageEvent:
         return self.get_state()
 
     def get_state_string(self,
-              error="failed", 
-              skipped="skipped",
-              done="done",
-              pending="pending"):
+                         error="failed",
+                         skipped="skipped",
+                         done="done",
+                         pending="pending"):
 
         if self.error is not None:
             return error
@@ -252,10 +253,12 @@ class ReleaseUpdateDownload(ReleaseEvent):
 
 
 class RunReleaseUpdate(ReleaseUpdate):
+
     def __init__(self, release, **kwargs):
         ReleaseUpdate.__init__(self, release, **kwargs)
 
 
 class ExecuteReleaseUpdate(ReleaseUpdate):
+
     def __init__(self, release, **kwargs):
         ReleaseUpdate.__init__(self, release, **kwargs)

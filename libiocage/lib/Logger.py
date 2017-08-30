@@ -30,6 +30,7 @@ class LogEntry:
 
         self.logger.redraw(self)
 
+
 class Logger:
 
     COLORS = (
@@ -48,15 +49,15 @@ class Logger:
     LINE_UP_SEQ = "\033[F"
 
     LOG_LEVEL_SETTINGS = {
-        "screen"  : {"color": None},
-        "info"    : {"color": None},
-        "notice"  : {"color": "magenta"},
-        "verbose" : {"color": "blue"},
-        "spam"    : {"color": "green"},
+        "screen": {"color": None},
+        "info": {"color": None},
+        "notice": {"color": "magenta"},
+        "verbose": {"color": "blue"},
+        "spam": {"color": "green"},
         "critical": {"color": "red", "bold": True},
-        "error"   : {"color": "red"},
-        "debug"   : {"color": "green"},
-        "warn"    : {"color": "yellow"}
+        "error": {"color": "red"},
+        "debug": {"color": "green"},
+        "warn": {"color": "yellow"}
     }
 
     LOG_LEVELS = (
@@ -118,7 +119,7 @@ class Logger:
         if self._should_print_log_entry(log_entry):
             self._print_log_entry(log_entry)
             self.PRINT_HISTORY.append(log_entry)
-        
+
         return log_entry
 
     def verbose(self, message, indent=0, **kwargs):
@@ -193,7 +194,11 @@ class Logger:
         print(self._beautify_message(message, level, indent))
 
     def _print_log_entry(self, log_entry):
-        return self._print(log_entry.message, log_entry.level, log_entry.indent)
+        return self._print(
+            log_entry.message,
+            log_entry.level,
+            log_entry.indent
+        )
 
     def _indent(self, message, level):
         indent = Logger.INDENT_PREFIX * level

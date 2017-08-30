@@ -42,7 +42,10 @@ def cli(ctx, rc, jails):
     """
 
     logger = ctx.parent.logger
-    ioc_jails = libiocage.lib.Jails.JailsGenerator(logger=logger, filters=jails)
+    ioc_jails = libiocage.lib.Jails.JailsGenerator(
+        logger=logger,
+        filters=jails
+    )
 
     for jail in ioc_jails:
         logger.log(f"Starting {jail.humanreadable_name}")

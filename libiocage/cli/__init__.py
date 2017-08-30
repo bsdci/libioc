@@ -62,14 +62,13 @@ except su.CalledProcessError:
 
 def print_events(generator):
     lines = {}
-    last_event = None
     for event in generator:
 
         if event.identifier is None:
             identifier = "generic"
         else:
             identifier = event.identifier
-        
+
         if event.type not in lines:
             lines[event.type] = {}
 
@@ -94,7 +93,6 @@ def print_events(generator):
         if event.duration is not None:
             output += " [" + str(round(event.duration, 3)) + "s]"
 
-        indent = event.parent_count
         # new line or update of previous
         if identifier not in lines[event.type]:
             # Indent if previous task is not finished
@@ -107,8 +105,6 @@ def print_events(generator):
                 output,
                 indent=event.parent_count
             )
-
-        last_event = event
 
 
 class IOCageCLI(click.MultiCommand):
@@ -149,6 +145,7 @@ class IOCageCLI(click.MultiCommand):
         except (ImportError, AttributeError):
             raise
             return
+
 
 @click.option("--log-level", "-d", default=None)
 @click.command(cls=IOCageCLI)
