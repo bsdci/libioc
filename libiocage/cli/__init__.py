@@ -86,8 +86,8 @@ class IOCageCLI(click.MultiCommand):
                     if len(sys.argv) != 1:
                         if os.geteuid() != 0:
                             logger.error(
-                                f"You need to have root privileges"
-                                f" to run {mod.__name__}"
+                                "You need to have root privileges"
+                                f" to run {mod.__name__.rsplit('.')[-1]}"
                             )
                             exit(1)
             except AttributeError:
