@@ -51,8 +51,8 @@ import libiocage.lib.Logger
 @click.option("--log-level", "-d", default="info")
 @click.option("--output", "-o", default=None)
 @click.argument("filters", nargs=-1)
-def cli(ctx, dataset_type, header, _long, remote, plugins,
-        _sort, quick, log_level, output, filters):
+def cli(ctx, header, _long, remote, plugins, _sort, log_level, output,
+        filters):
     logger = ctx.parent.logger
     logger.print_level = log_level
 
