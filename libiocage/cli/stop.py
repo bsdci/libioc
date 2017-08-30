@@ -45,15 +45,13 @@ def cli(ctx, rc, log_level, force, jails):
     location to stop_jail.
     """
     logger = ctx.parent.logger
-    logger.print_level = log_level
-    ioc_jails = libiocage.lib.Jails.Jails(logger=logger)
+    ioc_jails = libiocage.lib.Jails.JailsGenerator(logger=logger, filters=jails)
 
-    for jail in ioc_jails.list(filters=jails):
-        logger.log(f"Stopping jail {jail.humanreadable_name}")
+    for jail in ioc_jails:
         try:
-            jail.stop(force=force)
+            ctx.parent.print_events(jail.stop(force=force))
         except:
             exit(1)
 
-        logger.log("done")
+        logger.log(f"{jail.name} stopped")
         exit(0)

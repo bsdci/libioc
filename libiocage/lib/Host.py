@@ -7,7 +7,10 @@ import libiocage.lib.Distribution
 import libiocage.lib.helpers
 
 
-class Host:
+class HostGenerator:
+
+    _class_distribution = libiocage.lib.Distribution.DistributionGenerator
+
     def __init__(self, root_dataset=None, zfs=None, logger=None):
 
         libiocage.lib.helpers.init_logger(self, logger)
@@ -17,7 +20,7 @@ class Host:
             logger=self.logger,
             zfs=self.zfs
         )
-        self.distribution = libiocage.lib.Distribution.Distribution(
+        self.distribution = self._class_distribution(
             host=self,
             logger=self.logger
         )
@@ -61,3 +64,8 @@ class Host:
     @property
     def processor(self):
         return platform.processor()
+
+
+class Host(HostGenerator):
+
+    class_distribution = libiocage.lib.Distribution.DistributionGenerator

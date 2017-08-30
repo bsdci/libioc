@@ -1,12 +1,14 @@
 import re
+from typing import Generator, List, Union, Iterable
 
 import libzfs
 
 import libiocage.lib.Jail
+import libiocage.lib.JailFilter
 import libiocage.lib.helpers
 
 
-class Jails:
+class JailsGenerator(list):
     # Keys that are stored on the Jail object, not the configuration
     JAIL_KEYS = [
         "jid",
@@ -17,6 +19,7 @@ class Jails:
     ]
 
     def __init__(self,
+                 filters=None,
                  host=None,
                  logger=None,
                  zfs=None):
@@ -26,122 +29,85 @@ class Jails:
         libiocage.lib.helpers.init_host(self, host)
         self.zfs = libzfs.ZFS(history=True, history_prefix="<iocage>")
 
-    def list(self, filters=None):
+        self._filters = None
+        self.filters = filters
+        list.__init__(self, [])
 
-        if len(filters) == 1:
-            chars = "+*="
-            name = filters[0]
-            if not any(x in name for x in chars):
-                single_jail = libiocage.lib.Jail.Jail(
-                    {
-                        "name": name
-                    },
-                    logger=self.logger,
-                    host=self.host,
-                    zfs=self.zfs
-                )
-                return [single_jail]
+    def __iter__(self):
 
-        jails = self._get_existing_jails()
+        for jail_dataset in self.jail_datasets:
 
-        if filters is not None:
-            return self._filter_jails(jails, filters)
-        else:
-            return jails
+            jail_name = self._get_name_from_jail_dataset(jail_dataset)
+            if self._filters.match_key("name", jail_name) is not True:
+                # Skip all jails that do not even match the name
+                continue
 
-    def _filter_jails(self, jails, filters):
+            # ToDo: Do not load jail if filters do not require to
+            jail = self._load_jail_from_dataset(jail_dataset)
+            if self._filters.match_jail(jail):
+                yield jail
 
-        filtered_jails = []
-        jail_filters = {}
-
-        filter_terms = list(map(_split_filter_map, filters))
-        for key, value in filter_terms:
-            if key not in jail_filters.keys():
-                jail_filters[key] = [value]
-            else:
-                jail_filters[key].append(value)
-
-        for jail in jails:
-
-            jail_matches = True
-
-            for group in jail_filters.keys():
-
-                # Providing multiple names = OR (e.g. name=foo, name=bar)
-                jail_matches_group = False
-
-                for current_filter in jail_filters[group]:
-                    if self._jail_matches_filter(jail, group, current_filter):
-                        jail_matches_group = True
-
-                if jail_matches_group is False:
-                    jail_matches = False
-                    continue
-
-            if jail_matches is True:
-                filtered_jails.append(jail)
-
-        return filtered_jails
-
-    def _get_existing_jails(self):
-        jails_dataset = self.host.datasets.jails
-        jail_datasets = list(jails_dataset.children)
-
-        return list(map(
-            lambda x: libiocage.lib.Jail.Jail({
-                "name": x.name.split("/").pop()
-            }, logger=self.logger, host=self.host, zfs=self.zfs),
-            jail_datasets
-        ))
-
-    def _jail_matches_filter(self, jail, key, value):
-        for filter_value in self._split_filter_values(value):
-            jail_value = self._lookup_jail_value(jail, key)
-            if not self._matches_filter(filter_value, jail_value):
-                return False
-        return True
-
-    def _matches_filter(self, filter_value, value):
-        escaped_characters = [".", "$", "^", "(", ")"]
-        for character in escaped_characters:
-            filter_value = filter_value.replace(character, f"\\{character}")
-        filter_value = filter_value.replace("$", "\\$")
-        filter_value = filter_value.replace(".", "\\.")
-        filter_value = filter_value.replace("*", ".*")
-        filter_value = filter_value.replace("+", ".+")
-        pattern = f"^{filter_value}$"
-        match = re.match(pattern, value)
-        return match is not None
-
-    def _lookup_jail_value(self, jail, key):
-        if key in Jails.JAIL_KEYS:
-            return jail.getstring(key)
-        else:
-            return str(jail.config[key])
-
-    def _split_filter_values(self, value):
-        values = []
-        escaped_comma_blocks = map(
-            lambda block: block.split(","),
-            value.split("\\,")
+    def _create_jail(self, *args, **kwargs):
+        return libiocage.lib.Jail.JailGenerator(
+            *args,
+            logger=self.logger,
+            host=self.host,
+            zfs=self.zfs,
+            **kwargs
         )
-        for block in escaped_comma_blocks:
-            n = len(values)
-            if n > 0:
-                index = n - 1
-                values[index] += f",{block[0]}"
-            else:
-                values.append(block[0])
-            if len(block) > 1:
-                values += block[1:]
-        return values
+
+    @property
+    def filters(self):
+        return self._filters
+
+    @filters.setter
+    def filters(
+            self,
+            value:Union[
+                str,
+                Iterable[Union[libiocage.lib.JailFilter.Terms,str]]
+            ]
+        ):
+        
+        if isinstance(value, libiocage.lib.JailFilter.Terms):
+            self._filters = value
+        else:
+            self._filters = libiocage.lib.JailFilter.Terms(value)
+
+    @property
+    def jail_datasets(self) -> list:
+        jails_dataset = self.host.datasets.jails
+        return list(jails_dataset.children)
+
+    def _load_jail_from_dataset(
+            self,
+            dataset: libzfs.ZFSDataset
+        ) -> Generator[libiocage.lib.Jail.JailGenerator, None, None]:
+
+        return self._create_jail({
+                "name": self._get_name_from_jail_dataset(dataset)
+            }
+        )
+
+    def _get_name_from_jail_dataset(
+            self,
+            dataset:libzfs.ZFSDataset
+        ) -> str:
+
+        return dataset.name.split("/").pop()
 
 
-def _split_filter_map(x):
-    try:
-        prop, value = x.split("=", maxsplit=1)
-    except:
-        prop = "name"
-        value = x
+class Jails(JailsGenerator):
 
-    return prop, value
+    def _create_jail(self, *args, **kwargs):
+        return libiocage.lib.Jail.Jail(
+            *args,
+            logger=self.logger,
+            host=self.host,
+            zfs=self.zfs,
+            **kwargs
+        )
+
+    def __iter__(self):
+        return list(JailsGenerator.__iter__(self))
+
