@@ -205,8 +205,7 @@ class JailConfig(dict, object):
             )
             self.logger.error(msg)
 
-        name_pattern = f"^[A-z0-9]([A-z0-9\\._\\-]+[A-z0-9])*$"
-        if not re.match(name_pattern, name):
+        if libiocage.lib.helpers.validate_name(name) is False:
             raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
 
         self.id = name
