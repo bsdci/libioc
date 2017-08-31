@@ -213,7 +213,7 @@ class JailConfig(dict, object):
             self["id"] = name
         else:
             try:
-                self["id"] = str(uuid.UUID(name)) # legacy support
+                self["id"] = str(uuid.UUID(name))  # legacy support
             except:
                 raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
 

@@ -58,7 +58,4 @@ def cli(ctx, rc, jails):
 
         logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")
 
-    if len(failed_jails) > 0:
-        exit(1)
-
-    exit(0)
+    exit(1) if len(failed_jails) > 0 else exit(0)
