@@ -4,9 +4,13 @@ import ucl
 
 import libiocage.lib.helpers
 
+from typing import Optional
+
 
 class RCConf(dict):
-    def __init__(self, path, data={}, logger=None, jail=None):
+    def __init__(self, path: str, data: dict={},
+                 logger: Optional[libiocage.lib.Logger.Logger]=None,
+                 jail:   Optional[libiocage.lib.Jail.Jail]=None) -> None:
 
         dict.__init__(self, {})
         libiocage.lib.helpers.init_logger(self, logger=logger)
