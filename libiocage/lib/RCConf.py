@@ -7,9 +7,7 @@ import libiocage.lib.helpers
 
 
 class RCConf(dict):
-    def __init__(self, path: str, data: dict={},
-                 logger: libiocage.lib.Logger.Logger=None,
-                 jail:   libiocage.lib.Jail.Jail=None) -> None:
+    def __init__(self, path: str, data={}, logger=None, jail=None) -> None:
 
         dict.__init__(self, {})
         libiocage.lib.helpers.init_logger(self, logger=logger)
