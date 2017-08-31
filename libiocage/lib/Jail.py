@@ -19,7 +19,7 @@ import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
 
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, List, Tuple, Dict, Any
 
 
 class JailGenerator:
@@ -118,8 +118,8 @@ class JailGenerator:
             zfs=self.zfs
         )
 
-        self.jail_state: dict[str, Union[str, int]] = None
-        self._dataset_name = None
+        self.jail_state: Optional[Dict[str, Any]] = None
+        self._dataset_name: Optional[str] = None
         self._rc_conf: Optional[libiocage.lib.RCConf.RCConf] = None
 
         if new is False:
@@ -889,7 +889,7 @@ class JailGenerator:
         except AttributeError:
             return "-"
 
-    def __dir__(self) -> List[str]:
+    def __dir__(self) -> List[Any]:
 
         properties = set()
 
