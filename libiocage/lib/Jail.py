@@ -712,13 +712,13 @@ class JailGenerator:
 
     def _resolve_name(self, text):
 
-        if (text is None) or (len(text)==0):
+        if (text is None) or (len(text) == 0):
             raise libiocage.lib.errors.JailNotSupplied(logger=self.logger)
 
         jails_dataset = self.host.datasets.jails
 
         for dataset in list(jails_dataset.children):
-            
+
             dataset_name = dataset.name[(len(jails_dataset.name) + 1):]
             humanreadable_name = libiocage.lib.helpers.to_humanreadable_name(
                 dataset_name
