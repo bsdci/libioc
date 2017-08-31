@@ -64,7 +64,7 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
     )
 
     if not jail.exists:
-        logger.error("Jail '{jail}' does not exist")
+        logger.error(f"Jail '{jail.name}' does not exist")
         exit(1)
 
     if _all is True:

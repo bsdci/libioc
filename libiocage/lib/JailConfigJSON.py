@@ -7,10 +7,15 @@ import libiocage.lib.helpers
 class JailConfigJSON:
     def toJSON(self):
         data = self.data
-        for key in data.keys():
-            if data[key] is None:
-                data[key] = "none"
-        return json.dumps(data, sort_keys=True, indent=4)
+        output_data = {}
+        for key, value in data.items():
+            output_data[key] = libiocage.lib.helpers.to_string(
+                value,
+                true="yes",
+                false="no",
+                none="none"
+            )
+        return json.dumps(output_data, sort_keys=True, indent=4)
 
     def save(self):
         config_file_path = JailConfigJSON.__get_config_json_path(self)

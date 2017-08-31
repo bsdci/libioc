@@ -66,11 +66,11 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
 
         available_releases = host.distribution.releases
         for available_release in available_releases:
-            print(available_release.name)
+            logger.screen(available_release.name)
         return
 
     if plugins and remote:
-        raise Exception("ToDo: Plugins")
+        raise libiocage.lib.errors.MissingFeature("Plugins", plural=True)
 
     if output is not None and _long is True:
         logger.error("--output and --long can't be used together")
@@ -80,6 +80,10 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         # Sorting destroys the ability to stream generators
         # ToDo: Figure out if we need to sort other output formats as well
         raise Exception("Sorting only allowed for tables")
+
+    # empty filters will match all jails
+    if len(filters) == 0:
+        filters += ("*",)
 
     jails = libiocage.lib.Jails.JailsGenerator(
         logger=logger,
@@ -143,6 +147,13 @@ def _print_list(
         print(separator.join(_lookup_jail_values(jail, columns)))
 
 
+def _lookup_jail_values(jail, columns) -> typing.List[str]:
+    return list(map(
+        lambda column: jail.getstring(column),
+        columns
+    ))
+
+
 def _list_output_comumns(
     user_input: str="",
     long_mode: bool=False
@@ -168,23 +179,3 @@ def _list_output_comumns(
             ]
 
         return columns
-
-
-def _lookup_jail_values(
-    jail: libiocage.lib.Jail.JailGenerator,
-    keys: str
-) -> list:
-
-    return [_lookup_jail_value(jail, x) for x in keys]
-
-
-def _lookup_jail_value(
-    jail: libiocage.lib.Jail.JailGenerator,
-    key: str
-) -> str:
-
-    # ToDo: Move this into lib/Jails ?
-    if key in libiocage.lib.Jails.JailsGenerator.JAIL_KEYS:
-        return jail.getstring(key)
-    else:
-        return str(jail.config.__getitem__(key))

@@ -49,6 +49,7 @@ def validate_count(ctx, param, value):
 
 
 @click.command(name="create", help="Create a jail.")
+@click.pass_context
 @click.option("--count", "-c", callback=validate_count, default="1",
               help="Designate a number of jails to create. Jails are"
                    " numbered sequentially.")
@@ -76,16 +77,12 @@ def validate_count(ctx, param, value):
               help="Do not automatically fetch releases")
 @click.option("--force", "-f", is_flag=True, default=False,
               help="Skip the interactive question.")
-@click.option("--log-level", "-d", default=None)
 @click.argument("props", nargs=-1)
-def cli(release, template, count, props, pkglist, basejail, basejail_type,
-        empty, name, no_fetch, force, log_level):
+def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
+        empty, name, no_fetch, force):
     zfs = libiocage.lib.helpers.get_zfs()
-    logger = libiocage.lib.Logger.Logger()
+    logger = ctx.parent.logger
     host = libiocage.lib.Host.Host(logger=logger, zfs=zfs)
-
-    if log_level is not None:
-        logger.print_level = log_level
 
     jail_data = {}
 

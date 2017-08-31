@@ -50,6 +50,8 @@ def cli(ctx, rc, log_level, force, jails):
         filters=jails
     )
 
+    print(ioc_jails)
+
     failed_jails = []
     for jail in ioc_jails:
         try:

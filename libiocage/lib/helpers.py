@@ -1,5 +1,6 @@
 import re
 import subprocess
+import uuid
 
 import libzfs
 
@@ -99,10 +100,20 @@ def _prettify_output(output):
     ))
 
 
+def to_humanreadable_name(name: str) -> str:
+    try:
+        uuid.UUID(name)
+        return str(name)[:8]
+    except (TypeError, ValueError):
+        return name
+
+
 # helper function to validate names
-def validate_name(name):
-    validate = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
-    return bool(validate.fullmatch(name))
+_validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
+
+
+def validate_name(name: str):
+    return bool(_validate_name.fullmatch(name))
 
 
 def _parse_none(data):

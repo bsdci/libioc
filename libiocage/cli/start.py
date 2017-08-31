@@ -49,14 +49,12 @@ def cli(ctx, rc, jails):
 
     failed_jails = []
     for jail in ioc_jails:
-        logger.log(f"Starting {jail.humanreadable_name}")
         try:
             ctx.parent.print_events(jail.start())
 
         except Exception:
             failed_jails.append(jail)
             continue
-            exit(1)
 
         logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")
 
