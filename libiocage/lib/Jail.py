@@ -19,7 +19,7 @@ import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
 
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Tuple
 
 
 class JailGenerator:
@@ -70,9 +70,9 @@ class JailGenerator:
 
     def __init__(self,
                  data:   Union[str, dict]={},
-                 zfs:    Optional[libzfs.ZFS]=None,
-                 host:   Optional[libiocage.lib.Host.Host]=None,
-                 logger: Optional[libiocage.lib.Logger.Logger]=None,
+                 zfs:    libzfs.ZFS=None,
+                 host:   libiocage.lib.Host.Host=None,
+                 logger: libiocage.lib.Logger.Logger=None,
                  new:    bool=False) -> None:
         """
         Initializes a Jail
@@ -108,7 +108,7 @@ class JailGenerator:
             logger=self.logger
         )
 
-        self.networks: List[str] = []
+        self.networks: List[libiocage.lib.Network.Network] = []
 
         self.storage = self._class_storage(
             auto_create=True,
@@ -118,7 +118,7 @@ class JailGenerator:
             zfs=self.zfs
         )
 
-        self.jail_state = None
+        self.jail_state: dict[str, Union[str, int]] = None
         self._dataset_name = None
         self._rc_conf: Optional[libiocage.lib.RCConf.RCConf] = None
 
@@ -365,7 +365,8 @@ class JailGenerator:
         self.config.data["release"] = release.name
         self.config.save()
 
-    def exec(self, command: List[str], **kwargs) -> None:
+    def exec(self, command: List[str], **kwargs) -> Tuple[
+            subprocess.Popen, str, str]:
         """
         Execute a command in a started jail
 
