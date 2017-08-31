@@ -85,9 +85,10 @@ class IOCageCLI(click.MultiCommand):
                 if mod.__rootcmd__ and "--help" not in sys.argv[1:]:
                     if len(sys.argv) != 1:
                         if os.geteuid() != 0:
+                            app_name = mod.__name__.rsplit(".")[-1]
                             logger.error(
                                 "You need to have root privileges"
-                                f" to run {mod.__name__.rsplit('.')[-1]}"
+                                f" to run {app_name}"
                             )
                             exit(1)
             except AttributeError:
