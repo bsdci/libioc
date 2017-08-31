@@ -1,4 +1,5 @@
 import re
+import uuid
 
 import libiocage.lib.JailConfigAddresses
 import libiocage.lib.JailConfigDefaults
@@ -73,15 +74,12 @@ class JailConfig(dict, object):
             self.jail = None
             self.fstab = None
 
-        data_keys = data.keys()
-
-        # the UUID is used in many other variables and needs to be set first
-        if "name" in data_keys:
-            self["name"] = data["name"]
-        elif "uuid" in data_keys:
-            self["name"] = data["uuid"]
-        else:
-            self["id"] = None
+        # the name is used in many other variables and needs to be set first
+        self["id"] = None
+        for key in ["id", "name", "uuid"]:
+            if key in data.keys():
+                self["name"] = data[key]
+                break
 
         # be aware of iocage-legacy jails for migration
         try:
@@ -129,8 +127,13 @@ class JailConfig(dict, object):
                 Passed to __setitem__
 
         """
-        for key in data:
-            self.__setitem__(key, data[key], skip_on_error=skip_on_error)
+        current_id = self["id"]
+        for key, value in data.items():
+
+            if (key in ["id", "name", "uuid"]) and (current_id is not None):
+                value = current_id
+
+            self.__setitem__(key, value, skip_on_error=skip_on_error)
 
     def read(self):
 
@@ -205,15 +208,19 @@ class JailConfig(dict, object):
             )
             self.logger.error(msg)
 
-        if libiocage.lib.helpers.validate_name(name) is False:
-            raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
-
-        self.id = name
+        is_valid_name = libiocage.lib.helpers.validate_name(name)
+        if is_valid_name is True:
+            self["id"] = name
+        else:
+            try:
+                self["id"] = str(uuid.UUID(name)) # legacy support
+            except:
+                raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
 
         try:
-            self.host_hostname
+            self["host_hostname"]
         except:
-            self.host_hostname = name
+            self["host_hostname"] = name
 
         self.logger.spam(
             f"Set jail name to {name}",

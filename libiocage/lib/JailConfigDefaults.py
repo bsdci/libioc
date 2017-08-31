@@ -7,6 +7,7 @@ import libiocage.lib.helpers
 class JailConfigDefaults(dict):
 
     DEFAULTS = {
+        "id": None,
         "basejail": False,
         "defaultrouter": None,
         "defaultrouter6": None,

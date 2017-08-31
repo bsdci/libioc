@@ -711,22 +711,21 @@ class JailGenerator:
                 )
 
     def _resolve_name(self, text):
-        jails_dataset = self.host.datasets.jails
-        best_guess = ""
-        for dataset in list(jails_dataset.children):
-            dataset_name = dataset.name[(len(jails_dataset.name) + 1):]
-            if text == dataset_name:
-                # Exact match, immediately return
-                return dataset_name
-            elif dataset_name.startswith(text) and len(text) > len(best_guess):
-                best_guess = text
 
-        if len(best_guess) > 0:
-            self.logger.debug(f"Resolved {text} to uuid {dataset_name}")
-            return best_guess
-
-        if not best_guess:
+        if (text is None) or (len(text)==0):
             raise libiocage.lib.errors.JailNotSupplied(logger=self.logger)
+
+        jails_dataset = self.host.datasets.jails
+
+        for dataset in list(jails_dataset.children):
+            
+            dataset_name = dataset.name[(len(jails_dataset.name) + 1):]
+            humanreadable_name = libiocage.lib.helpers.to_humanreadable_name(
+                dataset_name
+            )
+
+            if text in [dataset_name, humanreadable_name]:
+                return dataset_name
 
         raise libiocage.lib.errors.JailNotFound(text, logger=self.logger)
 
@@ -906,14 +905,6 @@ class Jail(JailGenerator):
 
     def start(self, *args, **kwargs):
         return list(JailGenerator.start(self, *args, **kwargs))
-        # libiocage.lib.helpers.print_event_generator(
-        #     JailGenerator.start(self, *args, **kwargs),
-        #     logger=self.logger
-        # )
 
     def stop(self, *args, **kwargs):
-        return list(JailGenerator.start(self, *args, **kwargs))
-        # libiocage.lib.helpers.print_event_generator(
-        #     JailGenerator.stop(self, *args, **kwargs),
-        #     logger=self.logger
-        # )
+        return list(JailGenerator.stop(self, *args, **kwargs))

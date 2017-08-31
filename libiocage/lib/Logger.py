@@ -85,7 +85,7 @@ class Logger:
 
     @property
     def default_print_level(self):
-        return "info"
+        return "spam"
 
     @property
     def print_level(self):
