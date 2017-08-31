@@ -60,7 +60,7 @@ class JailNotSupplied(IocageException):
 class JailUnknownIdentifier(IocageException):
 
     def __init__(self, *args, **kwargs):
-        msg = "The jail has not identifier yet"
+        msg = "The jail has no identifier yet"
         super().__init__(msg, *args, **kwargs)
 
 
