@@ -1,5 +1,5 @@
-import os.path
 import json
+import os.path
 
 import libiocage.lib.helpers
 

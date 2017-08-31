@@ -1,11 +1,11 @@
-import pytest
-import uuid
 import json
 import os
-
-import libiocage.lib.Jail
+import uuid
 
 import helper_functions
+import pytest
+
+import libiocage.lib.Jail
 
 
 def read_jail_config_json(config_file):

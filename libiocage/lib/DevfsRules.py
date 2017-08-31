@@ -1,5 +1,5 @@
-import re
 import os.path
+import re
 
 import libiocage.lib.errors
 import libiocage.lib.helpers

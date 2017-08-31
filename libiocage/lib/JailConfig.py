@@ -1,13 +1,13 @@
 import re
 
 import libiocage.lib.JailConfigAddresses
+import libiocage.lib.JailConfigDefaults
 import libiocage.lib.JailConfigFstab
 import libiocage.lib.JailConfigInterfaces
 import libiocage.lib.JailConfigJSON
 import libiocage.lib.JailConfigLegacy
 import libiocage.lib.JailConfigResolver
 import libiocage.lib.JailConfigZFS
-import libiocage.lib.JailConfigDefaults
 import libiocage.lib.errors
 import libiocage.lib.helpers
 

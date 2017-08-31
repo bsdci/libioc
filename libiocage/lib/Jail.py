@@ -2,6 +2,7 @@ import os
 import subprocess
 import uuid
 
+import libiocage.lib.DevfsRules
 import libiocage.lib.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
@@ -12,7 +13,6 @@ import libiocage.lib.StandaloneJailStorage
 import libiocage.lib.Storage
 import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
-import libiocage.lib.DevfsRules
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
