@@ -8,7 +8,7 @@ import libiocage.lib.Datasets
 import libiocage.lib.Host
 import libiocage.lib.Logger
 
-from typing import List
+from typing import List, Tuple
 
 
 def init_zfs(self, zfs):
@@ -52,8 +52,8 @@ def init_logger(self, logger=None):
         object.__setattr__(self, 'logger', new_logger)
 
 
-def exec(command, logger=None, ignore_error=False) -> (
-        subprocess.Popen, str, str,):
+def exec(command, logger=None, ignore_error=False) -> Tuple[
+        subprocess.Popen, str, str]:
 
     command_str = " ".join(list([command]))
 
