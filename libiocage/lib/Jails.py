@@ -82,8 +82,7 @@ class JailsGenerator(list):
 
         return self._create_jail({
             "name": self._get_name_from_jail_dataset(dataset)
-        }
-        )
+        })
 
     def _get_name_from_jail_dataset(
         self,

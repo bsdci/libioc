@@ -50,8 +50,6 @@ def cli(ctx, rc, log_level, force, jails):
         filters=jails
     )
 
-    print(ioc_jails)
-
     failed_jails = []
     for jail in ioc_jails:
         try:
@@ -62,7 +60,4 @@ def cli(ctx, rc, log_level, force, jails):
 
         logger.log(f"{jail.name} stopped")
 
-    if len(failed_jails) > 0:
-        exit(1)
-
-    exit(0)
+    exit(1) if len(failed_jails) > 0 else exit(0)

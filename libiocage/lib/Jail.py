@@ -159,18 +159,8 @@ class JailGenerator:
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
         jailServicesStartEvent = events.JailServicesStart(jail=self)
 
-        # Determine backend
-
-        backend = None
-
-        if self.config["basejail_type"] == "zfs":
-            backend = libiocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
-
-        if self.config["basejail_type"] == "nullfs":
-            backend = libiocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
-
-        if backend is not None:
-            backend.apply(self.storage, release)
+        if self.basejail_backend is not None:
+            self.basejail_backend.apply(self.storage, release)
 
         yield jailLaunchEvent.begin()
 
@@ -199,6 +189,20 @@ class JailGenerator:
             yield jailServicesStartEvent.begin()
             self._start_services()
             yield jailServicesStartEvent.end()
+
+    @property
+    def basejail_backend(self):
+
+        if self.config["basejail"] is False:
+            return None
+
+        if self.config["basejail_type"] == "nullfs":
+            return libiocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
+
+        if self.config["basejail_type"] == "zfs":
+            return libiocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
+
+        return None
 
     def _start_services(self):
         command = self.config["exec_start"].strip().split()
