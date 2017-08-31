@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """list module for the cli."""
 import click
+import json
 import texttable
 import typing
 
@@ -31,7 +32,7 @@ import libiocage.lib.Jails
 import libiocage.lib.JailFilter
 import libiocage.lib.Logger
 
-supported_output_formats = ['table', 'csv', 'list']
+supported_output_formats = ['table', 'csv', 'list', 'json']
 
 
 @click.command(name="list", help="List a specified dataset type, by default"
@@ -97,6 +98,8 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         _print_list(jails, columns, header, "\t")
     elif output_format == "csv":
         _print_list(jails, columns, header, ";")
+    elif output_format == "json":
+        _print_json(jails, columns)
     else:
         _print_table(jails, columns, header, _sort)
 
@@ -145,6 +148,26 @@ def _print_list(
 
     for jail in jails:
         print(separator.join(_lookup_jail_values(jail, columns)))
+
+
+def _print_json(
+    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    columns: list,
+    **json_dumps_args
+):
+
+    if "indent" not in json_dumps_args.keys():
+        json_dumps_args["indent"] = 2
+
+    if "sort_keys" not in json_dumps_args.keys():
+        json_dumps_args["sort_keys"] = True
+
+    output = []
+
+    for jail in jails:
+        output.append(dict(zip(columns, _lookup_jail_values(jail, columns))))
+
+    print(json.dumps(output, **json_dumps_args))
 
 
 def _lookup_jail_values(jail, columns) -> typing.List[str]:
