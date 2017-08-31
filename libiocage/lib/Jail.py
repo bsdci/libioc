@@ -744,7 +744,6 @@ class JailGenerator:
         Whenever a Jail is found to have a UUID as identifier,
         a shortened string of the first 8 characters is returned
         """
-
         try:
             return libiocage.lib.helpers.to_humanreadable_name(self.name)
         except:

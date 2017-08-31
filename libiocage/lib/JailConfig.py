@@ -217,11 +217,6 @@ class JailConfig(dict, object):
             except:
                 raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
 
-        try:
-            self["host_hostname"]
-        except:
-            self["host_hostname"] = name
-
         self.logger.spam(
             f"Set jail name to {name}",
             jail=self.jail
@@ -638,17 +633,7 @@ class JailConfig(dict, object):
         return list(properties)
 
     def stringify(self, value, enabled=True):
-
-        if not enabled:
-            return value
-        elif value is None:
-            return "-"
-        elif value is True:
-            return "on"
-        elif value is False:
-            return "off"
-        else:
-            return str(value)
+        return libiocage.helpers.to_string if (enabled is True) else value
 
 
 class JailConfigList(list):
