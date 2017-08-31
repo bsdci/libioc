@@ -120,7 +120,7 @@ class JailGenerator:
 
         self.jail_state = None
         self._dataset_name = None
-        self._rc_conf = None
+        self._rc_conf: Optional[libiocage.lib.RCConf.RCConf] = None
 
         if new is False:
             self.config.read()
