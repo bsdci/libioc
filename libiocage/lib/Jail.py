@@ -19,7 +19,7 @@ import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
 
-from typing import Union, Optional, List, Tuple, Dict, Any
+from typing import Union, Optional, List, Tuple, Any
 
 
 class JailGenerator:
