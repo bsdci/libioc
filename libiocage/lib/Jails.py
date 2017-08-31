@@ -47,13 +47,10 @@ class JailsGenerator(list):
                 yield jail
 
     def _create_jail(self, *args, **kwargs):
-        return libiocage.lib.Jail.JailGenerator(
-            *args,
-            logger=self.logger,
-            host=self.host,
-            zfs=self.zfs,
-            **kwargs
-        )
+        kwargs["logger"] = self.logger
+        kwargs["host"] = self.host
+        kwargs["zfs"] = self.zfs
+        return libiocage.lib.Jail.Jail(*args,**kwargs)
 
     @property
     def filters(self):
@@ -99,13 +96,10 @@ class JailsGenerator(list):
 class Jails(JailsGenerator):
 
     def _create_jail(self, *args, **kwargs):
-        return libiocage.lib.Jail.Jail(
-            *args,
-            logger=self.logger,
-            host=self.host,
-            zfs=self.zfs,
-            **kwargs
-        )
+        kwargs["logger"] = self.logger
+        kwargs["host"] = self.host
+        kwargs["zfs"] = self.zfs
+        return libiocage.lib.Jail.Jail(*args,**kwargs)
 
     def __iter__(self):
         return list(JailsGenerator.__iter__(self))
