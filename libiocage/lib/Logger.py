@@ -30,6 +30,9 @@ class LogEntry:
 
         self.logger.redraw(self)
 
+    def __len__(self):
+        return len(self.message.split("\n"))
+
 
 class Logger:
 
@@ -158,17 +161,19 @@ class Logger:
                 )
             )
 
-        line_number = self.PRINT_HISTORY.index(log_entry)
-        delta = len(self.PRINT_HISTORY) - line_number
-
-        # ToDo: Handle redrawing of multiline entries with different line count
+        # calculate the delta of messages printed since
+        i = self.PRINT_HISTORY.index(log_entry)
+        n = len(self.PRINT_HISTORY)
+        delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i,n)))
 
         output = "".join([
+            "\r",
             f"\033[{delta}F",  # CPL - Cursor Previous Line
             "\r",               # CR - Carriage Return
-            self._indent(log_entry.message, log_entry.indent),
+            self._indent(f"{log_entry.message}: {delta}", log_entry.indent),
             "\033[K",           # EL - Erase in Line
-            "\n" * delta
+            "\n" * (delta),
+            "\r"
         ])
 
         sys.stdout.write(output)
