@@ -1,6 +1,7 @@
 from typing import List, Union, Iterable
 import re
 import libiocage.lib.Jail
+import libiocage.lib.errors
 
 
 def match_filter(value: str, filter_string: str):
@@ -9,13 +10,14 @@ def match_filter(value: str, filter_string: str):
         filter_string = filter_string.replace(character, f"\\{character}")
     filter_string = filter_string.replace("*", ".*")
     filter_string = filter_string.replace("+", ".+")
-    print
     pattern = f"^{filter_string}$"
     match = re.match(pattern, value)
     return match is not None
 
 
 class Term(list):
+
+    glob_characters = ["*", "+"]
 
     def __init__(self, key, values=list()):
         self.key = key
@@ -30,15 +32,37 @@ class Term(list):
         list.__init__(self, data)
 
     def matches_jail(self, jail: libiocage.lib.Jail.JailGenerator) -> bool:
-        jail_value = jail.getstring(self.key)
-        return self.matches(jail_value)
+        return self.matches(jail.getstring(self.key))
 
     def matches(self, value: str) -> bool:
         """
         Returns True if the value matches the term
         """
         for filter_value in self:
+
+            if self.key == "name":
+                if self._validate_name_filter_string(filter_value) is False:
+                    raise libiocage.lib.errors.JailFilterInvalidName(
+                        filter_value,
+                        logger=self.logger
+                    )
+
             if match_filter(value, filter_value):
+                return True
+
+            # match against humanreadable names as well
+            has_humanreadble_length = (len(filter_value) == 8)
+            has_no_globs = not self._filter_string_has_globs(filter_value)
+            if (has_humanreadble_length and has_no_globs) is True:
+                shortname = libiocage.lib.helpers.to_humanreadable_name(value)
+                if match_filter(shortname, filter_value):
+                    return True
+
+        return False
+
+    def _filter_string_has_globs(self, filter_string: str) -> bool:
+        for glob in self.glob_characters:
+            if glob in filter_string:
                 return True
         return False
 
@@ -58,6 +82,22 @@ class Term(list):
             if len(block) > 1:
                 values += block[1:]
         return values
+
+    def _validate_name_filter_string(self, filter_string: str) -> bool:
+
+        globs = self.glob_characters
+
+        # Allow glob only filters
+        if (len(filter_string) == 1) and (filter_string in globs):
+            return True
+
+        # replace all glob charaters in user input
+        filter_string_without_globs = ""
+        for i, char in enumerate(filter_string):
+            if char not in globs:
+                filter_string_without_globs += char
+
+        return libiocage.lib.helpers.validate_name(filter_string_without_globs)
 
 
 class Terms(list):
@@ -82,17 +122,11 @@ class Terms(list):
 
         list.__init__(self, data)
 
-    @property
-    def only_by_name(self) -> bool:
-        """
-        True if all terms match by name only
-        """
-        return all([x.key == "name" for x in self])
-
     def match_jail(self, jail: libiocage.lib.Jail.JailGenerator) -> bool:
         """
         Returns True if all Terms match the jail
         """
+
         for term in self:
             if term.matches_jail(jail) is False:
                 return False
@@ -116,17 +150,16 @@ class Terms(list):
 
         return True
 
-    def _parse_term(self, user_input: Iterable[str]) -> List[Term]:
+    def _parse_term(self, user_input: str) -> List[Term]:
 
         terms = []
 
-        for user_term in user_input:
-            try:
-                prop, value = user_input.split("=", maxsplit=1)
-            except:
-                prop = "name"
-                value = user_input
+        try:
+            prop, value = user_input.split("=", maxsplit=1)
+        except:
+            prop = "name"
+            value = user_input
 
-            terms.append(Term(prop, value))
+        terms.append(Term(prop, value))
 
         return terms

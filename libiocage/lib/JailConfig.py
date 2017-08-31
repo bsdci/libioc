@@ -551,15 +551,53 @@ class JailConfig(dict, object):
         # except:
         #     pass
 
+        parsed_value = libiocage.lib.helpers.parse_user_input(value)
+
         setter_method = None
         try:
             setter_method = self.__getattribute__(f"_set_{key}")
         except:
-            self.data[key] = value
+            self.data[key] = parsed_value
             pass
 
         if setter_method is not None:
-            return setter_method(value, **kwargs)
+            return setter_method(parsed_value, **kwargs)
+
+    def set(self, key: str, value, **kwargs) -> bool:
+        """
+        Set a JailConfig property
+
+        Args:
+
+            key:
+                The jail config property name
+
+            value:
+                Value to set the property to
+
+            **kwargs:
+                Arguments from **kwargs are passed to setter functions
+
+        Returns:
+
+            bool: True if the JailConfig was changed
+        """
+
+        try:
+            hash_before = self.__getitem__(key).__hash__()
+        except KeyError:
+            hash_before = None
+            pass
+
+        self.__setitem__(key, value, **kwargs)
+
+        try:
+            hash_after = self.__getitem__(key).__hash__()
+        except KeyError:
+            hash_after = None
+            pass
+
+        return (hash_before != hash_after)
 
     def __str__(self):
         return libiocage.lib.JailConfigJSON.JailConfigJSON.toJSON(self)

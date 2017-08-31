@@ -89,7 +89,9 @@ class JailGenerator:
         libiocage.lib.helpers.init_host(self, host)
 
         if isinstance(data, str):
-            data = {"id": self._resolve_name(data)}
+            data = {
+                "id": self._resolve_name(data)
+            }
 
         self.config = libiocage.lib.JailConfig.JailConfig(
             data=data,
@@ -100,8 +102,12 @@ class JailGenerator:
         self.networks = []
 
         self.storage = self._class_storage(
-            auto_create=True, safe_mode=False,
-            jail=self, logger=self.logger, zfs=self.zfs)
+            auto_create=True,
+            safe_mode=False,
+            jail=self,
+            logger=self.logger,
+            zfs=self.zfs
+        )
 
         self.jail_state = None
         self._dataset_name = None
@@ -741,17 +747,11 @@ class JailGenerator:
         """
 
         try:
-            uuid.UUID(self.name)
-            return str(self.name)[:8]
-        except (TypeError, ValueError):
-            pass
-
-        try:
-            return self.name
-        except AttributeError:
-            pass
-
-        raise libiocage.lib.errors.JailUnknownIdentifier(logger=self.logger)
+            return libiocage.lib.helpers.to_humanreadable_name(self.name)
+        except:
+            raise libiocage.lib.errors.JailUnknownIdentifier(
+                logger=self.logger
+            )
 
     @property
     def stopped(self):
@@ -877,11 +877,15 @@ class JailGenerator:
             key (string):
                 Name of the jail property to return
         """
-        try:
-            if key == "jid" and self.__getattr__(key) is None:
-                return "-"
 
-            return str(self.__getattr__(key))
+        try:
+            return libiocage.helpers.to_string(self.config[key])
+        except:
+            pass
+
+        try:
+            return libiocage.lib.helpers.to_string(self.__getattr__(key))
+
         except AttributeError:
             return "-"
 

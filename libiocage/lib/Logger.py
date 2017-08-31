@@ -164,7 +164,7 @@ class Logger:
         # calculate the delta of messages printed since
         i = self.PRINT_HISTORY.index(log_entry)
         n = len(self.PRINT_HISTORY)
-        delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i,n)))
+        delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i, n)))
 
         output = "".join([
             "\r",

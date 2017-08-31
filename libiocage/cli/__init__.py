@@ -85,8 +85,8 @@ def print_events(generator):
         else:
             output += event.get_state_string(
                 done="OK",
-                error="failed",
-                skipped="skipped",
+                error="FAILED",
+                skipped="SKIPPED",
                 pending="..."
             )
 
@@ -143,7 +143,6 @@ class IOCageCLI(click.MultiCommand):
                 pass
             return mod.cli
         except (ImportError, AttributeError):
-            raise
             return
 
 

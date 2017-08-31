@@ -364,10 +364,34 @@ class EventAlreadyFinished(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+# Jail Filter
+
+
+class JailFilterException(IocageException):
+
+    def __init__(self, *args, **kwargs):
+        IocageException.__init__(self, *args, **kwargs)
+
+
+class JailFilterInvalidName(JailFilterException):
+
+    def __init__(self, *args, **kwargs):
+        msg = (
+            "Invalid jail selector: "
+            "Cannot select jail with illegal name"
+        )
+        JailFilterException.__init__(self, msg, *args, **kwargs)
+
+
 # Missing Features
 
 
 class MissingFeature(IocageException, NotImplementedError):
 
-    def __init__(self, message, *args, **kwargs):
-        super().__init__(message, *args, **kwargs)
+    def __init__(self, feature_name: str, plural: bool=False, *args, **kwargs):
+        message = (
+            f"Missing Feature: '{feature_name}' "
+            "are" if plural is True else "is"
+            " not implemented yet"
+        )
+        IocageException.__init__(self, message, *args, **kwargs)
