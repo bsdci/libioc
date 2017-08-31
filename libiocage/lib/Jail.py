@@ -828,7 +828,7 @@ class JailGenerator:
         self._dataset_name = value
 
     @property
-    def dataset(self) -> str:
+    def dataset(self) -> libzfs.ZFSDataset:
         """
         The jail's base ZFS dataset
         """
