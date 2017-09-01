@@ -27,9 +27,9 @@ import libiocage.lib.helpers
 
 class Releases:
     def __init__(self, host=None, zfs=None, logger=None):
-        libiocage.lib.helpers.init_host(self, host)
-        self.logger = logger
-        self.zfs = zfs
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
+        self.host = libiocage.lib.helpers.init_host(self, host)
 
     @property
     def dataset(self):

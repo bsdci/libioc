@@ -48,12 +48,11 @@ class DistributionGenerator:
     mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
 
     def __init__(self, host, zfs=None, logger=None):
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-        libiocage.lib.helpers.init_host(self, host)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
+        self.host = libiocage.lib.helpers.init_host(self, host)
+
         self.available_releases = None
-        self.zfs = zfs
-        self.logger = logger
 
     @property
     def name(self):

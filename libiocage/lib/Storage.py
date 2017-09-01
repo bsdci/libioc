@@ -35,9 +35,8 @@ class Storage:
                  safe_mode=True,
                  logger=None):
 
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self.jail = jail
 
         # when auto_create is enabled, non-existing zfs volumes will be

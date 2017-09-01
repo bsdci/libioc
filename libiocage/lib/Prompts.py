@@ -27,8 +27,8 @@ import libiocage.lib.helpers
 
 class Prompts:
     def __init__(self, host=None, logger=None):
-        self.logger = logger
-        libiocage.lib.helpers.init_host(self, host)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.host = libiocage.lib.helpers.init_host(self, host)
 
     def release(self):
         default = None

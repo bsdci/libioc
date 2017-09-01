@@ -79,8 +79,7 @@ class JailConfig(dict, object):
 
         dict.__init__(self)
 
-        libiocage.lib.helpers.init_logger(self, logger)
-
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.data = {}
         self.special_properties = {}
 

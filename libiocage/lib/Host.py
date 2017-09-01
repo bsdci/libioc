@@ -36,8 +36,8 @@ class HostGenerator:
 
     def __init__(self, root_dataset=None, zfs=None, logger=None):
 
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self.datasets = libiocage.lib.Datasets.Datasets(
             root=root_dataset,
             logger=self.logger,

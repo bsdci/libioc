@@ -32,7 +32,7 @@ class RCConf(dict):
     def __init__(self, path, data={}, logger=None, jail=None):
 
         dict.__init__(self, {})
-        libiocage.lib.helpers.init_logger(self, logger=logger)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.jail = jail
 
         # No file was loaded yet, so we can't know the delta yet

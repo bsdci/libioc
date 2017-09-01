@@ -56,9 +56,9 @@ class ReleaseGenerator:
                  check_hashes=True,
                  eol=False):
 
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-        libiocage.lib.helpers.init_host(self, host)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
+        self.host = libiocage.lib.helpers.init_host(self, host)
 
         if not libiocage.lib.helpers.validate_name(name):
             raise NameError(f"Invalid 'name' for Release: '{name}'")

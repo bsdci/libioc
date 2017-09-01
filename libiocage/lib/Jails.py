@@ -46,9 +46,10 @@ class JailsGenerator(list):
                  logger=None,
                  zfs=None):
 
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-        libiocage.lib.helpers.init_host(self, host)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.host = libiocage.lib.helpers.init_host(self, host)
+
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self.zfs = libzfs.ZFS(history=True, history_prefix="<iocage>")
 
         self._filters = None
