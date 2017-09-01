@@ -412,7 +412,13 @@ class JailFilterInvalidName(JailFilterException):
 
 class MissingFeature(IocageException, NotImplementedError):
 
-    def __init__(self, feature_name: str, plural: bool=False, *args, **kwargs):
+    def __init__(
+            self,
+            feature_name: str,
+            plural: bool=False,
+            *args,
+            **kwargs
+    ) -> None:
         message = (
             f"Missing Feature: '{feature_name}' "
             "are" if plural is True else "is"

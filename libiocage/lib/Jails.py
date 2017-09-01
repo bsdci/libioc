@@ -98,7 +98,7 @@ class JailsGenerator(list):
     def _load_jail_from_dataset(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> Generator[libiocage.lib.Jail.JailGenerator, None, None]:
+    ) -> Generator['libiocage.lib.Jail.JailGenerator', None, None]:
 
         return self._create_jail({
             "name": self._get_name_from_jail_dataset(dataset)

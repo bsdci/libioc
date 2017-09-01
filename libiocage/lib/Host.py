@@ -91,4 +91,4 @@ class HostGenerator:
 
 class Host(HostGenerator):
 
-    class_distribution = libiocage.lib.Distribution.DistributionGenerator
+    _class_distribution = libiocage.lib.Distribution.Distribution

@@ -26,6 +26,8 @@ import sys
 
 import libiocage.lib.errors
 
+from typing import List
+
 
 class LogEntry:
 
@@ -100,7 +102,7 @@ class Logger:
 
     INDENT_PREFIX = "  "
 
-    PRINT_HISTORY = []
+    PRINT_HISTORY: List[str] = []
 
     def __init__(self, print_level=None, log_directory="/var/log/iocage"):
         self._print_level = print_level
