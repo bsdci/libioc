@@ -609,7 +609,7 @@ class JailConfig(dict, object):
 
         try:
             hash_before = self.__getitem__(key).__hash__()
-        except KeyError:
+        except Exception:
             hash_before = None
             pass
 
