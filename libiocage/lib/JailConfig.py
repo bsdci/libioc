@@ -617,7 +617,7 @@ class JailConfig(dict, object):
 
         try:
             hash_after = self.__getitem__(key).__hash__()
-        except KeyError:
+        except Exception:
             hash_after = None
             pass
 
