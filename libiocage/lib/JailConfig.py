@@ -188,16 +188,16 @@ class JailConfig(dict, object):
             self.logger.debug("No configuration was found")
             return None
 
-    def update_special_property(self, name, new_property_handler=None):
+    def update_special_property(self, name):
 
         try:
-            if new_property_handler is not None:
-                self.special_properties[name] = new_property_handler
-
             self.data[name] = str(self.special_properties[name])
         except KeyError:
             # pass when there is no handler for the notifying propery
             pass
+
+    def attach_special_property(self, name, special_property):
+        self.special_properties[name] = special_property
 
     def save(self):
         if not self["legacy"]:
@@ -420,7 +420,7 @@ class JailConfig(dict, object):
             return False
 
     def _get_resolver(self):
-        return self.__create_special_property_resolver()
+        return self.__get_or_create_special_property_resolver()
 
     def _set_resolver(self, value, **kwargs):
 
@@ -429,9 +429,10 @@ class JailConfig(dict, object):
             resolver = self["resolver"]
         else:
             resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
-                jail_config=self
+                jail_config=self,
+                logger=self.logger
             )
-            resolver.update(value, notify=True)
+        resolver.update(value, notify=True)
 
     def _get_cloned_release(self):
         try:
@@ -505,20 +506,19 @@ class JailConfig(dict, object):
         except KeyError:
             return self["id"]
 
-    def __create_special_property_resolver(self):
+    def __get_or_create_special_property_resolver(self):
 
-        create_new = False
         try:
-            self.special_properties["resolver"]
+            return self.special_properties["resolver"]
         except:
-            create_new = True
             pass
 
-        if create_new:
-            resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
-                jail_config=self, logger=self.logger)
-            resolver.update(notify=False)
-            self.special_properties["resolver"] = resolver
+        resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
+            jail_config=self,
+            logger=self.logger
+        )
+        resolver.update(notify=False)
+        self.special_properties["resolver"] = resolver
 
         return self.special_properties["resolver"]
 
@@ -534,7 +534,7 @@ class JailConfig(dict, object):
         except AttributeError:
             return False
 
-    def __getitem__(self, key, string=False):
+    def __getitem_user(self, key, string=False):
 
         # passthrough existing properties
         try:
@@ -543,7 +543,6 @@ class JailConfig(dict, object):
             pass
 
         # data with mappings
-        get_method = None
         try:
             get_method = self.__getattribute__(f"_get_{key}")
             return self.stringify(get_method(), string)
@@ -556,11 +555,17 @@ class JailConfig(dict, object):
         except:
             pass
 
-        # then fall back to default
+        raise KeyError(f"User defined property not found: {key}")
+
+    def __getitem__(self, key, string=False):
+
         try:
-            return self.defaults[key]
+            return self.__getitem_user(key, string)
         except:
-            raise KeyError(f"Config variable {key} not found")
+            pass
+
+        # fall back to default
+        return self.defaults[key]
 
     def __delitem__(self, key):
         del self.data[key]
@@ -608,7 +613,8 @@ class JailConfig(dict, object):
         """
 
         try:
-            hash_before = self.__getitem__(key).__hash__()
+            hash_before = str(self.__getitem_user(key)).__hash__()
+            no_user_defined_property = False
         except Exception:
             hash_before = None
             pass
@@ -616,7 +622,7 @@ class JailConfig(dict, object):
         self.__setitem__(key, value, **kwargs)
 
         try:
-            hash_after = self.__getitem__(key).__hash__()
+            hash_after = str(self.__getitem_user(key)).__hash__()
         except Exception:
             hash_after = None
             pass

@@ -31,8 +31,10 @@ class JailConfigResolver(list):
         list.__init__(self, [])
         libiocage.lib.helpers.init_logger(self, logger)
         self.jail_config = jail_config
-        self.jail_config.update_special_property(
-            "resolver", new_property_handler=self)
+        self.jail_config.attach_special_property(
+            name="resolver",
+            special_property=self
+        )
 
     @property
     def conf_file_path(self):
@@ -81,8 +83,10 @@ class JailConfigResolver(list):
         if self.method == "manual":
             if isinstance(value, str):
                 self += value.split(";")
-            else:
+            elif isintance(value, list):
                 self += value
+            else:
+                raise TypeError("value can be list or string")
         else:
             self.append(value, notify=False)
 

@@ -40,6 +40,7 @@ class JailConfigDefaults(dict):
         "ip4_saddrsel": 1,
         "ip6": "new",
         "ip6_saddrsel": 1,
+        "resolver": "/etc/resolv.conf",
         "host_domainname": "none",
         "devfs_ruleset": 4,
         "enforce_statfs": 2,
