@@ -19,50 +19,49 @@ class JailDoesNotExist(IocageException):
 
     def __init__(self, jail, *args, **kwargs):
         msg = f"Jail '{jail.humanreadable_name}' does not exist"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailAlreadyExists(IocageException):
 
     def __init__(self, jail, *args, **kwargs):
         msg = f"Jail '{jail.humanreadable_name}' already exists"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotRunning(IocageException):
 
     def __init__(self, jail, *args, **kwargs):
         msg = f"Jail '{jail.humanreadable_name}' is not running"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailAlreadyRunning(IocageException):
 
     def __init__(self, jail, *args, **kwargs):
         msg = f"Jail '{jail.humanreadable_name}' is already running"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotFound(IocageException):
 
     def __init__(self, text, *args, **kwargs):
         msg = f"No jail matching '{text}' was found"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotSupplied(IocageException):
 
     def __init__(self, *args, **kwargs):
         msg = f"Please supply a jail"
-        super().__init__(msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailUnknownIdentifier(IocageException):
 
     def __init__(self, *args, **kwargs):
         msg = "The jail has no identifier yet"
-        super().__init__(msg, *args, **kwargs)
-
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 # JailConfig
 
