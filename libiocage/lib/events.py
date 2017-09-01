@@ -22,6 +22,8 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 from timeit import default_timer as timer
+from typing import List
+
 import libiocage.lib.errors
 
 EVENT_STATUS = (
@@ -38,7 +40,7 @@ class IocageEvent:
     Base class for all other iocage events
     """
 
-    HISTORY = []
+    HISTORY: List['IocageEvent'] = []
 
     PENDING_COUNT = 0
 

@@ -35,7 +35,7 @@ from ..lib.Logger import Logger
 
 logger = Logger()
 
-click.core._verify_python3_env = lambda: None
+click.core._verify_python3_env = lambda: None  # type: ignore
 user_locale = os.environ.get("LANG", "en_US.UTF-8")
 locale.setlocale(locale.LC_ALL, user_locale)
 
@@ -148,8 +148,7 @@ class IOCageCLI(click.MultiCommand):
 
 @click.option("--log-level", "-d", default=None)
 @click.command(cls=IOCageCLI)
-@click.version_option(version="0.2.11 08/29/2017", prog_name="ioc",
-                      message="%(version)s")
+@click.version_option(version="0.2.11 08/29/2017", prog_name="ioc")
 @click.pass_context
 def cli(ctx, log_level):
     """A jail manager."""

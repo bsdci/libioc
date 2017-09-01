@@ -21,10 +21,11 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from typing import List, Union, Iterable
 import re
-import libiocage.lib.Jail
+from typing import Iterable, List, Union
+
 import libiocage.lib.errors
+import libiocage.lib.Jail
 
 
 def match_filter(value: str, filter_string: str):
@@ -54,7 +55,7 @@ class Term(list):
 
         list.__init__(self, data)
 
-    def matches_jail(self, jail: libiocage.lib.Jail.JailGenerator) -> bool:
+    def matches_jail(self, jail: 'libiocage.lib.Jail.JailGenerator') -> bool:
         return self.matches(jail.getstring(self.key))
 
     def matches(self, value: str) -> bool:
@@ -83,7 +84,7 @@ class Term(list):
         return False
 
     def _split_filter_values(self, user_input: str) -> List[str]:
-        values = []
+        values: List[str] = []
         escaped_comma_blocks = map(
             lambda block: block.split(","),
             user_input.split("\\,")
@@ -124,9 +125,9 @@ class Terms(list):
     This can be interpreted as logical AND
     """
 
-    def __init__(self, terms: Iterable[Union[Term, str]]=None):
+    def __init__(self, terms: Iterable[Union[Term, str]]=None) -> None:
 
-        data = []
+        data: List[Union[Term, str]] = []
 
         if terms is not None:
 
@@ -138,7 +139,7 @@ class Terms(list):
 
         list.__init__(self, data)
 
-    def match_jail(self, jail: libiocage.lib.Jail.JailGenerator) -> bool:
+    def match_jail(self, jail: 'libiocage.lib.Jail.JailGenerator') -> bool:
         """
         Returns True if all Terms match the jail
         """

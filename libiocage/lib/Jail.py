@@ -84,9 +84,6 @@ class JailGenerator:
             release (stored in `zpool/iocage/base/<RELEASE>)
     """
 
-    _class_host = libiocage.lib.Host.HostGenerator
-    _class_storage = libiocage.lib.Storage.Storage
-
     def __init__(self, data={}, zfs=None, host=None, logger=None, new=False):
         """
         Initializes a Jail
@@ -124,7 +121,7 @@ class JailGenerator:
 
         self.networks = []
 
-        self.storage = self._class_storage(
+        self.storage = libiocage.lib.Storage.Storage(
             auto_create=True,
             safe_mode=False,
             jail=self,
