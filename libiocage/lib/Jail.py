@@ -289,6 +289,23 @@ class JailGenerator:
 
         self.storage.delete_dataset_recursive(self.dataset)
 
+    def rename(self, new_name: str):
+        """
+        Change the name of a jail
+        """
+
+        self.require_jail_existing()
+        self.require_jail_stopped()
+
+        current_id = self.config["id"]
+        dataset = self.dataset
+        self.config["name"] = new_name  # validates new_name
+        try:
+            dataset.rename(self.dataset_name)
+        except:
+            self.config["name"] = current_id
+            raise
+
     def _force_stop(self):
 
         successful = True
