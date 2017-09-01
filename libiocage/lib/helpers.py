@@ -8,6 +8,8 @@ import libiocage.lib.Datasets
 import libiocage.lib.Host
 import libiocage.lib.Logger
 
+from typing import List, Tuple
+
 
 def init_zfs(self, zfs):
     if isinstance(zfs, libzfs.ZFS):
@@ -50,11 +52,10 @@ def init_logger(self, logger=None):
         object.__setattr__(self, 'logger', new_logger)
 
 
-def exec(command, logger=None, ignore_error=False):
-    if isinstance(command, str):
-        command = [command]
+def exec(command, logger=None, ignore_error=False) -> Tuple[
+        subprocess.Popen, str, str]:
 
-    command_str = " ".join(command)
+    command_str = " ".join(list([command]))
 
     if logger:
         logger.log(f"Executing: {command_str}", level="spam")
@@ -230,21 +231,16 @@ def to_string(data, true="yes", false="no", none="-"):
     return str(data)
 
 
-def exec_passthru(command, logger=None):
-    if isinstance(command, str):
-        command = [command]
-
+def exec_passthru(command: List[str], logger=None):
     command_str = " ".join(command)
+
     if logger:
         logger.spam(f"Executing (interactive): {command_str}")
 
-    return subprocess.Popen(command).communicate()
+    return subprocess.Popen(command_str).communicate()
 
 
-def exec_raw(command, logger=None, **kwargs):
-    if isinstance(command, str):
-        command = [command]
-
+def exec_raw(command: List[str], logger=None, **kwargs):
     command_str = " ".join(command)
     if logger:
         logger.spam(f"Executing (raw): {command_str}")
@@ -255,7 +251,7 @@ def exec_raw(command, logger=None, **kwargs):
     )
 
 
-def exec_iter(command, logger=None):
+def exec_iter(command: List[str], logger=None):
     process = exec_raw(
         command,
         logger=logger,

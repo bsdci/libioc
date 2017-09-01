@@ -2,11 +2,12 @@ import os
 
 import ucl
 
+import libiocage.lib.Jail
 import libiocage.lib.helpers
 
 
 class RCConf(dict):
-    def __init__(self, path, data={}, logger=None, jail=None):
+    def __init__(self, path: str, data={}, logger=None, jail=None) -> None:
 
         dict.__init__(self, {})
         libiocage.lib.helpers.init_logger(self, logger=logger)
