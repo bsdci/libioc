@@ -31,9 +31,8 @@ class Datasets:
     ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc:active"
 
     def __init__(self, root=None, pool=None, zfs=None, logger=None):
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self._datasets = {}
 
         if isinstance(root, libzfs.ZFSDataset):

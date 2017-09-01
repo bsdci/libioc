@@ -25,37 +25,34 @@ import re
 import subprocess
 import uuid
 
-import libzfs
-
 import libiocage.lib.Datasets
 import libiocage.lib.Host
 import libiocage.lib.Logger
+import libzfs
 
 
-def init_zfs(self, zfs):
+def init_zfs(
+        self,
+        zfs: libzfs.ZFS=None
+) -> libzfs.ZFS:
     if isinstance(zfs, libzfs.ZFS):
-        self.zfs = zfs
+        return zfs
     else:
-        self.zfs = get_zfs()
+        return get_zfs()
 
 
 def get_zfs():
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
 
 
-def init_host(self, host=None):
+def init_host(
+        self,
+        host: 'libiocage.lib.Host.Host'=None,
+) -> 'libiocage.lib.Host.HostGenerator':
     if host:
-        self.host = host
-    else:
-        try:
-            logger = self.logger
-        except:
-            logger = None
+        return host
 
-        try:
-            self.host = self._class_host(logger=logger)
-        except:
-            self.host = libiocage.lib.Host.HostGenerator(logger=logger)
+    return libiocage.lib.Host.HostGenerator(self.logger)
 
 
 def init_datasets(self, datasets=None):
@@ -65,12 +62,14 @@ def init_datasets(self, datasets=None):
         self.datasets = libiocage.lib.Datasets.Datasets()
 
 
-def init_logger(self, logger=None):
+def init_logger(
+        self,
+        logger: 'libiocage.lib.Logger.Logger'=None
+) -> 'libiocage.lib.Logger.Logger':
     if logger is not None:
-        object.__setattr__(self, 'logger', logger)
+        return logger
     else:
-        new_logger = libiocage.lib.Logger.Logger()
-        object.__setattr__(self, 'logger', new_logger)
+        return libiocage.lib.Logger.Logger()
 
 
 def exec(command, logger=None, ignore_error=False):

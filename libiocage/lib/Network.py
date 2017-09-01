@@ -38,7 +38,7 @@ class Network:
                  bridges=None,
                  logger=None):
 
-        libiocage.lib.helpers.init_logger(self, logger)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
 
         if bridges is not None:
             if not isinstance(bridges, list):

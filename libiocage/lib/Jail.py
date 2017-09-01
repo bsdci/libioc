@@ -104,9 +104,9 @@ class JailGenerator:
 
         """
 
-        libiocage.lib.helpers.init_logger(self, logger)
-        libiocage.lib.helpers.init_zfs(self, zfs)
-        libiocage.lib.helpers.init_host(self, host)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
+        self.host = libiocage.lib.helpers.init_host(self, host)
 
         if isinstance(data, str):
             data = {
@@ -940,8 +940,6 @@ class JailGenerator:
 
 
 class Jail(JailGenerator):
-
-    _class_host = libiocage.lib.Host.HostGenerator
 
     def start(self, *args, **kwargs):
         return list(JailGenerator.start(self, *args, **kwargs))

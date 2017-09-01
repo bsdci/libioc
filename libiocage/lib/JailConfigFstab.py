@@ -45,7 +45,7 @@ class JailConfigFstab(set):
 
     def __init__(self, jail, logger=None):
         set.__init__(self)
-        libiocage.lib.helpers.init_logger(self, logger)
+        self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.jail = jail
 
     @property
