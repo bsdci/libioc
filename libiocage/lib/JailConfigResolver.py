@@ -83,7 +83,7 @@ class JailConfigResolver(list):
         if self.method == "manual":
             if isinstance(value, str):
                 self += value.split(";")
-            elif isintance(value, list):
+            elif isinstance(value, list):
                 self += value
             else:
                 raise TypeError("value can be list or string")
