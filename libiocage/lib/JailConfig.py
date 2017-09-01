@@ -614,7 +614,6 @@ class JailConfig(dict, object):
 
         try:
             hash_before = str(self.__getitem_user(key)).__hash__()
-            no_user_defined_property = False
         except Exception:
             hash_before = None
             pass
