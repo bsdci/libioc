@@ -133,18 +133,18 @@ class DistributionGenerator:
         _eol = "https://www.freebsd.org/security/unsupported.html"
         req = requests.get(_eol)
         status = req.status_code == requests.codes.ok
-        eol_releases = []
+        eol_releases: List[str] = []
         if not status:
             req.raise_for_status()
 
         for eol in req.content.decode("iso-8859-1").split():
-            eol = eol.strip("href=").strip("/").split(">")
+            eol_lines = eol.strip("href=").strip("/").split(">")
             # We want a dynamic EOL
             try:
-                if "-RELEASE" in eol[1]:
-                    eol = eol[1].strip('</td')
-                    if eol not in eol_releases:
-                        eol_releases.append(eol)
+                if "-RELEASE" in eol_lines[1]:
+                    eol_candidate = eol_lines[1].strip('</td')
+                    if eol_candidate not in eol_releases:
+                        eol_releases.append(eol_candidate)
             except IndexError:
                 pass
 
