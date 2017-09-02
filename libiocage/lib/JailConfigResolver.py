@@ -27,9 +27,16 @@ import libiocage.lib.helpers
 
 
 class JailConfigResolver(list):
-    def __init__(self, jail_config, logger=None):
+    def __init__(
+        self,
+        jail_config: 'libiocage.lib.JailConfig.JailConfig',
+        host: 'libiocage.lib.Host.HostGenerator'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None
+    ):
+
         list.__init__(self, [])
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
+        self.host = libiocage.lib.helpers.init_host(self, host)
         self.jail_config = jail_config
         self.jail_config.attach_special_property(
             name="resolver",
@@ -56,7 +63,7 @@ class JailConfigResolver(list):
         try:
             return self.jail_config.data["resolver"]
         except KeyError:
-            return self.jail_config.defaults["resolver"]
+            return self.host.defaults["resolver"]
 
     def apply(self, jail):
 
@@ -64,7 +71,7 @@ class JailConfigResolver(list):
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
 
-        remote_path = f"{jail.path}/root{self.conf_file_path}"
+        remote_path = f"{jail.resource.root_path}/{self.conf_file_path}"
 
         if self.method == "copy":
             shutil.copy(self.conf_file_path, remote_path)

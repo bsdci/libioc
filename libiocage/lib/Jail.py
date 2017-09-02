@@ -26,6 +26,7 @@ import subprocess
 import uuid
 
 import libiocage.lib.DevfsRules
+import libiocage.lib.Host
 import libiocage.lib.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
@@ -84,7 +85,17 @@ class JailGenerator:
             release (stored in `zpool/iocage/base/<RELEASE>)
     """
 
-    def __init__(self, data={}, zfs=None, host=None, logger=None, new=False):
+    _class_storage = libiocage.lib.Storage.Storage
+
+    def __init__(
+        self,
+        data={},
+        resource: 'libiocage.lib.Resource.LaunchableResource'=None,
+        zfs=None,
+        host=None,
+        logger=None,
+        new=False
+    ):
         """
         Initializes a Jail
 
@@ -115,14 +126,14 @@ class JailGenerator:
 
         self.config = libiocage.lib.JailConfig.JailConfig(
             data=data,
+            host=self.host,
             jail=self,
             logger=self.logger
         )
 
         self.networks = []
 
-        self.storage = libiocage.lib.Storage.Storage(
-            auto_create=True,
+        self.storage = self._class_storage(
             safe_mode=False,
             jail=self,
             logger=self.logger,
@@ -130,25 +141,38 @@ class JailGenerator:
         )
 
         self.jail_state = None
-        self._dataset_name = None
         self._rc_conf = None
+
+        self._resource = None
+        self.resource = resource
 
         if new is False:
             self.config.read()
 
     @property
-    def zfs_pool_name(self):
-        """
-        Name of the ZFS pool the jail is stored on
-        """
-        return self.host.datasets.root.name.split("/", maxsplit=1)[0]
+    def resource(self) -> 'libiocage.lib.Resource.LaunchableResource':
+        return self._resource
+
+    @resource.setter
+    def resource(self, value: 'libiocage.lib.Resource.LaunchableResource'):
+        if value is None:
+            self._resource = libiocage.lib.Resource.JailResource(
+                jail=self,
+                logger=self.logger,
+                host=self.host
+            )
+        else:
+            self._resource = value
 
     @property
     def _rc_conf_path(self):
         """
         Absolute path to the jail's rc.conf file
         """
-        return f"{self.path}/root/etc/rc.conf"
+        return os.path.join(
+            self.resource.root_dataset.mountpoint,
+            "/root/etc/rc.conf"
+        )
 
     @property
     def rc_conf(self):
@@ -179,13 +203,19 @@ class JailGenerator:
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
         jailServicesStartEvent = events.JailServicesStart(jail=self)
 
+        yield jailLaunchEvent.begin()
+
         if self.basejail_backend is not None:
             self.basejail_backend.apply(self.storage, release)
 
-        yield jailLaunchEvent.begin()
+        if self.config["basejail_type"] == "nullfs":
+            self.resource.fstab.base_resource = release.resource
+        else:
+            self.resource.fstab.base_resource = None
 
-        self.config.fstab.read_file()
-        self.config.fstab.save_with_basedirs()
+        self.resource.fstab.read_file()
+        self.resource.fstab.save()
+
         self._launch_jail()
 
         yield jailLaunchEvent.end()
@@ -382,8 +412,9 @@ class JailGenerator:
             msg = f"{key} = {value}"
             self.logger.spam(msg, jail=self, indent=1)
 
-        self.storage.create_jail_dataset()
-        self.config.fstab.update()
+        self.resource.create()
+        self.resource.get_or_create_dataset("root")
+        self.resource.fstab.update()
 
         backend = None
 
@@ -399,7 +430,11 @@ class JailGenerator:
             backend.setup(self.storage, release)
 
         self.config.data["release"] = release.name
-        self.config.save()
+        self.save()
+
+    def save(self):
+        self.resource.write_config(self.config.data)
+        self.rc_conf.save()
 
     def exec(self, command, **kwargs):
         """
@@ -534,7 +569,7 @@ class JailGenerator:
             f"name={self.identifier}",
             f"host.hostname={self.config['host_hostname']}",
             f"host.domainname={self.config['host_domainname']}",
-            f"path={self.path}/root",
+            f"path={self.resource.root_dataset.mountpoint}",
             f"securelevel={self.config['securelevel']}",
             f"host.hostuuid={self.name}",
             f"devfs_ruleset={self.devfs_ruleset}",
@@ -568,7 +603,7 @@ class JailGenerator:
             f"exec.clean={self.config['exec_clean']}",
             f"exec.timeout={self.config['exec_timeout']}",
             f"stop.timeout={self.config['stop_timeout']}",
-            f"mount.fstab={self.path}/fstab",
+            f"mount.fstab={self.resource.fstab.file_path}",
             f"mount.devfs={self.config['mount_devfs']}"
         ]
 
@@ -671,7 +706,7 @@ class JailGenerator:
         """
         Raise JailAlreadyExists exception if the jail already exists
         """
-        if self.exists:
+        if self.resource.exists:
             raise libiocage.lib.errors.JailAlreadyExists(
                 jail=self, logger=self.logger
             )
@@ -680,7 +715,7 @@ class JailGenerator:
         """
         Raise JailDoesNotExist exception if the jail does not exist
         """
-        if not self.exists:
+        if not self.resource.exists:
             raise libiocage.lib.errors.JailDoesNotExist(
                 jail=self,
                 logger=self.logger
@@ -730,7 +765,7 @@ class JailGenerator:
     def _teardown_mounts(self):
 
         mountpoints = list(map(
-            lambda mountpoint: f"{self.path}/root{mountpoint}",
+            lambda mountpoint: f"{self.resource.root_path}{mountpoint}",
             [
                 "/dev/fd",
                 "/dev",
@@ -739,8 +774,10 @@ class JailGenerator:
             ]
         ))
 
-        mountpoints += list(map(lambda x: x["destination"],
-                                list(self.config.fstab)))
+        mountpoints += list(map(
+            lambda x: x["destination"],
+            list(self.resource.fstab)
+        ))
 
         for mountpoint in mountpoints:
             if os.path.isdir(mountpoint):
@@ -835,7 +872,7 @@ class JailGenerator:
         Boolean value that is True if the Jail datset exists locally
         """
         try:
-            self.dataset
+            self.resource.exists
             return True
         except:
             return False
@@ -851,34 +888,6 @@ class JailGenerator:
             host=self.host,
             zfs=self.zfs
         )
-
-    @property
-    def dataset_name(self):
-        """
-        Name of the jail's base ZFS dataset
-        """
-        if self._dataset_name is not None:
-            return self._dataset_name
-        else:
-            return f"{self.host.datasets.root.name}/jails/{self.config['id']}"
-
-    @dataset_name.setter
-    def dataset_name(self, value: str):
-        self._dataset_name = value
-
-    @property
-    def dataset(self):
-        """
-        The jail's base ZFS dataset
-        """
-        return self.zfs.get_dataset(self.dataset_name)
-
-    @property
-    def path(self):
-        """
-        Mountpoint of the jail's base ZFS dataset
-        """
-        return self.dataset.mountpoint
 
     @property
     def logfile_path(self):

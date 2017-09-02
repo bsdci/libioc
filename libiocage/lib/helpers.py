@@ -28,21 +28,26 @@ import uuid
 import libiocage.lib.Datasets
 import libiocage.lib.Host
 import libiocage.lib.Logger
-import libzfs
+import libiocage.lib.ZFS
 
 
 def init_zfs(
         self,
-        zfs: libzfs.ZFS=None
-) -> libzfs.ZFS:
-    if isinstance(zfs, libzfs.ZFS):
+        zfs: libiocage.lib.ZFS.ZFS=None
+) -> libiocage.lib.ZFS.ZFS:
+
+    if (zfs is not None) and isinstance(zfs, libiocage.lib.ZFS.ZFS):
+        object.__setattr__(self, 'zfs', zfs)
         return zfs
-    else:
-        return get_zfs()
 
+    try:
+        return self.zfs
+    except AttributeError:
+        pass
 
-def get_zfs():
-    return libzfs.ZFS(history=True, history_prefix="<iocage>")
+    zfs = libiocage.lib.ZFS.get_zfs(logger=self.logger)
+    object.__setattr__(self, 'zfs', zfs)
+    return zfs
 
 
 def init_host(
@@ -67,9 +72,15 @@ def init_logger(
         logger: 'libiocage.lib.Logger.Logger'=None
 ) -> 'libiocage.lib.Logger.Logger':
     if logger is not None:
+        object.__setattr__(self, 'logger', logger)
         return logger
     else:
-        return libiocage.lib.Logger.Logger()
+        try:
+            return self.logger
+        except:
+            new_logger = libiocage.lib.Logger.Logger()
+            object.__setattr__(self, 'logger', new_logger)
+            return new_logger
 
 
 def exec(command, logger=None, ignore_error=False):

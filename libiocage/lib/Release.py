@@ -34,12 +34,15 @@ import libzfs
 import ucl
 
 import libiocage.lib.Jail
+import libiocage.lib.Resource
+import libiocage.lib.ZFS
 import libiocage.lib.errors
 import libiocage.lib.helpers
 import libiocage.lib.events
 
 
 class ReleaseGenerator:
+
     DEFAULT_RC_CONF_SERVICES = {
         "netif": False,
         "sendmail": False,
@@ -48,13 +51,16 @@ class ReleaseGenerator:
         "sendmail_outbound": False
     }
 
-    def __init__(self, name=None,
-                 dataset=None,
-                 host=None,
-                 zfs=None,
-                 logger=None,
-                 check_hashes=True,
-                 eol=False):
+    def __init__(
+        self,
+        name: str=None,
+        resource: 'libiocage.lib.Resource.Resource'=None,
+        host: 'libiocage.lib.Host.HostGenerator'=None,
+        zfs: 'libiocage.lib.ZFS.ZFS'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        check_hashes: bool=True,
+        eol: bool=False
+    ):
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
@@ -65,79 +71,48 @@ class ReleaseGenerator:
 
         self.name = name
         self.eol = eol
-        self._hashes = None
-        self._dataset = None
-        self._root_dataset = None
-        self.dataset = dataset
-        self.check_hashes = check_hashes is True
         self._hbsd_release_branch = None
+
+        self._hashes = None
+        self.check_hashes = check_hashes is True
+
+        self._resource = None
+        self.resource = resource
 
         self._assets = ["base"]
         if self.host.distribution.name != "HardenedBSD":
             self._assets.append("lib32")
 
     @property
-    def dataset(self):
-        if self._dataset is None:
-            self._dataset = self.zfs.get_dataset(self.dataset_name)
-        return self._dataset
+    def resource(self) -> libiocage.lib.Resource.Resource:
+        return self._resource
 
-    @dataset.setter
-    def dataset(self, value):
-        if isinstance(value, libzfs.ZFSDataset):
-            try:
-                value.mountpoint
-            except:
-                value.mount()
-
-            self._dataset = value
-            self._update_name_from_dataset()
-
+    @resource.setter
+    def resource(self, value: libiocage.lib.Resource.Resource):
+        if value is None:
+            self._resource = libiocage.lib.Resource.ReleaseResource(
+                release=self,
+                host=self.host,
+                logger=self.logger,
+                zfs=self.zfs
+            )
         else:
-            self._zfs = None
+            self._resource = value
 
     @property
-    def root_dataset(self):
-        if self._root_dataset is None:
-            try:
-                ds = self.zfs.get_dataset(self.root_dataset_name)
-            except:
-                self.host.datasets.releases.pool.create(
-                    self.root_dataset_name,
-                    {},
-                    create_ancestors=True
-                )
-                ds = self.zfs.get_dataset(self.root_dataset_name)
-                ds.mount()
-            self._root_dataset = ds
+    def base_dataset_name(self):
+        if self._base_dataset_name is not None:
+            return self._base_dataset_name
 
-        return self._root_dataset
-
-    @property
-    def dataset_name(self):
-        return f"{self.host.datasets.releases.name}/{self.name}"
-
-    @property
-    def root_dataset_name(self):
-        return f"{self.host.datasets.releases.name}/{self.name}/root"
+        return f"{self.host.datasets.base.name}/{self.name}"
 
     @property
     def releases_folder(self):
         return self.host.datasets.releases.mountpoint
 
     @property
-    def base_dataset(self):
-        # base datasets are created from releases. required to start
-        # zfs-basejails
-        return self.zfs.get_dataset(self.base_dataset_name)
-
-    @property
-    def base_dataset_name(self):
-        return f"{self.host.datasets.base.name}/{self.name}/root"
-
-    @property
     def download_directory(self):
-        return f"{self.releases_folder}/{self.name}"
+        return self.resource.dataset.mountpoint
 
     @property
     def root_dir(self):
@@ -210,10 +185,10 @@ class ReleaseGenerator:
 
     @property
     def fetched(self):
-        if not os.path.isdir(self.root_dir):
+        if self.resource.exists is False:
             return False
 
-        root_dir_index = os.listdir(self.root_dir)
+        root_dir_index = os.listdir(self.resource.root_dataset.mountpoint)
 
         for expected_directory in ["dev", "var", "etc"]:
             if expected_directory not in root_dir_index:
@@ -224,16 +199,9 @@ class ReleaseGenerator:
     @property
     def zfs_pool(self):
         try:
-            return self.root_dataset.pool
+            return self.resource.root_dataset.pool
         except:
-            pass
-
-        try:
             return self.host.datasets.releases.pool
-        except:
-            pass
-
-        raise libiocage.lib.errors.UnknownReleasePool()
 
     @property
     def hashes(self):
@@ -251,7 +219,7 @@ class ReleaseGenerator:
 
     @property
     def release_updates_dir(self):
-        return f"{self.dataset.mountpoint}/updates"
+        return f"{self.resource.dataset.mountpoint}/updates"
 
     @property
     def hbds_release_branch(self):
@@ -265,7 +233,8 @@ class ReleaseGenerator:
                 logger=self.logger
             )
 
-        source_file = f"{self.root_dataset.mountpoint}/etc/hbsd-update.conf"
+        root_dataset_mountpoint = self.resource.root_dataset.mountpoint
+        source_file = f"{root_dataset_mountpoint}/etc/hbsd-update.conf"
 
         if not os.path.isfile(source_file):
             raise libiocage.lib.errors.ReleaseUpdateBranchLookup(
@@ -296,8 +265,9 @@ class ReleaseGenerator:
             yield fetchReleaseEvent.begin()
             yield releasePrepareStorageEvent.begin()
 
+            # ToDo: allow to reach this for forced re-fetch
             self._clean_dataset()
-            self._create_dataset()
+            self.resource.create()
             self._ensure_dataset_mounted()
 
             yield releasePrepareStorageEvent.end()
@@ -350,7 +320,6 @@ class ReleaseGenerator:
         if release_changed:
             yield releaseCopyBaseEvent.begin()
             self._update_zfs_base()
-            self._copy_to_base_release()
             yield releaseCopyBaseEvent.end()
         else:
             yield releaseCopyBaseEvent.skip(message="release unchanged")
@@ -363,11 +332,21 @@ class ReleaseGenerator:
                 "rsync",
                 "-a",
                 "--delete",
-                f"{self.root_dataset.mountpoint}/",
+                f"{self.resource.root_dataset.mountpoint}/",
                 f"{self.base_dataset.mountpoint}"
             ],
             logger=self.logger
         )
+
+    @property
+    def _base_resource(self):
+        return libiocage.lib.Resource.ReleaseResource(
+            release=self.release,
+            logger=self.logger,
+            host=self.host,
+            zfs=self.zfs
+        )
+        # ToDo: Memoize ReleaseResource
 
     def fetch_updates(self):
 
@@ -465,7 +444,7 @@ class ReleaseGenerator:
             yield releaseUpdateDownloadEvent.end()
 
     def update(self):
-        dataset = self.dataset
+        dataset = self.resource.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
         runReleaseUpdateEvent = libiocage.lib.events.RunReleaseUpdate(self)
@@ -474,20 +453,20 @@ class ReleaseGenerator:
         # create snapshot before the changes
         dataset.snapshot(snapshot_name, recursive=True)
 
-        jail = libiocage.lib.Jail.JailGenerator({
-            "uuid": str(uuid.uuid4()),
-            "basejail": False,
-            "allow_mount_nullfs": "1",
-            "release": self.name,
-            "securelevel": "0"
-        },
+        jail = libiocage.lib.Jail.JailGenerator(
+            {
+                "uuid": str(uuid.uuid4()),
+                "basejail": False,
+                "allow_mount_nullfs": "1",
+                "release": self.name,
+                "securelevel": "0"
+            },
             new=True,
+            resource=self.resource,
             logger=self.logger,
             zfs=self.zfs,
             host=self.host
         )
-
-        jail.dataset_name = self.dataset_name
 
         changed = False
 
@@ -516,6 +495,51 @@ class ReleaseGenerator:
             raise e
 
         return changed
+
+    def snapshot(
+        self,
+        identifier: str,
+        force: bool=False
+    ) -> libzfs.ZFSSnapshot:
+        """
+        Returns a ZFS snapshot of the release
+
+        Args:
+
+            identifier:
+                This string specifies the snapshots name
+
+            force: (default=False)
+                Enabling this option forces re-creation of a snapshot in case
+                it already exists for the given idenfifier
+
+        Returns:
+
+            libzfs.ZFSSnapshot: The ZFS snapshot object found or created
+        """
+
+        snapshot_name = f"{self.resource.dataset.name}@{identifier}"
+
+        try:
+            existing_shapshot = self.zfs.get_snapshot(snapshot_name)
+            if force is False:
+                self.logger.verbose(
+                    f"Re-using release snapshot {self.name}@{identifier}"
+                )
+                return existing_shapshot
+        except libzfs.ZFSException:
+            existing_shapshot = None
+            pass
+
+        if existing_shapshot is not None:
+            self.logger.verbose(
+                f"Deleting release snapshot {self.name}@{identifier}"
+            )
+            existing_shapshot.delete()
+            existing_shapshot = None
+
+        self.resource.dataset.snapshot(snapshot_name)
+        return self.zfs.get_snapshot(snapshot_name)
 
     def _update_hbsd_jail(self, jail):
 
@@ -639,10 +663,10 @@ class ReleaseGenerator:
     def _create_dataset(self, name=None):
 
         if name is None:
-            name = self.dataset_name
+            name = self.resource.dataset_name
 
         try:
-            if isinstance(self.dataset, libzfs.ZFSDataset):
+            if isinstance(self.resource.dataset, libzfs.ZFSDataset):
                 return
         except:
             pass
@@ -654,8 +678,8 @@ class ReleaseGenerator:
         self._dataset = self.zfs.get_dataset(name)
 
     def _ensure_dataset_mounted(self):
-        if not self.dataset.mountpoint:
-            self.dataset.mount()
+        if not self.resource.dataset.mountpoint:
+            self.resource.dataset.mount()
 
     def _fetch_hashes(self):
         url = f"{self.remote_url}/{self.host.distribution.hash_file}"
@@ -760,38 +784,23 @@ class ReleaseGenerator:
         return f"{service_name}_enable=\"{state}\""
 
     def _update_name_from_dataset(self):
-        if self.dataset:
-            self.name = self.dataset.name.split("/")[-2:-1]
+        if self.resource.dataset is not None:
+            self.name = self.resource.dataset.name.split("/")[-2:-1]
 
     def _update_zfs_base(self):
 
-        try:
-            self.host.datasets.base.pool.create(
-                self.base_dataset_name, {}, create_ancestors=True)
-            self.base_dataset.mount()
-        except:
-            pass
-
-        base_dataset = self.base_dataset
-        pool = self.host.datasets.base.pool
+        base_dataset = self.zfs.get_or_create_dataset(self.base_dataset_name)
 
         basedirs = libiocage.lib.helpers.get_basedir_list(
             distribution_name=self.host.distribution.name
         )
 
         for folder in basedirs:
-            try:
-                pool.create(
-                    f"{base_dataset.name}/{folder}",
-                    {},
-                    create_ancestors=True
-                )
-                self.zfs.get_dataset(f"{base_dataset.name}/{folder}").mount()
-            except:
-                # dataset was already existing
-                pass
+            self.zfs.get_or_create_dataset(f"{base_dataset.name}/{folder}")
 
-        self.logger.debug(f"Updated release base datasets for {self.name}")
+        self._copy_to_base_release()
+
+        self.logger.debug(f"Base release '{self.name}' updated")
 
     def _cleanup(self):
         for asset in self.assets:

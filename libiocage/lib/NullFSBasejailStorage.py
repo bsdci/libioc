@@ -26,6 +26,12 @@ import libiocage.lib.helpers
 
 
 class NullFSBasejailStorage:
+    """
+    Iocage NullFS storage backend
+
+    This backend is used by NullFS basejails.
+    """
+
     def apply(self, release=None):
         NullFSBasejailStorage._create_nullfs_directories(self)
 
@@ -33,12 +39,13 @@ class NullFSBasejailStorage:
         libiocage.lib.StandaloneJailStorage.StandaloneJailStorage.setup(
             self, release)
 
-    """
-  In preparation of starting the jail with nullfs mounts
-  all mountpoints that are listed in fstab need to be unmounted
-  """
-
     def umount_nullfs(self):
+        """
+        Unmount all NullFS mounts from fstab
+
+        In preparation of starting the jail with NullFS mounts all mountpoints
+        that are listed in fstab need to be unmounted
+        """
         with open(f"{self.jail.path}/fstab") as f:
             mounts = []
             for mount in f.read().splitlines():

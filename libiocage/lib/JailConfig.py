@@ -24,14 +24,11 @@
 import re
 import uuid
 
+import libiocage.lib.ConfigJSON
 import libiocage.lib.JailConfigAddresses
 import libiocage.lib.JailConfigDefaults
-import libiocage.lib.JailConfigFstab
 import libiocage.lib.JailConfigInterfaces
-import libiocage.lib.JailConfigJSON
-import libiocage.lib.JailConfigLegacy
 import libiocage.lib.JailConfigResolver
-import libiocage.lib.JailConfigZFS
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
@@ -70,17 +67,24 @@ class JailConfig(dict, object):
 
     """
 
-    def __init__(self,
-                 data={},
-                 jail=None,
-                 logger=None,
-                 new=False,
-                 defaults_file=None):
+    def __init__(
+        self,
+        data: dict={},
+        jail: 'libiocage.lib.Jail.Jail'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        host: 'libiocage.lib.Host.HostGenerator'=None,
+        new: bool=False
+    ):
 
         dict.__init__(self)
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
-        self.data = {}
+        self.host = libiocage.lib.helpers.init_host(self, host)
+
+        self.data = {
+            "id": None
+        }
+
         self.special_properties = {}
 
         # be aware of iocage-legacy jails for migration
@@ -90,49 +94,15 @@ class JailConfig(dict, object):
         except:
             self.legacy = None
 
-        # jail is required for various operations (write, fstab, etc)
-        if jail:
-            self.jail = jail
-            fstab = libiocage.lib.JailConfigFstab.JailConfigFstab(
-                jail=jail,
-                logger=self.logger
-            )
-            self.fstab = fstab
-        else:
-            self.jail = None
-            self.fstab = None
+        self.jail = jail
 
         # the name is used in many other variables and needs to be set first
-        self["id"] = None
         for key in ["id", "name", "uuid"]:
             if key in data.keys():
-                self["name"] = data[key]
+                self["id"] = data[key]
                 break
 
-        self.defaults_file = defaults_file
-        self._defaults = None
-
         self.clone(data)
-
-    @property
-    def defaults(self):
-        if self._defaults is None:
-            self._load_defaults()
-        return self._defaults
-
-    def _load_defaults(self, defaults_file=None):
-
-        if defaults_file is not None:
-            self.defaults_file = defaults_file
-
-        if defaults_file is None and self.jail is not None:
-            root_mountpoint = self.jail.host.datasets.root.mountpoint
-            defaults_file = f"{root_mountpoint}/defaults.json"
-
-        self._defaults = libiocage.lib.JailConfigDefaults.JailConfigDefaults(
-            file=defaults_file,
-            logger=self.logger
-        )
 
     def clone(self, data, skip_on_error=False):
         """
@@ -158,34 +128,7 @@ class JailConfig(dict, object):
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
     def read(self):
-
-        if libiocage.lib.JailConfigJSON.JailConfigJSON.exists(self):
-
-            libiocage.lib.JailConfigJSON.JailConfigJSON.read(self)
-            self.legacy = False
-            self.logger.log("Configuration loaded from JSON", level="verbose")
-            return "json"
-
-        elif libiocage.lib.JailConfigLegacy.JailConfigLegacy.exists(self):
-
-            libiocage.lib.JailConfigLegacy.JailConfigLegacy.read(self)
-            self.legacy = "ucl"
-            self.logger.verbose(
-                "Configuration loaded from UCL config file (iocage-legacy)")
-            return "ucl"
-
-        elif libiocage.lib.JailConfigZFS.JailConfigZFS.exists(self):
-
-            libiocage.lib.JailConfigZFS.JailConfigZFS.read(self)
-            self.legacy = "zfs"
-            self.logger.verbose(
-                "Configuration loaded from ZFS properties (iocage-legacy)")
-            return "zfs"
-
-        else:
-
-            self.logger.debug("No configuration was found")
-            return None
+        self.clone(self.jail.resource.read_config())
 
     def update_special_property(self, name):
 
@@ -199,19 +142,12 @@ class JailConfig(dict, object):
         self.special_properties[name] = special_property
 
     def save(self):
-        if self.legacy is None:
-            self.save_json()
-        elif self.legacy == "zfs":
-            libiocage.lib.JailConfigZFS.JailConfigZFS.save(self)
-        else:
-            libiocage.lib.JailConfigLegacy.JailConfigLegacy.save(self)
+        self.jail.resource.write_config(self.data)
 
-        self.jail.rc_conf.save()
+    def _get_id(self) -> str:
+        return self.data["id"]
 
-    def save_json(self):
-        libiocage.lib.JailConfigJSON.JailConfigJSON.save(self)
-
-    def _set_name(self, name, **kwargs):
+    def _set_id(self, name: str, **kwargs):
 
         try:
             # We do not want to set the same name twice.
@@ -222,6 +158,10 @@ class JailConfig(dict, object):
                 return
         except:
             pass
+
+        if name is None:
+            self.data["id"] = None
+            return
 
         allowed_characters_pattern = "([^A-z0-9\\._\\-]|\\^)"
         invalid_characters = re.findall(allowed_characters_pattern, name)
@@ -234,17 +174,20 @@ class JailConfig(dict, object):
 
         is_valid_name = libiocage.lib.helpers.validate_name(name)
         if is_valid_name is True:
-            self["id"] = name
+            self.data["id"] = name
         else:
             try:
-                self["id"] = str(uuid.UUID(name))  # legacy support
+                self.data["id"] = str(uuid.UUID(name))  # legacy support
             except:
                 raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
 
-        self.logger.spam(
-            f"Set jail name to {name}",
-            jail=self.jail
-        )
+        self.logger.spam(f"Set jail name to {name}")
+
+    def _get_name(self):
+        return self._get_id()
+
+    def _get_uuid(self):
+        return self._get_id()
 
     def _get_type(self):
 
@@ -398,18 +341,11 @@ class JailConfig(dict, object):
             return False
 
     def _get_resolver(self):
-        return self.__get_or_create_special_property_resolver()
+        return self._create_or_get_special_property_resolver()
 
     def _set_resolver(self, value, **kwargs):
 
-        if isinstance(value, str):
-            self.data["resolver"] = value
-            resolver = self["resolver"]
-        else:
-            resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
-                jail_config=self,
-                logger=self.logger
-            )
+        resolver = self._create_or_get_special_property_resolver()
         resolver.update(value, notify=True)
 
     def _get_cloned_release(self):
@@ -484,7 +420,7 @@ class JailConfig(dict, object):
         except KeyError:
             return self["id"]
 
-    def __get_or_create_special_property_resolver(self):
+    def _create_or_get_special_property_resolver(self):
 
         try:
             return self.special_properties["resolver"]
@@ -493,8 +429,10 @@ class JailConfig(dict, object):
 
         resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
             jail_config=self,
+            host=self.host,
             logger=self.logger
         )
+
         resolver.update(notify=False)
         self.special_properties["resolver"] = resolver
 
@@ -543,20 +481,12 @@ class JailConfig(dict, object):
             pass
 
         # fall back to default
-        return self.defaults[key]
+        return self.host.defaults[key]
 
     def __delitem__(self, key):
         del self.data[key]
 
     def __setitem__(self, key, value, **kwargs):
-
-        # passthrough existing properties
-        # try:
-        #     self.__getitem__(key)
-        #     object.__setitem__(self, key, value)
-        #     return
-        # except:
-        #     pass
 
         parsed_value = libiocage.lib.helpers.parse_user_input(value)
 
@@ -607,7 +537,7 @@ class JailConfig(dict, object):
         return (hash_before != hash_after)
 
     def __str__(self):
-        return libiocage.lib.JailConfigJSON.JailConfigJSON.toJSON(self)
+        return libiocage.lib.ConfigJSON.to_json(self)
 
     def __dir__(self):
 

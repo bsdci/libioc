@@ -54,6 +54,7 @@ def cli(ctx, rc, jails):
             ctx.parent.print_events(jail.start())
 
         except Exception:
+            raise
             failed_jails.append(jail)
             continue
 
@@ -67,5 +68,3 @@ def cli(ctx, rc, jails):
         jails_input = " ".join(list(jails))
         logger.error(f"No jailes matches your input: {jails_input}")
         exit(1)
-
-    exit(0)

@@ -69,5 +69,3 @@ def cli(ctx, rc, log_level, force, jails):
         jails_input = " ".join(list(jails))
         logger.error(f"No jailes matches your input: {jails_input}")
         exit(1)
-
-    exit(0)

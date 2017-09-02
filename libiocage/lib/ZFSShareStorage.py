@@ -48,11 +48,11 @@ class ZFSShareStorage:
             except:
                 pass
 
-            pool_name = f"{self.jail.zfs_pool_name}/{name}"
+            pool_name = f"{self.jail.resource.pool_name}/{name}"
             try:
                 # legacy support (datasets not prefixed with pool/)
                 zpool = self._get_pool_from_dataset_name(pool_name)
-                name = f"{self.jail.zfs_pool_name}/{name}"
+                name = f"{self.jail.resource.pool_name}/{name}"
             except:
                 pass
 

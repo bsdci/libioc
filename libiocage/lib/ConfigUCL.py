@@ -25,36 +25,39 @@ import os.path
 
 import ucl
 
+import libiocage.lib.Config
+import libiocage.lib.errors
 
-class JailConfigLegacy:
-    def read(self):
-        self.clone(JailConfigLegacy.read_data(self), skip_on_error=True)
 
-    def save(self):
-        config_file_path = JailConfigLegacy.__get_config_path(self)
-        with open(config_file_path, "w") as f:
-            f.write(JailConfigLegacy.toLegacyConfig(self))
-            self.logger.verbose(f"Legacy config written to {config_file_path}")
+class ConfigUCL(libiocage.lib.Config.BaseConfig):
 
-    def read_data(self):
-        with open(JailConfigLegacy.__get_config_path(self), "r") as conf:
-            data = ucl.load(conf.read())
+    config_type = "zfs"
 
-            try:
-                if data["type"] == "basejail":
-                    data["basejail"] = "on"
-                    data["clonejail"] = "off"
-                    data["basejail_type"] = "zfs"
-            except:
-                pass
+    def map_input(self, data: dict) -> dict:
+        return ucl.load(data)
 
-            return data
+    def map_output(self, data: dict) -> dict:
+        # ToDo: Re-Implement UCL output
+        raise libiocage.lib.errors.MissingFeature("Writing ConfigUCL")
 
-    def exists(self):
-        return os.path.isfile(JailConfigLegacy.__get_config_path(self))
 
-    def __get_config_path(self):
-        try:
-            return f"{self.jail.dataset.mountpoint}/config"
-        except:
-            raise "Dataset not found or not mounted"
+class ResourceConfigUCL(ConfigUCL, libiocage.lib.Config.ResourceConfig):
+
+    def __init__(
+        self,
+        resource: 'libiocage.lib.Resource.Resource',
+        file: str="config",
+        **kwargs
+    ):
+
+        self.resource = resource
+        libiocage.lib.Config.ResourceConfig.__init__(
+            self,
+            resource=resource,
+            file=file,
+            **kwargs
+        )
+
+    @property
+    def file(self):
+        return os.path.join(self.resource.dataset.mountpoint, self._file)

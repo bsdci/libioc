@@ -180,6 +180,13 @@ class CommandFailure(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class NotAnIocageZFSProperty(IocageException):
+
+    def __init__(self, property_name, *args, **kwargs):
+        msg = f"The ZFS property '{property_name}' is not managed by iocage"
+        super().__init__(msg, *args, **kwargs)
+
+
 # Host, Distribution
 
 
@@ -269,16 +276,6 @@ class InvalidNetworkBridge(IocageException, ValueError):
 
 
 # Release
-
-
-class UnknownReleasePool(IocageException):
-
-    def __init__(self, *args, **kwargs):
-        msg = (
-            "Cannot determine the ZFS pool without knowing"
-            "the dataset or root_dataset"
-        )
-        super().__init__(msg, *args, **kwargs)
 
 
 class ReleaseUpdateFailure(IocageException):

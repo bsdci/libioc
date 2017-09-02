@@ -31,7 +31,6 @@ import libiocage.lib.helpers
 class Storage:
     def __init__(self, jail,
                  zfs=None,
-                 auto_create=False,
                  safe_mode=True,
                  logger=None):
 
@@ -39,31 +38,14 @@ class Storage:
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self.jail = jail
 
-        # when auto_create is enabled, non-existing zfs volumes will be
-        # automatically created if not enabled, accessing non-existent
-        # datasets will raise an error
-        self.auto_create = auto_create
-
         # safe-mody only attaches zfs datasets to jails that were tagged with
         # jailed=on already exist
         self.safe_mode = safe_mode
 
-    @property
-    def jail_root_dataset(self):
-        return self.zfs.get_dataset(self.jail_root_dataset_name)
-
-    @property
-    def jail_root_dataset_name(self):
-        return f"{self.jail.dataset.name}/root"
-
-    @property
-    def _pool(self):
-        return self.jail.host.datasets.root.pool
-
     def clone_release(self, release):
         self.clone_zfs_dataset(
-            release.root_dataset.name,
-            self.jail_root_dataset_name
+            release.resource.root_dataset_name,
+            self.jail.resource.root_dataset_name
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
@@ -144,7 +126,7 @@ class Storage:
                 f"trying to create the parent dataset '{parent}' first",
                 jail=self.jail
             )
-            self._create_dataset(parent)
+            self.zfs.create_dataset(parent)
             snapshot.clone(target)
 
         target_dataset = self.zfs.get_dataset(target)
@@ -154,32 +136,11 @@ class Storage:
             jail=self.jail
         )
 
-    def create_jail_dataset(self):
-        self._create_dataset(self.jail.dataset_name)
-
-    def create_jail_root_dataset(self):
-        self._create_dataset(self.jail_root_dataset_name)
-
-    def get_or_create_jail_root_dataset(self):
-        try:
-            return self.jail_root_dataset
-        except:
-            self.create_jail_root_dataset()
-        return self.jail_root_dataset
-
-    def create_jail_mountpoint(self, basedir):
-        basedir = f"{self.jail_root_dataset.mountpoint}/{basedir}"
+    def create_jail_mountpoint(self, basedir: str):
+        basedir = f"{self.jail.resource.root_dataset.mountpoint}/{basedir}"
         if not os.path.isdir(basedir):
             self.logger.verbose(f"Creating mountpoint {basedir}")
             os.makedirs(basedir)
-
-    def _create_dataset(self, name, mount=True):
-        self.logger.verbose(f"Creating ZFS dataset {name}")
-        self._pool.create(name, {}, create_ancestors=True)
-        if mount:
-            ds = self.zfs.get_dataset(name)
-            ds.mount()
-        self.logger.spam(f"ZFS dataset {name} created")
 
     def _mount_procfs(self):
         try:
@@ -189,7 +150,7 @@ class Storage:
                     "-t",
                     "procfs"
                     "proc"
-                    f"{self.path}/root/proc"
+                    f"{self.jail.resource.root_dataset.mountpoint}/proc"
                 ])
         except:
             raise libiocage.lib.errors.MountFailed("procfs")
@@ -202,17 +163,16 @@ class Storage:
         except:
             pass
 
-        linproc_path = "compat/linux/proc"
-        self._jail_mkdirp(f"{self.path}/root/{linproc_path}")
+        linproc_path = self._jail_mkdirp("/compat/linux/proc")
 
         try:
             if self.jail.config["mount_procfs"]:
                 libiocage.lib.helpers.exec([
                     "mount"
                     "-t",
-                    "linprocfs"
-                    "linproc"
-                    f"{self.path}/root/{linproc_path}"
+                    "linprocfs",
+                    "linproc",
+                    linproc_path
                 ])
         except:
             raise libiocage.lib.errors.MountFailed("linprocfs")
@@ -221,14 +181,18 @@ class Storage:
         if dataset.mountpoint:
             dataset.unmount()
 
-    def _jail_mkdirp(self, directory,
-                     permissions=0o775,
-                     user="root",
-                     group="wheel"):
+    def _jail_mkdirp(
+        self,
+        directory: str,
+        permissions=0o775,
+        user: str="root",
+        group: str="wheel"
+    ) -> str:
 
         uid = pwd.getpwnam(user).pw_uid
         gid = grp.getgrnam(group).gr_gid
-        folder = f"{self.jail.path}/{directory}"
+        folder = f"{self.jail.resource.root_dataset.mountpoint}{directory}"
         if not os.path.isdir(folder):
             os.mkdirs(folder, permissions)
             os.chown(folder, uid, gid, follow_symlinks=False)
+        return os.path.abspath(folder)
