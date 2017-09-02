@@ -35,7 +35,7 @@ __rootcmd__ = True
 @click.pass_context
 @click.argument("zpool")
 @click.option("--mountpoint", "-m", default="/iocage")
-def cli(ctx, zpool, log_level, mountpoint):
+def cli(ctx, zpool, mountpoint):
     """
     Calls ZFS set to change the property org.freebsd.ioc:active to yes.
     """

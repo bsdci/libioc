@@ -53,7 +53,10 @@ class JailConfigResolver(list):
 
     @property
     def value(self):
-        return self.jail_config.data["resolver"]
+        try:
+            return self.jail_config.data["resolver"]
+        except KeyError:
+            return self.jail_config.defaults["resolver"]
 
     def apply(self, jail):
 
