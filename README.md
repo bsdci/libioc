@@ -1,5 +1,4 @@
-libiocage
-=========
+# libiocage
 
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/iocage/libiocage.svg)](http://isitmaintained.com/project/iocage/libiocage "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/iocage/libiocage.svg)](http://isitmaintained.com/project/iocage/libiocage "Percentage of issues still open")
@@ -19,13 +18,13 @@ This library provides programmatic access to iocage features and jails, while be
 
 ### from Source Distribution
 
-```
+```sh
 pip3.6 install libiocage
 ```
 
 ### from Master branch
 
-```
+```sh
 git clone https://github.com/iocage/libiocage
 cd libiocage
 make install
@@ -37,7 +36,7 @@ Please note: this will build `py-libzfs` from source, which will require `/usr/s
 
 ### Library
 
-```
+```python
 import libiocage
 
 jail = libiocage.Jail()
@@ -46,4 +45,4 @@ jail.create("11.1-RELEASE")
 
 ### CLI
 
-Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the command line interface of https://github.com/iocage/iocage but meant to be developed among with the library and to spike on new features.
+Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
