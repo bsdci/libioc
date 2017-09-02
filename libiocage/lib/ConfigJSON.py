@@ -21,43 +21,50 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""activate module for the cli."""
-import click
+import os.path
+import json
 
-import libiocage.lib.Datasets
-import libiocage.lib.Logger
-import libiocage.lib.ZFS
-
-__rootcmd__ = True
+import libiocage.lib.Config
+import libiocage.lib.helpers
 
 
-@click.command(name="activate", help="Set a zpool active for iocage usage.")
-@click.pass_context
-@click.argument("zpool")
-@click.option("--mountpoint", "-m", default="/iocage")
-def cli(ctx, zpool, mountpoint):
-    """
-    Calls ZFS set to change the property org.freebsd.ioc:active to yes.
-    """
-    logger = ctx.parent.logger
-    zfs = libiocage.lib.ZFS.get_zfs()
-    iocage_pool = None
-
-    for pool in zfs.pools:
-        if pool.name == zpool:
-            iocage_pool = pool
-
-    if iocage_pool is None:
-        logger.error(f"ZFS pool '{zpool}' not found")
-        exit(1)
-
-    try:
-        datasets = libiocage.lib.Datasets.Datasets(
-            pool=iocage_pool,
-            zfs=zfs,
-            logger=logger
+def to_json(data: dict):
+    output_data = {}
+    for key, value in data.items():
+        output_data[key] = libiocage.lib.helpers.to_string(
+            value,
+            true="yes",
+            false="no",
+            none="none"
         )
-        datasets.activate(mountpoint=mountpoint)
-        logger.log(f"ZFS pool '{zpool}' activated")
-    except:
-        exit(1)
+    return json.dumps(output_data, sort_keys=True, indent=4)
+
+
+class ConfigJSON(libiocage.lib.Config.ConfigFile):
+
+    config_type = "json"
+
+    def map_input(self, data: dict) -> dict:
+        return json.load(data)
+
+    def map_output(self, data: dict) -> dict:
+        return to_json(data)
+
+
+class ResourceConfigJSON(ConfigJSON):
+
+    def __init__(
+        self,
+        resource: 'libiocage.lib.Resource.Resource',
+        **kwargs
+    ):
+
+        self.resource = resource
+        ConfigJSON.__init__(self, **kwargs)
+
+    @property
+    def file(self):
+        return os.path.join(
+            self.resource.dataset.mountpoint,
+            self.resource.config_file
+        )

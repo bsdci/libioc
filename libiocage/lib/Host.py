@@ -24,6 +24,8 @@
 import os
 import platform
 
+import libzfs
+
 import libiocage.lib.Datasets
 import libiocage.lib.DevfsRules
 import libiocage.lib.Distribution
@@ -34,10 +36,17 @@ class HostGenerator:
 
     _class_distribution = libiocage.lib.Distribution.DistributionGenerator
 
-    def __init__(self, root_dataset=None, zfs=None, logger=None):
+    def __init__(
+        self,
+        root_dataset: libzfs.ZFSDataset=None,
+        defaults: dict=None,
+        zfs: libzfs.ZFS=None,
+        logger: libiocage.lib.Logger.Logger=None
+    ):
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
+
         self.datasets = libiocage.lib.Datasets.Datasets(
             root=root_dataset,
             logger=self.logger,
@@ -47,9 +56,23 @@ class HostGenerator:
             host=self,
             logger=self.logger
         )
+        self._defaults = defaults
 
         self._devfs = None
         self.releases_dataset = None
+
+    @property
+    def defaults(self):
+        if self._defaults is None:
+            self._load_defaults()
+        return self._defaults
+
+    def _load_defaults(self):
+        self._defaults = libiocage.lib.Resource.DefaultResource(
+            dataset=self.datasets.root,
+            logger=self.logger,
+            zfs=self.zfs
+        ).read_config()
 
     @property
     def devfs(self):

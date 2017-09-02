@@ -28,7 +28,7 @@ import libiocage.lib.Host
 import libiocage.lib.Jail
 import libiocage.lib.Logger
 import libiocage.lib.Release
-import libiocage.lib.helpers
+import libiocage.lib.ZFS
 
 __rootcmd__ = True
 
@@ -80,7 +80,8 @@ def validate_count(ctx, param, value):
 @click.argument("props", nargs=-1)
 def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
         empty, name, no_fetch, force):
-    zfs = libiocage.lib.helpers.get_zfs()
+
+    zfs = libiocage.lib.ZFS.get_zfs()
     logger = ctx.parent.logger
     host = libiocage.lib.Host.Host(logger=logger, zfs=zfs)
 

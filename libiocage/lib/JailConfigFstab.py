@@ -43,14 +43,23 @@ class FstabLine(dict):
 class JailConfigFstab(set):
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
 
-    def __init__(self, jail, logger=None):
-        set.__init__(self)
+    def __init__(
+        self,
+        resource: 'libiocage.lib.Resource.JailResource',
+        release: 'libiocage.lib.Release.ReleaseGenerator'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        host: 'libiocage.lib.Host.HostGenerator'=None
+    ):
+
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
-        self.jail = jail
+        self.host = libiocage.lib.helpers.init_host(self, host)
+        self.resource = resource
+        self.release = release
+        set.__init__(self)
 
     @property
-    def fstab_file_path(self):
-        return f"{self.jail.path}/fstab"
+    def file_path(self):
+        return f"{self.resource.dataset.mountpoint}/fstab"
 
     def parse_lines(self, input, ignore_auto_created=True):
 
@@ -75,7 +84,7 @@ class JailConfigFstab(set):
             fragments = line.split()
             if len(fragments) != 6:
                 self.logger.log(
-                    f"Invalid line in fstab file {self.fstab_file_path}"
+                    f"Invalid line in fstab file {self.file_path}"
                     " - skipping line"
                 )
                 continue
@@ -101,23 +110,22 @@ class JailConfigFstab(set):
             self.add_line(new_line)
 
     def read_file(self):
-        if os.path.isfile(self.fstab_file_path):
-            with open(self.fstab_file_path, "r") as f:
+        if os.path.isfile(self.file_path):
+            with open(self.file_path, "r") as f:
                 self.parse_lines(f.read())
                 f.close()
-                self.logger.debug(f"fstab loaded from {self.fstab_file_path}")
+                self.logger.debug(f"fstab loaded from {self.file_path}")
 
     def save(self):
-        self.logger.verbose(f"Writing fstab to {self.fstab_file_path}")
-        with open(self.fstab_file_path, "w") as f:
+        self.logger.verbose(f"Writing fstab to {self.file_path}")
+        with open(self.file_path, "w") as f:
             f.write(self.__str__())
             f.truncate()
             f.close()
 
-        self.logger.verbose(f"{self.jail.path}/fstab written")
-
-    def save_with_basedirs(self):
-        return self.save()
+        self.logger.verbose(
+            f"{self.resource.dataset.mountpoint}/fstab written"
+        )
 
     def add(self,
             source,
@@ -147,23 +155,20 @@ class JailConfigFstab(set):
 
     @property
     def basejail_lines(self):
-        basejail = self.jail.config["basejail"]
-        basejail_type = self.jail.config["basejail_type"]
 
-        if not (basejail and basejail_type == "nullfs"):
+        if self.release.resource is None:
             return []
 
         basedirs = libiocage.lib.helpers.get_basedir_list(
-            distribution_name=self.jail.host.distribution.name
+            distribution_name=self.host.distribution.name
         )
 
         fstab_basejail_lines = []
+        release_root_path = self.release.resource.root_dataset.mountpoint
         for basedir in basedirs:
-            release_directory = self.jail.host.datasets.releases.mountpoint
 
-            cloned_release = self.jail.config["cloned_release"]
-            source = f"{release_directory}/{cloned_release}/root/{basedir}"
-            destination = f"{self.jail.path}/root/{basedir}"
+            source = f"{release_root_path}/{basedir}"
+            destination = f"{self.resource.root_dataset.mountpoint}/{basedir}"
             fstab_basejail_lines.append({
                 "source"     : source,
                 "destination": destination,

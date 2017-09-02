@@ -69,7 +69,7 @@ def cli(ctx, props, jail):
                 f"Jail '{jail.humanreadable_name}' updated: " +
                 ", ".join(updated_properties)
             )
-            jail.config.save()
+            jail.save()
 
 
 def _is_setter_property(property_string):

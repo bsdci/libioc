@@ -57,16 +57,16 @@ class ZFSBasejailStorage:
 
         for basedir in basedirs:
             source_dataset_name = f"{release.base_dataset.name}/{basedir}"
-            target_dataset_name = f"{self.jail_root_dataset_name}/{basedir}"
+            target_dataset_name = f"{self.jail.root_dataset_name}/{basedir}"
             self.clone_zfs_dataset(source_dataset_name, target_dataset_name)
 
     def _delete_clone_target_datasets(self, root=None):
 
         if root is None:
-            root = list(self.jail_root_dataset.children)
+            root = list(self.jail.root_dataset.children)
 
         for child in root:
-            root_dataset_prefix = f"{self.jail_root_dataset_name}/"
+            root_dataset_prefix = f"{self.jail.root_dataset_name}/"
             relative_name = child.name.replace(root_dataset_prefix, "")
             basedirs = libiocage.lib.helpers.get_basedir_list()
 
