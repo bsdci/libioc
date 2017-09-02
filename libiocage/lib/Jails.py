@@ -82,10 +82,7 @@ class JailsGenerator(list):
     @filters.setter
     def filters(
         self,
-        value: Union[
-            str,
-            Iterable[Union[libiocage.lib.JailFilter.Terms, str]]
-        ]
+        value: Iterable[Union['libiocage.lib.JailFilter.Term', str]]
     ):
 
         if isinstance(value, libiocage.lib.JailFilter.Terms):
