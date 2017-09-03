@@ -50,6 +50,7 @@ def cli(ctx, rc, log_level, force, jails):
         filters=jails
     )
 
+    changed_jails = []
     failed_jails = []
     for jail in ioc_jails:
         try:
@@ -59,5 +60,14 @@ def cli(ctx, rc, log_level, force, jails):
             continue
 
         logger.log(f"{jail.name} stopped")
+        change_jails.append(jail)
 
-    exit(1) if len(failed_jails) > 0 else exit(0)
+    if len(failed_jails) > 0:
+        exit(1)
+
+    if len(changed_jails) == 0:
+        jails_input = " ".join(list(jails))
+        logger.error(f"No jailes matches your input: {jails_input}")
+        exit(1)
+
+    exit(0)

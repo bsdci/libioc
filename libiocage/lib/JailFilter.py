@@ -63,12 +63,6 @@ class Term(list):
         """
         for filter_value in self:
 
-            if self.key == "name":
-                if self._validate_name_filter_string(filter_value) is False:
-                    raise libiocage.lib.errors.JailFilterInvalidName(
-                        filter_value
-                    )
-
             if match_filter(value, filter_value):
                 return True
 
