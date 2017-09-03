@@ -121,4 +121,4 @@ class Jails(JailsGenerator):
         return libiocage.lib.Jail.Jail(*args, **kwargs)
 
     def __iter__(self):
-        return list(JailsGenerator.__iter__(self))
+        return JailsGenerator.__iter__(self)
