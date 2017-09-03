@@ -350,6 +350,9 @@ class JailGenerator:
                 The jail is created from the release matching the name provided
         """
 
+        if self.config["id"] is None:
+            self.config["name"] = str(uuid.uuid4())
+
         self.require_jail_not_existing()
 
         # check if release exists
@@ -372,9 +375,6 @@ class JailGenerator:
 
         release = filteres_released[0]
         self.config["release"] = release.name
-
-        if not self.config["id"]:
-            self.config["name"] = str(uuid.uuid4())
 
         self.logger.verbose(
             f"Creating jail '{self.config['id']}'",
