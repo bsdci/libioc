@@ -778,7 +778,7 @@ class ReleaseGenerator:
                 # dataset was already existing
                 pass
 
-            src = self.root_dataset.mountpoint
+            src = f"{self.root_dataset.mountpoint}/{folder}"
             dst = f"{base_dataset.mountpoint}/{folder}"
 
             self.logger.verbose(f"Copying {folder} from {src} to {dst}")
