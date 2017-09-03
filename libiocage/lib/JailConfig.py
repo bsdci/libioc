@@ -523,8 +523,9 @@ class JailConfig(dict, object):
 
         # data with mappings
         try:
-            return self.__getattribute__(f"_get_{key}")()
-        except:
+            get_method = self.__getattribute__(f"_get_{key}")
+            return get_method()
+        except AttributeError:
             pass
 
         # plain data attribute

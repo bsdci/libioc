@@ -45,7 +45,6 @@ class JailConfigLegacy:
                     data["basejail"] = "on"
                     data["clonejail"] = "off"
                     data["basejail_type"] = "zfs"
-                    data["type"] = "jail"
             except:
                 pass
 

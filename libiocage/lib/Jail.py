@@ -390,7 +390,7 @@ class JailGenerator:
 
         backend = None
 
-        is_basejail = self.config["type"] == "basejail"
+        is_basejail = self.config["basjail"] == True
         if not is_basejail:
             backend = libiocage.lib.StandaloneJailStorage.StandaloneJailStorage
         if is_basejail and self.config["basejail_type"] == "nullfs":
@@ -866,7 +866,7 @@ class JailGenerator:
             return f"{self.host.datasets.root.name}/jails/{self.config['id']}"
 
     @dataset_name.setter
-    def dataset_name(self, value=None):
+    def dataset_name(self, value: str):
         self._dataset_name = value
 
     @property
