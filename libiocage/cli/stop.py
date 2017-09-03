@@ -60,7 +60,7 @@ def cli(ctx, rc, log_level, force, jails):
             continue
 
         logger.log(f"{jail.name} stopped")
-        change_jails.append(jail)
+        changed_jails.append(jail)
 
     if len(failed_jails) > 0:
         exit(1)
