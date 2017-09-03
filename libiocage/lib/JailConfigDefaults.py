@@ -31,6 +31,7 @@ class JailConfigDefaults(dict):
 
     DEFAULTS = {
         "id": None,
+        "release": None,
         "boot": False,
         "legacy": False,
         "priority": 0,
