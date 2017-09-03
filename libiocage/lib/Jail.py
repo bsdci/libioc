@@ -390,7 +390,7 @@ class JailGenerator:
 
         backend = None
 
-        is_basejail = self.config["basjail"] == True
+        is_basejail = self.config.get("basejail", False)
         if not is_basejail:
             backend = libiocage.lib.StandaloneJailStorage.StandaloneJailStorage
         if is_basejail and self.config["basejail_type"] == "nullfs":
