@@ -350,11 +350,24 @@ class ReleaseGenerator:
         if release_changed:
             yield releaseCopyBaseEvent.begin()
             self._update_zfs_base()
+            self._copy_to_base_release()
             yield releaseCopyBaseEvent.end()
         else:
             yield releaseCopyBaseEvent.skip(message="release unchanged")
 
         self._cleanup()
+
+    def _copy_to_base_release(self):
+        libiocage.lib.helpers.exec(
+            [
+                "rsync",
+                "-a",
+                "--delete",
+                f"{self.root_dataset.mountpoint}/",
+                f"{self.base_dataset.mountpoint}"
+            ],
+            logger=self.logger
+        )
 
     def fetch_updates(self):
 
@@ -778,65 +791,7 @@ class ReleaseGenerator:
                 # dataset was already existing
                 pass
 
-            src = f"{self.root_dataset.mountpoint}/{folder}"
-            dst = f"{base_dataset.mountpoint}/{folder}"
-
-            self.logger.verbose(f"Copying {folder} from {src} to {dst}")
-            self._copytree(src, dst)
-
         self.logger.debug(f"Updated release base datasets for {self.name}")
-
-    def _copytree(self, src_path, dst_path, delete=False):
-
-        src_dir = set(os.listdir(src_path))
-        dst_dir = set(os.listdir(dst_path))
-
-        if delete is True:
-            for item in dst_dir - src_dir:
-                self._rmtree("f{dst_dir}/{item}")
-
-        for item in os.listdir(src_path):
-            src = os.path.join(src_path, item)
-            dst = os.path.join(dst_path, item)
-            if os.path.islink(src) or os.path.isfile(src):
-                self._copyfile(src, dst)
-            else:
-                if not os.path.isdir(dst):
-                    src_stat = os.stat(src)
-                    os.makedirs(dst, src_stat.st_mode)
-                self._copytree(src, dst)
-
-    def _copyfile(self, src_path, dst_path):
-
-        dst_flags = None
-
-        if os.path.islink(dst_path):
-            os.unlink(dst_path)
-        elif os.path.isfile(dst_path) or os.path.isdir(dst_path):
-            dst_stat = os.stat(dst_path)
-            dst_flags = dst_stat.st_flags
-            self._rmtree(dst_path)
-
-        if os.path.islink(src_path):
-            linkto = os.readlink(src_path)
-            os.symlink(linkto, dst_path)
-        else:
-            shutil.copy2(src_path, dst_path)
-            if dst_flags is not None:
-                os.chflags(dst_path, dst_flags)
-
-    def _rmtree(self, path):
-        if os.path.islink(path):
-            os.unlink(path)
-            return
-        elif os.path.isdir(path):
-            for item in os.listdir(path):
-                self._rmtree(f"{path}/{item}")
-            os.chflags(path, 2048)
-            os.rmdir(path)
-        else:
-            os.chflags(path, 2048)
-            os.remove(path)
 
     def _cleanup(self):
         for asset in self.assets:
