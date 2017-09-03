@@ -40,7 +40,7 @@ class JailConfigZFS:
 
         self.clone(data, skip_on_error=True)
 
-        if not self.exists:
+        if JailConfigZFS.exists is False:
             raise libiocage.lib.errors.JailConfigNotFound("ZFS")
 
         if self.data["basejail"] == "on":
@@ -75,14 +75,23 @@ class JailConfigZFS:
         #   if not existing_property_name in data_keys:
         #     pass
 
-        for zfs_property_name in self.data:
+        for key, value in self.data.items():
+            zfs_property_name = f"{JailConfigZFS.property_prefix}{key}"
             zfs_property = libzfs.ZFSUserProperty(
-                str(self.data[zfs_property_name])
+                JailConfigZFS._to_config_string(self, value)
             )
-            self.jail.dataset.property[zfs_property_name] = zfs_property
+            self.jail.dataset.properties[zfs_property_name] = zfs_property
 
     def _is_iocage_property(self, name):
         return name.startswith(JailConfigZFS.property_prefix)
 
     def _get_iocage_property_name(self, zfs_property_name):
         return zfs_property_name[len(JailConfigZFS.property_prefix):]
+
+    def _to_config_string(self, value):
+        return libiocage.lib.helpers.to_string(
+                value,
+                true="on",
+                false="off",
+                none="none"
+            )

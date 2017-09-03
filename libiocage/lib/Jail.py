@@ -921,7 +921,7 @@ class JailGenerator:
         """
 
         try:
-            return libiocage.helpers.to_string(self.config[key])
+            return libiocage.lib.helpers.to_string(self.config[key])
         except:
             pass
 

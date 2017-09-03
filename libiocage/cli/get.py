@@ -90,9 +90,9 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
             logger.error(f"Unknown property '{prop}'")
             exit(1)
 
-    for key in jail.config["all_properties"]:
+    for key in jail.config.all_properties:
         if (prop is None) or (key == prop):
-            value = jail.config["get_string"](key)
+            value = jail.config.get_string(key)
             print_property(key, value)
 
 
@@ -101,12 +101,10 @@ def print_property(key, value):
 
 
 def _lookup_jail_value(jail, key):
-    if key in libiocage.lib.Jails.Jails.JAIL_KEYS:
-        return jail.getstring(key)
+
+    if key == "running":
+        value = jail.running
     else:
-        if key == "running":
-            return jail.running
+        value = jail.getstring(key)
 
-        val = str(jail.config.__getitem__(key))
-
-        return val if val is not None else False
+    return libiocage.lib.helpers.to_string(value)

@@ -31,6 +31,9 @@ class JailConfigDefaults(dict):
 
     DEFAULTS = {
         "id": None,
+        "boot": False,
+        "legacy": False,
+        "priority": 0,
         "basejail": False,
         "defaultrouter": None,
         "defaultrouter6": None,

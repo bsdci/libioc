@@ -83,7 +83,12 @@ class JailConfig(dict, object):
 
         self.data = {}
         self.special_properties = {}
-        self["legacy"] = False
+
+        # be aware of iocage-legacy jails for migration
+        try:
+            self.legacy = libiocage.lib.helpers.parse_user_input(data["legacy"]) is True
+        except:
+            self.legacy = False
 
         # jail is required for various operations (write, fstab, etc)
         if jail:
@@ -103,12 +108,6 @@ class JailConfig(dict, object):
             if key in data.keys():
                 self["name"] = data[key]
                 break
-
-        # be aware of iocage-legacy jails for migration
-        try:
-            self["legacy"] = data["legacy"] is True
-        except:
-            self["legacy"] = False
 
         self.defaults_file = defaults_file
         self._defaults = None
@@ -163,14 +162,14 @@ class JailConfig(dict, object):
         if libiocage.lib.JailConfigJSON.JailConfigJSON.exists(self):
 
             libiocage.lib.JailConfigJSON.JailConfigJSON.read(self)
-            self["legacy"] = False
+            self.legacy = False
             self.logger.log("Configuration loaded from JSON", level="verbose")
             return "json"
 
         elif libiocage.lib.JailConfigLegacy.JailConfigLegacy.exists(self):
 
             libiocage.lib.JailConfigLegacy.JailConfigLegacy.read(self)
-            self["legacy"] = True
+            self.legacy = "ucl"
             self.logger.verbose(
                 "Configuration loaded from UCL config file (iocage-legacy)")
             return "ucl"
@@ -178,7 +177,7 @@ class JailConfig(dict, object):
         elif libiocage.lib.JailConfigZFS.JailConfigZFS.exists(self):
 
             libiocage.lib.JailConfigZFS.JailConfigZFS.read(self)
-            self["legacy"] = True
+            self.legacy = "zfs"
             self.logger.verbose(
                 "Configuration loaded from ZFS properties (iocage-legacy)")
             return "zfs"
@@ -200,8 +199,10 @@ class JailConfig(dict, object):
         self.special_properties[name] = special_property
 
     def save(self):
-        if not self["legacy"]:
+        if self.legacy is None:
             self.save_json()
+        elif self.legacy == "zfs":
+            libiocage.lib.JailConfigZFS.JailConfigZFS.save(self)
         else:
             libiocage.lib.JailConfigLegacy.JailConfigLegacy.save(self)
 
@@ -276,12 +277,7 @@ class JailConfig(dict, object):
         return False
 
     def _set_basejail(self, value, **kwargs):
-        if self["legacy"]:
-            self.data["basejail"] = libiocage.lib.helpers.to_string(
-                value, true="on", false="off")
-        else:
-            self.data["basejail"] = libiocage.lib.helpers.to_string(
-                value, true="yes", false="no")
+        self.data["basejail"] = self.stringify(value)
 
     def _get_clonejail(self):
         return libiocage.lib.helpers.parse_user_input(self.data["clonejail"])
@@ -290,8 +286,7 @@ class JailConfig(dict, object):
         return True
 
     def _set_clonejail(self, value, **kwargs):
-        self.data["clonejail"] = libiocage.lib.helpers.to_string(
-            value, true="on", false="off")
+        self.data["clonejail"] = self.stringify(value)
 
     def _get_ip4_addr(self):
         try:
@@ -377,25 +372,19 @@ class JailConfig(dict, object):
 
     def _get_jail_zfs(self):
         try:
-            enabled = libiocage.lib.helpers.parse_user_input(
+            return libiocage.lib.helpers.parse_user_input(
                 self.data["jail_zfs"]
             )
         except:
-            enabled = self._default_jail_zfs()
-
-        if not enabled:
-            if len(self["jail_zfs_dataset"]) > 0:
-                raise libiocage.lib.errors.JailConigZFSIsNotAllowed(
-                    logger=self.logger
-                )
-        return enabled
+            return self._default_jail_zfs()
 
     def _set_jail_zfs(self, value, **kwargs):
-        if (value is None) or (value == ""):
+        parsed_value = libiocage.lib.helpers.parse_user_input(value)
+        if parsed_value is None:
             del self.data["jail_zfs"]
             return
         self.data["jail_zfs"] = libiocage.lib.helpers.to_string(
-            value,
+            parsed_value,
             true="on",
             false="off"
         )
@@ -512,7 +501,7 @@ class JailConfig(dict, object):
         return self.special_properties["resolver"]
 
     def get_string(self, key):
-        return self.__getitem__(key, string=True)
+        return self.stringify(self.__getitem__(key))
 
     def _skip_on_error(self, **kwargs):
         """
@@ -523,7 +512,7 @@ class JailConfig(dict, object):
         except AttributeError:
             return False
 
-    def __getitem_user(self, key, string=False):
+    def __getitem_user(self, key):
 
         # passthrough existing properties
         try:
@@ -533,23 +522,22 @@ class JailConfig(dict, object):
 
         # data with mappings
         try:
-            get_method = self.__getattribute__(f"_get_{key}")
-            return self.stringify(get_method(), string)
+            return self.__getattribute__(f"_get_{key}")()
         except:
             pass
 
         # plain data attribute
         try:
-            return self.stringify(self.data[key], string)
+            return self.data[key]
         except:
             pass
 
         raise KeyError(f"User defined property not found: {key}")
 
-    def __getitem__(self, key, string=False):
+    def __getitem__(self, key):
 
         try:
-            return self.__getitem_user(key, string)
+            return self.__getitem_user(key)
         except:
             pass
 
@@ -649,8 +637,9 @@ class JailConfig(dict, object):
 
         return list(properties)
 
-    def stringify(self, value, enabled=True):
-        return libiocage.helpers.to_string if (enabled is True) else value
+    def stringify(self, value):
+        parsed_input = libiocage.lib.helpers.parse_user_input(value)
+        return libiocage.lib.helpers.to_string(value)
 
 
 class JailConfigList(list):
