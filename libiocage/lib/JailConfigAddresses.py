@@ -53,7 +53,7 @@ class JailConfigAddresses(dict):
         dict.__setattr__(self, 'property_name', property_name)
         dict.__setattr__(self, 'skip_on_error', skip_on_error)
 
-        if value != None:
+        if value is not None:
             self.read(value)
 
     def read(self, config_line):

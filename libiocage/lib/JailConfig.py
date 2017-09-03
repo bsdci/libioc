@@ -86,7 +86,8 @@ class JailConfig(dict, object):
 
         # be aware of iocage-legacy jails for migration
         try:
-            self.legacy = libiocage.lib.helpers.parse_user_input(data["legacy"]) is True
+            _legacy = libiocage.lib.helpers.parse_user_input(data["legacy"])
+            self.legacy = (_legacy is True)
         except:
             self.legacy = False
 
@@ -516,7 +517,7 @@ class JailConfig(dict, object):
 
         # passthrough existing properties
         try:
-            return self.stringify(self.__getattribute__(key), string)
+            return self.stringify(self.__getattribute__(key))
         except:
             pass
 
@@ -639,7 +640,7 @@ class JailConfig(dict, object):
 
     def stringify(self, value):
         parsed_input = libiocage.lib.helpers.parse_user_input(value)
-        return libiocage.lib.helpers.to_string(value)
+        return libiocage.lib.helpers.to_string(parsed_input)
 
 
 class JailConfigList(list):

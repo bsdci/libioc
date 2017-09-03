@@ -90,8 +90,8 @@ class JailConfigZFS:
 
     def _to_config_string(self, value):
         return libiocage.lib.helpers.to_string(
-                value,
-                true="on",
-                false="off",
-                none="none"
-            )
+            value,
+            true="on",
+            false="off",
+            none="none"
+        )
