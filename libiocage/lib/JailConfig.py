@@ -247,23 +247,12 @@ class JailConfig(dict, object):
 
     def _get_type(self):
 
-        # ToDo: Implement template jails or remove
-        current_type = None
-        try:
-            if (self.data["type"] == "jail") or (self.data["type"] == ""):
-                current_type = "jail"
-        except:
-            current_type = "jail"
-
-        if current_type == "jail":
-            if self["basejail"]:
-                return "basejail"
-            elif self["clonejail"]:
-                return "clonejail"
-            else:
-                return "jail"
-
-        return self.data["type"]
+        if self["basejail"]:
+            return "basejail"
+        elif self["clonejail"]:
+            return "clonejail"
+        else:
+            return "jail"
 
     def _set_type(self, value, **kwargs):
 
