@@ -116,7 +116,8 @@ class TestNullFSBasejail(object):
     def test_can_be_created(self, host, local_release, logger, zfs,
                             root_dataset):
 
-        jail = libiocage.lib.Jail.Jail({
+        jail = libiocage.lib.Jail.Jail(
+            {
                 "basejail": True
             },
             new=True,
