@@ -87,9 +87,9 @@ class JailConfig(dict, object):
         # be aware of iocage-legacy jails for migration
         try:
             _legacy = libiocage.lib.helpers.parse_user_input(data["legacy"])
-            self.legacy = (_legacy is True)
+            self.legacy = _legacy
         except:
-            self.legacy = False
+            self.legacy = None
 
         # jail is required for various operations (write, fstab, etc)
         if jail:

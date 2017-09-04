@@ -55,7 +55,12 @@ class TestJail(object):
     def test_can_be_created(self, host, local_release, logger, zfs,
                             root_dataset, capsys):
 
-        jail = libiocage.lib.Jail.Jail(host=host, logger=logger, zfs=zfs)
+        jail = libiocage.lib.Jail.Jail(
+            new=True,
+            host=host,
+            logger=logger,
+            zfs=zfs
+        )
         jail.create(local_release.name)
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
@@ -112,8 +117,13 @@ class TestNullFSBasejail(object):
                             root_dataset):
 
         jail = libiocage.lib.Jail.Jail({
-            "basejail": True
-        }, host=host, logger=logger, zfs=zfs)
+                "basejail": True
+            },
+            new=True,
+            host=host,
+            logger=logger,
+            zfs=zfs
+        )
         jail.create(local_release.name)
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
