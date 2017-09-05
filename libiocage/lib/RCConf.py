@@ -52,9 +52,12 @@ class RCConf(dict):
             self._read_file()
 
     def _read_file(self, silent=False, delete=False):
+
         try:
             if (self.path is not None) and os.path.isfile(self.path):
                 data = self._read(silent=silent)
+            else:
+                data = {}
         except:
             data = {}
             pass
