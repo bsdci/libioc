@@ -33,5 +33,32 @@ import click
 
 from libiocage.cli import cli
 
+
+def main_safe():
+  try:
+    main()
+  except BaseException as e:
+    return e
+
+
+def main():
+  cli(prog_name="iocage")
+
+
 if __name__ == "__main__":
-    cli(prog_name="iocage")
+
+  debug = False
+
+  try:
+    coverdir = os.environ["IOCAGE_TRACE"]
+    import trace
+    tracer = trace.Trace(
+      ignoredirs=[sys.prefix, sys.exec_prefix],
+      trace=0,
+      count=1)
+    tracer.run("main_safe()")
+    r = tracer.results()
+    r.write_results(show_missing=True, coverdir=coverdir)
+    print(f"Iocage Trace written to: {coverdir}")
+  except:
+    main()
