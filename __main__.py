@@ -46,11 +46,10 @@ def main():
 
 
 if __name__ == "__main__":
-
-  debug = False
-
-  try:
-    coverdir = os.environ["IOCAGE_TRACE"]
+  coverdir = os.environ.get("IOCAGE_TRACE", None)
+  if coverdir is None:
+    main()
+  else:
     import trace
     tracer = trace.Trace(
       ignoredirs=[sys.prefix, sys.exec_prefix],
@@ -60,5 +59,3 @@ if __name__ == "__main__":
     r = tracer.results()
     r.write_results(show_missing=True, coverdir=coverdir)
     print(f"Iocage Trace written to: {coverdir}")
-  except:
-    main()
