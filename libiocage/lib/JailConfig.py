@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import re
 import uuid
 
@@ -31,6 +32,8 @@ import libiocage.lib.JailConfigInterfaces
 import libiocage.lib.JailConfigResolver
 import libiocage.lib.errors
 import libiocage.lib.helpers
+
+__dict: typing.Any = dict
 
 
 class JailConfig(dict, object):
@@ -67,32 +70,26 @@ class JailConfig(dict, object):
 
     """
 
+    special_properties: dict = {}
+    data: dict = {
+        "id": None
+    }
+    legacy: bool = None
+    jail: 'libiocage.lib.Jail.JailGenerator' = None
+
     def __init__(
         self,
         data: dict={},
-        jail: 'libiocage.lib.Jail.Jail'=None,
+        jail: 'libiocage.lib.Jail.JailGenerator'=None,
         logger: 'libiocage.lib.Logger.Logger'=None,
         host: 'libiocage.lib.Host.HostGenerator'=None,
         new: bool=False
-    ):
+    ) -> None:
 
         dict.__init__(self)
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.host = libiocage.lib.helpers.init_host(self, host)
-
-        self.data = {
-            "id": None
-        }
-
-        self.special_properties = {}
-
-        # be aware of iocage-legacy jails for migration
-        try:
-            _legacy = libiocage.lib.helpers.parse_user_input(data["legacy"])
-            self.legacy = _legacy
-        except:
-            self.legacy = None
 
         self.jail = jail
 
@@ -127,10 +124,10 @@ class JailConfig(dict, object):
 
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
-    def read(self):
+    def read(self) -> None:
         self.clone(self.jail.read_config())
 
-    def update_special_property(self, name):
+    def update_special_property(self, name: str) -> None:
 
         try:
             self.data[name] = str(self.special_properties[name])
@@ -141,8 +138,14 @@ class JailConfig(dict, object):
     def attach_special_property(self, name, special_property):
         self.special_properties[name] = special_property
 
-    def save(self):
+    def save(self) -> None:
         self.jail.write_config(self.data)
+
+    def _set_legacy(self, value) -> None:
+        try:
+            self.legacy = libiocage.lib.helpers.parse_bool(value)
+        except:
+            self.legacy = False
 
     def _get_id(self) -> str:
         return self.data["id"]
@@ -154,7 +157,7 @@ class JailConfig(dict, object):
             # This can occur when the Jail is initialized
             # with it's name and the same name is read from
             # the configuration
-            if self.id == name:
+            if self["id"] == name:
                 return
         except:
             pass
@@ -544,8 +547,7 @@ class JailConfig(dict, object):
     def __dir__(self) -> list:
 
         properties = set()
-
-        for prop in dict.__dir__(self):
+        for prop in __dict.__dir__(self):
             if prop.startswith("_default_"):
                 properties.add(prop[9:])
             elif not prop.startswith("_"):
@@ -561,7 +563,7 @@ class JailConfig(dict, object):
 
         properties = set()
 
-        for prop in dict.__dir__(self):
+        for prop in __dict.__dir__(self):
             if prop.startswith("_default_"):
                 properties.add(prop[9:])
 

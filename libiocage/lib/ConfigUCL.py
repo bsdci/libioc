@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os.path
 
 import ucl
@@ -33,10 +34,10 @@ class ConfigUCL(libiocage.lib.Config.BaseConfig):
 
     config_type = "ucl"
 
-    def map_input(self, data: dict) -> dict:
+    def map_input(self, data: typing.TextIO) -> dict:
         return ucl.load(data)
 
-    def map_output(self, data: dict) -> dict:
+    def map_output(self, data: dict) -> str:
         # ToDo: Re-Implement UCL output
         raise libiocage.lib.errors.MissingFeature("Writing ConfigUCL")
 
@@ -48,7 +49,7 @@ class ResourceConfigUCL(ConfigUCL, libiocage.lib.Config.ResourceConfig):
         resource: 'libiocage.lib.Resource.Resource',
         file: str="config",
         **kwargs
-    ):
+    ) -> None:
 
         self.resource = resource
         libiocage.lib.Config.ResourceConfig.__init__(
@@ -61,3 +62,7 @@ class ResourceConfigUCL(ConfigUCL, libiocage.lib.Config.ResourceConfig):
     @property
     def file(self) -> str:
         return os.path.join(self.resource.dataset.mountpoint, self._file)
+
+    @file.setter
+    def file(self, value: str):
+        self._file = value

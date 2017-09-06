@@ -87,6 +87,9 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
     """
 
     _class_storage = libiocage.lib.Storage.Storage
+    config: libiocage.lib.JailConfig.JailConfig = None
+    _rc_conf: libiocage.lib.RCConf.RCConf = None
+    jail_state: dict = None
 
     def __init__(
         self,
@@ -97,7 +100,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         logger=None,
         new=False,
         **resource_args
-    ):
+    ) -> None:
         """
         Initializes a Jail
 
@@ -133,17 +136,12 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
             logger=self.logger
         )
 
-        self.networks = []
-
         self.storage = self._class_storage(
             safe_mode=False,
             jail=self,
             logger=self.logger,
             zfs=self.zfs
         )
-
-        self.jail_state = None
-        self._rc_conf = None
 
         libiocage.lib.Resource.JailResource.__init__(
             self,
@@ -627,9 +625,10 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
             )
             raise
 
-    def _start_vimage_network(self):
+    @property
+    def networks(self) -> list:
 
-        self.logger.debug("Starting VNET/VIMAGE", jail=self)
+        networks = []
 
         nics = self.config["interfaces"]
         for nic in nics:
@@ -654,18 +653,23 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 bridges=bridges,
                 logger=self.logger
             )
-            net.setup()
-            self.networks.append(net)
+            networks.append(net)
 
-    def _stop_vimage_network(self):
+        return networks
+
+    def _start_vimage_network(self) -> None:
+        self.logger.debug("Starting VNET/VIMAGE", jail=self)
+        for network in self.networks:
+            network.setup()
+
+    def _stop_vimage_network(self) -> None:
         for network in self.networks:
             network.teardown()
-            self.networks.remove(network)
 
-    def _configure_nameserver(self):
+    def _configure_nameserver(self) -> None:
         self.config["resolver"].apply(self)
 
-    def _configure_routes(self):
+    def _configure_routes(self) -> None:
 
         defaultrouter = self.config["defaultrouter"]
         defaultrouter6 = self.config["defaultrouter6"]
@@ -680,7 +684,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         if defaultrouter6:
             self._configure_route(defaultrouter6, ipv6=True)
 
-    def _configure_route(self, gateway, ipv6=False):
+    def _configure_route(self, gateway, ipv6=False) -> None:
 
         ip_version = 4 + 2 * (ipv6 is True)
 
@@ -694,7 +698,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
         self.exec(command)
 
-    def require_jail_not_existing(self):
+    def require_jail_not_existing(self) -> None:
         """
         Raise JailAlreadyExists exception if the jail already exists
         """
@@ -703,7 +707,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 jail=self, logger=self.logger
             )
 
-    def require_jail_existing(self):
+    def require_jail_existing(self) -> None:
         """
         Raise JailDoesNotExist exception if the jail does not exist
         """
@@ -713,7 +717,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 logger=self.logger
             )
 
-    def require_jail_stopped(self):
+    def require_jail_stopped(self) -> None:
         """
         Raise JailAlreadyRunning exception if the jail is runninhg
         """
@@ -723,7 +727,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 logger=self.logger
             )
 
-    def require_jail_running(self):
+    def require_jail_running(self) -> None:
         """
         Raise JailNotRunning exception if the jail is stopped
         """
@@ -733,7 +737,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 logger=self.logger
             )
 
-    def update_jail_state(self):
+    def update_jail_state(self) -> None:
         """
         Invoke update of the jail state from jls output
         """
@@ -754,7 +758,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         except:
             self.jail_state = None
 
-    def _teardown_mounts(self):
+    def _teardown_mounts(self) -> None:
 
         mountpoints = list(map(
             lambda mountpoint: f"{self.root_path}{mountpoint}",
@@ -780,7 +784,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                     ignore_error=True  # maybe it was not mounted
                 )
 
-    def _resolve_name(self, text):
+    def _resolve_name(self, text) -> str:
 
         if (text is None) or (len(text) == 0):
             raise libiocage.lib.errors.JailNotSupplied(logger=self.logger)
@@ -800,14 +804,14 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         raise libiocage.lib.errors.JailNotFound(text, logger=self.logger)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         The name (formerly UUID) of the Jail
         """
         return self.config["id"]
 
     @property
-    def humanreadable_name(self):
+    def humanreadable_name(self) -> str:
         """
         A human-readable identifier to print in logs and CLI output
 
@@ -822,32 +826,32 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
             )
 
     @property
-    def stopped(self):
+    def stopped(self) -> bool:
         """
         Boolean value that is True if a jail is stopped
         """
         return self.running is not True
 
     @property
-    def running(self):
+    def running(self) -> bool:
         """
         Boolean value that is True if a jail is running
         """
         return self.jid is not None
 
     @property
-    def jid(self):
+    def jid(self) -> int:
         """
         The JID of a running jail or None if the jail is not running
         """
         try:
-            return self.jail_state["jid"]
+            return int(self.jail_state["jid"])
         except (TypeError, AttributeError, KeyError):
             pass
 
         try:
             self.update_jail_state()
-            return self.jail_state["jid"]
+            return int(self.jail_state["jid"])
         except (TypeError, AttributeError, KeyError):
             return None
 

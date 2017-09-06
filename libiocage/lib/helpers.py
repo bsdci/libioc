@@ -33,8 +33,8 @@ import libiocage.lib.ZFS
 
 def init_zfs(
         self,
-        zfs: libiocage.lib.ZFS.ZFS=None
-) -> libiocage.lib.ZFS.ZFS:
+        zfs: 'libiocage.lib.ZFS.ZFS'=None
+) -> 'libiocage.lib.ZFS.ZFS':
 
     if (zfs is not None) and isinstance(zfs, libiocage.lib.ZFS.ZFS):
         object.__setattr__(self, 'zfs', zfs)
@@ -52,7 +52,7 @@ def init_zfs(
 
 def init_host(
         self,
-        host: 'libiocage.lib.Host.Host'=None,
+        host: 'libiocage.lib.Host.HostGenerator'=None,
 ) -> 'libiocage.lib.Host.HostGenerator':
     if host:
         return host
@@ -126,7 +126,7 @@ def exec(command, logger=None, ignore_error=False):
     return child, stdout, stderr
 
 
-def _prettify_output(output):
+def _prettify_output(output: str) -> str:
     return "\n".join(map(
         lambda line: f"    {line}",
         output.split("\n")
@@ -145,11 +145,11 @@ def to_humanreadable_name(name: str) -> str:
 _validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
 
 
-def validate_name(name: str):
+def validate_name(name: str) -> bool:
     return bool(_validate_name.fullmatch(name))
 
 
-def _parse_none(data):
+def parse_none(data):
     if data is None:
         return None
 
@@ -159,18 +159,18 @@ def _parse_none(data):
     raise TypeError("Value is not None")
 
 
-def _parse_bool(data):
+def parse_bool(data):
     """
     try to parse booleans from strings
 
     On success, it returns the parsed boolean on failure it raises a TypeError.
 
     Usage:
-        >>> _parse_bool("YES")
+        >>> parse_bool("YES")
         True
-        >>> _parse_bool("false")
+        >>> parse_bool("false")
         False
-        >>> _parse_bool("/etc/passwd")
+        >>> parse_bool("/etc/passwd")
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
         TypeError: Not a boolean value
@@ -190,7 +190,7 @@ def _parse_bool(data):
 
 def parse_user_input(data):
     """
-    uses _parse_bool() to partially return Boolean and NoneType values
+    uses parse_bool() to partially return Boolean and NoneType values
     All other types as returned as-is
 
     >>> parse_user_input("YES")
@@ -204,21 +204,21 @@ def parse_user_input(data):
     """
 
     try:
-        return _parse_bool(data)
+        return parse_bool(data)
     except TypeError:
         pass
 
     try:
-        return _parse_none(data)
+        return parse_none(data)
     except TypeError:
         pass
 
     return data
 
 
-def to_string(data, true="yes", false="no", none="-"):
+def to_string(data, true="yes", false="no", none="-") -> str:
     """
-    return a string boolean value using _parse_bool(), of specified style
+    return a string boolean value using parse_bool(), of specified style
 
     Args:
 

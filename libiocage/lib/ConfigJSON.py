@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os.path
 import json
 
@@ -44,10 +45,10 @@ class ConfigJSON(libiocage.lib.Config.ConfigFile):
 
     config_type = "json"
 
-    def map_input(self, data: dict) -> dict:
+    def map_input(self, data: typing.TextIO) -> dict:
         return json.load(data)
 
-    def map_output(self, data: dict) -> dict:
+    def map_output(self, data: dict) -> str:
         return to_json(data)
 
 
@@ -57,7 +58,7 @@ class ResourceConfigJSON(ConfigJSON):
         self,
         resource: 'libiocage.lib.Resource.Resource',
         **kwargs
-    ):
+    ) -> None:
 
         self.resource = resource
         ConfigJSON.__init__(self, **kwargs)
@@ -68,3 +69,7 @@ class ResourceConfigJSON(ConfigJSON):
             self.resource.dataset.mountpoint,
             self.resource.config_file
         )
+
+    @file.setter
+    def file(self, value: str):
+        self._file = value

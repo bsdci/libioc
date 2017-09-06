@@ -9,6 +9,7 @@ import libiocage.lib.JailConfigFstab
 import libiocage.lib.Jail
 import libiocage.lib.Logger
 import libiocage.lib.ZFS
+import libiocage.lib.Release
 import libiocage.lib.helpers
 
 
@@ -53,6 +54,11 @@ class Resource:
     DEFAULT_JSON_FILE = "config.json"
     DEFAULT_UCL_FILE = "config"
 
+    _dataset_name: str = None
+    _config_type: int = None
+    _config_file: str = None
+    _dataset: libzfs.ZFSDataset = None
+
     def __init__(
         self,
         dataset: libzfs.ZFSDataset=None,
@@ -61,7 +67,7 @@ class Resource:
         config_file: str=None,  # 'config.json', 'config', etc
         logger: 'libiocage.lib.Logger.Logger'=None,
         zfs: 'libiocage.lib.ZFS.ZFS'=None
-    ):
+    ) -> None:
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
@@ -82,11 +88,7 @@ class Resource:
         )
 
         self._config_file = config_file
-        self._config_type = None
         self.config_type = config_type
-
-        self._dataset_name = None
-        self._dataset = None
 
         if dataset_name is not None:
             self.dataset_name = dataset_name
@@ -94,18 +96,18 @@ class Resource:
             self.dataset = dataset
 
     @property
-    def pool_name(self):
+    def pool_name(self) -> str:
         return self.zfs.get_pool(self.dataset_name).name
 
     @property
-    def exists(self):
+    def exists(self) -> bool:
         try:
             return os.path.isdir(self.dataset.mountpoint)
         except:
             return False
 
     @property
-    def _assigned_dataset_name(self):
+    def _assigned_dataset_name(self) -> str:
         """
         Name of the jail's base ZFS dataset manually assigned to this resource
         """
@@ -115,7 +117,7 @@ class Resource:
             return self._dataset.name
 
     @property
-    def dataset_name(self):
+    def dataset_name(self) -> str:
         return self._assigned_dataset_name
 
     @dataset_name.setter
@@ -123,7 +125,7 @@ class Resource:
         self._dataset_name = value
 
     @property
-    def dataset(self):
+    def dataset(self) -> libzfs.ZFSDataset:
         """
         The jail's base ZFS dataset
         """
@@ -134,10 +136,10 @@ class Resource:
         return self._dataset
 
     @dataset.setter
-    def dataset(self, value):
+    def dataset(self, value: libzfs.ZFSDataset):
         self._set_dataset(value)
 
-    def _set_dataset(self, value):
+    def _set_dataset(self, value) -> None:
         self._dataset_name = None
         self._dataset = value
 
@@ -149,21 +151,21 @@ class Resource:
     #     return self.dataset.mountpoint
 
     @property
-    def config_type(self):
-        if self._config_type == None:
+    def config_type(self) -> str:
+        if self._config_type is None:
             return None
         elif self._config_type == self.CONFIG_TYPES.index("auto"):
             self._config_type = self._find_config_type()
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
-    def config_type(self, value):
+    def config_type(self, value: str):
         if value is None:
             self._config_type = None
         else:
             self._config_type = self.CONFIG_TYPES.index(value)
 
-    def _find_config_type(self):
+    def _find_config_type(self) -> int:
 
         if self.config_json.exists:
             return self.CONFIG_TYPES.index("json")
@@ -174,10 +176,10 @@ class Resource:
         if self.config_zfs.exists:
             return self.CONFIG_TYPES.index("zfs")
 
-        return self.CONFIG_TYPES[0]
+        return 0
 
     @property
-    def config_file(self):
+    def config_file(self) -> str:
         """
         Relative path of the resource config file
         """
@@ -195,7 +197,7 @@ class Resource:
 
         return None
 
-    def create_resource(self):
+    def create_resource(self) -> None:
         """
         Creates the dataset
         """
@@ -215,7 +217,7 @@ class Resource:
     def write_config(self, data: dict):
         return self.config_handler.write(data)
 
-    def read_config(self):
+    def read_config(self) -> dict:
         return self.config_handler.read()
 
     @property
@@ -281,7 +283,7 @@ class DefaultResource(Resource):
         "tags": []
     }
 
-    def read_config(self):
+    def read_config(self) -> dict:
         defaults = self.config_handler.read()
         user_defaults_keys = defaults.keys()
 
@@ -299,28 +301,34 @@ class LaunchableResource(Resource):
         return self.root_dataset.mountpoint
 
     @property
-    def root_dataset(self):
+    def root_dataset(self) -> libzfs.ZFSDataset:
         return self.get_dataset("root")
 
     @property
-    def root_dataset_name(self):
+    def root_dataset_name(self) -> str:
         return f"{self.dataset_name}/root"
 
     @property
-    def dataset_name(self):
+    def dataset_name(self) -> str:
         raise NotImplementedError(
-            "This needs to be implemented by inheriting classes"
+            "This needs to be implemented by the inheriting class"
+        )
+
+    @dataset_name.setter
+    def dataset_name(self, value: str) -> str:
+        raise NotImplementedError(
+            "This needs to be implemented by the inheriting class"
         )
 
     @property
-    def dataset(self):
+    def dataset(self) -> libzfs.ZFSDataset:
         if self._dataset is None:
             self._dataset = self.zfs.get_dataset(self.dataset_name)
 
         return self._dataset
 
     @dataset.setter
-    def dataset(self, value):
+    def dataset(self, value: libzfs.ZFSDataset):
         self._set_dataset(value)
 
 
@@ -331,7 +339,7 @@ class JailResource(LaunchableResource):
         host: 'libiocage.lib.Host.HostGenerator',
         jail: 'libiocage.lib.Jail.JailGenerator'=None,
         **kwargs
-    ):
+    ) -> None:
 
         self.__jails_dataset_name = host.datasets.jails.name
         self.host = libiocage.lib.helpers.init_host(self, host)
@@ -364,7 +372,7 @@ class JailResource(LaunchableResource):
         )
 
     @property
-    def dataset_name(self):
+    def dataset_name(self) -> str:
         """
         Name of the jail base ZFS dataset
 
@@ -382,6 +390,10 @@ class JailResource(LaunchableResource):
 
         return f"{self.__jails_dataset_name}/{jail_id}"
 
+    @dataset_name.setter
+    def dataset_name(self, value: str):
+        self._dataset_name = value
+
     @property
     def fstab(self):
         if self._fstab is None:
@@ -396,12 +408,14 @@ class JailResource(LaunchableResource):
 
 class ReleaseResource(LaunchableResource):
 
+    _release: 'libiocage.lib.Release.ReleaseGenerator' = None
+
     def __init__(
         self,
         host: 'libiocage.lib.Host.HostGenerator',
         release: 'libiocage.lib.Release.ReleaseGenerator'=None,
         **kwargs
-    ):
+    ) -> None:
 
         self.__releases_dataset_name = host.datasets.releases.name
         self.__base_dataset_name = host.datasets.base.name
@@ -421,7 +435,7 @@ class ReleaseResource(LaunchableResource):
 
         Usually the resource becomes inherited from the Release itself.
         It can still be used linked to a foreign ReleaseGenerator by passing
-        release as named attribute to the __init__ function 
+        release as named attribute to the __init__ function
         """
         if self._release is not None:
             return self._release
@@ -434,7 +448,7 @@ class ReleaseResource(LaunchableResource):
         )
 
     @property
-    def dataset_name(self):
+    def dataset_name(self) -> str:
         """
         Name of the release base ZFS dataset
 
@@ -448,12 +462,16 @@ class ReleaseResource(LaunchableResource):
 
         return f"{self.__releases_dataset_name}/{self.release.name}"
 
+    @dataset_name.setter
+    def dataset_name(self, value: str):
+        self._dataset_name = value
+
     @property
-    def base_dataset(self):
+    def base_dataset(self) -> libzfs.ZFSDataset:
         # base datasets are created from releases. required to start
         # zfs-basejails
         return self.zfs.get_dataset(self.base_dataset_name)
 
     @property
-    def base_dataset_name(self):
-        return f"{self.__base_dataset_name}/{self.name}/root"
+    def base_dataset_name(self) -> str:
+        return f"{self.__base_dataset_name}/{self.release.name}/root"
