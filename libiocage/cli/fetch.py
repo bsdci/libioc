@@ -58,7 +58,7 @@ __rootcmd__ = True
                    "(Deprecared: renamed to --file)")
 def cli(ctx, **kwargs):
     logger = ctx.parent.logger
-    host = libiocage.lib.Host.Host(logger=logger)
+    host = libiocage.lib.Host.HostGenerator(logger=logger)
     prompts = libiocage.lib.Prompts.Prompts(host=host, logger=logger)
 
     release_input = kwargs["release"]

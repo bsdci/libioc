@@ -128,7 +128,7 @@ class JailConfig(dict, object):
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
     def read(self):
-        self.clone(self.jail.resource.read_config())
+        self.clone(self.jail.read_config())
 
     def update_special_property(self, name):
 
@@ -142,7 +142,7 @@ class JailConfig(dict, object):
         self.special_properties[name] = special_property
 
     def save(self):
-        self.jail.resource.write_config(self.data)
+        self.jail.write_config(self.data)
 
     def _get_id(self) -> str:
         return self.data["id"]

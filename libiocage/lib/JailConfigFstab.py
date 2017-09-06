@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import typing.List
+import typing
 import os
 
 import libiocage.lib.helpers
@@ -54,7 +54,7 @@ class JailConfigFstab(set):
 
     def __init__(
         self,
-        resource: 'libiocage.lib.Resource.JailResource',
+        jail: 'libiocage.lib.Jail.JailGenerator',
         release: 'libiocage.lib.Release.ReleaseGenerator'=None,
         logger: 'libiocage.lib.Logger.Logger'=None,
         host: 'libiocage.lib.Host.HostGenerator'=None
@@ -62,7 +62,7 @@ class JailConfigFstab(set):
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.host = libiocage.lib.helpers.init_host(self, host)
-        self.resource = resource
+        self.jail = jail
         self.release = release
         set.__init__(self)
 
@@ -74,7 +74,7 @@ class JailConfigFstab(set):
         This is the file read from and written to.
         """
 
-        return f"{self.resource.dataset.mountpoint}/fstab"
+        return f"{self.jail.dataset.mountpoint}/fstab"
 
     def parse_lines(
         self,
@@ -154,7 +154,7 @@ class JailConfigFstab(set):
             f.close()
 
         self.logger.verbose(
-            f"{self.resource.dataset.mountpoint}/fstab written"
+            f"{self.jail.dataset.mountpoint}/fstab written"
         )
 
     def add(self,
@@ -186,7 +186,7 @@ class JailConfigFstab(set):
     @property
     def basejail_lines(self) -> typing.List[dict]:
 
-        if self.release.resource is None:
+        if self.jail.config["basejail_type"] != "nullfs":
             return []
 
         basedirs = libiocage.lib.helpers.get_basedir_list(
@@ -194,11 +194,11 @@ class JailConfigFstab(set):
         )
 
         fstab_basejail_lines = []
-        release_root_path = self.release.resource.root_dataset.mountpoint
+        release_root_path = self.release.root_dataset.mountpoint
         for basedir in basedirs:
 
             source = f"{release_root_path}/{basedir}"
-            destination = f"{self.resource.root_dataset.mountpoint}/{basedir}"
+            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
             fstab_basejail_lines.append({
                 "source"     : source,
                 "destination": destination,
