@@ -65,7 +65,7 @@ class BaseConfigZFS(libiocage.lib.Config.BaseConfig):
         #   map(lambda x: get_iocage_property_name(x),
         #     filter(
         #       lambda name: is_iocage_property(name),
-        #       self.jail.resource.dataset.properties
+        #       self.jail.dataset.properties
         #     )
         #   )
         # )

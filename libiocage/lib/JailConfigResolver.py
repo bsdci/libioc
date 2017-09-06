@@ -71,7 +71,7 @@ class JailConfigResolver(list):
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
 
-        remote_path = f"{jail.resource.root_path}/{self.conf_file_path}"
+        remote_path = f"{jail.root_path}/{self.conf_file_path}"
 
         if self.method == "copy":
             shutil.copy(self.conf_file_path, remote_path)

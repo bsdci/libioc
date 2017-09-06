@@ -44,8 +44,8 @@ class Storage:
 
     def clone_release(self, release):
         self.clone_zfs_dataset(
-            release.resource.root_dataset_name,
-            self.jail.resource.root_dataset_name
+            release.root_dataset_name,
+            self.jail.root_dataset_name
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
@@ -137,7 +137,7 @@ class Storage:
         )
 
     def create_jail_mountpoint(self, basedir: str):
-        basedir = f"{self.jail.resource.root_dataset.mountpoint}/{basedir}"
+        basedir = f"{self.jail.root_dataset.mountpoint}/{basedir}"
         if not os.path.isdir(basedir):
             self.logger.verbose(f"Creating mountpoint {basedir}")
             os.makedirs(basedir)
@@ -150,7 +150,7 @@ class Storage:
                     "-t",
                     "procfs"
                     "proc"
-                    f"{self.jail.resource.root_dataset.mountpoint}/proc"
+                    f"{self.jail.root_dataset.mountpoint}/proc"
                 ])
         except:
             raise libiocage.lib.errors.MountFailed("procfs")
@@ -191,7 +191,7 @@ class Storage:
 
         uid = pwd.getpwnam(user).pw_uid
         gid = grp.getgrnam(group).gr_gid
-        folder = f"{self.jail.resource.root_dataset.mountpoint}{directory}"
+        folder = f"{self.jail.root_dataset.mountpoint}{directory}"
         if not os.path.isdir(folder):
             os.mkdirs(folder, permissions)
             os.chown(folder, uid, gid, follow_symlinks=False)

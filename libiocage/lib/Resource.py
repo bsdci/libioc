@@ -150,13 +150,18 @@ class Resource:
 
     @property
     def config_type(self):
-        if self._config_type == self.CONFIG_TYPES.index("auto"):
+        if self._config_type == None:
+            return None
+        elif self._config_type == self.CONFIG_TYPES.index("auto"):
             self._config_type = self._find_config_type()
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
     def config_type(self, value):
-        self._config_type = self.CONFIG_TYPES.index(value)
+        if value is None:
+            self._config_type = None
+        else:
+            self._config_type = self.CONFIG_TYPES.index(value)
 
     def _find_config_type(self):
 
@@ -176,18 +181,21 @@ class Resource:
         """
         Relative path of the resource config file
         """
-        if self._config_file is not None:
+        if self.config_type is None:
+            return None
+
+        elif self._config_file is not None:
             return self._config_file
 
-        if self.config_type == "json":
+        elif self.config_type == "json":
             return self.DEFAULT_JSON_FILE
 
-        if self.config_type == "ucl":
+        elif self.config_type == "ucl":
             return self.DEFAULT_UCL_FILE
 
         return None
 
-    def create(self):
+    def create_resource(self):
         """
         Creates the dataset
         """
@@ -320,20 +328,39 @@ class JailResource(LaunchableResource):
 
     def __init__(
         self,
-        jail: 'libiocage.lib.Jail.JailGenerator',
         host: 'libiocage.lib.Host.HostGenerator',
+        jail: 'libiocage.lib.Jail.JailGenerator'=None,
         **kwargs
     ):
 
-        self.__jails_dataset_name = jail.host.datasets.jails.name
+        self.__jails_dataset_name = host.datasets.jails.name
         self.host = libiocage.lib.helpers.init_host(self, host)
 
-        self.jail = jail
+        self._jail = jail
         self._fstab = None
 
         Resource.__init__(
             self,
             **kwargs
+        )
+
+    @property
+    def jail(self) -> 'libiocage.lib.Jail.JailGenerator':
+        """
+        Jail instance that belongs to the resource
+
+        Usually the resource becomes inherited from the jail itself.
+        It can still be used linked to a foreign jail by passing jail as
+        named attribute to the __init__ function
+        """
+        if self._jail is not None:
+            return self._jail
+
+        elif isinstance(self, libiocage.lib.Jail.JailGenerator):
+            return self
+
+        raise Exception(
+            "Resource is not a valid jail itself and has no linked jail"
         )
 
     @property
@@ -359,7 +386,7 @@ class JailResource(LaunchableResource):
     def fstab(self):
         if self._fstab is None:
             self._fstab = libiocage.lib.JailConfigFstab.JailConfigFstab(
-                resource=self,
+                jail=self.jail,
                 release=self.jail.release,
                 logger=self.logger,
                 host=self.jail.host
@@ -371,8 +398,8 @@ class ReleaseResource(LaunchableResource):
 
     def __init__(
         self,
-        release: 'libiocage.lib.Release.ReleaseGenerator',
         host: 'libiocage.lib.Host.HostGenerator',
+        release: 'libiocage.lib.Release.ReleaseGenerator'=None,
         **kwargs
     ):
 
@@ -385,7 +412,26 @@ class ReleaseResource(LaunchableResource):
             **kwargs
         )
 
-        self.release = release
+        self._release = release
+
+    @property
+    def release(self) -> 'libiocage.lib.Release.ReleaseGenerator':
+        """
+        Release instance that belongs to the resource
+
+        Usually the resource becomes inherited from the Release itself.
+        It can still be used linked to a foreign ReleaseGenerator by passing
+        release as named attribute to the __init__ function 
+        """
+        if self._release is not None:
+            return self._release
+
+        elif isinstance(self, libiocage.lib.Release.ReleaseGenerator):
+            return self
+
+        raise Exception(
+            "Resource is not a valid release itself and has no linked release"
+        )
 
     @property
     def dataset_name(self):

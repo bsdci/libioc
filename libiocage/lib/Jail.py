@@ -31,6 +31,7 @@ import libiocage.lib.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
 import libiocage.lib.RCConf
+import libiocage.lib.Resource
 import libiocage.lib.Release
 import libiocage.lib.Releases
 import libiocage.lib.StandaloneJailStorage
@@ -42,7 +43,7 @@ import libiocage.lib.events
 import libiocage.lib.helpers
 
 
-class JailGenerator:
+class JailGenerator(libiocage.lib.Resource.JailResource):
     """
     iocage unit orchestrates a jail's configuration and manages state
 
@@ -94,7 +95,8 @@ class JailGenerator:
         zfs=None,
         host=None,
         logger=None,
-        new=False
+        new=False,
+        **resource_args
     ):
         """
         Initializes a Jail
@@ -143,26 +145,16 @@ class JailGenerator:
         self.jail_state = None
         self._rc_conf = None
 
-        self._resource = None
-        self.resource = resource
+        libiocage.lib.Resource.JailResource.__init__(
+            self,
+            host=self.host,
+            logger=self.logger,
+            zfs=self.zfs,
+            **resource_args
+        )
 
         if new is False:
             self.config.read()
-
-    @property
-    def resource(self) -> 'libiocage.lib.Resource.LaunchableResource':
-        return self._resource
-
-    @resource.setter
-    def resource(self, value: 'libiocage.lib.Resource.LaunchableResource'):
-        if value is None:
-            self._resource = libiocage.lib.Resource.JailResource(
-                jail=self,
-                logger=self.logger,
-                host=self.host
-            )
-        else:
-            self._resource = value
 
     @property
     def _rc_conf_path(self) -> str:
@@ -170,7 +162,7 @@ class JailGenerator:
         Absolute path to the jail's rc.conf file
         """
         return os.path.join(
-            self.resource.root_dataset.mountpoint,
+            self.root_dataset.mountpoint,
             "/root/etc/rc.conf"
         )
 
@@ -209,12 +201,12 @@ class JailGenerator:
             self.basejail_backend.apply(self.storage, release)
 
         if self.config["basejail_type"] == "nullfs":
-            self.resource.fstab.base_resource = release.resource
+            self.fstab.base_resource = release
         else:
-            self.resource.fstab.base_resource = None
+            self.fstab.base_resource = None
 
-        self.resource.fstab.read_file()
-        self.resource.fstab.save()
+        self.fstab.read_file()
+        self.fstab.save()
 
         self._launch_jail()
 
@@ -412,9 +404,9 @@ class JailGenerator:
             msg = f"{key} = {value}"
             self.logger.spam(msg, jail=self, indent=1)
 
-        self.resource.create()
-        self.resource.get_or_create_dataset("root")
-        self.resource.fstab.update()
+        self.create_resource()
+        self.get_or_create_dataset("root")
+        self.fstab.update()
 
         backend = None
 
@@ -433,7 +425,7 @@ class JailGenerator:
         self.save()
 
     def save(self):
-        self.resource.write_config(self.config.data)
+        self.write_config(self.config.data)
         self.rc_conf.save()
 
     def exec(self, command, **kwargs):
@@ -569,7 +561,7 @@ class JailGenerator:
             f"name={self.identifier}",
             f"host.hostname={self.config['host_hostname']}",
             f"host.domainname={self.config['host_domainname']}",
-            f"path={self.resource.root_dataset.mountpoint}",
+            f"path={self.root_dataset.mountpoint}",
             f"securelevel={self.config['securelevel']}",
             f"host.hostuuid={self.name}",
             f"devfs_ruleset={self.devfs_ruleset}",
@@ -603,7 +595,7 @@ class JailGenerator:
             f"exec.clean={self.config['exec_clean']}",
             f"exec.timeout={self.config['exec_timeout']}",
             f"stop.timeout={self.config['stop_timeout']}",
-            f"mount.fstab={self.resource.fstab.file_path}",
+            f"mount.fstab={self.fstab.file_path}",
             f"mount.devfs={self.config['mount_devfs']}"
         ]
 
@@ -706,7 +698,7 @@ class JailGenerator:
         """
         Raise JailAlreadyExists exception if the jail already exists
         """
-        if self.resource.exists:
+        if self.exists:
             raise libiocage.lib.errors.JailAlreadyExists(
                 jail=self, logger=self.logger
             )
@@ -715,7 +707,7 @@ class JailGenerator:
         """
         Raise JailDoesNotExist exception if the jail does not exist
         """
-        if not self.resource.exists:
+        if not self.exists:
             raise libiocage.lib.errors.JailDoesNotExist(
                 jail=self,
                 logger=self.logger
@@ -765,7 +757,7 @@ class JailGenerator:
     def _teardown_mounts(self):
 
         mountpoints = list(map(
-            lambda mountpoint: f"{self.resource.root_path}{mountpoint}",
+            lambda mountpoint: f"{self.root_path}{mountpoint}",
             [
                 "/dev/fd",
                 "/dev",
@@ -776,7 +768,7 @@ class JailGenerator:
 
         mountpoints += list(map(
             lambda x: x["destination"],
-            list(self.resource.fstab)
+            list(self.fstab)
         ))
 
         for mountpoint in mountpoints:
@@ -865,17 +857,6 @@ class JailGenerator:
         Used internally to identify jails (in snapshots, jls, etc)
         """
         return f"ioc-{self.config['id']}"
-
-    @property
-    def exists(self):
-        """
-        Boolean value that is True if the Jail datset exists locally
-        """
-        try:
-            self.resource.exists
-            return True
-        except:
-            return False
 
     @property
     def release(self):

@@ -42,7 +42,7 @@ import libiocage.lib.helpers
 import libiocage.lib.events
 
 
-class ReleaseGenerator:
+class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
 
     DEFAULT_RC_CONF_SERVICES = {
         "netif": False,
@@ -55,12 +55,12 @@ class ReleaseGenerator:
     def __init__(
         self,
         name: str=None,
-        resource: 'libiocage.lib.Resource.Resource'=None,
         host: 'libiocage.lib.Host.HostGenerator'=None,
         zfs: 'libiocage.lib.ZFS.ZFS'=None,
         logger: 'libiocage.lib.Logger.Logger'=None,
         check_hashes: bool=True,
-        eol: bool=False
+        eol: bool=False,
+        **release_resource_args
     ):
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
@@ -77,8 +77,13 @@ class ReleaseGenerator:
         self._hashes = None
         self.check_hashes = check_hashes is True
 
-        self._resource = None
-        self.resource = resource
+        libiocage.lib.Resource.ReleaseResource.__init__(
+            self,
+            host=self.host,
+            logger=self.logger,
+            zfs=self.zfs,
+            **release_resource_args
+        )
 
         self._assets = ["base"]
         if self.host.distribution.name != "HardenedBSD":
@@ -113,7 +118,7 @@ class ReleaseGenerator:
 
     @property
     def download_directory(self) -> str:
-        return self.resource.dataset.mountpoint
+        return self.dataset.mountpoint
 
     @property
     def root_dir(self) -> str:
@@ -186,10 +191,10 @@ class ReleaseGenerator:
 
     @property
     def fetched(self) -> bool:
-        if self.resource.exists is False:
+        if self.exists is False:
             return False
 
-        root_dir_index = os.listdir(self.resource.root_dataset.mountpoint)
+        root_dir_index = os.listdir(self.root_dataset.mountpoint)
 
         for expected_directory in ["dev", "var", "etc"]:
             if expected_directory not in root_dir_index:
@@ -200,7 +205,7 @@ class ReleaseGenerator:
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:
         try:
-            return self.resource.root_dataset.pool
+            return self.root_dataset.pool
         except:
             return self.host.datasets.releases.pool
 
@@ -220,7 +225,7 @@ class ReleaseGenerator:
 
     @property
     def release_updates_dir(self) -> str:
-        return f"{self.resource.dataset.mountpoint}/updates"
+        return f"{self.dataset.mountpoint}/updates"
 
     @property
     def hbds_release_branch(self):
@@ -234,7 +239,7 @@ class ReleaseGenerator:
                 logger=self.logger
             )
 
-        root_dataset_mountpoint = self.resource.root_dataset.mountpoint
+        root_dataset_mountpoint = self.root_dataset.mountpoint
         source_file = f"{root_dataset_mountpoint}/etc/hbsd-update.conf"
 
         if not os.path.isfile(source_file):
@@ -268,7 +273,7 @@ class ReleaseGenerator:
 
             # ToDo: allow to reach this for forced re-fetch
             self._clean_dataset()
-            self.resource.create()
+            self.create_resource()
             self._ensure_dataset_mounted()
 
             yield releasePrepareStorageEvent.end()
@@ -333,7 +338,7 @@ class ReleaseGenerator:
                 "rsync",
                 "-a",
                 "--delete",
-                f"{self.resource.root_dataset.mountpoint}/",
+                f"{self.root_dataset.mountpoint}/",
                 f"{self.base_dataset.mountpoint}"
             ],
             logger=self.logger
@@ -445,7 +450,7 @@ class ReleaseGenerator:
             yield releaseUpdateDownloadEvent.end()
 
     def update(self):
-        dataset = self.resource.dataset
+        dataset = self.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
         runReleaseUpdateEvent = libiocage.lib.events.RunReleaseUpdate(self)
@@ -463,10 +468,10 @@ class ReleaseGenerator:
                 "securelevel": "0"
             },
             new=True,
-            resource=self.resource,
             logger=self.logger,
             zfs=self.zfs,
-            host=self.host
+            host=self.host,
+            dataset=self.dataset
         )
 
         changed = False
@@ -519,7 +524,7 @@ class ReleaseGenerator:
             libzfs.ZFSSnapshot: The ZFS snapshot object found or created
         """
 
-        snapshot_name = f"{self.resource.dataset.name}@{identifier}"
+        snapshot_name = f"{self.dataset.name}@{identifier}"
 
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
@@ -539,7 +544,7 @@ class ReleaseGenerator:
             existing_snapshot.delete()
             existing_snapshot = None
 
-        self.resource.dataset.snapshot(snapshot_name)
+        self.dataset.snapshot(snapshot_name)
         return self.zfs.get_snapshot(snapshot_name)
 
     def _update_hbsd_jail(self, jail):
@@ -602,13 +607,13 @@ class ReleaseGenerator:
             )
             os.makedirs(local_update_mountpoint)
 
-        jail.config.fstab.add(
+        jail.fstab.add(
             self.release_updates_dir,
             local_update_mountpoint,
             "nullfs",
             "rw"
         )
-        jail.config.fstab.save()
+        jail.fstab.save()
 
         for event in jail.start():
             yield event
@@ -664,10 +669,10 @@ class ReleaseGenerator:
     def _create_dataset(self, name=None):
 
         if name is None:
-            name = self.resource.dataset_name
+            name = self.dataset_name
 
         try:
-            if isinstance(self.resource.dataset, libzfs.ZFSDataset):
+            if isinstance(self.dataset, libzfs.ZFSDataset):
                 return
         except:
             pass
@@ -679,8 +684,8 @@ class ReleaseGenerator:
         self._dataset = self.zfs.get_dataset(name)
 
     def _ensure_dataset_mounted(self):
-        if not self.resource.dataset.mountpoint:
-            self.resource.dataset.mount()
+        if not self.dataset.mountpoint:
+            self.dataset.mount()
 
     def _fetch_hashes(self):
         url = f"{self.remote_url}/{self.host.distribution.hash_file}"
@@ -785,8 +790,8 @@ class ReleaseGenerator:
         return f"{service_name}_enable=\"{state}\""
 
     def _update_name_from_dataset(self):
-        if self.resource.dataset is not None:
-            self.name = self.resource.dataset.name.split("/")[-2:-1]
+        if self.dataset is not None:
+            self.name = self.dataset.name.split("/")[-2:-1]
 
     def _update_zfs_base(self):
 
