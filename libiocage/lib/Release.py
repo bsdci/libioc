@@ -34,6 +34,8 @@ from urllib.parse import urlparse
 import libzfs
 import ucl
 
+# import libiocage.lib.Host
+# import libiocage.lib.Logger
 import libiocage.lib.Jail
 import libiocage.lib.Resource
 import libiocage.lib.ZFS
@@ -52,6 +54,15 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         "sendmail_outbound": False
     }
 
+    name: str = None
+    eol: bool = False
+
+    logger: 'libiocage.lib.Logger.Logger'
+    zfs: 'libiocage.lib.ZFS.ZFS'
+    host: 'libiocage.lib.Host.HostGenerator'
+    _resource: 'libiocage.lib.Resource.Resource'
+    _assets: typing.List[str]
+
     def __init__(
         self,
         name: str=None,
@@ -61,7 +72,7 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         check_hashes: bool=True,
         eol: bool=False,
         **release_resource_args
-    ):
+    ) -> None:
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
@@ -106,13 +117,6 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
             self._resource = value
 
     @property
-    def base_dataset_name(self) -> str:
-        if self._base_dataset_name is not None:
-            return self._base_dataset_name
-
-        return f"{self.host.datasets.base.name}/{self.name}"
-
-    @property
     def releases_folder(self) -> str:
         return self.host.datasets.releases.mountpoint
 
@@ -135,12 +139,12 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         return self._assets
 
     @assets.setter
-    def assets(self, value: typing.Union[list,str]):
+    def assets(self, value: typing.Union[typing.List[str], str]):
         value = [value] if isinstance(value, str) else value
-        self._assets = map(
+        self._assets = list(map(
             lambda x: x if not x.endswith(".txz") else x[:-4],
             value
-        )
+        ))
 
     @property
     def real_name(self) -> str:
@@ -185,7 +189,7 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
             resource = urllib.request.urlopen(request)
-            return resource.getcode() == 200
+            return resource.getcode() == 200  # type: ignore
         except:
             return False
 
@@ -658,30 +662,6 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         now = datetime.datetime.utcnow()
         text += now.strftime("%Y%m%d%H%I%S.%f")
         return text
-
-    def _basejail_datasets_already_exists(self, release_name):
-        base_dataset = self.host.datasets.base
-        for dataset in base_dataset.children:
-            if dataset.name == f"{base_dataset.name}/release_name":
-                return True
-        return False
-
-    def _create_dataset(self, name=None):
-
-        if name is None:
-            name = self.dataset_name
-
-        try:
-            if isinstance(self.dataset, libzfs.ZFSDataset):
-                return
-        except:
-            pass
-
-        options = {
-            "compression": "lz4"
-        }
-        self.zfs_pool.create(name, options, create_ancestors=True)
-        self._dataset = self.zfs.get_dataset(name)
 
     def _ensure_dataset_mounted(self):
         if not self.dataset.mountpoint:

@@ -28,13 +28,13 @@ import libiocage.lib.helpers
 
 
 class FstabLine(dict):
-    def __init__(self, data):
+    def __init__(self, data: dict) -> None:
         keys = data.keys()
         if "comment" not in keys:
             data["comment"] = None
         dict.__init__(self, data)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return _line_to_string(self)
 
     def __hash__(self):
@@ -58,7 +58,7 @@ class JailConfigFstab(set):
         release: 'libiocage.lib.Release.ReleaseGenerator'=None,
         logger: 'libiocage.lib.Logger.Logger'=None,
         host: 'libiocage.lib.Host.HostGenerator'=None
-    ):
+    ) -> None:
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.host = libiocage.lib.helpers.init_host(self, host)

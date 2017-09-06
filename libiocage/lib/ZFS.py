@@ -1,5 +1,6 @@
 import libzfs
 
+import libiocage.lib.Logger
 import libiocage.lib.helpers
 
 
@@ -14,6 +15,8 @@ def get_zfs(
 
 
 class ZFS(libzfs.ZFS):
+
+    logger: libiocage.lib.Logger.Logger = None
 
     def create_dataset(
         self,

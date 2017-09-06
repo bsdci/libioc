@@ -193,6 +193,6 @@ class Storage:
         gid = grp.getgrnam(group).gr_gid
         folder = f"{self.jail.root_dataset.mountpoint}{directory}"
         if not os.path.isdir(folder):
-            os.mkdirs(folder, permissions)
-            os.chown(folder, uid, gid, follow_symlinks=False)
+            os.makedirs(folder, permissions)
+            os.chown(folder, uid, gid, follow_symlinks=False)  # type: ignore
         return os.path.abspath(folder)

@@ -24,6 +24,7 @@
 import shutil
 
 import libiocage.lib.helpers
+import libiocage.lib.JailConfig
 
 
 class JailConfigResolver(list):
@@ -32,7 +33,7 @@ class JailConfigResolver(list):
         jail_config: 'libiocage.lib.JailConfig.JailConfig',
         host: 'libiocage.lib.Host.HostGenerator'=None,
         logger: 'libiocage.lib.Logger.Logger'=None
-    ):
+    ) -> None:
 
         list.__init__(self, [])
         self.logger = libiocage.lib.helpers.init_logger(self, logger)

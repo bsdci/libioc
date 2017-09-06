@@ -23,6 +23,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import libzfs
 
+import libiocage.lib.Config
+import libiocage.lib.Resource
 import libiocage.lib.errors
 
 
@@ -44,7 +46,7 @@ def get_iocage_property_name(zfs_property_name):
     return zfs_property_name[len(ZFS_PROPERTY_PREFIX):]
 
 
-class BaseConfigZFS(libiocage.lib.Config.BaseConfig):
+class BaseConfigZFS(libiocage.lib.Config.DatasetConfig):
 
     config_type = "zfs"
 
@@ -82,7 +84,8 @@ class BaseConfigZFS(libiocage.lib.Config.BaseConfig):
             self.dataset.properties[prop_name] = prop
 
     def map_input(self, data: dict) -> dict:
-        return map(libiocage.lib.helpers.parse_user_input, data)
+        parse_user_input = libiocage.lib.helpers.parse_user_input
+        return dict([(x, parse_user_input(y)) for (x, y) in data.items()])
 
     def map_output(self, data: dict) -> dict:
         output = {}
@@ -124,7 +127,7 @@ class ConfigZFS(BaseConfigZFS):
         self,
         dataset: libzfs.ZFSDataset,
         **kwargs
-    ):
+    ) -> None:
 
         self._dataset = dataset
         BaseConfigZFS.__init__(self, **kwargs)
@@ -140,11 +143,11 @@ class ResourceConfigZFS(BaseConfigZFS):
         self,
         resource: 'libiocage.lib.Resource.Resource',
         **kwargs
-    ):
+    ) -> None:
 
         self.resource = resource
         BaseConfigZFS.__init__(self, **kwargs)
 
     @property
-    def dataset(self):
+    def dataset(self) -> libzfs.ZFSDataset:
         return self.resource.dataset
