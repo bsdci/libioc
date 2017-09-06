@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import datetime
 import hashlib
 import os
@@ -100,22 +101,22 @@ class ReleaseGenerator:
             self._resource = value
 
     @property
-    def base_dataset_name(self):
+    def base_dataset_name(self) -> str:
         if self._base_dataset_name is not None:
             return self._base_dataset_name
 
         return f"{self.host.datasets.base.name}/{self.name}"
 
     @property
-    def releases_folder(self):
+    def releases_folder(self) -> str:
         return self.host.datasets.releases.mountpoint
 
     @property
-    def download_directory(self):
+    def download_directory(self) -> str:
         return self.resource.dataset.mountpoint
 
     @property
-    def root_dir(self):
+    def root_dir(self) -> str:
         try:
             if self.root_dataset.mountpoint:
                 return self.root_dataset.mountpoint
@@ -125,11 +126,11 @@ class ReleaseGenerator:
         return f"{self.releases_folder}/{self.name}/root"
 
     @property
-    def assets(self):
+    def assets(self) -> typing.List[str]:
         return self._assets
 
     @assets.setter
-    def assets(self, value):
+    def assets(self, value: typing.Union[list,str]):
         value = [value] if isinstance(value, str) else value
         self._assets = map(
             lambda x: x if not x.endswith(".txz") else x[:-4],
@@ -137,13 +138,13 @@ class ReleaseGenerator:
         )
 
     @property
-    def real_name(self):
+    def real_name(self) -> str:
         if self.host.distribution.name == "HardenedBSD":
             return f"HardenedBSD-{self.name}-{self.host.processor}-LATEST"
         return self.name
 
     @property
-    def annotated_name(self):
+    def annotated_name(self) -> str:
         annotations = set()
 
         if self.eol is True:
@@ -155,7 +156,7 @@ class ReleaseGenerator:
         return f"{self.name}"
 
     @property
-    def mirror_url(self):
+    def mirror_url(self) -> str:
         try:
             if self._mirror_url:
                 return self._mirror_url
@@ -171,11 +172,11 @@ class ReleaseGenerator:
         self._mirror_url = url.geturl()
 
     @property
-    def remote_url(self):
+    def remote_url(self) -> str:
         return f"{self.mirror_url}/{self.real_name}"
 
     @property
-    def available(self):
+    def available(self) -> bool:
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
             resource = urllib.request.urlopen(request)
@@ -184,7 +185,7 @@ class ReleaseGenerator:
             return False
 
     @property
-    def fetched(self):
+    def fetched(self) -> bool:
         if self.resource.exists is False:
             return False
 
@@ -197,7 +198,7 @@ class ReleaseGenerator:
         return True
 
     @property
-    def zfs_pool(self):
+    def zfs_pool(self) -> libzfs.ZFSPool:
         try:
             return self.resource.root_dataset.pool
         except:
@@ -214,11 +215,11 @@ class ReleaseGenerator:
         return self._hashes
 
     @property
-    def _supported_url_schemes(self):
+    def _supported_url_schemes(self) -> typing.List[str]:
         return ["https", "http", "ftp"]
 
     @property
-    def release_updates_dir(self):
+    def release_updates_dir(self) -> str:
         return f"{self.resource.dataset.mountpoint}/updates"
 
     @property
@@ -339,7 +340,7 @@ class ReleaseGenerator:
         )
 
     @property
-    def _base_resource(self):
+    def _base_resource(self) -> libiocage.lib.Resource.ReleaseResource:
         return libiocage.lib.Resource.ReleaseResource(
             release=self.release,
             logger=self.logger,
@@ -521,22 +522,22 @@ class ReleaseGenerator:
         snapshot_name = f"{self.resource.dataset.name}@{identifier}"
 
         try:
-            existing_shapshot = self.zfs.get_snapshot(snapshot_name)
+            existing_snapshot = self.zfs.get_snapshot(snapshot_name)
             if force is False:
                 self.logger.verbose(
                     f"Re-using release snapshot {self.name}@{identifier}"
                 )
-                return existing_shapshot
+                return existing_snapshot
         except libzfs.ZFSException:
-            existing_shapshot = None
+            existing_snapshot = None
             pass
 
-        if existing_shapshot is not None:
+        if existing_snapshot is not None:
             self.logger.verbose(
                 f"Deleting release snapshot {self.name}@{identifier}"
             )
-            existing_shapshot.delete()
-            existing_shapshot = None
+            existing_snapshot.delete()
+            existing_snapshot = None
 
         self.resource.dataset.snapshot(snapshot_name)
         return self.zfs.get_snapshot(snapshot_name)

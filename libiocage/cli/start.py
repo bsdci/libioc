@@ -54,7 +54,6 @@ def cli(ctx, rc, jails):
             ctx.parent.print_events(jail.start())
 
         except Exception:
-            raise
             failed_jails.append(jail)
             continue
 

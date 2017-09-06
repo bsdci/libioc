@@ -25,7 +25,7 @@ class ConfigFile:
         self._file = file
 
     @property
-    def file(self):
+    def file(self) -> str:
         return self._file
 
     @file.setter
@@ -53,7 +53,7 @@ class ConfigFile:
     def map_output(self, data: dict) -> dict:
         return data
 
-    def exists(self):
+    def exists(self) -> bool:
         return os.path.isfile(self.file)
 
 
@@ -69,9 +69,9 @@ class ResourceConfig(ConfigFile):
         ConfigFile.__init__(self, **kwargs)
 
     @property
-    def file(self):
+    def file(self) -> str:
         return os.path.join(self.dataset.mountpoint, self._file)
 
     @property
-    def dataset(self):
+    def dataset(self) -> 'libzfs.ZFSDataset':
         return self.resource.dataset

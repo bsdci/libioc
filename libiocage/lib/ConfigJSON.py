@@ -28,7 +28,7 @@ import libiocage.lib.Config
 import libiocage.lib.helpers
 
 
-def to_json(data: dict):
+def to_json(data: dict) -> str:
     output_data = {}
     for key, value in data.items():
         output_data[key] = libiocage.lib.helpers.to_string(
@@ -63,7 +63,7 @@ class ResourceConfigJSON(ConfigJSON):
         ConfigJSON.__init__(self, **kwargs)
 
     @property
-    def file(self):
+    def file(self) -> str:
         return os.path.join(
             self.resource.dataset.mountpoint,
             self.resource.config_file

@@ -165,7 +165,7 @@ class JailGenerator:
             self._resource = value
 
     @property
-    def _rc_conf_path(self):
+    def _rc_conf_path(self) -> str:
         """
         Absolute path to the jail's rc.conf file
         """
@@ -175,7 +175,7 @@ class JailGenerator:
         )
 
     @property
-    def rc_conf(self):
+    def rc_conf(self) -> libiocage.lib.RCConf.RCConf:
         """
         The jail's libiocage.RCConf instance (lazy-loaded on first access)
         """

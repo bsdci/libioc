@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing.List
 import os
 
 import libiocage.lib.helpers
@@ -41,6 +42,14 @@ class FstabLine(dict):
 
 
 class JailConfigFstab(set):
+    """
+
+    Fstab configuration file wrapper
+
+    This object allows to read, programatically edit and write fstab files.
+    Bound to an iocage resource, the location of the /etc/fstab file is
+    relative to the resource's root_dataset `<resource>/root`
+    """
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
 
     def __init__(
@@ -58,10 +67,31 @@ class JailConfigFstab(set):
         set.__init__(self)
 
     @property
-    def file_path(self):
+    def file_path(self) -> str:
+        """
+        Absolute fstab file path
+
+        This is the file read from and written to.
+        """
+
         return f"{self.resource.dataset.mountpoint}/fstab"
 
-    def parse_lines(self, input, ignore_auto_created=True):
+    def parse_lines(
+        self,
+        input: str,
+        ignore_auto_created: bool=True
+    ):
+        """
+        Parses the content of a fstab file
+
+        Args:
+
+            input:
+                The text content of an existing fstab file
+
+            ignore_auto_created:
+                Skips reading entries that were created by iocage
+        """
 
         set.clear(self)
 
@@ -154,7 +184,7 @@ class JailConfigFstab(set):
         set.add(self, line)
 
     @property
-    def basejail_lines(self):
+    def basejail_lines(self) -> typing.List[dict]:
 
         if self.release.resource is None:
             return []
