@@ -420,7 +420,9 @@ class JailConfig(dict, object):
         except KeyError:
             return self["id"]
 
-    def _create_or_get_special_property_resolver(self):
+    def _create_or_get_special_property_resolver(
+        self
+    ) -> libiocage.lib.JailConfigResolver.JailConfigResolver:
 
         try:
             return self.special_properties["resolver"]
@@ -536,10 +538,10 @@ class JailConfig(dict, object):
 
         return (hash_before != hash_after)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return libiocage.lib.ConfigJSON.to_json(self)
 
-    def __dir__(self):
+    def __dir__(self) -> list:
 
         properties = set()
 
@@ -555,7 +557,7 @@ class JailConfig(dict, object):
         return list(properties)
 
     @property
-    def all_properties(self):
+    def all_properties(self) -> list:
 
         properties = set()
 
@@ -575,5 +577,5 @@ class JailConfig(dict, object):
 
 class JailConfigList(list):
 
-    def __str__(self):
+    def __str__(self) -> str:
         return " ".join(self)

@@ -16,15 +16,14 @@ class JsonConfigFile:
         self._file = file
 
     @property
-    def file(self):
+    def file(self) -> str:
         return self._file
 
     def read(self) -> dict:
-        try:
+        if os.path.isfile(self.file) is True:
             with open(self.file, "r") as conf:
                 return json.load(conf)
-        except:
-            return {}
+        return {}
 
     def write(self, data: dict):
         """
@@ -34,7 +33,7 @@ class JsonConfigFile:
             conf.write(self._to_json(data))
             conf.truncate()
 
-    def _to_json(self, data: dict):
+    def _to_json(self, data: dict) -> str:
         output_data = {}
         for key, value in data.items():
             output_data[key] = libiocage.lib.helpers.to_string(
@@ -58,5 +57,5 @@ class ResourceJsonConfigFile:
         JsonConfigFile.__init__(self, **kwargs)
 
     @property
-    def file(self):
+    def file(self) -> str:
         return os.path.join(self.resource.dataset.mountpoint, self._file)

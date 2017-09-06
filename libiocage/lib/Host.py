@@ -62,7 +62,7 @@ class HostGenerator:
         self.releases_dataset = None
 
     @property
-    def defaults(self):
+    def defaults(self) -> dict:
         if self._defaults is None:
             self._load_defaults()
         return self._defaults

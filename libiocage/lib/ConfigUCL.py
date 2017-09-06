@@ -31,7 +31,7 @@ import libiocage.lib.errors
 
 class ConfigUCL(libiocage.lib.Config.BaseConfig):
 
-    config_type = "zfs"
+    config_type = "ucl"
 
     def map_input(self, data: dict) -> dict:
         return ucl.load(data)
@@ -59,5 +59,5 @@ class ResourceConfigUCL(ConfigUCL, libiocage.lib.Config.ResourceConfig):
         )
 
     @property
-    def file(self):
+    def file(self) -> str:
         return os.path.join(self.resource.dataset.mountpoint, self._file)

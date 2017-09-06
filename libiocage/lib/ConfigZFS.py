@@ -99,7 +99,7 @@ class BaseConfigZFS(libiocage.lib.Config.BaseConfig):
         )
 
     @property
-    def exists(self):
+    def exists(self) -> bool:
         """
         Returns True, when this configuration was found in the dataset
         """
@@ -109,7 +109,7 @@ class BaseConfigZFS(libiocage.lib.Config.BaseConfig):
 
         return False
 
-    def _read_properties(self):
+    def _read_properties(self) -> dict:
         data = {}
         for prop in self.dataset.properties:
             if is_iocage_property(prop):
@@ -130,7 +130,7 @@ class ConfigZFS(BaseConfigZFS):
         BaseConfigZFS.__init__(self, **kwargs)
 
     @property
-    def dataset(self):
+    def dataset(self) -> libzfs.ZFSDataset:
         return self._dataset
 
 
