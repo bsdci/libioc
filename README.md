@@ -46,3 +46,24 @@ jail.create("11.1-RELEASE")
 ### CLI
 
 Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
+
+## Development
+
+### Unit Tests
+
+Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage pool.
+
+```sh
+pytest
+```
+
+### Type Checking
+
+```
+setenv MYPYPATH `pwd`/.travis/mypy-stubs
+mypy libiocage/
+```
+
+### Code Style
+
+- Flake8
