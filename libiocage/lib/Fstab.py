@@ -28,6 +28,7 @@ import libiocage.lib.helpers
 
 
 class FstabLine(dict):
+
     def __init__(self, data: dict) -> None:
         keys = data.keys()
         if "comment" not in keys:
@@ -41,7 +42,7 @@ class FstabLine(dict):
         return hash(self["destination"])
 
 
-class JailConfigFstab(set):
+class Fstab(set):
     """
 
     Fstab configuration file wrapper
@@ -51,6 +52,11 @@ class JailConfigFstab(set):
     relative to the resource's root_dataset `<resource>/root`
     """
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
+
+    release: 'libiocage.lib.Release.ReleaseGenerator'
+    host: 'libiocage.lib.Host.HostGenerator'
+    logger: 'libiocage.lib.Logger.Logger'
+    jail: 'libiocage.lib.Jail.JailGenerator'
 
     def __init__(
         self,
@@ -80,7 +86,7 @@ class JailConfigFstab(set):
         self,
         input: str,
         ignore_auto_created: bool=True
-    ):
+    ) -> None:
         """
         Parses the content of a fstab file
 
@@ -100,7 +106,7 @@ class JailConfigFstab(set):
             try:
                 line, comment = line.split("#", maxsplit=1)
                 comment = comment.strip("# ")
-                ignored_comment = JailConfigFstab.AUTO_COMMENT_IDENTIFIER
+                ignored_comment = Fstab.AUTO_COMMENT_IDENTIFIER
                 if ignore_auto_created and (comment == ignored_comment):
                     continue
             except:
@@ -122,13 +128,13 @@ class JailConfigFstab(set):
             destination = os.path.abspath(fragments[1])
 
             new_line = FstabLine({
-                "source"     : fragments[0],
+                "source": fragments[0],
                 "destination": fragments[1],
-                "type"       : fragments[2],
-                "options"    : fragments[3],
-                "dump"       : fragments[4],
-                "passnum"    : fragments[5],
-                "comment"    : comment
+                "type": fragments[2],
+                "options": fragments[3],
+                "dump": fragments[4],
+                "passnum": fragments[5],
+                "comment": comment
             })
 
             if new_line in self:
@@ -139,52 +145,81 @@ class JailConfigFstab(set):
 
             self.add_line(new_line)
 
-    def read_file(self):
+    def read_file(self) -> None:
         if os.path.isfile(self.file_path):
             with open(self.file_path, "r") as f:
-                self.parse_lines(f.read())
-                f.close()
+                self._read_file_handle(f)
                 self.logger.debug(f"fstab loaded from {self.file_path}")
 
-    def save(self):
-        self.logger.verbose(f"Writing fstab to {self.file_path}")
+    def save(self) -> None:
         with open(self.file_path, "w") as f:
-            f.write(self.__str__())
-            f.truncate()
-            f.close()
+            self._save_file_handle(f)
+            self.logger.verbose(f"{self.file_path} written")
 
-        self.logger.verbose(
-            f"{self.jail.dataset.mountpoint}/fstab written"
-        )
+    def _save_file_handle(self, f) -> None:
+        f.write(self.__str__())
+        f.truncate()
 
-    def add(self,
-            source,
-            destination,
-            type="nullfs",
-            options="ro",
-            dump="0",
-            passnum="0",
-            comment=None):
+    def _read_file_handle(self, f) -> None:
+        self.parse_lines(f.read())
+
+    def update_and_save(
+        self
+    ) -> None:
+
+        if os.path.isfile(self.file_path):
+            f = open(self.file_path, "r+")
+            self._read_file_handle(f)
+            f.seek(0)
+        else:
+            f = open(self.file_path, "w")
+
+        self._save_file_handle(f)
+        f.close()
+
+    def update_release(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator' = None
+    ) -> None:
+        """
+        Set a new release and save the updated file
+        """
+        self.release = release
+        self.update_and_save()
+
+    def new_line(
+        self,
+        source,
+        destination,
+        type="nullfs",
+        options="ro",
+        dump="0",
+        passnum="0",
+        comment=None
+    ) -> None:
 
         line = FstabLine({
-            "source"     : source,
+            "source": source,
             "destination": destination,
-            "type"       : type,
-            "options"    : options,
-            "dump"       : dump,
-            "passnum"    : passnum,
-            "comment"    : comment
+            "type": type,
+            "options": options,
+            "dump": dump,
+            "passnum": passnum,
+            "comment": comment
         })
 
-        return self.add_line(line)
+        self.add_line(line)
 
-    def add_line(self, line):
+    def add_line(self, line: FstabLine) -> None:
 
         self.logger.debug(f"Adding line to fstab: {line}")
         set.add(self, line)
 
     @property
     def basejail_lines(self) -> typing.List[dict]:
+
+        if self.release is None:
+            return None
 
         if self.jail.config["basejail_type"] != "nullfs":
             return []
@@ -200,18 +235,18 @@ class JailConfigFstab(set):
             source = f"{release_root_path}/{basedir}"
             destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
             fstab_basejail_lines.append({
-                "source"     : source,
+                "source": source,
                 "destination": destination,
-                "type"       : "nullfs",
-                "options"    : "ro",
-                "dump"       : "0",
-                "passnum"    : "0",
-                "comment"    : "iocage-auto"
+                "type": "nullfs",
+                "options": "ro",
+                "dump": "0",
+                "passnum": "0",
+                "comment": "iocage-auto"
             })
 
         return fstab_basejail_lines
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "\n".join(map(
             _line_to_string,
             list(self)
@@ -219,18 +254,21 @@ class JailConfigFstab(set):
 
     def __iter__(self):
         fstab_lines = list(set.__iter__(self))
-        fstab_lines += self.basejail_lines
+        basejail_lines = self.basejail_lines
+        if basejail_lines is not None:
+            fstab_lines += self.basejail_lines
         return iter(fstab_lines)
 
-    def __contains__(self, value):
+    def __contains__(self, value: typing.Any) -> bool:
         for entry in self:
             if value["destination"] == entry["destination"]:
                 return True
             else:
                 return False
+        return False
 
 
-def _line_to_string(line):
+def _line_to_string(line: FstabLine) -> str:
     output = "\t".join([
         line["source"],
         line["destination"],

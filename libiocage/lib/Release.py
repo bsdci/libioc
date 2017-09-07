@@ -611,7 +611,7 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
             )
             os.makedirs(local_update_mountpoint)
 
-        jail.fstab.add(
+        jail.fstab.new_line(
             self.release_updates_dir,
             local_update_mountpoint,
             "nullfs",
@@ -751,16 +751,11 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
                 )
 
     def _create_default_rcconf(self):
-        file = f"{self.root_dir}/etc/rc.conf"
 
-        content = "\n".join(map(
-            lambda key: self._generate_default_rcconf_line(key),
-            Release.DEFAULT_RC_CONF_SERVICES.keys()
-        )) + "\n"
+        for key, value in self.DEFAULT_RC_CONF_SERVICES.items():
+            self.rc_conf[key] = value
 
-        with open(file, "w") as f:
-            f.write(content)
-            f.truncate()
+        self.rc_conf.save()
 
     def _generate_default_rcconf_line(self, service_name):
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os
 import subprocess
 import uuid
@@ -87,8 +88,8 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
     """
 
     _class_storage = libiocage.lib.Storage.Storage
+
     config: libiocage.lib.JailConfig.JailConfig = None
-    _rc_conf: libiocage.lib.RCConf.RCConf = None
     jail_state: dict = None
 
     def __init__(
@@ -154,30 +155,10 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         if new is False:
             self.config.read()
 
-    @property
-    def _rc_conf_path(self) -> str:
-        """
-        Absolute path to the jail's rc.conf file
-        """
-        return os.path.join(
-            self.root_dataset.mountpoint,
-            "/root/etc/rc.conf"
-        )
-
-    @property
-    def rc_conf(self) -> libiocage.lib.RCConf.RCConf:
-        """
-        The jail's libiocage.RCConf instance (lazy-loaded on first access)
-        """
-        if self._rc_conf is None:
-            self._rc_conf = libiocage.lib.RCConf.RCConf(
-                path=self._rc_conf_path,
-                jail=self,
-                logger=self.logger
-            )
-        return self._rc_conf
-
-    def start(self):
+    def start(
+        self,
+        quick: bool=False
+    ) -> typing.Generator['libiocage.lib.events.IocageEvent', None, None]:
         """
         Start the jail.
         """
@@ -187,7 +168,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
         release = self.release
 
-        events = libiocage.lib.events
+        events: typing.Any = libiocage.lib.events
         jailLaunchEvent = events.JailLaunch(jail=self)
         jailVnetConfigurationEvent = events.JailVnetConfiguration(jail=self)
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
@@ -198,13 +179,8 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         if self.basejail_backend is not None:
             self.basejail_backend.apply(self.storage, release)
 
-        if self.config["basejail_type"] == "nullfs":
-            self.fstab.base_resource = release
-        else:
-            self.fstab.base_resource = None
-
-        self.fstab.read_file()
-        self.fstab.save()
+        if quick is False:
+            self._save_autoconfig()
 
         self._launch_jail()
 
@@ -249,7 +225,10 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
         self.exec(command)
 
-    def stop(self, force=False):
+    def stop(
+        self,
+        force: bool=False
+    ) -> typing.Generator['libiocage.lib.events.IocageEvent', None, None]:
         """
         Stop a jail.
 
@@ -265,7 +244,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         self.require_jail_existing()
         self.require_jail_running()
 
-        events = libiocage.lib.events
+        events: typing.Any = libiocage.lib.events
         jailDestroyEvent = events.JailDestroy(self)
         jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
         jailMountTeardownEvent = events.JailMountTeardown(self)
@@ -404,7 +383,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
         self.create_resource()
         self.get_or_create_dataset("root")
-        self.fstab.update()
+        self._update_fstab()
 
         backend = None
 
@@ -424,7 +403,23 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
     def save(self):
         self.write_config(self.config.data)
+        self._save_autoconfig()
+
+    def _save_autoconfig(self):
+        """
+        Saves auto-generated files
+        """
         self.rc_conf.save()
+        self._update_fstab()
+
+    def _update_fstab(self) -> None:
+
+        if self.config["basejail_type"] == "nullfs":
+            self.fstab.release = self.release
+        else:
+            self.fstab.release = None
+
+        self.fstab.update_and_save()
 
     def exec(self, command, **kwargs):
         """

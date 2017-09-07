@@ -29,30 +29,64 @@ import libiocage.lib.helpers
 
 
 class RCConf(dict):
-    def __init__(self, path, data={}, logger=None, jail=None):
+
+    # the file is always relative to the resource
+    _file: str = "/etc/rc.conf"
+
+    def __init__(
+        self,
+        resource: 'libiocage.lib.Resource.LaunchableResource',
+        file: str=None,
+        logger: 'libiocage.lib.Logger.Logger'=None
+    ) -> None:
 
         dict.__init__(self, {})
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
-        self.jail = jail
 
         # No file was loaded yet, so we can't know the delta yet
         self._file_content_changed = True
-        self._path = None
-        self.path = path
+
+        if file is not None:
+            self._file = file
+
+        self.resource = resource
+        self._read_file()
 
     @property
     def path(self):
-        return object.__getattribute__(self, "_path")
+        path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
+        return os.path.abspath(path)
 
-    @path.setter
-    def path(self, value):
-        if self.path != value:
-            new_path = None if value is None else os.path.realpath(value)
-            dict.__setattr__(self, "_path", new_path)
+    @property
+    def file(self):
+        return self._file
+
+    @file.setter
+    def file(self, value):
+        if self._file != value:
+            self._file = value
             self._read_file()
 
-    def _read_file(self, silent=False, delete=False):
+    def _read_file(
+        self,
+        silent: bool=False,
+        delete: bool=False,
+        merge: bool=False
+    ) -> None:
+        """
+        Read the rc.conf file
 
+        Args:
+
+            silent:
+                Do not use the logger
+
+            delete:
+                Delete entries that do not exist in the file
+
+            merge:
+                Do not change already existing properties
+        """
         try:
             if (self.path is not None) and os.path.isfile(self.path):
                 data = self._read(silent=silent)
@@ -60,7 +94,6 @@ class RCConf(dict):
                 data = {}
         except:
             data = {}
-            pass
 
         existing_keys = set(self.keys())
         new_keys = set(data.keys())
@@ -71,7 +104,13 @@ class RCConf(dict):
                 del self[key]
 
         for key in new_keys:
-            self[key] = data[key]
+            if key in existing_keys:
+                if (merge is True) and (self[key] != data[key]):
+                    self[key] = data[key]
+                    self._file_content_changed = True
+            else:
+                self[key] = data[key]
+                self._file_content_changed = True
 
         if silent is False:
             self.logger.verbose(f"Updated rc.conf data from {self.path}")
@@ -85,10 +124,7 @@ class RCConf(dict):
 
     def _read(self, silent=False):
         data = ucl.load(open(self.path).read())
-        self.logger.spam(
-            f"rc.conf was read from {self.path}",
-            jail=self.jail
-        )
+        self.logger.spam(f"rc.conf was read from {self.path}")
         return data
 
     def save(self):
@@ -102,16 +138,14 @@ class RCConf(dict):
             output = output.replace(" = \"", "=\"")
             output = output.replace("\";\n", "\"\n")
 
-            self.logger.verbose(
-                f"Writing rc.conf to {self.path}",
-                jail=self.jail
-            )
+            self.logger.verbose(f"Writing rc.conf to {self.path}")
 
             rcconf.write(output)
             rcconf.truncate()
             rcconf.close()
 
-            self.logger.spam(output[:-1], jail=self.jail, indent=1)
+            self._file_content_changed = False
+            self.logger.spam(output[:-1], indent=1)
 
     def __setitem__(self, key, value):
         val = libiocage.lib.helpers.to_string(

@@ -74,7 +74,7 @@ class JailsGenerator(list):
         kwargs["logger"] = self.logger
         kwargs["host"] = self.host
         kwargs["zfs"] = self.zfs
-        return libiocage.lib.Jail.Jail(*args, **kwargs)
+        return libiocage.lib.Jail.JailGenerator(*args, **kwargs)
 
     @property
     def filters(self):

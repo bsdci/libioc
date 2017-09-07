@@ -5,7 +5,8 @@ import libzfs
 import libiocage.lib.ConfigJSON
 import libiocage.lib.ConfigUCL
 import libiocage.lib.ConfigZFS
-import libiocage.lib.JailConfigFstab
+import libiocage.lib.Fstab
+import libiocage.lib.RCConf
 import libiocage.lib.Jail
 import libiocage.lib.Logger
 import libiocage.lib.ZFS
@@ -239,6 +240,7 @@ class DefaultResource(Resource):
         "legacy": False,
         "priority": 0,
         "basejail": False,
+        "clonejail": True,
         "defaultrouter": None,
         "defaultrouter6": None,
         "mac_prefix": "02ff60",
@@ -296,12 +298,22 @@ class DefaultResource(Resource):
 
 class LaunchableResource(Resource):
 
+    _rc_conf: libiocage.lib.RCConf.RCConf = None
+
+    def create_resource(self) -> None:
+        """
+        Creates the root dataset
+        """
+        Resource.create_resource(self)
+        self.zfs.create_dataset(self.root_dataset_name)
+
     @property
     def root_path(self):
         return self.root_dataset.mountpoint
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:
+        # ToDo: Memoize root_dataset
         return self.get_dataset("root")
 
     @property
@@ -331,8 +343,20 @@ class LaunchableResource(Resource):
     def dataset(self, value: libzfs.ZFSDataset):
         self._set_dataset(value)
 
+    @property
+    def rc_conf(self) -> libiocage.lib.RCConf.RCConf:
+        if self._rc_conf is None:
+            self._rc_conf = libiocage.lib.RCConf.RCConf(
+                resource=self,
+                logger=self.logger
+            )
+        return self._rc_conf
+
 
 class JailResource(LaunchableResource):
+
+    _jail: 'libiocage.lib.Jail.JailGenerator' = None
+    _fstab: libiocage.lib.Fstab.Fstab = None
 
     def __init__(
         self,
@@ -345,7 +369,6 @@ class JailResource(LaunchableResource):
         self.host = libiocage.lib.helpers.init_host(self, host)
 
         self._jail = jail
-        self._fstab = None
 
         Resource.__init__(
             self,
@@ -372,6 +395,17 @@ class JailResource(LaunchableResource):
         )
 
     @property
+    def fstab(self) -> libiocage.lib.Fstab.Fstab:
+        if self._fstab is None:
+            self._fstab = libiocage.lib.Fstab.Fstab(
+                jail=self.jail,
+                release=self.jail.release,
+                logger=self.logger,
+                host=self.jail.host
+            )
+        return self._fstab
+
+    @property
     def dataset_name(self) -> str:
         """
         Name of the jail base ZFS dataset
@@ -393,17 +427,6 @@ class JailResource(LaunchableResource):
     @dataset_name.setter
     def dataset_name(self, value: str):
         self._dataset_name = value
-
-    @property
-    def fstab(self):
-        if self._fstab is None:
-            self._fstab = libiocage.lib.JailConfigFstab.JailConfigFstab(
-                jail=self.jail,
-                release=self.jail.release,
-                logger=self.logger,
-                host=self.jail.host
-            )
-        return self._fstab
 
 
 class ReleaseResource(LaunchableResource):
