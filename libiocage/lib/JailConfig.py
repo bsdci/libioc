@@ -33,8 +33,6 @@ import libiocage.lib.JailConfigResolver
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
-__dict: typing.Any = dict
-
 
 class JailConfig(dict, object):
     """
@@ -216,8 +214,20 @@ class JailConfig(dict, object):
         else:
             self.data["type"] = value
 
-    def _get_basejail(self):
-        return libiocage.lib.helpers.parse_user_input(self.data["basejail"])
+    def _get_tags(self) -> typing.List[str]:
+        return libiocage.lib.helpers.parse_list(self.data["tags"])
+
+    def _set_tags(
+        self,
+        value: typing.Union[str, typing.List[str]],
+        **kwargs
+    ) -> None:
+
+        data = libiocage.lib.helpers.to_string(value)
+        self.data["tags"] = data
+
+    def _get_basejail(self) -> bool:
+        return libiocage.lib.helpers.parse_bool(self.data["basejail"])
 
     def _default_basejail(self):
         return False
@@ -225,8 +235,8 @@ class JailConfig(dict, object):
     def _set_basejail(self, value, **kwargs):
         self.data["basejail"] = self.stringify(value)
 
-    def _get_clonejail(self):
-        return libiocage.lib.helpers.parse_user_input(self.data["clonejail"])
+    def _get_clonejail(self) -> bool:
+        return libiocage.lib.helpers.parse_bool(self.data["clonejail"])
 
     def _default_clonejail(self):
         return True
@@ -398,19 +408,6 @@ class JailConfig(dict, object):
                     logger=self.logger
                 )
 
-    def _set_tags(self, value, **kwargs):
-        if isinstance(value, str):
-            self.tags = value.split(",")
-        elif isinstance(value, list):
-            self.tags = set(value)
-        elif isinstance(value, set):
-            self.tags = value
-        else:
-            raise libiocage.lib.errors.InvalidJailConfigValue(
-                property_name="tags",
-                logger=self.logger
-            )
-
     def _get_host_hostname(self):
         try:
             return self.data["host_hostname"]
@@ -464,10 +461,13 @@ class JailConfig(dict, object):
             pass
 
         # data with mappings
+        get_method = None
         try:
             get_method = self.__getattribute__(f"_get_{key}")
             return get_method()
         except AttributeError:
+            if get_method is not None:
+                raise
             pass
 
         # plain data attribute
@@ -547,7 +547,8 @@ class JailConfig(dict, object):
     def __dir__(self) -> list:
 
         properties = set()
-        for prop in __dict.__dir__(self):
+        props = dict.__dir__(self)  # type: ignore
+        for prop in props:
             if prop.startswith("_default_"):
                 properties.add(prop[9:])
             elif not prop.startswith("_"):
@@ -562,15 +563,15 @@ class JailConfig(dict, object):
     def all_properties(self) -> list:
 
         properties = set()
-
-        for prop in __dict.__dir__(self):
+        props = dict.__dir__(self)  # type: ignore
+        for prop in props:
             if prop.startswith("_default_"):
                 properties.add(prop[9:])
 
         for key in self.data.keys():
             properties.add(key)
 
-        return list(properties)
+        return sorted(list(properties | set(self.host.defaults.keys())))
 
     def stringify(self, value):
         parsed_input = libiocage.lib.helpers.parse_user_input(value)

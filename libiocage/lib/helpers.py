@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import re
 import subprocess
 import uuid
@@ -58,13 +59,6 @@ def init_host(
         return host
 
     return libiocage.lib.Host.HostGenerator(self.logger)
-
-
-def init_datasets(self, datasets=None):
-    if datasets:
-        self.datasets = datasets
-    else:
-        self.datasets = libiocage.lib.Datasets.Datasets()
 
 
 def init_logger(
@@ -149,17 +143,25 @@ def validate_name(name: str) -> bool:
     return bool(_validate_name.fullmatch(name))
 
 
-def parse_none(data):
+def parse_none(data) -> str:
     if data is None:
         return None
 
-    if data in ["none", "-"]:
+    if data in ["none", "-", ""]:
         return None
 
     raise TypeError("Value is not None")
 
 
-def parse_bool(data):
+def parse_list(data: typing.Union[str, typing.List[str]]) -> list:
+    """
+    Transforms a comma separated string into a list
+    """
+    # ToDo: escaped commas
+    return data if isinstance(data, list) else data.split(",")
+
+
+def parse_bool(data) -> bool:
     """
     try to parse booleans from strings
 
@@ -216,7 +218,13 @@ def parse_user_input(data):
     return data
 
 
-def to_string(data, true="yes", false="no", none="-") -> str:
+def to_string(
+    data: typing.Union[str, typing.List[str]],
+    true: str="yes",
+    false: str="no",
+    none: str="-",
+    delimiter: str=","
+) -> str:
     """
     return a string boolean value using parse_bool(), of specified style
 
@@ -251,16 +259,29 @@ def to_string(data, true="yes", false="no", none="-") -> str:
         "-"
     """
 
-    data = parse_user_input(data)
-
     if data is None:
         return none
-    elif data is True:
+
+    if isinstance(data, list) is True:
+        children = [
+            to_string(x, true, false, none, delimiter)
+            for x in data
+            if x is not None
+        ]
+        if len(children) == 0:
+            return none
+        normalized_data = ",".join(children)
+    else:
+        normalized_data = str(data)
+
+    parsed_data = parse_user_input(normalized_data)
+
+    if parsed_data is True:
         return true
-    elif data is False:
+    elif parsed_data is False:
         return false
 
-    return str(data)
+    return str(parsed_data)
 
 
 def exec_passthru(command, logger=None):
