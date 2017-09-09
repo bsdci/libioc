@@ -27,6 +27,9 @@ import ucl
 
 import libiocage.lib.helpers
 
+# MyPy
+import libiocage.lib.LaunchableResource
+
 
 class RCConf(dict):
 
@@ -35,7 +38,7 @@ class RCConf(dict):
 
     def __init__(
         self,
-        resource: 'libiocage.lib.Resource.LaunchableResource',
+        resource: 'libiocage.lib.LaunchableResource.LaunchableResource',
         file: str=None,
         logger: 'libiocage.lib.Logger.Logger'=None
     ) -> None:

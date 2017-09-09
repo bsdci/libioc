@@ -21,10 +21,11 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from libiocage.lib import errors, events
-from libiocage.lib.Host import Host
-from libiocage.lib.Jail import Jail
-from libiocage.lib.Jails import Jails
-from libiocage.lib.Logger import Logger
-from libiocage.lib.Release import Release
-from libiocage.lib.Releases import Releases
+import libiocage.lib
+# from libiocage.lib import errors, events
+# from libiocage.lib.Host import Host
+# from libiocage.lib.Jail import Jail
+# from libiocage.lib.Jails import Jails
+# from libiocage.lib.Logger import Logger
+# from libiocage.lib.Release import Release
+# from libiocage.lib.Releases import Releases

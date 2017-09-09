@@ -36,15 +36,15 @@ class HostGenerator:
 
     _class_distribution = libiocage.lib.Distribution.DistributionGenerator
 
-    _devfs: libiocage.lib.DevfsRules.DevfsRules = None
+    _devfs: 'libiocage.lib.DevfsRules.DevfsRules' = None
     releases_dataset: libzfs.ZFSDataset = None
 
     def __init__(
         self,
         root_dataset: libzfs.ZFSDataset=None,
         defaults: dict=None,
-        zfs: libiocage.lib.ZFS.ZFS=None,
-        logger: libiocage.lib.Logger.Logger=None
+        zfs: 'libiocage.lib.ZFS.ZFS'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None
     ) -> None:
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
@@ -75,7 +75,7 @@ class HostGenerator:
         ).read_config()
 
     @property
-    def devfs(self) -> libiocage.lib.DevfsRules.DevfsRules:
+    def devfs(self) -> 'libiocage.lib.DevfsRules.DevfsRules':
         """
         Lazy-loaded DevfsRules instance
         """

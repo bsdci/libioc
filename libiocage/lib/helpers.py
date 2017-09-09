@@ -37,6 +37,11 @@ def init_zfs(
         zfs: 'libiocage.lib.ZFS.ZFS'=None
 ) -> 'libiocage.lib.ZFS.ZFS':
 
+    try:
+        return self.zfs
+    except:
+        pass
+
     if (zfs is not None) and isinstance(zfs, libiocage.lib.ZFS.ZFS):
         object.__setattr__(self, 'zfs', zfs)
         return zfs
@@ -53,18 +58,33 @@ def init_zfs(
 
 def init_host(
         self,
-        host: 'libiocage.lib.Host.HostGenerator'=None,
+        host: 'libiocage.lib.Host.HostGenerator'=None
 ) -> 'libiocage.lib.Host.HostGenerator':
+
+    try:
+        return self.host
+    except:
+        pass
+
     if host:
         return host
 
-    return libiocage.lib.Host.HostGenerator(self.logger)
+    return libiocage.lib.Host.HostGenerator(
+        logger=self.logger,
+        zfs=self.zfs
+    )
 
 
 def init_logger(
         self,
         logger: 'libiocage.lib.Logger.Logger'=None
 ) -> 'libiocage.lib.Logger.Logger':
+
+    try:
+        return self.logger
+    except:
+        pass
+
     if logger is not None:
         object.__setattr__(self, 'logger', logger)
         return logger

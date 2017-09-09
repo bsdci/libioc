@@ -34,17 +34,90 @@ from urllib.parse import urlparse
 import libzfs
 import ucl
 
-# import libiocage.lib.Host
-# import libiocage.lib.Logger
-import libiocage.lib.Jail
-import libiocage.lib.Resource
 import libiocage.lib.ZFS
 import libiocage.lib.errors
 import libiocage.lib.helpers
 import libiocage.lib.events
+import libiocage.lib.LaunchableResource
+import libiocage.lib.Jail
 
 
-class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
+class ReleaseResource(libiocage.lib.LaunchableResource.LaunchableResource):
+
+    _release: 'ReleaseGenerator' = None
+
+    def __init__(
+        self,
+        host: 'libiocage.lib.Host.HostGenerator',
+        release: 'ReleaseGenerator'=None,
+        **kwargs
+    ) -> None:
+
+        self.__releases_dataset_name = host.datasets.releases.name
+        self.__base_dataset_name = host.datasets.base.name
+        self.host = libiocage.lib.helpers.init_host(self, host)
+
+        libiocage.lib.LaunchableResource.LaunchableResource.__init__(
+            self,
+            **kwargs
+        )
+
+        self._release = release
+
+    @property
+    def release(self) -> 'ReleaseGenerator':
+        """
+        Release instance that belongs to the resource
+
+        Usually the resource becomes inherited from the Release itself.
+        It can still be used linked to a foreign ReleaseGenerator by passing
+        release as named attribute to the __init__ function
+        """
+        if self._release is not None:
+            return self._release
+
+        elif isinstance(self, ReleaseGenerator):
+            return self
+
+        raise Exception(
+            "Resource is not a valid release itself and has no linked release"
+        )
+
+    @property
+    def dataset_name(self) -> str:
+        """
+        Name of the release base ZFS dataset
+
+        If the resource has no dataset or dataset_name assigned yet,
+        the release id is used to find name the dataset
+        """
+        try:
+            return self._assigned_dataset_name
+        except:
+            pass
+
+        return f"{self.__releases_dataset_name}/{self.release.name}"
+
+    @dataset_name.setter
+    def dataset_name(self, value: str):
+        self._dataset_name = value
+
+    @property
+    def base_dataset(self) -> libzfs.ZFSDataset:
+        # base datasets are created from releases. required to start
+        # zfs-basejails
+        return self.zfs.get_dataset(self.base_dataset_name)
+
+    @property
+    def base_dataset_name(self) -> str:
+        return f"{self.__base_dataset_name}/{self.release.name}/root"
+
+    @property
+    def file(self) -> str:
+        return None
+
+
+class ReleaseGenerator(ReleaseResource):
 
     DEFAULT_RC_CONF_SERVICES = {
         "netif": False,
@@ -88,7 +161,7 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         self._hashes = None
         self.check_hashes = check_hashes is True
 
-        libiocage.lib.Resource.ReleaseResource.__init__(
+        ReleaseResource.__init__(
             self,
             host=self.host,
             logger=self.logger,
@@ -107,7 +180,7 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
     @resource.setter
     def resource(self, value: libiocage.lib.Resource.Resource):
         if value is None:
-            self._resource = libiocage.lib.Resource.ReleaseResource(
+            self._resource = ReleaseResource(
                 release=self,
                 host=self.host,
                 logger=self.logger,
@@ -350,8 +423,8 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
         )
 
     @property
-    def _base_resource(self) -> libiocage.lib.Resource.ReleaseResource:
-        return libiocage.lib.Resource.ReleaseResource(
+    def _base_resource(self) -> ReleaseResource:
+        return ReleaseResource(
             release=self.release,
             logger=self.logger,
             host=self.host,
@@ -841,6 +914,9 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
 
     def __str__(self):
         return self.name
+
+    def destroy(self):
+        self.storage.delete_dataset_recursive(self.dataset)
 
 
 class Release(ReleaseGenerator):
