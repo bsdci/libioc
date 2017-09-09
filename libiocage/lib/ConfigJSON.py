@@ -22,10 +22,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import os.path
 import json
 
 import libiocage.lib.Config
+import libiocage.lib.ResourceConfig
 import libiocage.lib.helpers
 
 
@@ -52,24 +52,8 @@ class ConfigJSON(libiocage.lib.Config.ConfigFile):
         return to_json(data)
 
 
-class ResourceConfigJSON(ConfigJSON):
-
-    def __init__(
-        self,
-        resource: 'libiocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        self.resource = resource
-        ConfigJSON.__init__(self, **kwargs)
-
-    @property
-    def file(self) -> str:
-        return os.path.join(
-            self.resource.dataset.mountpoint,
-            self.resource.config_file
-        )
-
-    @file.setter
-    def file(self, value: str):
-        self._file = value
+class ResourceConfigJSON(
+    ConfigJSON,
+    libiocage.lib.ResourceConfig.ResourceConfig
+):
+    pass

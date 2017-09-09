@@ -27,10 +27,12 @@ import json
 import texttable
 import typing
 
-import libiocage.lib.Host
-import libiocage.lib.Jails
-import libiocage.lib.JailFilter
 import libiocage.lib.Logger
+import libiocage.lib.Host
+import libiocage.lib.Resource
+import libiocage.lib.Jails
+import libiocage.lib.Releases
+
 
 supported_output_formats = ['table', 'csv', 'list', 'json']
 
@@ -86,26 +88,35 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
     if len(filters) == 0:
         filters += ("*",)
 
-    jails = libiocage.lib.Jails.JailsGenerator(
+    if dataset_type == "base":
+        resources_class = libiocage.lib.Releases.ReleasesGenerator
+        columns = ["name"]
+    else:
+        resources_class = libiocage.lib.Jails.JailsGenerator
+        columns = _list_output_comumns(output, _long)
+
+    resources = resources_class(
         logger=logger,
         host=host,
         filters=filters  # ToDo: allow quoted whitespaces from user input
     )
 
-    columns = _list_output_comumns(output, _long)
-
     if output_format == "list":
-        _print_list(jails, columns, header, "\t")
+        _print_list(resources, columns, header, "\t")
     elif output_format == "csv":
-        _print_list(jails, columns, header, ";")
+        _print_list(resources, columns, header, ";")
     elif output_format == "json":
-        _print_json(jails, columns)
+        _print_json(resources, columns)
     else:
-        _print_table(jails, columns, header, _sort)
+        _print_table(resources, columns, header, _sort)
 
 
 def _print_table(
-    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    resources: typing.Generator[
+        libiocage.lib.Resource.ListableResource,
+        None,
+        None
+    ],
     columns: list,
     show_header: bool,
     sort_key: str=None
@@ -122,8 +133,8 @@ def _print_table(
     except ValueError:
         sort_index = None
 
-    for jail in jails:
-        table_data.append(_lookup_jail_values(jail, columns))
+    for resource in resources:
+        table_data.append(_lookup_resource_values(resource, columns))
 
     if sort_index is not None:
         table_data.sort(key=lambda x: x[sort_index])
@@ -137,7 +148,11 @@ def _print_table(
 
 
 def _print_list(
-    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    resources: typing.Generator[
+        libiocage.lib.Jails.JailsGenerator,
+        None,
+        None
+    ],
     columns: list,
     show_header: bool,
     separator: str=";"
@@ -146,12 +161,16 @@ def _print_list(
     if show_header is True:
         print(separator.join(columns).upper())
 
-    for jail in jails:
-        print(separator.join(_lookup_jail_values(jail, columns)))
+    for resource in resources:
+        print(separator.join(_lookup_resource_values(resource, columns)))
 
 
 def _print_json(
-    jails: typing.Generator[libiocage.lib.Jails.JailsGenerator, None, None],
+    resources: typing.Generator[
+        libiocage.lib.Jails.JailsGenerator,
+        None,
+        None
+    ],
     columns: list,
     **json_dumps_args
 ):
@@ -164,15 +183,18 @@ def _print_json(
 
     output = []
 
-    for jail in jails:
-        output.append(dict(zip(columns, _lookup_jail_values(jail, columns))))
+    for resource in resources:
+        output.append(dict(zip(
+            columns,
+            _lookup_resource_values(resource, columns)
+        )))
 
     print(json.dumps(output, **json_dumps_args))
 
 
-def _lookup_jail_values(jail, columns) -> typing.List[str]:
+def _lookup_resource_values(resource, columns) -> typing.List[str]:
     return list(map(
-        lambda column: jail.getstring(column),
+        lambda column: resource.getstring(column),
         columns
     ))
 

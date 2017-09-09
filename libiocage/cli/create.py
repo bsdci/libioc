@@ -160,6 +160,5 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
         except:
             msg = f"{jail.humanreadable_name} could not be created!{suffix}"
             logger.warn(msg)
-            raise
 
     exit(int(errors))

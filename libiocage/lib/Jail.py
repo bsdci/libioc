@@ -32,19 +32,110 @@ import libiocage.lib.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
 import libiocage.lib.RCConf
-import libiocage.lib.Resource
 import libiocage.lib.Release
-import libiocage.lib.Releases
 import libiocage.lib.StandaloneJailStorage
 import libiocage.lib.Storage
 import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
+import libiocage.lib.LaunchableResource
+import libiocage.lib.Fstab
 import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
 
 
-class JailGenerator(libiocage.lib.Resource.JailResource):
+class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
+
+    _jail: 'JailGenerator' = None
+    _fstab: 'libiocage.lib.Fstab.Fstab' = None
+
+    def __init__(
+        self,
+        host: 'libiocage.lib.Host.HostGenerator',
+        jail: 'JailGenerator'=None,
+        **kwargs
+    ) -> None:
+
+        self.__jails_dataset_name = host.datasets.jails.name
+        self.host = libiocage.lib.helpers.init_host(self, host)
+
+        self._jail = jail
+
+        libiocage.lib.LaunchableResource.LaunchableResource.__init__(
+            self,
+            **kwargs
+        )
+
+    @property
+    def jail(self) -> 'JailGenerator':
+        """
+        Jail instance that belongs to the resource
+
+        Usually the resource becomes inherited from the jail itself.
+        It can still be used linked to a foreign jail by passing jail as
+        named attribute to the __init__ function
+        """
+        if self._jail is not None:
+            return self._jail
+
+        # is instance of Jail itself
+        if isinstance(self, JailGenerator):
+            return self
+
+        raise Exception("This resource is not a jail or not linked to one")
+
+    @property
+    def fstab(self) -> 'libiocage.lib.Fstab.Fstab':
+        if self._fstab is None:
+            self._fstab = libiocage.lib.Fstab.Fstab(
+                jail=self.jail,
+                release=self.jail.release,
+                logger=self.logger,
+                host=self.jail.host
+            )
+        return self._fstab
+
+    @property
+    def dataset_name(self) -> str:
+        """
+        Name of the jail base ZFS dataset
+
+        If the resource has no dataset or dataset_name assigned yet,
+        the jail id is used to find name the dataset
+        """
+        try:
+            return self._assigned_dataset_name
+        except:
+            pass
+
+        jail_id = self.jail.config["id"]
+        if jail_id is None:
+            raise libiocage.lib.errors.JailUnknownIdentifier()
+
+        return f"{self.__jails_dataset_name}/{jail_id}"
+
+    @dataset_name.setter
+    def dataset_name(self, value: str):
+        self._dataset_name = value
+
+    def getstring(self, key):
+        """
+        Returns a jail properties string or '-'
+
+        Args:
+            key (string):
+                Name of the jail property to return
+        """
+
+        try:
+            return libiocage.lib.helpers.to_string(self.jail.config[key])
+        except:
+            pass
+
+        return libiocage.lib.Resource.Resource.getstring(self, key)
+
+
+class JailGenerator(JailResource):
     """
     iocage unit orchestrates a jail's configuration and manages state
 
@@ -94,8 +185,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
     def __init__(
         self,
-        data={},
-        resource: 'libiocage.lib.Resource.LaunchableResource'=None,
+        data: typing.Union[str, typing.Dict[str, typing.Any]]={},
         zfs=None,
         host=None,
         logger=None,
@@ -144,8 +234,9 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
             zfs=self.zfs
         )
 
-        libiocage.lib.Resource.JailResource.__init__(
+        JailResource.__init__(
             self,
+            jail=self,
             host=self.host,
             logger=self.logger,
             zfs=self.zfs,
@@ -154,6 +245,8 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
         if new is False:
             self.config.read()
+            if self.config["id"] is None:
+                self.config["id"] = self.dataset_name.split("/").pop()
 
     def start(
         self,
@@ -353,24 +446,19 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         self.require_jail_not_existing()
 
         # check if release exists
-        releases = libiocage.lib.Releases.Releases(
+        release = libiocage.lib.Release.Release(
+            name=release_name,
             host=self.host,
             zfs=self.zfs,
             logger=self.logger
         )
 
-        filteres_released = list(filter(
-            lambda x: x.name == release_name,
-            releases.local
-        ))
-
-        if len(filteres_released) == 0:
+        if release.fetched is False:
             raise libiocage.lib.errors.ReleaseNotFetched(
                 name=release_name,
                 logger=self.logger
             )
 
-        release = filteres_released[0]
         self.config["release"] = release.name
 
         self.logger.verbose(
@@ -921,7 +1009,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
         """
         return f"{self.host.datasets.logs.mountpoint}-console.log"
 
-    def __getattr__(self, key):
+    def __getattribute__(self, key):
 
         try:
             return object.__getattribute__(self, key)
@@ -941,26 +1029,6 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
                 pass
 
         raise AttributeError(f"Jail property {key} not found")
-
-    def getstring(self, key):
-        """
-        Returns a jail properties string or '-'
-
-        Args:
-            key (string):
-                Name of the jail property to return
-        """
-
-        try:
-            return libiocage.lib.helpers.to_string(self.config[key])
-        except:
-            pass
-
-        try:
-            return libiocage.lib.helpers.to_string(self.__getattr__(key))
-
-        except AttributeError:
-            return "-"
 
     def __dir__(self):
 

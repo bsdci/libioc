@@ -25,7 +25,7 @@ import re
 from typing import Iterable, List, Union
 
 import libiocage.lib.errors
-import libiocage.lib.Jail
+import libiocage.lib.Resource
 
 
 def match_filter(value: str, filter_string: str):
@@ -55,17 +55,33 @@ class Term(list):
 
         list.__init__(self, data)
 
-    def matches_jail(self, jail: 'libiocage.lib.Jail.JailGenerator') -> bool:
-        return self.matches(jail.getstring(self.key))
+    def matches_resource(
+        self,
+        resource: 'libiocage.lib.Resource.Resource'
+    ) -> bool:
+        return self.matches(resource.getstring(self.key))
 
-    def matches(self, value: str) -> bool:
+    def matches(self, value: str, short: bool=False) -> bool:
         """
         Returns True if the value matches the term
+
+        Args:
+
+            value:
+                The value that is matched against the filter term
+
+            short:
+                When value has a length of 8 characters, this argument allows
+                to match a jail's shortname as well. This is required for
+                selecting jails with UUIDs by the first part of the name
         """
         for filter_value in self:
 
             if match_filter(value, filter_value):
                 return True
+
+            if short is False:
+                continue
 
             # match against humanreadable names as well
             has_humanreadble_length = (len(filter_value) == 8)
@@ -119,9 +135,9 @@ class Term(list):
 
 class Terms(list):
     """
-    A group of jail filter terms.
+    A group of filter terms.
 
-    Each item in this group must match for a jail to pass the filter.
+    Each item in this group must match for a resource to pass the filter.
     This can be interpreted as logical AND
     """
 
@@ -139,13 +155,16 @@ class Terms(list):
 
         list.__init__(self, data)
 
-    def match_jail(self, jail: 'libiocage.lib.Jail.JailGenerator') -> bool:
+    def match_resource(
+        self,
+        resource: 'libiocage.lib.Resource.Resource'
+    ) -> bool:
         """
-        Returns True if all Terms match the jail
+        Returns True if all Terms match the resource
         """
 
         for term in self:
-            if term.matches_jail(jail) is False:
+            if term.matches_resource(resource) is False:
                 return False
 
         return True
@@ -162,7 +181,9 @@ class Terms(list):
             if term.key != key:
                 continue
 
-            if term.matches(value) is False:
+            short = (key == "name")
+
+            if term.matches(value, short) is False:
                 return False
 
         return True

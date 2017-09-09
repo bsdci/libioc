@@ -21,29 +21,31 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import typing
-
-import ucl
-
+"""The main CLI for ioc."""
+import os.path
+import libzfs
 import libiocage.lib.Config
-import libiocage.lib.ResourceConfig
-import libiocage.lib.errors
 
 
-class ConfigUCL(libiocage.lib.Config.BaseConfig):
+class DatasetConfig(libiocage.lib.Config.ConfigFile):
 
-    config_type = "ucl"
+    def __init__(
+        self,
+        dataset: libzfs.ZFSDataset = None,
+        **kwargs
+    ) -> None:
 
-    def map_input(self, data: typing.TextIO) -> dict:
-        return ucl.load(data)
+        self._dataset = dataset
+        libiocage.lib.Config.ConfigFile.__init__(self, **kwargs)
 
-    def map_output(self, data: dict) -> str:
-        # ToDo: Re-Implement UCL output
-        raise libiocage.lib.errors.MissingFeature("Writing ConfigUCL")
+    @property
+    def dataset(self) -> libzfs.ZFSDataset:
+        return self._dataset
 
+    @property
+    def file(self) -> str:
+        return os.path.join(self.dataset.mountpoint, self._file)
 
-class ResourceConfigUCL(
-    ConfigUCL,
-    libiocage.lib.ResourceConfig.ResourceConfig
-):
-    pass
+    @file.setter
+    def file(self, value: str):
+        self._file = value

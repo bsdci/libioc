@@ -33,6 +33,9 @@ import libiocage.lib.JailConfigResolver
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
+# MyPy
+import libiocage.lib.Jail
+
 
 class JailConfig(dict, object):
     """
@@ -69,9 +72,7 @@ class JailConfig(dict, object):
     """
 
     special_properties: dict = {}
-    data: dict = {
-        "id": None
-    }
+    data: dict = None
     legacy: bool = None
     jail: 'libiocage.lib.Jail.JailGenerator' = None
 
@@ -86,6 +87,11 @@ class JailConfig(dict, object):
 
         dict.__init__(self)
 
+        if self.data is None:
+            self.data = {
+                "id": None
+            }
+
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.host = libiocage.lib.helpers.init_host(self, host)
 
@@ -99,7 +105,11 @@ class JailConfig(dict, object):
 
         self.clone(data)
 
-    def clone(self, data, skip_on_error=False):
+    def clone(
+        self,
+        data: typing.Dict[str, typing.Any],
+        skip_on_error: bool=False
+    ) -> None:
         """
         Apply data from a data dictionary to the JailConfig
 
@@ -114,6 +124,9 @@ class JailConfig(dict, object):
                 Passed to __setitem__
 
         """
+        if data is None:
+            return
+
         current_id = self["id"]
         for key, value in data.items():
 

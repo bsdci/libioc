@@ -26,6 +26,10 @@ import os
 
 import libiocage.lib.helpers
 
+# MyPy
+import libiocage.lib.Resource
+import libiocage.lib.Jail
+
 
 class FstabLine(dict):
 

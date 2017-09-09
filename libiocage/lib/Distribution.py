@@ -29,14 +29,11 @@ from typing import List
 
 import requests
 
-import libiocage.lib.Release
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
 
 class DistributionGenerator:
-
-    _class_release = libiocage.lib.Release.ReleaseGenerator
 
     release_name_blacklist = [
         "",
@@ -53,6 +50,10 @@ class DistributionGenerator:
         self.host = libiocage.lib.helpers.init_host(self, host)
 
         self.available_releases = None
+
+    @property
+    def _class_release(self):
+        return libiocage.lib.Release.ReleaseGenerator
 
     @property
     def name(self):
@@ -199,4 +200,6 @@ class DistributionGenerator:
 
 class Distribution(DistributionGenerator):
 
-    _class_release = libiocage.lib.Release.Release
+    @property
+    def _class_release(self):
+        return libiocage.lib.Release.Release

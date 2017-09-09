@@ -1,3 +1,27 @@
+# Copyright (c) 2014-2017, iocage
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted providing that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+# IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os.path
 
 import libzfs
@@ -5,13 +29,13 @@ import libzfs
 import libiocage.lib.ConfigJSON
 import libiocage.lib.ConfigUCL
 import libiocage.lib.ConfigZFS
-import libiocage.lib.Fstab
-import libiocage.lib.RCConf
-import libiocage.lib.Jail
 import libiocage.lib.Logger
 import libiocage.lib.ZFS
-import libiocage.lib.Release
 import libiocage.lib.helpers
+
+
+# MyPy
+import libiocage.lib.Filter
 
 
 class Resource:
@@ -73,6 +97,7 @@ class Resource:
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
 
+        # ToDo: Lazy-load config handlers
         self.config_json = libiocage.lib.ConfigJSON.ResourceConfigJSON(
             resource=self,
             logger=self.logger
@@ -156,7 +181,7 @@ class Resource:
         if self._config_type is None:
             return None
         elif self._config_type == self.CONFIG_TYPES.index("auto"):
-            self._config_type = self._find_config_type()
+            self._config_type = self._detect_config_type()
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
@@ -166,7 +191,7 @@ class Resource:
         else:
             self._config_type = self.CONFIG_TYPES.index(value)
 
-    def _find_config_type(self) -> int:
+    def _detect_config_type(self) -> int:
 
         if self.config_json.exists:
             return self.CONFIG_TYPES.index("json")
@@ -198,6 +223,10 @@ class Resource:
 
         return None
 
+    @config_file.setter
+    def config_file(self, value: str) -> None:
+        self._config_file = value
+
     def create_resource(self) -> None:
         """
         Creates the dataset
@@ -209,6 +238,14 @@ class Resource:
         return self.zfs.get_dataset(dataset_name)
 
     def get_or_create_dataset(self, name: str, **kwargs) -> libzfs.ZFSDataset:
+        """
+        Get or create a child dataset
+
+        Returns:
+
+            libzfs.ZFSDataset:
+                Existing or newly created ZFS Dataset
+        """
         dataset_name = f"{self.dataset_name}/{name}"
         return self.zfs.get_or_create_dataset(dataset_name, **kwargs)
 
@@ -226,6 +263,19 @@ class Resource:
 
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
+
+    def getstring(self, key):
+        """
+        Returns the resource propertiey string or '-'
+
+        Args:
+            key (string):
+                Name of the jail property to return
+        """
+        try:
+            return libiocage.lib.helpers.to_string(self.__getattribute__(key))
+        except AttributeError:
+            return "-"
 
 
 class DefaultResource(Resource):
@@ -296,205 +346,86 @@ class DefaultResource(Resource):
         return defaults
 
 
-class LaunchableResource(Resource):
+class ListableResource(list, Resource):
 
-    _rc_conf: libiocage.lib.RCConf.RCConf = None
-
-    def create_resource(self) -> None:
-        """
-        Creates the root dataset
-        """
-        Resource.create_resource(self)
-        self.zfs.create_dataset(self.root_dataset_name)
-
-    @property
-    def root_path(self):
-        return self.root_dataset.mountpoint
-
-    @property
-    def root_dataset(self) -> libzfs.ZFSDataset:
-        # ToDo: Memoize root_dataset
-        return self.get_dataset("root")
-
-    @property
-    def root_dataset_name(self) -> str:
-        return f"{self.dataset_name}/root"
-
-    @property
-    def dataset_name(self) -> str:
-        raise NotImplementedError(
-            "This needs to be implemented by the inheriting class"
-        )
-
-    @dataset_name.setter
-    def dataset_name(self, value: str) -> str:
-        raise NotImplementedError(
-            "This needs to be implemented by the inheriting class"
-        )
-
-    @property
-    def dataset(self) -> libzfs.ZFSDataset:
-        if self._dataset is None:
-            self._dataset = self.zfs.get_dataset(self.dataset_name)
-
-        return self._dataset
-
-    @dataset.setter
-    def dataset(self, value: libzfs.ZFSDataset):
-        self._set_dataset(value)
-
-    @property
-    def rc_conf(self) -> libiocage.lib.RCConf.RCConf:
-        if self._rc_conf is None:
-            self._rc_conf = libiocage.lib.RCConf.RCConf(
-                resource=self,
-                logger=self.logger
-            )
-        return self._rc_conf
-
-
-class JailResource(LaunchableResource):
-
-    _jail: 'libiocage.lib.Jail.JailGenerator' = None
-    _fstab: libiocage.lib.Fstab.Fstab = None
+    _filters: 'libiocage.lib.Filter.Terms' = None
 
     def __init__(
         self,
-        host: 'libiocage.lib.Host.HostGenerator',
-        jail: 'libiocage.lib.Jail.JailGenerator'=None,
-        **kwargs
+        dataset: libzfs.ZFSDataset=None,
+        filters: 'libiocage.lib.Filter.Terms'=None,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        zfs: 'libiocage.lib.ZFS.ZFS'=None,
     ) -> None:
 
-        self.__jails_dataset_name = host.datasets.jails.name
-        self.host = libiocage.lib.helpers.init_host(self, host)
-
-        self._jail = jail
+        list.__init__(self, [])
 
         Resource.__init__(
             self,
-            **kwargs
+            config_type=None,
+            dataset=dataset,
+            logger=logger,
+            zfs=zfs
         )
 
-    @property
-    def jail(self) -> 'libiocage.lib.Jail.JailGenerator':
-        """
-        Jail instance that belongs to the resource
+        self.filters = filters
 
-        Usually the resource becomes inherited from the jail itself.
-        It can still be used linked to a foreign jail by passing jail as
-        named attribute to the __init__ function
-        """
-        if self._jail is not None:
-            return self._jail
+    def __iter__(self):
 
-        elif isinstance(self, libiocage.lib.Jail.JailGenerator):
-            return self
+        for child_dataset in self.dataset.children:
 
-        raise Exception(
-            "Resource is not a valid jail itself and has no linked jail"
-        )
+            name = self._get_asset_name_from_dataset(child_dataset)
+            if self._filters.match_key("name", name) is not True:
+                # Skip all jails that do not even match the name
+                continue
 
-    @property
-    def fstab(self) -> libiocage.lib.Fstab.Fstab:
-        if self._fstab is None:
-            self._fstab = libiocage.lib.Fstab.Fstab(
-                jail=self.jail,
-                release=self.jail.release,
-                logger=self.logger,
-                host=self.jail.host
-            )
-        return self._fstab
+            # ToDo: Do not load jail if filters do not require to
+            resource = self._get_resource_from_dataset(child_dataset)
+            if self._filters.match_resource(resource):
+                yield resource
 
-    @property
-    def dataset_name(self) -> str:
-        """
-        Name of the jail base ZFS dataset
-
-        If the resource has no dataset or dataset_name assigned yet,
-        the jail id is used to find name the dataset
-        """
-        try:
-            return self._assigned_dataset_name
-        except:
-            pass
-
-        jail_id = self.jail.config["id"]
-        if jail_id is None:
-            raise libiocage.lib.errors.JailUnknownIdentifier()
-
-        return f"{self.__jails_dataset_name}/{jail_id}"
-
-    @dataset_name.setter
-    def dataset_name(self, value: str):
-        self._dataset_name = value
-
-
-class ReleaseResource(LaunchableResource):
-
-    _release: 'libiocage.lib.Release.ReleaseGenerator' = None
-
-    def __init__(
+    def _get_asset_name_from_dataset(
         self,
-        host: 'libiocage.lib.Host.HostGenerator',
-        release: 'libiocage.lib.Release.ReleaseGenerator'=None,
+        dataset: libzfs.ZFSDataset
+    ) -> str:
+        """
+        Returns the last fragment of a dataset's name
+
+        Example:
+            /iocage/jails/foo -> foo
+        """
+
+        return dataset.name.split("/").pop()
+
+    def _get_resource_from_dataset(
+        self,
+        dataset: libzfs.ZFSDataset
+    ) -> typing.Generator[Resource, None, None]:
+
+        return self._create_resource_instance(dataset)
+
+    @property
+    def filters(self):
+        return self._filters
+
+    @filters.setter
+    def filters(
+        self,
+        value: typing.Iterable[typing.Union['libiocage.lib.Filter.Term', str]]
+    ):
+
+        if isinstance(value, libiocage.lib.Filter.Terms):
+            self._filters = value
+        else:
+            self._filters = libiocage.lib.Filter.Terms(value)
+
+    def _create_resource_instance(
+        self,
+        dataset: libzfs.ZFSDataset,
+        *args,
         **kwargs
-    ) -> None:
+    ):
 
-        self.__releases_dataset_name = host.datasets.releases.name
-        self.__base_dataset_name = host.datasets.base.name
-        self.host = libiocage.lib.helpers.init_host(self, host)
-
-        Resource.__init__(
-            self,
-            **kwargs
+        raise NotImplementedError(
+            "This needs to be implemented by the inheriting class"
         )
-
-        self._release = release
-
-    @property
-    def release(self) -> 'libiocage.lib.Release.ReleaseGenerator':
-        """
-        Release instance that belongs to the resource
-
-        Usually the resource becomes inherited from the Release itself.
-        It can still be used linked to a foreign ReleaseGenerator by passing
-        release as named attribute to the __init__ function
-        """
-        if self._release is not None:
-            return self._release
-
-        elif isinstance(self, libiocage.lib.Release.ReleaseGenerator):
-            return self
-
-        raise Exception(
-            "Resource is not a valid release itself and has no linked release"
-        )
-
-    @property
-    def dataset_name(self) -> str:
-        """
-        Name of the release base ZFS dataset
-
-        If the resource has no dataset or dataset_name assigned yet,
-        the release id is used to find name the dataset
-        """
-        try:
-            return self._assigned_dataset_name
-        except:
-            pass
-
-        return f"{self.__releases_dataset_name}/{self.release.name}"
-
-    @dataset_name.setter
-    def dataset_name(self, value: str):
-        self._dataset_name = value
-
-    @property
-    def base_dataset(self) -> libzfs.ZFSDataset:
-        # base datasets are created from releases. required to start
-        # zfs-basejails
-        return self.zfs.get_dataset(self.base_dataset_name)
-
-    @property
-    def base_dataset_name(self) -> str:
-        return f"{self.__base_dataset_name}/{self.release.name}/root"

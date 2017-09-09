@@ -22,24 +22,40 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import libiocage.lib.Release
+import libiocage.lib.Resource
 import libiocage.lib.helpers
 
+# MyPy
+import libzfs
 
-class Releases:
-    def __init__(self, host=None, zfs=None, logger=None):
+
+class ReleasesGenerator(libiocage.lib.Resource.ListableResource):
+
+    _class_release = libiocage.lib.Release.ReleaseGenerator
+
+    def __init__(
+        self,
+        filters: 'libiocage.lib.Filter.Terms'=None,
+        host=None,
+        zfs=None,
+        logger=None
+    ) -> None:
+
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
         self.host = libiocage.lib.helpers.init_host(self, host)
 
-    @property
-    def dataset(self):
-        return self.host.datasets.releases
+        libiocage.lib.Resource.ListableResource.__init__(
+            self,
+            dataset=self.host.datasets.releases,
+            filters=filters
+        )
 
     @property
     def local(self):
         release_datasets = self.dataset.children
         return list(map(
-            lambda x: libiocage.lib.Release.Release(
+            lambda x: self._class_release(
                 name=x.name.split("/").pop(),
                 logger=self.logger,
                 host=self.host,
@@ -52,6 +68,26 @@ class Releases:
     def available(self):
         return self.host.distribution.releases
 
-    @property
-    def releases_folder(self):
-        return self.dataset.mountpoint
+    def _create_resource_instance(
+        self,
+        dataset: libzfs.ZFSDataset,
+        *args,
+        **kwargs
+    ) -> 'libiocage.lib.Release.ReleaseGenerator':
+
+        kwargs["name"] = self._get_asset_name_from_dataset(dataset)
+        kwargs["logger"] = self.logger
+        kwargs["host"] = self.host
+        kwargs["zfs"] = self.zfs
+        return self._class_release(*args, **kwargs)
+
+    def _create_instance(self, *args, **kwargs):
+        return self._class_release(*args, **kwargs)
+
+
+class Releases(ReleasesGenerator):
+
+    _class_release = libiocage.lib.Release.Release
+
+    def _create_instance(self, *args, **kwargs):
+        return libiocage.lib.Release.Release(*args, **kwargs)
