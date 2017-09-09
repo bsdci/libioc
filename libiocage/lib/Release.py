@@ -295,12 +295,6 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
                 raise
 
             yield releaseExtractionEvent.end()
-            yield releaseConfigurationEvent.begin()
-
-            self._create_default_rcconf()
-
-            yield releaseConfigurationEvent.end()
-
             release_changed = True
 
             yield fetchReleaseEvent.end()
@@ -314,6 +308,13 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
             self.logger.verbose(
                 "Release was already downloaded. Skipping download."
             )
+
+        yield releaseConfigurationEvent.begin()
+        if self._set_default_rc_conf() is True:
+            yield releaseConfigurationEvent.end()
+            release_changed = True
+        else:
+            yield releaseConfigurationEvent.skip()
 
         if fetch_updates is True:
             for event in ReleaseGenerator.fetch_updates(self):
@@ -750,12 +751,12 @@ class ReleaseGenerator(libiocage.lib.Resource.ReleaseResource):
                     f"Asset {asset} was extracted to {self.root_dir}"
                 )
 
-    def _create_default_rcconf(self):
+    def _set_default_rc_conf(self) -> bool:
 
         for key, value in self.DEFAULT_RC_CONF_SERVICES.items():
-            self.rc_conf[key] = value
+            self.rc_conf[f"{key}_enable"] = value
 
-        self.rc_conf.save()
+        return self.rc_conf.save()
 
     def _generate_default_rcconf_line(self, service_name):
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:

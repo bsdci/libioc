@@ -314,7 +314,10 @@ class JailConfig(dict, object):
 
     def _set_vnet(self, value, **kwargs):
         self.data["vnet"] = libiocage.lib.helpers.to_string(
-            value, true="on", false="off")
+            value,
+            true="on",
+            false="off"
+        )
 
     def _get_jail_zfs_dataset(self):
         try:

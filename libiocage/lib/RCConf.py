@@ -67,6 +67,10 @@ class RCConf(dict):
             self._file = value
             self._read_file()
 
+    @property
+    def changed(self) -> bool:
+        return (self._file_content_changed is True)
+
     def _read_file(
         self,
         silent: bool=False,
@@ -127,13 +131,14 @@ class RCConf(dict):
         self.logger.spam(f"rc.conf was read from {self.path}")
         return data
 
-    def save(self):
+    def save(self) -> bool:
 
-        if self._file_content_changed is False:
+        if self.changed is False:
             self.logger.debug("rc.conf was not modified - skipping write")
-            return
+            return False
 
         with open(self.path, "w") as rcconf:
+
             output = ucl.dump(self, ucl.UCL_EMIT_CONFIG)
             output = output.replace(" = \"", "=\"")
             output = output.replace("\";\n", "\"\n")
@@ -146,6 +151,7 @@ class RCConf(dict):
 
             self._file_content_changed = False
             self.logger.spam(output[:-1], indent=1)
+            return True
 
     def __setitem__(self, key, value):
         val = libiocage.lib.helpers.to_string(
@@ -154,7 +160,14 @@ class RCConf(dict):
             false="NO"
         )
 
+        try:
+            if self[key] == value:
+                return
+        except KeyError:
+            pass
+
         dict.__setitem__(self, key, val)
+        self._file_content_changed = True
 
     def __getitem__(self, key):
         val = dict.__getitem__(self, key)
