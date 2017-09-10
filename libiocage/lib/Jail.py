@@ -192,6 +192,7 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
             self._configure_routes()
             yield jailVnetConfigurationEvent.end()
 
+        self._limit_resources()
         self._configure_nameserver()
 
         if self.config["jail_zfs"] is True:
@@ -663,6 +664,50 @@ class JailGenerator(libiocage.lib.Resource.JailResource):
 
     def _configure_nameserver(self) -> None:
         self.config["resolver"].apply(self)
+
+    def _limit_resources(self) -> None:
+
+        for resource in self._resource_limit_config_keys:
+            try:
+                limit, action = self.config[resource].split(":", maxsplit=1)
+                command = [
+                    "/usr/bin/rctl",
+                    "-a",
+                    f"jail:{self.identifier}:{resource}:{action}={limit}"
+                ]
+                libiocage.lib.helpers.exec(command, logger=self.logger)
+            except KeyError:
+                pass
+
+    @property
+    def _resource_limit_config_keys(self):
+        return [
+            "cputime",
+            "datasize",
+            "stacksize",
+            "coredumpsize",
+            "memoryuse",
+            "memorylocked",
+            "maxproc",
+            "openfiles",
+            "vmemoryuse",
+            "pseudoterminals",
+            "swapuse",
+            "nthr",
+            "msgqqueued",
+            "msgqsize",
+            "nmsgq",
+            "nsem",
+            "nsemop",
+            "nshm",
+            "shmsize",
+            "wallclock",
+            "pcpu",
+            "readbps",
+            "writebps",
+            "readiops",
+            "writeiops"
+        ]
 
     def _configure_routes(self) -> None:
 
