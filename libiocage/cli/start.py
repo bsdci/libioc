@@ -42,17 +42,21 @@ def cli(ctx, rc, jails):
     """
 
     logger = ctx.parent.logger
+    start_args = {
+        "logger": logger,
+        "print_function": ctx.parent.print_events
+    }
 
     if rc is True:
         if len(jails) > 0:
             logger.error("Cannot use --rc and jail selectors simultaniously")
             exit(1)
-        autostart(logger=logger)
+        autostart(**start_args)
     else:
-        start_jails(jails, logger=logger)
+        normal(jails, **start_args)
 
 
-def autostart(logger):
+def autostart(logger, print_function):
 
     filters = ("boot=yes",)
 
@@ -61,27 +65,32 @@ def autostart(logger):
         filters=filters
     )
 
+    # sort jails by their priority
     jails = sorted(
         list(ioc_jails),
         key=lambda x: x.config["priority"]
     )
 
-    print(jails)
+    start_jails(jails, logger=logger, print_function=print_function)
 
 
-def start_jails(filters):
+def normal(filters, logger, print_function):
 
-    
-    ioc_jails = libiocage.lib.Jails.JailsGenerator(
+    jails = libiocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=filters
     )
 
+    start_jails(jails, logger=logger, print_function=print_function)
+
+
+def start_jails(jails, logger, print_function):
+
     changed_jails = []
     failed_jails = []
-    for jail in ioc_jails:
+    for jail in jails:
         try:
-            ctx.parent.print_events(jail.start())
+            print_function(jail.start())
 
         except Exception:
             failed_jails.append(jail)
