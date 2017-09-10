@@ -214,6 +214,12 @@ class JailConfig(dict, object):
         else:
             self.data["type"] = value
 
+    def _get_priority(self) -> int:
+        return int(self.data["priority"])
+
+    def _set_priority(self, value: typing.Union[int, str]):
+        self.data["priority"] = str(value)
+
     def _get_tags(self) -> typing.List[str]:
         return libiocage.lib.helpers.parse_list(self.data["tags"])
 

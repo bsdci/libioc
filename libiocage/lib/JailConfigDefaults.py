@@ -33,6 +33,7 @@ class JailConfigDefaults(dict):
         "id": None,
         "release": None,
         "boot": False,
+        "priority": 0,
         "legacy": False,
         "priority": 0,
         "basejail": False,

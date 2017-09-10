@@ -42,9 +42,39 @@ def cli(ctx, rc, jails):
     """
 
     logger = ctx.parent.logger
+
+    if rc is True:
+        if len(jails) > 0:
+            logger.error("Cannot use --rc and jail selectors simultaniously")
+            exit(1)
+        autostart(logger=logger)
+    else:
+        start_jails(jails, logger=logger)
+
+
+def autostart(logger):
+
+    filters = ("boot=yes",)
+
     ioc_jails = libiocage.lib.Jails.JailsGenerator(
         logger=logger,
-        filters=jails
+        filters=filters
+    )
+
+    jails = sorted(
+        list(ioc_jails),
+        key=lambda x: x.config["priority"]
+    )
+
+    print(jails)
+
+
+def start_jails(filters):
+
+    
+    ioc_jails = libiocage.lib.Jails.JailsGenerator(
+        logger=logger,
+        filters=filters
     )
 
     changed_jails = []
