@@ -22,7 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import re
-from typing import Iterable, List, Union
+from typing import Any, Iterable, List, Union
 
 import libiocage.lib.errors
 import libiocage.lib.Resource
@@ -59,9 +59,11 @@ class Term(list):
         self,
         resource: 'libiocage.lib.Resource.Resource'
     ) -> bool:
-        return self.matches(resource.getstring(self.key))
+        value = resource.get(self.key)
 
-    def matches(self, value: str, short: bool=False) -> bool:
+        return self.matches(value)
+
+    def matches(self, value: Any, short: bool=False) -> bool:
         """
         Returns True if the value matches the term
 
@@ -75,9 +77,17 @@ class Term(list):
                 to match a jail's shortname as well. This is required for
                 selecting jails with UUIDs by the first part of the name
         """
+
+        # match any item of a list
+        if (value is not None) and isinstance(value, list):
+            # `short` not required here
+            return any(map(self.matches, value))
+
+        input_value = libiocage.lib.helpers.to_string(value)
+
         for filter_value in self:
 
-            if match_filter(value, filter_value):
+            if match_filter(input_value, filter_value):
                 return True
 
             if short is False:
@@ -87,7 +97,9 @@ class Term(list):
             has_humanreadble_length = (len(filter_value) == 8)
             has_no_globs = not self._filter_string_has_globs(filter_value)
             if (has_humanreadble_length and has_no_globs) is True:
-                shortname = libiocage.lib.helpers.to_humanreadable_name(value)
+                shortname = libiocage.lib.helpers.to_humanreadable_name(
+                    input_value
+                )
                 if match_filter(shortname, filter_value):
                     return True
 
