@@ -77,6 +77,8 @@ def cli(ctx, force, release, recursive, download, filters):
 
     for item in resources:
 
+        old_mountpoint = item.dataset.mountpoint
+
         # ToDo: generalize and move this Method from Jail to LaunchableResource
         if isinstance(item, libiocage.lib.Jail.JailGenerator):
             try:
@@ -89,7 +91,7 @@ def cli(ctx, force, release, recursive, download, filters):
                 continue
 
         item.destroy()
-        logger.screen(f"{item.dataset.mountpoint} destroyed")
+        logger.screen(f"{old_mountpoint} destroyed")
 
     if len(failed_items) > 0:
         exit(1)
