@@ -275,6 +275,7 @@ class JailGenerator(JailResource):
         if quick is False:
             self._save_autoconfig()
 
+        self._run_hook("prestart")
         self._launch_jail()
 
         yield jailLaunchEvent.end()
@@ -300,6 +301,8 @@ class JailGenerator(JailResource):
             self._start_services()
             yield jailServicesStartEvent.end()
 
+        self._run_hook("poststart")
+
     @property
     def basejail_backend(self):
 
@@ -313,6 +316,24 @@ class JailGenerator(JailResource):
             return libiocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
         return None
+
+    def _run_hook(self, hook_name: str):
+
+        key = f"exec_{hook_name}"
+        value = self.config[key]
+
+        if value == "/usr/bin/true":
+            return
+
+        self.logger.verbose(
+            f"Running {hook_name} hook for {self.humanreadable_name}"
+        )
+
+        return libiocage.lib.helpers.exec(
+            value.split(" "),
+            logger=self.logger,
+            env=self.env
+        )
 
     def _start_services(self):
         command = self.config["exec_start"].strip().split()
@@ -342,6 +363,8 @@ class JailGenerator(JailResource):
         jailDestroyEvent = events.JailDestroy(self)
         jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
         jailMountTeardownEvent = events.JailMountTeardown(self)
+
+        self._run_hook("prestop")
 
         yield jailDestroyEvent.begin()
         self._destroy_jail()
@@ -399,6 +422,12 @@ class JailGenerator(JailResource):
     def _force_stop(self):
 
         successful = True
+
+        try:
+            self._run_hook("prestop")
+        except:
+            successful = False
+            self.logger.warn("pre-stop script failed")
 
         try:
             self._destroy_jail()
@@ -523,7 +552,10 @@ class JailGenerator(JailResource):
         command = ["/usr/sbin/jexec", self.identifier] + command
 
         return libiocage.lib.helpers.exec(
-            command, logger=self.logger, **kwargs
+            command,
+            logger=self.logger,
+            env=self.env,
+            **kwargs
         )
 
     def passthru(self, command):
@@ -670,9 +702,6 @@ class JailGenerator(JailResource):
             f"allow.mount.zfs={self.config['allow_mount_zfs']}",
             f"allow.quotas={self.config['allow_quotas']}",
             f"allow.socket_af={self.config['allow_socket_af']}",
-            f"exec.prestart={self.config['exec_prestart']}",
-            f"exec.poststart={self.config['exec_poststart']}",
-            f"exec.prestop={self.config['exec_prestop']}",
             f"exec.stop={self.config['exec_stop']}",
             f"exec.clean={self.config['exec_clean']}",
             f"exec.timeout={self.config['exec_timeout']}",
@@ -982,6 +1011,18 @@ class JailGenerator(JailResource):
             return int(self.jail_state["jid"])
         except (TypeError, AttributeError, KeyError):
             return None
+
+    @property
+    def env(self):
+        """
+        Environment variables for hook scripts
+        """
+        jail_env = os.environ.copy()
+
+        for prop in self.config.all_properties:
+            jail_env[prop] = self.getstring(prop)
+
+        return jail_env
 
     @property
     def identifier(self):
