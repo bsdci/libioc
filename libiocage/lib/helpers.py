@@ -97,7 +97,7 @@ def init_logger(
             return new_logger
 
 
-def exec(command, logger=None, ignore_error=False):
+def exec(command, logger=None, ignore_error=False, **subprocess_args):
     if isinstance(command, str):
         command = [command]
 
@@ -106,11 +106,13 @@ def exec(command, logger=None, ignore_error=False):
     if logger:
         logger.log(f"Executing: {command_str}", level="spam")
 
+    subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
+    subprocess_args["stderr"] = subprocess_args.get("stderr", subprocess.PIPE)
+
     child = subprocess.Popen(
         command,
         shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        **subprocess_args
     )
 
     stdout, stderr = child.communicate()
