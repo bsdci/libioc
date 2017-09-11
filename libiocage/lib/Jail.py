@@ -25,6 +25,7 @@ import typing
 import os
 import subprocess
 import uuid
+import shlex
 
 import libiocage.lib.DevfsRules
 import libiocage.lib.Host
@@ -329,8 +330,12 @@ class JailGenerator(JailResource):
             f"Running {hook_name} hook for {self.humanreadable_name}"
         )
 
+        lex = shlex.shlex(value)
+        lex.whitespace_split = True
+        command = list(lex)  # type: ignore
+
         return libiocage.lib.helpers.exec(
-            value.split(" "),
+            command,
             logger=self.logger,
             env=self.env
         )
