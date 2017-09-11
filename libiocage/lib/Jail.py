@@ -1020,7 +1020,8 @@ class JailGenerator(JailResource):
         jail_env = os.environ.copy()
 
         for prop in self.config.all_properties:
-            jail_env[prop] = self.getstring(prop)
+            prop_name = f"IOCAGE_{prop.upper()}"
+            jail_env[prop_name] = self.getstring(prop)
 
         return jail_env
 
