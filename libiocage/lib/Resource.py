@@ -264,6 +264,12 @@ class Resource:
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 
+    def get(self, key):
+        try:
+            return self.__getattribute__(key)
+        except AttributeError:
+            return None
+
     def getstring(self, key):
         """
         Returns the resource propertiey string or '-'
@@ -272,10 +278,10 @@ class Resource:
             key (string):
                 Name of the jail property to return
         """
-        try:
-            return libiocage.lib.helpers.to_string(self.__getattribute__(key))
-        except AttributeError:
-            return "-"
+        return libiocage.lib.helpers.to_string(
+            self.get(key),
+            none="-"
+        )
 
 
 class DefaultResource(Resource):
