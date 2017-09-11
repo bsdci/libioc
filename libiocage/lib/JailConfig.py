@@ -233,6 +233,37 @@ class JailConfig(dict, object):
     def _set_priority(self, value: typing.Union[int, str]):
         self.data["priority"] = str(value)
 
+    # legacy support
+    def _get_tag(self) -> str:
+
+        if self._has_legacy_tag is True:
+            return self.data["tag"]
+
+        try:
+            return self["tags"][0]
+        except KeyError:
+            return None
+
+    def _set_tag(self, value: str, **kwargs):
+
+        if (self._has_legacy_tag is True) or ("tags" not in self.data.keys()):
+            # store as deprecated `tag` for downwards compatibility
+            # setting `tags` overrides usage of the deprecated `tag` property
+            self.data["tag"] = value
+            return
+
+        tags = self["tags"]
+        if value in tags:
+            # remove the tag if it was existing
+            del tags[tags.index(value)]
+
+        tags.insert(0, value)
+        self.data["tags"] = libiocage.lib.helpers.to_string(tags)
+
+    @property
+    def _has_legacy_tag(self):
+        return "tag" in self.data.keys()
+
     def _get_tags(self) -> typing.List[str]:
         return libiocage.lib.helpers.parse_list(self.data["tags"])
 
@@ -244,6 +275,9 @@ class JailConfig(dict, object):
 
         data = libiocage.lib.helpers.to_string(value)
         self.data["tags"] = data
+
+        if self._has_legacy_tag is True:
+            del self.data["tag"]
 
     def _get_basejail(self) -> bool:
         return libiocage.lib.helpers.parse_bool(self.data["basejail"])
