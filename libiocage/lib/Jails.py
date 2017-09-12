@@ -67,6 +67,9 @@ class JailsGenerator(libiocage.lib.Resource.ListableResource):
         **kwargs
     ) -> libiocage.lib.Jail.JailGenerator:
 
+        kwargs["data"] = {
+            "id": dataset.name.split("/").pop()
+        }
         kwargs["dataset"] = dataset
         kwargs["logger"] = self.logger
         kwargs["host"] = self.host

@@ -24,6 +24,7 @@
 """stop module for the cli."""
 import click
 
+import libiocage.lib.errors
 import libiocage.lib.Jails
 import libiocage.lib.Logger
 
@@ -55,7 +56,7 @@ def cli(ctx, rc, log_level, force, jails):
     for jail in ioc_jails:
         try:
             ctx.parent.print_events(jail.stop(force=force))
-        except:
+        except libiocage.lib.errors.IocageException:
             failed_jails.append(jail)
             continue
 

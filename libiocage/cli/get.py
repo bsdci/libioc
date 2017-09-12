@@ -24,6 +24,7 @@
 """get module for the cli."""
 import click
 
+import libiocage.lib.errors
 import libiocage.lib.Host
 import libiocage.lib.Jail
 import libiocage.lib.Logger
@@ -56,15 +57,13 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
     if jail == "":
         prop = ""
 
-    jail_identifier = jail
-    jail = libiocage.lib.Jail.Jail(
-        jail_identifier,
-        host=host,
-        logger=logger
-    )
-
-    if not jail.exists:
-        logger.error(f"Jail '{jail.name}' does not exist")
+    try:
+        ioc_jail = libiocage.lib.Jail.Jail(
+            jail,
+            host=host,
+            logger=logger
+        )
+    except libiocage.lib.errors.JailNotFound as e:
         exit(1)
 
     if _all is True:
@@ -73,15 +72,15 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
     if prop == "all":
         prop = None
 
-    if (prop is None) and (jail_identifier == "") and not _all:
+    if (prop is None) and (jail == "") and not _all:
         logger.error("Missing arguments property and jail")
         exit(1)
-    elif (prop is not None) and (jail_identifier == ""):
+    elif (prop is not None) and (jail == ""):
         logger.error("Missing argument property name or -a/--all argument")
         exit(1)
 
     if prop:
-        value = _lookup_jail_value(jail, prop)
+        value = _lookup_jail_value(ioc_jail, prop)
 
         if value:
             print(value)
@@ -90,9 +89,9 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
             logger.error(f"Unknown property '{prop}'")
             exit(1)
 
-    for key in jail.config.all_properties:
+    for key in ioc_jail.config.all_properties:
         if (prop is None) or (key == prop):
-            value = jail.config.get_string(key)
+            value = ioc_jail.config.get_string(key)
             print_property(key, value)
 
 

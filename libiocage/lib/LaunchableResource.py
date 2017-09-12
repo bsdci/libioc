@@ -59,7 +59,7 @@ class LaunchableResource(libiocage.lib.Resource.Resource):
         )
 
     @dataset_name.setter
-    def dataset_name(self, value: str) -> str:
+    def dataset_name(self, value: str) -> None:
         raise NotImplementedError(
             "This needs to be implemented by the inheriting class"
         )
