@@ -39,7 +39,7 @@ def cli(ctx, jail, name):
     """
 
     logger = ctx.parent.logger
-    try :
+    try:
         ioc_jail = libiocage.lib.Jail.Jail(jail, logger=logger)
         ioc_jail.rename(name)
     except libiocage.lib.errors.IocageException:

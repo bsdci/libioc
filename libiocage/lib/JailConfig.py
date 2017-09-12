@@ -37,6 +37,16 @@ import libiocage.lib.helpers
 import libiocage.lib.Jail
 
 
+class SpecialProperties(dict):
+
+    def __getitem__(self, key: str) -> typing.Any:
+
+        if key not in self.keys():
+            return None
+
+        return dict.__getitem__(key)
+
+
 class JailConfig(dict, object):
     """
     Represents an iocage jail's configuration
@@ -71,7 +81,7 @@ class JailConfig(dict, object):
 
     """
 
-    special_properties: dict = {}
+    special_properties: SpecialProperties = SpecialProperties({})
     data: dict = None
     legacy: bool = None
     jail: 'libiocage.lib.Jail.JailGenerator' = None
@@ -136,7 +146,20 @@ class JailConfig(dict, object):
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
     def read(self) -> None:
-        self.clone(self.jail.read_config())
+
+        data = self.jail.read_config()
+
+        # ignore name/id/uuid in config if the jail already has a name
+        if self["id"] is not None:
+            data_keys = data.keys()
+            if "name" in data_keys:
+                del data["name"]
+            if "id" in data_keys:
+                del data["id"]
+            if "uuid" in data_keys:
+                del data["uuid"]
+
+        self.clone(data)
 
     def update_special_property(self, name: str) -> None:
 
@@ -194,8 +217,6 @@ class JailConfig(dict, object):
                 self.data["id"] = str(uuid.UUID(name))  # legacy support
             except:
                 raise libiocage.lib.errors.InvalidJailName(logger=self.logger)
-
-        self.logger.spam(f"Set jail name to {name}")
 
     def _get_name(self):
         return self._get_id()
@@ -538,7 +559,7 @@ class JailConfig(dict, object):
 
         try:
             return self.__getitem_user(key)
-        except:
+        except KeyError:
             pass
 
         # fall back to default
