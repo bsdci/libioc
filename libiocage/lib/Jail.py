@@ -119,31 +119,13 @@ class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
     def dataset_name(self, value: str):
         self._dataset_name = value
 
-    def get(self, key):
+    def get(self, key: str) -> typing.Any:
         try:
             return self.jail.config[key]
-        except:
+        except KeyError:
             pass
 
-        try:
-            return self.resource.get(key)
-        except:
-            pass
-
-        return None
-
-    def getstring(self, key):
-        """
-        Returns a jail properties string or '-'
-
-        Args:
-            key (string):
-                Name of the jail property to return
-        """
-        return libiocage.lib.helpers.to_string(
-            self.get(key),
-            none="-"
-        )
+        return libiocage.lib.Resource.Resource.get(self, key)
 
 
 class JailGenerator(JailResource):

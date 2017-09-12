@@ -244,7 +244,7 @@ class JailConfig(dict, object):
         except KeyError:
             return None
 
-    def _set_tag(self, value: str, **kwargs):
+    def _set_tag(self, value: str, **kwargs) -> None:
 
         if (self._has_legacy_tag is True) or ("tags" not in self.data.keys()):
             # store as deprecated `tag` for downwards compatibility
@@ -261,7 +261,7 @@ class JailConfig(dict, object):
         self.data["tags"] = libiocage.lib.helpers.to_string(tags)
 
     @property
-    def _has_legacy_tag(self):
+    def _has_legacy_tag(self) -> bool:
         return "tag" in self.data.keys()
 
     def _get_tags(self) -> typing.List[str]:

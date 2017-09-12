@@ -26,6 +26,7 @@ import os.path
 
 import libzfs
 
+import libiocage.lib.Config
 import libiocage.lib.ConfigJSON
 import libiocage.lib.ConfigUCL
 import libiocage.lib.ConfigZFS
@@ -259,18 +260,17 @@ class Resource:
         return self.config_handler.read()
 
     @property
-    def config_handler(self):
-
+    def config_handler(self) -> libiocage.lib.Config.ConfigFile:
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 
-    def get(self, key):
+    def get(self, key: str) -> typing.Any:
         try:
             return self.__getattribute__(key)
         except AttributeError:
             return None
 
-    def getstring(self, key):
+    def getstring(self, key: str) -> str:
         """
         Returns the resource propertiey string or '-'
 
