@@ -109,15 +109,20 @@ class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
         except:
             pass
 
+        return self._dataset_name_from_jail_name
+
+    @dataset_name.setter
+    def dataset_name(self, value: str) -> None:
+        self._dataset_name = value
+
+    @property
+    def _dataset_name_from_jail_name(self) -> str:
+
         jail_id = self.jail.config["id"]
         if jail_id is None:
             raise libiocage.lib.errors.JailUnknownIdentifier()
 
         return f"{self.__jails_dataset_name}/{jail_id}"
-
-    @dataset_name.setter
-    def dataset_name(self, value: str):
-        self._dataset_name = value
 
     def get(self, key: str) -> typing.Any:
         try:
@@ -409,11 +414,18 @@ class JailGenerator(JailResource):
 
         current_id = self.config["id"]
         dataset = self.dataset
-        self.config["name"] = new_name  # validates new_name
+        current_dataset_name = dataset.name
+
+        self.config["id"] = new_name  # validates new_name
+        self.logger.debug(f"Renaming jail {current_id} to {new_name}")
         try:
-            dataset.rename(self.dataset_name)
+            new_dataset_name = self._dataset_name_from_jail_name
+            dataset.rename(new_dataset_name)
+            self.logger.verbose(
+                f"Dataset {current_dataset_name} renamed to {new_dataset_name}"
+            )
         except:
-            self.config["name"] = current_id
+            self.config["id"] = current_id
             raise
 
     def _force_stop(self):
@@ -741,6 +753,10 @@ class JailGenerator(JailResource):
         networks = []
 
         nics = self.config["interfaces"]
+
+        if nics is None:
+            return []
+
         for nic in nics:
 
             bridges = list(self.config["interfaces"][nic])
