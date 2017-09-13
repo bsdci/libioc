@@ -161,7 +161,7 @@ def validate_name(name: str) -> bool:
     return bool(_validate_name.fullmatch(name))
 
 
-def parse_none(data) -> str:
+def parse_none(data: typing.Any) -> None:
     if data is None:
         return None
 
