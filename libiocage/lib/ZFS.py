@@ -49,4 +49,4 @@ class ZFS(libzfs.ZFS):
         for pool in self.pools:
             if pool.name == pool_name:
                 return pool
-        return None
+        raise
