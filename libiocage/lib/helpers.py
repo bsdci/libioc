@@ -46,7 +46,7 @@ def init_zfs(
     if (zfs is not None) and isinstance(zfs, libiocage.lib.ZFS.ZFS):
         object.__setattr__(self, 'zfs', zfs)
     else:
-        new_zfs = libiocage.lib.ZFS.get_zfs(logger=self.logger)
+        new_zfs = libiocage.lib.ZFS.get_zfs()
         object.__setattr__(self, 'zfs', new_zfs)
 
     try:
