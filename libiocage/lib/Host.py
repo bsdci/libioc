@@ -40,8 +40,8 @@ class HostGenerator:
 
     _class_distribution = libiocage.lib.Distribution.DistributionGenerator
 
-    _devfs: 'libiocage.lib.DevfsRules.DevfsRules' = None
-    releases_dataset: libzfs.ZFSDataset = None
+    _devfs: 'libiocage.lib.DevfsRules.DevfsRules'
+    releases_dataset: libzfs.ZFSDataset
 
     def __init__(
         self,
