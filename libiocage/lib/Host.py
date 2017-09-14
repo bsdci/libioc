@@ -63,7 +63,7 @@ class HostGenerator:
             host=self,
             logger=self.logger
         )
-        self._defaults = defaults
+        self._defaults = defaults if defaults is not None else {}
 
     @property
     def defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
