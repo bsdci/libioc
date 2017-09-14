@@ -25,8 +25,8 @@ import typing
 
 import libiocage.lib.Config.Jail.Property
 
-# MyPy
-#import libiocage.lib.Config.Jail.BaseConfig  # noqa: F401
+init_property = libiocage.lib.Config.Jail.Property.init_property
+
 
 class JailConfigProperties(dict):
 
@@ -49,7 +49,7 @@ class JailConfigProperties(dict):
     ) -> typing.Any:
 
         if property_name not in self.keys():
-            self[property_name] = libiocage.lib.Config.Jail.Property.init_property(
+            self[property_name] = init_property(
                 property_name=property_name,
                 config=self.config,
                 logger=self.logger

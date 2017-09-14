@@ -3,17 +3,20 @@ import libiocage.lib.Config.Jail.Properties.Addresses
 import libiocage.lib.Config.Jail.Properties.Interfaces
 import libiocage.lib.Config.Jail.Properties.Resolver
 
-CLASSES: dict = {
-    "ip4_addr": libiocage.lib.Config.Jail.Properties.Addresses.JailConfigPropertyAddresses,
-    "ip6_addr": libiocage.lib.Config.Jail.Properties.Addresses.JailConfigPropertyAddresses,
-    "interfaces": libiocage.lib.Config.Jail.Properties.Interfaces.JailConfigPropertyInterfaces,
-    "resolver": libiocage.lib.Config.Jail.Properties.Resolver.JailConfigPropertyResolver
-}
+_Config = libiocage.lib.Config
 
-def init_property(property_name: str,**kwargs) -> typing.Union[
-    libiocage.lib.Config.Jail.Properties.Addresses.JailConfigPropertyAddresses,
-    libiocage.lib.Config.Jail.Properties.Interfaces.JailConfigPropertyInterfaces,
-    libiocage.lib.Config.Jail.Properties.Resolver.JailConfigPropertyResolver
+CLASSES: dict = dict(
+    ip4_addr=libiocage.lib.Config.Jail.Properties.Addresses.AddressesProp,
+    ip6_addr=libiocage.lib.Config.Jail.Properties.Addresses.AddressesProp,
+    interfaces=libiocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp,
+    resolver=libiocage.lib.Config.Jail.Properties.Resolver.ResolverProp
+)
+
+
+def init_property(property_name: str, **kwargs) -> typing.Union[
+    libiocage.lib.Config.Jail.Properties.Addresses.AddressesProp,
+    libiocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp,
+    libiocage.lib.Config.Jail.Properties.Resolver.ResolverProp
 ]:
 
     target_class = CLASSES[property_name]

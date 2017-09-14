@@ -25,6 +25,8 @@ import typing
 
 import libiocage.lib.helpers
 
+_ConfigType = 'libiocage.lib.Config.Jail.JailConfig.JailConfig'
+
 
 class BridgeSet(set):
 
@@ -49,9 +51,9 @@ class BridgeSet(set):
             pass
 
 
-class JailConfigPropertyInterfaces(dict):
+class InterfaceProp(dict):
 
-    config: 'libiocage.lib.Config.JailConfig.JailConfig'
+    config: _ConfigType  # type: ignore
     property_name: str = "interfaces"
 
     def __init__(

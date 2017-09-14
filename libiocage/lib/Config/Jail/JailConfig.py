@@ -22,8 +22,6 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import re
-import uuid
 
 import libiocage.lib.helpers
 import libiocage.lib.Config.Jail.BaseConfig
@@ -31,12 +29,14 @@ import libiocage.lib.Config.Jail.BaseConfig
 # MyPy
 import libiocage.lib.Jail
 
+_usp = libiocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property
+
 
 class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     legacy: bool = None
     jail: 'libiocage.lib.Jail.JailGenerator' = None
-    
+
     def __init__(
         self,
         data: dict={},
@@ -70,7 +70,7 @@ class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     def update_special_property(self, name: str) -> None:
 
-        libiocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property(
+        _usp(
             self,
             name=name
         )
@@ -79,7 +79,7 @@ class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
             rc_conf = self.jail.rc_conf
             rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
 
-    def _get_host_hostname(self):        
+    def _get_host_hostname(self):
         try:
             return self.data["host_hostname"]
         except KeyError:
@@ -95,5 +95,6 @@ class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
     @property
     def all_properties(self) -> list:
         jail_config_properties = set(super().all_properties)
-        default_config_properties = set(self.host.default_config.all_properties)
+        default_config_properties = set(
+            self.host.default_config.all_properties)
         return sorted(list(jail_config_properties | default_config_properties))

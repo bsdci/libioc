@@ -27,14 +27,14 @@ import libiocage.lib.helpers
 import libiocage.lib.Config.Jail
 
 
-class JailConfigPropertyResolver(list):
+class ResolverProp(list):
 
-    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
     property_name: str = "resolver"
 
     def __init__(
         self,
-        config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig',
+        config,  # type: ignore
         logger: 'libiocage.lib.Logger.Logger'=None,
         **kwargs
     ) -> None:

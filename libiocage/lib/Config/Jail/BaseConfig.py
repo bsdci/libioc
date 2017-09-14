@@ -64,7 +64,10 @@ class BaseConfig(dict):
 
     """
 
-    special_properties: 'libiocage.lib.Config.Jail.JailConfigProperties.JailConfigProperties'
+    special_properties: (
+        'libiocage.lib.Config.Jail.'
+        'JailConfigProperties.JailConfigProperties'
+    )
     data: dict = {}
 
     def __init__(
@@ -76,7 +79,8 @@ class BaseConfig(dict):
 
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
 
-        self.special_properties = libiocage.lib.Config.Jail.JailConfigProperties.JailConfigProperties(
+        tmp = libiocage.lib.Config.Jail.JailConfigProperties
+        self.special_properties = tmp.JailConfigProperties(  # type: ignore
             config=self,
             logger=self.logger
         )
@@ -460,8 +464,6 @@ class BaseConfig(dict):
             pass
 
         self.data[key] = parsed_value
-        
-            
 
     def set(self, key: str, value, **kwargs) -> bool:
         """
