@@ -35,6 +35,7 @@ import libiocage.lib.helpers
 # MyPy
 import libiocage.lib.Config.Jail.BaseConfig  # noqa: F401
 
+
 class HostGenerator:
 
     _class_distribution = libiocage.lib.Distribution.DistributionGenerator
@@ -71,7 +72,9 @@ class HostGenerator:
         return self._defaults
 
     @property
-    def default_config(self) -> 'libiocage.lib.Config.Jail.BaseConfig.BaseConfig':
+    def default_config(
+        self
+    ) -> 'libiocage.lib.Config.Jail.BaseConfig.BaseConfig':
         return self.defaults.config
 
     def _load_defaults(self) -> None:

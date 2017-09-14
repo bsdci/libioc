@@ -27,7 +27,7 @@ import libiocage.lib.helpers
 class Prototype:
 
     logger: 'libiocage.lib.Logger.Logger' = None
-    data: dict = {}  
+    data: dict = {}
 
     def __init__(
         self,

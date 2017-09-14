@@ -34,7 +34,7 @@ __rootcmd__ = True
 
 
 @click.command(
-    context_settings=dict( max_content_width=400, ),
+    context_settings=dict(max_content_width=400,),
     name="set",
     help="Sets the specified property."
 )

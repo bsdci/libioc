@@ -32,7 +32,7 @@ import libiocage.lib.Logger
 
 
 @click.command(
-    context_settings=dict( max_content_width=400, ),
+    context_settings=dict(max_content_width=400,),
     name="get",
     help="Gets the specified property."
 )
@@ -119,6 +119,7 @@ def print_property(key, value):
 
 def _lookup_config_value(resource, key: str) -> typing.Any:
     return libiocage.lib.helpers.to_string(resource.config[key])
+
 
 def _lookup_jail_value(resource, key: str) -> typing.Any:
 

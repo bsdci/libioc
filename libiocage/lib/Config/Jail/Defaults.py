@@ -22,8 +22,6 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import json
-import os.path
 
 import libiocage.lib.Config.Jail.BaseConfig
 
@@ -92,7 +90,6 @@ class JailConfigDefaults(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
         dict.clear(self)
         dict.__init__(self, JailConfigDefaults.DEFAULTS)
 
-
     def __setitem__(
         self,
         key: str,
@@ -103,7 +100,7 @@ class JailConfigDefaults(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
         out = super().__setitem__(key, value, **kwargs)
         self.user_properties.add(key)
         return out
-        
+
     @property
     def user_data(self) -> dict:
         data = {}

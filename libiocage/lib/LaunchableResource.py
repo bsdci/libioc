@@ -30,6 +30,7 @@ import libiocage.lib.Resource
 # MyPy
 import libiocage.lib.Config.Jail.JailConfig
 
+
 class LaunchableResource(libiocage.lib.Resource.Resource):
 
     _rc_conf: 'libiocage.lib.RCConf.RCConf' = None

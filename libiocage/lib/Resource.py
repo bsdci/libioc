@@ -303,7 +303,8 @@ class DefaultResource(Resource):
         zfs: 'libiocage.lib.ZFS.ZFS'=None
     ) -> None:
 
-        Resource.__init__(self, 
+        Resource.__init__(
+            self,
             dataset=dataset,
             logger=logger,
             zfs=zfs
@@ -313,8 +314,9 @@ class DefaultResource(Resource):
             logger=logger
         )
 
-    def save(self) ->  None:
+    def save(self) -> None:
         self.write_config(self.config.user_data)
+
 
 class ListableResource(list, Resource):
 
