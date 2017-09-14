@@ -21,35 +21,30 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import os.path
-import libzfs
-import libiocage.lib.DatasetConfig
+import typing
+
+import ucl
+
+import libiocage.lib.Config
+import libiocage.lib.Config.ConfigFile
+import libiocage.lib.Config.Resource.ResourceConfig
+import libiocage.lib.errors
 
 
-class ResourceConfig(libiocage.lib.DatasetConfig.DatasetConfig):
+class ConfigUCL(libiocage.lib.Config.ConfigFile.ConfigFile):
 
-    resource: 'libiocage.lib.Resource.Resource' = None  # type: ignore
+    config_type = "ucl"
 
-    def __init__(
-        self,
-        resource: 'libiocage.lib.Resource.Resource',  # type: ignore
-        **kwargs
-    ) -> None:
+    def map_input(self, data: typing.TextIO) -> dict:
+        return ucl.load(data)
 
-        self.resource = resource
-        libiocage.lib.DatasetConfig.DatasetConfig.__init__(self, **kwargs)
+    def map_output(self, data: dict) -> str:
+        # ToDo: Re-Implement UCL output
+        raise libiocage.lib.errors.MissingFeature("Writing ConfigUCL")
 
-    @property
-    def dataset(self) -> libzfs.ZFSDataset:
-        return self.resource.dataset
 
-    @property
-    def file(self) -> str:
-        return os.path.join(
-            self.resource.dataset.mountpoint,
-            self.resource.config_file
-        )
-
-    @file.setter
-    def file(self, value: str):
-        self.resource.config_file = value
+class ResourceConfigUCL(
+    ConfigUCL,
+    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig
+):
+    pass

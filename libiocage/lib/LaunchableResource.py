@@ -27,10 +27,13 @@ import libzfs
 import libiocage.lib.RCConf
 import libiocage.lib.Resource
 
+# MyPy
+import libiocage.lib.Config.Jail.JailConfig
 
 class LaunchableResource(libiocage.lib.Resource.Resource):
 
     _rc_conf: 'libiocage.lib.RCConf.RCConf' = None
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig' = None
 
     def create_resource(self) -> None:
         """

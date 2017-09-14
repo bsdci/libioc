@@ -21,42 +21,71 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
+
+import libiocage.lib.helpers
 
 
 class BridgeSet(set):
-    def __init__(self, jail_config=None):
-        self.jail_config = jail_config
+
+    def __init__(self, config=None):
+        self.config = config
         set.__init__(self)
 
     def add(self, value, notify=True):
         set.add(self, value)
         if notify:
-            try:
-                self.jail_config.update_special_property("interfaces")
-            except:
-                pass
+            self.notify()
 
     def remove(self, value, notify=True):
         set.remove(self, value)
         if notify:
-            try:
-                self.jail_config.update_special_property("interfaces")
-            except:
-                pass
+            self._notify()
+
+    def _notify(self):
+        try:
+            self.config.update_special_property("interfaces")
+        except:
+            pass
 
 
-class JailConfigInterfaces(dict):
-    def __init__(self, value, jail_config=None, property_name="interfaces"):
+class JailConfigPropertyInterfaces(dict):
+
+    config: 'libiocage.lib.Config.JailConfig.JailConfig'
+    property_name: str = "interfaces"
+
+    def __init__(
+        self,
+        config=None,
+        **kwargs
+    ) -> None:
+
         dict.__init__(self, {})
-        dict.__setattr__(self, 'jail_config', jail_config)
-        dict.__setattr__(self, 'property_name', property_name)
-        self.read(value)
+        self.config = config
 
-    def read(self, value):
-        nic_pairs = value.replace(",", " ").split(" ")
+    def set(
+        self,
+        data: typing.Union[str, typing.Dict[str, BridgeSet]]
+    ) -> None:
+
+        self.clear()
+
+        try:
+            libiocage.lib.helpers.parse_none(data)
+            return
+        except TypeError:
+            pass
+
+        if isinstance(data, dict):
+            dict.__init__(self, data)
+            return
+
+        nic_pairs = data.replace(",", " ").split(" ")
         for nic_pair in nic_pairs:
             jail_if, bridge_if = nic_pair.split(":", maxsplit=1)
             self.add(jail_if, bridge_if, notify=False)
+
+        self.__notify()
 
     def add(self, jail_if, bridges=None, notify=True):
 
@@ -92,19 +121,22 @@ class JailConfigInterfaces(dict):
 
     def __notify(self):
         try:
-            self.jail_config.update_special_property(self.property_name)
+            self.config.update_special_property(self.property_name)
         except:
             pass
 
     def __empty_prop(self, key):
 
-        prop = BridgeSet(self.jail_config)
+        prop = BridgeSet(self.config)
         dict.__setitem__(self, key, prop)
         return prop
 
-    def __str__(self):
+    def to_string(self, value: dict) -> str:
         out = []
-        for jail_if in self:
+        for jail_if in value:
             for bridge_if in self[jail_if]:
                 out.append(f"{jail_if}:{bridge_if}")
         return " ".join(out)
+
+    def __str__(self):
+        return self.to_string(value=self)

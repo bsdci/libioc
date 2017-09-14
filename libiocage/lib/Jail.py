@@ -29,7 +29,7 @@ import shlex
 
 import libiocage.lib.DevfsRules
 import libiocage.lib.Host
-import libiocage.lib.JailConfig
+import libiocage.lib.Config.Jail.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
 import libiocage.lib.RCConf
@@ -126,7 +126,8 @@ class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
 
     def get(self, key: str) -> typing.Any:
         try:
-            return self.jail.config[key]
+            out = self.jail.config[key]
+            return out
         except KeyError:
             pass
 
@@ -178,7 +179,6 @@ class JailGenerator(JailResource):
 
     _class_storage = libiocage.lib.Storage.Storage
 
-    config: libiocage.lib.JailConfig.JailConfig = None
     jail_state: dict = None
 
     def __init__(
@@ -218,7 +218,7 @@ class JailGenerator(JailResource):
                 "id": self._resolve_name(data)
             }
 
-        self.config = libiocage.lib.JailConfig.JailConfig(
+        self.config = libiocage.lib.Config.Jail.JailConfig.JailConfig(
             data=data,
             host=self.host,
             jail=self,
@@ -242,7 +242,7 @@ class JailGenerator(JailResource):
         )
 
         if new is False:
-            self.config.read()
+            self.config.read(data=self.read_config())
             if self.config["id"] is None:
                 self.config["id"] = self.dataset_name.split("/").pop()
 

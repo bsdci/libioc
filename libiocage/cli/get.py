@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """get module for the cli."""
+import typing
 import click
 
 import libiocage.lib.errors
@@ -30,16 +31,28 @@ import libiocage.lib.Jail
 import libiocage.lib.Logger
 
 
-@click.command(context_settings=dict(
-    max_content_width=400, ), name="get", help="Gets the specified property.")
+@click.command(
+    context_settings=dict( max_content_width=400, ),
+    name="get",
+    help="Gets the specified property."
+)
 @click.pass_context
 @click.argument("prop", required=True, default="")
 @click.argument("jail", required=True, default="")
-@click.option("--all", "-a", "_all", help="Get all properties for the "
-                                          "specified jail.", is_flag=True)
-@click.option("--pool", "-p", "_pool", help="Get the currently activated "
-                                            "zpool.", is_flag=True)
-@click.option("--log-level", "-d", default="info")
+@click.option(
+    "--all", "-a", "_all",
+    help="Get all properties for the specified jail.",
+    is_flag=True
+)
+@click.option(
+    "--pool", "-p", "_pool",
+    help="Get the currently activated zpool.",
+    is_flag=True
+)
+@click.option(
+    "--log-level", "-d",
+    default="info"
+)
 def cli(ctx, prop, _all, _pool, jail, log_level):
     """Get a list of jails and print the property."""
 
@@ -57,14 +70,19 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
     if jail == "":
         prop = ""
 
-    try:
-        ioc_jail = libiocage.lib.Jail.Jail(
-            jail,
-            host=host,
-            logger=logger
-        )
-    except libiocage.lib.errors.JailNotFound as e:
-        exit(1)
+    if jail == "defaults":
+        source_resource = host.defaults
+        lookup_method = _lookup_config_value
+    else:
+        lookup_method = _lookup_jail_value
+        try:
+            source_resource = libiocage.lib.Jail.Jail(
+                jail,
+                host=host,
+                logger=logger
+            )
+        except libiocage.lib.errors.JailNotFound as e:
+            exit(1)
 
     if _all is True:
         prop = None
@@ -80,7 +98,7 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
         exit(1)
 
     if prop:
-        value = _lookup_jail_value(ioc_jail, prop)
+        value = lookup_method(source_resource, prop)
 
         if value:
             print(value)
@@ -89,9 +107,9 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
             logger.error(f"Unknown property '{prop}'")
             exit(1)
 
-    for key in ioc_jail.config.all_properties:
+    for key in source_resource.config.all_properties:
         if (prop is None) or (key == prop):
-            value = ioc_jail.config.get_string(key)
+            value = source_resource.config.get_string(key)
             print_property(key, value)
 
 
@@ -99,11 +117,14 @@ def print_property(key, value):
     print(f"{key}:{value}")
 
 
-def _lookup_jail_value(jail, key):
+def _lookup_config_value(resource, key: str) -> typing.Any:
+    return libiocage.lib.helpers.to_string(resource.config[key])
+
+def _lookup_jail_value(resource, key: str) -> typing.Any:
 
     if key == "running":
-        value = jail.running
+        value = resource.running
     else:
-        value = jail.getstring(key)
+        value = resource.getstring(key)
 
     return libiocage.lib.helpers.to_string(value)

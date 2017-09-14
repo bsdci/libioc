@@ -24,22 +24,25 @@
 import shutil
 
 import libiocage.lib.helpers
-import libiocage.lib.JailConfig
+import libiocage.lib.Config.Jail
 
 
-class JailConfigResolver(list):
+class JailConfigPropertyResolver(list):
+
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'
+    property_name: str = "resolver"
+
     def __init__(
         self,
-        jail_config: 'libiocage.lib.JailConfig.JailConfig',
-        host: 'libiocage.lib.Host.HostGenerator'=None,
-        logger: 'libiocage.lib.Logger.Logger'=None
+        config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig',
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        **kwargs
     ) -> None:
 
         list.__init__(self, [])
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
-        self.host = libiocage.lib.helpers.init_host(self, host)
-        self.jail_config = jail_config
-        self.jail_config.attach_special_property(
+        self.config = config
+        self.config.attach_special_property(
             name="resolver",
             special_property=self
         )
@@ -61,10 +64,7 @@ class JailConfigResolver(list):
 
     @property
     def value(self):
-        try:
-            return self.jail_config.data["resolver"]
-        except KeyError:
-            return self.host.defaults["resolver"]
+        return self.config.data["resolver"]
 
     def apply(self, jail):
 
@@ -87,7 +87,7 @@ class JailConfigResolver(list):
         else:
             self.logger.verbose("resolv.conf not touched")
 
-    def update(self, value=None, notify=True):
+    def set(self, value=None, notify=True):
         value = value if value is not None else self.value
         self.clear()
 
@@ -121,6 +121,6 @@ class JailConfigResolver(list):
             return
 
         try:
-            self.jail_config.update_special_property("resolver")
+            self.config.update_special_property("resolver")
         except:
             raise
