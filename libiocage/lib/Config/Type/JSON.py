@@ -22,28 +22,27 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-
-import ucl
+import json
 
 import libiocage.lib.Config
-import libiocage.lib.ResourceConfig
-import libiocage.lib.errors
+import libiocage.lib.Config.ConfigFile
+import libiocage.lib.Config.Resource.ResourceConfig
+import libiocage.lib.helpers
 
 
-class ConfigUCL(libiocage.lib.Config.BaseConfig):
+class ConfigJSON(libiocage.lib.Config.ConfigFile.ConfigFile):
 
-    config_type = "ucl"
+    config_type = "json"
 
     def map_input(self, data: typing.TextIO) -> dict:
-        return ucl.load(data)
+        return json.load(data)
 
     def map_output(self, data: dict) -> str:
-        # ToDo: Re-Implement UCL output
-        raise libiocage.lib.errors.MissingFeature("Writing ConfigUCL")
+        return libiocage.lib.helpers.to_json(data)
 
 
-class ResourceConfigUCL(
-    ConfigUCL,
-    libiocage.lib.ResourceConfig.ResourceConfig
+class ResourceConfigJSON(
+    ConfigJSON,
+    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig
 ):
     pass

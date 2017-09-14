@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import json
 import re
 import subprocess
 import uuid
@@ -240,8 +241,25 @@ def parse_user_input(data):
     return data
 
 
+def to_json(data: dict) -> str:
+    output_data = {}
+    for key, value in data.items():
+        output_data[key] = to_string(
+            value,
+            true="yes",
+            false="no",
+            none="none"
+        )
+    return json.dumps(output_data, sort_keys=True, indent=4)
+
+
 def to_string(
-    data: typing.Union[str, typing.List[str]],
+    data: typing.Union[
+        str,
+        bool,
+        int,
+        typing.List[typing.Union[str, bool, int]]
+    ],
     true: str="yes",
     false: str="no",
     none: str="-",
@@ -284,17 +302,17 @@ def to_string(
     if data is None:
         return none
 
-    if isinstance(data, list) is True:
+    elif isinstance(data, list) is True:
         children = [
             to_string(x, true, false, none, delimiter)
-            for x in data
+            for x in list(data)  # type: ignore
             if x is not None
         ]
         if len(children) == 0:
             return none
         normalized_data = ",".join(children)
     else:
-        normalized_data = str(data)
+        normalized_data = data  # type: ignore
 
     parsed_data = parse_user_input(normalized_data)
 
@@ -302,6 +320,8 @@ def to_string(
         return true
     elif parsed_data is False:
         return false
+    elif parsed_data is None:
+        return none
 
     return str(parsed_data)
 

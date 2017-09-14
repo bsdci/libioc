@@ -29,8 +29,11 @@ import libzfs
 import libiocage.lib.Datasets
 import libiocage.lib.DevfsRules
 import libiocage.lib.Distribution
+import libiocage.lib.Resource
 import libiocage.lib.helpers
 
+# MyPy
+import libiocage.lib.Config.Jail.BaseConfig  # noqa: F401
 
 class HostGenerator:
 
@@ -42,7 +45,7 @@ class HostGenerator:
     def __init__(
         self,
         root_dataset: libzfs.ZFSDataset=None,
-        defaults: dict=None,
+        defaults: 'libiocage.lib.Resource.DefaultResource'=None,
         zfs: 'libiocage.lib.ZFS.ZFS'=None,
         logger: 'libiocage.lib.Logger.Logger'=None
     ) -> None:
@@ -62,17 +65,23 @@ class HostGenerator:
         self._defaults = defaults
 
     @property
-    def defaults(self) -> dict:
+    def defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
         if self._defaults is None:
             self._load_defaults()
         return self._defaults
 
-    def _load_defaults(self):
-        self._defaults = libiocage.lib.Resource.DefaultResource(
+    @property
+    def default_config(self) -> 'libiocage.lib.Config.Jail.BaseConfig.BaseConfig':
+        return self.defaults.config
+
+    def _load_defaults(self) -> None:
+        defaults_resource = libiocage.lib.Resource.DefaultResource(
             dataset=self.datasets.root,
             logger=self.logger,
             zfs=self.zfs
-        ).read_config()
+        )
+        defaults_resource.config.read(data=defaults_resource.read_config())
+        self._defaults = defaults_resource
 
     @property
     def devfs(self) -> 'libiocage.lib.DevfsRules.DevfsRules':

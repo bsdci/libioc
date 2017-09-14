@@ -25,29 +25,12 @@ import typing
 import re
 import uuid
 
-import libiocage.lib.ConfigJSON
-import libiocage.lib.JailConfigAddresses
-import libiocage.lib.JailConfigDefaults
-import libiocage.lib.JailConfigInterfaces
-import libiocage.lib.JailConfigResolver
+import libiocage.lib.Config.Jail.JailConfigProperties
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
-# MyPy
-import libiocage.lib.Jail
 
-
-class SpecialProperties(dict):
-
-    def __getitem__(self, key: str) -> typing.Any:
-
-        if key not in self.keys():
-            return None
-
-        return dict.__getitem__(key)
-
-
-class JailConfig(dict, object):
+class BaseConfig(dict):
     """
     Represents an iocage jail's configuration
 
@@ -81,39 +64,22 @@ class JailConfig(dict, object):
 
     """
 
-    special_properties: SpecialProperties = SpecialProperties({})
-    data: dict = None
-    legacy: bool = None
-    jail: 'libiocage.lib.Jail.JailGenerator' = None
+    special_properties: 'libiocage.lib.Config.Jail.JailConfigProperties.JailConfigProperties'
+    data: dict = {}
 
     def __init__(
         self,
-        data: dict={},
-        jail: 'libiocage.lib.Jail.JailGenerator'=None,
         logger: 'libiocage.lib.Logger.Logger'=None,
-        host: 'libiocage.lib.Host.HostGenerator'=None,
-        new: bool=False
     ) -> None:
 
         dict.__init__(self)
 
-        if self.data is None:
-            self.data = {
-                "id": None
-            }
-
         self.logger = libiocage.lib.helpers.init_logger(self, logger)
-        self.host = libiocage.lib.helpers.init_host(self, host)
 
-        self.jail = jail
-
-        # the name is used in many other variables and needs to be set first
-        for key in ["id", "name", "uuid"]:
-            if key in data.keys():
-                self["id"] = data[key]
-                break
-
-        self.clone(data)
+        self.special_properties = libiocage.lib.Config.Jail.JailConfigProperties.JailConfigProperties(
+            config=self,
+            logger=self.logger
+        )
 
     def clone(
         self,
@@ -134,7 +100,7 @@ class JailConfig(dict, object):
                 Passed to __setitem__
 
         """
-        if data is None:
+        if len(data.keys()) == 0:
             return
 
         current_id = self["id"]
@@ -145,9 +111,7 @@ class JailConfig(dict, object):
 
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
-    def read(self) -> None:
-
-        data = self.jail.read_config()
+    def read(self, data: dict) -> None:
 
         # ignore name/id/uuid in config if the jail already has a name
         if self["id"] is not None:
@@ -162,20 +126,12 @@ class JailConfig(dict, object):
         self.clone(data)
 
     def update_special_property(self, name: str) -> None:
-
-        try:
-            self.data[name] = str(self.special_properties[name])
-        except KeyError:
-            # pass when there is no handler for the notifying propery
-            pass
+        self.data[name] = str(self.special_properties[name])
 
     def attach_special_property(self, name, special_property):
         self.special_properties[name] = special_property
 
-    def save(self) -> None:
-        self.jail.write_config(self.data)
-
-    def _set_legacy(self, value) -> None:
+    def _set_legacy(self, value, **kwargs) -> None:
         try:
             self.legacy = libiocage.lib.helpers.parse_bool(value)
         except:
@@ -251,7 +207,7 @@ class JailConfig(dict, object):
     def _get_priority(self) -> int:
         return int(self.data["priority"])
 
-    def _set_priority(self, value: typing.Union[int, str]):
+    def _set_priority(self, value: typing.Union[int, str], **kwargs):
         self.data["priority"] = str(value)
 
     # legacy support
@@ -290,7 +246,12 @@ class JailConfig(dict, object):
 
     def _set_tags(
         self,
-        value: typing.Union[str, typing.List[str]],
+        value: typing.Union[
+            str,
+            bool,
+            int,
+            typing.List[typing.Union[str, bool, int]]
+        ],
         **kwargs
     ) -> None:
 
@@ -303,67 +264,14 @@ class JailConfig(dict, object):
     def _get_basejail(self) -> bool:
         return libiocage.lib.helpers.parse_bool(self.data["basejail"])
 
-    def _default_basejail(self):
-        return False
-
     def _set_basejail(self, value, **kwargs):
         self.data["basejail"] = self.stringify(value)
 
     def _get_clonejail(self) -> bool:
         return libiocage.lib.helpers.parse_bool(self.data["clonejail"])
 
-    def _default_clonejail(self):
-        return True
-
     def _set_clonejail(self, value, **kwargs):
         self.data["clonejail"] = self.stringify(value)
-
-    def _get_ip4_addr(self):
-        try:
-            return self.special_properties["ip4_addr"]
-        except:
-            return None
-
-    def _set_ip4_addr(self, value, **kwargs):
-        ip4_addr = libiocage.lib.JailConfigAddresses.JailConfigAddresses(
-            value,
-            jail_config=self,
-            property_name="ip4_addr",
-            logger=self.logger
-        )
-        self.special_properties["ip4_addr"] = ip4_addr
-        self.update_special_property("ip4_addr")
-
-    def _get_ip6_addr(self):
-        try:
-            return self.special_properties["ip6_addr"]
-        except:
-            return None
-
-    def _set_ip6_addr(self, value, **kwargs):
-        ip6_addr = libiocage.lib.JailConfigAddresses.JailConfigAddresses(
-            value,
-            jail_config=self,
-            property_name="ip6_addr",
-            logger=self.logger,
-            skip_on_error=self._skip_on_error(**kwargs)
-        )
-        self.special_properties["ip6_addr"] = ip6_addr
-        self.update_special_property("ip6_addr")
-
-        rc_conf = self.jail.rc_conf
-        rc_conf["rtsold_enable"] = "accept_rtadv" in str(value)
-
-    def _get_interfaces(self):
-        return self.special_properties["interfaces"]
-
-    def _set_interfaces(self, value, **kwargs):
-        interfaces = libiocage.lib.JailConfigInterfaces.JailConfigInterfaces(
-            value,
-            jail_config=self
-        )
-        self.special_properties["interfaces"] = interfaces
-        self.update_special_property("interfaces")
 
     def _get_defaultrouter(self):
         value = self.data['defaultrouter']
@@ -404,12 +312,9 @@ class JailConfig(dict, object):
         self.data["jail_zfs_dataset"] = " ".join(value)
 
     def _get_jail_zfs(self):
-        try:
-            return libiocage.lib.helpers.parse_user_input(
-                self.data["jail_zfs"]
-            )
-        except:
-            return self._default_jail_zfs()
+        return libiocage.lib.helpers.parse_user_input(
+            self.data["jail_zfs"]
+        )
 
     def _set_jail_zfs(self, value, **kwargs):
         parsed_value = libiocage.lib.helpers.parse_user_input(value)
@@ -421,22 +326,6 @@ class JailConfig(dict, object):
             true="on",
             false="off"
         )
-
-    def _default_jail_zfs(self):
-        # if self.data["jail_zfs"] does not explicitly exist,
-        # _get_jail_zfs would raise
-        try:
-            return len(self["jail_zfs_dataset"]) > 0
-        except:
-            return False
-
-    def _get_resolver(self):
-        return self._create_or_get_special_property_resolver()
-
-    def _set_resolver(self, value, **kwargs):
-
-        resolver = self._create_or_get_special_property_resolver()
-        resolver.update(value, notify=True)
 
     def _get_cloned_release(self):
         try:
@@ -485,37 +374,11 @@ class JailConfig(dict, object):
                     logger=self.logger
                 )
 
-    def _get_host_hostname(self):
-        try:
-            return self.data["host_hostname"]
-        except KeyError:
-            return self.jail.humanreadable_name
-
     def _get_host_hostuuid(self):
         try:
             return self.data["host_hostuuid"]
         except KeyError:
             return self["id"]
-
-    def _create_or_get_special_property_resolver(
-        self
-    ) -> libiocage.lib.JailConfigResolver.JailConfigResolver:
-
-        try:
-            return self.special_properties["resolver"]
-        except:
-            pass
-
-        resolver = libiocage.lib.JailConfigResolver.JailConfigResolver(
-            jail_config=self,
-            host=self.host,
-            logger=self.logger
-        )
-
-        resolver.update(notify=False)
-        self.special_properties["resolver"] = resolver
-
-        return self.special_properties["resolver"]
 
     def get_string(self, key):
         return self.stringify(self.__getitem__(key))
@@ -533,9 +396,14 @@ class JailConfig(dict, object):
 
         # passthrough existing properties
         try:
-            return self.stringify(self.__getattribute__(key))
+            return self.__getattribute__(key)
         except:
             pass
+
+        is_special_property = self.special_properties.is_special_property(key)
+        is_existing = key in self.data.keys()
+        if (is_special_property and is_existing) is True:
+            return self.special_properties.get_or_create(key)
 
         # data with mappings
         get_method = None
@@ -555,32 +423,45 @@ class JailConfig(dict, object):
 
         raise KeyError(f"User defined property not found: {key}")
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> typing.Any:
 
         try:
             return self.__getitem_user(key)
         except KeyError:
             pass
 
-        # fall back to default
-        return self.host.defaults[key]
+        raise KeyError(f"Item not found: {key}")
 
     def __delitem__(self, key):
         del self.data[key]
 
-    def __setitem__(self, key, value, **kwargs):
+    def __setitem__(
+        self,
+        key: str,
+        value: typing.Any,
+        **kwargs
+    ):
 
         parsed_value = libiocage.lib.helpers.parse_user_input(value)
 
-        setter_method = None
+        if self.special_properties.is_special_property(key):
+            special_property = self.special_properties.get_or_create(key)
+            special_property.set(value)
+            self.update_special_property(key)
+            return
+
         try:
             setter_method = self.__getattribute__(f"_set_{key}")
-        except:
-            self.data[key] = parsed_value
+            if setter_method is None:
+                return None
+            else:
+                return setter_method(parsed_value, **kwargs)
+        except AttributeError:
             pass
 
-        if setter_method is not None:
-            return setter_method(parsed_value, **kwargs)
+        self.data[key] = parsed_value
+        
+            
 
     def set(self, key: str, value, **kwargs) -> bool:
         """
@@ -618,17 +499,19 @@ class JailConfig(dict, object):
 
         return (hash_before != hash_after)
 
+    @property
+    def user_data(self) -> dict:
+        return self.data
+
     def __str__(self) -> str:
-        return libiocage.lib.ConfigJSON.to_json(self)
+        return libiocage.lib.helpers.to_json(self.user_data)
 
     def __dir__(self) -> list:
 
         properties = set()
         props = dict.__dir__(self)  # type: ignore
         for prop in props:
-            if prop.startswith("_default_"):
-                properties.add(prop[9:])
-            elif not prop.startswith("_"):
+            if not prop.startswith("_"):
                 properties.add(prop)
 
         for key in self.data.keys():
@@ -638,17 +521,7 @@ class JailConfig(dict, object):
 
     @property
     def all_properties(self) -> list:
-
-        properties = set()
-        props = dict.__dir__(self)  # type: ignore
-        for prop in props:
-            if prop.startswith("_default_"):
-                properties.add(prop[9:])
-
-        for key in self.data.keys():
-            properties.add(key)
-
-        return sorted(list(properties | set(self.host.defaults.keys())))
+        return sorted(self.data.keys())
 
     def stringify(self, value):
         parsed_input = libiocage.lib.helpers.parse_user_input(value)

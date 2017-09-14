@@ -22,17 +22,22 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """set module for the cli."""
+import typing
 import click
 
-import libiocage.lib.Jails
 import libiocage.lib.Logger
 import libiocage.lib.helpers
+import libiocage.lib.Resource
+import libiocage.lib.Jails
 
 __rootcmd__ = True
 
 
-@click.command(context_settings=dict(
-    max_content_width=400, ), name="set", help="Sets the specified property.")
+@click.command(
+    context_settings=dict( max_content_width=400, ),
+    name="set",
+    help="Sets the specified property."
+)
 @click.pass_context
 @click.argument("props", nargs=-1)
 @click.argument("jail", nargs=1, required=True)
@@ -40,27 +45,30 @@ def cli(ctx, props, jail):
     """Get a list of jails and print the property."""
 
     logger = ctx.parent.logger
+    host = libiocage.lib.Host.HostGenerator(logger=logger)
 
+    # Defaults
+    if jail == "defaults":
+        updated_properties = set_properties(props, host.defaults)
+        if len(updated_properties) > 0:
+            logger.screen("Defaults updated: " + ", ".join(updated_properties))
+        else:
+            logger.screen("Defaults unchanged")
+        return
+
+    # Jail Properties
     filters = (f"name={jail}",)
     ioc_jails = libiocage.lib.Jails.JailsGenerator(
         filters,
+        host=host,
         logger=logger
     )
 
+    updated_jail_count = 0
+
     for jail in ioc_jails:
 
-        updated_properties = set()
-
-        for prop in props:
-
-            if _is_setter_property(prop):
-                key, value = prop.split("=", maxsplit=1)
-                changed = jail.config.set(key, value)
-                if changed:
-                    updated_properties.add(key)
-            else:
-                key = prop
-                del jail.config[key]
+        updated_properties = set_properties(props, jail)
 
         if len(updated_properties) == 0:
             logger.screen(f"Jail '{jail.humanreadable_name}' unchanged")
@@ -69,7 +77,42 @@ def cli(ctx, props, jail):
                 f"Jail '{jail.humanreadable_name}' updated: " +
                 ", ".join(updated_properties)
             )
-            jail.save()
+
+        updated_jail_count += 1
+
+    if updated_jail_count == 0:
+        logger.error("No jails to update")
+        exit(1)
+
+    exit(0)
+
+
+def set_properties(
+    properties: typing.List[str],
+    target: 'libiocage.lib.LaunchableResource.LaunchableResource'
+) -> set:
+
+    updated_properties = set()
+
+    for prop in properties:
+
+        if _is_setter_property(prop):
+            key, value = prop.split("=", maxsplit=1)
+            changed = target.config.set(key, value)
+            if changed:
+                updated_properties.add(key)
+        else:
+            key = prop
+            try:
+                del target.config[key]
+                updated_properties.add(key)
+            except:
+                pass
+
+    if len(updated_properties) > 0:
+        target.save()
+
+    return updated_properties
 
 
 def _is_setter_property(property_string):

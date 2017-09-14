@@ -27,16 +27,17 @@ import os.path
 import libzfs
 
 import libiocage.lib.Config
-import libiocage.lib.ConfigJSON
-import libiocage.lib.ConfigUCL
-import libiocage.lib.ConfigZFS
+import libiocage.lib.Config.Jail.Defaults
+import libiocage.lib.Config.Type.JSON
+import libiocage.lib.Config.Type.UCL
+import libiocage.lib.Config.Type.ZFS
 import libiocage.lib.Logger
 import libiocage.lib.ZFS
+import libiocage.lib.Filter
 import libiocage.lib.helpers
 
-
 # MyPy
-import libiocage.lib.Filter
+import libiocage.lib.Config.ConfigFile  # noqa: F401
 
 
 class Resource:
@@ -99,17 +100,17 @@ class Resource:
         self.zfs = libiocage.lib.helpers.init_zfs(self, zfs)
 
         # ToDo: Lazy-load config handlers
-        self.config_json = libiocage.lib.ConfigJSON.ResourceConfigJSON(
+        self.config_json = libiocage.lib.Config.Type.JSON.ResourceConfigJSON(
             resource=self,
             logger=self.logger
         )
 
-        self.config_ucl = libiocage.lib.ConfigUCL.ResourceConfigUCL(
+        self.config_ucl = libiocage.lib.Config.Type.UCL.ResourceConfigUCL(
             resource=self,
             logger=self.logger
         )
 
-        self.config_zfs = libiocage.lib.ConfigZFS.ResourceConfigZFS(
+        self.config_zfs = libiocage.lib.Config.Type.ZFS.ResourceConfigZFS(
             resource=self,
             logger=self.logger
         )
@@ -260,7 +261,7 @@ class Resource:
         return self.config_handler.read()
 
     @property
-    def config_handler(self) -> libiocage.lib.Config.ConfigFile:
+    def config_handler(self) -> 'libiocage.lib.Config.ConfigFile.ConfigFile':
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 
@@ -278,9 +279,15 @@ class Resource:
             key (string):
                 Name of the jail property to return
         """
+        value = self.get(key)
         return libiocage.lib.helpers.to_string(
-            self.get(key),
+            value,
             none="-"
+        )
+
+    def save(self) -> None:
+        raise NotImplementedError(
+            "This needs to be implemented by the inheriting class"
         )
 
 
@@ -289,68 +296,25 @@ class DefaultResource(Resource):
     DEFAULT_JSON_FILE = "defaults.json"
     DEFAULT_UCL_FILE = "defaults"
 
-    DEFAULTS = {
-        "id": None,
-        "release": None,
-        "boot": False,
-        "legacy": False,
-        "priority": 0,
-        "basejail": False,
-        "clonejail": True,
-        "defaultrouter": None,
-        "defaultrouter6": None,
-        "mac_prefix": "02ff60",
-        "vnet": False,
-        "ip4": "new",
-        "ip4_saddrsel": 1,
-        "ip6": "new",
-        "ip6_saddrsel": 1,
-        "resolver": "/etc/resolv.conf",
-        "host_domainname": "none",
-        "devfs_ruleset": 4,
-        "enforce_statfs": 2,
-        "children_max": 0,
-        "allow_set_hostname": 1,
-        "allow_sysvipc": 0,
-        "allow_raw_sockets": 0,
-        "allow_chflags": 0,
-        "allow_mount": 0,
-        "allow_mount_devfs": 0,
-        "allow_mount_nullfs": 0,
-        "allow_mount_procfs": 0,
-        "allow_mount_zfs": 0,
-        "allow_mount_tmpfs": 0,
-        "allow_quotas": 0,
-        "allow_socket_af": 0,
-        "sysvmsg": "new",
-        "sysvsem": "new",
-        "sysvshm": "new",
-        "exec_clean": 1,
-        "exec_fib": 1,
-        "exec_prestart": "/usr/bin/true",
-        "exec_start": "/bin/sh /etc/rc",
-        "exec_poststart": "/usr/bin/true",
-        "exec_prestop": "/usr/bin/true",
-        "exec_stop": "/bin/sh /etc/rc.shutdown",
-        "exec_poststop": "/usr/bin/true",
-        "exec_timeout": "60",
-        "stop_timeout": "30",
-        "mount_devfs": "1",
-        "mount_fdescfs": "1",
-        "securelevel": "2",
-        "tags": []
-    }
+    def __init__(
+        self,
+        dataset: libzfs.ZFSDataset=None,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        zfs: 'libiocage.lib.ZFS.ZFS'=None
+    ) -> None:
 
-    def read_config(self) -> dict:
-        defaults = self.config_handler.read()
-        user_defaults_keys = defaults.keys()
+        Resource.__init__(self, 
+            dataset=dataset,
+            logger=logger,
+            zfs=zfs
+        )
 
-        for key, value in self.DEFAULTS.items():
-            if key not in user_defaults_keys:
-                defaults[key] = value
+        self.config = libiocage.lib.Config.Jail.Defaults.JailConfigDefaults(
+            logger=logger
+        )
 
-        return defaults
-
+    def save(self) ->  None:
+        self.write_config(self.config.user_data)
 
 class ListableResource(list, Resource):
 

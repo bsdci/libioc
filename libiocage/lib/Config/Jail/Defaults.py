@@ -21,15 +21,18 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import json
 import os.path
 
-import libiocage.lib.helpers
+import libiocage.lib.Config.Jail.BaseConfig
 
 
-class JailConfigDefaults(dict):
+class JailConfigDefaults(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
-    DEFAULTS = {
+    user_properties: set = set()
+
+    data: dict = {
         "id": None,
         "release": None,
         "boot": False,
@@ -41,10 +44,13 @@ class JailConfigDefaults(dict):
         "defaultrouter6": None,
         "mac_prefix": "02ff60",
         "vnet": False,
+        "interfaces": [],
         "ip4": "new",
         "ip4_saddrsel": 1,
+        "ip4_addr": None,
         "ip6": "new",
         "ip6_saddrsel": 1,
+        "ip6_addr": None,
         "resolver": "/etc/resolv.conf",
         "host_domainname": "none",
         "devfs_ruleset": 4,
@@ -78,41 +84,29 @@ class JailConfigDefaults(dict):
         "mount_devfs": "1",
         "mount_fdescfs": "1",
         "securelevel": "2",
-        "tags": []
+        "tags": [],
+        "jail_zfs": False
     }
-
-    def __init__(self, file, logger):
-        self.logger = logger
-        dict.__init__(self, JailConfigDefaults.DEFAULTS)
-        self.file = file
-        try:
-            self.read()
-        except:
-            pass
-
-    def read(self):
-
-        if (self.file is None) or not isinstance(self.file, str):
-            self._file = None
-            self.clear()
-            return
-
-        if not os.path.isfile(self.file):
-            raise libiocage.lib.errors.DefaultConfigNotFound(
-                config_file_path=self.file,
-                logger=None
-            )
-
-        if self.logger:
-            self.logger.debug(f"Reading default config from {self.file}")
-
-        f = open(self.file, "r")
-        data = json.load(f)
-        f.close()
-
-        for key, value in data.items():
-            self[key] = value
 
     def clear(self):
         dict.clear(self)
         dict.__init__(self, JailConfigDefaults.DEFAULTS)
+
+
+    def __setitem__(
+        self,
+        key: str,
+        value: typing.Any,
+        **kwargs
+    ):
+
+        out = super().__setitem__(key, value, **kwargs)
+        self.user_properties.add(key)
+        return out
+        
+    @property
+    def user_data(self) -> dict:
+        data = {}
+        for prop in self.user_properties:
+            data[prop] = self.data[prop]
+        return data

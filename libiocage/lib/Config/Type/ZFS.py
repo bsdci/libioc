@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import libzfs
 
-import libiocage.lib.DatasetConfig
+import libiocage.lib.Config.Dataset
 import libiocage.lib.Resource
 import libiocage.lib.errors
 
@@ -46,7 +46,7 @@ def get_iocage_property_name(zfs_property_name):
     return zfs_property_name[len(ZFS_PROPERTY_PREFIX):]
 
 
-class BaseConfigZFS(libiocage.lib.DatasetConfig.DatasetConfig):
+class BaseConfigZFS(libiocage.lib.Config.Dataset.DatasetConfig):
 
     config_type = "zfs"
 

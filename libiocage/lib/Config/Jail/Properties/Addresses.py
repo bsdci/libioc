@@ -21,12 +21,22 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import libiocage.lib.errors
+import libiocage.lib.helpers
 
 
 class AddressSet(set):
-    def __init__(self, jail_config=None, property_name="ip4_address"):
-        self.jail_config = jail_config
+
+    config: 'libiocage.lib.Config.Jail.JailConfig'
+
+    def __init__(
+        self,
+        config=None,
+        property_name="ip4_address"
+    ):
+
+        self.config = config
         set.__init__(self)
         object.__setattr__(self, 'property_name', property_name)
 
@@ -41,29 +51,46 @@ class AddressSet(set):
             self.__notify()
 
     def __notify(self):
-        self.jail_config.update_special_property(self.property_name)
+        self.config.update_special_property(self.property_name)
 
 
-class JailConfigAddresses(dict):
-    def __init__(self, value, jail_config=None, property_name="ip4_address",
-                 logger=None, skip_on_error=False):
+class JailConfigPropertyAddresses(dict):
+
+    logger: 'libiocage.lib.Logger.Logger'
+    config: 'libiocage.lib.Config.Jail.JailConfig'
+    property_name: str = "ip4_address"
+    skip_on_error: bool
+
+    def __init__(
+        self,
+        config: 'libiocage.lib.Config.Jail.JailConfig'=None,
+        property_name: str="ip4_address",
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        skip_on_error: bool=False
+    ) -> None:
+
         dict.__init__(self, {})
-        dict.__setattr__(self, 'logger', logger)
-        dict.__setattr__(self, 'jail_config', jail_config)
-        dict.__setattr__(self, 'property_name', property_name)
-        dict.__setattr__(self, 'skip_on_error', skip_on_error)
 
-        if value is not None:
-            self.read(value)
+        self.logger = logger
+        self.config = config
+        self.property_name = property_name
+        self.skip_on_error = skip_on_error
 
-    def read(self, config_line):
+    def set(self, data: typing.Union[str, typing.Dict[str, AddressSet]]) -> None:
 
-        config_line = config_line.strip()
+        self.clear()
 
-        if config_line == "" or config_line == "-" or config_line == "none":
+        try:
+            libiocage.lib.helpers.parse_none(data)
+            return
+        except TypeError:
+            pass
+
+        if isinstance(data, dict):
+            dict.__init__(self, data)
             return
 
-        ip_addresses = config_line.split(" ")
+        ip_addresses = data.split(" ")
         for ip_address_string in ip_addresses:
 
             try:
@@ -74,7 +101,7 @@ class JailConfigAddresses(dict):
                 level = "warn" if (self.skip_on_error is True) else "error"
 
                 libiocage.lib.errors.InvalidJailConfigAddress(
-                    jail=self.jail_config.jail,
+                    jail=self.config.jail,
                     value=ip_address_string,
                     property_name=self.property_name,
                     logger=self.logger,
@@ -84,7 +111,12 @@ class JailConfigAddresses(dict):
                 if self.skip_on_error is False:
                     exit(1)
 
-    def add(self, nic, addresses=None, notify=True):
+    def add(
+        self,
+        nic: str,
+        addresses: typing.Union[typing.List[str], str]=None,
+        notify: bool=True
+    ) -> None:
 
         if addresses is None or addresses == [] or addresses == "":
             return
@@ -104,38 +136,43 @@ class JailConfigAddresses(dict):
             self.__notify()
 
     @property
-    def networks(self):
+    def networks(self) -> typing.List[str]:
         """
         Flat list of all networks configured across all nics
         """
-        networks = []
+        networks: list = []
         for nic, addresses in self.items():
             networks += addresses
         return networks
 
-    def __setitem__(self, key, values):
+    def __setitem__(
+        self,
+        key: str,
+        addresses: typing.Union[typing.List[str], str]
+    ) -> None:
 
         try:
             dict.__delitem__(self, key)
         except KeyError:
             pass
 
-        self.add(key, values)
+        self.add(key, addresses)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         dict.__delitem__(self, key)
         self.__notify()
 
-    def __notify(self):
-        self.jail_config.update_special_property(self.property_name)
+    def __notify(self) -> None:
+        self.config.update_special_property(self.property_name)
 
-    def __empty_prop(self, key):
-
-        prop = AddressSet(self.jail_config, property_name=self.property_name)
+    def __empty_prop(self, key: str) -> AddressSet:
+        prop = AddressSet(self.config, property_name=self.property_name)
         dict.__setitem__(self, key, prop)
         return prop
 
-    def __str__(self):
+    def __str__(self) -> str:
+        if len(self) == 0:
+            return ""
         out = []
         for nic in self:
             for address in self[nic]:

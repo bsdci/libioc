@@ -174,11 +174,11 @@ class ReleaseGenerator(ReleaseResource):
             self._assets.append("lib32")
 
     @property
-    def resource(self) -> libiocage.lib.Resource.Resource:
+    def resource(self) -> 'libiocage.lib.Resource.Resource':
         return self._resource
 
     @resource.setter
-    def resource(self, value: libiocage.lib.Resource.Resource):
+    def resource(self, value: 'libiocage.lib.Resource.Resource'):
         if value is None:
             self._resource = ReleaseResource(
                 release=self,

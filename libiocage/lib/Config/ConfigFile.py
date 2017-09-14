@@ -22,38 +22,55 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import json
+import os.path
 
-import libiocage.lib.Config
-import libiocage.lib.ResourceConfig
-import libiocage.lib.helpers
+import libiocage.lib.Config.Prototype
 
 
-def to_json(data: dict) -> str:
-    output_data = {}
-    for key, value in data.items():
-        output_data[key] = libiocage.lib.helpers.to_string(
-            value,
-            true="yes",
-            false="no",
-            none="none"
+class ConfigFile(libiocage.lib.Config.Prototype.Prototype):
+
+    _file: str = None
+
+    def __init__(
+        self,
+        file: str=None,
+        logger: 'libiocage.lib.Logger.Logger'=None
+    ) -> None:
+
+        libiocage.lib.Config.Prototype.Prototype.__init__(
+            self,
+            logger=logger
         )
-    return json.dumps(output_data, sort_keys=True, indent=4)
+        self._file = file
 
+    @property
+    def file(self) -> str:
+        return self._file
 
-class ConfigJSON(libiocage.lib.Config.ConfigFile):
+    @file.setter
+    def file(self, value: str):
+        self._file = value
 
-    config_type = "json"
+    def read(self) -> dict:
+        try:
+            with open(self.file, "r") as data:
+                return self.map_input(data)
+        except:
+            return {}
 
-    def map_input(self, data: typing.TextIO) -> dict:
-        return json.load(data)
+    def write(self, data: dict) -> None:
+        """
+        Writes changes to the config file
+        """
+        with open(self.file, "w") as conf:
+            conf.write(self.map_output(data))
+            conf.truncate()
 
-    def map_output(self, data: dict) -> str:
-        return to_json(data)
+    def map_input(self, data: typing.Any) -> dict:
+        return data
 
+    def map_output(self, data: typing.Any) -> typing.Any:
+        return data
 
-class ResourceConfigJSON(
-    ConfigJSON,
-    libiocage.lib.ResourceConfig.ResourceConfig
-):
-    pass
+    def exists(self) -> bool:
+        return os.path.isfile(self.file)
