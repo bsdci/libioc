@@ -29,11 +29,11 @@ import libiocage.lib.Config.Prototype
 
 class ConfigFile(libiocage.lib.Config.Prototype.Prototype):
 
-    _file: str = None
+    _file: str
 
     def __init__(
         self,
-        file: str=None,
+        file: str,
         logger: 'libiocage.lib.Logger.Logger'=None
     ) -> None:
 
