@@ -160,7 +160,7 @@ class Resource:
         """
         if self._dataset_name is not None:
             # sets self._dataset_name to None and memoize the dataset
-            self._dataset = self.zfs.get_dataset(self.dataset_name)
+            self._set_dataset(self.zfs.get_dataset(self.dataset_name))
 
         return self._dataset
 
