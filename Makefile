@@ -3,10 +3,10 @@ SERVER=""
 SVN_REL_URL=https://svn.freebsd.org/base/releng/11.1
 
 install:
-	python3.6 -m ensurepip
-	pkg install -q -y libgit2 libucl cython3 rsync
+	pkg install -q -y libgit2 libucl cython3 rsync python36
 	( cd /usr/src && svnlite checkout $(SVN_REL_URL)/cddl/ && \
 		mkdir -p sys && cd sys && svnlite checkout $(SVN_REL_URL)/sys/cddl )
+	python3.6 -m ensurepip
 	pip3.6 install -Ur requirements.txt # properly install libzfs
 	pip3.6 install -e . # install libiocage from source / for testing.
 uninstall:
