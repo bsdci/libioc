@@ -100,18 +100,19 @@ class HostGenerator:
         return self._devfs
 
     @property
-    def userland_version(self):
+    def userland_version(self) -> float:
         return float(self.release_version.partition("-")[0])
 
     @property
-    def release_minor_version(self):
+    def release_minor_version(self) -> int:
         release_version_string = os.uname()[2]
         release_version_fragments = release_version_string.split("-")
 
+        print(release_version_fragments)
         if len(release_version_fragments) < 3:
             return 0
 
-        return int(release_version_fragments[2])
+        return int(release_version_fragments[2].strip("p"))
 
     @property
     def release_version(self):
@@ -122,7 +123,7 @@ class HostGenerator:
             return "-".join(release_version_fragments[0:2])
 
     @property
-    def processor(self):
+    def processor(self) -> str:
         return platform.processor()
 
 

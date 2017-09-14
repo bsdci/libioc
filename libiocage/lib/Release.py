@@ -235,6 +235,9 @@ class ReleaseGenerator(ReleaseResource):
         if self.eol is True:
             annotations.add("EOL")
 
+        if self.newer_than_host is True:
+            annotations.add("Newer than Host")
+
         if len(annotations) > 0:
             return f"{self.name} ({', ('.join(annotations)})"
 
@@ -281,6 +284,19 @@ class ReleaseGenerator(ReleaseResource):
                 return False
 
         return True
+
+    @property
+    def newer_than_host(self):
+        host_release_name = self._pad_release_name(self.host.release_version)
+        release_name = self._pad_release_name(self.name)
+        return (host_release_name < release_name)
+
+    def _pad_release_name(self, release_name: str, digits: int=4) -> str:
+        """
+        pads releases with 0 until it has 4 characters before the first .
+        """
+        padding = str("0" * (digits - release_name.index(".")))
+        return padding + release_name
 
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:
