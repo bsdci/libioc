@@ -31,7 +31,7 @@ class DatasetConfig(libiocage.lib.Config.ConfigFile.ConfigFile):
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset = None,
+        dataset: libzfs.ZFSDataset,
         **kwargs
     ) -> None:
 
