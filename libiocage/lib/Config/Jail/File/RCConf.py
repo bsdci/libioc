@@ -62,7 +62,6 @@ class RCConf(
     @property
     def path(self):
         path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
-        print("A", path)
         self._require_path_relative_to_resource(
             filepath=path,
             resource=self.resource
