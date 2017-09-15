@@ -64,14 +64,13 @@ class HostGenerator:
             host=self,
             logger=self.logger
         )
-
         if defaults is not None:
             self._defaults = defaults
 
     @property
     def defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
         if "_defaults" not in dir(self):
-            self._load_defaults()
+            self._defaults = self._load_defaults()
         return self._defaults
 
     @property
@@ -80,14 +79,14 @@ class HostGenerator:
     ) -> 'libiocage.lib.Config.Jail.BaseConfig.BaseConfig':
         return self.defaults.config
 
-    def _load_defaults(self) -> None:
+    def _load_defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
         defaults_resource = libiocage.lib.Resource.DefaultResource(
             dataset=self.datasets.root,
             logger=self.logger,
             zfs=self.zfs
         )
         defaults_resource.config.read(data=defaults_resource.read_config())
-        self._defaults = defaults_resource
+        return defaults_resource
 
     @property
     def devfs(self) -> 'libiocage.lib.DevfsRules.DevfsRules':
