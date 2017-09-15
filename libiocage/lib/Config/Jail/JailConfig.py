@@ -36,10 +36,11 @@ class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     legacy: bool = None
     jail: 'libiocage.lib.Jail.JailGenerator' = None
+    data: dict = {}
 
     def __init__(
         self,
-        data: dict={},
+        data: dict=None,
         jail: 'libiocage.lib.Jail.JailGenerator'=None,
         new: bool=False,
         logger: 'libiocage.lib.Logger.Logger'=None,
