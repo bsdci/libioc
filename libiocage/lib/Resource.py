@@ -81,10 +81,10 @@ class Resource:
     DEFAULT_JSON_FILE = "config.json"
     DEFAULT_UCL_FILE = "config"
 
-    _dataset_name: str = None
-    _config_type: int = None
-    _config_file: str = None
-    _dataset: libzfs.ZFSDataset = None
+    _dataset_name: typing.Optional[str] = None
+    _config_type: typing.Optional[int] = None
+    _config_file: typing.Optional[str] = None
+    _dataset: typing.Optional[libzfs.ZFSDataset] = None
 
     def __init__(
         self,
@@ -141,8 +141,9 @@ class Resource:
         """
         if self._dataset_name is not None:
             return self._dataset_name
-        else:
+        elif self._dataset is not None:
             return self._dataset.name
+        raise
 
     @property
     def dataset_name(self) -> str:
@@ -179,7 +180,7 @@ class Resource:
     #     return self.dataset.mountpoint
 
     @property
-    def config_type(self) -> str:
+    def config_type(self) -> typing.Optional[int]:
         if self._config_type is None:
             return None
         elif self._config_type == self.CONFIG_TYPES.index("auto"):
@@ -187,7 +188,7 @@ class Resource:
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
-    def config_type(self, value: str):
+    def config_type(self, value: typing.Optional[int]):
         if value is None:
             self._config_type = None
         else:

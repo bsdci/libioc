@@ -38,6 +38,7 @@ import libiocage.lib.ZFS
 import libiocage.lib.errors
 import libiocage.lib.helpers
 import libiocage.lib.events
+import libiocage.lib.Resource
 import libiocage.lib.LaunchableResource
 import libiocage.lib.Jail
 

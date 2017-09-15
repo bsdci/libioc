@@ -45,16 +45,14 @@ def init_zfs(
 
     if (zfs is not None) and isinstance(zfs, libiocage.lib.ZFS.ZFS):
         object.__setattr__(self, 'zfs', zfs)
-        return zfs
+    else:
+        new_zfs = libiocage.lib.ZFS.get_zfs()
+        object.__setattr__(self, 'zfs', new_zfs)
 
     try:
         return self.zfs
     except AttributeError:
-        pass
-
-    zfs = libiocage.lib.ZFS.get_zfs(logger=self.logger)
-    object.__setattr__(self, 'zfs', zfs)
-    return zfs
+        raise
 
 
 def init_host(
@@ -166,7 +164,7 @@ def validate_name(name: str) -> bool:
     return bool(_validate_name.fullmatch(name))
 
 
-def parse_none(data) -> str:
+def parse_none(data: typing.Any) -> None:
     if data is None:
         return None
 
