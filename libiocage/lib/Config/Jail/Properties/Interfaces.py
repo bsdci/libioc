@@ -53,7 +53,7 @@ class BridgeSet(set):
 
 class InterfaceProp(dict):
 
-    config: _ConfigType  # type: ignore
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "interfaces"
 
     def __init__(

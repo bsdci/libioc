@@ -25,11 +25,12 @@ import shutil
 
 import libiocage.lib.helpers
 import libiocage.lib.Config.Jail
+import libiocage.lib.Config.Jail.JailConfig
 
 
 class ResolverProp(list):
 
-    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
+    config: libiocage.lib.Config.Jail.JailConfig.JailConfig
     property_name: str = "resolver"
 
     def __init__(
