@@ -23,10 +23,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import re
-from collections import UserString
 
 
-class AbsolutePath(UserString):
+class AbsolutePath(str):
     """Wrapper Type for ensuring a `str` matches a Unix Path"""
 
     unix_path = re.compile(r"/([^/\0]+/*)+")
@@ -37,16 +36,7 @@ class AbsolutePath(UserString):
     ) -> None:
         if self.unix_path.fullmatch(sequence) is None:
             raise TypeError("Invalid value for AbsolutePath")
-        self.data = sequence
-
-    def __str__(self) -> str:
-        return self.data
-
-    def __getitem__(self):
-        return str.__getitem__(self.data)
-
-    def __len__(self):
-        return str.__len__(self.data)
+        str.__init__(self, sequence)
 
 
 class UserInput:
