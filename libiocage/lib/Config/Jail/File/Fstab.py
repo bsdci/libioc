@@ -22,9 +22,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import os
+import os.path
 
 import libiocage.lib.helpers
+import libiocage.lib.Config.Jail.File.Prototype
 
 # MyPy
 import libiocage.lib.Resource
@@ -46,7 +47,7 @@ class FstabLine(dict):
         return hash(self["destination"])
 
 
-class Fstab(set):
+class Fstab(set, libiocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
     """
 
     Fstab configuration file wrapper
@@ -77,14 +78,18 @@ class Fstab(set):
         set.__init__(self)
 
     @property
-    def file_path(self) -> str:
+    def path(self) -> str:
         """
         Absolute fstab file path
 
         This is the file read from and written to.
         """
-
-        return f"{self.jail.dataset.mountpoint}/fstab"
+        path = f"{self.jail.dataset.mountpoint}/fstab"
+        self._require_path_relative_to_resource(
+            filepath=path,
+            resource=self.jail
+        )
+        return path
 
     def parse_lines(
         self,
@@ -124,7 +129,7 @@ class Fstab(set):
             fragments = line.split()
             if len(fragments) != 6:
                 self.logger.log(
-                    f"Invalid line in fstab file {self.file_path}"
+                    f"Invalid line in fstab file {self.path}"
                     " - skipping line"
                 )
                 continue
@@ -150,15 +155,15 @@ class Fstab(set):
             self.add_line(new_line)
 
     def read_file(self) -> None:
-        if os.path.isfile(self.file_path):
-            with open(self.file_path, "r") as f:
+        if os.path.isfile(self.path):
+            with open(self.path, "r") as f:
                 self._read_file_handle(f)
-                self.logger.debug(f"fstab loaded from {self.file_path}")
+                self.logger.debug(f"fstab loaded from {self.path}")
 
     def save(self) -> None:
-        with open(self.file_path, "w") as f:
+        with open(self.path, "w") as f:
             self._save_file_handle(f)
-            self.logger.verbose(f"{self.file_path} written")
+            self.logger.verbose(f"{self.path} written")
 
     def _save_file_handle(self, f) -> None:
         f.write(self.__str__())
@@ -171,12 +176,12 @@ class Fstab(set):
         self
     ) -> None:
 
-        if os.path.isfile(self.file_path):
-            f = open(self.file_path, "r+")
+        if os.path.isfile(self.path):
+            f = open(self.path, "r+")
             self._read_file_handle(f)
             f.seek(0)
         else:
-            f = open(self.file_path, "w")
+            f = open(self.path, "w")
 
         self._save_file_handle(f)
         f.close()

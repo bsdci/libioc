@@ -714,7 +714,7 @@ class JailGenerator(JailResource):
             f"exec.clean={self.config['exec_clean']}",
             f"exec.timeout={self.config['exec_timeout']}",
             f"stop.timeout={self.config['stop_timeout']}",
-            f"mount.fstab={self.fstab.file_path}",
+            f"mount.fstab={self.fstab.path}",
             f"mount.devfs={self.config['mount_devfs']}"
         ]
 
