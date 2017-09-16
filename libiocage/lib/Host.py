@@ -41,6 +41,7 @@ class HostGenerator:
     _class_distribution = libiocage.lib.Distribution.DistributionGenerator
 
     _devfs: 'libiocage.lib.DevfsRules.DevfsRules'
+    _defaults: 'libiocage.lib.Resource.DefaultResource'
     releases_dataset: libzfs.ZFSDataset
 
     def __init__(
@@ -63,7 +64,9 @@ class HostGenerator:
             host=self,
             logger=self.logger
         )
-        self._defaults = defaults
+
+        if defaults is not None:
+            self._defaults = defaults
 
     @property
     def defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
