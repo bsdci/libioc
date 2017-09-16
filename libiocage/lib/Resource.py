@@ -31,9 +31,10 @@ import libiocage.lib.Config.Jail.Defaults
 import libiocage.lib.Config.Type.JSON
 import libiocage.lib.Config.Type.UCL
 import libiocage.lib.Config.Type.ZFS
-import libiocage.lib.Logger
-import libiocage.lib.ZFS
 import libiocage.lib.Filter
+import libiocage.lib.Logger
+import libiocage.lib.Types
+import libiocage.lib.ZFS
 import libiocage.lib.helpers
 
 # MyPy

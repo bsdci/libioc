@@ -26,6 +26,7 @@
 import libzfs  # noqa: F401
 import libiocage.lib.events  # noqa: F401
 import libiocage.lib.Jail  # noqa: F401
+import libiocage.lib.Types  # noqa: F401
 
 
 class IocageException(Exception):
@@ -269,7 +270,7 @@ class UnmountFailed(IocageException):
 
     def __init__(
         self,
-        mountpoint: str,
+        mountpoint: libiocage.lib.Types.AbsolutePath,
         *args,
         **kwargs
     ) -> None:
@@ -282,7 +283,7 @@ class MountFailed(IocageException):
 
     def __init__(
         self,
-        mountpoint: str,
+        mountpoint: libiocage.lib.Types.AbsolutePath,
         *args,
         **kwargs
     ) -> None:
