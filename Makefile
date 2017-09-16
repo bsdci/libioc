@@ -2,13 +2,8 @@ ZPOOL=""
 SERVER=""
 SVN_REL_URL=https://svn.freebsd.org/base/releng/11.1
 
-/usr/src/cddl:
-	( cd /usr/src && svnlite checkout $(SVN_REL_URL)/cddl/ )
-/usr/src/sys/cddl:
-	( mkdir -p /usr/src/sys && cd /usr/src/sys && \
-		svnlite checkout $(SVN_REL_URL)/sys/cddl/ )
 install: /usr/src/cddl /usr/src/sys/cddl
-	pkg install -q -y libgit2 libucl cython3 rsync python36
+	pkg install -q -y libgit2 libucl cython3 rsync python36 py36-libzfs
 	python3.6 -m ensurepip
 	pip3.6 install -Ur requirements.txt # properly install libzfs
 	pip3.6 install -e . # install libiocage from source / for testing.
