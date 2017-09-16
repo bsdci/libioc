@@ -22,17 +22,27 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# MyPy
+import libzfs  # noqa: F401
+import libiocage.lib.events  # noqa: F401
+import libiocage.lib.Jail  # noqa: F401
+
 
 class IocageException(Exception):
 
-    def __init__(self, message, errors=None, logger=None, level="error",
-                 append_warning=False, warning=None):
+    def __init__(
+        self,
+        message: str,
+        logger: 'libiocage.lib.Logger.Logger'=None,
+        level: str="error",
+        append_warning: bool=False,
+        warning: bool=None
+    ) -> None:
+
         if logger is not None:
             logger.__getattribute__(level)(message)
             if append_warning is True:
                 logger.warn(warning)
-        if errors is not None:
-            super().__init__(message, errors)
         else:
             super().__init__(message)
 
@@ -42,49 +52,79 @@ class IocageException(Exception):
 
 class JailDoesNotExist(IocageException):
 
-    def __init__(self, jail, *args, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Jail '{jail.humanreadable_name}' does not exist"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailAlreadyExists(IocageException):
 
-    def __init__(self, jail, *args, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Jail '{jail.humanreadable_name}' already exists"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotRunning(IocageException):
 
-    def __init__(self, jail, *args, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Jail '{jail.humanreadable_name}' is not running"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailAlreadyRunning(IocageException):
 
-    def __init__(self, jail, *args, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Jail '{jail.humanreadable_name}' is already running"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotFound(IocageException):
 
-    def __init__(self, text, *args, **kwargs):
+    def __init__(
+        self,
+        text: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"No jail matching '{text}' was found"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailNotSupplied(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = f"Please supply a jail"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailUnknownIdentifier(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = "The jail has no identifier yet"
         IocageException.__init__(self, msg, *args, **kwargs)
 
@@ -94,16 +134,16 @@ class JailUnknownIdentifier(IocageException):
 
 class SecurityViolation(IocageException):
 
-    def __init__(self, reason, *args, **kwargs):
+    def __init__(self, reason, *args, **kwargs) -> None:
         msg = f"Security violation: {reason}"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class SecurityViolationConfigJailEscape(IocageException):
 
-    def __init__(self, file, *args, **kwargs):
+    def __init__(self, file, *args, **kwargs) -> None:
         msg = f"The file {file} references a file outsite of the jail resource"
-        IocageException.__init__(self, reason=msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 # JailConfig
@@ -115,7 +155,7 @@ class JailConfigError(IocageException):
 
 class InvalidJailName(JailConfigError):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = (
             "Invalid jail name: "
             "Names have to begin and end with an alphanumeric character"
@@ -125,7 +165,7 @@ class InvalidJailName(JailConfigError):
 
 class JailConigZFSIsNotAllowed(JailConfigError):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = (
             "jail_zfs is disabled"
             "despite jail_zfs_dataset is configured"
@@ -135,7 +175,14 @@ class JailConigZFSIsNotAllowed(JailConfigError):
 
 class InvalidJailConfigValue(JailConfigError):
 
-    def __init__(self, property_name, jail=None, reason=None, **kwargs):
+    def __init__(
+        self,
+        property_name: str,
+        jail: 'libiocage.lib.Jail.JailGenerator'=None,
+        reason: str=None,
+        **kwargs
+    ) -> None:
+
         msg = f"Invalid value for property '{property_name}'"
         if jail is not None:
             msg += f" of jail {jail.humanreadable_name}"
@@ -146,7 +193,7 @@ class InvalidJailConfigValue(JailConfigError):
 
 class InvalidJailConfigAddress(InvalidJailConfigValue):
 
-    def __init__(self, value, **kwargs):
+    def __init__(self, value: str, **kwargs) -> None:
         reason = f"expected \"<nic>|<address>\" but got \"{value}\""
         super().__init__(
             reason=reason,
@@ -156,15 +203,15 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
 
 class JailConfigNotFound(IocageException):
 
-    def __init__(self, config_type, *args, **kwargs):
+    def __init__(self, config_type: str, *args, **kwargs) -> None:
         msg = f"Could not read {config_type} config"
         # This is a silent error internally used
-        Exception.__init__(self, msg, *args, **kwargs)
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class DefaultConfigNotFound(IocageException, FileNotFoundError):
 
-    def __init__(self, config_file_path, *args, **kwargs):
+    def __init__(self, config_file_path: str, *args, **kwargs) -> None:
         msg = f"Default configuration not found at {config_file_path}"
         IocageException.__init__(self, msg, *args, **kwargs)
 
@@ -174,7 +221,7 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
 
 class IocageNotActivated(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = (
             "iocage is not activated yet - "
             "please run `iocage activate` first and select a pool"
@@ -184,7 +231,7 @@ class IocageNotActivated(IocageException):
 
 class MustBeRoot(IocageException):
 
-    def __init__(self, msg, *args, **kwargs):
+    def __init__(self, msg: str, *args, **kwargs) -> None:
         _msg = (
             f"Must be root to {msg}"
         )
@@ -193,14 +240,14 @@ class MustBeRoot(IocageException):
 
 class CommandFailure(IocageException):
 
-    def __init__(self, returncode, *args, **kwargs):
+    def __init__(self, returncode: int, *args, **kwargs) -> None:
         msg = f"Command exited with {returncode}"
         super().__init__(msg, *args, **kwargs)
 
 
 class NotAnIocageZFSProperty(IocageException):
 
-    def __init__(self, property_name, *args, **kwargs):
+    def __init__(self, property_name: str, *args, **kwargs) -> None:
         msg = f"The ZFS property '{property_name}' is not managed by iocage"
         super().__init__(msg, *args, **kwargs)
 
@@ -210,7 +257,7 @@ class NotAnIocageZFSProperty(IocageException):
 
 class DistributionUnknown(IocageException):
 
-    def __init__(self, distribution_name, *args, **kwargs):
+    def __init__(self, distribution_name: str, *args, **kwargs) -> None:
         msg = f"Unknown Distribution: {distribution_name}"
         super().__init__(msg, *args, **kwargs)
 
@@ -220,35 +267,59 @@ class DistributionUnknown(IocageException):
 
 class UnmountFailed(IocageException):
 
-    def __init__(self, mountpoint, *args, **kwargs):
+    def __init__(
+        self,
+        mountpoint: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Failed to unmount {mountpoint}"
         super().__init__(msg, *args, **kwargs)
 
 
 class MountFailed(IocageException):
 
-    def __init__(self, mountpoint, *args, **kwargs):
+    def __init__(
+        self,
+        mountpoint: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Failed to mount {mountpoint}"
         super().__init__(msg, *args, **kwargs)
 
 
 class DatasetNotMounted(IocageException):
 
-    def __init__(self, dataset, *args, **kwargs):
+    def __init__(
+        self,
+        dataset: 'libzfs.ZFSDataset',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Dataset '{dataset.name}' is not mounted"
         super().__init__(msg, *args, **kwargs)
 
 
 class DatasetNotAvailable(IocageException):
 
-    def __init__(self, dataset_name, *args, **kwargs):
+    def __init__(self, dataset_name, *args, **kwargs) -> None:
         msg = f"Dataset '{dataset_name}' is not available"
         super().__init__(msg, *args, **kwargs)
 
 
 class DatasetNotJailed(IocageException):
 
-    def __init__(self, dataset, *args, **kwargs):
+    def __init__(
+        self,
+        dataset: 'libzfs.ZFSDataset',
+        *args,
+        **kwargs
+    ) -> None:
+
         name = dataset.name
         msg = f"Dataset {name} is not jailed."
         warning = f"Run 'zfs set jailed=on {name}' to allow mounting"
@@ -258,7 +329,13 @@ class DatasetNotJailed(IocageException):
 
 class ZFSPoolInvalid(IocageException, TypeError):
 
-    def __init__(self, consequence=None, *args, **kwargs):
+    def __init__(
+        self,
+        consequence: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = "Invalid ZFS pool"
 
         if consequence is not None:
@@ -269,7 +346,13 @@ class ZFSPoolInvalid(IocageException, TypeError):
 
 class ZFSPoolUnavailable(IocageException):
 
-    def __init__(self, pool_name, *args, **kwargs):
+    def __init__(
+        self,
+        pool_name: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"ZFS pool '{pool_name}' is UNAVAIL"
         super().__init__(msg, *args, **kwargs)
 
@@ -279,14 +362,20 @@ class ZFSPoolUnavailable(IocageException):
 
 class VnetBridgeMissing(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = "VNET is enabled and requires setting a bridge"
         super().__init__(msg, *args, **kwargs)
 
 
 class InvalidNetworkBridge(IocageException, ValueError):
 
-    def __init__(self, reason=None, *args, **kwargs):
+    def __init__(
+        self,
+        reason: str=None,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = "Invalid network bridge argument"
         if reason is not None:
             msg += f": {reason}"
@@ -298,7 +387,14 @@ class InvalidNetworkBridge(IocageException, ValueError):
 
 class ReleaseUpdateFailure(IocageException):
 
-    def __init__(self, release_name, reason=None, *args, **kwargs):
+    def __init__(
+        self,
+        release_name: str,
+        reason: str=None,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Release update of '{release_name}' failed"
         if reason is not None:
             msg += f": {reason}"
@@ -307,32 +403,64 @@ class ReleaseUpdateFailure(IocageException):
 
 class InvalidReleaseAssetSignature(ReleaseUpdateFailure):
 
-    def __init__(self, release_name, asset_name, *args, **kwargs):
+    def __init__(
+        self,
+        release_name: str,
+        asset_name: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Asset {asset_name} has an invalid signature"
-        super().__init__(release_name, reason=msg, *args, **kwargs)
+        ReleaseUpdateFailure.__init__(
+            self,
+            release_name=release_name,
+            reason=msg,
+            **kwargs
+        )
 
 
 class IllegalReleaseAssetContent(ReleaseUpdateFailure):
 
-    def __init__(self, release_name, asset_name, reason, *args, **kwargs):
+    def __init__(
+        self,
+        release_name: str,
+        asset_name: str,
+        reason: str,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Asset {asset_name} contains illegal files - {reason}"
-        super().__init__(release_name, reason=msg, *args, **kwargs)
+        ReleaseUpdateFailure.__init__(
+            self,
+            release_name=release_name,
+            reason=msg,
+            **kwargs
+        )
 
 
 class ReleaseNotFetched(IocageException):
 
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name: str, *args, **kwargs) -> None:
         msg = f"Release '{name}' does not exist or is not fetched locally"
         super().__init__(msg, *args, **kwargs)
 
 
 class ReleaseUpdateBranchLookup(IocageException):
 
-    def __init__(self, release_name, reason=None, *args, **kwargs):
+    def __init__(
+        self,
+        release_name: str,
+        reason: str=None,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Update source of release '{release_name}' not found"
         if reason is not None:
             msg += ": {reason}"
-        super.__init__(msg, *args, **kwargs)
+        super().__init__(msg, *args, **kwargs)
 
 
 # Prompts
@@ -340,7 +468,7 @@ class ReleaseUpdateBranchLookup(IocageException):
 
 class DefaultReleaseNotFound(IocageException):
 
-    def __init__(self, host_release_name, *args, **kwargs):
+    def __init__(self, host_release_name: str, *args, **kwargs) -> None:
         msg = (
             f"Release '{host_release_name}' not found: "
             "Could not determine a default source"
@@ -353,13 +481,20 @@ class DefaultReleaseNotFound(IocageException):
 
 class DevfsRuleException(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
 
 class InvalidDevfsRulesSyntax(DevfsRuleException):
 
-    def __init__(self, devfs_rules_file, reason=None, *args, **kwargs):
+    def __init__(
+        self,
+        devfs_rules_file: str,
+        reason: str=None,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = f"Invalid devfs rules in {devfs_rules_file}"
         if reason is not None:
             msg += f": {reason}"
@@ -368,7 +503,14 @@ class InvalidDevfsRulesSyntax(DevfsRuleException):
 
 class DuplicateDevfsRuleset(DevfsRuleException):
 
-    def __init__(self, devfs_rules_file, reason=None, *args, **kwargs):
+    def __init__(
+        self,
+        devfs_rules_file: str,
+        reason: str=None,
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = "Cannot add duplicate ruleset"
         if reason is not None:
             msg += f": {reason}"
@@ -380,13 +522,13 @@ class DuplicateDevfsRuleset(DevfsRuleException):
 
 class LogException(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
 
 class CannotRedrawLine(LogException):
 
-    def __init__(self, reason, *args, **kwargs):
+    def __init__(self, reason: str, *args, **kwargs) -> None:
         msg = "Logger can't redraw line"
         if reason is not None:
             msg += f": {reason}"
@@ -398,7 +540,13 @@ class CannotRedrawLine(LogException):
 
 class EventAlreadyFinished(IocageException):
 
-    def __init__(self, event, *args, **kwargs):
+    def __init__(
+        self,
+        event: 'libiocage.lib.events.IocageEvent',
+        *args,
+        **kwargs
+    ) -> None:
+
         msg = "This {event.type} event is already finished"
         IocageException.__init__(self, msg, *args, **kwargs)
 
@@ -408,13 +556,13 @@ class EventAlreadyFinished(IocageException):
 
 class JailFilterException(IocageException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         IocageException.__init__(self, *args, **kwargs)
 
 
 class JailFilterInvalidName(JailFilterException):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         msg = (
             "Invalid jail selector: "
             "Cannot select jail with illegal name"
