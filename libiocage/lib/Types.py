@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
+import typing
 import re
 from collections import UserString
 
@@ -38,3 +38,22 @@ class AbsolutePath(UserString):
         if self.unix_path.fullmatch(sequence) is None:
             raise TypeError("Invalid value for AbsolutePath")
         self.data = sequence
+
+    def __str__(self) -> str:
+        return self.data
+
+    def __getitem__(self):
+        return str.__getitem__(self.data)
+
+    def __len__(self):
+        return str.__len__(self.data)
+
+
+class UserInput:
+
+    def __init__(
+        self,
+        data: typing.Union[str, int, float, bool, None]
+    ) -> None:
+
+        ...

@@ -27,14 +27,18 @@ import re
 import subprocess
 import uuid
 
+import libiocage.lib.errors
 import libiocage.lib.Datasets
 import libiocage.lib.Host
 import libiocage.lib.Logger
 import libiocage.lib.ZFS
 
+# MyPy
+import libiocage.lib.Types
+
 
 def init_zfs(
-        self,
+        self: typing.Any,
         zfs: 'libiocage.lib.ZFS.ZFS'=None
 ) -> 'libiocage.lib.ZFS.ZFS':
 
@@ -53,7 +57,7 @@ def init_zfs(
 
 
 def init_host(
-        self,
+        self: typing.Any,
         host: 'libiocage.lib.Host.HostGenerator'=None
 ) -> 'libiocage.lib.Host.HostGenerator':
 
@@ -72,7 +76,7 @@ def init_host(
 
 
 def init_logger(
-        self,
+        self: typing.Any,
         logger: 'libiocage.lib.Logger.Logger'=None
 ) -> 'libiocage.lib.Logger.Logger':
 
@@ -93,7 +97,13 @@ def init_logger(
             return new_logger
 
 
-def exec(command, logger=None, ignore_error=False, **subprocess_args):
+def exec(
+    command: typing.List[str],
+    logger: 'libiocage.lib.Logger.Logger'=None,
+    ignore_error: bool=False,
+    **subprocess_args
+) -> typing.Tuple[subprocess.Popen, str, str]:
+
     if isinstance(command, str):
         command = [command]
 
@@ -179,7 +189,7 @@ def parse_list(data: typing.Union[str, typing.List[str]]) -> list:
     return data if isinstance(data, list) else data.split(",")
 
 
-def parse_bool(data) -> bool:
+def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
     """
     try to parse booleans from strings
 
@@ -208,7 +218,7 @@ def parse_bool(data) -> bool:
     raise TypeError("Value is not a boolean")
 
 
-def parse_user_input(data):
+def parse_user_input(data: typing.Optional[typing.Union[str, bool]]):
     """
     uses parse_bool() to partially return Boolean and NoneType values
     All other types as returned as-is
@@ -253,6 +263,7 @@ def to_string(
         str,
         bool,
         int,
+        None,
         typing.List[typing.Union[str, bool, int]]
     ],
     true: str="yes",
@@ -321,7 +332,11 @@ def to_string(
     return str(parsed_data)
 
 
-def exec_passthru(command, logger=None):
+def exec_passthru(
+    command: typing.List[str],
+    logger: 'libiocage.lib.Logger.Logger'=None
+) -> typing.Tuple[str, str]:
+
     if isinstance(command, str):
         command = [command]
 
@@ -332,7 +347,12 @@ def exec_passthru(command, logger=None):
     return subprocess.Popen(command).communicate()
 
 
-def exec_raw(command, logger=None, **kwargs):
+def exec_raw(
+    command: typing.List[str],
+    logger: 'libiocage.lib.Logger.Logger'=None,
+    **kwargs
+) -> subprocess.Popen:
+
     if isinstance(command, str):
         command = [command]
 
@@ -346,7 +366,11 @@ def exec_raw(command, logger=None, **kwargs):
     )
 
 
-def exec_iter(command, logger=None):
+def exec_iter(
+    command: typing.List[str],
+    logger: 'libiocage.lib.Logger.Logger'=None
+) -> typing.Generator[str, None, None]:
+
     process = exec_raw(
         command,
         logger=logger,
@@ -365,15 +389,21 @@ def exec_iter(command, logger=None):
         raise subprocess.CalledProcessError(return_code, command)
 
 
-def shell(command, logger=None):
+def shell(
+    command: typing.Union[str, typing.List[str]],
+    logger: 'libiocage.lib.Logger.Logger'=None
+) -> subprocess.CompletedProcess:
+
     if not isinstance(command, str):
-        command = " ".join(command)
+        shell_command = " ".join(command)
+    else:
+        shell_command = command
 
     if logger:
         logger.spam(f"Executing Shell: {command}")
 
     return subprocess.check_output(
-        command,
+        shell_command,
         shell=True,
         universal_newlines=True,
         stderr=subprocess.DEVNULL
@@ -381,13 +411,19 @@ def shell(command, logger=None):
 
 
 # ToDo: replace with (u)mount library
-def umount(mountpoint, force=False, ignore_error=False, logger=None):
+def umount(
+    mountpoint: libiocage.lib.Types.AbsolutePath,
+    force: bool=False,
+    ignore_error: bool=False,
+    logger: 'libiocage.lib.Logger.Logger'=None
+) -> None:
+
     cmd = ["/sbin/umount"]
 
     if force is True:
         cmd.append("-f")
 
-    cmd.append(mountpoint)
+    cmd.append(str(mountpoint))
 
     try:
         exec(cmd)
@@ -401,7 +437,10 @@ def umount(mountpoint, force=False, ignore_error=False, logger=None):
                 f"Jail mountpoint {mountpoint} not unmounted"
             )
         if ignore_error is False:
-            raise libiocage.lib.errors.UnmountFailed(logger=logger)
+            raise libiocage.lib.errors.UnmountFailed(
+                mountpoint=mountpoint,
+                logger=logger
+            )
 
 
 def get_basedir_list(distribution_name="FreeBSD"):
