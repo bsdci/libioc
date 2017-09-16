@@ -25,6 +25,7 @@ import libzfs
 
 import libiocage.lib.Logger
 import libiocage.lib.helpers
+import libiocage.lib.errors
 
 
 def get_zfs(
@@ -72,4 +73,7 @@ class ZFS(libzfs.ZFS):
         for pool in self.pools:
             if pool.name == pool_name:
                 return pool
-        raise
+        raise libiocage.lib.errors.ZFSPoolUnavailable(
+            pool_name=pool_name,
+            logger=self.logger
+        )
