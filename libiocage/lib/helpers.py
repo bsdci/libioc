@@ -49,10 +49,7 @@ def init_zfs(
         new_zfs = libiocage.lib.ZFS.get_zfs(logger=self.logger)
         object.__setattr__(self, 'zfs', new_zfs)
 
-    try:
-        return self.zfs
-    except AttributeError:
-        raise
+    return self.zfs
 
 
 def init_host(
