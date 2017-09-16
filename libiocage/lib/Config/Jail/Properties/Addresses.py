@@ -25,12 +25,10 @@ import typing
 import libiocage.lib.errors
 import libiocage.lib.helpers
 
-_ConfigType = 'libiocage.lib.Config.JailConfig.JailConfig'
-
 
 class AddressSet(set):
 
-    config: 'libiocage.lib.Config.JailConfig.JailConfig'  # type: ignore
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
 
     def __init__(
         self,
@@ -62,7 +60,7 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 class AddressesProp(dict):
 
     logger: 'libiocage.lib.Logger.Logger'
-    config: 'libiocage.lib.Config.JailConfig.JailConfig'  # type: ignore
+    config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
     property_name: str = "ip4_address"
     skip_on_error: bool
 

@@ -41,6 +41,9 @@ import libiocage.lib.events
 import libiocage.lib.LaunchableResource
 import libiocage.lib.Jail
 
+# MyPy
+import libiocage.lib.Resource
+
 
 class ReleaseResource(libiocage.lib.LaunchableResource.LaunchableResource):
 

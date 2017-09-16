@@ -54,7 +54,7 @@ class JailConfig(libiocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
         self.host = libiocage.lib.helpers.init_host(self, host)
 
-        if self.data is None:
+        if len(data.keys()) == 0:
             self.data = {
                 "id": None
             }
