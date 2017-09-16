@@ -21,28 +21,34 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import typing
-import json
+import os.path
 
-import libiocage.lib.Config
-import libiocage.lib.Config.File
-import libiocage.lib.Config.Resource.ResourceConfig
-import libiocage.lib.helpers
+import libiocage.lib.LaunchableResource
 
 
-class ConfigJSON(libiocage.lib.Config.File.ConfigFile):
+class ResourceConfigFile:
 
-    config_type = "json"
+    def _require_path_relative_to_resource(
+        self,
+        filepath: str,
+        resource: 'libiocage.lib.LaunchableResource.LaunchableResource'
+    ) -> None:
 
-    def map_input(self, data: typing.TextIO) -> dict:
-        return json.load(data)
+        if self._is_path_relative_to_resource(filepath, resource) is False:
+            raise libiocage.lib.errors.SecurityViolationConfigJailEscape(
+                file=filepath
+            )
 
-    def map_output(self, data: dict) -> str:
-        return libiocage.lib.helpers.to_json(data)
+    def _is_path_relative_to_resource(
+        self,
+        filepath: str,
+        resource: 'libiocage.lib.LaunchableResource.LaunchableResource'
+    ) -> bool:
 
+        real_resource_path = self._resolve_path(resource.dataset.mountpoint)
+        real_file_path = self._resolve_path(filepath)
 
-class ResourceConfigJSON(
-    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
-    ConfigJSON
-):
-    pass
+        return real_file_path.startswith(real_resource_path)
+
+    def _resolve_path(self, filepath: str) -> str:
+        return os.path.realpath(os.path.abspath(filepath))

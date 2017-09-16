@@ -21,17 +21,21 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import os
+import os.path
 
 import ucl
 
 import libiocage.lib.helpers
+import libiocage.lib.Config.Jail.File.Prototype
 
 # MyPy
 import libiocage.lib.LaunchableResource
 
 
-class RCConf(dict):
+class RCConf(
+    dict,
+    libiocage.lib.Config.Jail.File.Prototype.ResourceConfigFile
+):
 
     # the file is always relative to the resource
     _file: str = "/etc/rc.conf"
@@ -58,6 +62,11 @@ class RCConf(dict):
     @property
     def path(self):
         path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
+        print("A", path)
+        self._require_path_relative_to_resource(
+            filepath=path,
+            resource=self.resource
+        )
         return os.path.abspath(path)
 
     @property

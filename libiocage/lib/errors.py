@@ -88,6 +88,24 @@ class JailUnknownIdentifier(IocageException):
         msg = "The jail has no identifier yet"
         IocageException.__init__(self, msg, *args, **kwargs)
 
+
+# Security
+
+
+class SecurityViolation(IocageException):
+
+    def __init__(self, reason, *args, **kwargs):
+        msg = f"Security violation: {reason}"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class SecurityViolationConfigJailEscape(IocageException):
+
+    def __init__(self, file, *args, **kwargs):
+        msg = f"The file {file} references a file outsite of the jail resource"
+        IocageException.__init__(self, reason=msg, *args, **kwargs)
+
+
 # JailConfig
 
 
