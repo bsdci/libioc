@@ -32,14 +32,13 @@ import libiocage.lib.Host
 import libiocage.lib.Config.Jail.JailConfig
 import libiocage.lib.Network
 import libiocage.lib.NullFSBasejailStorage
-import libiocage.lib.RCConf
 import libiocage.lib.Release
 import libiocage.lib.StandaloneJailStorage
 import libiocage.lib.Storage
 import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
 import libiocage.lib.LaunchableResource
-import libiocage.lib.Fstab
+import libiocage.lib.Config.Jail.File.Fstab
 import libiocage.lib.errors
 import libiocage.lib.events
 import libiocage.lib.helpers
@@ -48,7 +47,7 @@ import libiocage.lib.helpers
 class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
 
     _jail: 'JailGenerator' = None
-    _fstab: 'libiocage.lib.Fstab.Fstab' = None
+    _fstab: 'libiocage.lib.Config.Jail.File.Fstab.Fstab' = None
 
     def __init__(
         self,
@@ -86,9 +85,9 @@ class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
         raise Exception("This resource is not a jail or not linked to one")
 
     @property
-    def fstab(self) -> 'libiocage.lib.Fstab.Fstab':
+    def fstab(self) -> 'libiocage.lib.Config.Jail.File.Fstab.Fstab':
         if self._fstab is None:
-            self._fstab = libiocage.lib.Fstab.Fstab(
+            self._fstab = libiocage.lib.Config.Jail.File.Fstab.Fstab(
                 jail=self.jail,
                 release=self.jail.release,
                 logger=self.logger,
