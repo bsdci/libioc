@@ -930,7 +930,7 @@ class JailGenerator(JailResource):
     def _teardown_mounts(self) -> None:
 
         mountpoints = list(map(
-            lambda mountpoint: f"{self.root_path}{mountpoint}",
+            self._get_absolute_path_from_jail_asset,
             [
                 "/dev/fd",
                 "/dev",
@@ -945,13 +945,22 @@ class JailGenerator(JailResource):
         ))
 
         for mountpoint in mountpoints:
-            if os.path.isdir(mountpoint):
+            if os.path.isdir(str(mountpoint)):
                 libiocage.lib.helpers.umount(
                     mountpoint,
                     force=True,
                     logger=self.logger,
                     ignore_error=True  # maybe it was not mounted
                 )
+
+    def _get_absolute_path_from_jail_asset(
+        self,
+        value: str
+    ) -> libiocage.lib.Types.AbsolutePath:
+
+        return libiocage.lib.Types.AbsolutePath(
+            sequence=f"{self.root_path}{value}"
+        )
 
     def _resolve_name(self, text) -> str:
 
