@@ -21,10 +21,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 from timeit import default_timer as timer
-from typing import List
 
 import libiocage.lib.errors
+
+# MyPy
+import libiocage.lib.Jail  # noqa: F401
+import libiocage.lib.Release  # noqa: F401
 
 EVENT_STATUS = (
     "pending",
@@ -40,26 +44,26 @@ class IocageEvent:
     Base class for all other iocage events
     """
 
-    HISTORY: List['IocageEvent'] = []
+    HISTORY: typing.List['IocageEvent'] = []
 
-    PENDING_COUNT = 0
+    PENDING_COUNT: int = 0
 
-    def __init__(self, message=None, **kwargs):
+    identifier: str = None
+    _started_at: float = None
+    _stopped_at: float = None
+    _pending: bool = False
+    skipped: bool = False
+    done: bool = True
+    error: BaseException = None
+
+    def __init__(self, message=None, **kwargs) -> None:
         """
         Initializes an IocageEvent
         """
 
         for event in IocageEvent.HISTORY:
             if event.__hash__() == self.__hash__():
-                return event
-
-        self.identifier = None
-        self._started_at = None
-        self._stopped_at = None
-        self._pending = False
-        self.skipped = False
-        self.done = True
-        self.error = None
+                return event  # type: ignore
 
         self.data = kwargs
         self.number = len(IocageEvent.HISTORY) + 1
@@ -70,15 +74,13 @@ class IocageEvent:
         if self not in IocageEvent.HISTORY:
             IocageEvent.HISTORY.append(self)
 
-    @property
-    def state(self):
-        return self.get_state()
-
-    def get_state_string(self,
-                         error="failed",
-                         skipped="skipped",
-                         done="done",
-                         pending="pending"):
+    def get_state_string(
+        self,
+        error: str="failed",
+        skipped: str="skipped",
+        done: str="done",
+        pending: str="pending"
+    ) -> str:
 
         if self.error is not None:
             return error
@@ -92,7 +94,7 @@ class IocageEvent:
         return pending
 
     @property
-    def type(self):
+    def type(self) -> str:
         """
         The type of event
 
@@ -101,11 +103,11 @@ class IocageEvent:
         return type(self).__name__
 
     @property
-    def pending(self):
+    def pending(self) -> bool:
         return self._pending
 
     @pending.setter
-    def pending(self, state):
+    def pending(self, state: bool) -> None:
         current = self._pending
         new_state = (state is True)
 
@@ -115,31 +117,31 @@ class IocageEvent:
         if new_state is True:
             if self._started_at is not None:
                 raise libiocage.lib.errors.EventAlreadyFinished(event=self)
-            self._started_at = timer()
+            self._started_at = float(timer())
         if new_state is False:
-            self._stopped_at = timer()
+            self._stopped_at = float(timer())
 
         self._pending = new_state
         IocageEvent.PENDING_COUNT += 1 if (state is True) else -1
 
     @property
-    def duration(self):
+    def duration(self) -> typing.Optional[float]:
         if (self._started_at is None) or (self._stopped_at is None):
             return None
         return self._stopped_at - self._started_at
 
-    def _update_message(self, **kwargs):
+    def _update_message(self, **kwargs) -> None:
         if "message" in kwargs:
             self.message = kwargs["message"]
 
-    def begin(self, **kwargs):
+    def begin(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.pending = True
         self.done = False
         self.parent_count = IocageEvent.PENDING_COUNT - 1
         return self
 
-    def end(self, **kwargs):
+    def end(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.done = True
         self.pending = False
@@ -147,19 +149,19 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def step(self, **kwargs):
+    def step(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def skip(self, **kwargs):
+    def skip(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.skipped = True
         self.pending = False
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def fail(self, exception=True, **kwargs):
+    def fail(self, exception=True, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.error = exception
         self.pending = False
@@ -176,7 +178,12 @@ class IocageEvent:
 
 class JailEvent(IocageEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         try:
             self.identifier = jail.humanreadable_name
         except:
@@ -187,43 +194,78 @@ class JailEvent(IocageEvent):
 
 class JailLaunch(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailVnetConfiguration(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailZfsShareMount(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailServicesStart(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailDestroy(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailNetworkTeardown(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 
 class JailMountTeardown(JailEvent):
 
-    def __init__(self, jail, **kwargs):
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
         JailEvent.__init__(self, jail, **kwargs)
 
 # Release
@@ -231,7 +273,12 @@ class JailMountTeardown(JailEvent):
 
 class ReleaseEvent(IocageEvent):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         try:
             self.identifier = release.name
         except:
@@ -242,59 +289,109 @@ class ReleaseEvent(IocageEvent):
 
 class FetchRelease(ReleaseEvent):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         ReleaseEvent.__init__(self, release, **kwargs)
 
 
 class ReleasePrepareStorage(FetchRelease):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         FetchRelease.__init__(self, release, **kwargs)
 
 
 class ReleaseDownload(FetchRelease):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         FetchRelease.__init__(self, release, **kwargs)
 
 
 class ReleaseExtraction(FetchRelease):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         FetchRelease.__init__(self, release, **kwargs)
 
 
 class ReleaseCopyBase(FetchRelease):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         FetchRelease.__init__(self, release, **kwargs)
 
 
 class ReleaseConfiguration(FetchRelease):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         FetchRelease.__init__(self, release, **kwargs)
 
 
 class ReleaseUpdate(ReleaseEvent):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         ReleaseEvent.__init__(self, release, **kwargs)
 
 
-class ReleaseUpdateDownload(ReleaseEvent):
+class ReleaseUpdateDownload(ReleaseUpdate):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         ReleaseUpdate.__init__(self, release, **kwargs)
 
 
 class RunReleaseUpdate(ReleaseUpdate):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         ReleaseUpdate.__init__(self, release, **kwargs)
 
 
 class ExecuteReleaseUpdate(ReleaseUpdate):
 
-    def __init__(self, release, **kwargs):
+    def __init__(
+        self,
+        release: 'libiocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
         ReleaseUpdate.__init__(self, release, **kwargs)
