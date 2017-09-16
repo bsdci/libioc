@@ -24,7 +24,7 @@
 """The main CLI for ioc."""
 import libzfs
 
-import libiocage.lib.RCConf
+import libiocage.lib.Config.Jail.File.RCConf
 import libiocage.lib.Resource
 
 # MyPy
@@ -33,7 +33,7 @@ import libiocage.lib.Config.Jail.JailConfig
 
 class LaunchableResource(libiocage.lib.Resource.Resource):
 
-    _rc_conf: 'libiocage.lib.RCConf.RCConf' = None
+    _rc_conf: 'libiocage.lib.Config.Jail.File.RCConf.RCConf' = None
     config: 'libiocage.lib.Config.Jail.JailConfig.JailConfig' = None
 
     def create_resource(self) -> None:
@@ -80,9 +80,9 @@ class LaunchableResource(libiocage.lib.Resource.Resource):
         self._set_dataset(value)
 
     @property
-    def rc_conf(self) -> 'libiocage.lib.RCConf.RCConf':
+    def rc_conf(self) -> 'libiocage.lib.Config.Jail.File.RCConf.RCConf':
         if self._rc_conf is None:
-            self._rc_conf = libiocage.lib.RCConf.RCConf(
+            self._rc_conf = libiocage.lib.Config.Jail.File.RCConf.RCConf(
                 resource=self,
                 logger=self.logger
             )
