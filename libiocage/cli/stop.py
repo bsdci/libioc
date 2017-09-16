@@ -46,6 +46,11 @@ def cli(ctx, rc, log_level, force, jails):
     location to stop_jail.
     """
     logger = ctx.parent.logger
+
+    if len(jails) == 0:
+        logger.error("No jail selector provided")
+        exit(1)
+
     ioc_jails = libiocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=jails
