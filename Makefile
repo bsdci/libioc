@@ -1,12 +1,11 @@
 ZPOOL=""
 SERVER=""
-SVN_REL_URL=https://svn.freebsd.org/base/releng/11.1
 
-install: /usr/src/cddl /usr/src/sys/cddl
+install:
 	pkg install -q -y libgit2 libucl cython3 rsync python36 py36-libzfs
 	python3.6 -m ensurepip
-	pip3.6 install -Ur requirements.txt # properly install libzfs
-	pip3.6 install -e . # install libiocage from source / for testing.
+	pip3.6 install -Ur requirements.txt
+	pip3.6 install -e .
 uninstall:
 	pip3.6 uninstall -y libiocage
 test:
