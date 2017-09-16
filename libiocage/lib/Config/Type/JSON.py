@@ -25,12 +25,12 @@ import typing
 import json
 
 import libiocage.lib.Config
-import libiocage.lib.Config.ConfigFile
+import libiocage.lib.Config.File
 import libiocage.lib.Config.Resource.ResourceConfig
 import libiocage.lib.helpers
 
 
-class ConfigJSON(libiocage.lib.Config.ConfigFile.ConfigFile):
+class ConfigJSON(libiocage.lib.Config.File.ConfigFile):
 
     config_type = "json"
 
@@ -42,7 +42,18 @@ class ConfigJSON(libiocage.lib.Config.ConfigFile.ConfigFile):
 
 
 class ResourceConfigJSON(
-    ConfigJSON,
-    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig
+    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
+    ConfigJSON
 ):
-    pass
+    pass    
+    # def __init__(
+    #     self,
+    #     resource: 'libiocage.lib.Resource.Resource',
+    #     **kwargs
+    # ):
+
+    #     libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig.__init__(
+    #         self,
+    #         resource=resource,
+    #         **kwargs
+    #     )

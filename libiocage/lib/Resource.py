@@ -37,7 +37,7 @@ import libiocage.lib.Filter
 import libiocage.lib.helpers
 
 # MyPy
-import libiocage.lib.Config.ConfigFile  # noqa: F401
+import libiocage.lib.Config.File  # noqa: F401
 
 
 class Resource:
@@ -261,7 +261,7 @@ class Resource:
         return self.config_handler.read()
 
     @property
-    def config_handler(self) -> 'libiocage.lib.Config.ConfigFile.ConfigFile':
+    def config_handler(self) -> 'libiocage.lib.Config.File.ConfigFile':
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 

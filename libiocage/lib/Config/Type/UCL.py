@@ -26,12 +26,12 @@ import typing
 import ucl
 
 import libiocage.lib.Config
-import libiocage.lib.Config.ConfigFile
+import libiocage.lib.Config.File
 import libiocage.lib.Config.Resource.ResourceConfig
 import libiocage.lib.errors
 
 
-class ConfigUCL(libiocage.lib.Config.ConfigFile.ConfigFile):
+class ConfigUCL(libiocage.lib.Config.File.ConfigFile):
 
     config_type = "ucl"
 
@@ -44,7 +44,7 @@ class ConfigUCL(libiocage.lib.Config.ConfigFile.ConfigFile):
 
 
 class ResourceConfigUCL(
-    ConfigUCL,
-    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig
+    libiocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
+    ConfigUCL
 ):
     pass

@@ -24,19 +24,23 @@
 """The main CLI for ioc."""
 import os.path
 import libzfs
-import libiocage.lib.Config.ConfigFile
+import libiocage.lib.Config.Prototype
 
 
-class DatasetConfig(libiocage.lib.Config.ConfigFile.ConfigFile):
+class DatasetConfig(libiocage.lib.Config.Prototype.Prototype):
+
+    _dataset: libzfs.ZFSDataset
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset,
+        dataset: libzfs.ZFSDataset=None,
         **kwargs
     ) -> None:
 
-        self._dataset = dataset
-        libiocage.lib.Config.ConfigFile.ConfigFile.__init__(self, **kwargs)
+        if dataset is not None:
+            self._dataset = dataset
+
+        libiocage.lib.Config.Prototype.Prototype.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:

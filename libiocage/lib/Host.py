@@ -70,7 +70,7 @@ class HostGenerator:
 
     @property
     def defaults(self) -> 'libiocage.lib.Resource.DefaultResource':
-        if self._defaults is None:
+        if "_defaults" not in dir(self):
             self._load_defaults()
         return self._defaults
 
@@ -94,7 +94,7 @@ class HostGenerator:
         """
         Lazy-loaded DevfsRules instance
         """
-        if self._devfs is None:
+        if "_devfs" not in dir(self):
             self._devfs = libiocage.lib.DevfsRules.DevfsRules(
                 logger=self.logger
             )

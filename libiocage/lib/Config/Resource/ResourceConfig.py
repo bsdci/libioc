@@ -23,10 +23,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import os.path
 import libzfs
-import libiocage.lib.Config.Dataset
+import libiocage.lib.Config.Prototype
 
 
-class ResourceConfig(libiocage.lib.Config.Dataset.DatasetConfig):
+class ResourceConfig(libiocage.lib.Config.Prototype.Prototype):
 
     resource: 'libiocage.lib.Resource.Resource' = None  # type: ignore
 
@@ -37,7 +37,7 @@ class ResourceConfig(libiocage.lib.Config.Dataset.DatasetConfig):
     ) -> None:
 
         self.resource = resource
-        libiocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
+        libiocage.lib.Config.Prototype.Prototype.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
