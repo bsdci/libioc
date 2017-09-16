@@ -235,6 +235,7 @@ class Resource:
         Creates the dataset
         """
         self.dataset = self.zfs.create_dataset(self.dataset_name)
+        os.chmod(self.dataset.mountpoint, 0o700)
 
     def get_dataset(self, name: str) -> libzfs.ZFSDataset:
         dataset_name = f"{self.dataset_name}/{name}"
