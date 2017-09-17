@@ -1056,7 +1056,7 @@ class JailGenerator(JailResource):
         return self.jid is not None
 
     @property
-    def jid(self) -> int:
+    def jid(self) -> typing.Optional[int]:
         """
         The JID of a running jail or None if the jail is not running
         """
