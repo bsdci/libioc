@@ -116,9 +116,9 @@ class HostGenerator:
 
         elif self.distribution.name == "HardenedBSD":
             pattern = re.compile(
-                r"""\(hardened\/
+                r"""\(hardened/
                     (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
-                    \/
+                    /
                     (?P<branch>[A-z0-9]+)
                     \):""", re.X)
 
