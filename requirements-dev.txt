@@ -1,1 +1,6 @@
+pytest
+pytest-cov
+pytest-pep8
+pytest-mock
+mypy
 git+https://github.com/freenas/py-libzfs.git#egg=libzfs
