@@ -181,7 +181,7 @@ class Resource:
     #     return self.dataset.mountpoint
 
     @property
-    def config_type(self) -> str:
+    def config_type(self) -> typing.Optional[str]:
         if self._config_type is None:
             return None
         elif self._config_type == self.CONFIG_TYPES.index("auto"):
