@@ -131,12 +131,12 @@ def _print_table(
     try:
         sort_index = columns.index(sort_key)
     except ValueError:
-        sort_index = None
+        sort_index = -1
 
     for resource in resources:
         table_data.append(_lookup_resource_values(resource, columns))
 
-    if sort_index is not None:
+    if sort_index > -1:
         table_data.sort(key=lambda x: x[sort_index])
 
     if show_header:
