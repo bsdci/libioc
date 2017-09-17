@@ -21,10 +21,10 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from iocage.lib import errors, events
-from iocage.lib.Host import Host
-from iocage.lib.Jail import Jail
-from iocage.lib.Jails import Jails
-from iocage.lib.Logger import Logger
-from iocage.lib.Release import Release
-from iocage.lib.Releases import Releases
+from iocage.lib import errors, events  # noqa: F401
+from iocage.lib.Host import Host  # noqa: F401
+from iocage.lib.Jail import Jail  # noqa: F401
+from iocage.lib.Jails import Jails  # noqa: F401
+from iocage.lib.Logger import Logger  # noqa: F401
+from iocage.lib.Release import Release  # noqa: F401
+from iocage.lib.Releases import Releases  # noqa: F401
