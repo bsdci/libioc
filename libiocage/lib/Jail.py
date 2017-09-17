@@ -810,8 +810,8 @@ class JailGenerator(JailResource):
 
     def _limit_resources(self) -> None:
 
-        for limit, action in map(
-            self._get_resource_limit,
+        for key, limit, action in map(
+            lambda name: (name, ) + self._get_resource_limit(name),
             self._resource_limit_config_keys
         ):
 
@@ -856,15 +856,18 @@ class JailGenerator(JailResource):
             "writeiops"
         ]
 
-    def _get_resource_limit(self, key: str) -> libiocage.lib.Types.UserInput:
+    def _get_resource_limit(self, key: str) -> typing.Tuple[str, str]:
         try:
-            return self._parse_resource_limit(self.config[key])
+            if isinstance(self.config[key], str):
+                return self._parse_resource_limit(self.config[key])
         except:
-            return None, None
+            pass
+
+        return None, None
 
     def _parse_resource_limit(
         self,
-        value: libiocage.lib.Types.UserInput
+        value: str
     ) -> typing.Tuple[str, str]:
 
         limit, action = value.split(":", maxsplit=1)
@@ -1109,7 +1112,7 @@ class JailGenerator(JailResource):
         """
         return f"{self.host.datasets.logs.mountpoint}-console.log"
 
-    def __getattribute__(self, key):
+    def __getattribute__(self, key: str):
 
         try:
             return object.__getattribute__(self, key)
