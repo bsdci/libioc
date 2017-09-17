@@ -48,13 +48,13 @@ class IocageEvent:
 
     PENDING_COUNT: int = 0
 
-    identifier: str = None
-    _started_at: float = None
-    _stopped_at: float = None
+    identifier: str
+    _started_at: float
+    _stopped_at: float
     _pending: bool = False
     skipped: bool = False
     done: bool = True
-    error: BaseException = None
+    error: BaseException
 
     def __init__(self, message=None, **kwargs) -> None:
         """
