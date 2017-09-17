@@ -26,7 +26,7 @@ import iocage.lib.Config.Prototype
 
 class ConfigFile(iocage.lib.Config.Prototype.Prototype):
 
-    _file: str = None
+    _file: str
 
     def __init__(
         self,
@@ -38,7 +38,9 @@ class ConfigFile(iocage.lib.Config.Prototype.Prototype):
             self,
             logger=logger
         )
-        self._file = file
+
+        if file is not None:
+            self._file = file
 
     @property
     def file(self) -> str:

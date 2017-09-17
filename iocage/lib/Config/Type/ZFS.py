@@ -31,12 +31,11 @@ import iocage.lib.errors
 ZFS_PROPERTY_PREFIX = "org.freebsd.iocage:"
 
 
-def is_iocage_property(name):
-
+def is_iocage_property(name: str) -> bool:
     return name.startswith(ZFS_PROPERTY_PREFIX)
 
 
-def get_iocage_property_name(zfs_property_name):
+def get_iocage_property_name(zfs_property_name: str) -> str:
 
     if is_iocage_property(zfs_property_name) is False:
         raise iocage.lib.errors.NotAnIocageZFSProperty(
@@ -56,7 +55,7 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
         except:
             return {}
 
-    def write(self, data: dict):
+    def write(self, data: dict) -> None:
         """
         Writes changes to the config file
         """
@@ -130,7 +129,7 @@ class ConfigZFS(BaseConfigZFS):
     ) -> None:
 
         self._dataset = dataset
-        BaseConfigZFS.__init__(self, **kwargs)
+        iocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
@@ -146,7 +145,7 @@ class ResourceConfigZFS(BaseConfigZFS):
     ) -> None:
 
         self.resource = resource
-        BaseConfigZFS.__init__(self, **kwargs)
+        iocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:

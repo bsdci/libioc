@@ -47,20 +47,21 @@ import iocage.lib.Config.Jail.File.Fstab
 
 class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
 
-    _jail: 'JailGenerator' = None
-    _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab' = None
+    _jail: 'JailGenerator'
+    _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab'
 
     def __init__(
         self,
         host: 'iocage.lib.Host.HostGenerator',
-        jail: 'JailGenerator'=None,
+        jail: typing.Optional['JailGenerator']=None,
         **kwargs
     ) -> None:
 
         self.__jails_dataset_name = host.datasets.jails.name
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        self._jail = jail
+        if jail is not None:
+            self._jail = jail
 
         iocage.lib.LaunchableResource.LaunchableResource.__init__(
             self,
@@ -76,25 +77,33 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         It can still be used linked to a foreign jail by passing jail as
         named attribute to the __init__ function
         """
-        if self._jail is not None:
+        try:
             return self._jail
+        except AttributeError:
+            pass
 
         # is instance of Jail itself
-        if isinstance(self, JailGenerator):
+        if isinstance(self, iocage.lib.Jail.JailGenerator):
             return self
 
         raise Exception("This resource is not a jail or not linked to one")
 
     @property
     def fstab(self) -> 'iocage.lib.Config.Jail.File.Fstab.Fstab':
-        if self._fstab is None:
-            self._fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
-                jail=self.jail,
-                release=self.jail.release,
-                logger=self.logger,
-                host=self.jail.host
-            )
-        return self._fstab
+
+        try:
+            return self._fstab
+        except AttributeError:
+            pass
+
+        fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
+            jail=self.jail,
+            release=self.jail.release,
+            logger=self.logger,
+            host=self.jail.host
+        )
+        self._fstab = fstab
+        return fstab
 
     @property
     def dataset_name(self) -> str:
@@ -107,6 +116,11 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         try:
             return self._assigned_dataset_name
         except:
+            pass
+
+        try:
+            return self._dataset.name
+        except AttributeError:
             pass
 
         return self._dataset_name_from_jail_name
@@ -179,7 +193,7 @@ class JailGenerator(JailResource):
 
     _class_storage = iocage.lib.Storage.Storage
 
-    jail_state: dict = None
+    jail_state: dict = {}
 
     def __init__(
         self,
@@ -218,6 +232,22 @@ class JailGenerator(JailResource):
                 "id": self._resolve_name(data)
             }
 
+        JailResource.__init__(
+            self,
+            jail=self,
+            host=self.host,
+            logger=self.logger,
+            zfs=self.zfs,
+            **resource_args
+        )
+
+        if not new and (("id" not in data) or (data["id"] is None)):
+            try:
+                # try to get the Jail nane from it's dataset_name
+                data["id"] = self.dataset_name.split("/").pop()
+            except:
+                pass
+
         self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(
             data=data,
             host=self.host,
@@ -230,15 +260,6 @@ class JailGenerator(JailResource):
             jail=self,
             logger=self.logger,
             zfs=self.zfs
-        )
-
-        JailResource.__init__(
-            self,
-            jail=self,
-            host=self.host,
-            logger=self.logger,
-            zfs=self.zfs,
-            **resource_args
         )
 
         if new is False:
@@ -337,7 +358,7 @@ class JailGenerator(JailResource):
             env=self.env
         )
 
-    def _start_services(self):
+    def _start_services(self) -> None:
         command = self.config["exec_start"].strip().split()
         self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
         self.exec(command)
@@ -385,7 +406,7 @@ class JailGenerator(JailResource):
 
         self.update_jail_state()
 
-    def destroy(self, force=False):
+    def destroy(self, force: bool=False) -> None:
         """
         Destroy a Jail and it's datasets
 
@@ -406,7 +427,7 @@ class JailGenerator(JailResource):
 
         self.storage.delete_dataset_recursive(self.dataset)
 
-    def rename(self, new_name: str):
+    def rename(self, new_name: str) -> None:
         """
         Change the name of a jail
         """
@@ -430,9 +451,9 @@ class JailGenerator(JailResource):
             self.config["id"] = current_id
             raise
 
-    def _force_stop(self):
-
-        successful = True
+    def _force_stop(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events: typing.Any = iocage.lib.events
         jailDestroyEvent = events.JailDestroy(self)
@@ -442,7 +463,6 @@ class JailGenerator(JailResource):
         try:
             self._run_hook("prestop")
         except:
-            successful = False
             self.logger.warn("pre-stop script failed")
 
         yield jailDestroyEvent.begin()
@@ -451,7 +471,6 @@ class JailGenerator(JailResource):
             self.logger.debug(f"{self.humanreadable_name}: jail destroyed")
             yield jailDestroyEvent.end()
         except Exception as e:
-            successful = False
             yield jailDestroyEvent.skip()
 
         if self.config["vnet"]:
@@ -461,7 +480,6 @@ class JailGenerator(JailResource):
                 self.logger.debug(f"{self.humanreadable_name}: VNET stopped")
                 yield jailNetworkTeardownEvent.end()
             except Exception as e:
-                successful = False
                 yield jailNetworkTeardownEvent.skip()
 
         yield jailMountTeardownEvent.begin()
@@ -470,18 +488,14 @@ class JailGenerator(JailResource):
             self.logger.debug(f"{self.humanreadable_name}: mounts destroyed")
             yield jailMountTeardownEvent.end()
         except Exception as e:
-            successful = False
             yield jailMountTeardownEvent.skip()
 
         try:
             self.update_jail_state()
         except Exception as e:
-            successful = False
             self.logger.warn(str(e))
 
-        return successful
-
-    def create(self, release_name):
+    def create(self, release_name: str) -> None:
         """
         Create a Jail from a Release
 
@@ -541,11 +555,11 @@ class JailGenerator(JailResource):
         self.config.data["release"] = release.name
         self.save()
 
-    def save(self):
+    def save(self) -> None:
         self.write_config(self.config.data)
         self._save_autoconfig()
 
-    def _save_autoconfig(self):
+    def _save_autoconfig(self) -> None:
         """
         Saves auto-generated files
         """
@@ -561,7 +575,11 @@ class JailGenerator(JailResource):
 
         self.fstab.update_and_save()
 
-    def exec(self, command, **kwargs):
+    def exec(
+        self,
+        command: typing.List[str],
+        **kwargs
+    ) -> typing.Tuple[subprocess.Popen, str, str]:
         """
         Execute a command in a started jail
 
@@ -580,7 +598,7 @@ class JailGenerator(JailResource):
             **kwargs
         )
 
-    def passthru(self, command):
+    def passthru(self, command: typing.List[str]):
         """
         Execute a command in a started jail ans passthrough STDIN and STDOUT
 
@@ -609,7 +627,7 @@ class JailGenerator(JailResource):
             ["/usr/bin/login"] + self.config["login_flags"]
         )
 
-    def _destroy_jail(self):
+    def _destroy_jail(self) -> None:
 
         command = ["jail", "-r"]
         command.append(self.identifier)
@@ -621,7 +639,7 @@ class JailGenerator(JailResource):
         )
 
     @property
-    def _dhcp_enabled(self):
+    def _dhcp_enabled(self) -> bool:
         """
         True if any ip4_addr uses DHCP
         """
@@ -631,7 +649,7 @@ class JailGenerator(JailResource):
         return ("dhcp" in self.config["ip4_addr"].networks)
 
     @property
-    def devfs_ruleset(self):
+    def devfs_ruleset(self) -> iocage.lib.DevfsRules.DevfsRuleset:
         """
         The number of the jails devfs ruleset
 
@@ -669,7 +687,7 @@ class JailGenerator(JailResource):
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
             return self.host.devfs[ruleset_line_position].number
 
-    def _launch_jail(self):
+    def _launch_jail(self) -> None:
 
         command = ["jail", "-c"]
 
@@ -761,7 +779,7 @@ class JailGenerator(JailResource):
             raise
 
     @property
-    def networks(self) -> list:
+    def networks(self) -> typing.List[iocage.lib.Network.Network]:
 
         networks = []
 
@@ -856,7 +874,11 @@ class JailGenerator(JailResource):
             "writeiops"
         ]
 
-    def _get_resource_limit(self, key: str) -> typing.Tuple[str, str]:
+    def _get_resource_limit(
+        self,
+        key: str
+    ) -> typing.Union[typing.Tuple[str, str], typing.Tuple[None, None]]:
+
         try:
             if isinstance(self.config[key], str):
                 return self._parse_resource_limit(self.config[key])
@@ -965,7 +987,7 @@ class JailGenerator(JailResource):
             self.jail_state = json.loads(output)["jail-information"]["jail"][0]
 
         except:
-            self.jail_state = None
+            self.jail_state = {}
 
     def _teardown_mounts(self) -> None:
 
@@ -1062,7 +1084,7 @@ class JailGenerator(JailResource):
         """
         try:
             return int(self.jail_state["jid"])
-        except (TypeError, AttributeError, KeyError):
+        except KeyError:
             pass
 
         try:
@@ -1119,17 +1141,10 @@ class JailGenerator(JailResource):
         except AttributeError:
             pass
 
-        try:
-            jail_state = object.__getattribute__(self, "jail_state")
-        except:
-            jail_state = None
-            raise
+        jail_state = self.jail_state
 
-        if jail_state is not None:
-            try:
-                return jail_state[key]
-            except:
-                pass
+        if (len(jail_state) > 0) and key in jail_state.keys():
+            return jail_state[key]
 
         raise AttributeError(f"Jail property {key} not found")
 
@@ -1146,8 +1161,18 @@ class JailGenerator(JailResource):
 
 class Jail(JailGenerator):
 
-    def start(self, *args, **kwargs):
+    def start(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+
         return list(JailGenerator.start(self, *args, **kwargs))
 
-    def stop(self, *args, **kwargs):
+    def stop(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+
         return list(JailGenerator.stop(self, *args, **kwargs))

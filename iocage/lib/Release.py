@@ -28,7 +28,6 @@ import os
 import shutil
 import tarfile
 import urllib.request
-import uuid
 from urllib.parse import urlparse
 
 import libzfs
@@ -47,12 +46,12 @@ import iocage.lib.Resource
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
-    _release: 'ReleaseGenerator' = None
+    _release: typing.Optional['ReleaseGenerator'] = None
 
     def __init__(
         self,
         host: 'iocage.lib.Host.HostGenerator',
-        release: 'ReleaseGenerator'=None,
+        release: typing.Optional['ReleaseGenerator']=None,
         **kwargs
     ) -> None:
 
@@ -130,7 +129,7 @@ class ReleaseGenerator(ReleaseResource):
         "sendmail_outbound": False
     }
 
-    name: str = None
+    name: str
     eol: bool = False
 
     logger: 'iocage.lib.Logger.Logger'
@@ -141,7 +140,7 @@ class ReleaseGenerator(ReleaseResource):
 
     def __init__(
         self,
-        name: str=None,
+        name: str,
         host: 'iocage.lib.Host.HostGenerator'=None,
         zfs: 'iocage.lib.ZFS.ZFS'=None,
         logger: 'iocage.lib.Logger.Logger'=None,
@@ -385,7 +384,6 @@ class ReleaseGenerator(ReleaseResource):
             yield releasePrepareStorageEvent.begin()
 
             # ToDo: allow to reach this for forced re-fetch
-            self._clean_dataset()
             self.create_resource()
             self._ensure_dataset_mounted()
 
@@ -575,11 +573,14 @@ class ReleaseGenerator(ReleaseResource):
 
         jail = iocage.lib.Jail.JailGenerator(
             {
-                "uuid": str(uuid.uuid4()),
                 "basejail": False,
                 "allow_mount_nullfs": "1",
                 "release": self.name,
-                "securelevel": "0"
+                "securelevel": "0",
+                "vnet": False,
+                "ip4_addr": None,
+                "ip6_addr": None,
+                "defaultrouter": None
             },
             new=True,
             logger=self.logger,
@@ -725,7 +726,7 @@ class ReleaseGenerator(ReleaseResource):
             source=self.release_updates_dir,
             destination=local_update_mountpoint,
             fs_type="nullfs",
-            option="rw"
+            options="rw"
         )
         jail.fstab.save()
 
@@ -749,7 +750,7 @@ class ReleaseGenerator(ReleaseResource):
                 )
                 self.logger.debug("Already up to date")
             else:
-                yield executeReleaseUpdateEvent.failed()
+                yield executeReleaseUpdateEvent.fail()
                 raise iocage.lib.errors.ReleaseUpdateFailure(
                     release_name=self.name,
                     reason=(
@@ -796,23 +797,6 @@ class ReleaseGenerator(ReleaseResource):
                 self.logger.debug(f"Starting download of {url}")
                 urllib.request.urlretrieve(url, path)
                 self.logger.verbose(f"{url} was saved to {path}")
-
-    def _clean_dataset(self):
-
-        if not os.path.isdir(self.root_dir):
-            return
-
-        root_dir_index = os.listdir(self.root_dir)
-        if not len(root_dir_index) > 0:
-            return
-
-        self.logger.verbose(
-            f"Remove existing fragments from {self.root_dir}"
-        )
-        for directory in root_dir_index:
-            asset_path = os.path.join(self.root_dir, directory)
-            self.logger.spam(f"Purging {asset_path}")
-            self._rmtree(asset_path)
 
     def read_hashes(self):
         # yes, this can read HardenedBSD and FreeBSD hash files

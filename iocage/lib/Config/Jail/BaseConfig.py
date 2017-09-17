@@ -72,7 +72,7 @@ class BaseConfig(dict):
 
     def __init__(
         self,
-        logger: 'iocage.lib.Logger.Logger'=None,
+        logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
 
         dict.__init__(self)
@@ -484,20 +484,27 @@ class BaseConfig(dict):
 
             bool: True if the JailConfig was changed
         """
+        hash_before: typing.Any
+        hash_after: typing.Any
+
+        existed_before = key in self.user_data
 
         try:
             hash_before = str(self.__getitem_user(key)).__hash__()
         except Exception:
             hash_before = None
-            pass
 
         self.__setitem__(key, value, **kwargs)
+
+        exists_after = key in self.user_data
 
         try:
             hash_after = str(self.__getitem_user(key)).__hash__()
         except Exception:
             hash_after = None
-            pass
+
+        if existed_before != exists_after:
+            return True
 
         return (hash_before != hash_after)
 
@@ -506,7 +513,7 @@ class BaseConfig(dict):
         return self.data
 
     def __str__(self) -> str:
-        return iocage.lib.helpers.to_json(self.user_data)
+        return iocage.lib.helpers.to_json(self.data)
 
     def __dir__(self) -> list:
 

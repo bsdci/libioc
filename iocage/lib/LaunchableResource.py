@@ -36,6 +36,9 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     _rc_conf: 'iocage.lib.Config.Jail.File.RCConf.RCConf' = None
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig' = None
 
+    def __init__(self, *args, **kwargs) -> None:
+        iocage.lib.Resource.Resource.__init__(self, *args, **kwargs)
+
     def create_resource(self) -> None:
         """
         Creates the root dataset
@@ -67,17 +70,6 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         raise NotImplementedError(
             "This needs to be implemented by the inheriting class"
         )
-
-    @property
-    def dataset(self) -> libzfs.ZFSDataset:
-        if self._dataset is None:
-            self._dataset = self.zfs.get_dataset(self.dataset_name)
-
-        return self._dataset
-
-    @dataset.setter
-    def dataset(self, value: libzfs.ZFSDataset):
-        self._set_dataset(value)
 
     @property
     def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.RCConf':

@@ -137,7 +137,7 @@ class RCConf(
             # Current data matches with file contents
             self._file_content_changed = False
 
-    def _read(self, silent=False):
+    def _read(self, silent=False) -> dict:
         data = ucl.load(open(self.path).read())
         self.logger.spam(f"rc.conf was read from {self.path}")
         return data

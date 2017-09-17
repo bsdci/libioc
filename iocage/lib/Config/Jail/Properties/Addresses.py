@@ -28,29 +28,31 @@ import iocage.lib.helpers
 
 class AddressSet(set):
 
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
 
     def __init__(
         self,
-        config=None,
-        property_name="ip4_address"
-    ):
+        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None,
+        property_name: str="ip4_address"
+    ) -> None:
 
-        self.config = config
+        if config is not None:
+            self.config = config
+
         set.__init__(self)
-        object.__setattr__(self, 'property_name', property_name)
+        self.property_name = property_name
 
-    def add(self, value, notify=True):
+    def add(self, value, notify=True) -> None:
         set.add(self, value)
         if notify:
             self.__notify()
 
-    def remove(self, value, notify=True):
+    def remove(self, value, notify=True) -> None:
         set.remove(self, value)
         if notify:
             self.__notify()
 
-    def __notify(self):
+    def __notify(self) -> None:
         self.config.update_special_property(self.property_name)
 
 
@@ -166,7 +168,10 @@ class AddressesProp(dict):
         self.__notify()
 
     def __notify(self) -> None:
-        self.config.update_special_property(self.property_name)
+        try:
+            self.config.update_special_property(self.property_name)
+        except:
+            pass
 
     def __empty_prop(self, key: str) -> AddressSet:
         prop = AddressSet(self.config, property_name=self.property_name)

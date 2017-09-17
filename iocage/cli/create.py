@@ -144,7 +144,7 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
     errors = False
     for i in range(count):
 
-        jail = iocage.lib.Jail.Jail(
+        jail = iocage.lib.Jail.JailGenerator(
             jail_data,
             logger=logger,
             host=host,
@@ -158,6 +158,7 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
             msg = f"{jail.humanreadable_name} successfully created!{suffix}"
             logger.log(msg)
         except:
+            raise
             msg = f"{jail.humanreadable_name} could not be created!{suffix}"
             logger.warn(msg)
 
