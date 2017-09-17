@@ -958,9 +958,7 @@ class JailGenerator(JailResource):
         value: str
     ) -> libiocage.lib.Types.AbsolutePath:
 
-        return libiocage.lib.Types.AbsolutePath(
-            sequence=f"{self.root_path}{value}"
-        )
+        return libiocage.lib.Types.AbsolutePath(f"{self.root_path}{value}")
 
     def _resolve_name(self, text) -> str:
 
