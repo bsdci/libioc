@@ -27,6 +27,7 @@ import iocage.lib.helpers
 class NetworkInterface:
     ifconfig_command = "/sbin/ifconfig"
     dhclient_command = "/sbin/dhclient"
+    rtsold_command = "/usr/sbin/rtsold"
 
     def __init__(self,
                  name="vnet0",
@@ -105,11 +106,15 @@ class NetworkInterface:
     def __apply_addresses(self, addresses, ipv6=False):
         family = "inet6" if ipv6 else "inet"
         for address in addresses:
-            if address.lower() == "dhcp":
+            if (ipv6 is False) and (address.lower() == "dhcp"):
                 command = [self.dhclient_command, self.name]
             else:
                 command = [self.ifconfig_command, self.name, family, address]
+
             self.exec(command)
+
+            if (ipv6 is True) and (address.lower() == "accept_rtadv"):
+                self.exec([self.rtsold_command, self.name])
 
     def exec(self, command, force_local=False):
         if self.__is_jail():
