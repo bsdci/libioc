@@ -116,7 +116,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         return f"{self.__base_dataset_name}/{self.release.name}/root"
 
     @property
-    def file(self) -> str:
+    def file(self) -> typing.Optional[str]:
         return None
 
 
