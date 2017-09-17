@@ -75,8 +75,7 @@ class Network:
 
     @property
     def nic_local_name(self):
-        self.jail.require_jail_running()
-
+        self.jail.require_jail_running(silent=True)
         return f"{self.nic}:{self.jail.jid}"
 
     @property

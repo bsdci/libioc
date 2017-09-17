@@ -867,43 +867,48 @@ class JailGenerator(JailResource):
 
         self.exec(command)
 
-    def require_jail_not_existing(self) -> None:
+    def require_jail_not_existing(self, **kwargs) -> None:
         """
         Raise JailAlreadyExists exception if the jail already exists
         """
         if self.exists:
             raise libiocage.lib.errors.JailAlreadyExists(
-                jail=self, logger=self.logger
+                jail=self,
+                logger=self.logger,
+                **kwargs
             )
 
-    def require_jail_existing(self) -> None:
+    def require_jail_existing(self, **kwargs) -> None:
         """
         Raise JailDoesNotExist exception if the jail does not exist
         """
         if not self.exists:
             raise libiocage.lib.errors.JailDoesNotExist(
                 jail=self,
-                logger=self.logger
+                logger=self.logger,
+                **kwargs
             )
 
-    def require_jail_stopped(self) -> None:
+    def require_jail_stopped(self, **kwargs) -> None:
         """
         Raise JailAlreadyRunning exception if the jail is runninhg
         """
         if self.running:
             raise libiocage.lib.errors.JailAlreadyRunning(
                 jail=self,
-                logger=self.logger
+                logger=self.logger,
+                **kwargs
             )
 
-    def require_jail_running(self) -> None:
+    def require_jail_running(self, **kwargs) -> None:
         """
         Raise JailNotRunning exception if the jail is stopped
         """
         if not self.running:
             raise libiocage.lib.errors.JailNotRunning(
                 jail=self,
-                logger=self.logger
+                logger=self.logger,
+                **kwargs
             )
 
     def update_jail_state(self) -> None:
