@@ -45,7 +45,7 @@ if sys.version_info < (3, 6):
 setup(
     name='iocage',
     license='BSD',
-    version='0.1.4',
+    version='0.2.12',
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='iocage Contributors',
