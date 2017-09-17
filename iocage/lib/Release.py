@@ -310,7 +310,7 @@ class ReleaseGenerator(ReleaseResource):
 
         try:
             int(major_version_number)
-            padding = str("0" * (digits-len(str(major_version_number))))
+            padding = str("0" * (digits - len(str(major_version_number))))
             return padding + release_name
         except:
             return release_name
