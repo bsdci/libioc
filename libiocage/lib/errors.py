@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 
 # MyPy
 import libzfs  # noqa: F401
@@ -36,13 +37,14 @@ class IocageException(Exception):
         message: str,
         logger: 'libiocage.lib.Logger.Logger'=None,
         level: str="error",
+        silent: bool=False,
         append_warning: bool=False,
-        warning: bool=None
+        warning: typing.Optional[str]=None
     ) -> None:
 
-        if logger is not None:
+        if (logger is not None) and (silent is False):
             logger.__getattribute__(level)(message)
-            if append_warning is True:
+            if (append_warning is True) and (warning is not None):
                 logger.warn(warning)
         else:
             super().__init__(message)
