@@ -53,10 +53,13 @@ class ResolverProp(list):
 
     @property
     def method(self):
-        if self.value == "/etc/resolv.conf":
+        return self._get_method(self.value)
+
+    def _get_method(self, value: str) -> str:
+        if value == "/etc/resolv.conf":
             return "copy"
 
-        elif self.value == "/dev/null":
+        elif value == "/dev/null":
             return "skip"
 
         else:
@@ -88,10 +91,10 @@ class ResolverProp(list):
             self.logger.verbose("resolv.conf not touched")
 
     def set(self, value=None, notify=True):
-        value = value if value is not None else self.value
-        self.clear()
 
-        if self.method == "manual":
+        self.clear()
+        method = self._get_method(value)
+        if method == "manual":
             if isinstance(value, str):
                 self += value.split(";")
             elif isinstance(value, list):
