@@ -200,7 +200,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self,
         source,
         destination,
-        type="nullfs",
+        fs_type="nullfs",
         options="ro",
         dump="0",
         passnum="0",
@@ -210,7 +210,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         line = FstabLine({
             "source": source,
             "destination": destination,
-            "type": type,
+            "type": fs_type,
             "options": options,
             "dump": dump,
             "passnum": passnum,

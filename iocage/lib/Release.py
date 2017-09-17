@@ -722,10 +722,10 @@ class ReleaseGenerator(ReleaseResource):
             os.makedirs(local_update_mountpoint)
 
         jail.fstab.new_line(
-            self.release_updates_dir,
-            local_update_mountpoint,
-            "nullfs",
-            "rw"
+            source=self.release_updates_dir,
+            destination=local_update_mountpoint,
+            fs_type="nullfs",
+            option="rw"
         )
         jail.fstab.save()
 
