@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import os
 import platform
+import re
 
 import libzfs
 
@@ -104,26 +105,24 @@ class HostGenerator:
         return float(self.release_version.partition("-")[0])
 
     @property
-    def release_minor_version(self) -> int:
-        release_version_string = os.uname()[2]
-        release_version_fragments = release_version_string.split("-")
-
-        print(release_version_fragments)
-        if len(release_version_fragments) < 3:
-            return 0
-
-        try:
-            return int(release_version_fragments[2].strip("p"))
-        except ValueError:
-            return 0
-
-    @property
     def release_version(self):
-        release_version_string = os.uname()[2]
-        release_version_fragments = release_version_string.split("-")
 
-        if len(release_version_fragments) > 1:
-            return "-".join(release_version_fragments[0:2])
+        if self.distribution.name == "FreeBSD":
+            release_version_string = os.uname()[2]
+            release_version_fragments = release_version_string.split("-")
+
+            if len(release_version_fragments) > 1:
+                return "-".join(release_version_fragments[0:2])
+
+        elif self.distribution.name == "HardenedBSD":
+            pattern = re.compile(
+                r"""\(hardened\/
+                    (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
+                    \/
+                    (?P<branch>[A-z0-9]+)
+                    \):""", re.X)
+
+            return re.search(pattern, os.uname()[3])["release"].upper()
 
     @property
     def processor(self) -> str:
