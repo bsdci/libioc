@@ -19,7 +19,7 @@ This library provides programmatic access to iocage features and jails, while be
 ### from Source Distribution
 
 ```sh
-pip3.6 install libiocage
+pip3.6 install iocage
 ```
 
 ### from Master branch
@@ -49,6 +49,12 @@ Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the comm
 
 ## Development
 
+### Install Development Dependencies
+
+```sh
+pip3.6 install -r requirements-dev.txt
+```
+
 ### Unit Tests
 
 Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage pool.
@@ -59,6 +65,9 @@ pytest
 
 ### Type Checking
 
+At this time differential type checking is enabled, which allows us to incrementally cover the library with strong typings until we can switch to strict type checking.
+
+
 ```
 setenv MYPYPATH `pwd`/.travis/mypy-stubs
 mypy iocage/
@@ -66,4 +75,4 @@ mypy iocage/
 
 ### Code Style
 
-- Flake8
+The code style is automatically checked with flake8.
