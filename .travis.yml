@@ -5,7 +5,6 @@ sudo: false
 env:
   - MYPYPATH="$TRAVIS_BUILD_DIR/.travis/mypy-stubs"
 install:
-  - pip3 install flake8-mutable flake8-builtins mypy
+  - pip3 install flake8-mutable flake8-builtins flake8-mypy
 script:
-  - ".travis/flake8.sh"
-  - mypy iocage
+  - flake8 --exclude=__init__.py --ignore=E203,W391
