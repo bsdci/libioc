@@ -19,6 +19,8 @@ This library provides programmatic access to iocage features and jails, while be
 ### from Source Distribution
 
 ```sh
+pkg install python36 py36-pygit2 py36-libzfs libucl
+python3.6 -m ensurepip
 pip3.6 install iocage
 ```
 
