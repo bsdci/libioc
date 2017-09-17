@@ -93,7 +93,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
     def parse_lines(
         self,
-        input: str,
+        input_text: str,
         ignore_auto_created: bool=True
     ) -> None:
         """
@@ -101,7 +101,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
         Args:
 
-            input:
+            input_text:
                 The text content of an existing fstab file
 
             ignore_auto_created:
@@ -110,7 +110,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
         set.clear(self)
 
-        for line in input.split("\n"):
+        for line in input_text.split("\n"):
 
             try:
                 line, comment = line.split("#", maxsplit=1)
