@@ -108,7 +108,6 @@ class HostGenerator:
         release_version_string = os.uname()[2]
         release_version_fragments = release_version_string.split("-")
 
-        print(release_version_fragments)
         if len(release_version_fragments) < 3:
             return 0
 
