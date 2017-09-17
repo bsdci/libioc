@@ -27,6 +27,10 @@ import subprocess
 import uuid
 import shlex
 
+import libiocage.lib.Types
+import libiocage.lib.errors
+import libiocage.lib.events
+import libiocage.lib.helpers
 import libiocage.lib.DevfsRules
 import libiocage.lib.Host
 import libiocage.lib.Config.Jail.JailConfig
@@ -39,9 +43,6 @@ import libiocage.lib.ZFSBasejailStorage
 import libiocage.lib.ZFSShareStorage
 import libiocage.lib.LaunchableResource
 import libiocage.lib.Config.Jail.File.Fstab
-import libiocage.lib.errors
-import libiocage.lib.events
-import libiocage.lib.helpers
 
 
 class JailResource(libiocage.lib.LaunchableResource.LaunchableResource):
@@ -809,17 +810,18 @@ class JailGenerator(JailResource):
 
     def _limit_resources(self) -> None:
 
-        for resource in self._resource_limit_config_keys:
-            try:
-                limit, action = self.config[resource].split(":", maxsplit=1)
-                command = [
-                    "/usr/bin/rctl",
-                    "-a",
-                    f"jail:{self.identifier}:{resource}:{action}={limit}"
-                ]
-                libiocage.lib.helpers.exec(command, logger=self.logger)
-            except KeyError:
-                pass
+        for limit, action in map(self._get_resource_limit, self._resource_limit_config_keys):
+
+            if (limit is None) and (action is None):
+                # this resource is not limited (limit disabled)
+                continue
+
+            command = [
+                "/usr/bin/rctl",
+                "-a",
+                f"jail:{self.identifier}:{key}:{action}={limit}"
+            ]
+            libiocage.lib.helpers.exec(command, logger=self.logger)
 
     @property
     def _resource_limit_config_keys(self):
@@ -850,6 +852,20 @@ class JailGenerator(JailResource):
             "readiops",
             "writeiops"
         ]
+
+    def _get_resource_limit(self, key: str) -> libiocage.lib.Types.UserInput:
+        try:
+            return self._parse_resource_limit(self.config[key])
+        except:
+            return None, None
+
+    def _parse_resource_limit(
+        self,
+        value: libiocage.lib.Types.UserInput
+    ) -> typing.Tuple[str, str]:
+
+        limit, action = value.split(":", maxsplit=1)
+        return limit, action
 
     def _configure_routes(self) -> None:
 
