@@ -26,6 +26,9 @@ import libzfs
 import iocage.lib.errors
 import iocage.lib.helpers
 
+# MyPy
+import iocage.lib.Types
+
 
 class Datasets:
     ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc:active"
@@ -151,38 +154,42 @@ class Datasets:
             )
             dataset.properties[name] = libzfs.ZFSUserProperty(value)
 
-    def _get_or_create_dataset(self,
-                               name,
-                               root_name=None,
-                               pool=None,
-                               mountpoint=None):
+    def _get_or_create_dataset(
+        self,
+        name: str,
+        root_name: str=None,
+        pool: libzfs.ZFSPool=None,
+        mountpoint: iocage.lib.Types.AbsolutePath=None
+    ):
 
         if not iocage.lib.helpers.validate_name(name):
             raise NameError(f"Invalid 'name' for Dataset: {name}")
 
         try:
-            return self.datasets[name]
+            return self._datasets[name]
         except (AttributeError, KeyError):
             pass
 
-        if root_name is None:
-            root_name = self.root.name
+        if root_name is not None:
+            root_dataset_name = root_name
+        else:
+            root_dataset_name = self.root.name
 
         if pool is None:
             pool = self.root.pool
 
-        name = f"{root_name}/{name}"
+        dataset_name = f"{root_dataset_name}/{name}"
         try:
-            dataset = self.zfs.get_dataset(name)
+            dataset = self.zfs.get_dataset(dataset_name)
         except:
-            pool.create(name, {})
-            dataset = self.zfs.get_dataset(name)
+            pool.create(dataset_name, {})
+            dataset = self.zfs.get_dataset(dataset_name)
 
             if mountpoint is not None:
                 mountpoint_property = libzfs.ZFSUserProperty(mountpoint)
                 dataset.properties["mountpoint"] = mountpoint_property
 
             dataset.mount()
-        self._datasets[name] = dataset
+        self._datasets[dataset_name] = dataset
 
         return dataset
