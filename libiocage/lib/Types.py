@@ -36,7 +36,7 @@ class AbsolutePath(str):
     ) -> None:
         if self.unix_path.fullmatch(sequence) is None:
             raise TypeError("Invalid value for AbsolutePath")
-        str.__init__(self, sequence)
+        self = sequence
 
 
 class UserInput:
