@@ -43,7 +43,7 @@ class Term(list):
 
     glob_characters = ["*", "+"]
 
-    def __init__(self, key, values=list()):
+    def __init__(self, key, values=list()) -> None:
         self.key = key
 
         if values is None:

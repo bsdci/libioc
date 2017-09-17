@@ -30,21 +30,29 @@ _ConfigType = 'iocage.lib.Config.Jail.JailConfig.JailConfig'
 
 class BridgeSet(set):
 
-    def __init__(self, config=None):
-        self.config = config
+    config: 'iocage.lib.JailConfig.JailConfig'
+
+    def __init__(
+        self,
+        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None
+    ) -> None:
+
+        if config is not None:
+            self.config = config
+
         set.__init__(self)
 
-    def add(self, value, notify=True):
+    def add(self, value: str, notify: bool=True) -> None:
         set.add(self, value)
         if notify:
-            self.notify()
+            self.__notify()
 
-    def remove(self, value, notify=True):
+    def remove(self, value: str, notify: bool=True) -> None:
         set.remove(self, value)
         if notify:
-            self._notify()
+            self.__notify()
 
-    def _notify(self):
+    def __notify(self) -> None:
         try:
             self.config.update_special_property("interfaces")
         except:
@@ -53,17 +61,19 @@ class BridgeSet(set):
 
 class InterfaceProp(dict):
 
-    config: _ConfigType  # type: ignore
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "interfaces"
 
     def __init__(
         self,
-        config=None,
+        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None,
         **kwargs
     ) -> None:
 
         dict.__init__(self, {})
-        self.config = config
+
+        if config is not None:
+            self.config = config
 
     def set(
         self,
@@ -89,7 +99,12 @@ class InterfaceProp(dict):
 
         self.__notify()
 
-    def add(self, jail_if, bridges=None, notify=True):
+    def add(
+        self,
+        jail_if: str,
+        bridges: typing.Optional[typing.Union[str, typing.List[str]]]=None,
+        notify: bool=True
+    ) -> None:
 
         if bridges is None or bridges == [] or bridges == "":
             return
@@ -117,17 +132,17 @@ class InterfaceProp(dict):
 
         self.add(key, values)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         dict.__delitem__(self, key)
         self.__notify()
 
-    def __notify(self):
+    def __notify(self) -> None:
         try:
             self.config.update_special_property(self.property_name)
         except:
             pass
 
-    def __empty_prop(self, key):
+    def __empty_prop(self, key: str) -> BridgeSet:
 
         prop = BridgeSet(self.config)
         dict.__setitem__(self, key, prop)
@@ -140,5 +155,5 @@ class InterfaceProp(dict):
                 out.append(f"{jail_if}:{bridge_if}")
         return " ".join(out)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.to_string(value=self)

@@ -48,7 +48,8 @@ def cli(
 ) -> None:
     """Get a list of jails and print the property."""
 
-    logger: libiocage.lib.Logger.Logger = ctx.parent.logger
+    parent: typing.Any = ctx.parent
+    logger: iocage.lib.Logger.Logger = parent.logger
     host = iocage.lib.Host.HostGenerator(logger=logger)
 
     # Defaults
@@ -70,15 +71,15 @@ def cli(
 
     updated_jail_count = 0
 
-    for jail in ioc_jails:
+    for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
 
-        updated_properties = set_properties(props, jail)
+        updated_properties = set_properties(props, ioc_jail)
 
         if len(updated_properties) == 0:
-            logger.screen(f"Jail '{jail.humanreadable_name}' unchanged")
+            logger.screen(f"Jail '{ioc_jail.humanreadable_name}' unchanged")
         else:
             logger.screen(
-                f"Jail '{jail.humanreadable_name}' updated: " +
+                f"Jail '{ioc_jail.humanreadable_name}' updated: " +
                 ", ".join(updated_properties)
             )
 
@@ -92,7 +93,7 @@ def cli(
 
 
 def set_properties(
-    properties: typing.List[str],
+    properties: typing.Iterable[str],
     target: 'iocage.lib.LaunchableResource.LaunchableResource'
 ) -> set:
 
@@ -111,6 +112,7 @@ def set_properties(
                 del target.config[key]
                 updated_properties.add(key)
             except:
+                raise
                 pass
 
     if len(updated_properties) > 0:

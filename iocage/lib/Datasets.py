@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import libzfs
 
 import iocage.lib.errors
@@ -31,18 +32,30 @@ import iocage.lib.Types
 
 
 class Datasets:
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc:active"
 
-    def __init__(self, root=None, pool=None, zfs=None, logger=None):
+    ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
+
+    root: libzfs.ZFSDataset
+    zfs: 'iocage.lib.ZFS.ZFS'
+    logger: 'iocage.lib.Logger.Logger'
+    _datasets: typing.Dict[str, libzfs.ZFSDataset] = {}
+
+    def __init__(
+        self,
+        root: typing.Optional[libzfs.ZFSDataset]=None,
+        pool: typing.Optional[libzfs.ZFSPool]=None,
+        zfs: 'iocage.lib.ZFS.ZFS'=None,
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
+
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
-        self._datasets = {}
 
         if isinstance(root, libzfs.ZFSDataset):
             self.root = root
             return
 
-        if isinstance(pool, libzfs.ZFSPool):
+        if (pool is not None) and isinstance(pool, libzfs.ZFSPool):
             self.root = self._get_or_create_dataset(
                 "iocage",
                 root_name=pool.name,
@@ -58,32 +71,40 @@ class Datasets:
             self.root = self.zfs.get_dataset(f"{active_pool.name}/iocage")
 
     @property
-    def active_pool(self):
+    def active_pool(self) -> typing.Optional[libzfs.ZFSPool]:
         for pool in self.zfs.pools:
             if self._is_pool_active(pool):
                 return pool
         return None
 
     @property
-    def releases(self):
+    def releases(self) -> libzfs.ZFSDataset:
         return self._get_or_create_dataset("releases")
 
     @property
-    def base(self):
+    def base(self) -> libzfs.ZFSDataset:
         return self._get_or_create_dataset("base")
 
     @property
-    def jails(self):
+    def jails(self) -> libzfs.ZFSDataset:
         return self._get_or_create_dataset("jails")
 
     @property
-    def logs(self):
+    def logs(self) -> libzfs.ZFSDataset:
         return self._get_or_create_dataset("log")
 
-    def activate(self, mountpoint=None):
+    def activate(
+        self,
+        mountpoint=None
+    ) -> None:
+
         self.activate_pool(self.root.pool, mountpoint)
 
-    def activate_pool(self, pool, mountpoint=None):
+    def activate_pool(
+        self,
+        pool: libzfs.ZFSPool,
+        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
+    ) -> None:
 
         if self._is_pool_active(pool):
             msg = f"ZFS pool '{pool.name}' is already active"
@@ -101,43 +122,50 @@ class Datasets:
 
         self._activate_pool(pool)
 
-        root_dataset_args = {
-            "pool": pool
-        }
-
         if mountpoint is not None:
-            root_dataset_args["mountpoint"] = mountpoint
+            self.root = self._get_or_create_dataset(
+                "iocage",
+                pool=pool,
+                mountpoint=mountpoint
+            )
+        else:
+            self.root = self._get_or_create_dataset(
+                "iocage",
+                pool=pool
+            )
 
-        self.root = self._get_or_create_dataset(
-            "iocage",
-            **root_dataset_args
-        )
-
-    def _is_pool_active(self, pool):
+    def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
             pool,
             self.ZFS_POOL_ACTIVE_PROPERTY
         ))
 
-    def _get_pool_property(self, pool, prop):
-        try:
-            return pool.root_dataset.properties[prop].value
-        except (KeyError, ValueError):
-            return None
+    def _get_pool_property(
+        self,
+        pool: libzfs.ZFSPool,
+        prop: str
+    ) -> str:
 
-    def _get_dataset_property(self, dataset, prop):
+        return pool.root_dataset.properties[prop].value
+
+    def _get_dataset_property(
+        self,
+        dataset: libzfs.ZFSDataset,
+        prop: str
+    ) -> typing.Optional[str]:
+
         try:
             return dataset.properties[prop].value
         except:
             return None
 
-    def _activate_pool(self, pool):
+    def _activate_pool(self, pool: libzfs.ZFSPool) -> None:
         self._set_pool_activation(pool, True)
 
-    def _deactivate_pool(self, pool):
+    def _deactivate_pool(self, pool: libzfs.ZFSPool) -> None:
         self._set_pool_activation(pool, False)
 
-    def _set_pool_activation(self, pool, state):
+    def _set_pool_activation(self, pool: libzfs.ZFSPool, state: bool) -> None:
         value = "yes" if state is True else "no"
         self._set_zfs_property(
             pool.root_dataset,
@@ -145,7 +173,13 @@ class Datasets:
             value
         )
 
-    def _set_zfs_property(self, dataset, name, value):
+    def _set_zfs_property(
+        self,
+        dataset: libzfs.ZFSDataset,
+        name: str,
+        value: str
+    ) -> None:
+
         current_value = self._get_dataset_property(dataset, name)
         if current_value != value:
             self.logger.verbose(
@@ -158,9 +192,9 @@ class Datasets:
         self,
         name: str,
         root_name: str=None,
-        pool: libzfs.ZFSPool=None,
-        mountpoint: iocage.lib.Types.AbsolutePath=None
-    ):
+        pool: typing.Optional[libzfs.ZFSPool]=None,
+        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
+    ) -> libzfs.ZFSDataset:
 
         if not iocage.lib.helpers.validate_name(name):
             raise NameError(f"Invalid 'name' for Dataset: {name}")
@@ -175,14 +209,17 @@ class Datasets:
         else:
             root_dataset_name = self.root.name
 
-        if pool is None:
-            pool = self.root.pool
+        target_pool: libzfs.ZFSPool
+        if pool is not None:
+            target_pool = pool
+        else:
+            target_pool = self.root.pool
 
         dataset_name = f"{root_dataset_name}/{name}"
         try:
             dataset = self.zfs.get_dataset(dataset_name)
         except:
-            pool.create(dataset_name, {})
+            target_pool.create(dataset_name, {})
             dataset = self.zfs.get_dataset(dataset_name)
 
             if mountpoint is not None:

@@ -82,16 +82,16 @@ class Resource:
     DEFAULT_JSON_FILE = "config.json"
     DEFAULT_UCL_FILE = "config"
 
-    _dataset_name: typing.Optional[str] = None
     _config_type: typing.Optional[int] = None
     _config_file: typing.Optional[str] = None
     _dataset: libzfs.ZFSDataset
+    _dataset_name: str
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset=None,
-        dataset_name: str=None,
-        config_type: str="auto",  # auto, json, zfs, ucl
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: typing.Optional[str]="auto",  # auto, json, zfs, ucl
         config_file: str=None,  # 'config.json', 'config', etc
         logger: 'iocage.lib.Logger.Logger'=None,
         zfs: 'iocage.lib.ZFS.ZFS'=None
@@ -140,11 +140,17 @@ class Resource:
         """
         Name of the jail's base ZFS dataset manually assigned to this resource
         """
-        if self._dataset_name is not None:
+        try:
             return self._dataset_name
-        elif "_dataset" in dir(self):
+        except AttributeError:
+            pass
+
+        try:
             return self._dataset.name
-        raise
+        except AttributeError:
+            pass
+
+        raise Exception("Could not determine dataset_name")
 
     @property
     def dataset_name(self) -> str:
@@ -156,29 +162,23 @@ class Resource:
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
-        """
-        The jail's base ZFS dataset
-        """
-        if self._dataset_name is not None:
-            # sets self._dataset_name to None and memoize the dataset
-            self._set_dataset(self.zfs.get_dataset(self.dataset_name))
-
-        return self._dataset
+        try:
+            return self._dataset
+        except AttributeError:
+            dataset = self.zfs.get_dataset(self.dataset_name)
+            self._dataset = dataset
+            return dataset
 
     @dataset.setter
     def dataset(self, value: libzfs.ZFSDataset):
         self._set_dataset(value)
 
     def _set_dataset(self, value: libzfs.ZFSDataset) -> None:
-        self._dataset_name = None
+        try:
+            del self._dataset_name
+        except:
+            pass
         self._dataset = value
-
-    # @property
-    # def path(self):
-    #     """
-    #     Mountpoint of the jail's base ZFS dataset
-    #     """
-    #     return self.dataset.mountpoint
 
     @property
     def config_type(self) -> typing.Optional[str]:
@@ -345,7 +345,9 @@ class ListableResource(list, Resource):
 
         self.filters = filters
 
-    def __iter__(self):
+    def __iter__(
+        self
+    ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
 
         for child_dataset in self.dataset.children:
 

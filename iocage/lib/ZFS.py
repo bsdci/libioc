@@ -28,16 +28,6 @@ import iocage.lib.helpers
 import iocage.lib.errors
 
 
-def get_zfs(
-    logger: 'iocage.lib.Logger.Logger'=None,
-    history: bool=True,
-    history_prefix: str="<iocage>"
-):
-    zfs = ZFS(history=history, history_prefix=history_prefix)
-    zfs.logger = iocage.lib.helpers.init_logger(zfs, logger)
-    return zfs
-
-
 class ZFS(libzfs.ZFS):
 
     logger: iocage.lib.Logger.Logger = None
@@ -77,3 +67,13 @@ class ZFS(libzfs.ZFS):
             pool_name=pool_name,
             logger=self.logger
         )
+
+
+def get_zfs(
+    logger: 'iocage.lib.Logger.Logger'=None,
+    history: bool=True,
+    history_prefix: str="<iocage>"
+) -> ZFS:
+    zfs = ZFS(history=history, history_prefix=history_prefix)
+    zfs.logger = iocage.lib.helpers.init_logger(zfs, logger)
+    return zfs

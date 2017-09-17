@@ -48,13 +48,13 @@ class IocageEvent:
 
     PENDING_COUNT: int = 0
 
-    identifier: str
+    identifier: typing.Optional[str]
     _started_at: float
     _stopped_at: float
     _pending: bool = False
     skipped: bool = False
     done: bool = True
-    error: BaseException
+    error: typing.Optional[BaseException] = None
 
     def __init__(self, message=None, **kwargs) -> None:
         """
@@ -115,9 +115,11 @@ class IocageEvent:
             return
 
         if new_state is True:
-            if self._started_at is not None:
+            try:
+                self._started_at
                 raise iocage.lib.errors.EventAlreadyFinished(event=self)
-            self._started_at = float(timer())
+            except AttributeError:
+                self._started_at = float(timer())
         if new_state is False:
             self._stopped_at = float(timer())
 
@@ -126,9 +128,10 @@ class IocageEvent:
 
     @property
     def duration(self) -> typing.Optional[float]:
-        if (self._started_at is None) or (self._stopped_at is None):
+        try:
+            return self._stopped_at - self._started_at
+        except AttributeError:
             return None
-        return self._stopped_at - self._started_at
 
     def _update_message(self, **kwargs) -> None:
         if "message" in kwargs:
@@ -168,7 +171,7 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def __hash__(self):
+    def __hash__(self) -> typing.Any:
         identifier = "generic" if self.identifier is None else self.identifier
         return hash((self.type, identifier))
 

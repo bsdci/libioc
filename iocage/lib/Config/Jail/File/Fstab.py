@@ -110,6 +110,9 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
         set.clear(self)
 
+        line: str
+        comment: typing.Optional[str]
+
         for line in input_text.split("\n"):
 
             try:
@@ -228,7 +231,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
     def basejail_lines(self) -> typing.List[dict]:
 
         if self.release is None:
-            return None
+            return []
 
         if self.jail.config["basejail_type"] != "nullfs":
             return []
@@ -263,9 +266,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
     def __iter__(self):
         fstab_lines = list(set.__iter__(self))
-        basejail_lines = self.basejail_lines
-        if basejail_lines is not None:
-            fstab_lines += self.basejail_lines
+        fstab_lines += self.basejail_lines
         return iter(fstab_lines)
 
     def __contains__(self, value: typing.Any) -> bool:

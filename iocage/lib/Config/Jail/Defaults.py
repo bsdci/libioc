@@ -26,11 +26,38 @@ import typing
 import iocage.lib.Config.Jail.BaseConfig
 
 
-class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
+class DefaultsUserData(dict):
 
     user_properties: set = set()
 
-    data: dict = {
+    def __init__(self, defaults: dict={}) -> None:
+        self.defaults = defaults
+        dict.__init__(self, defaults)
+
+    def __setitem__(self, key: str, value: typing.Any) -> None:
+        dict.__setitem__(self, key, value)
+        self.user_properties.add(key)
+
+    def __delitem__(self, key: str) -> None:
+        if key in self.defaults:
+            self[key] = self.defaults[key]
+        else:
+            del self[key]
+        self.user_properties.remove(key)
+
+    @property
+    def exclusive_user_data(self) -> dict:
+        data = {}
+        for key in self.user_properties:
+            data[key] = self[key]
+        return data
+
+
+class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
+
+    _user_data: DefaultsUserData
+
+    DEFAULTS: dict = {
         "id": None,
         "release": None,
         "boot": False,
@@ -86,24 +113,20 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "jail_zfs": False
     }
 
-    def clear(self):
-        dict.clear(self)
-        dict.__init__(self, JailConfigDefaults.DEFAULTS)
-
-    def __setitem__(
+    def __init__(
         self,
-        key: str,
-        value: typing.Any,
-        **kwargs
-    ):
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
 
-        out = super().__setitem__(key, value, **kwargs)
-        self.user_properties.add(key)
-        return out
+        self._user_data = DefaultsUserData(
+            defaults=self.DEFAULTS
+        )
+        super().__init__(logger=logger)
+
+    @property
+    def data(self) -> DefaultsUserData:
+        return self._user_data
 
     @property
     def user_data(self) -> dict:
-        data = {}
-        for prop in self.user_properties:
-            data[prop] = self.data[prop]
-        return data
+        return self._user_data.exclusive_user_data

@@ -98,7 +98,6 @@ def start_jails(jails, logger, print_function):
 
         except Exception:
             failed_jails.append(jail)
-            raise
             continue
 
         logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")

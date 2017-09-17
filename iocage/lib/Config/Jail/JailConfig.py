@@ -34,13 +34,13 @@ _usp = iocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property
 
 class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
-    legacy: bool = None
+    legacy: bool = False
     jail: 'iocage.lib.Jail.JailGenerator' = None
     data: dict = {}
 
     def __init__(
         self,
-        data: dict=None,
+        data: dict={},
         jail: 'iocage.lib.Jail.JailGenerator'=None,
         new: bool=False,
         logger: 'iocage.lib.Logger.Logger'=None,
