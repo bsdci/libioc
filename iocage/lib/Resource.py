@@ -209,7 +209,7 @@ class Resource:
         return 0
 
     @property
-    def config_file(self) -> str:
+    def config_file(self) -> typing.Optional[str]:
         """
         Relative path of the resource config file
         """
