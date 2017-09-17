@@ -85,7 +85,7 @@ class Resource:
     _dataset_name: typing.Optional[str] = None
     _config_type: typing.Optional[int] = None
     _config_file: typing.Optional[str] = None
-    _dataset: typing.Optional[libzfs.ZFSDataset] = None
+    _dataset: libzfs.ZFSDataset
 
     def __init__(
         self,
@@ -142,7 +142,7 @@ class Resource:
         """
         if self._dataset_name is not None:
             return self._dataset_name
-        elif self._dataset is not None:
+        elif "_dataset" in dir(self):
             return self._dataset.name
         raise
 
@@ -169,7 +169,7 @@ class Resource:
     def dataset(self, value: libzfs.ZFSDataset):
         self._set_dataset(value)
 
-    def _set_dataset(self, value) -> None:
+    def _set_dataset(self, value: libzfs.ZFSDataset) -> None:
         self._dataset_name = None
         self._dataset = value
 
