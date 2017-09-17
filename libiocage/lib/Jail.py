@@ -810,7 +810,10 @@ class JailGenerator(JailResource):
 
     def _limit_resources(self) -> None:
 
-        for limit, action in map(self._get_resource_limit, self._resource_limit_config_keys):
+        for limit, action in map(
+            self._get_resource_limit,
+            self._resource_limit_config_keys
+        ):
 
             if (limit is None) and (action is None):
                 # this resource is not limited (limit disabled)
