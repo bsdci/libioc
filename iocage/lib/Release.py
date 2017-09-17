@@ -289,14 +289,31 @@ class ReleaseGenerator(ReleaseResource):
     def newer_than_host(self):
         host_release_name = self._pad_release_name(self.host.release_version)
         release_name = self._pad_release_name(self.name)
+
+        host_is_current = host_release_name.startswith("CURRENT")
+        release_is_current = release_name.startswith("CURRENT")
+
+        if release_is_current is True:
+            if host_is_current is False:
+                return True
+            else:
+                return False
+
         return (host_release_name < release_name)
 
     def _pad_release_name(self, release_name: str, digits: int=4) -> str:
         """
         pads releases with 0 until it has 4 characters before the first .
         """
-        padding = str("0" * (digits - release_name.index(".")))
-        return padding + release_name
+
+        major_version_number = release_name.split("-")[0].split(".")[0]
+
+        try:
+            int(major_version_number)
+            padding = str("0" * (digits-len(str(major_version_number))))
+            return padding + release_name
+        except:
+            return release_name
 
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:

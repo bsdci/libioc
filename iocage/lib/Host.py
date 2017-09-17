@@ -108,10 +108,14 @@ class HostGenerator:
         release_version_string = os.uname()[2]
         release_version_fragments = release_version_string.split("-")
 
+        print(release_version_fragments)
         if len(release_version_fragments) < 3:
             return 0
 
-        return int(release_version_fragments[2].strip("p"))
+        try:
+            return int(release_version_fragments[2].strip("p"))
+        except ValueError:
+            return 0
 
     @property
     def release_version(self):
