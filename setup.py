@@ -49,7 +49,7 @@ setup(
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='iocage Contributors',
-    author_email='https://groups.google.com/forum/#!forum/iocage',
+    author_email='authors@iocage.io',
     url='https://github.com/iocage/libiocage',
     python_requires='>=3.6',
     packages=find_packages(),
