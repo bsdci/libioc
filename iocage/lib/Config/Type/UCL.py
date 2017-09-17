@@ -21,41 +21,30 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+import typing
 
-import click
+import ucl
 
-from iocage.cli import cli
+import iocage.lib.Config
+import iocage.lib.Config.File
+import iocage.lib.Config.Resource.ResourceConfig
+import iocage.lib.errors
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class ConfigUCL(iocage.lib.Config.File.ConfigFile):
+
+    config_type = "ucl"
+
+    def map_input(self, data: typing.TextIO) -> dict:
+        return ucl.load(data)
+
+    def map_output(self, data: dict) -> str:
+        # ToDo: Re-Implement UCL output
+        raise iocage.lib.errors.MissingFeature("Writing ConfigUCL")
 
 
-def main():
-  cli(prog_name="iocage")
-
-
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+class ResourceConfigUCL(
+    iocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
+    ConfigUCL
+):
+    pass

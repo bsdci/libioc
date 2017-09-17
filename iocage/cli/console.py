@@ -21,41 +21,35 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+"""console module for the cli."""
 
 import click
 
-from iocage.cli import cli
+import iocage.lib.Jail
+import iocage.lib.Logger
+
+__rootcmd__ = True
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+@click.command(name="console", help="Login to a jail.")
+@click.pass_context
+@click.argument("jail")
+@click.option("--log-level", "-d", default=None)
+def cli(ctx, jail, log_level):
+    """
+    Runs jexec to login into the specified jail.
+    """
+    logger = ctx.parent.logger
+    logger.print_level = log_level
 
+    jail = iocage.lib.Jail.Jail(jail, logger=logger)
+    jail.update_jail_state()
 
-def main():
-  cli(prog_name="iocage")
-
-
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    if not jail.exists:
+        logger.error(f"The jail {jail.humanreadable_name} does not exist")
+        exit(1)
+    if not jail.running:
+        logger.error(f"The jail {jail.humanreadable_name} is not running")
+        exit(1)
+    else:
+        jail.exec_console()

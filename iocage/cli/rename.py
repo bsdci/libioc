@@ -21,41 +21,26 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
+"""rename a jail."""
 import click
 
-from iocage.cli import cli
+import iocage.lib.Jail
+
+__rootcmd__ = True
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+@click.command(name="rename", help="Rename a stopped jail.")
+@click.pass_context
+@click.argument("jail", nargs=1)
+@click.argument("name", nargs=1)
+def cli(ctx, jail, name):
+    """
+    Rename a stopped jail.
+    """
 
-
-def main():
-  cli(prog_name="iocage")
-
-
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    logger = ctx.parent.logger
+    try:
+        ioc_jail = iocage.lib.Jail.Jail(jail, logger=logger)
+        ioc_jail.rename(name)
+    except iocage.lib.errors.IocageException:
+        exit(1)

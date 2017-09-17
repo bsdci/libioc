@@ -37,9 +37,9 @@ Please note: this will build `py-libzfs` from source, which will require `/usr/s
 ### Library
 
 ```python
-import libiocage
+import iocage
 
-jail = libiocage.Jail()
+jail = iocage.Jail()
 jail.create("11.1-RELEASE")
 ```
 
@@ -61,7 +61,7 @@ pytest
 
 ```
 setenv MYPYPATH `pwd`/.travis/mypy-stubs
-mypy libiocage/
+mypy iocage/
 ```
 
 ### Code Style

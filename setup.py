@@ -27,7 +27,7 @@ import fastentrypoints
 from setuptools import find_packages, setup
 from pip.req import parse_requirements
 
-reqs = list(parse_requirements("requirements.txt", session="libiocage"))
+reqs = list(parse_requirements("requirements.txt", session="iocage"))
 install_requires = list(map(lambda x: f"{x.name}{x.specifier}", reqs))
 dependency_links = list(map(
     lambda x: str(x.link), 
@@ -43,7 +43,7 @@ if sys.version_info < (3, 6):
     exit("Only Python 3.6 and higher is supported.")
 
 setup(
-    name='libiocage',
+    name='iocage',
     license='BSD',
     version='0.1.4',
     description='A Python library to manage jails with iocage',
@@ -60,7 +60,7 @@ setup(
     setup_requires=['pytest-runner'],
     entry_points={
         'console_scripts': [
-            'ioc=libiocage.cli:cli'
+            'ioc=iocage.cli:cli'
         ]
     },
     data_files=_data,

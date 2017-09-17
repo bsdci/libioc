@@ -21,41 +21,38 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+import typing
 
-import click
+import iocage.lib.Config.Jail.Property
 
-from iocage.cli import cli
+init_property = iocage.lib.Config.Jail.Property.init_property
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class JailConfigProperties(dict):
 
+    def __init__(
+        self,
+        config: 'iocage.lib.Config.Jail.BaseConfig.BaseConfig',
+        logger: 'iocage.lib.Logger.Logger'
+    ) -> None:
 
-def main():
-  cli(prog_name="iocage")
+        self.logger = logger
+        self.config = config
 
+    def is_special_property(self, property_name: str) -> bool:
+        classes = iocage.lib.Config.Jail.Property.CLASSES
+        return (property_name in classes.keys())
 
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    def get_or_create(
+        self,
+        property_name: str
+    ) -> typing.Any:
+
+        if property_name not in self.keys():
+            self[property_name] = init_property(
+                property_name=property_name,
+                config=self.config,
+                logger=self.logger
+            )
+
+        return self[property_name]

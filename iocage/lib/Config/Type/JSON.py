@@ -21,41 +21,28 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+import typing
+import json
 
-import click
-
-from iocage.cli import cli
+import iocage.lib.Config
+import iocage.lib.Config.File
+import iocage.lib.Config.Resource.ResourceConfig
+import iocage.lib.helpers
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class ConfigJSON(iocage.lib.Config.File.ConfigFile):
+
+    config_type = "json"
+
+    def map_input(self, data: typing.TextIO) -> dict:
+        return json.load(data)
+
+    def map_output(self, data: dict) -> str:
+        return iocage.lib.helpers.to_json(data)
 
 
-def main():
-  cli(prog_name="iocage")
-
-
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+class ResourceConfigJSON(
+    iocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
+    ConfigJSON
+):
+    pass

@@ -21,41 +21,29 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
-import click
-
-from iocage.cli import cli
+import iocage.lib.Config.Prototype
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class ConfigFile(iocage.lib.Config.Prototype.Prototype):
 
+    _file: str = None
 
-def main():
-  cli(prog_name="iocage")
+    def __init__(
+        self,
+        file: str=None,
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
 
+        iocage.lib.Config.Prototype.Prototype.__init__(
+            self,
+            logger=logger
+        )
+        self._file = file
 
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    @property
+    def file(self) -> str:
+        return self._file
+
+    @file.setter
+    def file(self, value: str):
+        self._file = value

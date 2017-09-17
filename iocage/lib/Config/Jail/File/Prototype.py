@@ -21,41 +21,34 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+import os.path
 
-import click
-
-from iocage.cli import cli
+import iocage.lib.LaunchableResource
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class ResourceConfigFile:
 
+    def _require_path_relative_to_resource(
+        self,
+        filepath: str,
+        resource: 'iocage.lib.LaunchableResource.LaunchableResource'
+    ) -> None:
 
-def main():
-  cli(prog_name="iocage")
+        if self._is_path_relative_to_resource(filepath, resource) is False:
+            raise iocage.lib.errors.SecurityViolationConfigJailEscape(
+                file=filepath
+            )
 
+    def _is_path_relative_to_resource(
+        self,
+        filepath: str,
+        resource: 'iocage.lib.LaunchableResource.LaunchableResource'
+    ) -> bool:
 
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+        real_resource_path = self._resolve_path(resource.dataset.mountpoint)
+        real_file_path = self._resolve_path(filepath)
+
+        return real_file_path.startswith(real_resource_path)
+
+    def _resolve_path(self, filepath: str) -> str:
+        return os.path.realpath(os.path.abspath(filepath))

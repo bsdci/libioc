@@ -21,41 +21,55 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
-import click
-
-from iocage.cli import cli
+import typing
+import os.path
+import iocage.lib.helpers
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class Prototype:
 
+    logger: 'iocage.lib.Logger.Logger' = None
+    data: dict = {}
 
-def main():
-  cli(prog_name="iocage")
+    def __init__(
+        self,
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
 
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
 
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    @property
+    def file(self) -> str:
+        raise NotImplementedError(
+            "This needs to be implemented by the inheriting class"
+        )
+
+    @file.setter
+    def file(self, value: str):
+        raise NotImplementedError(
+            "This needs to be implemented by the inheriting class"
+        )
+
+    def read(self) -> dict:
+        try:
+            with open(self.file, "r") as data:
+                return self.map_input(data)
+        except:
+            return {}
+
+    def write(self, data: dict) -> None:
+        """
+        Writes changes to the config file
+        """
+        with open(self.file, "w") as conf:
+            conf.write(self.map_output(data))
+            conf.truncate()
+
+    def map_input(self, data: typing.Any) -> dict:
+        return data
+
+    def map_output(self, data: typing.Any) -> typing.Any:
+        return data
+
+    def exists(self) -> bool:
+        return os.path.isfile(self.file)

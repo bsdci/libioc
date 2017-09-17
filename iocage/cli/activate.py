@@ -21,41 +21,43 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
-
+"""activate module for the cli."""
 import click
 
-from iocage.cli import cli
+import iocage.lib.Datasets
+import iocage.lib.Logger
+import iocage.lib.ZFS
+
+__rootcmd__ = True
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+@click.command(name="activate", help="Set a zpool active for iocage usage.")
+@click.pass_context
+@click.argument("zpool")
+@click.option("--mountpoint", "-m", default="/iocage")
+def cli(ctx, zpool, mountpoint):
+    """
+    Calls ZFS set to change the property org.freebsd.ioc:active to yes.
+    """
+    logger = ctx.parent.logger
+    zfs = iocage.lib.ZFS.get_zfs()
+    iocage_pool = None
 
+    for pool in zfs.pools:
+        if pool.name == zpool:
+            iocage_pool = pool
 
-def main():
-  cli(prog_name="iocage")
+    if iocage_pool is None:
+        logger.error(f"ZFS pool '{zpool}' not found")
+        exit(1)
 
-
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+    try:
+        datasets = iocage.lib.Datasets.Datasets(
+            pool=iocage_pool,
+            zfs=zfs,
+            logger=logger
+        )
+        datasets.activate(mountpoint=mountpoint)
+        logger.log(f"ZFS pool '{zpool}' activated")
+    except:
+        exit(1)

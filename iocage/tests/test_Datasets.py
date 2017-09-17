@@ -21,41 +21,24 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
-import locale
-import os
-import re
-import signal
-import subprocess as su
-import sys
+import pytest
 
-import click
-
-from iocage.cli import cli
+import iocage.lib
 
 
-def main_safe():
-  try:
-    main()
-  except BaseException as e:
-    return e
+class TestDatasets(object):
 
+    @pytest.fixture
+    def MockedDatasets(self, logger, pool):
 
-def main():
-  cli(prog_name="iocage")
+        class DatasetsMock(iocage.lib.Datasets.Datasets):
+            ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
 
+        yield DatasetsMock
 
-if __name__ == "__main__":
-  coverdir = os.environ.get("IOCAGE_TRACE", None)
-  if coverdir is None:
-    main()
-  else:
-    import trace
-    tracer = trace.Trace(
-      ignoredirs=[sys.prefix, sys.exec_prefix],
-      trace=0,
-      count=1)
-    tracer.run("main_safe()")
-    r = tracer.results()
-    r.write_results(show_missing=True, coverdir=coverdir)
-    print(f"Iocage Trace written to: {coverdir}")
+        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
+        pool.root_dataset.properties[prop].value = "no"
+
+    def test_pool_can_be_activated(self, MockedDatasets, pool, logger):
+        datasets = MockedDatasets(pool=pool, logger=logger)
+        datasets.activate()

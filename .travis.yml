@@ -8,4 +8,4 @@ install:
   - pip3 install flake8 mypy
 script:
   - ".travis/flake8.sh"
-  - mypy libiocage
+  - mypy iocage
