@@ -215,7 +215,7 @@ class BaseConfig(dict):
         self.data["priority"] = str(value)
 
     # legacy support
-    def _get_tag(self) -> str:
+    def _get_tag(self) -> typing.Optional[str]:
 
         if self._has_legacy_tag is True:
             return self.data["tag"]
@@ -396,7 +396,7 @@ class BaseConfig(dict):
         except AttributeError:
             return False
 
-    def __getitem_user(self, key):
+    def __getitem_user(self, key: str) -> typing.Any:
 
         # passthrough existing properties
         try:
