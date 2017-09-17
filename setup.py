@@ -23,7 +23,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import os.path
 import sys
-import fastentrypoints
 from setuptools import find_packages, setup
 from pip.req import parse_requirements
 
@@ -53,7 +52,6 @@ setup(
     url='https://github.com/iocage/libiocage',
     python_requires='>=3.6',
     packages=find_packages(),
-    package_data={'': ['fastentrypoints.py']},
     include_package_data=True,
     install_requires=install_requires,
     dependency_links=dependency_links,
