@@ -32,8 +32,8 @@ import iocage.lib.helpers
 class Network:
     def __init__(self, jail,
                  nic="vnet0",
-                 ipv4_addresses=[],
-                 ipv6_addresses=[],
+                 ipv4_addresses=None,
+                 ipv6_addresses=None,
                  mtu=1500,
                  bridges=None,
                  logger=None):
@@ -52,8 +52,8 @@ class Network:
         self.jail = jail
         self.nic = nic
         self.mtu = mtu
-        self.ipv4_addresses = ipv4_addresses
-        self.ipv6_addresses = ipv6_addresses
+        self.ipv4_addresses = ipv4_addresses or []
+        self.ipv6_addresses = ipv6_addresses or []
 
     def setup(self):
         if self.vnet:
