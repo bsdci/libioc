@@ -41,10 +41,14 @@ __rootcmd__ = True
 @click.pass_context
 @click.argument("props", nargs=-1)
 @click.argument("jail", nargs=1, required=True)
-def cli(ctx, props, jail):
+def cli(
+    ctx: click.core.Context,
+    props: typing.Tuple[str, ...],
+    jail: str
+) -> None:
     """Get a list of jails and print the property."""
 
-    logger = ctx.parent.logger
+    logger: libiocage.lib.Logger.Logger = ctx.parent.logger
     host = iocage.lib.Host.HostGenerator(logger=logger)
 
     # Defaults
@@ -115,5 +119,5 @@ def set_properties(
     return updated_properties
 
 
-def _is_setter_property(property_string):
-    return "=" in property_string
+def _is_setter_property(property_string: str) -> bool:
+    return ("=" in property_string)
