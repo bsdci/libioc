@@ -492,7 +492,7 @@ class JailGenerator(JailResource):
         """
 
         if self.config["id"] is None:
-            self.config["name"] = str(uuid.uuid4())
+            self.config["id"] = str(uuid.uuid4())
 
         self.require_jail_not_existing()
 
