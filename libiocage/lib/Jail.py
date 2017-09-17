@@ -355,7 +355,9 @@ class JailGenerator(JailResource):
         """
 
         if force is True:
-            return self._force_stop()
+            for event in self._force_stop():
+                yield event
+            return
 
         self.require_jail_existing()
         self.require_jail_running()
@@ -431,33 +433,44 @@ class JailGenerator(JailResource):
 
         successful = True
 
+        events: typing.Any = libiocage.lib.events
+        jailDestroyEvent = events.JailDestroy(self)
+        jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
+        jailMountTeardownEvent = events.JailMountTeardown(self)
+
         try:
             self._run_hook("prestop")
         except:
             successful = False
             self.logger.warn("pre-stop script failed")
 
+        yield jailDestroyEvent.begin()
         try:
             self._destroy_jail()
             self.logger.debug(f"{self.humanreadable_name}: jail destroyed")
+            yield jailDestroyEvent.end()
         except Exception as e:
             successful = False
-            self.logger.warn(str(e))
+            yield jailDestroyEvent.skip()
 
         if self.config["vnet"]:
+            yield jailNetworkTeardownEvent.begin()
             try:
                 self._stop_vimage_network()
                 self.logger.debug(f"{self.humanreadable_name}: VNET stopped")
+                yield jailNetworkTeardownEvent.end()
             except Exception as e:
                 successful = False
-                self.logger.warn(str(e))
+                yield jailNetworkTeardownEvent.skip()
 
+        yield jailMountTeardownEvent.begin()
         try:
             self._teardown_mounts()
             self.logger.debug(f"{self.humanreadable_name}: mounts destroyed")
+            yield jailMountTeardownEvent.end()
         except Exception as e:
             successful = False
-            self.logger.warn(str(e))
+            yield jailMountTeardownEvent.skip()
 
         try:
             self.update_jail_state()
