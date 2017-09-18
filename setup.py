@@ -24,14 +24,43 @@
 import os.path
 import sys
 from setuptools import find_packages, setup
+from setuptools.command import easy_install
 from pip.req import parse_requirements
 
 reqs = list(parse_requirements("requirements.txt", session="iocage"))
 install_requires = list(map(lambda x: f"{x.name}{x.specifier}", reqs))
 dependency_links = list(map(
-    lambda x: str(x.link), 
+    lambda x: str(x.link),
     filter(lambda x: x.link, reqs)
 ))
+
+TEMPLATE = '''\
+# -*- coding: utf-8 -*-
+# EASY-INSTALL-ENTRY-SCRIPT: '{0}'
+__requires__ = '{0}'
+import sys
+
+from iocage.cli import cli
+
+if __name__ == '__main__':
+    sys.dd:exit(cli())'''
+
+
+@classmethod
+def get_args(cls, dist, header=None):
+
+    if header is None:
+        header = cls.get_header()
+
+    script_text = TEMPLATE.format(str(dist.as_requirement()))
+    args = cls._get_script_args("console", "ioc", header, script_text)
+
+    for res in args:
+        yield res
+
+
+easy_install.ScriptWriter.get_args = get_args
+
 
 if os.path.isdir("/usr/local/etc/init.d"):
     _data = [('/usr/local/etc/init.d', ['rc.d/ioc'])]
