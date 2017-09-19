@@ -2,5 +2,9 @@ pytest
 pytest-cov
 pytest-pep8
 pytest-mock
-mypy
+flake8-mutable
+flake8-builtins
+flake8-mypy
+bandit
+bandit-high-entropy-string
 git+https://github.com/freenas/py-libzfs.git#egg=libzfs
