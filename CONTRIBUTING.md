@@ -72,6 +72,24 @@ x = max(
 
 - Add a linefeed at the end of the file
 
+## Running Tests
+
+Please run our Test suit before submitting a pull request.
+To do this you can run
+
+```sh
+make check-deps  # install dependencies needed to run check
+make check
+```
+
+The linters and static code analysis tools run in `check ` can be executed on _any_ system.
+For regression tests, you'll need a \*BSD system with a ZFS pool you can give `iocage` access to:
+
+```sh
+setenv ZPOOL=jails
+make test
+```
+
 ## Documentation for Read The Docs
 
 If you wish to update some of our [documentation](http://iocage.readthedocs.org), you only need to submit a PR for the files you change in iocage/doc/source. They will automatically be updated when the changes are merged.
