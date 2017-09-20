@@ -44,7 +44,7 @@ class Prompts:
 
         if default is not None:
             default_release = available_releases[default]
-            selection = input(
+            selection = input(  # nosec: we're on Python 3
                 # f"Release ({default_release.name}) [{default}]: "
                 "\nType the number of the desired RELEASE\n"
                 "Press [Enter] to fetch the default selection"
@@ -52,7 +52,7 @@ class Prompts:
             )
         else:
             default_release = None
-            selection = input("Your selection: ")
+            selection = input("Your selection: ")  # nosec: we're on Python 3
 
         if selection == "":
             if default_release is None:

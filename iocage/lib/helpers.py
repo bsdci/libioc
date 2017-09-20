@@ -402,7 +402,7 @@ def shell(
     if logger:
         logger.spam(f"Executing Shell: {command}")
 
-    return subprocess.check_output(
+    return subprocess.check_output(  # nosec: Yes, we actually want this
         shell_command,
         shell=True,
         universal_newlines=True,
@@ -426,7 +426,7 @@ def umount(
     cmd.append(str(mountpoint))
 
     try:
-        exec(cmd)
+        iocage.lib.helpers.exec(cmd)
         if logger is not None:
             logger.debug(
                 f"Jail mountpoint {mountpoint} umounted"
