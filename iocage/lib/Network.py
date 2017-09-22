@@ -69,7 +69,7 @@ class Network:
             # down host_if
             iocage.lib.NetworkInterface.NetworkInterface(
                 name=self.nic_local_name,
-                extra_settings=["down"],
+                extra_settings=["destroy"],
                 logger=self.logger
             )
 
