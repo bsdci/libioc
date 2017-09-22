@@ -28,14 +28,15 @@ import re
 import urllib.request
 import html.parser
 
+
 import iocage.lib.errors
 import iocage.lib.helpers
 
 
 class EOLParser(html.parser.HTMLParser):
 
-    eol_releases: List[str] = []
-    data: List[str] = []
+    eol_releases: typing.List[str] = []
+    data: typing.List[str] = []
     in_id: bool = False
     td_counter: int = 0
 
@@ -153,10 +154,10 @@ class DistributionGenerator:
         arch = release_name.split("-")[-2:][0]
         return self.host.processor == arch
 
-    def _get_eol_list(self) -> List[str]:
+    def _get_eol_list(self) -> typing.List[str]:
         """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
         request = urllib.request.Request(self.eol_url)
-        eol_releases: List[str] = []
+        eol_releases: typing.List[str] = []
 
         with urllib.request.urlopen(request) as response:
             
@@ -171,7 +172,7 @@ class DistributionGenerator:
                 parser.feed(response.read().decode("ISO-8859-1"))
                 return parser.eol_releases
 
-    def _check_eol(self, release: str, eol: List[str]) -> bool:
+    def _check_eol(self, release: str, eol: typing.List[str]) -> bool:
         if self.host.distribution.name == "FreeBSD":
             if release in eol:
                 return True
