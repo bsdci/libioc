@@ -27,6 +27,7 @@ import json
 import texttable
 import typing
 
+import iocage.lib.errors
 import iocage.lib.Logger
 import iocage.lib.Host
 import iocage.lib.Resource
@@ -63,14 +64,20 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         _sort, quick, output, output_format, filters):
     logger = ctx.parent.logger
 
-    host = iocage.lib.Host.Host(logger=logger)
+    try:
+        host = iocage.lib.Host.Host(logger=logger)
+    except iocage.lib.errors.IocageNotActivated:
+        exit(1)
 
     if remote and not plugins:
 
-        available_releases = host.distribution.releases
-        for available_release in available_releases:
-            logger.screen(available_release.name)
-        return
+        try:
+            available_releases = host.distribution.releases
+            for available_release in available_releases:
+                logger.screen(available_release.name)
+            return
+        except iocage.lib.errors.IocageException:
+            exit(1)
 
     if plugins and remote:
         raise iocage.lib.errors.MissingFeature("Plugins", plural=True)
@@ -95,11 +102,14 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         resources_class = iocage.lib.Jails.JailsGenerator
         columns = _list_output_comumns(output, _long)
 
-    resources = resources_class(
-        logger=logger,
-        host=host,
-        filters=filters  # ToDo: allow quoted whitespaces from user input
-    )
+    try:
+        resources = resources_class(
+            logger=logger,
+            host=host,
+            filters=filters  # ToDo: allow quoted whitespaces from user input
+        )
+    except iocage.lib.errors.IocageException:
+        exit(1)
 
     if output_format == "list":
         _print_list(resources, columns, header, "\t")

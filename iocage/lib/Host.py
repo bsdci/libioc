@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os
 import platform
 import re
@@ -48,19 +49,20 @@ class HostGenerator:
     def __init__(
         self,
         root_dataset: libzfs.ZFSDataset=None,
-        defaults: 'iocage.lib.Resource.DefaultResource'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
-        logger: 'iocage.lib.Logger.Logger'=None
+        defaults: typing.Optional['iocage.lib.Resource.DefaultResource']=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
         self.datasets = iocage.lib.Datasets.Datasets(
-            root=root_dataset,
             logger=self.logger,
-            zfs=self.zfs
+            zfs=self.zfs,
+            root=root_dataset
         )
+
         self.distribution = self._class_distribution(
             host=self,
             logger=self.logger
