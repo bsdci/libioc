@@ -265,6 +265,14 @@ class DistributionUnknown(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class DistributionEOLWarningDownloadFailed(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = f"Failed to download the EOL warnings"
+        super().__init__(msg, *args, **kwargs)
+
+
+
 # Storage
 
 
