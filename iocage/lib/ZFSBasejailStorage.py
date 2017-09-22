@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import iocage.lib.helpers
+import libzfs
 
 
 class ZFSBasejailStorage:
@@ -90,7 +91,7 @@ class ZFSBasejailStorage:
                         self.logger.verbose(
                             f"Snapshot {current_mountpoint} deleted"
                         )
-                    except:
+                    except libzfs.ZFSException:
                         pass
 
                 child.delete()

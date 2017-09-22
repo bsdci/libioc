@@ -45,7 +45,7 @@ class ZFSShareStorage:
             zpool = None
             try:
                 zpool = self._get_pool_from_dataset_name(name)
-            except:
+            except iocage.lib.errors.ZFSPoolUnavailable:
                 pass
 
             pool_name = f"{self.jail.pool_name}/{name}"
@@ -53,13 +53,13 @@ class ZFSShareStorage:
                 # legacy support (datasets not prefixed with pool/)
                 zpool = self._get_pool_from_dataset_name(pool_name)
                 name = f"{self.jail.pool_name}/{name}"
-            except:
+            except iocage.lib.errors.ZFSPoolUnavailable:
                 pass
 
             try:
                 if auto_create:
                     zpool.create(name, {}, create_ancestors=True)
-            except:
+            except libzfs.ZFSException:
                 pass
 
             try:
