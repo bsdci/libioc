@@ -156,27 +156,42 @@ class DistributionGenerator:
 
     def _get_eol_list(self) -> typing.List[str]:
         """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
-        request = urllib.request.Request(self.eol_url)
-        eol_releases: typing.List[str] = []
-
+        request = urllib.request.Request(
+            self.eol_url,
+            headers={
+                "Accept-Charset": "utf-8"
+            }
+        )
         with urllib.request.urlopen(request) as response:
-            
-            if response.getcode() != 200:
+
+            if response.getcode() != 200:  # noqa: T484
                 iocage.lib.errors.DistributionEOLWarningDownloadFailed(
                     logger=self.logger,
-                    level=warning
+                    level="warning"
                 )
                 return []
 
-            with EOLParser() as parser:
-                parser.feed(response.read().decode("ISO-8859-1"))
-                return parser.eol_releases
+            parser = EOLParser()
+            data = response.read().decode("utf-8", "ignore")
+            parser.feed(data)
+            parser.close()
+
+            return parser.eol_releases
+
+    def _parse_release_version(self, release_version_string: str) -> str:
+        parsed_version = release_version_string.split("-", maxsplit=1)[0]
+        if "." not in parsed_version:
+            parsed_version += ".0"
+        return parsed_version
 
     def _check_eol(self, release: str, eol: typing.List[str]) -> bool:
         if self.host.distribution.name == "FreeBSD":
-            if release in eol:
-                return True
-
+            return release in eol
+        elif self.host.distribution.name == "HardenedBSD":
+            return self._parse_release_version(release) in map(
+                lambda x: self._parse_release_version(x),
+                eol
+            )
         return False
 
     def get_release_trunk_file_url(self, release, filename):
