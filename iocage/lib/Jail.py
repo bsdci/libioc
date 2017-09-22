@@ -115,7 +115,7 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         """
         try:
             return self._assigned_dataset_name
-        except:
+        except AttributeError:
             pass
 
         try:
@@ -243,9 +243,9 @@ class JailGenerator(JailResource):
 
         if not new and (("id" not in data) or (data["id"] is None)):
             try:
-                # try to get the Jail nane from it's dataset_name
+                # try to get the Jail name from it's dataset_name
                 data["id"] = self.dataset_name.split("/").pop()
-            except:
+            except:  # nosec: Why is there a try/catch here?
                 pass
 
         self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(
@@ -882,7 +882,7 @@ class JailGenerator(JailResource):
         try:
             if isinstance(self.config[key], str):
                 return self._parse_resource_limit(self.config[key])
-        except:
+        except KeyError:
             pass
 
         return None, None

@@ -138,7 +138,7 @@ class BaseConfig(dict):
     def _set_legacy(self, value, **kwargs) -> None:
         try:
             self.legacy = iocage.lib.helpers.parse_bool(value)
-        except:
+        except TypeError:
             self.legacy = False
 
     def _get_id(self) -> str:
