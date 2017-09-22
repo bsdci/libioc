@@ -44,7 +44,7 @@ def init_zfs(
 
     try:
         return self.zfs
-    except:
+    except AttributeError:
         pass
 
     if (zfs is not None) and isinstance(zfs, iocage.lib.ZFS.ZFS):
@@ -63,7 +63,7 @@ def init_host(
 
     try:
         return self.host
-    except:
+    except AttributeError:
         pass
 
     if host:
@@ -82,7 +82,7 @@ def init_logger(
 
     try:
         return self.logger
-    except:
+    except AttributeError:
         pass
 
     if logger is not None:
