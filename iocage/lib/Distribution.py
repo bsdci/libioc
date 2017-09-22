@@ -95,8 +95,8 @@ class DistributionGenerator:
         processor = self.host.processor
 
         if distribution == "FreeBSD":
-            release_path = f"/pub/FreeBSD/releases/{processor}/{processor}"
-            return f"http://ftp.freebsd.org{release_path}"
+            release_path = f"/ftp/releases/{processor}/{processor}"
+            return f"https://downloads.freebsd.org{release_path}"
         elif distribution == "HardenedBSD":
             return f"http://jenkins.hardenedbsd.org/builds"
         else:
