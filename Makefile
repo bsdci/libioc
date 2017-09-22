@@ -2,7 +2,7 @@ ZPOOL=""
 SERVER=""
 
 install:
-	pkg install -q -y libgit2 libucl cython3 rsync python36 py36-libzfs
+	pkg install -q -y libucl cython3 rsync python36 py36-libzfs
 	python3.6 -m ensurepip
 	pip3.6 install -Ur requirements.txt
 	pip3.6 install -e .
