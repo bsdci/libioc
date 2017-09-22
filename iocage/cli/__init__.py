@@ -25,7 +25,7 @@ import locale
 import os
 import re
 import signal
-import subprocess as su
+import subprocess
 import sys
 
 import click
@@ -49,9 +49,9 @@ signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 # @formatter:on
 
 try:
-    su.check_call(["sysctl", "vfs.zfs.version.spa"],
-                  stdout=su.PIPE, stderr=su.PIPE)
-except su.CalledProcessError:
+    subprocess.check_call(["/sbin/sysctl", "vfs.zfs.version.spa"],  # nosec
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except subprocess.CalledProcessError:
     logger.error(
         "ZFS is required to use iocage.\n"
         "Try calling 'kldload zfs' as root."

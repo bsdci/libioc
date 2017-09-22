@@ -85,8 +85,8 @@ class Network:
     def __create_vnet_iface(self):
 
         # create new epair interface
-        epair_a_cmd = ["ifconfig", "epair", "create"]
-        epair_a = subprocess.Popen(
+        epair_a_cmd = ["/sbin/ifconfig", "epair", "create"]
+        epair_a = subprocess.Popen(  # nosec: TODO: use exec helper?
             epair_a_cmd, stdout=subprocess.PIPE, shell=False).communicate()[0]
         epair_a = epair_a.decode("utf-8").strip()
         epair_b = f"{epair_a[:-1]}b"

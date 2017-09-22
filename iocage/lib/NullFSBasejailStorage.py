@@ -56,8 +56,8 @@ class NullFSBasejailStorage:
 
             if (len(mounts) > 0):
                 try:
-                    iocage.lib.helpers.exec(["umount"] + mounts)
-                except:
+                    iocage.lib.helpers.exec(["/sbin/umount"] + mounts)
+                except iocage.lib.errors.CommandFailure:
                     # in case directories were not mounted
                     pass
 

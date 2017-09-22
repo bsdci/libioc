@@ -629,12 +629,12 @@ class JailGenerator(JailResource):
 
     def _destroy_jail(self) -> None:
 
-        command = ["jail", "-r"]
+        command = ["/usr/sbin/jail", "-r"]
         command.append(self.identifier)
 
         subprocess.check_output(
             command,
-            shell=False,
+            shell=False,  # nosec; TODO use helper
             stderr=subprocess.DEVNULL
         )
 
@@ -981,7 +981,7 @@ class JailGenerator(JailResource):
                 "-v",
                 "-h",
                 "--libxo=json"
-            ], shell=False, stderr=subprocess.DEVNULL)
+            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
             output = stdout.decode().strip()
 
             self.jail_state = json.loads(output)["jail-information"]["jail"][0]
