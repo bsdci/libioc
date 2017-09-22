@@ -22,7 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import subprocess
-from hashlib import md5
+from hashlib import sha224
 
 import iocage.lib.NetworkInterface
 import iocage.lib.errors
@@ -143,7 +143,7 @@ class Network:
         )
 
     def __generate_mac_bytes(self):
-        m = md5()
+        m = sha224()
         m.update(self.jail.name.encode("utf-8"))
         m.update(self.nic.encode("utf-8"))
         prefix = self.jail.config["mac_prefix"]
