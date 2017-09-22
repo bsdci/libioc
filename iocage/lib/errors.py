@@ -272,7 +272,6 @@ class DistributionEOLWarningDownloadFailed(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
-
 # Storage
 
 
