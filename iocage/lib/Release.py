@@ -245,9 +245,8 @@ class ReleaseGenerator(ReleaseResource):
     @property
     def mirror_url(self) -> str:
         try:
-            if self._mirror_url:
-                return self._mirror_url
-        except:
+            return self._mirror_url
+        except AttributeError:
             pass
         return self.host.distribution.mirror_url
 
