@@ -113,7 +113,8 @@ class DistributionGenerator:
 
         self.logger.spam(f"Fetching release list from '{self.mirror_url}'")
 
-        resource = urllib.request.urlopen(self.mirror_url)
+        # the mirror_url @property is validated (enforced) @property, so:
+        resource = urllib.request.urlopen(self.mirror_url)  # nosec
         charset = resource.headers.get_content_charset()
         response = resource.read().decode(charset if charset else "UTF-8")
 
