@@ -21,16 +21,39 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import os
 import platform
 import re
 import urllib.request
-from typing import List
-
-import requests
+import html.parser
 
 import iocage.lib.errors
 import iocage.lib.helpers
+
+
+class EOLParser(html.parser.HTMLParser):
+
+    eol_releases: List[str] = []
+    data: List[str] = []
+    in_id: bool = False
+    td_counter: int = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "td":
+            self.in_id = True
+            self.td_counter += 1
+        elif tag == "tr":
+            self.td_counter = 0
+
+    def handle_endtag(self, tag):
+        if tag == "td":
+            self.in_id = False
+
+    def handle_data(self, data):
+        if self.in_id and self.td_counter == 2:
+            if data != "n/a":
+                self.eol_releases.append(data)
 
 
 class DistributionGenerator:
@@ -41,6 +64,8 @@ class DistributionGenerator:
         "..",
         "ISO-IMAGES"
     ]
+
+    eol_url: str = "https://www.freebsd.org/security/unsupported.html"
 
     mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
 
@@ -130,25 +155,21 @@ class DistributionGenerator:
 
     def _get_eol_list(self) -> List[str]:
         """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
-        _eol = "https://www.freebsd.org/security/unsupported.html"
-        req = requests.get(_eol)
-        status = req.status_code == requests.codes.ok
+        request = urllib.request.Request(self.eol_url)
         eol_releases: List[str] = []
-        if not status:
-            req.raise_for_status()
 
-        for eol in req.content.decode("iso-8859-1").split():
-            eol_lines = eol.strip("href=").strip("/").split(">")
-            # We want a dynamic EOL
-            try:
-                if "-RELEASE" in eol_lines[1]:
-                    eol_candidate = eol_lines[1].strip('</td')
-                    if eol_candidate not in eol_releases:
-                        eol_releases.append(eol_candidate)
-            except IndexError:
-                pass
+        with urllib.request.urlopen(request) as response:
+            
+            if response.getcode() != 200:
+                iocage.lib.errors.DistributionEOLWarningDownloadFailed(
+                    logger=self.logger,
+                    level=warning
+                )
+                return []
 
-        return eol_releases
+            with EOLParser() as parser:
+                parser.feed(response.read().decode("ISO-8859-1"))
+                return parser.eol_releases
 
     def _check_eol(self, release: str, eol: List[str]) -> bool:
         if self.host.distribution.name == "FreeBSD":
