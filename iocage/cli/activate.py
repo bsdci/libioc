@@ -41,6 +41,7 @@ def cli(ctx, zpool, mountpoint):
     """
     logger = ctx.parent.logger
     zfs = iocage.lib.ZFS.get_zfs()
+
     iocage_pool = None
 
     for pool in zfs.pools:

@@ -52,30 +52,43 @@ class Datasets:
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
         if isinstance(root, libzfs.ZFSDataset):
-            self.root = root
+            self._root = root
             return
 
         if (pool is not None) and isinstance(pool, libzfs.ZFSPool):
-            self.root = self._get_or_create_dataset(
+            self._root = self._get_or_create_dataset(
                 "iocage",
                 root_name=pool.name,
                 pool=pool
             )
             return
 
-        active_pool = self.active_pool
-
-        if active_pool is None:
-            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
-        else:
-            self.root = self.zfs.get_dataset(f"{active_pool.name}/iocage")
-
     @property
-    def active_pool(self) -> typing.Optional[libzfs.ZFSPool]:
+    def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
         for pool in self.zfs.pools:
             if self._is_pool_active(pool):
                 return pool
         return None
+
+    @property
+    def active_pool(self) -> libzfs.ZFSPool:
+        pool = self._active_pool_or_none
+        if pool is None:
+            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
+        return pool
+
+    @property
+    def root(self):
+        try:
+            return self._root
+        except:
+            pass
+
+        if self._active_pool_or_none is None:
+            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
+
+        self._root = self.zfs.get_dataset(f"{self.active_pool.name}/iocage")
+        return self._root
 
     @property
     def releases(self) -> libzfs.ZFSDataset:
@@ -123,13 +136,13 @@ class Datasets:
         self._activate_pool(pool)
 
         if mountpoint is not None:
-            self.root = self._get_or_create_dataset(
+            self._root = self._get_or_create_dataset(
                 "iocage",
                 pool=pool,
                 mountpoint=mountpoint
             )
         else:
-            self.root = self._get_or_create_dataset(
+            self._root = self._get_or_create_dataset(
                 "iocage",
                 pool=pool
             )
@@ -138,7 +151,7 @@ class Datasets:
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
             pool,
             self.ZFS_POOL_ACTIVE_PROPERTY
-        ))
+        )) is True
 
     def _get_pool_property(
         self,
