@@ -266,7 +266,7 @@ class ReleaseGenerator(ReleaseResource):
     def available(self) -> bool:
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
-            resource = urllib.request.urlopen(request)
+            resource = urllib.request.urlopen(request)  # nosec: see above
             return resource.getcode() == 200  # type: ignore
         except:
             return False
@@ -511,7 +511,7 @@ class ReleaseGenerator(ReleaseResource):
                 os.remove(local_path)
 
             self.logger.verbose(f"Downloading {url}")
-            urllib.request.urlretrieve(url, local_path)
+            urllib.request.urlretrieve(url, local_path)  # nosec: url validated
 
             if key == update_script_name:
                 os.chmod(local_path, 0o755)
@@ -782,7 +782,7 @@ class ReleaseGenerator(ReleaseResource):
         url = f"{self.remote_url}/{self.host.distribution.hash_file}"
         path = self.__get_hashfile_location()
         self.logger.verbose(f"Downloading hashes from {url}")
-        urllib.request.urlretrieve(url, path)
+        urllib.request.urlretrieve(url, path)  # nosec: validated in @setter
         self.logger.debug(f"Hashes downloaded to {path}")
 
     def _fetch_assets(self):
@@ -795,7 +795,7 @@ class ReleaseGenerator(ReleaseResource):
                 return
             else:
                 self.logger.debug(f"Starting download of {url}")
-                urllib.request.urlretrieve(url, path)
+                urllib.request.urlretrieve(url, path)  # nosec: validated
                 self.logger.verbose(f"{url} was saved to {path}")
 
     def read_hashes(self):
