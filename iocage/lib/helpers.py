@@ -115,7 +115,7 @@ def exec(
     subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
     subprocess_args["stderr"] = subprocess_args.get("stderr", subprocess.PIPE)
 
-    child = subprocess.Popen(
+    child = subprocess.Popen(  # nosec: TODO: #113
         command,
         shell=False,
         **subprocess_args
@@ -344,7 +344,7 @@ def exec_passthru(
     if logger:
         logger.spam(f"Executing (interactive): {command_str}")
 
-    return subprocess.Popen(command).communicate()
+    return subprocess.Popen(command).communicate()  # nosec: TODO: #113
 
 
 def exec_raw(
@@ -360,7 +360,7 @@ def exec_raw(
     if logger:
         logger.spam(f"Executing (raw): {command_str}")
 
-    return subprocess.Popen(
+    return subprocess.Popen(  # nosec: TODO: #113
         command,
         **kwargs
     )

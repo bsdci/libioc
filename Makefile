@@ -13,7 +13,7 @@ check-deps:
 	pip3 install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 check:
 	flake8 --exclude=".*" --exclude=__init__.py --ignore=E203,W391
-	bandit --exclude iocage/tests/ -r .
+	bandit --skip B404 --exclude iocage/tests/ -r .
 test:
 	pytest --zpool $(ZPOOL) --server $(SERVER)
 help:
