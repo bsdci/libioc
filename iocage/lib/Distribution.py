@@ -212,8 +212,8 @@ class DistributionGenerator:
                 fragments = release.name.split("-", maxsplit=1)
                 release_name = f"{fragments[0]}.0"
 
-            base_url = "https://svnweb.freebsd.org/base/release"
-            return f"{base_url}/{release_name}/{filename}?view=co"
+            base_url = "https://svn.freebsd.org/base/release"
+            return f"{base_url}/{release_name}/{filename}"
 
     @property
     def releases(self):
