@@ -513,7 +513,7 @@ class ReleaseGenerator(ReleaseResource):
             urllib.request.urlretrieve(url, local_path)  # nosec: url validated
 
             if key == update_script_name:
-                os.chmod(local_path, 0o755)
+                os.chmod(local_path, 0o744)
 
             elif key == update_conf_name:
 
