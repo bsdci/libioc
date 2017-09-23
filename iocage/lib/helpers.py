@@ -412,7 +412,10 @@ def shell(
 
 # ToDo: replace with (u)mount library
 def umount(
-    mountpoint: iocage.lib.Types.AbsolutePath,
+    mountpoint: typing.Optional[typing.Union[
+        iocage.lib.Types.AbsolutePath,
+        typing.List[iocage.lib.Types.AbsolutePath]
+    ]]=None,
     force: bool=False,
     ignore_error: bool=False,
     logger: 'iocage.lib.Logger.Logger'=None
@@ -423,7 +426,10 @@ def umount(
     if force is True:
         cmd.append("-f")
 
-    cmd.append(str(mountpoint))
+    if isinstance(mountpoint, list):
+        cmd += mountpoint
+    elif isinstance(mountpoint, iocage.lib.Types.AbsolutePath):
+        cmd.append(str(mountpoint))
 
     try:
         iocage.lib.helpers.exec(cmd)
