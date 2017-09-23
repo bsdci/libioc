@@ -991,29 +991,33 @@ class JailGenerator(JailResource):
 
     def _teardown_mounts(self) -> None:
 
-        mountpoints = list(map(
-            self._get_absolute_path_from_jail_asset,
-            [
-                "/dev/fd",
-                "/dev",
-                "/proc",
-                "/root/compat/linux/proc"
-            ]
+        mountpoints = list(filter(
+            os.path.isdir,
+            map(
+                self._get_absolute_path_from_jail_asset,
+                [
+                    "/usr/bin",
+                    "/dev/fd",
+                    "/dev",
+                    "/proc",
+                    "/root/compat/linux/proc"
+                ]
+            )
         ))
 
-        mountpoints += list(map(
-            lambda x: x["destination"],
-            list(self.fstab)
-        ))
+        iocage.lib.helpers.umount(
+            mountpoints,
+            force=True,
+            logger=self.logger,
+            ignore_error=True
+        )
 
-        for mountpoint in mountpoints:
-            if os.path.isdir(str(mountpoint)):
-                iocage.lib.helpers.umount(
-                    mountpoint,
-                    force=True,
-                    logger=self.logger,
-                    ignore_error=True  # maybe it was not mounted
-                )
+        iocage.lib.helpers.umount(
+            ["-a", "-F", self.fstab.path],
+            force=True,
+            logger=self.logger,
+            ignore_error=True
+        )
 
     def _get_absolute_path_from_jail_asset(
         self,
