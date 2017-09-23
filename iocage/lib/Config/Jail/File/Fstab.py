@@ -265,9 +265,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         )) + "\n"
 
     def __iter__(self):
-        fstab_lines = list(set.__iter__(self))
-        fstab_lines += self.basejail_lines
-        return iter(fstab_lines)
+        return iter(self.basejail_lines + self)
 
     def __contains__(self, value: typing.Any) -> bool:
         for entry in self:
