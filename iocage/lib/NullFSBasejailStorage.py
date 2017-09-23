@@ -49,10 +49,10 @@ class NullFSBasejailStorage:
         with open(f"{self.jail.path}/fstab") as f:
             mounts = []
             for mount in f.read().splitlines():
-                try:
-                    mounts.append(mount.replace("\t", " ").split(" ")[1])
-                except:
-                    pass
+                mount_line_data = mount.replace("\t", " ").split()
+                if len(mount_line_data) > 2:
+                    # line has a mountpoint
+                    mounts.append(mount_line_data[1])
 
             if (len(mounts) > 0):
                 try:

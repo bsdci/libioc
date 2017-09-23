@@ -206,7 +206,7 @@ class Terms(list):
 
         try:
             prop, value = user_input.split("=", maxsplit=1)
-        except:
+        except ValueError:
             prop = "name"
             value = user_input
 

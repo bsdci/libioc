@@ -82,15 +82,15 @@ class TestJail(object):
 
             try:
                 assert data["basejail"] is "no"
-            except (KeyError) as e:
+            except KeyError:
                 pass
 
             try:
                 assert (data["basejail"] is "") or (data["basejail"] == "none")
-            except (KeyError) as e:
+            except KeyError:
                 pass
 
-        except Exception as e:
+        except BaseException as e:
             cleanup()
             raise e
 

@@ -24,7 +24,7 @@
 import typing
 import json
 import re
-import subprocess
+import subprocess  # nosec: B404
 import uuid
 
 import iocage.lib.errors
@@ -91,7 +91,7 @@ def init_logger(
     else:
         try:
             return self.logger
-        except:
+        except AttributeError:
             new_logger = iocage.lib.Logger.Logger()
             object.__setattr__(self, 'logger', new_logger)
             return new_logger
@@ -431,7 +431,7 @@ def umount(
             logger.debug(
                 f"Jail mountpoint {mountpoint} umounted"
             )
-    except:
+    except iocage.lib.errors.CommandFailure:
         if logger is not None:
             logger.spam(
                 f"Jail mountpoint {mountpoint} not unmounted"

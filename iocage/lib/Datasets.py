@@ -81,7 +81,7 @@ class Datasets:
     def root(self):
         try:
             return self._root
-        except:
+        except AttributeError:
             pass
 
         if self._active_pool_or_none is None:
@@ -169,7 +169,7 @@ class Datasets:
 
         try:
             return dataset.properties[prop].value
-        except:
+        except KeyError:
             return None
 
     def _activate_pool(self, pool: libzfs.ZFSPool) -> None:
@@ -231,7 +231,7 @@ class Datasets:
         dataset_name = f"{root_dataset_name}/{name}"
         try:
             dataset = self.zfs.get_dataset(dataset_name)
-        except:
+        except libzfs.ZFSException:
             target_pool.create(dataset_name, {})
             dataset = self.zfs.get_dataset(dataset_name)
 

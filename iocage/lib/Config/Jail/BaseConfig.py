@@ -129,8 +129,12 @@ class BaseConfig(dict):
 
         self.clone(data)
 
-    def update_special_property(self, name: str) -> None:
-        self.data[name] = str(self.special_properties[name])
+    def update_special_property(self, name: str) -> bool:
+        try:
+            self.data[name] = str(self.special_properties[name])
+            return True
+        except KeyError:
+            return False
 
     def attach_special_property(self, name, special_property):
         self.special_properties[name] = special_property
@@ -153,7 +157,7 @@ class BaseConfig(dict):
             # the configuration
             if self["id"] == name:
                 return
-        except:
+        except KeyError:
             pass
 
         if name is None:
@@ -340,16 +344,14 @@ class BaseConfig(dict):
     def _get_basejail_type(self):
 
         # first see if basejail_type was explicitly set
-        try:
+        if "basejail_type" in self.data.keys():
             return self.data["basejail_type"]
-        except:
-            pass
 
         # if it was not, the default for is 'nullfs' if the jail is a basejail
         try:
             if self["basejail"]:
                 return "nullfs"
-        except:
+        except KeyError:
             pass
 
         # otherwise the jail does not have a basejail_type
@@ -365,7 +367,7 @@ class BaseConfig(dict):
         if value is None:
             try:
                 del self.data["login_flags"]
-            except:
+            except KeyError:
                 pass
         else:
             if isinstance(value, list):
@@ -401,7 +403,7 @@ class BaseConfig(dict):
         # passthrough existing properties
         try:
             return self.__getattribute__(key)
-        except:
+        except AttributeError:
             pass
 
         is_special_property = self.special_properties.is_special_property(key)
@@ -420,10 +422,8 @@ class BaseConfig(dict):
             pass
 
         # plain data attribute
-        try:
+        if key in self.data.keys():
             return self.data[key]
-        except:
-            pass
 
         raise KeyError(f"User defined property not found: {key}")
 
@@ -454,14 +454,13 @@ class BaseConfig(dict):
             self.update_special_property(key)
             return
 
-        try:
-            setter_method = self.__getattribute__(f"_set_{key}")
+        setter_method_name = f"_set_{key}"
+        if setter_method_name in self.__dir__():
+            setter_method = self.__getattribute__(setter_method_name)
             if setter_method is None:
                 return None
             else:
                 return setter_method(parsed_value, **kwargs)
-        except AttributeError:
-            pass
 
         self.data[key] = parsed_value
 

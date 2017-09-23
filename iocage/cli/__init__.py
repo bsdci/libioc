@@ -25,7 +25,7 @@ import locale
 import os
 import re
 import signal
-import subprocess
+import subprocess  # nosec: B404
 import sys
 
 import click

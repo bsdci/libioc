@@ -163,7 +163,7 @@ class DistributionGenerator:
                 "Accept-Charset": "utf-8"
             }
         )
-        with urllib.request.urlopen(request) as response:
+        with urllib.request.urlopen(request) as response:  # nosec: B310
 
             if response.getcode() != 200:  # noqa: T484
                 iocage.lib.errors.DistributionEOLWarningDownloadFailed(

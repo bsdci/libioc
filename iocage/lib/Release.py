@@ -28,7 +28,8 @@ import os
 import shutil
 import tarfile
 import urllib.request
-from urllib.parse import urlparse
+import urllib.error
+import urllib.parse
 
 import libzfs
 import ucl
@@ -95,13 +96,13 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         """
         try:
             return self._assigned_dataset_name
-        except:
+        except AttributeError:
             pass
 
         return f"{self.__releases_dataset_name}/{self.release.name}"
 
     @dataset_name.setter
-    def dataset_name(self, value: str):
+    def dataset_name(self, value: str) -> None:
         self._dataset_name = value
 
     @property
@@ -121,7 +122,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
 class ReleaseGenerator(ReleaseResource):
 
-    DEFAULT_RC_CONF_SERVICES = {
+    DEFAULT_RC_CONF_SERVICES: typing.Dict[str, bool] = {
         "netif": False,
         "sendmail": False,
         "sendmail_submit": False,
@@ -180,7 +181,7 @@ class ReleaseGenerator(ReleaseResource):
         return self._resource
 
     @resource.setter
-    def resource(self, value: 'iocage.lib.Resource.Resource'):
+    def resource(self, value: 'iocage.lib.Resource.Resource') -> None:
         if value is None:
             self._resource = ReleaseResource(
                 release=self,
@@ -204,7 +205,7 @@ class ReleaseGenerator(ReleaseResource):
         try:
             if self.root_dataset.mountpoint:
                 return self.root_dataset.mountpoint
-        except:
+        except AttributeError:
             pass
 
         return f"{self.releases_folder}/{self.name}/root"
@@ -252,7 +253,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @mirror_url.setter
     def mirror_url(self, value):
-        url = urlparse(value)
+        url = urllib.parse.urlparse(value)
         if url.scheme not in self._supported_url_schemes:
             raise ValueError(f"Invalid URL scheme '{url.scheme}'")
         self._mirror_url = url.geturl()
@@ -267,8 +268,9 @@ class ReleaseGenerator(ReleaseResource):
             request = urllib.request.Request(self.remote_url, method="HEAD")
             resource = urllib.request.urlopen(request)  # nosec: see above
             return resource.getcode() == 200  # type: ignore
-        except:
-            return False
+        except urllib.error.URLError:
+            pass
+        return False
 
     @property
     def fetched(self) -> bool:
@@ -303,14 +305,11 @@ class ReleaseGenerator(ReleaseResource):
         """
         pads releases with 0 until it has 4 characters before the first .
         """
-
-        major_version_number = release_name.split("-")[0].split(".")[0]
-
         try:
-            int(major_version_number)
-            padding = str("0" * (digits - len(str(major_version_number))))
+            major_version = int(release_name.split("-")[0].split(".")[0])
+            padding = str("0" * (digits - len(str(major_version))))
             return padding + release_name
-        except:
+        except (KeyError, AttributeError, ValueError):
             return release_name
 
     @property

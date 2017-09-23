@@ -53,7 +53,7 @@ class ZFS(libzfs.ZFS):
 
         try:
             return self.get_dataset(dataset_name)
-        except:
+        except libzfs.ZFSException:
             pass
 
         return self.create_dataset(dataset_name, **kwargs)
