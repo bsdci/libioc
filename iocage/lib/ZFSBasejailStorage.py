@@ -74,15 +74,12 @@ class ZFSBasejailStorage:
             if relative_name in basedirs:
 
                 # Unmount if mounted
-                try:
-                    current_mountpoint = child.mountpoint
-                    if current_mountpoint:
-                        child.umount()
-                        self.logger.verbose(
-                            f"Clone target {current_mountpoint} unmounted"
-                        )
-                except:
-                    pass
+                current_mountpoint = child.mountpoint
+                if current_mountpoint is not None:
+                    child.umount()
+                    self.logger.verbose(
+                        f"Clone target {current_mountpoint} unmounted"
+                    )
 
                 # Delete existing snapshots
                 for snapshot in child.snapshots:

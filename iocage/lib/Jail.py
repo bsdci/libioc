@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import os
-import subprocess
+import subprocess  # nosec: B404
 import uuid
 import shlex
 
@@ -245,7 +245,7 @@ class JailGenerator(JailResource):
             try:
                 # try to get the Jail name from it's dataset_name
                 data["id"] = self.dataset_name.split("/").pop()
-            except:  # nosec: Why is there a try/catch here?
+            except iocage.lib.errors.JailUnknownIdentifier:
                 pass
 
         self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(

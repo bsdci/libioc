@@ -168,10 +168,7 @@ class AddressesProp(dict):
         self.__notify()
 
     def __notify(self) -> None:
-        try:
-            self.config.update_special_property(self.property_name)
-        except:
-            pass
+        self.config.update_special_property(self.property_name)
 
     def __empty_prop(self, key: str) -> AddressSet:
         prop = AddressSet(self.config, property_name=self.property_name)

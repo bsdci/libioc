@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import shutil
 
 import iocage.lib.helpers
@@ -48,14 +49,14 @@ class ResolverProp(list):
         )
 
     @property
-    def conf_file_path(self):
+    def conf_file_path(self) -> str:
         return "/etc/resolv.conf"
 
     @property
-    def method(self):
+    def method(self) -> str:
         return self._get_method(self.value)
 
-    def _get_method(self, value: str) -> str:
+    def _get_method(self, value: typing.Any) -> str:
         if value == "/etc/resolv.conf":
             return "copy"
 
@@ -66,11 +67,10 @@ class ResolverProp(list):
             return "manual"
 
     @property
-    def value(self):
+    def value(self) -> str:
         return self.config.data["resolver"]
 
     def apply(self, jail):
-
         self.logger.verbose(
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
@@ -90,40 +90,49 @@ class ResolverProp(list):
         else:
             self.logger.verbose("resolv.conf not touched")
 
-    def set(self, value=None, notify=True):
+    def set(
+        self,
+        value: typing.Optional[typing.Union[str, list]]=None,
+        notify: bool=True
+    ) -> None:
 
         self.clear()
         method = self._get_method(value)
         if method == "manual":
             if isinstance(value, str):
-                self += value.split(";")
+                self += str(value).split(";")  # noqa: T484
             elif isinstance(value, list):
-                self += value
+                self += list(value)  # noqa: T484
             else:
                 raise TypeError("value can be list or string")
         else:
-            self.append(value, notify=False)
+            if isinstance(value, str):
+                self.append(str(value), notify=False)
+            else:
+                raise ValueError(
+                    "list of strings or ; separated string expected"
+                )
 
         self.__notify(notify)
 
-    def append(self, value, notify=True):
+    def append(self, value: str, notify: bool=True):
         list.append(self, value)
         self.__notify(notify)
 
-    def __setitem__(self, key, value, notify=True):
-        list.__setitem__(self, key, value)
-        self.__notify(notify)
+    def __setitem__(  # noqa: T484
+        self,
+        key: str,
+        value: str
+    ) -> None:
+
+        list.__setitem__(self, key, value)   # noqa: T484
+        self.__notify()
 
     def __str__(self):
         out = ";".join(list(self))
         return out
 
-    def __notify(self, notify=True):
-
+    def __notify(self, notify: bool=True):
         if not notify:
             return
-
-        try:
-            self.config.update_special_property("resolver")
-        except:
-            raise
+        self.config.update_special_property("resolver")

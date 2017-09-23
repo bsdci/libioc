@@ -69,7 +69,7 @@ def pool(zfs, logger):
             value = properties["org.freebsd.ioc:active"].value
             if value == "yes":
                 active_pool = pool
-        except:
+        except KeyError:
             pass
 
     if active_pool is None:
@@ -87,44 +87,58 @@ def logger():
 
 
 @pytest.fixture
-def root_dataset(force_clean, zfs, pool):
+def root_dataset(
+    force_clean: bool,
+    zfs: libzfs.ZFS,
+    pool: libzfs.ZFSPool
+) -> libzfs.ZFSDataset:
+
     dataset_name = f"{pool.name}/iocage-test"
 
     if force_clean:
         try:
             dataset = zfs.get_dataset(dataset_name)
             helper_functions.unmount_and_destroy_dataset_recursive(dataset)
-        except:
+        except libzfs.ZFSException:
             pass
 
     try:
         pool.create(dataset_name, {})
-    except:
-        if force_clean:
+    except libzfs.ZFSException:
+        if force_clean is True:
             raise
-        pass
 
     dataset = zfs.get_dataset(dataset_name)
     if not dataset.mountpoint:
         dataset.mount()
 
-    yield dataset
+    return dataset
 
     if force_clean:
         helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
 
 @pytest.fixture
-def host(root_dataset, logger, zfs):
+def host(
+    root_dataset: libzfs.ZFSDataset,
+    logger: 'iocage.lib.Logger.Logger',
+    zfs: libzfs.ZFS
+) -> 'iocage.lib.Host.HostGenerator':
+
     host = iocage.lib.Host.Host(
         root_dataset=root_dataset, logger=logger, zfs=zfs
     )
-    yield host
+    return host
     del host
 
 
 @pytest.fixture
-def release(host, logger, zfs):
+def release(
+    host: 'iocage.lib.Host.HostGenerator',
+    logger: 'iocage.lib.Logger.Logger',
+    zfs: libzfs.ZFS
+) -> 'iocage.lib.Release.ReleaseGenerator':
+
     return iocage.lib.Release.Release(
         name=host.release_version, host=host, logger=logger, zfs=zfs
     )

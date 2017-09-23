@@ -150,7 +150,7 @@ class Resource:
         except AttributeError:
             pass
 
-        raise Exception("Could not determine dataset_name")
+        raise AttributeError("Could not determine dataset_name")
 
     @property
     def dataset_name(self) -> str:
@@ -176,7 +176,7 @@ class Resource:
     def _set_dataset(self, value: libzfs.ZFSDataset) -> None:
         try:
             del self._dataset_name
-        except:
+        except AttributeError:
             pass
         self._dataset = value
 

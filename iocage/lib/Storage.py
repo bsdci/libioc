@@ -25,6 +25,8 @@ import grp
 import os
 import pwd
 
+import libzfs
+
 import iocage.lib.helpers
 
 
@@ -83,6 +85,9 @@ class Storage:
         # delete target dataset if it already exists
         try:
             existing_dataset = self.zfs.get_dataset(target)
+        except libzfs.ZFSException:
+            pass
+        else:
             self.logger.verbose(
                 f"Deleting existing dataset {target}",
                 jail=self.jail
@@ -91,17 +96,14 @@ class Storage:
                 existing_dataset.umount()
             existing_dataset.delete()
             del existing_dataset
-        except:
-            pass
 
         # delete existing snapshot if existing
         existing_snapshot = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
-        except:
+        except libzfs.ZFSException:
             pass
-
-        if existing_snapshot:
+        else:
             self.logger.verbose(
                 f"Deleting existing snapshot {snapshot_name}",
                 jail=self.jail
@@ -119,7 +121,7 @@ class Storage:
                 jail=self.jail
             )
             snapshot.clone(target)
-        except:
+        except libzfs.ZFSException:
             parent = "/".join(target.split("/")[:-1])
             self.logger.debug(
                 "Cloning was unsuccessful - "
@@ -144,7 +146,7 @@ class Storage:
 
     def _mount_procfs(self):
         try:
-            if self.jail.config["mount_procfs"]:
+            if self.jail.config["mount_procfs"] is True:
                 iocage.lib.helpers.exec([
                     "mount"
                     "-t",
@@ -152,7 +154,7 @@ class Storage:
                     "proc"
                     f"{self.jail.root_dataset.mountpoint}/proc"
                 ])
-        except:
+        except KeyError:
             raise iocage.lib.errors.MountFailed("procfs")
 
     # ToDo: Remove unused function?
@@ -160,13 +162,13 @@ class Storage:
         try:
             if not self.jail.config["mount_linprocfs"]:
                 return
-        except:
+        except KeyError:
             pass
 
         linproc_path = self._jail_mkdirp("/compat/linux/proc")
 
         try:
-            if self.jail.config["mount_procfs"]:
+            if self.jail.config["mount_procfs"] is True:
                 iocage.lib.helpers.exec([
                     "mount"
                     "-t",
@@ -174,7 +176,7 @@ class Storage:
                     "linproc",
                     linproc_path
                 ])
-        except:
+        except KeyError:
             raise iocage.lib.errors.MountFailed("linprocfs")
 
     def _unmount_local(self, dataset):

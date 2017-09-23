@@ -53,10 +53,7 @@ class BridgeSet(set):
             self.__notify()
 
     def __notify(self) -> None:
-        try:
-            self.config.update_special_property("interfaces")
-        except:
-            pass
+        self.config.update_special_property("interfaces")
 
 
 class InterfaceProp(dict):
@@ -125,10 +122,8 @@ class InterfaceProp(dict):
 
     def __setitem__(self, key, values):
 
-        try:
+        if key in self.keys():
             dict.__delitem__(self, key)
-        except:
-            pass
 
         self.add(key, values)
 
@@ -137,10 +132,7 @@ class InterfaceProp(dict):
         self.__notify()
 
     def __notify(self) -> None:
-        try:
-            self.config.update_special_property(self.property_name)
-        except:
-            pass
+        self.config.update_special_property(self.property_name)
 
     def __empty_prop(self, key: str) -> BridgeSet:
 
