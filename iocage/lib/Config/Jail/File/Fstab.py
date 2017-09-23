@@ -47,7 +47,7 @@ class FstabLine(dict):
         return hash(self["destination"])
 
 
-class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
     """
 
     Fstab configuration file wrapper
@@ -75,7 +75,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self.host = iocage.lib.helpers.init_host(self, host)
         self.jail = jail
         self.release = release
-        set.__init__(self)
+        list.__init__(self)
 
     @property
     def path(self) -> str:
@@ -108,7 +108,7 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
                 Skips reading entries that were created by iocage
         """
 
-        set.clear(self)
+        list.clear(self)
 
         line: str
         comment: typing.Optional[str]
@@ -223,9 +223,8 @@ class Fstab(set, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self.add_line(line)
 
     def add_line(self, line: FstabLine) -> None:
-
         self.logger.debug(f"Adding line to fstab: {line}")
-        set.add(self, line)
+        self.append(line)
 
     @property
     def basejail_lines(self) -> typing.List[dict]:
