@@ -24,6 +24,7 @@
 """start module for the cli."""
 import click
 
+import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
 
@@ -96,7 +97,7 @@ def start_jails(jails, logger, print_function):
         try:
             print_function(jail.start())
 
-        except Exception:
+        except iocage.lib.errors.IocageException:
             failed_jails.append(jail)
             continue
 
