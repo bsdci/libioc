@@ -46,14 +46,23 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         iocage.lib.Resource.Resource.create_resource(self)
         self.zfs.create_dataset(self.root_dataset_name)
 
+    def _require_dataset_mounted(self, dataset: libzfs.ZFSDataset) -> None:
+        if dataset.mountpoint is None:
+            raise iocage.lib.errors.DatasetNotMounted(
+                dataset=dataset,
+                logger=self.logger
+            )
+
     @property
-    def root_path(self):
+    def root_path(self) -> str:
         return self.root_dataset.mountpoint
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:
         # ToDo: Memoize root_dataset
-        return self.get_dataset("root")
+        root_dataset = self.get_dataset("root")
+        self._require_dataset_mounted(root_dataset)
+        return root_dataset
 
     @property
     def root_dataset_name(self) -> str:
