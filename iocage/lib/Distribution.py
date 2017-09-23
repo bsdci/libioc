@@ -96,7 +96,7 @@ class DistributionGenerator:
 
         if distribution == "FreeBSD":
             release_path = f"/ftp/releases/{processor}/{processor}"
-            return f"https://downloads.freebsd.org{release_path}"
+            return f"https://download.freebsd.org{release_path}"
         elif distribution == "HardenedBSD":
             return f"http://jenkins.hardenedbsd.org/builds"
         else:
