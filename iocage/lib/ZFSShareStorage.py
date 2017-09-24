@@ -21,45 +21,39 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import libzfs
 
 import iocage.lib.errors
 
 
 class ZFSShareStorage:
-    @property
-    def zfs_datasets(self):
-        return self._get_zfs_datasets(auto_create=self.auto_create)
 
-    def mount_zfs_shares(self, auto_create=False):
-        self.logger.log("Mounting ZFS shares")
+    def mount_zfs_shares(self, auto_create: bool=False) -> None:
+        self.logger.verbose("Mounting ZFS shares")
         self._mount_procfs()
-        self._mount_jail_datasets(auto_create=auto_create)
+        ZFSShareStorage._mount_jail_datasets(self, auto_create=auto_create)
 
-    def _get_zfs_datasets(self, auto_create=None):
+    def get_zfs_datasets(
+        self,
+        auto_create: bool=False
+    ) -> typing.List[libzfs.ZFSDataset]:
+
         dataset_names = self.jail.config["jail_zfs_dataset"]
-
-        auto_create = self.auto_create if auto_create is None else auto_create
 
         datasets = set()
         for name in dataset_names:
 
             zpool = None
             try:
-                zpool = self._get_pool_from_dataset_name(name)
+                zpool = ZFSShareStorage._get_pool_from_dataset_name(self, name)
             except iocage.lib.errors.ZFSPoolUnavailable:
-                pass
-
-            pool_name = f"{self.jail.pool_name}/{name}"
-            try:
                 # legacy support (datasets not prefixed with pool/)
-                zpool = self._get_pool_from_dataset_name(pool_name)
+                zpool = self.jail.pool
                 name = f"{self.jail.pool_name}/{name}"
-            except iocage.lib.errors.ZFSPoolUnavailable:
-                pass
 
             try:
-                if auto_create:
+                if auto_create is True:
                     zpool.create(name, {}, create_ancestors=True)
             except libzfs.ZFSException:
                 pass
@@ -75,35 +69,58 @@ class ZFSShareStorage:
 
         return datasets
 
-    def _mount_jail_dataset(self, dataset_name):
+    def _mount_jail_dataset(
+        self,
+        dataset_name: str
+    ) -> None:
+
         self.jail.exec(['zfs', 'mount', dataset_name])
 
-    def _mount_jail_datasets(self, auto_create=None):
+    def _mount_jail_datasets(
+        self,
+        auto_create: typing.Optional[bool]=None
+    ) -> None:
 
-        auto_create = self.auto_create if auto_create is None else (
-            auto_create is True)
+        if auto_create is None:
+            auto_create = self.auto_create
 
         if self.safe_mode:
-            self._require_datasets_exist_and_jailed()
+            ZFSShareStorage._require_datasets_exist_and_jailed(self)
 
-        for dataset in self.zfs_datasets:
+        for dataset in ZFSShareStorage.get_zfs_datasets(self):
+
+            self.logger.verbose(f"Mounting ZFS Dataset {dataset.name}")
 
             self._unmount_local(dataset)
 
             # ToDo: bake jail feature into py-libzfs
             iocage.lib.helpers.exec(
-                ["zfs", "jail", self.jail.identifier, dataset.name])
+                ["zfs", "jail", self.jail.identifier, dataset.name],
+                logger=self.logger
+            )
 
             if dataset.properties['mountpoint']:
                 for child in list(dataset.children):
                     self._ensure_dataset_exists(child)
-                    self._mount_jail_dataset(child.name)
+                    ZFSShareStorage._mount_jail_dataset(self, child.name)
 
-    def _get_pool_name_from_dataset_name(self, dataset_name):
+    def _get_pool_name_from_dataset_name(
+        self,
+        dataset_name: str
+    ) -> str:
+
         return dataset_name.split("/", maxsplit=1)[0]
 
-    def _get_pool_from_dataset_name(self, dataset_name):
-        target_pool_name = self._get_pool_name_from_dataset_name(dataset_name)
+    def _get_pool_from_dataset_name(
+        self,
+        dataset_name: str
+    ) -> libzfs.ZFSPool:
+
+        target_pool_name = ZFSShareStorage._get_pool_name_from_dataset_name(
+            self,
+            dataset_name=dataset_name
+        )
+
         for zpool in list(self.zfs.pools):
             if zpool.name == target_pool_name:
                 return zpool
@@ -113,7 +130,8 @@ class ZFSShareStorage:
             pool_name=target_pool_name
         )
 
-    def _require_datasets_exist_and_jailed(self):
+    def _require_datasets_exist_and_jailed(self) -> None:
+
         existing_datasets = self.get_zfs_datasets(auto_create=False)
         for existing_dataset in existing_datasets:
             if existing_dataset.properties["jailed"] != "on":
