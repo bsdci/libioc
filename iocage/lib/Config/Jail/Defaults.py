@@ -106,6 +106,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "exec_poststop": "/usr/bin/true",
         "exec_timeout": "60",
         "stop_timeout": "30",
+        "mount_procfs": "0",
         "mount_devfs": "1",
         "mount_fdescfs": "1",
         "securelevel": "2",
