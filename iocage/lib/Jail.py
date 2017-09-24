@@ -673,8 +673,11 @@ class JailGenerator(JailResource):
         devfs_ruleset = iocage.lib.DevfsRules.DevfsRuleset()
         devfs_ruleset.clone(configured_devfs_ruleset)
 
-        if self._dhcp_enabled:
+        if self._dhcp_enabled is True:
             devfs_ruleset.append("add path 'bpf*' unhide")
+
+        if self._allow_mount_zfs == "1":
+            devfs_ruleset.append("add path zfs unhide")
 
         # create if the final rule combination does not exist as ruleset
         if devfs_ruleset not in self.host.devfs:
@@ -716,44 +719,44 @@ class JailGenerator(JailResource):
             f"host.hostname={self.config['host_hostname']}",
             f"host.domainname={self.config['host_domainname']}",
             f"path={self.root_dataset.mountpoint}",
-            f"securelevel={self.config['securelevel']}",
+            f"securelevel={self._get_jail_config_value('securelevel')}",
             f"host.hostuuid={self.name}",
             f"devfs_ruleset={self.devfs_ruleset}",
-            f"enforce_statfs={self.config['enforce_statfs']}",
-            f"children.max={self.config['children_max']}",
-            f"allow.set_hostname={self.config['allow_set_hostname']}",
-            f"allow.sysvipc={self.config['allow_sysvipc']}"
+            f"enforce_statfs={self._get_jail_config_value('enforce_statfs')}",
+            f"children.max={self._get_jail_config_value('children_max')}",
+            f"allow.set_hostname={self._get_jail_config_value('allow_set_hostname')}",
+            f"allow.sysvipc={self._get_jail_config_value('allow_sysvipc')}"
         ]
 
         if self.host.userland_version > 10.3:
             command += [
-                f"sysvmsg={self.config['sysvmsg']}",
-                f"sysvsem={self.config['sysvsem']}",
-                f"sysvshm={self.config['sysvshm']}"
+                f"sysvmsg={self._get_jail_config_value('sysvmsg')}",
+                f"sysvsem={self._get_jail_config_value('sysvsem')}",
+                f"sysvshm={self._get_jail_config_value('sysvshm')}"
             ]
 
         command += [
-            f"allow.raw_sockets={self.config['allow_raw_sockets']}",
-            f"allow.chflags={self.config['allow_chflags']}",
-            f"allow.mount={self.config['allow_mount']}",
-            f"allow.mount.devfs={self.config['allow_mount_devfs']}",
-            f"allow.mount.nullfs={self.config['allow_mount_nullfs']}",
-            f"allow.mount.procfs={self.config['allow_mount_procfs']}",
-            f"allow.mount.zfs={self.config['allow_mount_zfs']}",
-            f"allow.quotas={self.config['allow_quotas']}",
-            f"allow.socket_af={self.config['allow_socket_af']}",
-            f"exec.stop={self.config['exec_stop']}",
-            f"exec.clean={self.config['exec_clean']}",
-            f"exec.timeout={self.config['exec_timeout']}",
-            f"stop.timeout={self.config['stop_timeout']}",
+            f"allow.raw_sockets={self._get_jail_config_value('allow_raw_sockets')}",
+            f"allow.chflags={self._get_jail_config_value('allow_chflags')}",
+            f"allow.mount={self._allow_mount}",
+            f"allow.mount.devfs={self._get_jail_config_value('allow_mount_devfs')}",
+            f"allow.mount.nullfs={self._get_jail_config_value('allow_mount_nullfs')}",
+            f"allow.mount.procfs={self._get_jail_config_value('allow_mount_procfs')}",
+            f"allow.mount.zfs={self._allow_mount_zfs}",
+            f"allow.quotas={self._get_jail_config_value('allow_quotas')}",
+            f"allow.socket_af={self._get_jail_config_value('allow_socket_af')}",
+            f"exec.stop={self._get_jail_config_value('exec_stop')}",
+            f"exec.clean={self._get_jail_config_value('exec_clean')}",
+            f"exec.timeout={self._get_jail_config_value('exec_timeout')}",
+            f"stop.timeout={self._get_jail_config_value('stop_timeout')}",
             f"mount.fstab={self.fstab.path}",
-            f"mount.devfs={self.config['mount_devfs']}"
+            f"mount.devfs={self._get_jail_config_value('mount_devfs')}"
         ]
 
         if self.host.userland_version > 9.3:
             command += [
-                f"mount.fdescfs={self.config['mount_fdescfs']}",
-                f"allow.mount.tmpfs={self.config['allow_mount_tmpfs']}"
+                f"mount.fdescfs={self._get_jail_config_value('mount_fdescfs')}",
+                f"allow.mount.tmpfs={self._get_jail_config_value('allow_mount_tmpfs')}"
             ]
 
         command += [
@@ -777,6 +780,14 @@ class JailGenerator(JailResource):
                 jail=self
             )
             raise
+
+    def _get_jail_config_value(self, key: str) -> str:
+        return iocage.lib.helpers.to_string(
+            self.config[key],
+            true="1",
+            false="0",
+            none=""
+        )
 
     @property
     def networks(self) -> typing.List[iocage.lib.Network.Network]:
@@ -873,6 +884,18 @@ class JailGenerator(JailResource):
             "readiops",
             "writeiops"
         ]
+
+    @property
+    def _allow_mount(self) -> str:
+        if self._allow_mount_zfs == "1":
+            return "1"
+        return self._get_jail_config_value("allow_mount")
+
+    @property
+    def _allow_mount_zfs(self) -> str:
+        if self.config["jail_zfs"] == True:
+            return "1"
+        return self._get_jail_config_value("allow_mount_zfs")
 
     def _get_resource_limit(
         self,
