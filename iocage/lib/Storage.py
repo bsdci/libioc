@@ -181,7 +181,7 @@ class Storage:
 
     def _unmount_local(self, dataset):
         if dataset.mountpoint:
-            dataset.unmount()
+            dataset.umount()
 
     def _jail_mkdirp(
         self,
