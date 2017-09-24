@@ -125,8 +125,12 @@ class Resource:
             self.dataset = dataset
 
     @property
+    def pool(self) -> libzfs.ZFSPool:
+        return self.zfs.get_pool(self.dataset_name)
+
+    @property
     def pool_name(self) -> str:
-        return self.zfs.get_pool(self.dataset_name).name
+        return self.pool.name
 
     @property
     def exists(self) -> bool:
