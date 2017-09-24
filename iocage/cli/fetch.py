@@ -52,6 +52,14 @@ __rootcmd__ = True
 # Compat
 @click.option("--http", "-h", default=False,
               help="Have --server define a HTTP server instead.", is_flag=True)
+# Basejail Update
+@click.option(
+    "--copy-basejail-only",
+    "-b",
+    is_flag=True,
+    default=False,
+    help="Update basejail after changes"
+)
 # Compat files
 @click.option("--files", multiple=True,
               help="Specify the files to fetch from the mirror. "
@@ -76,6 +84,13 @@ def cli(ctx, **kwargs):
             )
         except:
             logger.error(f"Invalid Release '{release_input}'")
+            exit(1)
+
+    if kwargs["copy_basejail_only"] is True:
+        try:
+            release.update_base_release()
+            exit(0)
+        except iocage.lib.errors.IocageException:
             exit(1)
 
     url_or_files_selected = False
