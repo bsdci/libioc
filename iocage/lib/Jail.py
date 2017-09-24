@@ -310,9 +310,11 @@ class JailGenerator(JailResource):
 
         if self.config["jail_zfs"] is True:
             yield JailZfsShareMount.begin()
-            iocage.lib.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares(
-                self.storage
+            share_storage = iocage.lib.ZFSShareStorage.ZFSShareStorage(
+                jail=self,
+                logger=self.logger
             )
+            share_storage.mount_zfs_shares()
             yield JailZfsShareMount.end()
 
         if self.config["exec_start"] is not None:
@@ -719,44 +721,44 @@ class JailGenerator(JailResource):
             f"host.hostname={self.config['host_hostname']}",
             f"host.domainname={self.config['host_domainname']}",
             f"path={self.root_dataset.mountpoint}",
-            f"securelevel={self._get_jail_config_value('securelevel')}",
+            f"securelevel={self._get_value('securelevel')}",
             f"host.hostuuid={self.name}",
             f"devfs_ruleset={self.devfs_ruleset}",
-            f"enforce_statfs={self._get_jail_config_value('enforce_statfs')}",
-            f"children.max={self._get_jail_config_value('children_max')}",
-            f"allow.set_hostname={self._get_jail_config_value('allow_set_hostname')}",
-            f"allow.sysvipc={self._get_jail_config_value('allow_sysvipc')}"
+            f"enforce_statfs={self._get_value('enforce_statfs')}",
+            f"children.max={self._get_value('children_max')}",
+            f"allow.set_hostname={self._get_value('allow_set_hostname')}",
+            f"allow.sysvipc={self._get_value('allow_sysvipc')}"
         ]
 
         if self.host.userland_version > 10.3:
             command += [
-                f"sysvmsg={self._get_jail_config_value('sysvmsg')}",
-                f"sysvsem={self._get_jail_config_value('sysvsem')}",
-                f"sysvshm={self._get_jail_config_value('sysvshm')}"
+                f"sysvmsg={self._get_value('sysvmsg')}",
+                f"sysvsem={self._get_value('sysvsem')}",
+                f"sysvshm={self._get_value('sysvshm')}"
             ]
 
         command += [
-            f"allow.raw_sockets={self._get_jail_config_value('allow_raw_sockets')}",
-            f"allow.chflags={self._get_jail_config_value('allow_chflags')}",
+            f"allow.raw_sockets={self._get_value('allow_raw_sockets')}",
+            f"allow.chflags={self._get_value('allow_chflags')}",
             f"allow.mount={self._allow_mount}",
-            f"allow.mount.devfs={self._get_jail_config_value('allow_mount_devfs')}",
-            f"allow.mount.nullfs={self._get_jail_config_value('allow_mount_nullfs')}",
-            f"allow.mount.procfs={self._get_jail_config_value('allow_mount_procfs')}",
+            f"allow.mount.devfs={self._get_value('allow_mount_devfs')}",
+            f"allow.mount.nullfs={self._get_value('allow_mount_nullfs')}",
+            f"allow.mount.procfs={self._get_value('allow_mount_procfs')}",
             f"allow.mount.zfs={self._allow_mount_zfs}",
-            f"allow.quotas={self._get_jail_config_value('allow_quotas')}",
-            f"allow.socket_af={self._get_jail_config_value('allow_socket_af')}",
-            f"exec.stop={self._get_jail_config_value('exec_stop')}",
-            f"exec.clean={self._get_jail_config_value('exec_clean')}",
-            f"exec.timeout={self._get_jail_config_value('exec_timeout')}",
-            f"stop.timeout={self._get_jail_config_value('stop_timeout')}",
+            f"allow.quotas={self._get_value('allow_quotas')}",
+            f"allow.socket_af={self._get_value('allow_socket_af')}",
+            f"exec.stop={self._get_value('exec_stop')}",
+            f"exec.clean={self._get_value('exec_clean')}",
+            f"exec.timeout={self._get_value('exec_timeout')}",
+            f"stop.timeout={self._get_value('stop_timeout')}",
             f"mount.fstab={self.fstab.path}",
-            f"mount.devfs={self._get_jail_config_value('mount_devfs')}"
+            f"mount.devfs={self._get_value('mount_devfs')}"
         ]
 
         if self.host.userland_version > 9.3:
             command += [
-                f"mount.fdescfs={self._get_jail_config_value('mount_fdescfs')}",
-                f"allow.mount.tmpfs={self._get_jail_config_value('allow_mount_tmpfs')}"
+                f"mount.fdescfs={self._get_value('mount_fdescfs')}",
+                f"allow.mount.tmpfs={self._get_value('allow_mount_tmpfs')}"
             ]
 
         command += [
@@ -781,7 +783,10 @@ class JailGenerator(JailResource):
             )
             raise
 
-    def _get_jail_config_value(self, key: str) -> str:
+    def _get_value(self, key: str) -> str:
+        """
+        Return jail command consumable config value string
+        """
         return iocage.lib.helpers.to_string(
             self.config[key],
             true="1",
@@ -889,13 +894,13 @@ class JailGenerator(JailResource):
     def _allow_mount(self) -> str:
         if self._allow_mount_zfs == "1":
             return "1"
-        return self._get_jail_config_value("allow_mount")
+        return self._get_value("allow_mount")
 
     @property
     def _allow_mount_zfs(self) -> str:
-        if self.config["jail_zfs"] == True:
+        if self.config["jail_zfs"] is True:
             return "1"
-        return self._get_jail_config_value("allow_mount_zfs")
+        return self._get_value("allow_mount_zfs")
 
     def _get_resource_limit(
         self,

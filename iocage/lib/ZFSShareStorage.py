@@ -25,14 +25,26 @@ import typing
 import libzfs
 
 import iocage.lib.errors
+import iocage.lib.helpers
 
 
 class ZFSShareStorage:
 
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
+    ) -> None:
+
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
+        self.jail = jail
+
     def mount_zfs_shares(self, auto_create: bool=False) -> None:
         self.logger.verbose("Mounting ZFS shares")
-        self._mount_procfs()
-        ZFSShareStorage._mount_jail_datasets(self, auto_create=auto_create)
+        self.jail.storage._mount_procfs()
+        self._mount_jail_datasets(auto_create=auto_create)
 
     def get_zfs_datasets(
         self,
@@ -44,9 +56,8 @@ class ZFSShareStorage:
         datasets = set()
         for name in dataset_names:
 
-            zpool = None
             try:
-                zpool = ZFSShareStorage._get_pool_from_dataset_name(self, name)
+                zpool = self._get_pool_from_dataset_name(name)
             except iocage.lib.errors.ZFSPoolUnavailable:
                 # legacy support (datasets not prefixed with pool/)
                 zpool = self.jail.pool
@@ -67,7 +78,7 @@ class ZFSShareStorage:
                     logger=self.logger
                 )
 
-        return datasets
+        return list(datasets)
 
     def _mount_jail_dataset(
         self,
@@ -78,16 +89,13 @@ class ZFSShareStorage:
 
     def _mount_jail_datasets(
         self,
-        auto_create: typing.Optional[bool]=None
+        auto_create: bool=False
     ) -> None:
 
-        if auto_create is None:
-            auto_create = self.auto_create
+        if self.jail.storage.safe_mode:
+            self._require_datasets_exist_and_jailed()
 
-        if self.safe_mode:
-            ZFSShareStorage._require_datasets_exist_and_jailed(self)
-
-        for dataset in ZFSShareStorage.get_zfs_datasets(self):
+        for dataset in self.get_zfs_datasets():
 
             self.logger.verbose(f"Mounting ZFS Dataset {dataset.name}")
 
@@ -101,8 +109,8 @@ class ZFSShareStorage:
 
             if dataset.properties['mountpoint']:
                 for child in list(dataset.children):
-                    self._ensure_dataset_exists(child)
-                    ZFSShareStorage._mount_jail_dataset(self, child.name)
+                    self.jail.storage._ensure_dataset_exists(child)
+                    self._mount_jail_dataset(child.name)
 
     def _get_pool_name_from_dataset_name(
         self,
@@ -116,10 +124,7 @@ class ZFSShareStorage:
         dataset_name: str
     ) -> libzfs.ZFSPool:
 
-        target_pool_name = ZFSShareStorage._get_pool_name_from_dataset_name(
-            self,
-            dataset_name=dataset_name
-        )
+        target_pool_name = self._get_pool_name_from_dataset_name(dataset_name)
 
         for zpool in list(self.zfs.pools):
             if zpool.name == target_pool_name:
@@ -127,7 +132,8 @@ class ZFSShareStorage:
 
         # silent exception, no logger defined
         raise iocage.lib.errors.ZFSPoolUnavailable(
-            pool_name=target_pool_name
+            pool_name=target_pool_name,
+            logger=self.logger
         )
 
     def _require_datasets_exist_and_jailed(self) -> None:
@@ -139,3 +145,7 @@ class ZFSShareStorage:
                     dataset=existing_dataset,
                     logger=self.logger
                 )
+
+    def _unmount_local(self, dataset: libzfs.ZFSDataset) -> None:
+        if dataset.mountpoint:
+            dataset.umount()

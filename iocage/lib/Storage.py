@@ -34,10 +34,10 @@ class Storage:
 
     def __init__(
         self,
-        jail: 'libiocage.lib.Jail.JailGenerator',
-        zfs: 'libiocage.lib.ZFS.ZFS'=None,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        zfs: 'iocage.lib.ZFS.ZFS'=None,
         safe_mode: bool=True,
-        logger: 'libiocage.lib.Logger.Logger'=None
+        logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -149,7 +149,7 @@ class Storage:
             self.logger.verbose(f"Creating mountpoint {basedir}")
             os.makedirs(basedir)
 
-    def _mount_procfs(self):
+    def _mount_procfs(self) -> None:
         try:
             if self.jail.config["mount_procfs"] is True:
                 iocage.lib.helpers.exec([
@@ -160,7 +160,10 @@ class Storage:
                     f"{self.jail.root_dataset.mountpoint}/proc"
                 ])
         except KeyError:
-            raise iocage.lib.errors.MountFailed("procfs")
+            raise iocage.lib.errors.MountFailed(
+                "procfs",
+                logger=self.logger
+            )
 
     # ToDo: Remove unused function?
     def _mount_linprocfs(self):
@@ -183,10 +186,6 @@ class Storage:
                 ])
         except KeyError:
             raise iocage.lib.errors.MountFailed("linprocfs")
-
-    def _unmount_local(self, dataset):
-        if dataset.mountpoint:
-            dataset.umount()
 
     def _jail_mkdirp(
         self,
