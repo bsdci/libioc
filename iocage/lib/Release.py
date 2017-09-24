@@ -435,7 +435,7 @@ class ReleaseGenerator(ReleaseResource):
 
         if release_changed:
             yield releaseCopyBaseEvent.begin()
-            self._update_zfs_base()
+            self.update_base_release()
             yield releaseCopyBaseEvent.end()
         else:
             yield releaseCopyBaseEvent.skip(message="release unchanged")
@@ -864,7 +864,7 @@ class ReleaseGenerator(ReleaseResource):
         if self.dataset is not None:
             self.name = self.dataset.name.split("/")[-2:-1]
 
-    def _update_zfs_base(self):
+    def update_base_release(self):
 
         base_dataset = self.zfs.get_or_create_dataset(self.base_dataset_name)
 

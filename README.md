@@ -49,6 +49,25 @@ jail.create("11.1-RELEASE")
 
 Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
 
+### Custom Release (e.g. running -CURRENT)
+
+#### Initially create release dataset
+
+```sh
+zfs create zroot/iocage/releases/custom/root
+cd /usr/src
+#install your source tree
+make installworld DESTDIR=/iocage/releases/custom/root
+make distribution DESTDIR=/iocage/releases/custom/root
+ioc fetch -r custom -b
+```
+
+#### Update the installation after recompile
+```sh
+make installworld DESTDIR=/iocage/releases/custom/root
+ioc fetch -r custom -b
+```
+
 ## Development
 
 ### Install Development Dependencies
