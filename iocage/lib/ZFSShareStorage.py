@@ -147,5 +147,5 @@ class ZFSShareStorage:
                 )
 
     def _unmount_local(self, dataset: libzfs.ZFSDataset) -> None:
-        if dataset.mountpoint:
+        if dataset.mountpoint is not None:
             dataset.umount()
