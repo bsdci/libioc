@@ -31,10 +31,14 @@ import iocage.lib.helpers
 
 
 class Storage:
-    def __init__(self, jail,
-                 zfs=None,
-                 safe_mode=True,
-                 logger=None):
+
+    def __init__(
+        self,
+        jail: 'libiocage.lib.Jail.JailGenerator',
+        zfs: 'libiocage.lib.ZFS.ZFS'=None,
+        safe_mode: bool=True,
+        logger: 'libiocage.lib.Logger.Logger'=None
+    ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
@@ -45,6 +49,7 @@ class Storage:
         self.safe_mode = safe_mode
 
     def clone_release(self, release):
+
         self.clone_zfs_dataset(
             release.root_dataset_name,
             self.jail.root_dataset_name
