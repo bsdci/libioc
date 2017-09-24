@@ -552,6 +552,8 @@ class ReleaseGenerator(ReleaseResource):
                 "-d",
                 release_update_download_dir,
                 "-f",
+                "-r",
+                self.name,
                 f"{self.release_updates_dir}/{update_conf_name}",
                 "--not-running-from-cron",
                 "fetch"
@@ -737,6 +739,8 @@ class ReleaseGenerator(ReleaseResource):
             "-d",
             "/var/db/freebsd-update",
             "-f",
+            "-r",
+            self.name,
             "/var/db/freebsd-update/freebsd-update.conf",
             "install"
         ], ignore_error=True)
