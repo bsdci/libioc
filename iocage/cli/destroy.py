@@ -85,7 +85,7 @@ def cli(ctx, force, release, recursive, download, filters):
                 item.require_jail_stopped()
             except:
                 logger.log(
-                    "Jail '{item.name}' needs to be stopped before destruction"
+                    f"Jail '{item.name}' must be stopped before destruction"
                 )
                 failed_items.append(item)
                 continue
