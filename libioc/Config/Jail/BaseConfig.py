@@ -536,6 +536,19 @@ class BaseConfig(dict):
         except KeyError:
             return "local"
 
+    def _get_usb_device(self) -> typing.List[str]:
+        devices = self.data["usb_device"].split()  # type: typing.List[str]
+        return devices
+
+    def _set_usb_device(
+        self,
+        value: typing.Union[typing.List[str], str]
+    ) -> None:
+        if isinstance(value, list):
+            self.data["usb_device"] = " ".join(value)
+        else:
+            self.data["usb_device"] = value
+
     def get_string(self, key: str) -> str:
         """Get the stringified value of a configuration property."""
         return self.stringify(self.__getitem__(key))

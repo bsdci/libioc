@@ -1616,7 +1616,7 @@ class JailGenerator(JailResource):
         if self._dhcp_enabled is True:
             devfs_ruleset.append("add path 'bpf*' unhide")
 
-        if self._allow_mount_zfs == "1":
+        if self._allow_mount_zfs is True:
             devfs_ruleset.append("add path zfs unhide")
 
         if self.config["jail_zfs"] is True:
@@ -1642,6 +1642,12 @@ class JailGenerator(JailResource):
             devfs_ruleset.append("add path vmm unhide")
             devfs_ruleset.append("add path vmm/* unhide")
             devfs_ruleset.append("add path nmdm* unhide")
+
+        if self.config["allow_usb"] is True:
+            devfs_ruleset.append("add path 'usb/*' unhide")
+            devfs_ruleset.append("add path 'usbctl' unhide")
+            for usb_device in self.config["usb_device"]:
+                devfs_ruleset.append(f"add path '{usb_device}' unhide")
 
         # create if the final rule combination does not exist as ruleset
         if devfs_ruleset not in self.host.devfs:
