@@ -3,11 +3,10 @@ SERVER=""
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
 deps:
-	pkg install -q -y libucl cython3 rsync python36 py36-libzfs
+	which pkg && pkg install -q -y libucl cython3 rsync python36 py36-libzfs || true
 	python3.6 -m ensurepip
 	pip3.6 install -Ur requirements.txt
-#install: deps
-install:
+install: deps
 	pip3.6 install -U --compile .
 install-dev: deps
 	pip3.6 install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
