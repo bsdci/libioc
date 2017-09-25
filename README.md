@@ -54,7 +54,7 @@ Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the comm
 ### Install Development Dependencies
 
 ```sh
-pip3.6 install -r requirements-dev.txt
+make install-dev
 ```
 
 ### Unit Tests
