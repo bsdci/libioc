@@ -5,6 +5,6 @@ sudo: false
 env:
   - MYPYPATH="$TRAVIS_BUILD_DIR/.travis/mypy-stubs"
 install:
-  - make check-deps
+  - make install-dev
 script:
   - make check
