@@ -7,7 +7,7 @@ deps:
 	python3.6 -m ensurepip
 	pip3.6 install -Ur requirements.txt
 install: deps
-	pip3.6 install -U --compile .
+	pip3.6 install -U .
 install-dev: deps
 	pip3.6 install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 	pip3.6 install -e .
