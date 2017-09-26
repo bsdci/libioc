@@ -412,14 +412,10 @@ class BaseConfig(dict):
             return self.special_properties.get_or_create(key)
 
         # data with mappings
-        get_method = None
-        try:
-            get_method = self.__getattribute__(f"_get_{key}")
+        method_name = f"_get_{key}"
+        if method_name in dict.__dir__(self):   # type: ignore
+            get_method = self.__getattribute__(method_name)
             return get_method()
-        except AttributeError:
-            if get_method is not None:
-                raise
-            pass
 
         # plain data attribute
         if key in self.data.keys():
