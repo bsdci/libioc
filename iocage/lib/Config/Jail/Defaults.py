@@ -65,6 +65,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "legacy": False,
         "priority": 0,
         "basejail": False,
+        "clonejail": False,
         "defaultrouter": None,
         "defaultrouter6": None,
         "mac_prefix": "02ff60",
