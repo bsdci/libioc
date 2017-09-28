@@ -307,6 +307,7 @@ class JailGenerator(JailResource):
 
         self._limit_resources()
         self._configure_nameserver()
+        self._configure_localhost()
 
         if self.config["jail_zfs"] is True:
             yield JailZfsShareMount.begin()
@@ -841,6 +842,9 @@ class JailGenerator(JailResource):
 
     def _configure_nameserver(self) -> None:
         self.config["resolver"].apply(self)
+
+    def _configure_localhost(self) -> None:
+        self.exec(["ifconfig", "lo0", "localhost"])
 
     def _limit_resources(self) -> None:
 
