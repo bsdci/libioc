@@ -55,13 +55,17 @@ class Term(list):
 
         list.__init__(self, data)
 
+    @property
+    def short(self) -> bool:
+        return (self.key == "name")
+
     def matches_resource(
         self,
         resource: 'iocage.lib.Resource.Resource'
     ) -> bool:
         value = resource.get(self.key)
 
-        return self.matches(value)
+        return self.matches(value, self.short)
 
     def matches(self, value: Any, short: bool=False) -> bool:
         """
@@ -100,7 +104,7 @@ class Term(list):
                 shortname = iocage.lib.helpers.to_humanreadable_name(
                     input_value
                 )
-                if match_filter(shortname, filter_value):
+                if shortname == filter_value:
                     return True
 
         return False
