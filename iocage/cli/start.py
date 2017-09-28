@@ -109,5 +109,5 @@ def start_jails(jails, logger, print_function):
 
     if len(changed_jails) == 0:
         jails_input = " ".join(list(jails))
-        logger.error(f"No jailes matches your input: {jails_input}")
+        logger.error(f"No jails matched your input: {jails_input}")
         exit(1)
