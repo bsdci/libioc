@@ -265,6 +265,13 @@ class DistributionUnknown(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class HostReleaseUnknown(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = f"The host release is unknown"
+        super().__init__(msg, *args, **kwargs)
+
+
 class DistributionEOLWarningDownloadFailed(IocageException):
 
     def __init__(self, *args, **kwargs) -> None:

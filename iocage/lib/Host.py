@@ -46,6 +46,18 @@ class HostGenerator:
     _defaults: 'iocage.lib.Resource.DefaultResource'
     releases_dataset: libzfs.ZFSDataset
 
+    branch_pattern = re.compile(
+        r"""\(hardened/
+            (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
+            /
+            (?P<branch>[A-z0-9]+)
+            \):""", re.X)
+
+    release_name_pattern = re.compile(
+        r"^(?P<major>\d+)(?:\.(?P<minor>\d+))-(?P<type>[A-Z]+)-HBSD$",
+        re.X
+    )
+
     def __init__(
         self,
         root_dataset: libzfs.ZFSDataset=None,
@@ -117,14 +129,16 @@ class HostGenerator:
                 return "-".join(release_version_fragments[0:2])
 
         elif self.distribution.name == "HardenedBSD":
-            pattern = re.compile(
-                r"""\(hardened/
-                    (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
-                    /
-                    (?P<branch>[A-z0-9]+)
-                    \):""", re.X)
 
-            return re.search(pattern, os.uname()[3])["release"].upper()
+            match = re.search(self.branch_pattern, os.uname()[3])
+            if match is not None:
+                return match["release"].upper()
+
+            match = re.search(self.release_name_pattern, os.uname()[2])
+            if match is not None:
+                return f"{match['major']}-{match['type']}"
+
+            raise iocage.lib.errors.HostReleaseUnknown()
 
     @property
     def processor(self) -> str:
