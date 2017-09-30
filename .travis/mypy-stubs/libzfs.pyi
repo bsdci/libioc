@@ -79,7 +79,7 @@ class ZFS:
     def __setstate_cython__(self, *args, **kwargs): ...
 
 class ZFSBookmark(ZFSObject):
-    bookmark_name = ... # type: Any
+    bookmark_name = ... # type: str
     parent = ... # type: Any
     def __init__(self, *args, **kwargs): ...
     def __getstate__(self): ...
@@ -123,7 +123,7 @@ class ZFSImportablePool(ZFSPool):
     config = ... # type: Any
     error_count = ... # type: Any
     features = ... # type: Any
-    name = ... # type: Any
+    name = ... # type: str
     properties = ... # type: Any
     root_dataset = ... # type: Any
     __pyx_vtable__ = ... # type: Any
@@ -135,7 +135,7 @@ class ZFSImportablePool(ZFSPool):
     def __setstate_cython__(self, *args, **kwargs): ...
 
 class ZFSObject:
-    name = ... # type: Any
+    name = ... # type: str
     pool = ... # type: Any
     properties = ... # type: Any
     root = ... # type: Any
@@ -157,9 +157,9 @@ class ZFSPool:
     features = ... # type: Any
     groups = ... # type: Any
     guid = ... # type: Any
-    hostname = ... # type: Any
+    hostname = ... # type: str
     log_vdevs = ... # type: Any
-    name = ... # type: Any
+    name = ... # type: str
     properties = ... # type: Any
     root = ... # type: Any
     root_dataset = ... # type: Any
@@ -185,7 +185,7 @@ class ZFSPool:
 class ZFSProperty:
     allowed_values = ... # type: Any
     dataset = ... # type: Any
-    name = ... # type: Any
+    name = ... # type: str
     parsed = ... # type: Any
     rawvalue = ... # type: Any
     source = ... # type: Any
@@ -235,7 +235,7 @@ class ZFSSnapshot(ZFSObject):
     def __setstate_cython__(self, *args, **kwargs): ...
 
 class ZFSUserProperty(ZFSProperty):
-    name = ... # type: Any
+    name = ... # type: str
     rawvalue = ... # type: Any
     source = ... # type: Any
     value = ... # type: Any
@@ -292,7 +292,7 @@ class ZFSVdevStats:
 class ZPoolFeature:
     description = ... # type: Any
     guid = ... # type: Any
-    name = ... # type: Any
+    name = ... # type: str
     pool = ... # type: Any
     state = ... # type: Any
     def __init__(self, *args, **kwargs): ...
@@ -303,7 +303,7 @@ class ZPoolFeature:
 
 class ZPoolProperty:
     allowed_values = ... # type: Any
-    name = ... # type: Any
+    name = ... # type: str
     parsed = ... # type: Any
     pool = ... # type: Any
     rawvalue = ... # type: Any
