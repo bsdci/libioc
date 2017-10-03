@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import os.path
+import abc
 
 import libzfs
 
@@ -41,7 +42,7 @@ import iocage.lib.helpers
 import iocage.lib.Config.File  # noqa: F401
 
 
-class Resource:
+class Resource(metaclass=abc.ABCMeta):
     """
     iocage resource
 
@@ -123,6 +124,10 @@ class Resource:
             self.dataset_name = dataset_name
         elif dataset is not None:
             self.dataset = dataset
+
+    @abc.abstractmethod
+    def destroy(self):
+        pass
 
     @property
     def pool(self) -> libzfs.ZFSPool:
@@ -321,6 +326,9 @@ class DefaultResource(Resource):
             logger=logger
         )
 
+    def destroy(self):
+        raise NotImplementedError("destroy unimplemented for DefaultResource")
+
     def save(self) -> None:
         self.write_config(self.config.user_data)
 
@@ -348,6 +356,9 @@ class ListableResource(list, Resource):
         )
 
         self.filters = filters
+
+    def destroy(self):
+        raise NotImplementedError("destroy unimplemented for ListableResource")
 
     def __iter__(
         self
