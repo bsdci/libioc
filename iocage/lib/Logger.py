@@ -23,10 +23,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import os
 import sys
+import typing
 
 import iocage.lib.errors
-
-from typing import List
 
 
 class LogEntry:
@@ -102,42 +101,45 @@ class Logger:
 
     INDENT_PREFIX = "  "
 
-    PRINT_HISTORY: List[str] = []
+    PRINT_HISTORY: typing.List[str] = []
 
-    def __init__(self, print_level=None, log_directory="/var/log/iocage"):
+    def __init__(
+            self,
+            print_level: typing.Optional[str]=None,
+            log_directory: str="/var/log/iocage"
+    ) -> None:
         self._print_level = print_level
         self._set_log_directory(log_directory)
 
     @property
-    def default_print_level(self):
+    def default_print_level(self) -> str:
         return "info"
 
     @property
-    def print_level(self):
+    def print_level(self) -> str:
         if self._print_level is None:
             return self.default_print_level
         else:
             return self._print_level
 
     @print_level.setter
-    def print_level(self, value):
+    def print_level(self, value: str) -> None:
         self._print_level = value
 
-    def _set_log_directory(self, log_directory):
+    def _set_log_directory(self, log_directory: str) -> None:
         self.log_directory = os.path.abspath(log_directory)
         if not os.path.isdir(log_directory):
             self._create_log_directory()
         self.log(f"Log directory set to '{log_directory}'", level="spam")
 
-    def log(self, *args, **kwargs):
+    def log(self, *args, **kwargs) -> LogEntry:
+        log_args = list(args)
 
-        args = list(args)
+        if ("message" not in kwargs) and (len(log_args) > 0):
+            kwargs["message"] = log_args.pop(0)
 
-        if ("message" not in kwargs) and (len(args) > 0):
-            kwargs["message"] = args.pop(0)
-
-        if ("level" not in kwargs) and (len(args) > 0):
-            kwargs["level"] = args.pop(0)
+        if ("level" not in kwargs) and (len(log_args) > 0):
+            kwargs["level"] = log_args.pop(0)
 
         if "level" not in kwargs:
             kwargs["level"] = "info"
@@ -146,32 +148,32 @@ class Logger:
 
         if self._should_print_log_entry(log_entry):
             self._print_log_entry(log_entry)
-            self.PRINT_HISTORY.append(log_entry)
+            self.PRINT_HISTORY.append(log_entry.message)
 
         return log_entry
 
-    def verbose(self, message, indent=0, **kwargs):
+    def verbose(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="verbose", indent=indent, **kwargs)
 
-    def error(self, message, indent=0, **kwargs):
+    def error(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="error", indent=indent, **kwargs)
 
-    def warn(self, message, indent=0, **kwargs):
+    def warn(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="warn", indent=indent, **kwargs)
 
-    def debug(self, message, indent=0, **kwargs):
+    def debug(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="debug", indent=indent, **kwargs)
 
-    def spam(self, message, indent=0, **kwargs):
+    def spam(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="spam", indent=indent, **kwargs)
 
-    def screen(self, message, indent=0, **kwargs):
+    def screen(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         """
         Screen never gets printed to log files
         """
         return self.log(message, level="screen", indent=indent, **kwargs)
 
-    def redraw(self, log_entry):
+    def redraw(self, log_entry: LogEntry) -> None:
 
         if log_entry not in self.PRINT_HISTORY:
             raise iocage.lib.errors.CannotRedrawLine(
@@ -182,12 +184,12 @@ class Logger:
             raise iocage.lib.errors.CannotRedrawLine(
                 reason=(
                     "Log level 'screen' is required to redraw, "
-                    f"but got '{self.level}'"
+                    f"but got '{log_entry.level}'"
                 )
             )
 
         # calculate the delta of messages printed since
-        i = self.PRINT_HISTORY.index(log_entry)
+        i = self.PRINT_HISTORY.index(log_entry.message)
         n = len(self.PRINT_HISTORY)
         delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i, n)))
 

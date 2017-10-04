@@ -300,7 +300,7 @@ class UnmountFailed(IocageException):
 
     def __init__(
         self,
-        mountpoint: iocage.lib.Types.AbsolutePath,
+        mountpoint: typing.Any,
         *args,
         **kwargs
     ) -> None:

@@ -32,7 +32,9 @@ class AddressSet(set):
 
     def __init__(
         self,
-        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None,
+        config: typing.Optional[
+            iocage.lib.Config.Jail.JailConfig.JailConfig
+        ]=None,
         property_name: str="ip4_address"
     ) -> None:
 
