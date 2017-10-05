@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import libzfs
+import typing
 
 import iocage.lib.Jail
 import iocage.lib.Filter
@@ -44,7 +45,7 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
 
     def __init__(
         self,
-        filters: iocage.lib.Filter.Terms=None,
+        filters: typing.Optional[iocage.lib.Filter.Terms]=None,
         host=None,
         logger=None,
         zfs=None
