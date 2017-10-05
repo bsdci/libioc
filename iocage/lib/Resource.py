@@ -92,10 +92,10 @@ class Resource(metaclass=abc.ABCMeta):
         self,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
         dataset_name: typing.Optional[str]=None,
-        config_type: typing.Optional[str]="auto",  # auto, json, zfs, ucl
-        config_file: str=None,  # 'config.json', 'config', etc
-        logger: 'iocage.lib.Logger.Logger'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None
+        config_type: str="auto",  # auto, json, zfs, ucl
+        config_file: typing.Optional[str]=None,  # 'config.json', 'config', etc
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -310,9 +310,9 @@ class DefaultResource(Resource):
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset=None,
-        logger: 'iocage.lib.Logger.Logger'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None
     ) -> None:
 
         Resource.__init__(
@@ -335,21 +335,20 @@ class DefaultResource(Resource):
 
 class ListableResource(list, Resource):
 
-    _filters: 'iocage.lib.Filter.Terms' = None
+    _filters: typing.Optional[iocage.lib.Filter.Terms] = None
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset=None,
-        filters: 'iocage.lib.Filter.Terms'=None,
-        logger: 'iocage.lib.Logger.Logger'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        filters: typing.Optional[iocage.lib.Filter.Terms]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
     ) -> None:
 
         list.__init__(self, [])
 
         Resource.__init__(
             self,
-            config_type=None,
             dataset=dataset,
             logger=logger,
             zfs=zfs
@@ -367,13 +366,15 @@ class ListableResource(list, Resource):
         for child_dataset in self.dataset.children:
 
             name = self._get_asset_name_from_dataset(child_dataset)
-            if self._filters.match_key("name", name) is not True:
+            if self._filters is not None and \
+               self._filters.match_key("name", name) is not True:
                 # Skip all jails that do not even match the name
                 continue
 
             # ToDo: Do not load jail if filters do not require to
             resource = self._get_resource_from_dataset(child_dataset)
-            if self._filters.match_resource(resource):
+            if self._filters is not None and \
+               self._filters.match_resource(resource):
                 yield resource
 
     def _get_asset_name_from_dataset(
@@ -403,7 +404,7 @@ class ListableResource(list, Resource):
     @filters.setter
     def filters(
         self,
-        value: typing.Iterable[typing.Union['iocage.lib.Filter.Term', str]]
+        value: typing.Iterable[typing.Union[iocage.lib.Filter.Term, str]]
     ):
 
         if isinstance(value, iocage.lib.Filter.Terms):
@@ -411,13 +412,11 @@ class ListableResource(list, Resource):
         else:
             self._filters = iocage.lib.Filter.Terms(value)
 
+    @abc.abstractmethod
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset,
         *args,
         **kwargs
     ):
-
-        raise NotImplementedError(
-            "This needs to be implemented by the inheriting class"
-        )
+        pass

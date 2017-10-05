@@ -135,7 +135,7 @@ def _print_table(
     ],
     columns: list,
     show_header: bool,
-    sort_key: str=None
+    sort_key: typing.Optional[str]=None
 ) -> None:
 
     table = texttable.Texttable(max_width=0)
