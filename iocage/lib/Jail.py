@@ -574,7 +574,10 @@ class JailGenerator(JailResource):
         self.get_or_create_dataset("root")
         self._update_fstab()
 
-        backend = None
+        backend: typing.Optional[typing.Union[
+            iocage.lib.StandaloneJailStorage.StandaloneJailStorage,
+            iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage,
+            iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage]] = None
 
         is_basejail = self.config.get("basejail", False)
         if not is_basejail:
@@ -1091,14 +1094,14 @@ class JailGenerator(JailResource):
         ))
 
         iocage.lib.helpers.umount(
-            mountpoints,
+            mountpoints=mountpoints,
             force=True,
             logger=self.logger,
             ignore_error=True
         )
 
         iocage.lib.helpers.umount(
-            ["-a", "-F", self.fstab.path],
+            options=["-a", "-F", self.fstab.path],
             force=True,
             logger=self.logger,
             ignore_error=True
