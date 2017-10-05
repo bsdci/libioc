@@ -36,14 +36,15 @@ import iocage.lib.helpers
 
 # MyPy
 import iocage.lib.Config.Jail.BaseConfig  # noqa: F401
+import iocage.lib.DevfsRules
 
 
 class HostGenerator:
 
     _class_distribution = iocage.lib.Distribution.DistributionGenerator
 
-    _devfs: 'iocage.lib.DevfsRules.DevfsRules'
-    _defaults: 'iocage.lib.Resource.DefaultResource'
+    _devfs: iocage.lib.DevfsRules.DevfsRules
+    _defaults: iocage.lib.Resource.DefaultResource
     releases_dataset: libzfs.ZFSDataset
 
     branch_pattern = re.compile(
@@ -60,10 +61,10 @@ class HostGenerator:
 
     def __init__(
         self,
-        root_dataset: libzfs.ZFSDataset=None,
-        defaults: typing.Optional['iocage.lib.Resource.DefaultResource']=None,
-        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
-        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+        root_dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        defaults: typing.Optional[iocage.lib.Resource.DefaultResource]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -94,7 +95,7 @@ class HostGenerator:
     ) -> 'iocage.lib.Config.Jail.BaseConfig.BaseConfig':
         return self.defaults.config
 
-    def _load_defaults(self) -> 'iocage.lib.Resource.DefaultResource':
+    def _load_defaults(self) -> iocage.lib.Resource.DefaultResource:
         defaults_resource = iocage.lib.Resource.DefaultResource(
             dataset=self.datasets.root,
             logger=self.logger,

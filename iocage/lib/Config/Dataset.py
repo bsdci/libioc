@@ -24,6 +24,8 @@
 """The main CLI for ioc."""
 import os.path
 import libzfs
+import typing
+
 import iocage.lib.Config.Prototype
 
 
@@ -33,7 +35,7 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset=None,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
         **kwargs
     ) -> None:
 

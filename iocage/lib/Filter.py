@@ -22,7 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import re
-from typing import Any, Iterable, List, Union
+import typing
 
 import iocage.lib.errors
 import iocage.lib.Resource
@@ -67,7 +67,7 @@ class Term(list):
 
         return self.matches(value, self.short)
 
-    def matches(self, value: Any, short: bool=False) -> bool:
+    def matches(self, value: typing.Any, short: bool=False) -> bool:
         """
         Returns True if the value matches the term
 
@@ -115,7 +115,7 @@ class Term(list):
                 return True
         return False
 
-    def _split_filter_values(self, user_input: str) -> List[str]:
+    def _split_filter_values(self, user_input: str) -> typing.List[str]:
         values: List[str] = []
         escaped_comma_blocks = map(
             lambda block: block.split(","),
@@ -157,7 +157,11 @@ class Terms(list):
     This can be interpreted as logical AND
     """
 
-    def __init__(self, terms: Iterable[Union[Term, str]]=None) -> None:
+    def __init__(
+            self,
+            terms: typing.Optional[
+                typing.Iterable[typing.Union[Term, str]]
+            ]=None) -> None:
 
         data: List[Union[Term, str]] = []
 

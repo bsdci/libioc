@@ -43,6 +43,8 @@ import iocage.lib.Jail
 
 # MyPy
 import iocage.lib.Resource
+import iocage.lib.Host
+import iocage.lib.Logger
 
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
@@ -51,7 +53,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
     def __init__(
         self,
-        host: 'iocage.lib.Host.HostGenerator',
+        host: iocage.lib.Host.HostGenerator,
         release: typing.Optional['ReleaseGenerator']=None,
         **kwargs
     ) -> None:
@@ -133,18 +135,18 @@ class ReleaseGenerator(ReleaseResource):
     name: str
     eol: bool = False
 
-    logger: 'iocage.lib.Logger.Logger'
-    zfs: 'iocage.lib.ZFS.ZFS'
-    host: 'iocage.lib.Host.HostGenerator'
-    _resource: 'iocage.lib.Resource.Resource'
+    logger: iocage.lib.Logger.Logger
+    zfs: iocage.lib.ZFS.ZFS
+    host: iocage.lib.Host.HostGenerator
+    _resource: iocage.lib.Resource.Resource
     _assets: typing.List[str]
 
     def __init__(
         self,
         name: str,
-        host: 'iocage.lib.Host.HostGenerator'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
-        logger: 'iocage.lib.Logger.Logger'=None,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         check_hashes: bool=True,
         eol: bool=False,
         **release_resource_args
@@ -642,6 +644,7 @@ class ReleaseGenerator(ReleaseResource):
 
         snapshot_name = f"{self.dataset.name}@{identifier}"
 
+        existing_snapshot = typing.Optional[libzfs.ZFS.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
             if force is False:
