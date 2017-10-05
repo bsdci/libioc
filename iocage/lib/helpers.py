@@ -414,8 +414,9 @@ def shell(
 def umount(
     mountpoint: typing.Optional[typing.Union[
         iocage.lib.Types.AbsolutePath,
-        typing.List[iocage.lib.Types.AbsolutePath]
+        typing.List[iocage.lib.Types.AbsolutePath],
     ]]=None,
+    options: typing.Optional[typing.List[str]]=None,
     force: bool=False,
     ignore_error: bool=False,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
@@ -425,6 +426,9 @@ def umount(
 
     if force is True:
         cmd.append("-f")
+
+    if options is not None and len(options) != 0:
+        cmd + options
 
     if isinstance(mountpoint, list):
         cmd += mountpoint
