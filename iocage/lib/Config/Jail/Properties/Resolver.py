@@ -27,16 +27,18 @@ import shutil
 import iocage.lib.helpers
 import iocage.lib.Config.Jail
 
+# mypy
+import iocage.lib.Logger
 
 class ResolverProp(list):
 
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
+    config: iocage.lib.Config.Jail.JailConfig.JailConfig
     property_name: str = "resolver"
 
     def __init__(
         self,
-        config,  # type: ignore
-        logger: 'iocage.lib.Logger.Logger'=None,
+        config,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         **kwargs
     ) -> None:
 

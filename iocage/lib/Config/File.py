@@ -21,7 +21,11 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import iocage.lib.Config.Prototype
+
+# mypy
+import iocage.lib.Logger
 
 
 class ConfigFile(iocage.lib.Config.Prototype.Prototype):
@@ -30,8 +34,8 @@ class ConfigFile(iocage.lib.Config.Prototype.Prototype):
 
     def __init__(
         self,
-        file: str=None,
-        logger: 'iocage.lib.Logger.Logger'=None
+        file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         iocage.lib.Config.Prototype.Prototype.__init__(

@@ -89,7 +89,7 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         raise Exception("This resource is not a jail or not linked to one")
 
     @property
-    def fstab(self) -> 'iocage.lib.Config.Jail.File.Fstab.Fstab':
+    def fstab(self) -> iocage.lib.Config.Jail.File.Fstab.Fstab:
 
         try:
             return self._fstab
@@ -209,7 +209,7 @@ class JailGenerator(JailResource):
 
         Args:
 
-            data (string|dict):
+            data:
                 Jail configuration dict or jail name as string identifier.
 
             zfs (libzfs.ZFS): (optional)

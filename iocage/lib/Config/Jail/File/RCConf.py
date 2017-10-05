@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import os.path
+import typing
 
 import ucl
 
@@ -30,6 +31,7 @@ import iocage.lib.Config.Jail.File.Prototype
 
 # MyPy
 import iocage.lib.LaunchableResource
+import iocage.lib.Logger
 
 
 class RCConf(
@@ -42,9 +44,9 @@ class RCConf(
 
     def __init__(
         self,
-        resource: 'iocage.lib.LaunchableResource.LaunchableResource',
-        file: str=None,
-        logger: 'iocage.lib.Logger.Logger'=None
+        resource: iocage.lib.LaunchableResource.LaunchableResource,
+        file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         dict.__init__(self, {})

@@ -25,15 +25,17 @@ import typing
 import os.path
 import iocage.lib.helpers
 
+# mypy:
+import iocage.lib.Logger
 
 class Prototype:
 
-    logger: 'iocage.lib.Logger.Logger' = None
+    logger: typing.Type[iocage.lib.Logger.Logger]
     data: dict = {}
 
     def __init__(
         self,
-        logger: 'iocage.lib.Logger.Logger'=None
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)

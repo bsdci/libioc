@@ -57,9 +57,9 @@ def init_zfs(
 
 
 def init_host(
-        self: typing.Any,
-        host: 'iocage.lib.Host.HostGenerator'=None
-) -> 'iocage.lib.Host.HostGenerator':
+        self,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None
+) -> iocage.lib.Host.HostGenerator:
 
     try:
         return self.host
@@ -76,9 +76,9 @@ def init_host(
 
 
 def init_logger(
-        self: typing.Any,
-        logger: 'iocage.lib.Logger.Logger'=None
-) -> 'iocage.lib.Logger.Logger':
+        self,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+) -> iocage.lib.Logger.Logger:
 
     try:
         return self.logger
@@ -99,7 +99,7 @@ def init_logger(
 
 def exec(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     ignore_error: bool=False,
     **subprocess_args
 ) -> typing.Tuple[subprocess.Popen, str, str]:
@@ -334,7 +334,7 @@ def to_string(
 
 def exec_passthru(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Tuple[str, str]:
 
     if isinstance(command, str):
@@ -349,7 +349,7 @@ def exec_passthru(
 
 def exec_raw(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     **kwargs
 ) -> subprocess.Popen:
 
@@ -368,7 +368,7 @@ def exec_raw(
 
 def exec_iter(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Generator[str, None, None]:
 
     process = exec_raw(
@@ -391,7 +391,7 @@ def exec_iter(
 
 def shell(
     command: typing.Union[str, typing.List[str]],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> subprocess.CompletedProcess:
 
     if not isinstance(command, str):
@@ -418,7 +418,7 @@ def umount(
     ]]=None,
     force: bool=False,
     ignore_error: bool=False,
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> None:
 
     cmd = ["/sbin/umount"]

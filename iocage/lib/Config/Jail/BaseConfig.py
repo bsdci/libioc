@@ -29,6 +29,9 @@ import iocage.lib.Config.Jail.JailConfigProperties
 import iocage.lib.errors
 import iocage.lib.helpers
 
+# mypy
+import iocage.lib.Logger
+
 
 class BaseConfig(dict):
     """
@@ -72,7 +75,7 @@ class BaseConfig(dict):
 
     def __init__(
         self,
-        logger: 'iocage.lib.Logger.Logger'=None
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.data = {}
