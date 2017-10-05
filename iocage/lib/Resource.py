@@ -126,7 +126,7 @@ class Resource(metaclass=abc.ABCMeta):
             self.dataset = dataset
 
     @abc.abstractmethod
-    def destroy(self):
+    def destroy(self, force: bool=False) -> None:
         pass
 
     @property
@@ -326,7 +326,7 @@ class DefaultResource(Resource):
             logger=logger
         )
 
-    def destroy(self):
+    def destroy(self, force: bool=False) -> None:
         raise NotImplementedError("destroy unimplemented for DefaultResource")
 
     def save(self) -> None:
@@ -357,12 +357,12 @@ class ListableResource(list, Resource):
 
         self.filters = filters
 
-    def destroy(self):
+    def destroy(self, force: bool=False) -> None:
         raise NotImplementedError("destroy unimplemented for ListableResource")
 
     def __iter__(
         self
-    ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
+    ) -> typing.Generator[Resource, None, None]:
 
         for child_dataset in self.dataset.children:
 

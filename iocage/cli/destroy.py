@@ -23,11 +23,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """stop module for the cli."""
 import click
+import typing
 
+import iocage.lib.Filter
 import iocage.lib.Jail
 import iocage.lib.Jails
-import iocage.lib.Releases
 import iocage.lib.Logger
+import iocage.lib.Releases
 import iocage.lib.Resource
 
 __rootcmd__ = True
@@ -45,7 +47,12 @@ __rootcmd__ = True
               help="Destroy the download dataset of the specified RELEASE as"
                    " well.")
 @click.argument("filters", nargs=-1)
-def cli(ctx, force, release, recursive, download, filters):
+def cli(ctx,
+        force: bool=False,
+        release: bool=False,
+        recursive: bool=False,
+        download: bool=False,
+        filters: typing.Optional[iocage.lib.Filter.Terms]=None) -> None:
     """
     Looks for the jail supplied and passes the uuid, path and configuration
     location to stop_jail.
@@ -53,10 +60,11 @@ def cli(ctx, force, release, recursive, download, filters):
     logger = ctx.parent.logger
     host = iocage.lib.Host.Host(logger=logger)
 
-    if len(filters) == 0:
+    if filters is None or len(filters) == 0:
         logger.error("No filter specified - cannot select a target to delete")
         exit(1)
 
+    resources_class: typing.Type[iocage.lib.Resource.Resource]
     if release is True:
         resources_class = iocage.lib.Releases.ReleasesGenerator
     else:
