@@ -64,7 +64,10 @@ def cli(ctx,
         logger.error("No filter specified - cannot select a target to delete")
         exit(1)
 
-    resources_class: typing.Type[iocage.lib.Resource.Resource]
+    resources_class: typing.Union[
+        typing.Type[iocage.lib.Releases.ReleasesGenerator],
+        typing.Type[iocage.lib.Jails.JailsGenerator]
+    ]
     if release is True:
         resources_class = iocage.lib.Releases.ReleasesGenerator
     else:

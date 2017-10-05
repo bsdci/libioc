@@ -76,7 +76,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
         dataset: libzfs.ZFSDataset,
         *args,
         **kwargs
-    ) -> 'iocage.lib.Release.ReleaseGenerator':
+    ) -> iocage.lib.Release.ReleaseGenerator:
 
         kwargs["name"] = self._get_asset_name_from_dataset(dataset)
         kwargs["logger"] = self.logger
