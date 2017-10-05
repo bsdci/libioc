@@ -116,7 +116,7 @@ class Term(list):
         return False
 
     def _split_filter_values(self, user_input: str) -> typing.List[str]:
-        values: List[str] = []
+        values: typing.List[str] = []
         escaped_comma_blocks = map(
             lambda block: block.split(","),
             user_input.split("\\,")
@@ -163,7 +163,7 @@ class Terms(list):
                 typing.Iterable[typing.Union[Term, str]]
             ]=None) -> None:
 
-        data: List[Union[Term, str]] = []
+        data: typing.List[typing.Union[Term, str]] = []
 
         if terms is not None:
 
@@ -208,7 +208,7 @@ class Terms(list):
 
         return True
 
-    def _parse_term(self, user_input: str) -> List[Term]:
+    def _parse_term(self, user_input: str) -> typing.List[Term]:
 
         terms = []
 
