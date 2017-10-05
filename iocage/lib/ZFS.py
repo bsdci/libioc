@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import libzfs
+import typing
 
 import iocage.lib.Logger
 import iocage.lib.helpers
@@ -30,7 +31,7 @@ import iocage.lib.errors
 
 class ZFS(libzfs.ZFS):
 
-    logger: iocage.lib.Logger.Logger = None
+    logger: typing.Optional[iocage.lib.Logger.Logger] = None
 
     def create_dataset(
         self,
@@ -70,7 +71,7 @@ class ZFS(libzfs.ZFS):
 
 
 def get_zfs(
-    logger: 'iocage.lib.Logger.Logger'=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     history: bool=True,
     history_prefix: str="<iocage>"
 ) -> ZFS:

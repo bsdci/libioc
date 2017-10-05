@@ -24,9 +24,13 @@
 import grp
 import os
 import pwd
+import typing
 
 import libzfs
 
+import iocage.lib.Jail
+import iocage.lib.Logger
+import iocage.lib.ZFS
 import iocage.lib.helpers
 
 
@@ -34,10 +38,10 @@ class Storage:
 
     def __init__(
         self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
+        jail: iocage.lib.Jail.JailGenerator,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         safe_mode: bool=True,
-        logger: 'iocage.lib.Logger.Logger'=None
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)

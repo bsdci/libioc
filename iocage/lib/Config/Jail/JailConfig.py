@@ -28,6 +28,8 @@ import iocage.lib.Config.Jail.BaseConfig
 
 # MyPy
 import iocage.lib.Jail
+import iocage.lib.Logger
+import iocage.lib.Host
 
 _usp = iocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property
 
@@ -35,16 +37,16 @@ _usp = iocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property
 class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     legacy: bool = False
-    jail: 'iocage.lib.Jail.JailGenerator' = None
+    jail: typing.Optional[iocage.lib.Jail.JailGenerator]
     data: dict = {}
 
     def __init__(
         self,
         data: dict={},
-        jail: 'iocage.lib.Jail.JailGenerator'=None,
+        jail: typing.Optional[iocage.lib.Jail.JailGenerator]=None,
         new: bool=False,
-        logger: 'iocage.lib.Logger.Logger'=None,
-        host: 'iocage.lib.Host.HostGenerator'=None
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None
     ) -> None:
 
         iocage.lib.Config.Jail.BaseConfig.BaseConfig.__init__(

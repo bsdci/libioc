@@ -30,6 +30,8 @@ import iocage.lib.helpers
 
 # MyPy
 import iocage.lib.Types
+import iocage.lib.ZFS
+import iocage.lib.Logger
 
 
 class Datasets:
@@ -45,8 +47,8 @@ class Datasets:
         self,
         root: typing.Optional[libzfs.ZFSDataset]=None,
         pool: typing.Optional[libzfs.ZFSPool]=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
-        logger: 'iocage.lib.Logger.Logger'=None
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -109,7 +111,7 @@ class Datasets:
 
     def activate(
         self,
-        mountpoint=None
+        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
     ) -> None:
 
         self.activate_pool(self.root.pool, mountpoint)
@@ -208,7 +210,7 @@ class Datasets:
     def _get_or_create_dataset(
         self,
         name: str,
-        root_name: str=None,
+        root_name: typing.Optional[str]=None,
         pool: typing.Optional[libzfs.ZFSPool]=None,
         mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
     ) -> libzfs.ZFSDataset:
