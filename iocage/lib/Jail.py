@@ -303,11 +303,11 @@ class JailGenerator(JailResource):
             yield jailVnetConfigurationEvent.begin()
             self._start_vimage_network()
             self._configure_routes()
+            self._configure_localhost()
             yield jailVnetConfigurationEvent.end()
 
         self._limit_resources()
         self._configure_nameserver()
-        self._configure_localhost()
 
         if self.config["jail_zfs"] is True:
             yield JailZfsShareMount.begin()
