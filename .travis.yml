@@ -8,3 +8,5 @@ install:
   - make install-travis
 script:
   - make check
+notifications:
+  email: false
