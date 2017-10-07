@@ -95,8 +95,8 @@ def start_jails(jails, logger, print_function):
     failed_jails = []
     for jail in jails:
         try:
+            jail.require_jail_not_template()
             print_function(jail.start())
-
         except iocage.lib.errors.IocageException:
             failed_jails.append(jail)
             continue

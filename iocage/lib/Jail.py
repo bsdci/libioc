@@ -269,7 +269,7 @@ class JailGenerator(JailResource):
 
     def start(
         self,
-        quick: bool=False
+        quick: bool=False,
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Start the jail.
@@ -351,7 +351,7 @@ class JailGenerator(JailResource):
             f"Running {hook_name} hook for {self.humanreadable_name}"
         )
 
-        lex = shlex.shlex(value)
+        lex = shlex.shlex(value)  # noqa: T484
         lex.whitespace_split = True
         command = list(lex)  # type: ignore
 
@@ -498,36 +498,63 @@ class JailGenerator(JailResource):
         except Exception as e:
             self.logger.warn(str(e))
 
-    def create(self, release_name: str) -> None:
+    def create(
+        self,
+        resource: typing.Union[
+            'JailGenerator',
+            'iocage.lib.Jail.ReleaseGenerator',
+        ]
+    ) -> None:
+        """
+        Create a Jail from a given Resource
+        """
+        if isinstance(resource, JailGenerator):
+            self.create_from_template(template=resource)
+        else:
+            self.create_from_release(release=resource)
+
+    def create_from_release(
+        self,
+        release: iocage.lib.Release.ReleaseGenerator
+    ) -> None:
         """
         Create a Jail from a Release
 
         Args:
 
-            release_name (string):
-                The jail is created from the release matching the name provided
+            resource:
+                The jail is created from the provided resource.
+                This can be either another Jail or a Release.
         """
+        if release.fetched is False:
+            raise iocage.lib.errors.ReleaseNotFetched(
+                name=release.name,
+                logger=self.logger
+            )
+
+        self.config["release"] = release.name
+        self._create_from_resource(release)
+
+    def create_from_template(
+        self,
+        template: 'JailGenerator'
+    ) -> None:
+
+        template.require_jail_is_template()
+        self.config['release'] = template.config['release']
+        self.config['basejail'] = template.config['basejail']
+        self.config['basejail_type'] = template.config['basejail_type']
+        self._create_from_resource(template)
+
+    def _create_from_resource(
+        self,
+        resource: 'iocage.lib.Resource.Resource'
+    ) -> None:
 
         if self.config["id"] is None:
             self.config["id"] = str(uuid.uuid4())
 
         self.require_jail_not_existing()
-
-        # check if release exists
-        release = iocage.lib.Release.Release(
-            name=release_name,
-            host=self.host,
-            zfs=self.zfs,
-            logger=self.logger
-        )
-
-        if release.fetched is False:
-            raise iocage.lib.errors.ReleaseNotFetched(
-                name=release_name,
-                logger=self.logger
-            )
-
-        self.config["release"] = release.name
 
         self.logger.verbose(
             f"Creating jail '{self.config['id']}'",
@@ -553,9 +580,8 @@ class JailGenerator(JailResource):
             backend = iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
         if backend is not None:
-            backend.setup(self.storage, release)
+            backend.setup(self.storage, resource)
 
-        self.config.data["release"] = release.name
         self.save()
 
     def save(self) -> None:
@@ -955,6 +981,28 @@ class JailGenerator(JailResource):
             (["-6"] if (ipv6 is True) else []) + ["default", gateway]
 
         self.exec(command)
+
+    def require_jail_is_template(self, **kwargs) -> None:
+        """
+        Raise JailIsTemplate exception if the jail is a template
+        """
+        if self.config['template'] is False:
+            raise iocage.lib.errors.JailNotTemplate(
+                jail=self,
+                logger=self.logger,
+                **kwargs
+            )
+
+    def require_jail_not_template(self, **kwargs) -> None:
+        """
+        Raise JailIsTemplate exception if the jail is a template
+        """
+        if self.config['template'] is True:
+            raise iocage.lib.errors.JailIsTemplate(
+                jail=self,
+                logger=self.logger,
+                **kwargs
+            )
 
     def require_jail_not_existing(self, **kwargs) -> None:
         """

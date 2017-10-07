@@ -99,6 +99,12 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         resources_class = iocage.lib.Releases.ReleasesGenerator
         columns = ["name"]
     else:
+
+        if dataset_type == "template":
+            filters += ("template=yes",)
+        else:
+            filters += ("template=no",)
+
         resources_class = iocage.lib.Jails.JailsGenerator
         columns = _list_output_comumns(output, _long)
 
