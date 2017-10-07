@@ -68,13 +68,14 @@ class BaseConfig(dict):
         'iocage.lib.Config.Jail.'
         'JailConfigProperties.JailConfigProperties'
     )
-    data: dict = {}
+    data: dict
 
     def __init__(
         self,
         logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
 
+        self.data = {}
         dict.__init__(self)
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)

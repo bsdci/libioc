@@ -112,6 +112,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "mount_fdescfs": "1",
         "securelevel": "2",
         "tags": [],
+        "template": False,
         "jail_zfs": False
     }
 
@@ -128,6 +129,10 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
     @property
     def data(self) -> DefaultsUserData:
         return self._user_data
+
+    @data.setter
+    def data(self, value: dict):
+        pass
 
     @property
     def user_data(self) -> dict:

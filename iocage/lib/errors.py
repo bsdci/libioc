@@ -132,6 +132,20 @@ class JailUnknownIdentifier(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+class JailIsTemplate(IocageException):
+
+    def __init__(self, jail, *args, **kwargs) -> None:
+        msg = f"The jail '{jail.name}' is a template"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class JailNotTemplate(IocageException):
+
+    def __init__(self, jail, *args, **kwargs) -> None:
+        msg = f"The jail '{jail.name}' is not a template"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # Security
 
 

@@ -87,7 +87,7 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
 
     jail_data = {}
 
-    if release is None:
+    if (release is None) and (template is None):
         logger.spam(
             "No release selected (-r, --release)."
             f" Selecting host release '{host.release_version}' as default."
@@ -97,30 +97,41 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
     if name:
         jail_data["name"] = name
 
-    release = iocage.lib.Release.Release(
-        name=release,
-        logger=logger,
-        host=host,
-        zfs=zfs
-    )
-    if not release.fetched:
-        if not release.available:
-            logger.error(
-                f"The release '{release.name}' does not exist"
-            )
-            exit(1)
-
-        msg = (
-            f"The release '{release.name}' is available, but not downloaded"
-            " yet"
+    if release is not None:
+        resource = iocage.lib.Release.ReleaseGenerator(
+            name=release,
+            logger=logger,
+            host=host,
+            zfs=zfs
         )
-        if no_fetch:
-            logger.error(msg)
-            exit(1)
-        else:
-            logger.spam(msg)
-            logger.log("Automatically fetching release '{release.name}'")
-            release.fetch()
+        if not resource.fetched:
+            if not resource.available:
+                logger.error(
+                    f"The release '{resource.name}' does not exist"
+                )
+                exit(1)
+
+            msg = (
+                f"The release '{resource.name}' is available,"
+                " but not downloaded yet"
+            )
+            if no_fetch:
+                logger.error(msg)
+                exit(1)
+            else:
+                logger.spam(msg)
+                logger.log("Automatically fetching release '{resource.name}'")
+                resource.fetch()
+    elif template is not None:
+        resource = iocage.lib.Jail.JailGenerator(
+            template,
+            logger=logger,
+            host=host,
+            zfs=zfs
+        )
+    else:
+        logger.error("No release or jail selected")
+        exit(1)
 
     if basejail:
         jail_data["basejail"] = True
@@ -151,11 +162,13 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
             zfs=zfs,
             new=True
         )
-
         suffix = f" ({i}/{count})" if count > 1 else ""
         try:
-            jail.create(release.name)
-            msg = f"{jail.humanreadable_name} successfully created!{suffix}"
+            jail.create(resource)
+            msg = (
+                f"{jail.humanreadable_name} successfully created"
+                f" from {resource.name}!{suffix}"
+            )
             logger.log(msg)
         except:
             raise
