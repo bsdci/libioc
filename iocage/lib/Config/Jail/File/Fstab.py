@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import os.path
+import uuid
 
 import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
@@ -36,15 +37,60 @@ class FstabLine(dict):
 
     def __init__(self, data: dict) -> None:
         keys = data.keys()
-        if "comment" not in keys:
-            data["comment"] = None
         dict.__init__(self, data)
+        if "comment" not in keys:
+            self["comment"] = None
+        for key in keys:
+            self[key] = data[key]
 
     def __str__(self) -> str:
-        return _line_to_string(self)
+        output = "\t".join([
+            self["source"],
+            self["destination"],
+            self["type"],
+            self["options"],
+            self["dump"],
+            self["passnum"]
+        ])
+
+        if self["comment"] is not None:
+            comment = self["comment"]
+            output += f" # {comment}"
+
+        return output
 
     def __hash__(self):
         return hash(self["destination"])
+
+
+class FstabCommentLine(dict):
+
+    def __init__(self, data: dict) -> None:
+        if "line" not in data:
+            raise ValueError("malformed input")
+        dict.__init__(self)
+        self["line"] = data["line"]
+
+    def __str__(self) -> str:
+        return self["line"]
+
+    def __hash__(self):
+        return hash(uuid.uuid4().hex)
+
+
+class FstabAutoPlaceholderLine(dict):
+    """
+    A placeholder for auto-created fstab lines
+    """
+
+    def __init__(self, data: dict={}) -> None:
+        dict.__init__(self)
+
+    def __str__(self) -> str:
+        raise NotImplementedError("this is a virtual fstab line")
+
+    def __hash__(self):
+        return hash(None)
 
 
 class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
@@ -112,16 +158,29 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
         line: str
         comment: typing.Optional[str]
+        auto_comment_found: bool = False
 
         for line in input_text.split("\n"):
+
+            if _is_comment_line(line) or _is_empty_line(line):
+                self.add_line(FstabCommentLine({
+                    "line": line
+                }))
+                continue
 
             try:
                 line, comment = line.split("#", maxsplit=1)
                 comment = comment.strip("# ")
                 ignored_comment = Fstab.AUTO_COMMENT_IDENTIFIER
                 if ignore_auto_created and (comment == ignored_comment):
+                    if auto_comment_found is False:
+                        auto_comment_found = True
+                        self.add_line(FstabAutoPlaceholderLine({}))
                     continue
-            except:
+                if comment == "":
+                    comment = None
+
+            except ValueError:
                 comment = None
 
             line = line.strip()
@@ -179,6 +238,8 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self
     ) -> None:
 
+        # print("!!!", str(self))
+        # raise Exception("FOO")
         if os.path.isfile(self.path):
             f = open(self.path, "r+")
             self._read_file_handle(f)
@@ -222,12 +283,24 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
         self.add_line(line)
 
-    def add_line(self, line: FstabLine) -> None:
-        self.logger.debug(f"Adding line to fstab: {line}")
+    def add_line(
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
+
+        if isinstance(line, FstabAutoPlaceholderLine):
+            self.logger.debug("Setting fstab auto-creation placeholder")
+        else:
+            self.logger.debug(f"Adding line to fstab: {line}")
+
         self.append(line)
 
     @property
-    def basejail_lines(self) -> typing.List[dict]:
+    def basejail_lines(self) -> typing.List[FstabLine]:
 
         if self.release is None:
             return []
@@ -245,7 +318,7 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
             source = f"{release_root_path}/{basedir}"
             destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
-            fstab_basejail_lines.append({
+            fstab_basejail_lines.append(FstabLine({
                 "source": source,
                 "destination": destination,
                 "type": "nullfs",
@@ -253,18 +326,36 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
                 "dump": "0",
                 "passnum": "0",
                 "comment": "iocage-auto"
-            })
+            }))
 
         return fstab_basejail_lines
 
     def __str__(self) -> str:
         return "\n".join(map(
-            _line_to_string,
+            str,
             list(self)
-        )) + "\n"
+        ))
 
     def __iter__(self):
-        return iter(self.basejail_lines + self)
+        """
+        Returns an iterator of all printable lines
+
+        The output includes user configured and auto created lines for NullFS
+        basejails. The previous position of auto-created entries is preserved.
+        """
+        basejail_lines_added = False
+        output = []
+        for line in list.__iter__(self):
+            if isinstance(line, FstabAutoPlaceholderLine):
+                output += self.basejail_lines
+                basejail_lines_added = True
+            else:
+                output.append(line)
+
+        if basejail_lines_added is False:
+            output = self.basejail_lines + self
+
+        return iter(output)
 
     def __contains__(self, value: typing.Any) -> bool:
         for entry in self:
@@ -275,18 +366,9 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         return False
 
 
-def _line_to_string(line: FstabLine) -> str:
-    output = "\t".join([
-        line["source"],
-        line["destination"],
-        line["type"],
-        line["options"],
-        line["dump"],
-        line["passnum"]
-    ])
+def _is_comment_line(text: str):
+    return text.strip().startswith("#")
 
-    if line["comment"] is not None:
-        comment = line["comment"]
-        output += f" # {comment}"
 
-    return output
+def _is_empty_line(text: str):
+    return text.strip() == ""
