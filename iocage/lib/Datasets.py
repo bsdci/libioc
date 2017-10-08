@@ -157,9 +157,12 @@ class Datasets:
         self,
         pool: libzfs.ZFSPool,
         prop: str
-    ) -> str:
+    ) -> typing.Optional[str]:
 
-        return pool.root_dataset.properties[prop].value
+        if prop in pool.root_dataset.properties:
+            return pool.root_dataset.properties[prop].value
+
+        return None
 
     def _get_dataset_property(
         self,
