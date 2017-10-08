@@ -135,7 +135,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def pool_name(self) -> str:
-        return self.pool.name
+        return str(self.pool.name)
 
     @property
     def exists(self) -> bool:
@@ -150,12 +150,12 @@ class Resource(metaclass=abc.ABCMeta):
         Name of the jail's base ZFS dataset manually assigned to this resource
         """
         try:
-            return self._dataset_name
+            return str(self._dataset_name)
         except AttributeError:
             pass
 
         try:
-            return self._dataset.name
+            return str(self._dataset.name)
         except AttributeError:
             pass
 
@@ -264,13 +264,14 @@ class Resource(metaclass=abc.ABCMeta):
         return self.zfs.get_or_create_dataset(dataset_name, **kwargs)
 
     def abspath(self, relative_path: str) -> str:
-        return os.path.join(self.dataset.mountpoint, relative_path)
+        return str(os.path.join(self.dataset.mountpoint, relative_path))
 
-    def write_config(self, data: dict):
-        return self.config_handler.write(data)
+    def write_config(self, data: dict) -> None:
+        self.config_handler.write(data)
 
-    def read_config(self) -> dict:
-        return self.config_handler.read()
+    def read_config(self) -> typing.Dict[str, typing.Any]:
+        o = self.config_handler.read()  # type: typing.Dict[str, typing.Any]
+        return o
 
     @property
     def config_handler(self) -> 'iocage.lib.Config.File.ConfigFile':
@@ -292,10 +293,10 @@ class Resource(metaclass=abc.ABCMeta):
                 Name of the jail property to return
         """
         value = self.get(key)
-        return iocage.lib.helpers.to_string(
+        return str(iocage.lib.helpers.to_string(
             value,
             none="-"
-        )
+        ))
 
     def save(self) -> None:
         raise NotImplementedError(
@@ -373,9 +374,9 @@ class ListableResource(list, Resource):
 
             # ToDo: Do not load jail if filters do not require to
             resource = self._get_resource_from_dataset(child_dataset)
-            if self._filters is not None and \
-               self._filters.match_resource(resource):
-                yield resource
+            if self._filters is not None:
+                if self._filters.match_resource(resource):
+                    yield resource
 
     def _get_asset_name_from_dataset(
         self,
@@ -388,17 +389,17 @@ class ListableResource(list, Resource):
             /iocage/jails/foo -> foo
         """
 
-        return dataset.name.split("/").pop()
+        return str(dataset.name.split("/").pop())
 
     def _get_resource_from_dataset(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> typing.Generator[Resource, None, None]:
+    ) -> Resource:
 
         return self._create_resource_instance(dataset)
 
     @property
-    def filters(self):
+    def filters(self) -> typing.Optional[iocage.lib.Filter.Terms]:
         return self._filters
 
     @filters.setter
@@ -418,5 +419,5 @@ class ListableResource(list, Resource):
         dataset: libzfs.ZFSDataset,
         *args,
         **kwargs
-    ):
+    ) -> Resource:
         pass

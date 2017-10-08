@@ -28,11 +28,6 @@ import uuid
 import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
 
-# MyPy
-import iocage.lib.Resource
-import iocage.lib.Jail
-import iocage.lib.Release
-
 
 class FstabLine(dict):
 
@@ -73,7 +68,7 @@ class FstabCommentLine(dict):
         self["line"] = data["line"]
 
     def __str__(self) -> str:
-        return self["line"]
+        return str(self["line"])
 
     def __hash__(self):
         return hash(uuid.uuid4().hex)
@@ -105,17 +100,17 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
     """
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
 
-    release: typing.Optional[iocage.lib.Release.ReleaseGenerator]
-    host: iocage.lib.Host.HostGenerator
-    logger: iocage.lib.Logger.Logger
-    jail: iocage.lib.Jail.JailGenerator
+    release: typing.Optional['iocage.lib.Release.ReleaseGenerator']
+    host: 'iocage.lib.Host.HostGenerator'
+    logger: 'iocage.lib.Logger.Logger'
+    jail: 'iocage.lib.Jail.JailGenerator'
 
     def __init__(
         self,
-        jail: iocage.lib.Jail.JailGenerator,
-        release: typing.Optional[iocage.lib.Release.ReleaseGenerator]=None,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-        host: typing.Optional[iocage.lib.Host.HostGenerator]=None
+        jail: 'iocage.lib.Jail.JailGenerator',
+        release: typing.Optional['iocage.lib.Release.ReleaseGenerator']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        host: typing.Optional['iocage.lib.Host.HostGenerator']=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -253,7 +248,7 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
     def update_release(
         self,
-        release: typing.Optional[iocage.lib.Release.ReleaseGenerator] = None
+        release: typing.Optional['iocage.lib.Release.ReleaseGenerator'] = None
     ) -> None:
         """
         Set a new release and save the updated file
@@ -345,7 +340,14 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         basejails. The previous position of auto-created entries is preserved.
         """
         basejail_lines_added = False
-        output = []
+        output: typing.List[
+            typing.Union[
+                FstabAutoPlaceholderLine,
+                FstabCommentLine,
+                FstabLine
+            ]
+        ] = []
+
         for line in list.__iter__(self):
             if isinstance(line, FstabAutoPlaceholderLine):
                 output += self.basejail_lines
@@ -367,9 +369,9 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         return False
 
 
-def _is_comment_line(text: str):
-    return text.strip().startswith("#")
+def _is_comment_line(text: str) -> bool:
+    return text.strip().startswith("#") is True
 
 
-def _is_empty_line(text: str):
-    return text.strip() == ""
+def _is_empty_line(text: str) -> bool:
+    return (text.strip() == "") is True

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import libzfs
 
 import iocage.lib.Config.Dataset
@@ -59,7 +60,9 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
         """
         Writes changes to the config file
         """
-        output_data = self.map_output(data)
+        output_data = {}
+        for key, value in data.items():
+            output_data[key] = self._to_string(value)
 
         # ToDo: Delete unnecessary ZFS options
         # existing_property_names = list(
@@ -82,23 +85,17 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
             )
             self.dataset.properties[prop_name] = prop
 
-    def map_input(self, data: dict) -> dict:
+    def map_input(self, data: dict) -> typing.Dict[str, typing.Any]:
         parse_user_input = iocage.lib.helpers.parse_user_input
         return dict([(x, parse_user_input(y)) for (x, y) in data.items()])
 
-    def map_output(self, data: dict) -> dict:
-        output = {}
-        for key, value in data.items():
-            output[key] = self._to_string(value)
-        return output
-
     def _to_string(self, value) -> str:
-        return iocage.lib.helpers.to_string(
+        return str(iocage.lib.helpers.to_string(
             value,
             true="on",
             false="off",
             none="none"
-        )
+        ))
 
     @property
     def exists(self) -> bool:

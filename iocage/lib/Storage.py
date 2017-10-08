@@ -28,9 +28,6 @@ import typing
 
 import libzfs
 
-import iocage.lib.Jail
-import iocage.lib.Logger
-import iocage.lib.ZFS
 import iocage.lib.helpers
 
 
@@ -38,10 +35,10 @@ class Storage:
 
     def __init__(
         self,
-        jail: iocage.lib.Jail.JailGenerator,
-        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         safe_mode: bool=True,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -52,7 +49,10 @@ class Storage:
         # jailed=on already exist
         self.safe_mode = safe_mode
 
-    def clone_release(self, release):
+    def clone_release(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator'
+    ) -> None:
 
         self.clone_zfs_dataset(
             release.root_dataset_name,
@@ -64,7 +64,11 @@ class Storage:
             jail=self.jail
         )
 
-    def delete_dataset_recursive(self, dataset, delete_snapshots=True):
+    def delete_dataset_recursive(
+        self,
+        dataset: libzfs.ZFSDataset,
+        delete_snapshots: bool=True
+    ) -> None:
 
         for child in dataset.children:
             self.delete_dataset_recursive(child)
@@ -87,7 +91,11 @@ class Storage:
             origin_snapshot = self.zfs.get_snapshot(origin)
             origin_snapshot.delete()
 
-    def clone_zfs_dataset(self, source, target):
+    def clone_zfs_dataset(
+        self,
+        source: str,
+        target: str
+    ) -> None:
 
         snapshot_name = f"{source}@{self.jail.name}"
 
@@ -147,7 +155,7 @@ class Storage:
             jail=self.jail
         )
 
-    def create_jail_mountpoint(self, basedir: str):
+    def create_jail_mountpoint(self, basedir: str) -> None:
         basedir = f"{self.jail.root_dataset.mountpoint}/{basedir}"
         if not os.path.isdir(basedir):
             self.logger.verbose(f"Creating mountpoint {basedir}")
@@ -205,4 +213,4 @@ class Storage:
         if not os.path.isdir(folder):
             os.makedirs(folder, permissions)
             os.chown(folder, uid, gid, follow_symlinks=False)  # type: ignore
-        return os.path.abspath(folder)
+        return str(os.path.abspath(folder))

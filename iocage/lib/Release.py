@@ -45,6 +45,7 @@ import iocage.lib.Jail
 import iocage.lib.Resource
 import iocage.lib.Host
 import iocage.lib.Logger
+import iocage.lib.Config.Jail.File.RCConf
 
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
@@ -97,7 +98,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         the release id is used to find name the dataset
         """
         try:
-            return self._assigned_dataset_name
+            return str(self._assigned_dataset_name)
         except AttributeError:
             pass
 
@@ -140,6 +141,7 @@ class ReleaseGenerator(ReleaseResource):
     host: iocage.lib.Host.HostGenerator
     _resource: iocage.lib.Resource.Resource
     _assets: typing.List[str]
+    _mirror_url: typing.Optional[str] = None
 
     def __init__(
         self,
@@ -196,17 +198,17 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def releases_folder(self) -> str:
-        return self.host.datasets.releases.mountpoint
+        return str(self.host.datasets.releases.mountpoint)
 
     @property
     def download_directory(self) -> str:
-        return self.dataset.mountpoint
+        return str(self.dataset.mountpoint)
 
     @property
     def root_dir(self) -> str:
         try:
             if self.root_dataset.mountpoint:
-                return self.root_dataset.mountpoint
+                return str(self.root_dataset.mountpoint)
         except AttributeError:
             pass
 
@@ -247,14 +249,13 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def mirror_url(self) -> str:
-        try:
+        if self._mirror_url is None:
+            return str(self.host.distribution.mirror_url)
+        else:
             return self._mirror_url
-        except AttributeError:
-            pass
-        return self.host.distribution.mirror_url
 
     @mirror_url.setter
-    def mirror_url(self, value):
+    def mirror_url(self, value: str) -> None:
         url = urllib.parse.urlparse(value)
         if url.scheme not in self._supported_url_schemes:
             raise ValueError(f"Invalid URL scheme '{url.scheme}'")
@@ -366,7 +367,11 @@ class ReleaseGenerator(ReleaseResource):
             self._hbsd_release_branch = hbsd_update_conf["branch"]
             return self._hbsd_release_branch
 
-    def fetch(self, update=None, fetch_updates=None):
+    def fetch(
+        self,
+        update: typing.Optional[bool]=None,
+        fetch_updates: typing.Optional[bool]=None
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         release_changed = False
 
@@ -378,7 +383,7 @@ class ReleaseGenerator(ReleaseResource):
         releaseConfigurationEvent = events.ReleaseConfiguration(self)
         releaseCopyBaseEvent = events.ReleaseCopyBase(self)
 
-        if not self.fetched:
+        if self.fetched is False:
 
             yield fetchReleaseEvent.begin()
             yield releasePrepareStorageEvent.begin()
@@ -444,7 +449,7 @@ class ReleaseGenerator(ReleaseResource):
 
         self._cleanup()
 
-    def _copy_to_base_release(self):
+    def _copy_to_base_release(self) -> None:
         iocage.lib.helpers.exec(
             [
                 "rsync",
@@ -468,7 +473,7 @@ class ReleaseGenerator(ReleaseResource):
 
     def fetch_updates(
         self
-    ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
@@ -568,7 +573,7 @@ class ReleaseGenerator(ReleaseResource):
 
     def update(
         self
-    ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         dataset = self.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
@@ -648,8 +653,7 @@ class ReleaseGenerator(ReleaseResource):
         """
 
         snapshot_name = f"{self.dataset.name}@{identifier}"
-
-        existing_snapshot = typing.Optional[libzfs.ZFS.ZFSSnapshot] = None
+        existing_snapshot: typing.Optional[libzfs.ZFS.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
             if force is False:
@@ -671,7 +675,10 @@ class ReleaseGenerator(ReleaseResource):
         self.dataset.snapshot(snapshot_name)
         return self.zfs.get_snapshot(snapshot_name)
 
-    def _update_hbsd_jail(self, jail):
+    def _update_hbsd_jail(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator'
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
@@ -717,9 +724,12 @@ class ReleaseGenerator(ReleaseResource):
             yield event
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return True  # ToDo: return False if nothing was updated
+        yield True  # ToDo: yield False if nothing was updated
 
-    def _update_freebsd_jail(self, jail):
+    def _update_freebsd_jail(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator'
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
@@ -863,7 +873,7 @@ class ReleaseGenerator(ReleaseResource):
         for key, value in self.DEFAULT_RC_CONF_SERVICES.items():
             self.rc_conf[f"{key}_enable"] = value
 
-        return self.rc_conf.save()
+        return self.rc_conf.save() is True
 
     def _generate_default_rcconf_line(self, service_name: str) -> str:
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:
@@ -955,8 +965,20 @@ class ReleaseGenerator(ReleaseResource):
 
 class Release(ReleaseGenerator):
 
-    def fetch(self, *args, **kwargs):
-        return list(ReleaseGenerator.fetch(self, *args, **kwargs))
+    def fetch(  # noqa: T484
+        self,
+        update: typing.Optional[bool]=None,
+        fetch_updates: typing.Optional[bool]=None
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
 
-    def update(self, *args, **kwargs):
-        return list(ReleaseGenerator.update(self, *args, **kwargs))
+        return list(ReleaseGenerator.fetch(
+            self,
+            update=update,
+            fetch_updates=fetch_updates
+        ))
+
+    def update(  # noqa: T484
+        self
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+
+        return list(ReleaseGenerator.update(self))

@@ -117,7 +117,7 @@ class Logger:
 
     INDENT_PREFIX = "  "
 
-    PRINT_HISTORY: typing.List[str] = []
+    PRINT_HISTORY: typing.List[LogEntry] = []
 
     def __init__(
             self,
@@ -164,7 +164,7 @@ class Logger:
 
         if self._should_print_log_entry(log_entry):
             self._print_log_entry(log_entry)
-            self.PRINT_HISTORY.append(log_entry.message)
+            self.PRINT_HISTORY.append(log_entry)
 
         return log_entry
 
@@ -205,9 +205,11 @@ class Logger:
             )
 
         # calculate the delta of messages printed since
-        i = self.PRINT_HISTORY.index(log_entry.message)
+        i = self.PRINT_HISTORY.index(log_entry)
         n = len(self.PRINT_HISTORY)
-        delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i, n)))
+        delta = sum(
+            map(lambda i: self.PRINT_HISTORY[i].__len__(), range(i, n))
+        )
 
         output = "".join([
             "\r",

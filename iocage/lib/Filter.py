@@ -25,6 +25,7 @@ import re
 import typing
 
 import iocage.lib.errors
+import iocage.lib.helpers
 import iocage.lib.Resource
 
 
@@ -57,7 +58,7 @@ class Term(list):
 
     @property
     def short(self) -> bool:
-        return (self.key == "name")
+        return (self.key == "name") is True
 
     def matches_resource(
         self,
@@ -146,7 +147,9 @@ class Term(list):
             if char not in globs:
                 filter_string_without_globs += char
 
-        return iocage.lib.helpers.validate_name(filter_string_without_globs)
+        return iocage.lib.helpers.validate_name(
+            filter_string_without_globs
+        ) is True
 
 
 class Terms(list):

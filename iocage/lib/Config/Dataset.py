@@ -50,7 +50,7 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
 
     @property
     def file(self) -> str:
-        return os.path.join(self.dataset.mountpoint, self._file)
+        return str(os.path.join(self.dataset.mountpoint, self._file))
 
     @file.setter
     def file(self, value: str):
