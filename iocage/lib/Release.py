@@ -466,7 +466,9 @@ class ReleaseGenerator(ReleaseResource):
         )
         # ToDo: Memoize ReleaseResource
 
-    def fetch_updates(self):
+    def fetch_updates(
+        self
+    ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
 
         events = iocage.lib.events
         releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
@@ -564,7 +566,10 @@ class ReleaseGenerator(ReleaseResource):
 
             yield releaseUpdateDownloadEvent.end()
 
-    def update(self):
+    def update(
+        self
+    ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
+
         dataset = self.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 

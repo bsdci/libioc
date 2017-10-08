@@ -141,14 +141,14 @@ class IocageEvent:
         if "message" in kwargs:
             self.message = kwargs["message"]
 
-    def begin(self, **kwargs) -> IocageEvent:
+    def begin(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.pending = True
         self.done = False
         self.parent_count = IocageEvent.PENDING_COUNT - 1
         return self
 
-    def end(self, **kwargs) -> IocageEvent:
+    def end(self, **kwargs) -> 'IocageEvent':
         self._update_message(**kwargs)
         self.done = True
         self.pending = False
