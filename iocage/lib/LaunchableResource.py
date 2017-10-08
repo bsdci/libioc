@@ -57,7 +57,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def root_path(self) -> str:
-        return self.root_dataset.mountpoint
+        return str(self.root_dataset.mountpoint)
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:

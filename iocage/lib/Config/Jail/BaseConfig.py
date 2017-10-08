@@ -71,7 +71,7 @@ class BaseConfig(dict):
         'iocage.lib.Config.Jail.'
         'JailConfigProperties.JailConfigProperties'
     )
-    data: dict
+    data: typing.Dict[str, typing.Any]
 
     def __init__(
         self,
@@ -291,7 +291,7 @@ class BaseConfig(dict):
 
     def _get_defaultrouter(self) -> typing.Optional[str]:
         value = self.data['defaultrouter']
-        return value if (value != "none" and value is not None) else None
+        return str(value) if (value != "none" and value is not None) else None
 
     def _set_defaultrouter(
         self,
@@ -304,7 +304,7 @@ class BaseConfig(dict):
 
     def _get_defaultrouter6(self) -> typing.Optional[str]:
         value = self.data['defaultrouter6']
-        return value if (value != "none" and value is not None) else None
+        return str(value) if (value != "none" and value is not None) else None
 
     def _set_defaultrouter6(
         self,
@@ -331,7 +331,8 @@ class BaseConfig(dict):
 
     def _get_jail_zfs_dataset(self) -> typing.List[str]:
         try:
-            return self.data["jail_zfs_dataset"].split()
+            jail_zfs_dataset = str(self.data["jail_zfs_dataset"])
+            return jail_zfs_dataset.split()
         except KeyError:
             return []
 
@@ -360,17 +361,20 @@ class BaseConfig(dict):
             false="off"
         )
 
-    def _get_cloned_release(self):
+    def _get_cloned_release(self) -> typing.Optional[str]:
         try:
-            return self.data["cloned_release"]
+            return str(self.data["cloned_release"])
         except:
-            return self["release"]
+            release = self["release"]
+            if isinstance(release, str):
+                return str(self["release"])
+            return None
 
-    def _get_basejail_type(self):
+    def _get_basejail_type(self) -> typing.Optional[str]:
 
         # first see if basejail_type was explicitly set
         if "basejail_type" in self.data.keys():
-            return self.data["basejail_type"]
+            return str(self.data["basejail_type"])
 
         # if it was not, the default for is 'nullfs' if the jail is a basejail
         try:
@@ -478,10 +482,8 @@ class BaseConfig(dict):
         setter_method_name = f"_set_{key}"
         if setter_method_name in self.__dir__():
             setter_method = self.__getattribute__(setter_method_name)
-            if setter_method is None:
-                return None
-            else:
-                return setter_method(parsed_value, **kwargs)
+            setter_method(parsed_value, **kwargs)
+            return
 
         self.data[key] = parsed_value
 
@@ -526,14 +528,14 @@ class BaseConfig(dict):
         if existed_before != exists_after:
             return True
 
-        return (hash_before != hash_after)
+        return (hash_before != hash_after) is True
 
     @property
-    def user_data(self) -> dict:
+    def user_data(self) -> typing.Dict[str, typing.Any]:
         return self.data
 
     def __str__(self) -> str:
-        return iocage.lib.helpers.to_json(self.data)
+        return str(iocage.lib.helpers.to_json(self.data))
 
     def __dir__(self) -> list:
 

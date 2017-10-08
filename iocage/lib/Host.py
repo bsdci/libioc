@@ -37,6 +37,10 @@ import iocage.lib.helpers
 # MyPy
 import iocage.lib.Config.Jail.BaseConfig  # noqa: F401
 import iocage.lib.DevfsRules
+_distribution_types = typing.Union[
+    iocage.lib.Distribution.DistributionGenerator,
+    iocage.lib.Distribution.Distribution,
+]
 
 
 class HostGenerator:
@@ -46,6 +50,8 @@ class HostGenerator:
     _devfs: iocage.lib.DevfsRules.DevfsRules
     _defaults: iocage.lib.Resource.DefaultResource
     releases_dataset: libzfs.ZFSDataset
+    datasets: iocage.lib.Datasets.Datasets
+    distribution: _distribution_types
 
     branch_pattern = re.compile(
         r"""\(hardened/
@@ -120,7 +126,7 @@ class HostGenerator:
         return float(self.release_version.partition("-")[0])
 
     @property
-    def release_version(self):
+    def release_version(self) -> str:
 
         if self.distribution.name == "FreeBSD":
             release_version_string = os.uname()[2]
@@ -139,7 +145,7 @@ class HostGenerator:
             if match is not None:
                 return f"{match['major']}-{match['type']}"
 
-            raise iocage.lib.errors.HostReleaseUnknown()
+        raise iocage.lib.errors.HostReleaseUnknown()
 
     @property
     def processor(self) -> str:

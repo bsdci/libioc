@@ -52,7 +52,7 @@ class Prototype:
             "This needs to be implemented by the inheriting class"
         )
 
-    def read(self) -> dict:
+    def read(self):
         try:
             with open(self.file, "r") as data:
                 return self.map_input(data)
@@ -67,11 +67,15 @@ class Prototype:
             conf.write(self.map_output(data))
             conf.truncate()
 
-    def map_input(self, data: typing.Any) -> typing.Dict[str, any]:
-        return data  # type: typing.Dict[str, any]
+    def map_input(self, data: typing.Any):
+        # result = data  # type: typing.Dict[str, typing.Any]
+        # return result
+        return data
 
-    def map_output(self, data: typing.Any) -> typing.Any:
-        return data  # type: typing.Dict[str, any]
+    def map_output(self, data: typing.Any):
+        # result = data  # type: typing.Dict[str, typing.Any]
+        # return result
+        return data
 
     def exists(self) -> bool:
         return os.path.isfile(self.file)

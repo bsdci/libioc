@@ -34,11 +34,12 @@ class ConfigJSON(iocage.lib.Config.File.ConfigFile):
 
     config_type = "json"
 
-    def map_input(self, data: typing.TextIO) -> dict:
-        return json.load(data)
+    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        result = json.load(data)  # type: typing.Dict[str, typing.Any]
+        return result
 
     def map_output(self, data: dict) -> str:
-        return iocage.lib.helpers.to_json(data)
+        return str(iocage.lib.helpers.to_json(data))
 
 
 class ResourceConfigJSON(
