@@ -362,8 +362,13 @@ class JailGenerator(JailResource):
         )
 
     def _start_services(self) -> None:
-        command = self.config["exec_start"].strip().split()
-        self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
+        self.exec_hook("start")
+
+    def exec_hook(self, hook_name: str) -> None:
+        command = self.config[f"exec_{hook_name}"].strip().split()
+        self.logger.debug(
+            f"Running exec_{hook_name} on {self.humanreadable_name}"
+        )
         self.exec(command)
 
     def stop(
