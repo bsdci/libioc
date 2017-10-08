@@ -22,19 +22,35 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """start module for the cli."""
+import typing
 import click
 
 import iocage.lib.errors
+import iocage.lib.events
 import iocage.lib.Jails
 import iocage.lib.Logger
 
 __rootcmd__ = True
 
 
-@click.command(name="restart", help="Restarts the specified jails or ALL.")
+@click.command(name="restart", help="Restarts the specified jails.")
 @click.pass_context
+@click.option(
+    '--shutdown',
+    '-s',
+    default=False,
+    is_flag=True,
+    help="Entirely shutdown jail during restart"
+)
+@click.option(
+    '--force',
+    '-f',
+    default=False,
+    is_flag=True,
+    help="Force jail shutdown during restart"
+)
 @click.argument("jails", nargs=-1)
-def cli(ctx, jails):
+def cli(ctx, shutdown, force, jails):
     """
     Starts Jails
     """
@@ -42,44 +58,32 @@ def cli(ctx, jails):
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
 
+    # force implies shutdown
+    if force is True:
+        shutdown = True
+
     if len(jails) == 0:
         logger.error("No jail selector provided")
         exit(1)
 
-    jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=jails
     )
 
-    restart_jails(jails, logger=logger, print_function=print_function)
-
-
-def restart_jails(jails, logger, print_function):
-
     changed_jails = []
     failed_jails = []
-    for jail in jails:
-
-        failed = False
+    for jail in ioc_jails:
 
         try:
-            print_function(jail.stop())
-        except:
-            failed = True
-            pass
-
-        try:
-            print_function(jail.start())
-        except:
-            failed = True
-            pass
-
-        if failed is True:
+            print_function(restart_jail(
+                jail,
+                shutdown=shutdown,
+                force=force
+            ))
+            changed_jails.append(jail)
+        except StopIteration:
             failed_jails.append(jail)
-            continue
-
-        logger.log(f"{jail.humanreadable_name} restarted as JID {jail.jid}")
-        changed_jails.append(jail)
 
     if len(failed_jails) > 0:
         exit(1)
@@ -88,3 +92,71 @@ def restart_jails(jails, logger, print_function):
         jails_input = " ".join(list(jails))
         logger.error(f"No jails matched your input: {jails_input}")
         exit(1)
+
+    exit(0)
+
+
+def restart_jail(
+    jail: 'iocage.lib.Jail.JailsGenerator',
+    shutdown: bool=False,
+    force: bool=False
+) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+    failed: bool = False
+    jailRestartEvent = iocage.lib.events.JailRestart(jail=jail)
+    jailShutdownEvent = iocage.lib.events.JailShutdown(jail=jail)
+    JailSoftShutdownEvent = iocage.lib.events.JailSoftShutdown(jail=jail)
+    jailStartEvent = iocage.lib.events.JailStart(jail=jail)
+
+    yield jailRestartEvent.begin()
+
+    if shutdown is False:
+
+        # soft stop
+        yield JailSoftShutdownEvent.begin()
+        try:
+            jail.exec_hook("start")
+            yield JailSoftShutdownEvent.end()
+        except iocage.lib.errors.IocageException:
+            yield JailSoftShutdownEvent.fail(exception=False)
+
+        # service start
+        yield jailStartEvent.begin()
+        try:
+            jail.exec_hook("start")
+            yield jailStartEvent.end()
+        except iocage.lib.errors.IocageException:
+            yield jailStartEvent.fail(exception=False)
+
+    else:
+
+        # full shutdown
+        yield jailShutdownEvent.begin()
+        try:
+            for event in jail.stop():
+                yield event
+            yield jailShutdownEvent.end()
+        except iocage.lib.errors.IocageException:
+            failed = True
+            yield jailShutdownEvent.fail(exception=False)
+            if force is False:
+                # only continue when force is enabled
+                yield jailRestartEvent.fail(exception=False)
+                return
+
+        # start
+        yield jailStartEvent.begin()
+        try:
+            for event in jail.start():
+                yield event
+            yield jailStartEvent.end()
+        except iocage.lib.errors.IocageException:
+            failed = True
+            yield jailStartEvent.fail(exception=False)
+
+        # respond to failure
+        if failed is True:
+            yield jailRestartEvent.fail(exception=False)
+            return
+
+    yield jailRestartEvent.end()

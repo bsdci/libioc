@@ -394,3 +394,50 @@ class ExecuteReleaseUpdate(ReleaseUpdate):
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
+
+
+# CLI
+
+
+class JailRestart(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailShutdown(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailSoftShutdown(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailStart(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
