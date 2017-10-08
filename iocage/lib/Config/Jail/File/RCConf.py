@@ -30,7 +30,6 @@ import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
 
 # MyPy
-import iocage.lib.LaunchableResource
 import iocage.lib.Logger
 
 
@@ -44,9 +43,9 @@ class RCConf(
 
     def __init__(
         self,
-        resource: iocage.lib.LaunchableResource.LaunchableResource,
+        resource: 'iocage.lib.LaunchableResource.LaunchableResource',
         file: typing.Optional[str]=None,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         dict.__init__(self, {})
@@ -140,7 +139,7 @@ class RCConf(
             self._file_content_changed = False
 
     def _read(self, silent=False) -> dict:
-        data = ucl.load(open(self.path).read())
+        data = dict(ucl.load(open(self.path).read()))
         self.logger.spam(f"rc.conf was read from {self.path}")
         return data
 

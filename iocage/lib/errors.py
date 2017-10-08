@@ -417,6 +417,14 @@ class InvalidNetworkBridge(IocageException, ValueError):
 # Release
 
 
+class ReleaseListUnavailable(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+
+        msg = f"The releases list is not available"
+        super().__init__(msg, *args, **kwargs)
+
+
 class ReleaseUpdateFailure(IocageException):
 
     def __init__(

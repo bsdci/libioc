@@ -32,12 +32,12 @@ import iocage.lib.Logger
 
 class AddressSet(set):
 
-    config: iocage.lib.Config.Jail.JailConfig.JailConfig
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
 
     def __init__(
         self,
         config: typing.Optional[
-            iocage.lib.Config.Jail.JailConfig.JailConfig
+            'iocage.lib.Config.Jail.JailConfig.JailConfig'
         ]=None,
         property_name: str="ip4_address"
     ) -> None:
@@ -68,15 +68,17 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 class AddressesProp(dict):
 
     logger: iocage.lib.Logger.Logger
-    config: iocage.lib.Config.Jail.JailConfig.JailConfig
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "ip4_address"
     skip_on_error: bool
 
     def __init__(
         self,
-        config=None,  # type: ignore
+        config: typing.Optional[
+            'iocage.lib.Config.Jail.BaseConfig.BaseConfig'
+        ]=None,
         property_name: str="ip4_address",
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         skip_on_error: bool=False
     ) -> None:
 

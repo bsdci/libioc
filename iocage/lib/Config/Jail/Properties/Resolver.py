@@ -30,9 +30,10 @@ import iocage.lib.Config.Jail
 # mypy
 import iocage.lib.Logger
 
+
 class ResolverProp(list):
 
-    config: iocage.lib.Config.Jail.JailConfig.JailConfig
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "resolver"
 
     def __init__(
@@ -70,7 +71,7 @@ class ResolverProp(list):
 
     @property
     def value(self) -> str:
-        return self.config.data["resolver"]
+        return str(self.config.data["resolver"])
 
     def apply(self, jail):
         self.logger.verbose(
