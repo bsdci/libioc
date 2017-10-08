@@ -783,23 +783,23 @@ class ReleaseGenerator(ReleaseResource):
         self.logger.verbose(f"Release '{self.name}' updated")
         yield True  # ToDo: return False if nothing was updated
 
-    def _append_datetime(self, text):
+    def _append_datetime(self, text: str) -> str:
         now = datetime.datetime.utcnow()
         text += now.strftime("%Y%m%d%H%I%S.%f")
         return text
 
-    def _ensure_dataset_mounted(self):
+    def _ensure_dataset_mounted(self) -> None:
         if not self.dataset.mountpoint:
             self.dataset.mount()
 
-    def _fetch_hashes(self):
+    def _fetch_hashes(self) -> None:
         url = f"{self.remote_url}/{self.host.distribution.hash_file}"
         path = self.__get_hashfile_location()
         self.logger.verbose(f"Downloading hashes from {url}")
         urllib.request.urlretrieve(url, path)  # nosec: validated in @setter
         self.logger.debug(f"Hashes downloaded to {path}")
 
-    def _fetch_assets(self):
+    def _fetch_assets(self) -> None:
         for asset in self.assets:
             url = f"{self.remote_url}/{asset}.txz"
             path = self._get_asset_location(asset)
@@ -812,7 +812,7 @@ class ReleaseGenerator(ReleaseResource):
                 urllib.request.urlretrieve(url, path)  # nosec: validated
                 self.logger.verbose(f"{url} was saved to {path}")
 
-    def read_hashes(self):
+    def read_hashes(self) -> typing.Dict[str, str]:
         # yes, this can read HardenedBSD and FreeBSD hash files
         path = self.__get_hashfile_location()
         hashes = {}
@@ -833,14 +833,14 @@ class ReleaseGenerator(ReleaseResource):
         self.logger.spam(f"{count} hashes read from {path}")
         return hashes
 
-    def __get_hashfile_location(self):
+    def __get_hashfile_location(self) -> str:
         hash_file = self.host.distribution.hash_file
         return f"{self.download_directory}/{hash_file}"
 
-    def _get_asset_location(self, asset_name):
+    def _get_asset_location(self, asset_name) -> str:
         return f"{self.download_directory}/{asset_name}.txz"
 
-    def _extract_assets(self):
+    def _extract_assets(self) -> None:
 
         for asset in self.assets:
 
@@ -865,18 +865,18 @@ class ReleaseGenerator(ReleaseResource):
 
         return self.rc_conf.save()
 
-    def _generate_default_rcconf_line(self, service_name):
+    def _generate_default_rcconf_line(self, service_name: str) -> str:
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:
             state = "YES"
         else:
             state = "NO"
         return f"{service_name}_enable=\"{state}\""
 
-    def _update_name_from_dataset(self):
+    def _update_name_from_dataset(self) -> None:
         if self.dataset is not None:
             self.name = self.dataset.name.split("/")[-2:-1]
 
-    def update_base_release(self):
+    def update_base_release(self) -> None:
 
         base_dataset = self.zfs.get_or_create_dataset(self.base_dataset_name)
 
@@ -891,13 +891,13 @@ class ReleaseGenerator(ReleaseResource):
 
         self.logger.debug(f"Base release '{self.name}' updated")
 
-    def _cleanup(self):
+    def _cleanup(self) -> None:
         for asset in self.assets:
             asset_location = self._get_asset_location(asset)
             if os.path.isfile(asset_location):
                 os.remove(asset_location)
 
-    def _check_asset_hash(self, asset_name):
+    def _check_asset_hash(self, asset_name: str) -> None:
         local_file_hash = self._read_asset_hash(asset_name)
         expected_hash = self.hashes[asset_name]
 
@@ -917,7 +917,7 @@ class ReleaseGenerator(ReleaseResource):
             f"Asset {asset_name}.txz has a valid signature ({expected_hash})"
         )
 
-    def _read_asset_hash(self, asset_name):
+    def _read_asset_hash(self, asset_name: str) -> str:
         asset_location = self._get_asset_location(asset_name)
         sha256 = hashlib.sha256()
         with open(asset_location, 'rb') as f:
@@ -925,11 +925,11 @@ class ReleaseGenerator(ReleaseResource):
                 sha256.update(block)
         return sha256.hexdigest()
 
-    def _check_tar_files(self, tar_infos, asset_name):
+    def _check_tar_files(self, tar_infos, asset_name: str) -> None:
         for i in tar_infos:
             self._check_tar_info(i, asset_name)
 
-    def _check_tar_info(self, tar_info, asset_name):
+    def _check_tar_info(self, tar_info: typing.Any, asset_name: str) -> None:
         if tar_info.name == ".":
             return
         if not tar_info.name.startswith("./"):
@@ -946,7 +946,7 @@ class ReleaseGenerator(ReleaseResource):
             logger=self.logger
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def destroy(self, force: bool=False) -> None:

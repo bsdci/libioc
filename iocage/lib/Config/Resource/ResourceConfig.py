@@ -28,11 +28,11 @@ import iocage.lib.Config.Prototype
 
 class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
 
-    resource: 'iocage.lib.Resource.Resource' = None  # type: ignore
+    resource: 'iocage.lib.Resource.Resource' = None
 
     def __init__(
         self,
-        resource: 'iocage.lib.Resource.Resource',  # type: ignore
+        resource: 'iocage.lib.Resource.Resource',
         **kwargs
     ) -> None:
 
@@ -45,10 +45,10 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
 
     @property
     def file(self) -> str:
-        return os.path.join(
+        return str(os.path.join(
             self.resource.dataset.mountpoint,
             self.resource.config_file
-        )
+        ))
 
     @file.setter
     def file(self, value: str):

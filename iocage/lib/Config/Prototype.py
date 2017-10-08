@@ -68,11 +68,11 @@ class Prototype:
             conf.write(self.map_output(data))
             conf.truncate()
 
-    def map_input(self, data: typing.Any) -> dict:
-        return data
+    def map_input(self, data: typing.Any) -> typing.Dict[str, any]:
+        return data  # type: typing.Dict[str, any]
 
     def map_output(self, data: typing.Any) -> typing.Any:
-        return data
+        return data  # type: typing.Dict[str, any]
 
     def exists(self) -> bool:
         return os.path.isfile(self.file)

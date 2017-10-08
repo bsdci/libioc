@@ -285,7 +285,7 @@ class Logger:
         except KeyError:
             return "none"
 
-    def _colorize(self, message: str, color_name: str=None) -> str:
+    def _colorize(self, message: str, color_name: str) -> str:
         try:
             color_code = self._get_color_code(color_name)
         except:
