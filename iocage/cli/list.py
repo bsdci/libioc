@@ -210,7 +210,7 @@ def _print_json(
 
 def _lookup_resource_values(resource, columns) -> typing.List[str]:
     return list(map(
-        lambda column: resource.getstring(column),
+        lambda column: str(resource.getstring(column)),
         columns
     ))
 

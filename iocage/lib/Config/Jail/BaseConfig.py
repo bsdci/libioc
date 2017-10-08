@@ -280,7 +280,7 @@ class BaseConfig(dict):
         self.data["basejail"] = self.stringify(value)
 
     def _get_clonejail(self) -> bool:
-        return iocage.lib.helpers.parse_bool(self.data["clonejail"])
+        return iocage.lib.helpers.parse_bool(self.data["clonejail"]) is True
 
     def _set_clonejail(
         self,

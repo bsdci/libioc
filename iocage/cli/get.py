@@ -113,11 +113,14 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
             print_property(key, value)
 
 
-def print_property(key, value):
+def print_property(key: str, value: str) -> None:
     print(f"{key}:{value}")
 
 
-def _lookup_config_value(resource, key: str) -> typing.Any:
+def _lookup_config_value(
+    resource: 'iocage.lib.Resource.Resource',
+    key: str
+) -> typing.Any:
     return iocage.lib.helpers.to_string(resource.config[key])
 
 
