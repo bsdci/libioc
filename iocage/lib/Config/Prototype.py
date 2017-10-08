@@ -28,6 +28,7 @@ import iocage.lib.helpers
 # mypy:
 import iocage.lib.Logger
 
+
 class Prototype:
 
     logger: typing.Type[iocage.lib.Logger.Logger]
