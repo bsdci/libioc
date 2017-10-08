@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import os.path
 import libzfs
 
 import iocage.lib.errors
@@ -135,17 +136,17 @@ class Datasets:
 
         self._activate_pool(pool)
 
-        if mountpoint is not None:
-            self._root = self._get_or_create_dataset(
-                "iocage",
-                pool=pool,
-                mountpoint=mountpoint
+        if (mountpoint is None) and (os.path.ismount('/iocage') is False):
+            self.logger.spam(
+                "Claiming /iocage as mountpoint of the activated zpool"
             )
-        else:
-            self._root = self._get_or_create_dataset(
-                "iocage",
-                pool=pool
-            )
+            mountpoint = iocage.lib.Types.AbsolutePath('/iocage')
+
+        self._root = self._get_or_create_dataset(
+            "iocage",
+            pool=pool,
+            mountpoint=mountpoint
+        )
 
     def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
