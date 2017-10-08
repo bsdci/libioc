@@ -433,7 +433,7 @@ class ReleaseGenerator(ReleaseResource):
                     # the only non-IocageEvent is our return value
                     release_changed = event
 
-        if release_changed:
+        if release_changed is True:
             yield releaseCopyBaseEvent.begin()
             self.update_base_release()
             yield releaseCopyBaseEvent.end()
@@ -551,9 +551,9 @@ class ReleaseGenerator(ReleaseResource):
                 f"{self.release_updates_dir}/{update_script_name}",
                 "-d",
                 release_update_download_dir,
-                "-f",
-                "-r",
+                "--currently-running",
                 self.name,
+                "-f",
                 f"{self.release_updates_dir}/{update_conf_name}",
                 "--not-running-from-cron",
                 "fetch"
@@ -615,7 +615,7 @@ class ReleaseGenerator(ReleaseResource):
             yield runReleaseUpdateEvent.fail(e)
             raise e
 
-        return changed
+        yield changed
 
     def snapshot(
         self,
@@ -738,9 +738,11 @@ class ReleaseGenerator(ReleaseResource):
             "/var/db/freebsd-update/freebsd-update.sh",
             "-d",
             "/var/db/freebsd-update",
-            "-f",
+            "--currently-running",
+            self.name,
             "-r",
             self.name,
+            "-f",
             "/var/db/freebsd-update/freebsd-update.conf",
             "install"
         ], ignore_error=True)
