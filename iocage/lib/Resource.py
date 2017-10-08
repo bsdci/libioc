@@ -166,7 +166,7 @@ class Resource(metaclass=abc.ABCMeta):
         return self._assigned_dataset_name
 
     @dataset_name.setter
-    def dataset_name(self, value: str):
+    def dataset_name(self, value: str) -> None:
         self._dataset_name = value
 
     @property
