@@ -181,7 +181,7 @@ def parse_none(data: typing.Any) -> None:
     raise TypeError("Value is not None")
 
 
-def parse_list(data: typing.Union[str, typing.List[str]]) -> list:
+def parse_list(data: typing.Union[str, typing.List[str]]) -> typing.List[str]:
     """
     Transforms a comma separated string into a list
     """

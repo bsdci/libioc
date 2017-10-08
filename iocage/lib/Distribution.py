@@ -115,7 +115,7 @@ class DistributionGenerator:
 
         # the mirror_url @property is validated (enforced) @property, so:
         resource = urllib.request.urlopen(self.mirror_url)  # nosec
-        charset = resource.headers.get_content_charset()
+        charset = resource.headers.get_content_charset()  # noqa: T484
         response = resource.read().decode(charset if charset else "UTF-8")
 
         found_releases = self._parse_links(response)
