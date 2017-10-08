@@ -89,7 +89,7 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         raise Exception("This resource is not a jail or not linked to one")
 
     @property
-    def fstab(self) -> iocage.lib.Config.Jail.File.Fstab.Fstab:
+    def fstab(self) -> 'iocage.lib.Config.Jail.File.Fstab.Fstab':
 
         try:
             return self._fstab
@@ -209,7 +209,7 @@ class JailGenerator(JailResource):
 
         Args:
 
-            data:
+            data (string|dict):
                 Jail configuration dict or jail name as string identifier.
 
             zfs (libzfs.ZFS): (optional)
@@ -353,7 +353,7 @@ class JailGenerator(JailResource):
 
         lex = shlex.shlex(value)  # noqa: T484
         lex.whitespace_split = True
-        command = list(lex)  # type: ignore
+        command = list(lex)
 
         return iocage.lib.helpers.exec(
             command,
@@ -574,10 +574,7 @@ class JailGenerator(JailResource):
         self.get_or_create_dataset("root")
         self._update_fstab()
 
-        backend: typing.Optional[typing.Union[
-            iocage.lib.StandaloneJailStorage.StandaloneJailStorage,
-            iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage,
-            iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage]] = None
+        backend = None
 
         is_basejail = self.config.get("basejail", False)
         if not is_basejail:
@@ -1094,14 +1091,14 @@ class JailGenerator(JailResource):
         ))
 
         iocage.lib.helpers.umount(
-            mountpoints=mountpoints,
+            mountpoints,
             force=True,
             logger=self.logger,
             ignore_error=True
         )
 
         iocage.lib.helpers.umount(
-            options=["-a", "-F", self.fstab.path],
+            ["-a", "-F", self.fstab.path],
             force=True,
             logger=self.logger,
             ignore_error=True
@@ -1268,3 +1265,4 @@ class Jail(JailGenerator):
     ) -> typing.List['iocage.lib.events.IocageEvent']:
 
         return list(JailGenerator.stop(self, *args, **kwargs))
+                                                                                                                                                                                                                                          
