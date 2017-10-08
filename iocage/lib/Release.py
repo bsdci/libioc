@@ -549,6 +549,7 @@ class ReleaseGenerator(ReleaseResource):
             self.logger.verbose(f"Fetching updates for release '{self.name}'")
             iocage.lib.helpers.exec([
                 f"{self.release_updates_dir}/{update_script_name}",
+                "--not-running-from-cron",
                 "-d",
                 release_update_download_dir,
                 "--currently-running",
@@ -736,6 +737,7 @@ class ReleaseGenerator(ReleaseResource):
         yield executeReleaseUpdateEvent.begin()
         child, stdout, stderr = jail.exec([
             "/var/db/freebsd-update/freebsd-update.sh",
+            "--not-running-from-cron",
             "-d",
             "/var/db/freebsd-update",
             "--currently-running",
