@@ -48,7 +48,7 @@ def cli(ctx, rc, jails):
         "print_function": ctx.parent.print_events
     }
 
-    if len(jails) == 0:
+    if (rc is False) and (len(jails) == 0):
         logger.error("No jail selector provided")
         exit(1)
 
