@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """stop module for the cli."""
+import typing
 import click
 
 import iocage.lib.errors
@@ -40,27 +41,44 @@ __rootcmd__ = True
 @click.option("--force", "-f", is_flag=True, default=False,
               help="Skip checks and enforce jail shutdown")
 @click.argument("jails", nargs=-1)
-def cli(ctx, rc, log_level, force, jails):
+def cli(
+    ctx: click.core.Context,
+    rc: bool,
+    log_level: str,
+    force: bool,
+    jails: typing.Set[str]
+) -> None:
     """
     Looks for the jail supplied and passes the uuid, path and configuration
     location to stop_jail.
     """
     logger = ctx.parent.logger
 
-    if len(jails) == 0:
-        logger.error("No jail selector provided")
-        exit(1)
+    if rc is True:
+        if len(jails) > 0:
+            logger.error("Cannot use --rc and jail selectors simultaniously")
+            exit(1)
 
-    ioc_jails = iocage.lib.Jails.JailsGenerator(
-        logger=logger,
-        filters=jails
-    )
+        autostop(logger=logger, print_function=ctx.parent.print_events)
+    else:
+        normal(jails, logger=logger, print_function=ctx.parent.print_events, force=force)
+
+
+def stop_jails(
+    ioc_jails: typing.List[iocage.lib.Jails.JailsGenerator],
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ],
+    force: bool
+) -> None:
 
     changed_jails = []
     failed_jails = []
     for jail in ioc_jails:
         try:
-            ctx.parent.print_events(jail.stop(force=force))
+            print_function(jail.stop(force=force))
         except iocage.lib.errors.IocageException:
             failed_jails.append(jail)
             continue
@@ -75,3 +93,50 @@ def cli(ctx, rc, log_level, force, jails):
         jails_input = " ".join(list(jails))
         logger.error(f"No jails matched your input: {jails_input}")
         exit(1)
+
+
+def normal(
+    filters: typing.Set[str],
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ],
+    force: bool
+) -> None:
+
+    jails = iocage.lib.Jails.JailsGenerator(
+        logger=logger,
+        filters=filters
+    )
+    
+    if len(jails) == 0:
+        logger.error("No jail selector provided")
+        exit(1)
+
+    stop_jails(jails, logger=logger, print_function=print_function)
+
+
+def autostop(
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ]
+):
+
+    filters = ("boot=yes",)
+
+    ioc_jails = iocage.lib.Jails.JailsGenerator(
+        logger=logger,
+        filters=filters
+    )
+
+    # sort jails by their priority
+    jails = reversed(sorted(
+        list(ioc_jails),
+        key=lambda x: x.config["priority"]
+    ))
+
+    stop_jails(jails, logger=logger, print_function=print_function, force=False)
+

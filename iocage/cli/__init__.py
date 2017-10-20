@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import locale
 import os
 import re
@@ -31,6 +32,7 @@ import sys
 import click
 
 from ..lib.Logger import Logger
+from ..lib.events import IocageEvent
 
 logger = Logger()
 
@@ -59,8 +61,8 @@ except subprocess.CalledProcessError:
     exit(1)
 
 
-def print_events(generator):
-    lines = {}
+def print_events(generator: typing.Generator[IocageEvent, None, None]) -> None:
+    lines: typing.Dict[str, str] = {}
     for event in generator:
 
         if event.identifier is None:
@@ -142,6 +144,7 @@ class IOCageCLI(click.MultiCommand):
                 pass
             return mod.cli
         except (ImportError, AttributeError):
+            raise
             return
 
 
