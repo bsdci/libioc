@@ -57,9 +57,9 @@ def init_zfs(
 
 
 def init_host(
-        self: typing.Any,
-        host: 'iocage.lib.Host.HostGenerator'=None
-) -> 'iocage.lib.Host.HostGenerator':
+        self,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None
+) -> iocage.lib.Host.HostGenerator:
 
     try:
         return self.host
@@ -76,9 +76,9 @@ def init_host(
 
 
 def init_logger(
-        self: typing.Any,
-        logger: 'iocage.lib.Logger.Logger'=None
-) -> 'iocage.lib.Logger.Logger':
+        self,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+) -> iocage.lib.Logger.Logger:
 
     try:
         return self.logger
@@ -99,7 +99,7 @@ def init_logger(
 
 def exec(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     ignore_error: bool=False,
     **subprocess_args
 ) -> typing.Tuple[subprocess.Popen, str, str]:
@@ -168,7 +168,7 @@ _validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
 
 
 def validate_name(name: str) -> bool:
-    return bool(_validate_name.fullmatch(name))
+    return _validate_name.fullmatch(name) is not None
 
 
 def parse_none(data: typing.Any) -> None:
@@ -181,7 +181,7 @@ def parse_none(data: typing.Any) -> None:
     raise TypeError("Value is not None")
 
 
-def parse_list(data: typing.Union[str, typing.List[str]]) -> list:
+def parse_list(data: typing.Union[str, typing.List[str]]) -> typing.List[str]:
     """
     Transforms a comma separated string into a list
     """
@@ -218,9 +218,11 @@ def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
     raise TypeError("Value is not a boolean")
 
 
-def parse_user_input(data: typing.Optional[typing.Union[str, bool]]):
+def parse_user_input(
+    data: typing.Optional[typing.Union[str, bool]]
+) -> typing.Optional[typing.Union[str, bool]]:
     """
-    uses parse_bool() to partially return Boolean and NoneType values
+    uses parse_bool() to partially return Boolean and None values
     All other types as returned as-is
 
     >>> parse_user_input("YES")
@@ -239,14 +241,15 @@ def parse_user_input(data: typing.Optional[typing.Union[str, bool]]):
         pass
 
     try:
-        return parse_none(data)
+        parse_none(data)
+        return None
     except TypeError:
         pass
 
     return data
 
 
-def to_json(data: dict) -> str:
+def to_json(data: typing.Dict[str, typing.Any]) -> str:
     output_data = {}
     for key, value in data.items():
         output_data[key] = to_string(
@@ -255,7 +258,7 @@ def to_json(data: dict) -> str:
             false="no",
             none="none"
         )
-    return json.dumps(output_data, sort_keys=True, indent=4)
+    return str(json.dumps(output_data, sort_keys=True, indent=4))
 
 
 def to_string(
@@ -334,7 +337,7 @@ def to_string(
 
 def exec_passthru(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Tuple[str, str]:
 
     if isinstance(command, str):
@@ -349,7 +352,7 @@ def exec_passthru(
 
 def exec_raw(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     **kwargs
 ) -> subprocess.Popen:
 
@@ -368,7 +371,7 @@ def exec_raw(
 
 def exec_iter(
     command: typing.List[str],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Generator[str, None, None]:
 
     process = exec_raw(
@@ -391,7 +394,7 @@ def exec_iter(
 
 def shell(
     command: typing.Union[str, typing.List[str]],
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> subprocess.CompletedProcess:
 
     if not isinstance(command, str):
@@ -402,29 +405,35 @@ def shell(
     if logger:
         logger.spam(f"Executing Shell: {command}")
 
-    return subprocess.check_output(  # nosec: Yes, we actually want this
+    child = subprocess.check_output(  # nosec: Yes, we actually want this
         shell_command,
         shell=True,
         universal_newlines=True,
         stderr=subprocess.DEVNULL
     )
 
+    return child  # noqa: T484
+
 
 # ToDo: replace with (u)mount library
 def umount(
     mountpoint: typing.Optional[typing.Union[
         iocage.lib.Types.AbsolutePath,
-        typing.List[iocage.lib.Types.AbsolutePath]
+        typing.List[iocage.lib.Types.AbsolutePath],
     ]]=None,
+    options: typing.Optional[typing.List[str]]=None,
     force: bool=False,
     ignore_error: bool=False,
-    logger: 'iocage.lib.Logger.Logger'=None
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> None:
 
     cmd = ["/sbin/umount"]
 
     if force is True:
         cmd.append("-f")
+
+    if options is not None and len(options) != 0:
+        cmd + options
 
     if isinstance(mountpoint, list):
         cmd += mountpoint

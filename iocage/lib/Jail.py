@@ -114,12 +114,12 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
         the jail id is used to find name the dataset
         """
         try:
-            return self._assigned_dataset_name
+            return str(self._assigned_dataset_name)
         except AttributeError:
             pass
 
         try:
-            return self._dataset.name
+            return str(self._dataset.name)
         except AttributeError:
             pass
 
@@ -132,7 +132,7 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
     @property
     def _dataset_name_from_jail_name(self) -> str:
 
-        jail_id = self.jail.config["id"]
+        jail_id = str(self.jail.config["id"])
         if jail_id is None:
             raise iocage.lib.errors.JailUnknownIdentifier()
 
@@ -353,7 +353,7 @@ class JailGenerator(JailResource):
 
         lex = shlex.shlex(value)  # noqa: T484
         lex.whitespace_split = True
-        command = list(lex)  # type: ignore
+        command = list(lex)
 
         return iocage.lib.helpers.exec(
             command,
@@ -362,13 +362,8 @@ class JailGenerator(JailResource):
         )
 
     def _start_services(self) -> None:
-        self.exec_hook("start")
-
-    def exec_hook(self, hook_name: str) -> None:
-        command = self.config[f"exec_{hook_name}"].strip().split()
-        self.logger.debug(
-            f"Running exec_{hook_name} on {self.humanreadable_name}"
-        )
+        command = str(self.config["exec_start"]).strip().split()
+        self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
         self.exec(command)
 
     def stop(
@@ -625,12 +620,14 @@ class JailGenerator(JailResource):
 
         command = ["/usr/sbin/jexec", self.identifier] + command
 
-        return iocage.lib.helpers.exec(
+        child, stdout, stderr = iocage.lib.helpers.exec(
             command,
             logger=self.logger,
             env=self.env,
             **kwargs
         )
+
+        return child, stdout, stderr
 
     def passthru(self, command: typing.List[str]):
         """
@@ -680,7 +677,7 @@ class JailGenerator(JailResource):
         if self.config["ip4_addr"] is None:
             return False
 
-        return ("dhcp" in self.config["ip4_addr"].networks)
+        return ("dhcp" in self.config["ip4_addr"].networks) is True
 
     @property
     def devfs_ruleset(self) -> iocage.lib.DevfsRules.DevfsRuleset:
@@ -819,12 +816,12 @@ class JailGenerator(JailResource):
         """
         Return jail command consumable config value string
         """
-        return iocage.lib.helpers.to_string(
+        return str(iocage.lib.helpers.to_string(
             self.config[key],
             true="1",
             false="0",
             none=""
-        )
+        ))
 
     @property
     def networks(self) -> typing.List[iocage.lib.Network.Network]:
@@ -1120,7 +1117,7 @@ class JailGenerator(JailResource):
 
         for dataset in list(jails_dataset.children):
 
-            dataset_name = dataset.name[(len(jails_dataset.name) + 1):]
+            dataset_name = str(dataset.name[(len(jails_dataset.name) + 1):])
             humanreadable_name = iocage.lib.helpers.to_humanreadable_name(
                 dataset_name
             )
@@ -1135,7 +1132,7 @@ class JailGenerator(JailResource):
         """
         The name (formerly UUID) of the Jail
         """
-        return self.config["id"]
+        return str(self.config["id"])
 
     @property
     def humanreadable_name(self) -> str:
@@ -1146,7 +1143,7 @@ class JailGenerator(JailResource):
         a shortened string of the first 8 characters is returned
         """
         try:
-            return iocage.lib.helpers.to_humanreadable_name(self.name)
+            return str(iocage.lib.helpers.to_humanreadable_name(self.name))
         except:
             raise iocage.lib.errors.JailUnknownIdentifier(
                 logger=self.logger

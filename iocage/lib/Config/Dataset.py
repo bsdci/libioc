@@ -24,6 +24,8 @@
 """The main CLI for ioc."""
 import os.path
 import libzfs
+import typing
+
 import iocage.lib.Config.Prototype
 
 
@@ -33,7 +35,7 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
 
     def __init__(
         self,
-        dataset: libzfs.ZFSDataset=None,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
         **kwargs
     ) -> None:
 
@@ -48,7 +50,7 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
 
     @property
     def file(self) -> str:
-        return os.path.join(self.dataset.mountpoint, self._file)
+        return str(os.path.join(self.dataset.mountpoint, self._file))
 
     @file.setter
     def file(self, value: str):

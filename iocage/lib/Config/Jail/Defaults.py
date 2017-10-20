@@ -118,7 +118,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     def __init__(
         self,
-        logger: 'iocage.lib.Logger.Logger'=None
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         self._user_data = DefaultsUserData(

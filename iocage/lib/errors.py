@@ -28,6 +28,7 @@ import libzfs  # noqa: F401
 import iocage.lib.events  # noqa: F401
 import iocage.lib.Jail  # noqa: F401
 import iocage.lib.Types  # noqa: F401
+import iocage.lib.Logger
 
 
 class IocageException(Exception):
@@ -35,7 +36,7 @@ class IocageException(Exception):
     def __init__(
         self,
         message: str,
-        logger: 'iocage.lib.Logger.Logger'=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         level: str="error",
         silent: bool=False,
         append_warning: bool=False,
@@ -195,8 +196,8 @@ class InvalidJailConfigValue(JailConfigError):
     def __init__(
         self,
         property_name: str,
-        jail: 'iocage.lib.Jail.JailGenerator'=None,
-        reason: str=None,
+        jail: typing.Optional[iocage.lib.Jail.JailGenerator]=None,
+        reason: typing.Optional[str]=None,
         **kwargs
     ) -> None:
 
@@ -300,7 +301,7 @@ class UnmountFailed(IocageException):
 
     def __init__(
         self,
-        mountpoint: iocage.lib.Types.AbsolutePath,
+        mountpoint: typing.Any,
         *args,
         **kwargs
     ) -> None:
@@ -402,7 +403,7 @@ class InvalidNetworkBridge(IocageException, ValueError):
 
     def __init__(
         self,
-        reason: str=None,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
@@ -416,12 +417,20 @@ class InvalidNetworkBridge(IocageException, ValueError):
 # Release
 
 
+class ReleaseListUnavailable(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+
+        msg = f"The releases list is not available"
+        super().__init__(msg, *args, **kwargs)
+
+
 class ReleaseUpdateFailure(IocageException):
 
     def __init__(
         self,
         release_name: str,
-        reason: str=None,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
@@ -483,7 +492,7 @@ class ReleaseUpdateBranchLookup(IocageException):
     def __init__(
         self,
         release_name: str,
-        reason: str=None,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
@@ -521,7 +530,7 @@ class InvalidDevfsRulesSyntax(DevfsRuleException):
     def __init__(
         self,
         devfs_rules_file: str,
-        reason: str=None,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
@@ -537,7 +546,7 @@ class DuplicateDevfsRuleset(DevfsRuleException):
     def __init__(
         self,
         devfs_rules_file: str,
-        reason: str=None,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
@@ -559,7 +568,11 @@ class LogException(IocageException):
 
 class CannotRedrawLine(LogException):
 
-    def __init__(self, reason: str, *args, **kwargs) -> None:
+    def __init__(
+            self,
+            reason: typing.Optional[str]=None,
+            *args,
+            **kwargs) -> None:
         msg = "Logger can't redraw line"
         if reason is not None:
             msg += f": {reason}"

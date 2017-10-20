@@ -41,7 +41,7 @@ class JailConfigProperties(dict):
 
     def is_special_property(self, property_name: str) -> bool:
         classes = iocage.lib.Config.Jail.Property.CLASSES
-        return (property_name in classes.keys())
+        return (property_name in classes.keys()) is True
 
     def get_or_create(
         self,

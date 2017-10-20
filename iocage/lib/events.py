@@ -56,7 +56,11 @@ class IocageEvent:
     done: bool = True
     error: typing.Optional[BaseException] = None
 
-    def __init__(self, message=None, **kwargs) -> None:
+    def __init__(
+            self,
+            message: typing.Optional[str]=None,
+            **kwargs
+    ) -> None:
         """
         Initializes an IocageEvent
         """

@@ -23,7 +23,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import iocage.lib.Release
 import iocage.lib.Resource
+import iocage.lib.Filter
 import iocage.lib.helpers
+
+import typing
 
 # MyPy
 import libzfs
@@ -35,7 +38,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
 
     def __init__(
         self,
-        filters: 'iocage.lib.Filter.Terms'=None,
+        filters: typing.Optional[iocage.lib.Filter.Terms]=None,
         host=None,
         zfs=None,
         logger=None
@@ -73,7 +76,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
         dataset: libzfs.ZFSDataset,
         *args,
         **kwargs
-    ) -> 'iocage.lib.Release.ReleaseGenerator':
+    ) -> iocage.lib.Release.ReleaseGenerator:
 
         kwargs["name"] = self._get_asset_name_from_dataset(dataset)
         kwargs["logger"] = self.logger

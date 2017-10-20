@@ -23,18 +23,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The main CLI for ioc."""
 import libzfs
+import typing
 
 import iocage.lib.Config.Jail.File.RCConf
 import iocage.lib.Resource
 
 # MyPy
 import iocage.lib.Config.Jail.JailConfig
+import iocage.lib.Config.Jail.File
 
 
 class LaunchableResource(iocage.lib.Resource.Resource):
 
-    _rc_conf: 'iocage.lib.Config.Jail.File.RCConf.RCConf' = None
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig' = None
+    _rc_conf: typing.Optional[iocage.lib.Config.Jail.File.RCConf.RCConf] = None
+    config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(self, *args, **kwargs) -> None:
         iocage.lib.Resource.Resource.__init__(self, *args, **kwargs)
@@ -55,7 +57,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def root_path(self) -> str:
-        return self.root_dataset.mountpoint
+        return str(self.root_dataset.mountpoint)
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:

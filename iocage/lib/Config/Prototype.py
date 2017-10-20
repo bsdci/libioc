@@ -25,15 +25,18 @@ import typing
 import os.path
 import iocage.lib.helpers
 
+# mypy:
+import iocage.lib.Logger
+
 
 class Prototype:
 
-    logger: 'iocage.lib.Logger.Logger' = None
+    logger: typing.Type[iocage.lib.Logger.Logger]
     data: dict = {}
 
     def __init__(
         self,
-        logger: 'iocage.lib.Logger.Logger'=None
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -50,7 +53,7 @@ class Prototype:
             "This needs to be implemented by the inheriting class"
         )
 
-    def read(self) -> dict:
+    def read(self):
         try:
             with open(self.file, "r") as data:
                 return self.map_input(data)
@@ -65,10 +68,14 @@ class Prototype:
             conf.write(self.map_output(data))
             conf.truncate()
 
-    def map_input(self, data: typing.Any) -> dict:
+    def map_input(self, data: typing.Any):
+        # result = data  # type: typing.Dict[str, typing.Any]
+        # return result
         return data
 
-    def map_output(self, data: typing.Any) -> typing.Any:
+    def map_output(self, data: typing.Any):
+        # result = data  # type: typing.Dict[str, typing.Any]
+        # return result
         return data
 
     def exists(self) -> bool:

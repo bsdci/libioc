@@ -135,7 +135,7 @@ def _print_table(
     ],
     columns: list,
     show_header: bool,
-    sort_key: str=None
+    sort_key: typing.Optional[str]=None
 ) -> None:
 
     table = texttable.Texttable(max_width=0)
@@ -210,7 +210,7 @@ def _print_json(
 
 def _lookup_resource_values(resource, columns) -> typing.List[str]:
     return list(map(
-        lambda column: resource.getstring(column),
+        lambda column: str(resource.getstring(column)),
         columns
     ))
 

@@ -35,8 +35,9 @@ class ConfigUCL(iocage.lib.Config.File.ConfigFile):
 
     config_type = "ucl"
 
-    def map_input(self, data: typing.TextIO) -> dict:
-        return ucl.load(data)
+    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        result = ucl.load(data)  # type: typing.Dict[str, typing.Any]
+        return result
 
     def map_output(self, data: dict) -> str:
         # ToDo: Re-Implement UCL output

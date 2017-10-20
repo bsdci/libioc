@@ -25,6 +25,10 @@ import typing
 import iocage.lib.errors
 import iocage.lib.helpers
 
+# mypy
+import iocage.lib.Config.Jail
+import iocage.lib.Logger
+
 
 class AddressSet(set):
 
@@ -32,7 +36,9 @@ class AddressSet(set):
 
     def __init__(
         self,
-        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None,
+        config: typing.Optional[
+            'iocage.lib.Config.Jail.JailConfig.JailConfig'
+        ]=None,
         property_name: str="ip4_address"
     ) -> None:
 
@@ -61,16 +67,18 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 
 class AddressesProp(dict):
 
-    logger: 'iocage.lib.Logger.Logger'
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'  # type: ignore
+    logger: iocage.lib.Logger.Logger
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "ip4_address"
     skip_on_error: bool
 
     def __init__(
         self,
-        config=None,  # type: ignore
+        config: typing.Optional[
+            'iocage.lib.Config.Jail.BaseConfig.BaseConfig'
+        ]=None,
         property_name: str="ip4_address",
-        logger: 'iocage.lib.Logger.Logger'=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         skip_on_error: bool=False
     ) -> None:
 
@@ -119,7 +127,7 @@ class AddressesProp(dict):
     def add(
         self,
         nic: str,
-        addresses: typing.Union[typing.List[str], str]=None,
+        addresses: typing.Optional[typing.Union[typing.List[str], str]]=None,
         notify: bool=True
     ) -> None:
 

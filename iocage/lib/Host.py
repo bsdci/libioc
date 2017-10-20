@@ -36,15 +36,22 @@ import iocage.lib.helpers
 
 # MyPy
 import iocage.lib.Config.Jail.BaseConfig  # noqa: F401
+import iocage.lib.DevfsRules
+_distribution_types = typing.Union[
+    iocage.lib.Distribution.DistributionGenerator,
+    iocage.lib.Distribution.Distribution,
+]
 
 
 class HostGenerator:
 
     _class_distribution = iocage.lib.Distribution.DistributionGenerator
 
-    _devfs: 'iocage.lib.DevfsRules.DevfsRules'
-    _defaults: 'iocage.lib.Resource.DefaultResource'
+    _devfs: iocage.lib.DevfsRules.DevfsRules
+    _defaults: iocage.lib.Resource.DefaultResource
     releases_dataset: libzfs.ZFSDataset
+    datasets: iocage.lib.Datasets.Datasets
+    distribution: _distribution_types
 
     branch_pattern = re.compile(
         r"""\(hardened/
@@ -60,10 +67,10 @@ class HostGenerator:
 
     def __init__(
         self,
-        root_dataset: libzfs.ZFSDataset=None,
-        defaults: typing.Optional['iocage.lib.Resource.DefaultResource']=None,
-        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
-        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+        root_dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        defaults: typing.Optional[iocage.lib.Resource.DefaultResource]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -94,7 +101,7 @@ class HostGenerator:
     ) -> 'iocage.lib.Config.Jail.BaseConfig.BaseConfig':
         return self.defaults.config
 
-    def _load_defaults(self) -> 'iocage.lib.Resource.DefaultResource':
+    def _load_defaults(self) -> iocage.lib.Resource.DefaultResource:
         defaults_resource = iocage.lib.Resource.DefaultResource(
             dataset=self.datasets.root,
             logger=self.logger,
@@ -119,7 +126,7 @@ class HostGenerator:
         return float(self.release_version.partition("-")[0])
 
     @property
-    def release_version(self):
+    def release_version(self) -> str:
 
         if self.distribution.name == "FreeBSD":
             release_version_string = os.uname()[2]
@@ -138,7 +145,7 @@ class HostGenerator:
             if match is not None:
                 return f"{match['major']}-{match['type']}"
 
-            raise iocage.lib.errors.HostReleaseUnknown()
+        raise iocage.lib.errors.HostReleaseUnknown()
 
     @property
     def processor(self) -> str:

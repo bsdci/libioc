@@ -43,6 +43,9 @@ import iocage.lib.Jail
 
 # MyPy
 import iocage.lib.Resource
+import iocage.lib.Host
+import iocage.lib.Logger
+import iocage.lib.Config.Jail.File.RCConf
 
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
@@ -51,7 +54,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
     def __init__(
         self,
-        host: 'iocage.lib.Host.HostGenerator',
+        host: iocage.lib.Host.HostGenerator,
         release: typing.Optional['ReleaseGenerator']=None,
         **kwargs
     ) -> None:
@@ -95,7 +98,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         the release id is used to find name the dataset
         """
         try:
-            return self._assigned_dataset_name
+            return str(self._assigned_dataset_name)
         except AttributeError:
             pass
 
@@ -133,18 +136,19 @@ class ReleaseGenerator(ReleaseResource):
     name: str
     eol: bool = False
 
-    logger: 'iocage.lib.Logger.Logger'
-    zfs: 'iocage.lib.ZFS.ZFS'
-    host: 'iocage.lib.Host.HostGenerator'
-    _resource: 'iocage.lib.Resource.Resource'
+    logger: iocage.lib.Logger.Logger
+    zfs: iocage.lib.ZFS.ZFS
+    host: iocage.lib.Host.HostGenerator
+    _resource: iocage.lib.Resource.Resource
     _assets: typing.List[str]
+    _mirror_url: typing.Optional[str] = None
 
     def __init__(
         self,
         name: str,
-        host: 'iocage.lib.Host.HostGenerator'=None,
-        zfs: 'iocage.lib.ZFS.ZFS'=None,
-        logger: 'iocage.lib.Logger.Logger'=None,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         check_hashes: bool=True,
         eol: bool=False,
         **release_resource_args
@@ -194,17 +198,17 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def releases_folder(self) -> str:
-        return self.host.datasets.releases.mountpoint
+        return str(self.host.datasets.releases.mountpoint)
 
     @property
     def download_directory(self) -> str:
-        return self.dataset.mountpoint
+        return str(self.dataset.mountpoint)
 
     @property
     def root_dir(self) -> str:
         try:
             if self.root_dataset.mountpoint:
-                return self.root_dataset.mountpoint
+                return str(self.root_dataset.mountpoint)
         except AttributeError:
             pass
 
@@ -245,14 +249,13 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def mirror_url(self) -> str:
-        try:
+        if self._mirror_url is None:
+            return str(self.host.distribution.mirror_url)
+        else:
             return self._mirror_url
-        except AttributeError:
-            pass
-        return self.host.distribution.mirror_url
 
     @mirror_url.setter
-    def mirror_url(self, value):
+    def mirror_url(self, value: str) -> None:
         url = urllib.parse.urlparse(value)
         if url.scheme not in self._supported_url_schemes:
             raise ValueError(f"Invalid URL scheme '{url.scheme}'")
@@ -364,7 +367,11 @@ class ReleaseGenerator(ReleaseResource):
             self._hbsd_release_branch = hbsd_update_conf["branch"]
             return self._hbsd_release_branch
 
-    def fetch(self, update=None, fetch_updates=None):
+    def fetch(
+        self,
+        update: typing.Optional[bool]=None,
+        fetch_updates: typing.Optional[bool]=None
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         release_changed = False
 
@@ -376,7 +383,7 @@ class ReleaseGenerator(ReleaseResource):
         releaseConfigurationEvent = events.ReleaseConfiguration(self)
         releaseCopyBaseEvent = events.ReleaseCopyBase(self)
 
-        if not self.fetched:
+        if self.fetched is False:
 
             yield fetchReleaseEvent.begin()
             yield releasePrepareStorageEvent.begin()
@@ -442,7 +449,7 @@ class ReleaseGenerator(ReleaseResource):
 
         self._cleanup()
 
-    def _copy_to_base_release(self):
+    def _copy_to_base_release(self) -> None:
         iocage.lib.helpers.exec(
             [
                 "rsync",
@@ -464,7 +471,9 @@ class ReleaseGenerator(ReleaseResource):
         )
         # ToDo: Memoize ReleaseResource
 
-    def fetch_updates(self):
+    def fetch_updates(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
@@ -562,7 +571,10 @@ class ReleaseGenerator(ReleaseResource):
 
             yield releaseUpdateDownloadEvent.end()
 
-    def update(self):
+    def update(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
         dataset = self.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
@@ -641,7 +653,7 @@ class ReleaseGenerator(ReleaseResource):
         """
 
         snapshot_name = f"{self.dataset.name}@{identifier}"
-
+        existing_snapshot: typing.Optional[libzfs.ZFS.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
             if force is False:
@@ -663,7 +675,10 @@ class ReleaseGenerator(ReleaseResource):
         self.dataset.snapshot(snapshot_name)
         return self.zfs.get_snapshot(snapshot_name)
 
-    def _update_hbsd_jail(self, jail):
+    def _update_hbsd_jail(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator'
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
@@ -709,9 +724,12 @@ class ReleaseGenerator(ReleaseResource):
             yield event
 
         self.logger.verbose(f"Release '{self.name}' updated")
-        return True  # ToDo: return False if nothing was updated
+        yield True  # ToDo: yield False if nothing was updated
 
-    def _update_freebsd_jail(self, jail):
+    def _update_freebsd_jail(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator'
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
@@ -775,23 +793,23 @@ class ReleaseGenerator(ReleaseResource):
         self.logger.verbose(f"Release '{self.name}' updated")
         yield True  # ToDo: return False if nothing was updated
 
-    def _append_datetime(self, text):
+    def _append_datetime(self, text: str) -> str:
         now = datetime.datetime.utcnow()
         text += now.strftime("%Y%m%d%H%I%S.%f")
         return text
 
-    def _ensure_dataset_mounted(self):
+    def _ensure_dataset_mounted(self) -> None:
         if not self.dataset.mountpoint:
             self.dataset.mount()
 
-    def _fetch_hashes(self):
+    def _fetch_hashes(self) -> None:
         url = f"{self.remote_url}/{self.host.distribution.hash_file}"
         path = self.__get_hashfile_location()
         self.logger.verbose(f"Downloading hashes from {url}")
         urllib.request.urlretrieve(url, path)  # nosec: validated in @setter
         self.logger.debug(f"Hashes downloaded to {path}")
 
-    def _fetch_assets(self):
+    def _fetch_assets(self) -> None:
         for asset in self.assets:
             url = f"{self.remote_url}/{asset}.txz"
             path = self._get_asset_location(asset)
@@ -804,7 +822,7 @@ class ReleaseGenerator(ReleaseResource):
                 urllib.request.urlretrieve(url, path)  # nosec: validated
                 self.logger.verbose(f"{url} was saved to {path}")
 
-    def read_hashes(self):
+    def read_hashes(self) -> typing.Dict[str, str]:
         # yes, this can read HardenedBSD and FreeBSD hash files
         path = self.__get_hashfile_location()
         hashes = {}
@@ -825,14 +843,14 @@ class ReleaseGenerator(ReleaseResource):
         self.logger.spam(f"{count} hashes read from {path}")
         return hashes
 
-    def __get_hashfile_location(self):
+    def __get_hashfile_location(self) -> str:
         hash_file = self.host.distribution.hash_file
         return f"{self.download_directory}/{hash_file}"
 
-    def _get_asset_location(self, asset_name):
+    def _get_asset_location(self, asset_name) -> str:
         return f"{self.download_directory}/{asset_name}.txz"
 
-    def _extract_assets(self):
+    def _extract_assets(self) -> None:
 
         for asset in self.assets:
 
@@ -855,20 +873,20 @@ class ReleaseGenerator(ReleaseResource):
         for key, value in self.DEFAULT_RC_CONF_SERVICES.items():
             self.rc_conf[f"{key}_enable"] = value
 
-        return self.rc_conf.save()
+        return self.rc_conf.save() is True
 
-    def _generate_default_rcconf_line(self, service_name):
+    def _generate_default_rcconf_line(self, service_name: str) -> str:
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:
             state = "YES"
         else:
             state = "NO"
         return f"{service_name}_enable=\"{state}\""
 
-    def _update_name_from_dataset(self):
+    def _update_name_from_dataset(self) -> None:
         if self.dataset is not None:
             self.name = self.dataset.name.split("/")[-2:-1]
 
-    def update_base_release(self):
+    def update_base_release(self) -> None:
 
         base_dataset = self.zfs.get_or_create_dataset(self.base_dataset_name)
 
@@ -883,13 +901,13 @@ class ReleaseGenerator(ReleaseResource):
 
         self.logger.debug(f"Base release '{self.name}' updated")
 
-    def _cleanup(self):
+    def _cleanup(self) -> None:
         for asset in self.assets:
             asset_location = self._get_asset_location(asset)
             if os.path.isfile(asset_location):
                 os.remove(asset_location)
 
-    def _check_asset_hash(self, asset_name):
+    def _check_asset_hash(self, asset_name: str) -> None:
         local_file_hash = self._read_asset_hash(asset_name)
         expected_hash = self.hashes[asset_name]
 
@@ -909,7 +927,7 @@ class ReleaseGenerator(ReleaseResource):
             f"Asset {asset_name}.txz has a valid signature ({expected_hash})"
         )
 
-    def _read_asset_hash(self, asset_name):
+    def _read_asset_hash(self, asset_name: str) -> str:
         asset_location = self._get_asset_location(asset_name)
         sha256 = hashlib.sha256()
         with open(asset_location, 'rb') as f:
@@ -917,11 +935,11 @@ class ReleaseGenerator(ReleaseResource):
                 sha256.update(block)
         return sha256.hexdigest()
 
-    def _check_tar_files(self, tar_infos, asset_name):
+    def _check_tar_files(self, tar_infos, asset_name: str) -> None:
         for i in tar_infos:
             self._check_tar_info(i, asset_name)
 
-    def _check_tar_info(self, tar_info, asset_name):
+    def _check_tar_info(self, tar_info: typing.Any, asset_name: str) -> None:
         if tar_info.name == ".":
             return
         if not tar_info.name.startswith("./"):
@@ -938,17 +956,29 @@ class ReleaseGenerator(ReleaseResource):
             logger=self.logger
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def destroy(self):
+    def destroy(self, force: bool=False) -> None:
         self.storage.delete_dataset_recursive(self.dataset)
 
 
 class Release(ReleaseGenerator):
 
-    def fetch(self, *args, **kwargs):
-        return list(ReleaseGenerator.fetch(self, *args, **kwargs))
+    def fetch(  # noqa: T484
+        self,
+        update: typing.Optional[bool]=None,
+        fetch_updates: typing.Optional[bool]=None
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
 
-    def update(self, *args, **kwargs):
-        return list(ReleaseGenerator.update(self, *args, **kwargs))
+        return list(ReleaseGenerator.fetch(
+            self,
+            update=update,
+            fetch_updates=fetch_updates
+        ))
+
+    def update(  # noqa: T484
+        self
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+
+        return list(ReleaseGenerator.update(self))

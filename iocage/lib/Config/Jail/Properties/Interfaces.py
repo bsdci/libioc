@@ -25,16 +25,16 @@ import typing
 
 import iocage.lib.helpers
 
-_ConfigType = 'iocage.lib.Config.Jail.JailConfig.JailConfig'
-
 
 class BridgeSet(set):
 
-    config: 'iocage.lib.JailConfig.JailConfig'
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
 
     def __init__(
         self,
-        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None
+        config: typing.Optional[
+            'iocage.lib.Config.Jail.JailConfig.JailConfig'
+        ]=None
     ) -> None:
 
         if config is not None:
@@ -63,7 +63,9 @@ class InterfaceProp(dict):
 
     def __init__(
         self,
-        config: typing.Optional['iocage.lib.JailConfig.JailConfig']=None,
+        config: typing.Optional[
+            'iocage.lib.Config.Jail.JailConfig.JailConfig'
+        ]=None,
         **kwargs
     ) -> None:
 

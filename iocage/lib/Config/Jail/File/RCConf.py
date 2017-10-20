@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import os.path
+import typing
 
 import ucl
 
@@ -29,7 +30,7 @@ import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
 
 # MyPy
-import iocage.lib.LaunchableResource
+import iocage.lib.Logger
 
 
 class RCConf(
@@ -43,8 +44,8 @@ class RCConf(
     def __init__(
         self,
         resource: 'iocage.lib.LaunchableResource.LaunchableResource',
-        file: str=None,
-        logger: 'iocage.lib.Logger.Logger'=None
+        file: typing.Optional[str]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         dict.__init__(self, {})
@@ -138,7 +139,7 @@ class RCConf(
             self._file_content_changed = False
 
     def _read(self, silent=False) -> dict:
-        data = ucl.load(open(self.path).read())
+        data = dict(ucl.load(open(self.path).read()))
         self.logger.spam(f"rc.conf was read from {self.path}")
         return data
 

@@ -23,15 +23,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import os
 import sys
+import typing
 
 import iocage.lib.errors
-
-from typing import List
 
 
 class LogEntry:
 
-    def __init__(self, message, level, indent=0, logger=None, **kwargs):
+    def __init__(
+        self,
+        message: str,
+        level: str,
+        indent: int=0,
+        logger: 'iocage.lib.Logger.Logger'=None,
+        **kwargs
+    ) -> None:
         self.message = message
         self.level = level
         self.indent = indent
@@ -40,7 +46,11 @@ class LogEntry:
         for key in kwargs.keys():
             object.__setattr__(self, key, kwargs[key])
 
-    def edit(self, message=None, indent=None):
+    def edit(
+        self,
+        message: str=None,
+        indent: int=None
+    ) -> None:
 
         if self.logger is None:
             raise iocage.lib.errors.CannotRedrawLine(
@@ -55,7 +65,7 @@ class LogEntry:
 
         self.logger.redraw(self)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.message.split("\n"))
 
 
@@ -76,7 +86,12 @@ class Logger:
     BOLD_SEQ = "\033[1m"
     LINE_UP_SEQ = "\033[F"
 
-    LOG_LEVEL_SETTINGS = {
+    LOG_LEVEL_SETTINGS: typing.Dict[
+        str,
+        typing.Dict[str, typing.Optional[
+            typing.Union[str, bool]]
+        ]
+    ] = {
         "screen": {"color": None},
         "info": {"color": None},
         "notice": {"color": "magenta"},
@@ -102,42 +117,45 @@ class Logger:
 
     INDENT_PREFIX = "  "
 
-    PRINT_HISTORY: List[str] = []
+    PRINT_HISTORY: typing.List[LogEntry] = []
 
-    def __init__(self, print_level=None, log_directory="/var/log/iocage"):
+    def __init__(
+            self,
+            print_level: typing.Optional[str]=None,
+            log_directory: str="/var/log/iocage"
+    ) -> None:
         self._print_level = print_level
         self._set_log_directory(log_directory)
 
     @property
-    def default_print_level(self):
+    def default_print_level(self) -> str:
         return "info"
 
     @property
-    def print_level(self):
+    def print_level(self) -> str:
         if self._print_level is None:
             return self.default_print_level
         else:
             return self._print_level
 
     @print_level.setter
-    def print_level(self, value):
+    def print_level(self, value: str) -> None:
         self._print_level = value
 
-    def _set_log_directory(self, log_directory):
+    def _set_log_directory(self, log_directory: str) -> None:
         self.log_directory = os.path.abspath(log_directory)
         if not os.path.isdir(log_directory):
             self._create_log_directory()
         self.log(f"Log directory set to '{log_directory}'", level="spam")
 
-    def log(self, *args, **kwargs):
+    def log(self, *args, **kwargs) -> LogEntry:
+        log_args = list(args)
 
-        args = list(args)
+        if ("message" not in kwargs) and (len(log_args) > 0):
+            kwargs["message"] = log_args.pop(0)
 
-        if ("message" not in kwargs) and (len(args) > 0):
-            kwargs["message"] = args.pop(0)
-
-        if ("level" not in kwargs) and (len(args) > 0):
-            kwargs["level"] = args.pop(0)
+        if ("level" not in kwargs) and (len(log_args) > 0):
+            kwargs["level"] = log_args.pop(0)
 
         if "level" not in kwargs:
             kwargs["level"] = "info"
@@ -150,28 +168,28 @@ class Logger:
 
         return log_entry
 
-    def verbose(self, message, indent=0, **kwargs):
+    def verbose(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="verbose", indent=indent, **kwargs)
 
-    def error(self, message, indent=0, **kwargs):
+    def error(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="error", indent=indent, **kwargs)
 
-    def warn(self, message, indent=0, **kwargs):
+    def warn(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="warn", indent=indent, **kwargs)
 
-    def debug(self, message, indent=0, **kwargs):
+    def debug(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="debug", indent=indent, **kwargs)
 
-    def spam(self, message, indent=0, **kwargs):
+    def spam(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         return self.log(message, level="spam", indent=indent, **kwargs)
 
-    def screen(self, message, indent=0, **kwargs):
+    def screen(self, message: str, indent: int=0, **kwargs) -> LogEntry:
         """
         Screen never gets printed to log files
         """
         return self.log(message, level="screen", indent=indent, **kwargs)
 
-    def redraw(self, log_entry):
+    def redraw(self, log_entry: LogEntry) -> None:
 
         if log_entry not in self.PRINT_HISTORY:
             raise iocage.lib.errors.CannotRedrawLine(
@@ -182,14 +200,16 @@ class Logger:
             raise iocage.lib.errors.CannotRedrawLine(
                 reason=(
                     "Log level 'screen' is required to redraw, "
-                    f"but got '{self.level}'"
+                    f"but got '{log_entry.level}'"
                 )
             )
 
         # calculate the delta of messages printed since
         i = self.PRINT_HISTORY.index(log_entry)
         n = len(self.PRINT_HISTORY)
-        delta = sum(map(lambda i: len(self.PRINT_HISTORY[i]), range(i, n)))
+        delta = sum(
+            map(lambda i: self.PRINT_HISTORY[i].__len__(), range(i, n))
+        )
 
         output = "".join([
             "\r",
@@ -206,7 +226,7 @@ class Logger:
 
         sys.stdout.write(output)
 
-    def _should_print_log_entry(self, log_entry):
+    def _should_print_log_entry(self, log_entry: LogEntry) -> bool:
 
         if log_entry.level == "screen":
             return True
@@ -217,46 +237,57 @@ class Logger:
         print_level = Logger.LOG_LEVELS.index(self.print_level)
         return Logger.LOG_LEVELS.index(log_entry.level) <= print_level
 
-    def _beautify_message(self, message, level, indent=0):
+    def _beautify_message(
+        self,
+        message: str,
+        level: str,
+        indent: int=0
+    ) -> str:
+
         color = self._get_level_color(level)
         message = self._indent(message, indent)
         message = self._colorize(message, color)
         return message
 
-    def _print(self, message, level, indent=0):
+    def _print(self, message: str, level: str, indent: int=0) -> None:
         print(self._beautify_message(message, level, indent))
 
-    def _print_log_entry(self, log_entry):
+    def _print_log_entry(self, log_entry: LogEntry):
         return self._print(
             log_entry.message,
             log_entry.level,
             log_entry.indent
         )
 
-    def _indent(self, message, level):
+    def _indent(self, message: str, level: int) -> str:
         indent = Logger.INDENT_PREFIX * level
         return "\n".join(map(lambda x: f"{indent}{x}", message.split("\n")))
 
-    def _get_log_file_path(self, level, jail=None):
+    def _get_log_file_path(
+        self,
+        level: str,
+        jail: 'iocage.lib.Jail.JailGenerator'=None
+    ) -> str:
         return self.log_directory
 
-    def _create_log_directory(self):
+    def _create_log_directory(self) -> None:
         if os.geteuid() != 0:
             raise iocage.lib.errors.MustBeRoot(
                 f"create {self.log_directory}")
         os.makedirs(self.log_directory, 0x600)
         self.log(f"Log directory '{self.log_directory}' created", level="info")
 
-    def _get_color_code(self, color_name):
+    def _get_color_code(self, color_name: str) -> int:
         return Logger.COLORS.index(color_name) + 30
 
-    def _get_level_color(self, log_level):
+    def _get_level_color(self, log_level: str) -> str:
         try:
-            return Logger.LOG_LEVEL_SETTINGS[log_level]["color"]
+            log_level_setting = Logger.LOG_LEVEL_SETTINGS[log_level]
+            return str(log_level_setting["color"])
         except KeyError:
             return "none"
 
-    def _colorize(self, message, color_name=None):
+    def _colorize(self, message: str, color_name: str) -> str:
         try:
             color_code = self._get_color_code(color_name)
         except:

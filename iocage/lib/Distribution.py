@@ -28,7 +28,6 @@ import re
 import urllib.request
 import html.parser
 
-
 import iocage.lib.errors
 import iocage.lib.helpers
 
@@ -69,27 +68,31 @@ class DistributionGenerator:
     eol_url: str = "https://www.freebsd.org/security/unsupported.html"
 
     mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
+    available_releases: typing.Optional[
+        typing.List['iocage.lib.Release.ReleaseGenerator']
+    ] = None
 
     def __init__(self, host, zfs=None, logger=None):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        self.available_releases = None
-
     @property
-    def _class_release(self):
+    def _class_release(self) -> typing.Union[
+        'iocage.lib.Release.ReleaseGenerator',
+        'iocage.lib.Release.Release'
+    ]:
         return iocage.lib.Release.ReleaseGenerator
 
     @property
-    def name(self):
+    def name(self) -> str:
         if os.uname()[2].endswith("-HBSD"):
             return "HardenedBSD"
         else:
             return platform.system()
 
     @property
-    def mirror_url(self):
+    def mirror_url(self) -> str:
 
         distribution = self.name
         processor = self.host.processor
@@ -103,19 +106,22 @@ class DistributionGenerator:
             raise iocage.lib.errors.DistributionUnknown(distribution)
 
     @property
-    def hash_file(self):
+    def hash_file(self) -> str:
         if self.name == "FreeBSD":
             return "MANIFEST"
         elif self.name == "HardenedBSD":
             return "CHECKSUMS.SHA256"
+        raise iocage.lib.errors.DistributionUnknown(
+            distribution_name=self.name
+        )
 
-    def fetch_releases(self):
+    def fetch_releases(self) -> None:
 
         self.logger.spam(f"Fetching release list from '{self.mirror_url}'")
 
         # the mirror_url @property is validated (enforced) @property, so:
         resource = urllib.request.urlopen(self.mirror_url)  # nosec
-        charset = resource.headers.get_content_charset()
+        charset = resource.headers.get_content_charset()  # noqa: T484
         response = resource.read().decode(charset if charset else "UTF-8")
 
         found_releases = self._parse_links(response)
@@ -141,19 +147,18 @@ class DistributionGenerator:
             ),
             available_releases
         ))
-        return self.available_releases
 
-    def _map_available_release(self, release_name):
+    def _map_available_release(self, release_name: str) -> str:
         if self.name == "HardenedBSD":
             # e.g. HardenedBSD-11-STABLE-libressl-amd64-LATEST
             return "-".join(release_name.split("-")[1:-2])
         return release_name
 
-    def _filter_available_releases(self, release_name):
+    def _filter_available_releases(self, release_name: str) -> bool:
         if self.name != "HardenedBSD":
             return True
         arch = release_name.split("-")[-2:][0]
-        return self.host.processor == arch
+        return (self.host.processor == arch) is True
 
     def _get_eol_list(self) -> typing.List[str]:
         """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
@@ -195,7 +200,11 @@ class DistributionGenerator:
             )
         return False
 
-    def get_release_trunk_file_url(self, release, filename):
+    def get_release_trunk_file_url(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        filename: str
+    ) -> str:
 
         if self.host.distribution.name == "HardenedBSD":
 
@@ -216,28 +225,41 @@ class DistributionGenerator:
             base_url = "https://svn.freebsd.org/base/release"
             return f"{base_url}/{release_name}/{filename}"
 
+        raise iocage.lib.errors.DistributionUnknown(
+            distribution_name=self.host.distribution.name,
+            logger=self.logger
+        )
+
     @property
-    def releases(self):
+    def releases(self) -> typing.List['iocage.lib.Release.ReleaseGenerator']:
         if self.available_releases is None:
             self.fetch_releases()
-        return self.available_releases
+        if self.available_releases is not None:
+            return self.available_releases
+        raise iocage.lib.errors.ReleaseListUnavailable()
 
-    def _parse_links(self, text):
+    def _parse_links(self, text: str) -> typing.List[str]:
         blacklisted_releases = Distribution.release_name_blacklist
-        matches = filter(lambda y: y not in blacklisted_releases,
-                         map(lambda z: z.strip("\"/"),
-                             re.findall(
-                                 Distribution.mirror_link_pattern,
-                                 text,
-                                 re.MULTILINE)
-                             )
-                         )
+        matches = filter(
+            lambda y: y not in blacklisted_releases,
+            map(
+                lambda z: z.strip("\"/"),
+                re.findall(
+                    Distribution.mirror_link_pattern,
+                    text,
+                    re.MULTILINE
+                )
+            )
+        )
 
-        return matches
+        return list(matches)
 
 
 class Distribution(DistributionGenerator):
 
     @property
-    def _class_release(self):
+    def _class_release(self) -> typing.Union[
+        'iocage.lib.Release.ReleaseGenerator',
+        'iocage.lib.Release.Release'
+    ]:
         return iocage.lib.Release.Release

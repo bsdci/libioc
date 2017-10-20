@@ -22,9 +22,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import re
-from typing import Any, Iterable, List, Union
+import typing
 
 import iocage.lib.errors
+import iocage.lib.helpers
 import iocage.lib.Resource
 
 
@@ -57,7 +58,7 @@ class Term(list):
 
     @property
     def short(self) -> bool:
-        return (self.key == "name")
+        return (self.key == "name") is True
 
     def matches_resource(
         self,
@@ -67,7 +68,7 @@ class Term(list):
 
         return self.matches(value, self.short)
 
-    def matches(self, value: Any, short: bool=False) -> bool:
+    def matches(self, value: typing.Any, short: bool=False) -> bool:
         """
         Returns True if the value matches the term
 
@@ -115,8 +116,8 @@ class Term(list):
                 return True
         return False
 
-    def _split_filter_values(self, user_input: str) -> List[str]:
-        values: List[str] = []
+    def _split_filter_values(self, user_input: str) -> typing.List[str]:
+        values: typing.List[str] = []
         escaped_comma_blocks = map(
             lambda block: block.split(","),
             user_input.split("\\,")
@@ -146,7 +147,9 @@ class Term(list):
             if char not in globs:
                 filter_string_without_globs += char
 
-        return iocage.lib.helpers.validate_name(filter_string_without_globs)
+        return iocage.lib.helpers.validate_name(
+            filter_string_without_globs
+        ) is True
 
 
 class Terms(list):
@@ -157,9 +160,13 @@ class Terms(list):
     This can be interpreted as logical AND
     """
 
-    def __init__(self, terms: Iterable[Union[Term, str]]=None) -> None:
+    def __init__(
+            self,
+            terms: typing.Optional[
+                typing.Iterable[typing.Union[Term, str]]
+            ]=None) -> None:
 
-        data: List[Union[Term, str]] = []
+        data: typing.List[typing.Union[Term, str]] = []
 
         if terms is not None:
 
@@ -204,7 +211,7 @@ class Terms(list):
 
         return True
 
-    def _parse_term(self, user_input: str) -> List[Term]:
+    def _parse_term(self, user_input: str) -> typing.List[Term]:
 
         terms = []
 
