@@ -126,7 +126,8 @@ class ZFSShareStorage:
 
         target_pool_name = self._get_pool_name_from_dataset_name(dataset_name)
 
-        for zpool in list(self.zfs.pools):
+        zpools: typing.List[libzfs.ZFSPool] = list(self.zfs.pools)
+        for zpool in zpools:
             if zpool.name == target_pool_name:
                 return zpool
 
