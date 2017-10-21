@@ -29,6 +29,8 @@ import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
 
+from .shared import IocageClickContext
+
 __rootcmd__ = True
 
 
@@ -42,7 +44,7 @@ __rootcmd__ = True
               help="Skip checks and enforce jail shutdown")
 @click.argument("jails", nargs=-1)
 def cli(
-    ctx: click.core.Context,
+    ctx: IocageClickContext,
     rc: bool,
     log_level: str,
     force: bool,
@@ -61,11 +63,16 @@ def cli(
 
         autostop(logger=logger, print_function=ctx.parent.print_events)
     else:
-        normal(jails, logger=logger, print_function=ctx.parent.print_events, force=force)
+        normal(
+            jails,
+            logger=logger,
+            print_function=ctx.parent.print_events,
+            force=force
+        )
 
 
 def stop_jails(
-    ioc_jails: typing.List[iocage.lib.Jails.JailsGenerator],
+    jails: typing.Iterator[iocage.lib.Jails.JailsGenerator],
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -76,7 +83,7 @@ def stop_jails(
 
     changed_jails = []
     failed_jails = []
-    for jail in ioc_jails:
+    for jail in jails:
         try:
             print_function(jail.stop(force=force))
         except iocage.lib.errors.IocageException:
@@ -109,12 +116,17 @@ def normal(
         logger=logger,
         filters=filters
     )
-    
+
     if len(jails) == 0:
         logger.error("No jail selector provided")
         exit(1)
 
-    stop_jails(jails, logger=logger, print_function=print_function)
+    stop_jails(
+        jails,
+        logger=logger,
+        print_function=print_function,
+        force=force
+    )
 
 
 def autostop(
@@ -138,5 +150,9 @@ def autostop(
         key=lambda x: x.config["priority"]
     ))
 
-    stop_jails(jails, logger=logger, print_function=print_function, force=False)
-
+    stop_jails(
+        jails,
+        logger=logger,
+        print_function=print_function,
+        force=False
+    )
