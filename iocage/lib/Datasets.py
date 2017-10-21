@@ -178,7 +178,7 @@ class Datasets:
     ) -> typing.Optional[str]:
 
         try:
-            zfs_prop: libzfs.ZFSProperty = list(dataset.properties)[prop]
+            zfs_prop = dataset.properties[prop]  # type: libzfs.ZFSProperty
             return str(zfs_prop.value)
         except KeyError:
             return None
