@@ -24,10 +24,6 @@
 import typing
 import click.core
 
-# mypy
-#from ...lib.Logger import Logger
-#from ...lib.events import IocageEvent
-
 
 class IocageClickContext(click.core.Context):
 
