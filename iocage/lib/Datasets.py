@@ -163,11 +163,8 @@ class Datasets:
         prop: str
     ) -> typing.Optional[str]:
 
-        props: typing.List[libzfs.ZFSProperty] = pool.root_dataset.properties
-        if prop in props:
-            ds = pool.root_dataset
-            ps = ds.properties  # type: typing.Dict[str, libzfs.ZFSProperty]
-            zfs_prop = ps[prop]  # type: libzfs.ZFSProperty
+        if prop in pool.root_dataset.properties:
+            zfs_prop = pool.root_dataset.properties[prop]
             return str(zfs_prop.value)
 
         return None
@@ -179,9 +176,7 @@ class Datasets:
     ) -> typing.Optional[str]:
 
         try:
-            ds = dataset
-            ps = ds.properties  # type: typing.Dict[str, libzfs.ZFSProperty]
-            zfs_prop = ps[prop]  # type: libzfs.ZFSProperty
+            zfs_prop = dataset.properties[prop]
             return str(zfs_prop.value)
         except KeyError:
             return None
@@ -213,9 +208,7 @@ class Datasets:
                 f"Set ZFS property {name}='{value}'"
                 f" on dataset '{dataset.name}'"
             )
-            ds = dataset
-            ps = ds.properties  # type: typing.Dict[str, libzfs.ZFSProperty]
-            ps[name] = libzfs.ZFSUserProperty(value)
+            dataset.properties[name] = libzfs.ZFSUserProperty(value)
 
     def _get_or_create_dataset(
         self,
@@ -253,9 +246,7 @@ class Datasets:
 
             if mountpoint is not None:
                 mountpoint_property = libzfs.ZFSUserProperty(mountpoint)
-                d = dataset
-                ps = d.properties  # type: typing.Dict[str, libzfs.ZFSProperty]
-                ps["mountpoint"] = mountpoint_property
+                dataset.properties["mountpoint"] = mountpoint_property
 
             dataset.mount()
 
