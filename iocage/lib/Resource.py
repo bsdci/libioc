@@ -131,7 +131,8 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def pool(self) -> libzfs.ZFSPool:
-        return self.zfs.get_pool(self.dataset_name)
+        zpool: libzfs.ZFSPool = self.zfs.get_pool(self.dataset_name)
+        return zpool
 
     @property
     def pool_name(self) -> str:
@@ -174,12 +175,13 @@ class Resource(metaclass=abc.ABCMeta):
         try:
             return self._dataset
         except AttributeError:
-            dataset = self.zfs.get_dataset(self.dataset_name)
+            name = self.dataset_name
+            dataset: libzfs.ZFSDataset = self.zfs.get_dataset(name)
             self._dataset = dataset
             return dataset
 
     @dataset.setter
-    def dataset(self, value: libzfs.ZFSDataset):
+    def dataset(self, value: libzfs.ZFSDataset) -> None:
         self._set_dataset(value)
 
     def _set_dataset(self, value: libzfs.ZFSDataset) -> None:
@@ -249,7 +251,8 @@ class Resource(metaclass=abc.ABCMeta):
 
     def get_dataset(self, name: str) -> libzfs.ZFSDataset:
         dataset_name = f"{self.dataset_name}/{name}"
-        return self.zfs.get_dataset(dataset_name)
+        dataset: libzfs.ZFSDataset = self.zfs.get_dataset(dataset_name)
+        return dataset
 
     def get_or_create_dataset(self, name: str, **kwargs) -> libzfs.ZFSDataset:
         """
@@ -261,7 +264,11 @@ class Resource(metaclass=abc.ABCMeta):
                 Existing or newly created ZFS Dataset
         """
         dataset_name = f"{self.dataset_name}/{name}"
-        return self.zfs.get_or_create_dataset(dataset_name, **kwargs)
+        dataset: libzfs.ZFSDataset = self.zfs.get_or_create_dataset(
+            dataset_name,
+            **kwargs
+        )
+        return dataset
 
     def abspath(self, relative_path: str) -> str:
         return str(os.path.join(self.dataset.mountpoint, relative_path))
