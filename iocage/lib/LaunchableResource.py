@@ -62,7 +62,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:
         # ToDo: Memoize root_dataset
-        root_dataset = self.get_dataset("root")
+        root_dataset = self.get_dataset("root")  # type: libzfs.ZFSDataset
         self._require_dataset_mounted(root_dataset)
         return root_dataset
 
