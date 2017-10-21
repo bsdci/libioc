@@ -378,6 +378,9 @@ class ListableResource(list, Resource):
                 if self._filters.match_resource(resource):
                     yield resource
 
+    def __len__(self) -> int:
+        return len(list(self.__iter__()))
+
     def _get_asset_name_from_dataset(
         self,
         dataset: libzfs.ZFSDataset

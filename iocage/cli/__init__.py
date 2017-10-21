@@ -113,7 +113,7 @@ class IOCageCLI(click.MultiCommand):
     Iterates in the 'cli' directory and will load any module's cli definition.
     """
 
-    def list_commands(self, ctx):
+    def list_commands(self, ctx: click.core.Context):
         rv = []
 
         for filename in os.listdir(IOCAGE_CMD_FOLDER):
