@@ -319,9 +319,11 @@ class ReleaseGenerator(ReleaseResource):
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:
         try:
-            return self.root_dataset.pool  # type: libzfs.ZFSPool
+            root_pool = self.root_dataset.pool  # type: libzfs.ZFSPool
+            return root_pool
         except:
-            return self.host.datasets.releases.pool  # type: libzfs.ZFSPool
+            pool = self.host.datasets.releases.pool  # type: libzfs.ZFSPool
+            return pool
 
     @property
     def hashes(self):
@@ -654,7 +656,7 @@ class ReleaseGenerator(ReleaseResource):
         """
 
         snapshot_name = f"{self.dataset.name}@{identifier}"
-        existing_snapshot: typing.Optional[libzfs.ZFS.ZFSSnapshot] = None
+        existing_snapshot: typing.Optional[libzfs.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
             if force is False:
