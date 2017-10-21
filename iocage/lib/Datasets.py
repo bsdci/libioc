@@ -163,9 +163,10 @@ class Datasets:
         prop: str
     ) -> typing.Optional[str]:
 
-        if prop in pool.root_dataset.properties:
+        props: typing.List[libzfs.ZFSProperty] = pool.root_dataset.properties
+        if prop in props:
             dataset = pool.root_dataset
-            zfs_prop = dataset.properties[prop]  # type: libzfs.ZFSProperty
+            zfs_prop = dataset.properties[prop]
             return str(zfs_prop.value)
 
         return None
@@ -177,7 +178,7 @@ class Datasets:
     ) -> typing.Optional[str]:
 
         try:
-            zfs_prop: libzfs.ZFSProperty = dataset.properties[prop]
+            zfs_prop: libzfs.ZFSProperty = list(dataset.properties)[prop]
             return str(zfs_prop.value)
         except KeyError:
             return None
