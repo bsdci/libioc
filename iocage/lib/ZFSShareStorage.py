@@ -107,7 +107,7 @@ class ZFSShareStorage:
                 logger=self.logger
             )
 
-            if dataset.properties['mountpoint']:
+            if dataset.properties['mountpoint'] is not None:
                 for child in list(dataset.children):
                     self.jail.storage._ensure_dataset_exists(child)
                     self._mount_jail_dataset(child.name)
