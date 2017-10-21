@@ -7,4 +7,3 @@ flake8-builtins
 flake8-mypy
 bandit
 bandit-high-entropy-string
-git+https://github.com/freenas/py-libzfs.git#egg=libzfs
