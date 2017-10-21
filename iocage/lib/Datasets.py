@@ -237,6 +237,7 @@ class Datasets:
         else:
             target_pool = self.root.pool
 
+        dataset: libzfs.ZFSDataset
         dataset_name = f"{root_dataset_name}/{name}"
         try:
             dataset = self.zfs.get_dataset(dataset_name)
@@ -251,5 +252,4 @@ class Datasets:
             dataset.mount()
 
         self._datasets[dataset_name] = dataset
-
         return dataset

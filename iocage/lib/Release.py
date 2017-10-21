@@ -676,7 +676,8 @@ class ReleaseGenerator(ReleaseResource):
             existing_snapshot = None
 
         self.dataset.snapshot(snapshot_name)
-        return self.zfs.get_snapshot(snapshot_name)
+        snapshot: libzfs.ZFSSnapshot = self.zfs.get_snapshot(snapshot_name)
+        return snapshot
 
     def _update_hbsd_jail(
         self,

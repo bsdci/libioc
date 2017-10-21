@@ -146,4 +146,5 @@ class ResourceConfigZFS(BaseConfigZFS):
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
-        return self.resource.dataset
+        dataset: libzfs.ZFSDataset = self.resource.dataset
+        return dataset
