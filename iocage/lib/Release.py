@@ -112,7 +112,8 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     def base_dataset(self) -> libzfs.ZFSDataset:
         # base datasets are created from releases. required to start
         # zfs-basejails
-        return self.zfs.get_dataset(self.base_dataset_name)
+        ds: libzfs.ZFSDataset = self.zfs.get_dataset(self.base_dataset_name)
+        return ds
 
     @property
     def base_dataset_name(self) -> str:
@@ -318,9 +319,9 @@ class ReleaseGenerator(ReleaseResource):
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:
         try:
-            return self.root_dataset.pool
+            return self.root_dataset.pool  # type: libzfs.ZFSPool
         except:
-            return self.host.datasets.releases.pool
+            return self.host.datasets.releases.pool  # type: libzfs.ZFSPool
 
     @property
     def hashes(self):
