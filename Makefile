@@ -5,16 +5,16 @@ MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 deps:
 	which pkg && pkg install -q -y libucl cython3 rsync python36 py36-libzfs || true
 	python3.6 -m ensurepip
-	pip3.6 install -Ur requirements.txt
+	python3.6 -m pip install -Ur requirements.txt
 install: deps
-	pip3.6 install -U .
+	python3.6 -m pip install -U .
 install-dev: deps
-	pip3.6 install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
-	pip3.6 install -e .
+	python3.6 -m pip install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
+	python3.6 -m pip install -e .
 install-travis:
-	pip3.6 install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
+	python3.6 -m pip install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 uninstall:
-	pip3.6 uninstall -y iocage
+	python3.6 -m pip uninstall -y iocage
 check:
 	flake8 --exclude=".*" --exclude=__init__.py --ignore=E203,W391
 	bandit --skip B404 --exclude iocage/tests/ -r .
