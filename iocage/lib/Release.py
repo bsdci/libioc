@@ -659,7 +659,7 @@ class ReleaseGenerator(ReleaseResource):
         existing_snapshot: typing.Optional[libzfs.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
-            if force is False:
+            if (force is False) and (existing_snapshot is not None):
                 self.logger.verbose(
                     f"Re-using release snapshot {self.name}@{identifier}"
                 )
