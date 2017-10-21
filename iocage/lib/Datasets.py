@@ -68,7 +68,8 @@ class Datasets:
 
     @property
     def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
-        for pool in self.zfs.pools:
+        zpools: typing.List[libzfs.ZFSPool] = list(self.zfs.pools)
+        for pool in zpools:
             if self._is_pool_active(pool):
                 return pool
         return None
