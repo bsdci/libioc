@@ -212,5 +212,5 @@ class Storage:
         folder = f"{self.jail.root_dataset.mountpoint}{directory}"
         if not os.path.isdir(folder):
             os.makedirs(folder, permissions)
-            os.chown(folder, uid, gid, follow_symlinks=False)  # type: ignore
+            os.chown(folder, uid, gid, follow_symlinks=False)
         return str(os.path.abspath(folder))
