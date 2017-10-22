@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import json
 import os
 import subprocess  # nosec: B404
 import uuid
@@ -1055,7 +1056,6 @@ class JailGenerator(JailResource):
         Invoke update of the jail state from jls output
         """
         try:
-            import json
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
                 "-j",
