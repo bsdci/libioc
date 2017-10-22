@@ -78,6 +78,7 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
         kwargs["host"] = self.host
         kwargs["zfs"] = self.zfs
         jail = self._class_jail(*args, **kwargs)
+        jail.state = 
         return jail
 
     @property
