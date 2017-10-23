@@ -57,7 +57,7 @@ class Prototype:
         try:
             with open(self.file, "r") as data:
                 return self.map_input(data)
-        except:
+        except FileNotFoundError:
             return {}
 
     def write(self, data: dict) -> None:

@@ -321,7 +321,7 @@ class ReleaseGenerator(ReleaseResource):
         try:
             root_pool = self.root_dataset.pool  # type: libzfs.ZFSPool
             return root_pool
-        except:
+        except AttributeError:
             pool = self.host.datasets.releases.pool  # type: libzfs.ZFSPool
             return pool
 
@@ -712,7 +712,7 @@ class ReleaseGenerator(ReleaseResource):
 
             self.logger.debug(f"Update of release '{self.name}' finished")
 
-        except:
+        except Exception:
 
             raise iocage.lib.errors.ReleaseUpdateFailure(
                 release_name=self.name,

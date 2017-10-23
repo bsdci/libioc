@@ -108,7 +108,7 @@ class RCConf(
                 data = self._read(silent=silent)
             else:
                 data = {}
-        except:
+        except (FileNotFoundError, ValueError):
             data = {}
 
         existing_keys = set(self.keys())

@@ -462,7 +462,7 @@ class JailGenerator(JailResource):
             self.logger.verbose(
                 f"Dataset {current_dataset_name} renamed to {new_dataset_name}"
             )
-        except:
+        except BaseException:
             self.config["id"] = current_id
             raise
 
@@ -477,7 +477,7 @@ class JailGenerator(JailResource):
 
         try:
             self._run_hook("prestop")
-        except:
+        except Exception:
             self.logger.warn("pre-stop script failed")
 
         yield jailDestroyEvent.begin()
@@ -851,12 +851,12 @@ class JailGenerator(JailResource):
 
             try:
                 ipv4_addresses = self.config["ip4_addr"][nic]
-            except:
+            except KeyError:
                 ipv4_addresses = []
 
             try:
                 ipv6_addresses = self.config["ip6_addr"][nic]
-            except:
+            except KeyError:
                 ipv6_addresses = []
 
             net = iocage.lib.Network.Network(
@@ -1135,7 +1135,7 @@ class JailGenerator(JailResource):
         """
         try:
             return str(iocage.lib.helpers.to_humanreadable_name(self.name))
-        except:
+        except KeyError:
             raise iocage.lib.errors.JailUnknownIdentifier(
                 logger=self.logger
             )
@@ -1214,7 +1214,7 @@ class JailGenerator(JailResource):
 
         try:
             return object.__getattribute__(self, "state")[key]
-        except KeyError:
+        except (AttributeError, KeyError):
             pass
 
         raise AttributeError(f"Jail property {key} not found")

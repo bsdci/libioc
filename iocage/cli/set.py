@@ -25,6 +25,7 @@
 import typing
 import click
 
+import iocage.lib.errors
 import iocage.lib.Logger
 import iocage.lib.helpers
 import iocage.lib.Resource
@@ -111,8 +112,7 @@ def set_properties(
             try:
                 del target.config[key]
                 updated_properties.add(key)
-            except:
-                raise
+            except iocage.lib.errors.IocageException:
                 pass
 
     if len(updated_properties) > 0:

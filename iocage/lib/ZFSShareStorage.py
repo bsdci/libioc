@@ -72,7 +72,7 @@ class ZFSShareStorage:
             try:
                 dataset = self.zfs.get_dataset(name)
                 datasets.add(dataset)
-            except:
+            except libzfs.ZFSException:
                 raise iocage.lib.errors.DatasetNotAvailable(
                     dataset_name=name,
                     logger=self.logger
