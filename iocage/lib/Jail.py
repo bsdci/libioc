@@ -22,7 +22,6 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import json
 import os
 import subprocess  # nosec: B404
 import uuid
@@ -32,6 +31,7 @@ import iocage.lib.Types
 import iocage.lib.errors
 import iocage.lib.events
 import iocage.lib.helpers
+import iocage.lib.JailState
 import iocage.lib.DevfsRules
 import iocage.lib.Host
 import iocage.lib.Config.Jail.JailConfig
@@ -193,8 +193,7 @@ class JailGenerator(JailResource):
     """
 
     _class_storage = iocage.lib.Storage.Storage
-
-    jail_state: dict = {}
+    _state: typing.Optional[iocage.lib.JailState.JailState]
 
     def __init__(
         self,
@@ -267,6 +266,18 @@ class JailGenerator(JailResource):
             self.config.read(data=self.read_config())
             if self.config["id"] is None:
                 self.config["id"] = self.dataset_name.split("/").pop()
+
+    @property
+    def state(self) -> iocage.lib.JailState.JailState:
+        current_state = object.__getattribute__(self, "_state")
+        if current_state is None:
+            self._state = iocage.lib.JailState.JailState(self.identifier)
+            self._state.query()
+        return object.__getattribute__(self, "_state")
+
+    @state.setter
+    def state(self, value: iocage.lib.JailState):
+        object.__setattr__(self, '_state', value)
 
     def start(
         self,
@@ -408,7 +419,7 @@ class JailGenerator(JailResource):
         self._teardown_mounts()
         yield jailMountTeardownEvent.end()
 
-        self.update_jail_state()
+        self.state.update()
 
     def destroy(self, force: bool=False) -> None:
         """
@@ -422,7 +433,7 @@ class JailGenerator(JailResource):
                 requires it to be stopped.
         """
 
-        self.update_jail_state()
+        self.state.update()
 
         if self.running is True and force is True:
             self.stop(force=True)
@@ -495,7 +506,7 @@ class JailGenerator(JailResource):
             yield jailMountTeardownEvent.skip()
 
         try:
-            self.update_jail_state()
+            self.state.update()
         except Exception as e:
             self.logger.warn(str(e))
 
@@ -800,7 +811,7 @@ class JailGenerator(JailResource):
         humanreadable_name = self.humanreadable_name
         try:
             iocage.lib.helpers.exec(command, logger=self.logger)
-            self.update_jail_state()
+            self.state.update()
             self.logger.verbose(
                 f"Jail '{humanreadable_name}' started with JID {self.jid}",
                 jail=self
@@ -1051,26 +1062,6 @@ class JailGenerator(JailResource):
                 **kwargs
             )
 
-    def update_jail_state(self) -> None:
-        """
-        Invoke update of the jail state from jls output
-        """
-        try:
-            stdout = subprocess.check_output([
-                "/usr/sbin/jls",
-                "-j",
-                self.identifier,
-                "-v",
-                "-h",
-                "--libxo=json"
-            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            output = stdout.decode().strip()
-
-            self.jail_state = json.loads(output)["jail-information"]["jail"][0]
-
-        except:
-            self.jail_state = {}
-
     def _teardown_mounts(self) -> None:
 
         mountpoints = list(filter(
@@ -1169,14 +1160,8 @@ class JailGenerator(JailResource):
         The JID of a running jail or None if the jail is not running
         """
         try:
-            return int(self.jail_state["jid"])
+            return int(self.state["jid"])
         except KeyError:
-            pass
-
-        try:
-            self.update_jail_state()
-            return int(self.jail_state["jid"])
-        except (TypeError, AttributeError, KeyError):
             return None
 
     @property
@@ -1227,10 +1212,10 @@ class JailGenerator(JailResource):
         except AttributeError:
             pass
 
-        jail_state = self.jail_state
-
-        if (len(jail_state) > 0) and key in jail_state.keys():
-            return jail_state[key]
+        try:
+            return object.__getattribute__(self, "state")[key]
+        except KeyError:
+            pass
 
         raise AttributeError(f"Jail property {key} not found")
 
