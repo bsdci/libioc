@@ -113,7 +113,7 @@ class InterfaceProp(dict):
 
         try:
             prop = dict.__getitem__(self, jail_if)
-        except:
+        except KeyError:
             prop = self.__empty_prop(jail_if)
 
         for bridge_if in bridges:

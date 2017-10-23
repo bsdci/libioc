@@ -183,7 +183,7 @@ class BaseConfig(dict):
         else:
             try:
                 self.data["id"] = str(uuid.UUID(name))  # legacy support
-            except:
+            except ValueError:
                 raise iocage.lib.errors.InvalidJailName(logger=self.logger)
 
     def _get_name(self) -> str:
@@ -364,7 +364,7 @@ class BaseConfig(dict):
     def _get_cloned_release(self) -> typing.Optional[str]:
         try:
             return str(self.data["cloned_release"])
-        except:
+        except KeyError:
             release = self["release"]
             if isinstance(release, str):
                 return str(self["release"])

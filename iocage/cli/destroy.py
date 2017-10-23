@@ -25,6 +25,7 @@
 import click
 import typing
 
+import iocage.lib.errors
 import iocage.lib.Filter
 import iocage.lib.Jail
 import iocage.lib.Jails
@@ -94,7 +95,7 @@ def cli(ctx,
         if isinstance(item, iocage.lib.Jail.JailGenerator):
             try:
                 item.require_jail_stopped()
-            except:
+            except iocage.lib.errors.IocageException:
                 logger.log(
                     f"Jail '{item.name}' must be stopped before destruction"
                 )

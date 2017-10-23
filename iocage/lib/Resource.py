@@ -142,7 +142,7 @@ class Resource(metaclass=abc.ABCMeta):
     def exists(self) -> bool:
         try:
             return os.path.isdir(self.dataset.mountpoint)
-        except:
+        except (AttributeError, libzfs.ZFSException):
             return False
 
     @property

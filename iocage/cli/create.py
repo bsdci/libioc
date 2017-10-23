@@ -24,6 +24,7 @@
 """create module for the cli."""
 import click
 
+import iocage.lib.errors
 import iocage.lib.Host
 import iocage.lib.Jail
 import iocage.lib.Logger
@@ -170,8 +171,7 @@ def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
                 f" from {resource.name}!{suffix}"
             )
             logger.log(msg)
-        except:
-            raise
+        except iocage.lib.errors.IocageException:
             msg = f"{jail.humanreadable_name} could not be created!{suffix}"
             logger.warn(msg)
 

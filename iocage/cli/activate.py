@@ -24,6 +24,7 @@
 """activate module for the cli."""
 import click
 
+import iocage.lib.errors
 import iocage.lib.Datasets
 import iocage.lib.Logger
 import iocage.lib.ZFS
@@ -60,5 +61,5 @@ def cli(ctx, zpool, mountpoint):
         )
         datasets.activate(mountpoint=mountpoint)
         logger.log(f"ZFS pool '{zpool}' activated")
-    except:
+    except iocage.lib.errors.IocageException:
         exit(1)

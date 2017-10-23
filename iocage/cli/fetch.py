@@ -82,7 +82,7 @@ def cli(ctx, **kwargs):
                 host=host,
                 logger=logger
             )
-        except:
+        except Exception:
             logger.error(f"Invalid Release '{release_input}'")
             exit(1)
 

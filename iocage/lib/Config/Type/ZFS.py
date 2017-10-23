@@ -53,7 +53,7 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
     def read(self) -> dict:
         try:
             return self.map_input(self._read_properties())
-        except:
+        except AttributeError:
             return {}
 
     def write(self, data: dict) -> None:
