@@ -29,12 +29,11 @@ import iocage.lib.Filter
 import iocage.lib.Resource
 import iocage.lib.helpers
 
-JailStateDict = typing.Dict[str, iocage.lib.JailState.JailState]
 
 class JailsGenerator(iocage.lib.Resource.ListableResource):
 
     _class_jail = iocage.lib.Jail.JailGenerator
-    _jail_states: typing.Optional[JailStateDict]
+    states = iocage.lib.JailState.JailStates()
 
     # Keys that are stored on the Jail object, not the configuration
     JAIL_KEYS = [
@@ -78,40 +77,32 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
         kwargs["host"] = self.host
         kwargs["zfs"] = self.zfs
         jail = self._class_jail(*args, **kwargs)
-        jail.state = 
+
+        if jail.identifier in self.states:
+            self.logger.spam(
+                f"Injecting pre-loaded state to '{jail.humanreadable_name}'"
+            )
+            jail.jail_state = self.states[jail.identifier]
+
         return jail
 
-    @property
-    def states(self) -> JailStateDict
-        if isinstance(self._states, JailStateDict):
-            return self._jail_states
-        return self.update_jail_states()
+    def __iter__(
+        self
+    ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
 
-    def update_jail_states(self) -> JailStateDict:
-        """
-        Invoke update of the jail state from jls output
-        """
-        try:
-            stdout = subprocess.check_output([
-                "/usr/sbin/jls",
-                "-v",
-                "-h",
-                "--libxo=json"
-            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            output = stdout.decode().strip()
+        self.states.query()
 
-            import json
-            data = json.loads(output)
+        for jail in iocage.lib.Resource.ListableResource.__iter__(self):
 
-            states: JailStateDict = {}
-            for state_data in data["jail-information"]["jail"]:
-                states[state_data["name"]] = iocage.lib.JailState(state_data)
+            if jail.identifier in self.states:
+                jail.state = self.states[jail.identifier]
+            else:
+                jail.state = iocage.lib.JailState.JailState(
+                    jail.identifier, {}
+                )
 
-            self._states = states
-            return states
+            yield jail
 
-        except BaseException:
-            raise iocage.lib.errors.JailStateUpdateFailed()
 
 class Jails(JailsGenerator):
 

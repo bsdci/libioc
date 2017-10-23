@@ -22,82 +22,105 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import json
+import subprocess
 
-class JailStateData:
+import iocage.lib.errors
 
-  # jail.identifier
-  name: str;
-
-  devfs_ruleset: typing.Optional[str];
-  dying: typing.Optional[str];
-  enforce_statfs: typing.Optional[str];
-  host: typing.Optional[str];
-  ip4: typing.Optional[str];
-  ip6: typing.Optional[str];
-  jid: typing.Optional[str];
-  osreldate: typing.Optional[str];
-  osrelease: typing.Optional[str];
-  parent: typing.Optional[str];
-  path: typing.Optional[str];
-  persist: typing.Optional[str];
-  securelevel: typing.Optional[str];
-  sysvmsg: typing.Optional[str];
-  sysvsem: typing.Optional[str];
-  sysvshm: typing.Optional[str];
-  vnet: typing.Optional[str];
-  allow.chflags: typing.Optional[str];
-  allow.mount: typing.Optional[str];
-  allow.mount.devfs: typing.Optional[str];
-  allow.mount.fdescfs: typing.Optional[str];
-  allow.mount.linprocfs: typing.Optional[str];
-  allow.mount.linsysfs: typing.Optional[str];
-  allow.mount.nullfs: typing.Optional[str];
-  allow.mount.procfs: typing.Optional[str];
-  allow.mount.tmpfs: typing.Optional[str];
-  allow.mount.zfs: typing.Optional[str];
-  allow.quotas: typing.Optional[str];
-  allow.raw_sockets: typing.Optional[str];
-  allow.set_hostname: typing.Optional[str];
-  allow.socket_af: typing.Optional[str];
-  allow.sysvipc: typing.Optional[str];
-  children.cur: typing.Optional[str];
-  children.max: typing.Optional[str];
-  cpuset.id: typing.Optional[str];
-  host.domainname: typing.Optional[str];
-  host.hostid: typing.Optional[str];
-  host.hostname: typing.Optional[str];
-  host.hostuuid: typing.Optional[str];
-  ip4.saddrsel: typing.Optional[str];
-  ip6.saddrsel: typing.Optional[str];
-
-class JailState(JailStateData):
-
-  def __init__(
-    self,
-    data: JailStateData
-  ) -> None:
+JailStatesDict = typing.Dict[str, 'JailState']
 
 
-    self.name = 
+def _parse_json(data: str) -> JailStatesDict:
+    output: typing.Dict[str, 'JailState'] = {}
+    jail_states = json.loads(data)["jail-information"]["jail"]
+    for jail_state_data in jail_states:
+        identifier = jail_state_data["name"]
+        output[identifier] = JailState(identifier, jail_state_data)
+    return output
 
-  def update(self) -> None:
 
-    if self.name 
+class JailState(dict):
 
-    try:
-        import json
-        stdout = subprocess.check_output([
-            "/usr/sbin/jls",
-            "-j",
-            self.name,
-            "-v",
-            "-h",
-            "--libxo=json"
-        ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-        output = stdout.decode().strip()
+    name: str
+    _data: typing.Optional[typing.Dict[str, str]] = None
+    updated = False
 
-        self.jail_state = json.loads(output)["jail-information"]["jail"][0]
+    def __init__(
+        self,
+        name: str,
+        data: typing.Optional[typing.Dict[str, str]]=None
+    ) -> None:
 
-    except:
-        self.jail_state = {}
+        self.name = name
 
+        if data is not None:
+            self._data = data
+
+    def query(self) -> typing.Dict[str, str]:
+
+        data: typing.Dict[str, str] = {}
+        try:
+            stdout = subprocess.check_output([
+                "/usr/sbin/jls",
+                "-j",
+                self.name,
+                "-v",
+                "-h",
+                "--libxo=json"
+            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
+            output = stdout.decode().strip()
+            data = _parse_json(output)[self.name]
+        except (subprocess.CalledProcessError, KeyError):
+            pass
+
+        self._data = data
+        return data
+
+    @property
+    def data(self) -> typing.Dict[str, str]:
+        if self._data is None:
+            self._data = self.query()
+        return self._data
+
+    def __getitem__(self, name: str) -> str:
+        return self.data[name]
+
+    def __iter__(
+        self
+    ) -> typing.Iterator[str]:
+        return self.data.__iter__()
+
+    def keys(self):
+        return self.data.keys()
+
+
+class JailStates(dict):
+
+    def __init__(
+        self,
+        states: typing.Optional[JailStatesDict]=None
+    ) -> None:
+
+        if states is None:
+            dict.__init__(self, {})
+        else:
+            dict.__init__(self, states)
+
+    def query(self):
+        """
+        Invoke update of the jail state from jls output
+        """
+        try:
+            stdout = subprocess.check_output([
+                "/usr/sbin/jls",
+                "-v",
+                "-h",
+                "--libxo=json"
+            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
+            output = stdout.decode().strip()
+            output_data = _parse_json(output)
+            for name in output_data:
+                dict.__setitem__(self, name, output_data[name])
+
+        except BaseException:
+            raise iocage.lib.errors.JailStateUpdateFailed()
