@@ -563,8 +563,7 @@ class JailGenerator(JailResource):
     ) -> None:
 
         if self.config["id"] is None:
-            import uuid
-            self.config["id"] = str(uuid.uuid4())
+            self.config["id"] = str(iocage.lib.helpers.get_random_uuid())
 
         self.require_jail_not_existing()
 

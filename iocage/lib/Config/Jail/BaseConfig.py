@@ -23,7 +23,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import re
-import uuid
 
 import iocage.lib.Config.Jail.JailConfigProperties
 import iocage.lib.errors
@@ -181,9 +180,9 @@ class BaseConfig(dict):
         if is_valid_name is True:
             self.data["id"] = name
         else:
-            try:
-                self.data["id"] = str(uuid.UUID(name))  # legacy support
-            except ValueError:
+            if iocage.lib.helpers.is_uuid(name) is True:
+                self.data["id"] = name
+            else:
                 raise iocage.lib.errors.InvalidJailName(logger=self.logger)
 
     def _get_name(self) -> str:
