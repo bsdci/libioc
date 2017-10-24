@@ -23,9 +23,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import json
+import random
 import re
 import subprocess  # nosec: B404
-import uuid
 
 import iocage.lib.errors
 import iocage.lib.Datasets
@@ -156,11 +156,16 @@ def _prettify_output(output: str) -> str:
 
 
 def to_humanreadable_name(name: str) -> str:
-    try:
-        uuid.UUID(name)
-        return str(name)[:8]
-    except (TypeError, ValueError):
-        return name
+    return name[:8] if (is_uuid(name) is True) else name
+
+
+_UUID_REGEX = re.compile(
+    "^[A-z0-9]{8}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{12}$"
+)
+
+
+def is_uuid(text: str) -> bool:
+    return _UUID_REGEX.match(text) is not None
 
 
 # helper function to validate names
@@ -456,6 +461,13 @@ def umount(
                 mountpoint=mountpoint,
                 logger=logger
             )
+
+
+def get_random_uuid() -> str:
+    return "-".join(map(
+        lambda x: ('%030x' % random.randrange(16**x))[-x:],
+        [8, 4, 4, 4, 12]
+    ))
 
 
 def get_basedir_list(distribution_name="FreeBSD"):

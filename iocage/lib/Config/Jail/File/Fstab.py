@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import os.path
-import uuid
+import random
 
 import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
@@ -71,7 +71,7 @@ class FstabCommentLine(dict):
         return str(self["line"])
 
     def __hash__(self):
-        return hash(uuid.uuid4().hex)
+        return hash('%030x' % random.randrange(16**32))
 
 
 class FstabAutoPlaceholderLine(dict):
