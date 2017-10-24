@@ -24,7 +24,6 @@
 import typing
 import os
 import subprocess  # nosec: B404
-import uuid
 import shlex
 
 import iocage.lib.Types
@@ -564,6 +563,7 @@ class JailGenerator(JailResource):
     ) -> None:
 
         if self.config["id"] is None:
+            import uuid
             self.config["id"] = str(uuid.uuid4())
 
         self.require_jail_not_existing()
