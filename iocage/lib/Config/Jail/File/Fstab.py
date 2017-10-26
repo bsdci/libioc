@@ -71,7 +71,7 @@ class FstabCommentLine(dict):
         return str(self["line"])
 
     def __hash__(self):
-        return hash('%030x' % random.randrange(16**32))
+        return hash('%030x' % random.randrange(16**32))  # nosec: B311
 
 
 class FstabAutoPlaceholderLine(dict):
