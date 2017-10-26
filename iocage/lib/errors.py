@@ -249,7 +249,7 @@ class IocageNotActivated(IocageException):
     def __init__(self, *args, **kwargs) -> None:
         msg = (
             "iocage is not activated yet - "
-            "please run `iocage activate` first and select a pool"
+            "please run `ioc activate <POOL>` first and select a pool"
         )
         super().__init__(msg, *args, **kwargs)
 
