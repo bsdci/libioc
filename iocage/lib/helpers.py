@@ -465,7 +465,7 @@ def umount(
 
 def get_random_uuid() -> str:
     return "-".join(map(
-        lambda x: ('%030x' % random.randrange(16**x))[-x:],
+        lambda x: ('%030x' % random.randrange(16**x))[-x:],  # nosec: B311
         [8, 4, 4, 4, 12]
     ))
 
