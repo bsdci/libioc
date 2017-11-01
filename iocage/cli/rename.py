@@ -39,8 +39,10 @@ def cli(ctx, jail, name):
     """
 
     logger = ctx.parent.logger
+    print_function = ctx.parent.print_events
+
     try:
         ioc_jail = iocage.lib.Jail.Jail(jail, logger=logger)
-        ioc_jail.rename(name)
+        print_function(ioc_jail.rename(name))
     except iocage.lib.errors.IocageException:
         exit(1)
