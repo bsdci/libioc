@@ -133,6 +133,13 @@ class JailUnknownIdentifier(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+class JailBackendMissing(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = "The jail backend is unknown"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 class JailIsTemplate(IocageException):
 
     def __init__(self, jail, *args, **kwargs) -> None:

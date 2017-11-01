@@ -1,3 +1,4 @@
+
 # Copyright (c) 2014-2017, iocage
 # All rights reserved.
 #
@@ -268,15 +269,21 @@ class JailGenerator(JailResource):
 
     @property
     def state(self) -> iocage.lib.JailState.JailState:
-        current_state = object.__getattribute__(self, "_state")
-        if current_state is None:
-            self._state = iocage.lib.JailState.JailState(self.identifier)
-            self._state.query()
+        if "_state" not in object.__dir__(self):
+            return self._init_state()
+        elif object.__getattribute__(self, "_state") is None:
+            return self._init_state()
         return object.__getattribute__(self, "_state")
 
     @state.setter
     def state(self, value: iocage.lib.JailState):
         object.__setattr__(self, '_state', value)
+
+    def _init_state(self) -> iocage.lib.JailState.JailState:
+        state = iocage.lib.JailState.JailState(self.identifier)
+        self.state = state
+        state.query()
+        return state
 
     def start(
         self,
@@ -441,28 +448,48 @@ class JailGenerator(JailResource):
 
         self.storage.delete_dataset_recursive(self.dataset)
 
-    def rename(self, new_name: str) -> None:
+    def rename(
+        self,
+        new_name: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Change the name of a jail
         """
 
         self.require_jail_existing()
         self.require_jail_stopped()
+        self.require_storage_backend()
 
         current_id = self.config["id"]
-        dataset = self.dataset
-        current_dataset_name = dataset.name
+
+        jailRenameEvent = iocage.lib.events.JailRename(
+            jail=self,
+            current_name=current_id,
+            new_name=new_name
+        )
 
         self.config["id"] = new_name  # validates new_name
+
+        yield jailRenameEvent.begin()
         self.logger.debug(f"Renaming jail {current_id} to {new_name}")
-        try:
-            new_dataset_name = self._dataset_name_from_jail_name
-            dataset.rename(new_dataset_name)
-            self.logger.verbose(
-                f"Dataset {current_dataset_name} renamed to {new_dataset_name}"
-            )
-        except BaseException:
+
+        def revert_id_change() -> None:
             self.config["id"] = current_id
+            self.logger.debug(f"Jail id reverted to {current_id}")
+        jailRenameEvent.add_rollback_step(revert_id_change)
+
+        try:
+            events = self.storage_backend.rename(
+                self.storage,
+                new_name=new_name
+            )
+            for event in events:
+                yield jailRenameEvent.child_event(event)
+                if event.error is not None:
+                    raise event.error
+            yield jailRenameEvent.end()
+        except BaseException as e:
+            yield jailRenameEvent.fail(e)
             raise
 
     def _force_stop(
@@ -580,20 +607,21 @@ class JailGenerator(JailResource):
         self.get_or_create_dataset("root")
         self._update_fstab()
 
-        backend = None
-
-        is_basejail = self.config.get("basejail", False)
-        if not is_basejail:
-            backend = iocage.lib.StandaloneJailStorage.StandaloneJailStorage
-        if is_basejail and self.config["basejail_type"] == "nullfs":
-            backend = iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
-        elif is_basejail and self.config["basejail_type"] == "zfs":
-            backend = iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
-
+        backend = self.storage_backend
         if backend is not None:
             backend.setup(self.storage, resource)
 
         self.save()
+
+    @property
+    def storage_backend(self) -> iocage.lib.Storage.Storage:
+        is_basejail = self.config.get("basejail", False)
+        if not is_basejail:
+            return iocage.lib.StandaloneJailStorage.StandaloneJailStorage
+        if is_basejail and self.config["basejail_type"] == "nullfs":
+            return iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
+        elif is_basejail and self.config["basejail_type"] == "zfs":
+            return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
     def save(self) -> None:
         self.write_config(self.config.data)
@@ -1006,6 +1034,13 @@ class JailGenerator(JailResource):
                 **kwargs
             )
 
+    def require_storage_backend(self) -> None:
+        """
+        Raise if the jail was not initialized with a storage backend
+        """
+        if self.storage_backend is None:
+            raise Exception("")
+
     def require_jail_not_template(self, **kwargs) -> None:
         """
         Raise JailIsTemplate exception if the jail is a template
@@ -1043,7 +1078,7 @@ class JailGenerator(JailResource):
         """
         Raise JailAlreadyRunning exception if the jail is runninhg
         """
-        if self.running:
+        if self.running is not False:
             raise iocage.lib.errors.JailAlreadyRunning(
                 jail=self,
                 logger=self.logger,
@@ -1158,9 +1193,14 @@ class JailGenerator(JailResource):
         """
         The JID of a running jail or None if the jail is not running
         """
+
+        # force state init when jid was requested
+        if "_state" not in object.__dir__(self):
+            self._init_state()
+
         try:
             return int(self.state["jid"])
-        except KeyError:
+        except (KeyError, TypeError):
             return None
 
     @property
@@ -1183,7 +1223,8 @@ class JailGenerator(JailResource):
         """
         Used internally to identify jails (in snapshots, jls, etc)
         """
-        return f"ioc-{self.config['id']}"
+        config = object.__getattribute__(self, 'config')
+        return f"ioc-{config['id']}"
 
     @property
     def release(self):
@@ -1211,10 +1252,11 @@ class JailGenerator(JailResource):
         except AttributeError:
             pass
 
-        try:
-            return object.__getattribute__(self, "state")[key]
-        except (AttributeError, KeyError):
-            pass
+        if "_state" in object.__dir__(self):
+            try:
+                return object.__getattribute__(self, "state")[key]
+            except (AttributeError, KeyError):
+                pass
 
         raise AttributeError(f"Jail property {key} not found")
 
@@ -1246,3 +1288,11 @@ class Jail(JailGenerator):
     ) -> typing.List['iocage.lib.events.IocageEvent']:
 
         return list(JailGenerator.stop(self, *args, **kwargs))
+
+    def rename(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+
+        return list(JailGenerator.rename(self, *args, **kwargs))

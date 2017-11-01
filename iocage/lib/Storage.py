@@ -28,6 +28,7 @@ import typing
 
 import libzfs
 
+import iocage.lib.events
 import iocage.lib.helpers
 
 
@@ -63,6 +64,68 @@ class Storage:
             f"Cloned release '{release.name}' to {jail_name}",
             jail=self.jail
         )
+
+    def rename(
+        self,
+        new_name: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        for event in self._rename_dataset(new_name):
+            yield event
+
+        for event in self._rename_snapshot(new_name):
+            yield event
+
+    def _rename_dataset(
+        self,
+        new_name: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        current_dataset_name = self.jail.dataset.name
+        renameDatasetEvent = iocage.lib.events.ZFSDatasetRename(
+            dataset=self.jail.dataset
+        )
+        yield renameDatasetEvent.begin()
+
+        try:
+            new_dataset_name = "/".join([
+                self.jail.host.datasets.jails.name,
+                new_name
+            ])
+            self.jail.dataset.rename(new_dataset_name)
+            self.jail.dataset_name = new_dataset_name
+            self.logger.verbose(
+                f"Dataset {current_dataset_name} renamed to {new_dataset_name}"
+            )
+            yield renameDatasetEvent.end()
+        except BaseException as e:
+            yield renameDatasetEvent.fail(e)
+
+    def _rename_snapshot(
+        self,
+        new_name: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        root_dataset_properties = self.jail.root_dataset.properties
+
+        if "origin" not in root_dataset_properties:
+            return
+
+        snapshot = self.zfs.get_snapshot(
+            root_dataset_properties["origin"].value
+        )
+
+        renameSnapshotEvent = iocage.lib.events.ZFSSnapshotRename(
+            snapshot=self.jail.dataset
+        )
+        yield renameSnapshotEvent.begin()
+
+        try:
+            new_snapshot_name = f"{snapshot.parent.name}@{new_name}"
+            snapshot.rename(new_snapshot_name)
+            yield renameSnapshotEvent.end()
+        except BaseException as e:
+            yield renameSnapshotEvent.fail(e)
 
     def delete_dataset_recursive(
         self,

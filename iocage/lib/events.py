@@ -29,6 +29,7 @@ import iocage.lib.errors
 # MyPy
 import iocage.lib.Jail  # noqa: F401
 import iocage.lib.Release  # noqa: F401
+import libzfs
 
 EVENT_STATUS = (
     "pending",
@@ -54,7 +55,10 @@ class IocageEvent:
     _pending: bool = False
     skipped: bool = False
     done: bool = True
+    reverted: bool = False
     error: typing.Optional[BaseException] = None
+    _rollback_steps: typing.List[typing.Callable[[], None]] = []
+    _child_events: typing.List['IocageEvent'] = []
 
     def __init__(
             self,
@@ -96,6 +100,28 @@ class IocageEvent:
             return done
 
         return pending
+
+    def child_event(self, event: 'IocageEvent') -> 'IocageEvent':
+        self._child_events.append(event)
+        return event
+
+    def add_rollback_step(self, method: typing.Callable[[], None]) -> None:
+        self._rollback_steps.append(method)
+
+    def rollback(self) -> None:
+
+        if self.reverted is True:
+            return
+
+        self.reverted = True
+
+        # Notify child_events in reverse order
+        for event in reversed(self._child_events):
+            event.rollback()
+
+        # Execute rollback steps in reverse order
+        for revert_step in reversed(self._rollback_steps):
+            revert_step()
 
     @property
     def type(self) -> str:
@@ -173,10 +199,12 @@ class IocageEvent:
         self.error = exception
         self.pending = False
         self.parent_count = IocageEvent.PENDING_COUNT
+        self.rollback()
         return self
 
     def __hash__(self) -> typing.Any:
-        identifier = "generic" if self.identifier is None else self.identifier
+        has_identifier = ("identifier" in self.__dir__()) is True
+        identifier = "generic" if has_identifier is False else self.identifier
         return hash((self.type, identifier))
 
 
@@ -207,6 +235,21 @@ class JailLaunch(JailEvent):
         **kwargs
     ) -> None:
 
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailRename(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        current_name: str,
+        new_name: str,
+        **kwargs
+    ) -> None:
+
+        kwargs["current_name"] = current_name
+        kwargs["new_name"] = new_name
         JailEvent.__init__(self, jail, **kwargs)
 
 
@@ -398,6 +441,43 @@ class ExecuteReleaseUpdate(ReleaseUpdate):
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
+
+
+# ZFS
+
+
+class ZFSEvent(IocageEvent):
+
+    def __init__(
+        self,
+        zfs_object: libzfs.ZFSObject,
+        **kwargs
+    ) -> None:
+
+        self.identifier = zfs_object.name
+        IocageEvent.__init__(self, zfs_object=zfs_object, **kwargs)
+
+
+class ZFSDatasetRename(ZFSEvent):
+
+    def __init__(
+        self,
+        dataset: libzfs.ZFSDataset,
+        **kwargs
+    ) -> None:
+
+        ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
+
+
+class ZFSSnapshotRename(ZFSEvent):
+
+    def __init__(
+        self,
+        snapshot: libzfs.ZFSDataset,
+        **kwargs
+    ) -> None:
+
+        ZFSEvent.__init__(self, zfs_object=snapshot, **kwargs)
 
 
 # CLI

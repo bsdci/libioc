@@ -175,6 +175,7 @@ class BaseConfig(dict):
                 " ".join(invalid_characters)
             )
             self.logger.error(msg)
+            raise iocage.lib.errors.InvalidJailName(logger=self.logger)
 
         is_valid_name = iocage.lib.helpers.validate_name(name)
         if is_valid_name is True:
@@ -479,7 +480,7 @@ class BaseConfig(dict):
             return
 
         setter_method_name = f"_set_{key}"
-        if setter_method_name in self.__dir__():
+        if setter_method_name in object.__dir__(self):
             setter_method = self.__getattribute__(setter_method_name)
             setter_method(parsed_value, **kwargs)
             return
