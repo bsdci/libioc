@@ -425,7 +425,7 @@ class JailGenerator(JailResource):
         self._teardown_mounts()
         yield jailMountTeardownEvent.end()
 
-        self.state.update()
+        self.state.query()
 
     def destroy(self, force: bool=False) -> None:
         """
@@ -439,7 +439,7 @@ class JailGenerator(JailResource):
                 requires it to be stopped.
         """
 
-        self.state.update()
+        self.state.query()
 
         if self.running is True and force is True:
             self.stop(force=True)
@@ -532,7 +532,7 @@ class JailGenerator(JailResource):
             yield jailMountTeardownEvent.skip()
 
         try:
-            self.state.update()
+            self.state.query()
         except Exception as e:
             self.logger.warn(str(e))
 
@@ -838,7 +838,7 @@ class JailGenerator(JailResource):
         humanreadable_name = self.humanreadable_name
         try:
             iocage.lib.helpers.exec(command, logger=self.logger)
-            self.state.update()
+            self.state.query()
             self.logger.verbose(
                 f"Jail '{humanreadable_name}' started with JID {self.jid}",
                 jail=self
