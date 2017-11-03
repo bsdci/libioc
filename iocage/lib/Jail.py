@@ -198,9 +198,9 @@ class JailGenerator(JailResource):
     def __init__(
         self,
         data: typing.Union[str, typing.Dict[str, typing.Any]]={},
-        zfs=None,
-        host=None,
-        logger=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
+        host: typing.Optional['iocage.lib.Host.Host']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         new=False,
         **resource_args
     ) -> None:
@@ -446,7 +446,7 @@ class JailGenerator(JailResource):
         else:
             self.require_jail_stopped()
 
-        self.storage.delete_dataset_recursive(self.dataset)
+        self.zfs.delete_dataset_recursive(self.dataset)
 
     def rename(
         self,

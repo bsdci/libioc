@@ -964,7 +964,7 @@ class ReleaseGenerator(ReleaseResource):
         return self.name
 
     def destroy(self, force: bool=False) -> None:
-        self.storage.delete_dataset_recursive(self.dataset)
+        self.zfs.delete_dataset_recursive(self.dataset)
 
 
 class Release(ReleaseGenerator):

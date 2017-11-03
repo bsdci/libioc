@@ -127,33 +127,6 @@ class Storage:
         except BaseException as e:
             yield renameSnapshotEvent.fail(e)
 
-    def delete_dataset_recursive(
-        self,
-        dataset: libzfs.ZFSDataset,
-        delete_snapshots: bool=True
-    ) -> None:
-
-        for child in dataset.children:
-            self.delete_dataset_recursive(child)
-
-        if dataset.mountpoint is not None:
-            self.logger.spam("Unmounting {dataset.name}")
-            dataset.umount()
-
-        origin = None
-        if delete_snapshots is False:
-            origin_property = dataset.properties["origin"]
-            if origin_property.value != "":
-                origin = origin_property
-
-        self.logger.verbose("Deleting dataset {dataset.name}")
-        dataset.delete()
-
-        if origin is not None:
-            self.logger.verbose("Deleting snapshot {origin}")
-            origin_snapshot = self.zfs.get_snapshot(origin)
-            origin_snapshot.delete()
-
     def clone_zfs_dataset(
         self,
         source: str,

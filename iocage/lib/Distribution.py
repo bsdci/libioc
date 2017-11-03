@@ -72,7 +72,12 @@ class DistributionGenerator:
         typing.List['iocage.lib.Release.ReleaseGenerator']
     ] = None
 
-    def __init__(self, host, zfs=None, logger=None):
+    def __init__(
+        self,
+        host: 'iocage.lib.Host.Host',
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ) -> None:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)

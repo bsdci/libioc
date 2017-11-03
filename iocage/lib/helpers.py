@@ -53,7 +53,7 @@ def init_zfs(
         new_zfs = iocage.lib.ZFS.get_zfs(logger=self.logger)
         object.__setattr__(self, 'zfs', new_zfs)
 
-    return self.zfs
+    return object.__getattribute__(self, 'zfs')
 
 
 def init_host(

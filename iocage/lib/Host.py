@@ -84,7 +84,8 @@ class HostGenerator:
 
         self.distribution = self._class_distribution(
             host=self,
-            logger=self.logger
+            logger=self.logger,
+            zfs=self.zfs
         )
         if defaults is not None:
             self._defaults = defaults
