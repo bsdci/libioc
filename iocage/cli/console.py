@@ -43,7 +43,7 @@ def cli(ctx, jail, log_level):
     logger.print_level = log_level
 
     jail = iocage.lib.Jail.Jail(jail, logger=logger)
-    jail.update_jail_state()
+    jail.state.query()
 
     if not jail.exists:
         logger.error(f"The jail {jail.humanreadable_name} does not exist")
