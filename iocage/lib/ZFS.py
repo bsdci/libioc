@@ -69,6 +69,45 @@ class ZFS(libzfs.ZFS):
             logger=self.logger
         )
 
+    def delete_dataset_recursive(
+        self,
+        dataset: libzfs.ZFSDataset,
+        delete_snapshots: bool=True,
+        delete_origin_snapshot: bool=True
+    ) -> None:
+
+        for child in dataset.children:
+            self.delete_dataset_recursive(child)
+
+        if dataset.mountpoint is not None:
+            if self.logger is not None:
+                self.logger.spam(f"Unmounting {dataset.name}")
+            dataset.umount()
+
+        if delete_snapshots is True:
+            for snapshot in dataset.snapshots:
+                if self.logger is not None:
+                    self.logger.verbose(
+                        f"Deleting snapshot {snapshot.name}"
+                    )
+                snapshot.delete()
+
+        origin = None
+        if delete_origin_snapshot is True:
+            origin_property = dataset.properties["origin"]
+            if origin_property.value != "":
+                origin = origin_property
+
+        if self.logger is not None:
+            self.logger.verbose(f"Deleting dataset {dataset.name}")
+        dataset.delete()
+
+        if origin is not None:
+            if self.logger is not None:
+                self.logger.verbose(f"Deleting snapshot {origin}")
+            origin_snapshot = self.get_snapshot(origin.value)
+            origin_snapshot.delete()
+
 
 def get_zfs(
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,

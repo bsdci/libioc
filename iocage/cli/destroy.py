@@ -59,7 +59,9 @@ def cli(ctx,
     location to stop_jail.
     """
     logger = ctx.parent.logger
-    host = iocage.lib.Host.Host(logger=logger)
+    zfs = iocage.lib.ZFS.ZFS()
+    zfs.logger = logger
+    host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
 
     if filters is None or len(filters) == 0:
         logger.error("No filter specified - cannot select a target to delete")
@@ -76,6 +78,7 @@ def cli(ctx,
 
     resources = resources_class(
         filters=filters,
+        zfs=zfs,
         host=host,
         logger=logger
     )
