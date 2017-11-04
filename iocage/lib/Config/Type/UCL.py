@@ -26,12 +26,12 @@ import typing
 import ucl
 
 import iocage.lib.Config
-import iocage.lib.Config.File
+import iocage.lib.Config.Prototype
 import iocage.lib.Config.Resource.ResourceConfig
 import iocage.lib.errors
 
 
-class ConfigUCL(iocage.lib.Config.File.ConfigFile):
+class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
 
     config_type = "ucl"
 

@@ -48,9 +48,9 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
     def file(self) -> str:
         return str(os.path.join(
             self.resource.dataset.mountpoint,
-            self.resource.config_file
+            self._file
         ))
 
     @file.setter
     def file(self, value: str):
-        self.resource.config_file = value
+        self._file = value

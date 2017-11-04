@@ -106,6 +106,8 @@ class ResolverProp(list):
                 self += str(value).split(";")  # noqa: T484
             elif isinstance(value, list):
                 self += list(value)  # noqa: T484
+            elif value is None:
+                return
             else:
                 raise TypeError("value can be list or string")
         else:

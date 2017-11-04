@@ -24,8 +24,9 @@
 import typing
 import os.path
 import iocage.lib.helpers
+import iocage.lib.Config.Prototype
 
-# mypy:
+# mypy
 import iocage.lib.Logger
 
 
@@ -33,25 +34,26 @@ class Prototype:
 
     logger: typing.Type[iocage.lib.Logger.Logger]
     data: dict = {}
+    _file: str
 
     def __init__(
         self,
+        file: typing.Optional[str]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
+        if file is not None:
+            self._file = file
+
     @property
     def file(self) -> str:
-        raise NotImplementedError(
-            "This needs to be implemented by the inheriting class"
-        )
+        return self._file
 
     @file.setter
     def file(self, value: str):
-        raise NotImplementedError(
-            "This needs to be implemented by the inheriting class"
-        )
+        self._file = value
 
     def read(self):
         try:
@@ -78,5 +80,6 @@ class Prototype:
         # return result
         return data
 
+    @property
     def exists(self) -> bool:
         return os.path.isfile(self.file)
