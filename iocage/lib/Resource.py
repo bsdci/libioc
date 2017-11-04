@@ -38,9 +38,6 @@ import iocage.lib.Types
 import iocage.lib.ZFS
 import iocage.lib.helpers
 
-# MyPy
-import iocage.lib.Config.File  # noqa: F401
-
 
 class Resource(metaclass=abc.ABCMeta):
     """
@@ -101,22 +98,6 @@ class Resource(metaclass=abc.ABCMeta):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
-        # ToDo: Lazy-load config handlers
-        self.config_json = iocage.lib.Config.Type.JSON.ResourceConfigJSON(
-            resource=self,
-            logger=self.logger
-        )
-
-        self.config_ucl = iocage.lib.Config.Type.UCL.ResourceConfigUCL(
-            resource=self,
-            logger=self.logger
-        )
-
-        self.config_zfs = iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
-            resource=self,
-            logger=self.logger
-        )
-
         self._config_file = config_file
         self.config_type = config_type
 
@@ -124,6 +105,33 @@ class Resource(metaclass=abc.ABCMeta):
             self.dataset_name = dataset_name
         elif dataset is not None:
             self.dataset = dataset
+
+    @property
+    def config_json(self) -> 'iocage.lib.Config.Type.JSON.ResourceConfigJSON':
+        default = self.DEFAULT_JSON_FILE
+        file = self._config_file if self._config_file is not None else default
+        return iocage.lib.Config.Type.JSON.ResourceConfigJSON(
+            file=file,
+            resource=self,
+            logger=self.logger
+        )
+
+    @property
+    def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.ResourceConfigUCL':
+        default = self.DEFAULT_UCL_FILE
+        file = self._config_file if self._config_file is not None else default
+        return iocage.lib.Config.Type.UCL.ResourceConfigUCL(
+            file=file,
+            resource=self,
+            logger=self.logger
+        )
+
+    @property
+    def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.ResourceConfigZFS':
+        return iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
+            resource=self,
+            logger=self.logger
+        )
 
     @abc.abstractmethod
     def destroy(self, force: bool=False) -> None:
@@ -224,7 +232,7 @@ class Resource(metaclass=abc.ABCMeta):
         """
         Relative path of the resource config file
         """
-        if self.config_type is None:
+        if self._config_type is None:
             return None
 
         elif self._config_file is not None:
@@ -281,7 +289,7 @@ class Resource(metaclass=abc.ABCMeta):
         return o
 
     @property
-    def config_handler(self) -> 'iocage.lib.Config.File.ConfigFile':
+    def config_handler(self) -> 'iocage.lib.Config.Prototype.Prototype':
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 

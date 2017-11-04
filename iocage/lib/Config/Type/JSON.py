@@ -25,12 +25,12 @@ import typing
 import json
 
 import iocage.lib.Config
-import iocage.lib.Config.File
+import iocage.lib.Config.Prototype
 import iocage.lib.Config.Resource.ResourceConfig
 import iocage.lib.helpers
 
 
-class ConfigJSON(iocage.lib.Config.File.ConfigFile):
+class ConfigJSON(iocage.lib.Config.Prototype.Prototype):
 
     config_type = "json"
 
