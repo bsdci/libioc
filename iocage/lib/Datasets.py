@@ -145,12 +145,6 @@ class Datasets:
             )
             mountpoint = iocage.lib.Types.AbsolutePath('/iocage')
 
-        self._root = self._get_or_create_dataset(
-            "iocage",
-            pool=pool,
-            mountpoint=mountpoint
-        )
-
     def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
             pool,
@@ -251,5 +245,5 @@ class Datasets:
 
             dataset.mount()
 
-        self._datasets[dataset_name] = dataset
+        self._datasets[name] = dataset
         return dataset
