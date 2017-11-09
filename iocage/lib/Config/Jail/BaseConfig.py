@@ -230,7 +230,7 @@ class BaseConfig(dict):
 
         try:
             return str(self["tags"][0])
-        except KeyError:
+        except (KeyError, IndexError):
             return None
 
     def _set_tag(self, value: str, **kwargs) -> None:
