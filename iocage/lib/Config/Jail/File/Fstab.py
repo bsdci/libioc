@@ -167,6 +167,10 @@ class Fstab(
         line: str
         comment: typing.Optional[str]
         auto_comment_found: bool = False
+        basejail_destinations = map(
+            lambda x: str(x['destination']),
+            self.basejail_lines
+        )
 
         for line in input_text.rstrip("\n").split("\n"):
 
@@ -206,9 +210,13 @@ class Fstab(
 
             destination = os.path.abspath(fragments[1])
 
+            # skip lines with destinations overlapping self.basejail_lines
+            if destination in basejail_destinations:
+                continue
+
             new_line = FstabLine({
                 "source": fragments[0],
-                "destination": fragments[1],
+                "destination": destination,
                 "type": fragments[2],
                 "options": fragments[3],
                 "dump": fragments[4],
@@ -216,7 +224,7 @@ class Fstab(
                 "comment": comment
             })
 
-            if new_line in self:
+            if new_line in self._lines:
                 self.logger.error(
                     "Duplicate mountpoint in fstab: "
                     f"{destination} already mounted"
