@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
 import os
+import re
 import subprocess  # nosec: B404
 import shlex
 
@@ -461,6 +462,7 @@ class JailGenerator(JailResource):
         self.require_storage_backend()
 
         current_id = self.config["id"]
+        current_mountpoint = self.dataset.mountpoint
 
         jailRenameEvent = iocage.lib.events.JailRename(
             jail=self,
@@ -487,9 +489,26 @@ class JailGenerator(JailResource):
                 yield jailRenameEvent.child_event(event)
                 if event.error is not None:
                     raise event.error
-            yield jailRenameEvent.end()
         except BaseException as e:
             yield jailRenameEvent.fail(e)
+            raise
+
+        # Update fstab to the new dataset
+        jailFstabUpdateEvent = iocage.lib.events.JailFstabUpdate(
+            jail=self
+        )
+        yield jailFstabUpdateEvent.begin()
+        try:
+            self.fstab.read_file()
+            self.fstab.replace_path(
+                re.compile(f"^{current_mountpoint}"),
+                self.dataset.mountpoint
+            )
+            self.fstab.save()
+            yield jailFstabUpdateEvent.end()
+            yield jailRenameEvent.end()
+        except BaseException:
+            yield jailFstabUpdateEvent.fail()
             raise
 
     def _force_stop(

@@ -92,7 +92,9 @@ class Storage:
                 self.jail.host.datasets.jails.name,
                 new_name
             ])
-            self.jail.dataset.rename(new_dataset_name)
+            dataset = self.jail.dataset
+            dataset.rename(new_dataset_name)
+            self.jail._dataset = self.zfs.get_dataset(new_dataset_name)
             self.jail.dataset_name = new_dataset_name
             self.logger.verbose(
                 f"Dataset {current_dataset_name} renamed to {new_dataset_name}"
