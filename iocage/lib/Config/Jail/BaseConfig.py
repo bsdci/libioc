@@ -254,7 +254,18 @@ class BaseConfig(dict):
         return "tag" in self.data.keys()
 
     def _get_tags(self) -> typing.List[str]:
-        return list(iocage.lib.helpers.parse_list(self.data["tags"]))
+
+        data_keys = self.data.keys()
+
+        if "tags" in data_keys:
+            tags = set(list(iocage.lib.helpers.parse_list(self.data["tags"])))
+        else:
+            tags = set()
+
+        if (self._has_legacy_tag is True):
+            tags.add(self.data["tag"])
+
+        return list(tags)
 
     def _set_tags(
         self,
