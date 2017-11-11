@@ -25,6 +25,7 @@ import typing
 import datetime
 import hashlib
 import os
+import re
 import shutil
 import tarfile
 import urllib.request
@@ -531,10 +532,11 @@ class ReleaseGenerator(ReleaseResource):
                 if self.host.distribution.name == "FreeBSD":
                     with open(local_path, "r+") as f:
                         content = f.read()
+                        pattern = re.compile("^Components .+$", re.MULTILINE)
                         f.seek(0)
-                        f.write(content.replace(
-                            "Components src",
-                            "Components"
+                        f.write(pattern.sub(
+                            "Components world",
+                            content
                         ))
                         f.truncate()
 
