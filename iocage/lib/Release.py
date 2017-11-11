@@ -623,6 +623,7 @@ class ReleaseGenerator(ReleaseResource):
                         yield event
                     else:
                         changed = event
+            jail.stop()
             yield runReleaseUpdateEvent.end()
         except Exception as e:
             # kill the helper jail and roll back if anything went wrong
