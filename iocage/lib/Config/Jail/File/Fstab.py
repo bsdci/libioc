@@ -345,27 +345,18 @@ class Fstab(
     def __len__(self):
         return list.__len__(list(self.__iter__()))
 
-    def __delitem__(self, index: int) -> None:
+    def __delitem__(self, index):
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
-    def __getitem__(self, index: int) -> typing.Union[
-        FstabLine,
-        FstabCommentLine,
-        FstabAutoPlaceholderLine
-    ]:
+    def __getitem__(self, index):
         return list(self.__iter__())[index]
 
     def __setitem__(
         self,
-        index: int,
-        value: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ]
-    ) -> None:
-
+        index,
+        value
+    ):
         real_index = self._get_real_index(index)
         self._lines.__setitem__(real_index, value)
 
