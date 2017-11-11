@@ -318,6 +318,18 @@ class JailMountTeardown(JailEvent):
 
         JailEvent.__init__(self, jail, **kwargs)
 
+
+class JailFstabUpdate(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
 # Release
 
 

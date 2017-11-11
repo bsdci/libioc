@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import collections
 import os.path
 import random
 
@@ -59,6 +60,10 @@ class FstabLine(dict):
         return hash(self["destination"])
 
 
+class FstabBasejailLine(FstabLine):
+    pass
+
+
 class FstabCommentLine(dict):
 
     def __init__(self, data: dict) -> None:
@@ -89,7 +94,10 @@ class FstabAutoPlaceholderLine(dict):
         return hash(None)
 
 
-class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+class Fstab(
+    collections.MutableSequence,
+    iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile
+):
     """
 
     Fstab configuration file wrapper
@@ -104,6 +112,11 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
     host: 'iocage.lib.Host.HostGenerator'
     logger: 'iocage.lib.Logger.Logger'
     jail: 'iocage.lib.Jail.JailGenerator'
+    _lines: typing.List[typing.Union[
+        FstabLine,
+        FstabCommentLine,
+        FstabAutoPlaceholderLine
+    ]] = []
 
     def __init__(
         self,
@@ -117,7 +130,6 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self.host = iocage.lib.helpers.init_host(self, host)
         self.jail = jail
         self.release = release
-        list.__init__(self)
 
     @property
     def path(self) -> str:
@@ -150,13 +162,13 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
                 Skips reading entries that were created by iocage
         """
 
-        list.clear(self)
+        list.clear(self._lines)
 
         line: str
         comment: typing.Optional[str]
         auto_comment_found: bool = False
 
-        for line in input_text.split("\n"):
+        for line in input_text.rstrip("\n").split("\n"):
 
             if _is_comment_line(line) or _is_empty_line(line):
                 self.add_line(FstabCommentLine({
@@ -234,8 +246,6 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         self
     ) -> None:
 
-        # print("!!!", str(self))
-        # raise Exception("FOO")
         if os.path.isfile(self.path):
             f = open(self.path, "r+")
             self._read_file_handle(f)
@@ -293,10 +303,10 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         else:
             self.logger.debug(f"Adding line to fstab: {line}")
 
-        self.append(line)
+        self._lines.append(line)
 
     @property
-    def basejail_lines(self) -> typing.List[FstabLine]:
+    def basejail_lines(self) -> typing.List[FstabBasejailLine]:
 
         if self.release is None:
             return []
@@ -314,14 +324,14 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
 
             source = f"{release_root_path}/{basedir}"
             destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
-            fstab_basejail_lines.append(FstabLine({
+            fstab_basejail_lines.append(FstabBasejailLine({
                 "source": source,
                 "destination": destination,
                 "type": "nullfs",
                 "options": "ro",
                 "dump": "0",
                 "passnum": "0",
-                "comment": "iocage-auto"
+                "comment": self.AUTO_COMMENT_IDENTIFIER
             }))
 
         return fstab_basejail_lines
@@ -332,7 +342,71 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
             list(self)
         ))
 
-    def __iter__(self):
+    def __len__(self):
+        return list.__len__(list(self.__iter__()))
+
+    def __delitem__(self, index: int) -> None:
+        real_index = self._get_real_index(index)
+        self._lines.__delitem__(real_index)
+
+    def __getitem__(self, index: int) -> typing.Union[
+        FstabLine,
+        FstabCommentLine,
+        FstabAutoPlaceholderLine
+    ]:
+        return list(self.__iter__())[index]
+
+    def __setitem__(
+        self,
+        index: int,
+        value: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
+
+        real_index = self._get_real_index(index)
+        self._lines.__setitem__(real_index, value)
+
+    def insert(
+        self,
+        index: int,
+        value: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
+
+        target_line = list(self.__iter__())[index]
+
+        if isinstance(target_line, FstabBasejailLine):
+            # find FstabAutoPlaceholderLine instead
+            line = list(filter(
+                lambda x: isinstance(x, FstabAutoPlaceholderLine),
+                self._line
+            ))[0]
+            real_index = self._lines.index(line)
+        else:
+            real_index = self._get_real_index(index)
+
+        self._lines.insert(real_index, value)
+
+    def _get_real_index(self, index: int) -> int:
+        target_line = list(self.__iter__())[index]
+        if isinstance(target_line, FstabBasejailLine):
+            raise iocage.lib.errors.VirtualFstabLineHasNoRealIndex(
+                logger=self.logger
+            )
+        return self._lines.index(target_line)
+
+    def __iter__(self) -> typing.Iterator[typing.Union[
+        FstabAutoPlaceholderLine,
+        FstabBasejailLine,
+        FstabCommentLine,
+        FstabLine
+    ]]:
         """
         Returns an iterator of all printable lines
 
@@ -343,20 +417,22 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
         output: typing.List[
             typing.Union[
                 FstabAutoPlaceholderLine,
+                FstabBasejailLine,
                 FstabCommentLine,
                 FstabLine
             ]
         ] = []
 
-        for line in list.__iter__(self):
+        for line in self._lines:
             if isinstance(line, FstabAutoPlaceholderLine):
-                output += self.basejail_lines
-                basejail_lines_added = True
+                if basejail_lines_added is False:
+                    output += self.basejail_lines
+                    basejail_lines_added = True
             else:
                 output.append(line)
 
         if basejail_lines_added is False:
-            output = self.basejail_lines + self
+            output = self.basejail_lines + self._lines  # noqa: T484
 
         return iter(output)
 
@@ -367,6 +443,17 @@ class Fstab(list, iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
             else:
                 return False
         return False
+
+    def replace_path(self, pattern: typing.Pattern, replacement: str) -> None:
+        """
+        Replaces a given path in all fstab entries (source or destination)
+        """
+        for i, line in enumerate(self._lines):
+            if not isinstance(line, FstabLine):
+                continue
+            line["source"] = pattern.sub(replacement, line["source"])
+            line["destination"] = pattern.sub(replacement, line["destination"])
+            self._lines[i] = line
 
 
 def _is_comment_line(text: str) -> bool:

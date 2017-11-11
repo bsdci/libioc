@@ -161,6 +161,16 @@ class JailStateUpdateFailed(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+# Jail Fstab
+
+
+class VirtualFstabLineHasNoRealIndex(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = f"The virtual fstab line does not have a real list index"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # Security
 
 
