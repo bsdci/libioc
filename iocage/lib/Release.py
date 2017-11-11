@@ -591,6 +591,7 @@ class ReleaseGenerator(ReleaseResource):
 
         jail = iocage.lib.Jail.JailGenerator(
             {
+                "name": self.name.replace(".", "-"),
                 "basejail": False,
                 "allow_mount_nullfs": "1",
                 "release": self.name,
