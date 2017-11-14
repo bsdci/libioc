@@ -1,28 +1,15 @@
 # libiocage
 
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/iocage/libiocage.svg)](http://isitmaintained.com/project/iocage/libiocage "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/iocage/libiocage.svg)](http://isitmaintained.com/project/iocage/libiocage "Percentage of issues still open")
-![Python Version](https://img.shields.io/badge/Python-3.6-blue.svg)
-[![GitHub issues](https://img.shields.io/github/issues/iocage/libiocage.svg)](https://github.com/iocage/libiocage/issues)
-[![GitHub forks](https://img.shields.io/github/forks/iocage/libiocage.svg)](https://github.com/iocage/libiocage/network)
-[![GitHub stars](https://img.shields.io/github/stars/iocage/libiocage.svg)](https://github.com/iocage/libiocage/stargazers)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/iocage/libiocage.svg?style=social)](https://twitter.com/intent/tweet?text=@iocage)
-
 **Python Library to manage FreeBSD jails with libiocage.**
 
-iocage is a jail/container manager amalgamating some of the best features and technologies the FreeBSD operating system has to offer. It is geared for ease of use with a simple and easy to understand command syntax.
+iocage is a jail/container manager fusioning some of the best features and technologies the FreeBSD operating system has to offer. It is geared for ease of use with a simple and easy to understand command syntax.
 
-This library provides programmatic access to iocage features and jails, while being compatible with iocage-legacy, and the current Python 3 version of iocage.
+This library provides programmatic access to iocage features and jails, while aiming to be compatible with iocage-legacy, and the current Python 3 version of iocage.
+
+### Project Status
+As of November 2017 this project is *working towards an alpha release*. This means stabilization of command-line and library interfaces, so that proper integration tests can be built. This phase requires manual verification and testing until reaching feature-completion and compatibility with Python [iocage](https://github.com/iocage/iocage) and prior iocage_legacy versions with [ZFS property](https://github.com/iocage/iocage_legacy/tree/master) and [UCL file](https://github.com/iocage/iocage_legacy) config storage.
 
 ## Install
-
-### from Source Distribution
-
-```sh
-pkg install python36 py36-pygit2 py36-libzfs libucl
-python3.6 -m ensurepip
-pip3.6 install iocage
-```
 
 ### from Master branch
 
@@ -51,12 +38,12 @@ Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the comm
 
 ### Custom Release (e.g. running -CURRENT)
 
-#### Initially create release dataset
+#### Initially create the release dataset
 
 ```sh
 zfs create zroot/iocage/releases/custom/root
 cd /usr/src
-#install your source tree
+# install your source tree
 make installworld DESTDIR=/iocage/releases/custom/root
 make distribution DESTDIR=/iocage/releases/custom/root
 ioc fetch -r custom -b
@@ -90,8 +77,7 @@ At this time differential type checking is enabled, which allows us to increment
 
 
 ```
-setenv MYPYPATH `pwd`/.travis/mypy-stubs
-mypy iocage/
+make check
 ```
 
 ### Code Style
