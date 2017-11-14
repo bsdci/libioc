@@ -171,6 +171,13 @@ class VirtualFstabLineHasNoRealIndex(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+class FstabDestinationExists(IocageException):
+
+    def __init__(self, mountpoint: str, *args, **kwargs) -> None:
+        msg = f"The mountpoint {mountpoint} already exists in the fstab file"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # Security
 
 
