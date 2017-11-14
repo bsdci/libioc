@@ -38,6 +38,12 @@ __rootcmd__ = True
 FstabLine = iocage.lib.Config.Jail.File.Fstab.FstabLine
 
 
+class ClickContext(click.core.Context):
+    logger: 'iocage.lib.Logger.Logger'
+    host: 'iocage.lib.Host.Host'
+    parent: 'ClickContext'
+
+
 def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
     if path.startswith(jail.root_path) is True:
         return path[len(jail.root_path.rstrip("/")):]
@@ -46,7 +52,24 @@ def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
 
 
 def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
-    return os.path.join(jail.root_path, _get_relpath(path, jail).lstrip("/"))
+    return str(os.path.join(
+        jail.root_path,
+        _get_relpath(path, jail).lstrip("/")
+    ))
+
+
+def _get_jail(
+    jail_name: str,
+    ctx: ClickContext
+) -> iocage.lib.Jail.JailGenerator:
+    try:
+        return iocage.lib.Jail.JailGenerator(
+            jail_name,
+            logger=ctx.logger,
+            host=ctx.host
+        )
+    except iocage.lib.errors.IocageException:
+        exit(1)
 
 
 @click.command(
@@ -56,23 +79,29 @@ def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
 @click.argument(
     "source",
     nargs=1,
-    required=False
+    required=True
 )
 @click.argument(
     "destination",
-    nargs=1,
+    nargs=-1,
     required=False
 )
+@click.argument("jail", nargs=1, required=True)
 @click.option("--read-write", "-rw", is_flag=True, default=False)
 def cli_add(
-    ctx: click.core.Context,
+    ctx: ClickContext,
     source: str,
-    destination: str,
+    destination: typing.Tuple[str],
+    jail: str,
     read_write: bool
 ) -> None:
 
-    if destination is None:
-        destination = source
+    ioc_jail = _get_jail(jail, ctx.parent)
+
+    if len(destination) == 0:
+        desination_path = source
+    else:
+        desination_path = destination[0]
 
     if os.path.exists(source) is False:
         ctx.parent.logger.error(
@@ -86,24 +115,24 @@ def cli_add(
         )
         exit(1)
 
-    mount_options = "rw" if read_write is True else "ro"
-    destination = _get_abspath(destination, ctx.parent.jail)
+    mount_opts = "rw" if read_write is True else "ro"
+    desination_path = _get_abspath(desination_path, ioc_jail)
 
     try:
-        fstab = ctx.parent.jail.fstab
+        fstab = ioc_jail.fstab
         fstab.read_file()
         fstab.new_line(
             source=source,
-            destination=destination,
+            destination=desination_path,
             fs_type="nullfs",
-            options=mount_options,
+            options=mount_opts,
             dump="0",
             passnum="0",
             comment=None
         )
         fstab.save()
         ctx.parent.logger.log(
-            f"fstab mount added: {source} -> {destination} ({mount_options})"
+            f"fstab mount added: {source} -> {desination_path} ({mount_opts})"
         )
         exit(0)
     except iocage.lib.errors.IocageException:
@@ -114,11 +143,11 @@ def cli_add(
     name="show"
 )
 @click.pass_context
-def cli_show(ctx):
-    parent: typing.Any = ctx.parent
-
-    if os.path.isfile(ctx.parent.jail.fstab.path):
-        with open(ctx.parent.jail.fstab.path, "r") as f:
+@click.argument("jail", nargs=1, required=True)
+def cli_show(ctx: ClickContext, jail: str) -> None:
+    ioc_jail = _get_jail(jail, ctx.parent)
+    if os.path.isfile(ioc_jail.fstab.path):
+        with open(ioc_jail.fstab.path, "r") as f:
             print(f.read())
 
 
@@ -130,10 +159,12 @@ def cli_show(ctx):
     nargs=1,
     required=False
 )
+@click.argument("jail", nargs=1, required=True)
 @click.pass_context
-def cli_rm(ctx, source):
+def cli_rm(ctx: ClickContext, source: str, jail: str) -> None:
 
-    fstab = ctx.parent.jail.fstab
+    ioc_jail = _get_jail(jail, ctx.parent)
+    fstab = ioc_jail.fstab
     destination = None
     i = 0
 
@@ -144,8 +175,8 @@ def cli_rm(ctx, source):
             if isinstance(existing_line, FstabLine) is False:
                 continue
             if existing_line["source"] == source:
-                destination = fstab[i-1]["destination"]
-                del fstab[i-1]
+                destination = fstab[i - 1]["destination"]
+                del fstab[i - 1]
                 fstab.save()
                 break
     except iocage.lib.errors.IocageException:
@@ -160,7 +191,7 @@ def cli_rm(ctx, source):
 
 class FstabCli(click.MultiCommand):
 
-    def list_commands(self, ctx: click.core.Context) -> typing.List[str]:
+    def list_commands(self, ctx: click.core.Context) -> list:
         return [
             "show",
             "add",
@@ -170,17 +201,22 @@ class FstabCli(click.MultiCommand):
     def get_command(
         self,
         ctx: click.core.Context,
-        action: str
-    ):
+        cmd_name: str
+    ) -> click.core.Command:
 
-        if action == "show":
-            return cli_show
-        elif action == "add":
-            return cli_add
-        elif action == "rm":
-            return cli_rm
+        command: typing.Optional[click.core.Command] = None
 
-        raise NotImplementedException("action does not exist")
+        if cmd_name == "show":
+            command = cli_show
+        elif cmd_name == "add":
+            command = cli_add
+        elif cmd_name == "rm":
+            command = cli_rm
+
+        if command is None:
+            raise NotImplementedError("action does not exist")
+
+        return command
 
 
 @click.group(
@@ -191,26 +227,10 @@ class FstabCli(click.MultiCommand):
     )
 )
 @click.pass_context
-@click.argument(
-    "jail",
-    nargs=1,
-    required=True
-)
 def cli(
-    ctx: click.core.Context,
-    jail: str
+    ctx: ClickContext
 ) -> None:
     """Manage a jails fstab file"""
 
-    ctx.logger: iocage.lib.Logger.Logger = ctx.parent.logger
+    ctx.logger = ctx.parent.logger
     ctx.host = iocage.lib.Host.HostGenerator(logger=ctx.logger)
-
-    filters = (f"name={jail}",)
-    try:
-        ctx.jail = iocage.lib.Jail.JailGenerator(
-            jail,
-            host=ctx.host,
-            logger=ctx.logger
-        )
-    except iocage.lib.errors.IocageException:
-        exit(1)
