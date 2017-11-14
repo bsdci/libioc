@@ -311,6 +311,13 @@ class Fstab(
         else:
             self.logger.debug(f"Adding line to fstab: {line}")
 
+        for existing_line in self.__iter__():
+            if hash(existing_line) == hash(line):
+                raise iocage.lib.errors.FstabDestinationExists(
+                    mountpoint=line["destination"],
+                    logger=self.logger
+                )
+
         self._lines.append(line)
 
     @property
