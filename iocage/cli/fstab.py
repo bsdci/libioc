@@ -38,6 +38,17 @@ __rootcmd__ = True
 FstabLine = iocage.lib.Config.Jail.File.Fstab.FstabLine
 
 
+def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
+    if path.startswith(jail.root_path) is True:
+        return path[len(jail.root_path.rstrip("/")):]
+    else:
+        return path
+
+
+def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
+    return os.path.join(jail.root_path, _get_relpath(path, jail).lstrip("/"))
+
+
 @click.command(
     name="add"
 )
@@ -76,6 +87,7 @@ def cli_add(
         exit(1)
 
     mount_options = "rw" if read_write is True else "ro"
+    destination = _get_abspath(destination, ctx.parent.jail)
 
     try:
         fstab = ctx.parent.jail.fstab
@@ -122,8 +134,7 @@ def cli_show(ctx):
 def cli_rm(ctx, source):
 
     fstab = ctx.parent.jail.fstab
-
-    deleted_destination = None
+    destination = None
     i = 0
 
     try:
@@ -133,20 +144,18 @@ def cli_rm(ctx, source):
             if isinstance(existing_line, FstabLine) is False:
                 continue
             if existing_line["source"] == source:
-                deleted_destination = fstab[i-1]["destination"]
+                destination = fstab[i-1]["destination"]
                 del fstab[i-1]
                 fstab.save()
                 break
     except iocage.lib.errors.IocageException:
         exit(1)
 
-    if deleted_destination is None:
+    if destination is None:
         ctx.parent.logger.error("no matching fstab line found")
         exit(1)
 
-    ctx.parent.logger.log(
-        f"fstab mount removed: {source} -> {deleted_destination}"
-    )
+    ctx.parent.logger.log(f"fstab mount removed: {source} -> {destination}")
 
 
 class FstabCli(click.MultiCommand):
