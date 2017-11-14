@@ -23,8 +23,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """set module for the cli."""
 import typing
+import errno
 import click
-import os.path
+import os
 
 import iocage.lib.errors
 import iocage.lib.Logger
@@ -52,10 +53,18 @@ def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
 
 
 def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
-    return str(os.path.join(
+    result = str(os.path.realpath(os.path.join(
         jail.root_path,
         _get_relpath(path, jail).lstrip("/")
-    ))
+    )))
+
+    if result.startswith(jail.root_path):
+        return result
+
+    raise iocage.lib.errors.InsecureJailPath(
+        path=result,
+        logger=jail.logger
+    )
 
 
 def _get_jail(
@@ -115,10 +124,10 @@ def cli_add(
         )
         exit(1)
 
-    mount_opts = "rw" if read_write is True else "ro"
-    desination_path = _get_abspath(desination_path, ioc_jail)
-
     try:
+        mount_opts = "rw" if read_write is True else "ro"
+        desination_path = _get_abspath(desination_path, ioc_jail)
+
         fstab = ioc_jail.fstab
         fstab.read_file()
         fstab.new_line(
@@ -130,6 +139,16 @@ def cli_add(
             passnum="0",
             comment=None
         )
+
+        # ensure destination directory exists
+        try:
+            os.makedirs(desination_path)
+        except OSError as exc:  # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir(desination_path):
+                pass
+            else:
+                raise
+
         fstab.save()
         ctx.parent.logger.log(
             f"fstab mount added: {source} -> {desination_path} ({mount_opts})"

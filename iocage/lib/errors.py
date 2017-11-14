@@ -188,11 +188,18 @@ class SecurityViolation(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
-class SecurityViolationConfigJailEscape(IocageException):
+class InsecureJailPath(SecurityViolation):
+
+    def __init__(self, path, *args, **kwargs) -> None:
+        msg = f"Insecure path {path} jail escape attempt"
+        SecurityViolation.__init__(self, msg, *args, **kwargs)
+
+
+class SecurityViolationConfigJailEscape(SecurityViolation):
 
     def __init__(self, file, *args, **kwargs) -> None:
         msg = f"The file {file} references a file outsite of the jail resource"
-        IocageException.__init__(self, msg, *args, **kwargs)
+        SecurityViolation.__init__(self, msg, *args, **kwargs)
 
 
 # JailConfig
