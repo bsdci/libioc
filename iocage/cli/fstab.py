@@ -96,7 +96,7 @@ def _get_jail(
     required=False
 )
 @click.argument("jail", nargs=1, required=True)
-@click.option("--read-write", "-rw", is_flag=True, default=False)
+@click.option("--write", "-rw", is_flag=True, default=False)
 def cli_add(
     ctx: ClickContext,
     source: str,
