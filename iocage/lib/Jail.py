@@ -1223,7 +1223,7 @@ class JailGenerator(JailResource):
             return None
 
     @property
-    def env(self):
+    def env(self) -> typing.Dict[str, str]:
         """
         Environment variables for hook scripts
         """
@@ -1238,7 +1238,7 @@ class JailGenerator(JailResource):
         return jail_env
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         Used internally to identify jails (in snapshots, jls, etc)
         """
@@ -1246,11 +1246,11 @@ class JailGenerator(JailResource):
         return f"ioc-{config['id']}"
 
     @property
-    def release(self):
+    def release(self) -> 'iocage.lib.Release.ReleaseGenerator':
         """
         The iocage.Release instance linked with the jail
         """
-        return iocage.lib.Release.Release(
+        return iocage.lib.Release.ReleaseGenerator(
             name=self.config["release"],
             logger=self.logger,
             host=self.host,
@@ -1258,7 +1258,7 @@ class JailGenerator(JailResource):
         )
 
     @property
-    def logfile_path(self):
+    def logfile_path(self) -> str:
         """
         Absolute path of the jail log file
         """
