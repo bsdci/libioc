@@ -934,6 +934,10 @@ class JailGenerator(JailResource):
 
     def _limit_resources(self) -> None:
 
+        if self.config['rlimits'] is False:
+            self.logger.verbose("Resource limits disabled")
+            return
+
         for key, limit, action in map(
             lambda name: (name, ) + self._get_resource_limit(name),
             self._resource_limit_config_keys
