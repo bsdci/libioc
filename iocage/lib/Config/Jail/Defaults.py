@@ -94,6 +94,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "allow_mount_tmpfs": 0,
         "allow_quotas": 0,
         "allow_socket_af": 0,
+        "rlimits": None,
         "sysvmsg": "new",
         "sysvsem": "new",
         "sysvshm": "new",
