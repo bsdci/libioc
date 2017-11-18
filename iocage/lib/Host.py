@@ -55,10 +55,12 @@ class HostGenerator:
 
     branch_pattern = re.compile(
         r"""\(hardened/
-            (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
-            /
-            (?P<branch>[A-z0-9]+)
-            \):""", re.X)
+        (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
+        /
+        (?P<branch>[A-z0-9]+)
+        \):""",
+        re.X
+    )
 
     release_name_pattern = re.compile(
         r"^(?P<major>\d+)(?:\.(?P<minor>\d+))-(?P<type>[A-Z]+)-HBSD$",
