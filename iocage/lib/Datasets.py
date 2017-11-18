@@ -106,10 +106,6 @@ class Datasets:
     def jails(self) -> libzfs.ZFSDataset:
         return self._get_or_create_dataset("jails")
 
-    @property
-    def logs(self) -> libzfs.ZFSDataset:
-        return self._get_or_create_dataset("log")
-
     def activate(
         self,
         mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
