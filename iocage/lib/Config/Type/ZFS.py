@@ -52,9 +52,13 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
 
     def read(self) -> dict:
         try:
-            return self.map_input(self._read_properties())
+            data = self.map_input(self._read_properties())
+            data["legacy"] = True
+            return data
         except AttributeError:
-            return {}
+            return {
+                "legacy": True
+            }
 
     def write(self, data: dict) -> None:
         """
@@ -133,7 +137,7 @@ class ConfigZFS(BaseConfigZFS):
         return self._dataset
 
 
-class ResourceConfigZFS(BaseConfigZFS):
+class ResourceConfigZFS(ConfigZFS):
 
     def __init__(
         self,
@@ -142,9 +146,13 @@ class ResourceConfigZFS(BaseConfigZFS):
     ) -> None:
 
         self.resource = resource
-        iocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
+        ConfigZFS.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
-        dataset: libzfs.ZFSDataset = self.resource.dataset
+        dataset: libzfs.ZFSDataset
+        if self._dataset is not None:
+            dataset = self._dataset
+        else:
+            dataset = self.resource.dataset
         return dataset
