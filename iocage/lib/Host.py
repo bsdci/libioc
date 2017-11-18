@@ -89,13 +89,25 @@ class HostGenerator:
             logger=self.logger,
             zfs=self.zfs
         )
+
+        self._init_defaults(defaults)
+
+    def _init_defaults(
+        self,
+        defaults: typing.Optional[iocage.lib.Resource.DefaultResource]=None
+    ) -> None:
+
         if defaults is not None:
             self._defaults = defaults
+        else:
+            self._defaults = iocage.lib.Resource.DefaultResource(
+                dataset=self.datasets.root,
+                logger=self.logger,
+                zfs=self.zfs
+            )
 
     @property
     def defaults(self) -> 'iocage.lib.Resource.DefaultResource':
-        if "_defaults" not in dir(self):
-            self._defaults = self._load_defaults()
         return self._defaults
 
     @property
@@ -103,15 +115,6 @@ class HostGenerator:
         self
     ) -> 'iocage.lib.Config.Jail.BaseConfig.BaseConfig':
         return self.defaults.config
-
-    def _load_defaults(self) -> iocage.lib.Resource.DefaultResource:
-        defaults_resource = iocage.lib.Resource.DefaultResource(
-            dataset=self.datasets.root,
-            logger=self.logger,
-            zfs=self.zfs
-        )
-        defaults_resource.config.read(data=defaults_resource.read_config())
-        return defaults_resource
 
     @property
     def devfs(self) -> 'iocage.lib.DevfsRules.DevfsRules':
