@@ -850,7 +850,6 @@ class JailGenerator(JailResource):
 
         command += [
             "allow.dying",
-            f"exec.consolelog={self.logfile_path}",
             "persist"
         ]
 
@@ -1260,13 +1259,6 @@ class JailGenerator(JailResource):
             host=self.host,
             zfs=self.zfs
         )
-
-    @property
-    def logfile_path(self):
-        """
-        Absolute path of the jail log file
-        """
-        return f"{self.host.datasets.logs.mountpoint}-console.log"
 
     def __getattribute__(self, key: str):
 
