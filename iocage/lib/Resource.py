@@ -79,6 +79,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     DEFAULT_JSON_FILE = "config.json"
     DEFAULT_UCL_FILE = "config"
+    DEFAULT_ZFS_DATASET_SUFFIX: typing.Optional[str] = None
 
     _config_type: typing.Optional[int] = None
     _config_file: typing.Optional[str] = None
@@ -106,6 +107,7 @@ class Resource(metaclass=abc.ABCMeta):
         elif dataset is not None:
             self.dataset = dataset
 
+    # ToDo: Memoize
     @property
     def config_json(self) -> 'iocage.lib.Config.Type.JSON.ResourceConfigJSON':
         default = self.DEFAULT_JSON_FILE
@@ -116,6 +118,7 @@ class Resource(metaclass=abc.ABCMeta):
             logger=self.logger
         )
 
+    # ToDo: Memoize
     @property
     def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.ResourceConfigUCL':
         default = self.DEFAULT_UCL_FILE
@@ -126,10 +129,18 @@ class Resource(metaclass=abc.ABCMeta):
             logger=self.logger
         )
 
+    # ToDo: Memoize
     @property
     def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.ResourceConfigZFS':
+        if self.DEFAULT_ZFS_DATASET_SUFFIX is not None:
+            name = f"{self.dataset.name}{self.DEFAULT_ZFS_DATASET_SUFFIX}"
+            dataset = self.zfs.get_or_create_dataset(name)
+        else:
+            dataset = None
+
         return iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
             resource=self,
+            dataset=dataset,
             logger=self.logger
         )
 
@@ -323,19 +334,22 @@ class DefaultResource(Resource):
 
     DEFAULT_JSON_FILE = "defaults.json"
     DEFAULT_UCL_FILE = "defaults"
+    DEFAULT_ZFS_DATASET_SUFFIX = "/.defaults"
 
     def __init__(
         self,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        **kwargs
     ) -> None:
 
         Resource.__init__(
             self,
             dataset=dataset,
             logger=logger,
-            zfs=zfs
+            zfs=zfs,
+            **kwargs
         )
 
         self.config = iocage.lib.Config.Jail.Defaults.JailConfigDefaults(
