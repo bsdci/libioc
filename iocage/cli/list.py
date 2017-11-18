@@ -105,7 +105,7 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
         if dataset_type == "template":
             filters += ("template=yes",)
         else:
-            filters += ("template=no",)
+            filters += ("template=no,-",)
 
         resources_class = iocage.lib.Jails.JailsGenerator
         columns = _list_output_comumns(output, _long)
