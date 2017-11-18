@@ -26,6 +26,7 @@ import json
 import random
 import re
 import subprocess  # nosec: B404
+import ucl
 
 import iocage.lib.errors
 import iocage.lib.Datasets
@@ -264,6 +265,18 @@ def to_json(data: typing.Dict[str, typing.Any]) -> str:
             none="none"
         )
     return str(json.dumps(output_data, sort_keys=True, indent=4))
+
+
+def to_ucl(data: typing.Dict[str, typing.Any]) -> str:
+    output_data = {}
+    for key, value in data.items():
+        output_data[key] = to_string(
+            value,
+            true="on",
+            false="off",
+            none="none"
+        )
+    return str(ucl.dump(output_data))
 
 
 def to_string(

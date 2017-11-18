@@ -36,12 +36,11 @@ class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
     config_type = "ucl"
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
-        result = ucl.load(data)  # type: typing.Dict[str, typing.Any]
+        result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
         return result
 
     def map_output(self, data: dict) -> str:
-        # ToDo: Re-Implement UCL output
-        raise iocage.lib.errors.MissingFeature("Writing ConfigUCL")
+        return str(iocage.lib.helpers.to_ucl(data))
 
 
 class ResourceConfigUCL(
