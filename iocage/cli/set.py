@@ -112,7 +112,7 @@ def set_properties(
             try:
                 del target.config[key]
                 updated_properties.add(key)
-            except iocage.lib.errors.IocageException:
+            except (iocage.lib.errors.IocageException, KeyError):
                 pass
 
     if len(updated_properties) > 0:
