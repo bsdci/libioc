@@ -1129,7 +1129,11 @@ class JailGenerator(JailResource):
                     "/dev/fd",
                     "/dev",
                     "/proc",
-                    "/root/compat/linux/proc"
+                    "/root/compat/linux/proc",
+                    "/root/etcupdate",
+                    "/root/usr/ports",
+                    "/root/usr/src",
+                    "/tmp"
                 ]
             )
         ))
