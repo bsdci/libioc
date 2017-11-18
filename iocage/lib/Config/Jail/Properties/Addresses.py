@@ -67,7 +67,7 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 
 class AddressesProp(dict):
 
-    logger: iocage.lib.Logger.Logger
+    logger: 'iocage.lib.Logger.Logger'
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "ip4_address"
     skip_on_error: bool
