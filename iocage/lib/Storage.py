@@ -110,17 +110,22 @@ class Storage:
 
         root_dataset_properties = self.jail.root_dataset.properties
 
-        if "origin" not in root_dataset_properties:
-            return
-
-        snapshot = self.zfs.get_snapshot(
-            root_dataset_properties["origin"].value
-        )
-
         renameSnapshotEvent = iocage.lib.events.ZFSSnapshotRename(
             snapshot=self.jail.dataset
         )
         yield renameSnapshotEvent.begin()
+
+        if "origin" not in root_dataset_properties:
+            yield renameSnapshotEvent.skip()
+            return
+
+        origin_snapshot_name = str(root_dataset_properties["origin"].value)
+
+        if origin_snapshot_name == '':
+            yield renameSnapshotEvent.skip()
+            return
+
+        snapshot = self.zfs.get_snapshot(origin_snapshot_name)
 
         try:
             new_snapshot_name = f"{snapshot.parent.name}@{new_name}"
