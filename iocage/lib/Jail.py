@@ -1157,11 +1157,10 @@ class JailGenerator(JailResource):
                 "/bin/sh",
                 "-c",
                 " | ".join([
-                    "mount",
-                    f"grep 'on {self.root_dataset.mountpoint}'",
-                    "grep nullfs",
-                    "cut -f1 -d ' '",
-                    "xargs -n1 umount"
+                    "mount -t nullfs",
+                    "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
+                    f"grep '^{self.root_dataset.mountpoint}/'",
+                    "xargs umount"
                 ])
             ]
             iocage.lib.helpers.exec(
