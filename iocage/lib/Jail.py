@@ -1133,7 +1133,7 @@ class JailGenerator(JailResource):
                     "/root/etcupdate",
                     "/root/usr/ports",
                     "/root/usr/src",
-                    "/tmp"
+                    "/tmp"  # nosec: B108
                 ]
             )
         ))
