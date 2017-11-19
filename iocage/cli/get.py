@@ -72,6 +72,7 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
 
     if jail == "defaults":
         source_resource = host.defaults
+        source_resource.read_config()
         lookup_method = _lookup_config_value
     else:
         lookup_method = _lookup_jail_value
