@@ -37,6 +37,7 @@ class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
         result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
+        result["legacy"] = True
         return result
 
     def map_output(self, data: dict) -> str:
