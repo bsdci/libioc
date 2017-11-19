@@ -1152,6 +1152,23 @@ class JailGenerator(JailResource):
             ignore_error=True
         )
 
+        if self.config.legacy is True:
+            command = [
+                "/bin/sh",
+                "-c",
+                " | ".join([
+                    "mount",
+                    f"grep 'on {self.root_dataset.mountpoint}'",
+                    "grep nullfs",
+                    "cut -f1 -d ' '",
+                    "xargs -n1 umount"
+                ])
+            ]
+            iocage.lib.helpers.exec(
+                command,
+                logger=self.logger
+            )
+
     def _get_absolute_path_from_jail_asset(
         self,
         value: str
