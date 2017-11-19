@@ -86,6 +86,10 @@ class Resource(metaclass=abc.ABCMeta):
     _dataset: libzfs.ZFSDataset
     _dataset_name: str
 
+    _config_json: iocage.lib.Config.Type.JSON.ResourceConfigJSON
+    _config_ucl: iocage.lib.Config.Type.UCL.ResourceConfigUCL
+    _config_zfs: iocage.lib.Config.Type.ZFS.ResourceConfigZFS
+
     def __init__(
         self,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
@@ -107,42 +111,48 @@ class Resource(metaclass=abc.ABCMeta):
         elif dataset is not None:
             self.dataset = dataset
 
-    # ToDo: Memoize
     @property
     def config_json(self) -> 'iocage.lib.Config.Type.JSON.ResourceConfigJSON':
+        if "_config_json" in self.__dir__():
+            return self._config_json
         default = self.DEFAULT_JSON_FILE
         file = self._config_file if self._config_file is not None else default
-        return iocage.lib.Config.Type.JSON.ResourceConfigJSON(
+        self._config_json = iocage.lib.Config.Type.JSON.ResourceConfigJSON(
             file=file,
             resource=self,
             logger=self.logger
         )
+        return self._config_json
 
-    # ToDo: Memoize
     @property
     def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.ResourceConfigUCL':
+        if "_config_ucl" in self.__dir__():
+            return self._config_ucl
         default = self.DEFAULT_UCL_FILE
         file = self._config_file if self._config_file is not None else default
-        return iocage.lib.Config.Type.UCL.ResourceConfigUCL(
+        self._config_ucl = iocage.lib.Config.Type.UCL.ResourceConfigUCL(
             file=file,
             resource=self,
             logger=self.logger
         )
+        return self._config_ucl
 
-    # ToDo: Memoize
     @property
     def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.ResourceConfigZFS':
+        if "_config_zfs" in self.__dir__():
+            return self._config_zfs
         if self.DEFAULT_ZFS_DATASET_SUFFIX is not None:
             name = f"{self.dataset.name}{self.DEFAULT_ZFS_DATASET_SUFFIX}"
             dataset = self.zfs.get_or_create_dataset(name)
         else:
             dataset = None
 
-        return iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
+        self._config_zfs = iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
             resource=self,
             dataset=dataset,
             logger=self.logger
         )
+        return self._config_zfs
 
     @abc.abstractmethod
     def destroy(self, force: bool=False) -> None:
@@ -355,6 +365,11 @@ class DefaultResource(Resource):
         self.config = iocage.lib.Config.Jail.Defaults.JailConfigDefaults(
             logger=logger
         )
+
+    def read_config(self):
+        o = Resource.read_config(self)
+        self.config.clone(o)
+        return o
 
     def destroy(self, force: bool=False) -> None:
         raise NotImplementedError("destroy unimplemented for DefaultResource")
