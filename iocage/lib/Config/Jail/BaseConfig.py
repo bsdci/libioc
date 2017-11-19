@@ -349,12 +349,14 @@ class BaseConfig(dict):
 
     def _set_jail_zfs_dataset(
         self,
-        value: typing.Union[typing.List[str], str],
+        value: typing.Optional[typing.Union[typing.List[str], str]],
         **kwargs
     ) -> None:
-
         value = [value] if isinstance(value, str) else value
-        self.data["jail_zfs_dataset"] = " ".join(value)
+        if value is None:
+            self.data["jail_zfs_dataset"] = ""
+        else:
+            self.data["jail_zfs_dataset"] = " ".join(value)
 
     def _get_jail_zfs(self):
         return iocage.lib.helpers.parse_user_input(
