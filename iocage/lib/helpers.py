@@ -177,11 +177,15 @@ def validate_name(name: str) -> bool:
     return _validate_name.fullmatch(name) is not None
 
 
-def parse_none(data: typing.Any) -> None:
+def parse_none(
+    data: typing.Any,
+    none_matches: typing.List[str]=["none", "-", ""]
+) -> None:
+
     if data is None:
         return None
 
-    if data in ["none", "-", ""]:
+    if data in none_matches:
         return None
 
     raise TypeError("Value is not None")
