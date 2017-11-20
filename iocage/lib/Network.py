@@ -91,7 +91,13 @@ class Network:
         epair_a = epair_a.decode("utf-8").strip()
         epair_b = f"{epair_a[:-1]}b"
 
-        mac_a, mac_b = self.__generate_mac_address_pair()
+        try:
+            mac_config = self.jail.config[f"{self.nic}_mac"]
+            if mac_config is None or mac_config == "":
+                raise Exception("no manual mac address")
+            mac_a, mac_b = mac_config.split(',')
+        except Exception:
+            mac_a, mac_b = self.__generate_mac_address_pair()
 
         host_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_a,
