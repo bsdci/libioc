@@ -49,6 +49,7 @@ class HostGenerator:
 
     _devfs: iocage.lib.DevfsRules.DevfsRules
     _defaults: iocage.lib.Resource.DefaultResource
+    _defaults_initialized = False
     releases_dataset: libzfs.ZFSDataset
     datasets: iocage.lib.Datasets.Datasets
     distribution: _distribution_types
@@ -108,6 +109,9 @@ class HostGenerator:
 
     @property
     def defaults(self) -> 'iocage.lib.Resource.DefaultResource':
+        if self._defaults_initialized is False:
+            self._defaults.read_config()
+            self._defaults_initialized = True
         return self._defaults
 
     @property
