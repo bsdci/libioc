@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
+import collections
 import shutil
 
 import iocage.lib.helpers
@@ -31,19 +32,20 @@ import iocage.lib.Config.Jail
 import iocage.lib.Logger
 
 
-class ResolverProp(list):
+class ResolverProp(collections.MutableSequence):
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "resolver"
+    none_matches: typing.List[str] = ["/dev/null", "-", ""]
+    _entries: typing.List[str] = []
 
     def __init__(
         self,
-        config,
+        config: 'iocage.lib.Config.Jail.JailConfig.JailConfig',
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         **kwargs
     ) -> None:
 
-        list.__init__(self, [])
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.config = config
         self.config.attach_special_property(
@@ -60,38 +62,42 @@ class ResolverProp(list):
         return self._get_method(self.value)
 
     def _get_method(self, value: typing.Any) -> str:
-        if value == "/etc/resolv.conf":
-            return "copy"
-
-        elif value == "/dev/null":
+        if value is None:
             return "skip"
-
+        elif value == "/etc/resolv.conf":
+            return "copy"
         else:
             return "manual"
 
     @property
-    def value(self) -> str:
-        return str(self.config.data["resolver"])
+    def value(self) -> typing.Optional[str]:
+        value = self.config.data["resolver"]
+        try:
+            iocage.lib.helpers.parse_none(value, self.none_matches)
+            return None
+        except TypeError:
+            return str(value)
 
-    def apply(self, jail):
+    def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> None:
         self.logger.verbose(
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
 
         remote_path = f"{jail.root_path}/{self.conf_file_path}"
 
-        if self.method == "copy":
+        if self.method == "skip":
+            self.logger.verbose("resolv.conf untouched")
+
+        elif self.method == "copy":
             shutil.copy(self.conf_file_path, remote_path)
             self.logger.verbose("resolv.conf copied from host")
 
         elif self.method == "manual":
+            lines = map(lambda address: f"nameserver {address}", self._entries)
             with open(remote_path, "w") as f:
-                f.write("\n".join(self))
+                f.write("\n".join(lines))
                 f.close()
             self.logger.verbose("resolv.conf written manually")
-
-        else:
-            self.logger.verbose("resolv.conf not touched")
 
     def set(
         self,
@@ -99,17 +105,18 @@ class ResolverProp(list):
         notify: bool=True
     ) -> None:
 
-        self.clear()
+        self._entries.clear()
         method = self._get_method(value)
         if method == "manual":
             if isinstance(value, str):
-                self += str(value).split(";")  # noqa: T484
+                self._entries += str(value).split(";")  # noqa: T484
             elif isinstance(value, list):
-                self += list(value)  # noqa: T484
-            elif value is None:
-                return
+                self._entries += list(value)  # noqa: T484
             else:
                 raise TypeError("value can be list or string")
+        elif method == "skip":
+            # directly set config property
+            self.config.data["resolver"] = None
         else:
             if isinstance(value, str):
                 self.append(str(value), notify=False)
@@ -120,9 +127,26 @@ class ResolverProp(list):
 
         self.__notify(notify)
 
-    def append(self, value: str, notify: bool=True):
-        list.append(self, value)
+    def append(self, value: str, notify: bool=True) -> None:
+        self._entries.append(value)
         self.__notify(notify)
+
+    def insert(
+        self,
+        index: int,
+        value: str
+    ) -> None:
+        self._entries.insert(index, value)
+        self.__notify()
+
+    def __delitem__(self, key) -> None:
+        del self._entries[key]
+
+    def __getitem__(self, key) -> typing.Any:
+        return self._entries[key]
+
+    def __len__(self):
+        return self._entries.__len__()
 
     def __setitem__(  # noqa: T484
         self,
@@ -134,8 +158,7 @@ class ResolverProp(list):
         self.__notify()
 
     def __str__(self):
-        out = ";".join(list(self))
-        return out
+        return iocage.lib.helpers.to_string(self._entries, delimiter=";")
 
     def __notify(self, notify: bool=True):
         if not notify:
