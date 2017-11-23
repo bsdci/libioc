@@ -21,28 +21,32 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import iocage.lib.helpers
 
 
 class NetworkInterface:
+
     ifconfig_command = "/sbin/ifconfig"
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 
-    def __init__(self,
-                 name="vnet0",
-                 ipv4_addresses=[],
-                 ipv6_addresses=[],
-                 mac=None,
-                 mtu=None,
-                 description=None,
-                 rename=None,
-                 addm=None,
-                 vnet=None,
-                 jail=None,
-                 extra_settings=[],
-                 auto_apply=True,
-                 logger=None):
+    def __init__(
+        self,
+        name: str="vnet0",
+        ipv4_addresses: typing.List[str]=[],
+        ipv6_addresses: typing.List[str]=[],
+        mac: typing.Optional[str]=None,
+        mtu: typing.Optional[int]=None,
+        description: typing.Optional[str]=None,
+        rename: typing.Optional[str]=None,
+        addm: typing.Optional[str]=None,
+        vnet: typing.Optional[str]=None,
+        jail: 'iocage.lib.Jail.JailGenerator'=None,
+        extra_settings: typing.List[str]=[],
+        auto_apply: bool=True,
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
 
         self.jail = jail
 
@@ -78,11 +82,11 @@ class NetworkInterface:
         if auto_apply:
             self.apply()
 
-    def apply(self):
+    def apply(self) -> None:
         self.apply_settings()
         self.apply_addresses()
 
-    def apply_settings(self):
+    def apply_settings(self) -> None:
         command = [self.ifconfig_command, self.name]
         for key in self.settings:
             command.append(key)
@@ -99,11 +103,16 @@ class NetworkInterface:
             del self.settings["name"]
             self.rename = False
 
-    def apply_addresses(self):
+    def apply_addresses(self) -> None:
         self.__apply_addresses(self.ipv4_addresses, ipv6=False)
         self.__apply_addresses(self.ipv6_addresses, ipv6=True)
 
-    def __apply_addresses(self, addresses, ipv6=False):
+    def __apply_addresses(
+        self,
+        addresses: typing.List[str],
+        ipv6: bool=False
+    ) -> None:
+
         family = "inet6" if ipv6 else "inet"
         for address in addresses:
             if (ipv6 is False) and (address.lower() == "dhcp"):
@@ -116,11 +125,16 @@ class NetworkInterface:
             if (ipv6 is True) and (address.lower() == "accept_rtadv"):
                 self.exec([self.rtsold_command, self.name])
 
-    def exec(self, command, force_local=False):
+    def exec(
+        self,
+        command: typing.List[str],
+        force_local: bool=False
+    ) -> typing.Tuple[subprocess.Popen, str, str]:
+
         if self.__is_jail():
             return self.jail.exec(command)
         else:
             return iocage.lib.helpers.exec(command)
 
-    def __is_jail(self):
+    def __is_jail(self) -> bool:
         return self.jail is not None

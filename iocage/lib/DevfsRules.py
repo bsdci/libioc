@@ -30,7 +30,11 @@ import iocage.lib.helpers
 
 class DevfsRulesFilter:
 
-    def __init__(self, source, active_filters=[]):
+    def __init__(
+        self,
+        source,
+        active_filters=[]
+    ) -> None:
         self.source = source
         self.active_filters = active_filters
 
@@ -40,7 +44,7 @@ class DevfsRulesFilter:
             self.source
         ), self.active_filters + [rule])
 
-    def with_include(self, rule_name):
+    def with_include(self, rule_name: str):
         rule = f"add include ${rule_name}"
         return self.with_rule(rule)
 
@@ -74,7 +78,12 @@ class DevfsRuleset(list):
     PATTERN = re.compile(r"""^\[(?P<name>[a-z](?:[a-z0-9\-_]*[a-z0-9])?)=
                 (?P<number>[0-9]+)\]\s*(?:\#\s*(?P<comment>.*))?$""", re.X)
 
-    def __init__(self, value=None, number=None, comment=None):
+    def __init__(
+        self,
+        value=None,
+        number=None,
+        comment=None
+    ) -> None:
         """
         Initialize DevfsRuleset
 
@@ -109,7 +118,7 @@ class DevfsRuleset(list):
         self.comment = comment
         list.__init__(self)
 
-    def has_rule(self, rule):
+    def has_rule(self, rule) -> bool:
         """
         Returns true if the rule is part of the current ruleset
 
@@ -121,11 +130,11 @@ class DevfsRuleset(list):
         """
         return rule in self
 
-    def append(self, rule):
+    def append(self, rule) -> None:
         if rule not in self:
             list.append(self, rule)
 
-    def clone(self, source_ruleset):
+    def clone(self, source_ruleset) -> None:
         """
         Clones the rules from another ruleset
 
@@ -137,7 +146,10 @@ class DevfsRuleset(list):
         for rule in source_ruleset:
             self.append(rule)
 
-    def _parse_line(self, line):
+    def _parse_line(
+        self,
+        line: str
+    ) -> typing.Tupel[str, int, str]:
 
         # marks beginning of a new ruleset
         ruleset_match = re.search(DevfsRuleset.PATTERN, line)
@@ -149,7 +161,7 @@ class DevfsRuleset(list):
 
         raise SyntaxError("DevfsRuleset line parsing failed")
 
-    def __str__(self):
+    def __str__(self) -> str:
         ruleset_line = f"[{self.name}={self.number}]"
         if self.comment is not None:
             ruleset_line += f" # {self.comment}"

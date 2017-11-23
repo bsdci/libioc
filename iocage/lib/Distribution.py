@@ -39,18 +39,18 @@ class EOLParser(html.parser.HTMLParser):
     in_id: bool = False
     td_counter: int = 0
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag: str) -> None:
         if tag == "td":
             self.in_id = True
             self.td_counter += 1
         elif tag == "tr":
             self.td_counter = 0
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag: str) -> None:
         if tag == "td":
             self.in_id = False
 
-    def handle_data(self, data):
+    def handle_data(self, data) -> None:
         if self.in_id and self.td_counter == 2:
             if data != "n/a":
                 self.eol_releases.append(data)

@@ -277,7 +277,7 @@ class JailGenerator(JailResource):
         return object.__getattribute__(self, "_state")
 
     @state.setter
-    def state(self, value: iocage.lib.JailState):
+    def state(self, value: iocage.lib.JailState) -> None:
         object.__setattr__(self, '_state', value)
 
     def _init_state(self) -> iocage.lib.JailState.JailState:
@@ -345,7 +345,10 @@ class JailGenerator(JailResource):
         self._run_hook("poststart")
 
     @property
-    def basejail_backend(self):
+    def basejail_backend(self) -> typing.Union[
+        iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage,
+        iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
+    ]:
 
         if self.config["basejail"] is False:
             return None
@@ -358,7 +361,10 @@ class JailGenerator(JailResource):
 
         return None
 
-    def _run_hook(self, hook_name: str):
+    def _run_hook(
+        self,
+        hook_name: str
+    ) -> typing.Tuple[subprocess.Popen, str, str]:
 
         key = f"exec_{hook_name}"
         value = self.config[key]

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import subprocess  # nosec: B404
 from hashlib import sha224
 
@@ -30,13 +31,17 @@ import iocage.lib.helpers
 
 
 class Network:
-    def __init__(self, jail,
-                 nic="vnet0",
-                 ipv4_addresses=None,
-                 ipv6_addresses=None,
-                 mtu=1500,
-                 bridges=None,
-                 logger=None):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        nic: str="vnet0",
+        ipv4_addresses: typing.Optional[typing.List[str]]=None,
+        ipv6_addresses: typing.Optional[typing.List[str]]=None,
+        mtu: typing.Optional[int]=1500,
+        bridges=typing.Optional[typing.List[str]],
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
@@ -55,7 +60,7 @@ class Network:
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv6_addresses = ipv6_addresses or []
 
-    def setup(self):
+    def setup(self) -> None:
         if self.vnet:
             if not self.bridges or len(self.bridges) == 0:
                 raise iocage.lib.errors.VnetBridgeMissing(
@@ -64,7 +69,7 @@ class Network:
 
             jail_if, host_if = self.__create_vnet_iface()
 
-    def teardown(self):
+    def teardown(self) -> None:
         if self.vnet:
             # down host_if
             iocage.lib.NetworkInterface.NetworkInterface(
@@ -74,15 +79,15 @@ class Network:
             )
 
     @property
-    def nic_local_name(self):
+    def nic_local_name(self) -> str:
         self.jail.require_jail_running(silent=True)
-        return f"{self.nic}:{self.jail.jid}"
+        return str(f"{self.nic}:{self.jail.jid}")
 
     @property
     def nic_local_description(self):
         return f"associated with jail: {self.jail.humanreadable_name}"
 
-    def __create_vnet_iface(self):
+    def __create_vnet_iface(self) -> None:
 
         # create new epair interface
         epair_a_cmd = ["/sbin/ifconfig", "epair", "create"]
@@ -135,21 +140,21 @@ class Network:
 
         return jail_if, host_if
 
-    def __assign_vnet_iface_to_jail(self, nic, jail_name):
+    def __assign_vnet_iface_to_jail(self, nic: str, jail_name: str) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
             name=nic,
             vnet=jail_name,
             logger=self.logger
         )
 
-    def __generate_mac_bytes(self):
+    def __generate_mac_bytes(self) -> str:
         m = sha224()
         m.update(self.jail.name.encode("utf-8"))
         m.update(self.nic.encode("utf-8"))
         prefix = self.jail.config["mac_prefix"]
-        return f"{prefix}{m.hexdigest()[0:12-len(prefix)]}"
+        return str(f"{prefix}{m.hexdigest()[0:12-len(prefix)]}")
 
-    def __generate_mac_address_pair(self):
+    def __generate_mac_address_pair(self) -> tuping.Tupel[str, str]:
         mac_a = self.__generate_mac_bytes()
         mac_b = hex(int(mac_a, 16) + 1)[2:].zfill(12)
         return mac_a, mac_b
