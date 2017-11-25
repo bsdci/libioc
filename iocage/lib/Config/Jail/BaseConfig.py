@@ -153,15 +153,12 @@ class BaseConfig(dict):
 
     def _set_id(self, name: str, **kwargs) -> None:
 
-        try:
+        if ("id" in self.data.keys()) and (self.data["id"] == name):
             # We do not want to set the same name twice.
             # This can occur when the Jail is initialized
             # with it's name and the same name is read from
             # the configuration
-            if self["id"] == name:
-                return
-        except KeyError:
-            pass
+            return
 
         if name is None:
             self.data["id"] = None
