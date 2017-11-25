@@ -170,9 +170,12 @@ class Resource(metaclass=abc.ABCMeta):
     @property
     def exists(self) -> bool:
         try:
-            return os.path.isdir(self.dataset.mountpoint)
+            mountpoint = self.dataset.mountpoint
+            if isinstance(mountpoint, str):
+                return os.path.isdir(mountpoint)
         except (AttributeError, libzfs.ZFSException):
-            return False
+            pass
+        return False
 
     @property
     def _assigned_dataset_name(self) -> str:
