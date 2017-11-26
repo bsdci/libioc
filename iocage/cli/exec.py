@@ -57,7 +57,7 @@ def cli(ctx, command, jail, host_user, jail_user, log_level):
         command = ["/bin/sh", "-c", user_command]
 
     jail = iocage.lib.Jail.Jail(jail, logger=logger)
-    jail.update_jail_state()
+    jail.state.query()
 
     if not jail.exists:
         logger.error(f"The jail {jail.humanreadable_name} does not exist")
