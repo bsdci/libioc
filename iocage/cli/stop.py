@@ -63,12 +63,13 @@ def cli(
 
         autostop(logger=logger, print_function=ctx.parent.print_events)
     else:
-        normal(
+        if not normal(
             jails,
             logger=logger,
             print_function=ctx.parent.print_events,
             force=force
-        )
+        ):
+            exit(1)
 
 
 def stop_jails(
@@ -79,7 +80,7 @@ def stop_jails(
         None
     ],
     force: bool
-) -> None:
+) -> bool:
 
     changed_jails = []
     failed_jails = []
@@ -94,12 +95,14 @@ def stop_jails(
         changed_jails.append(jail)
 
     if len(failed_jails) > 0:
-        exit(1)
+        return False
 
     if len(changed_jails) == 0:
         jails_input = " ".join(list(jails))
         logger.error(f"No jails matched your input: {jails_input}")
-        exit(1)
+        return False
+
+    return False
 
 
 def normal(
@@ -110,7 +113,7 @@ def normal(
         None
     ],
     force: bool
-) -> None:
+) -> bool:
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
@@ -119,7 +122,7 @@ def normal(
 
     if len(jails) == 0:
         logger.error("No jail selector provided")
-        exit(1)
+        return False
 
     stop_jails(
         jails,
@@ -127,6 +130,7 @@ def normal(
         print_function=print_function,
         force=force
     )
+    return True
 
 
 def autostop(
@@ -135,9 +139,9 @@ def autostop(
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
         None
     ]
-):
+) -> None:
 
-    filters = ("boot=yes",)
+    filters = ("boot=yes", "running=yes",)
 
     ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,

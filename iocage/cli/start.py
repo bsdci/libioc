@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """start module for the cli."""
+import typing
 import click
 
 import iocage.lib.errors
@@ -62,7 +63,13 @@ def cli(ctx, rc, jails):
             exit(1)
 
 
-def autostart(logger, print_function):
+def autostart(
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ]
+) -> None:
 
     filters = ("boot=yes", "running=no",)
 
@@ -80,7 +87,14 @@ def autostart(logger, print_function):
     start_jails(jails, logger=logger, print_function=print_function)
 
 
-def normal(filters, logger, print_function) -> bool:
+def normal(
+    filters: typing.Set[str],
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ]
+) -> bool:
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
@@ -90,7 +104,14 @@ def normal(filters, logger, print_function) -> bool:
     return start_jails(jails, logger=logger, print_function=print_function)
 
 
-def start_jails(jails, logger, print_function) -> bool:
+def start_jails(
+    jails: typing.List[iocage.lib.Jails.JailsGenerator],
+    logger: iocage.lib.Logger.Logger,
+    print_function: typing.Callable[
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        None
+    ]
+) -> bool:
 
     changed_jails = []
     failed_jails = []
