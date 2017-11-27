@@ -58,12 +58,13 @@ def cli(ctx, rc, jails):
             exit(1)
         autostart(**start_args)
     else:
-        normal(jails, **start_args)
+        if not normal(jails, **start_args):
+            exit(1)
 
 
 def autostart(logger, print_function):
 
-    filters = ("boot=yes",)
+    filters = ("boot=yes", "running=no",)
 
     ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
@@ -79,17 +80,17 @@ def autostart(logger, print_function):
     start_jails(jails, logger=logger, print_function=print_function)
 
 
-def normal(filters, logger, print_function):
+def normal(filters, logger, print_function) -> bool:
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=filters
     )
 
-    start_jails(jails, logger=logger, print_function=print_function)
+    return start_jails(jails, logger=logger, print_function=print_function)
 
 
-def start_jails(jails, logger, print_function):
+def start_jails(jails, logger, print_function) -> bool:
 
     changed_jails = []
     failed_jails = []
@@ -105,9 +106,11 @@ def start_jails(jails, logger, print_function):
         changed_jails.append(jail)
 
     if len(failed_jails) > 0:
-        exit(1)
+        return False
 
     if len(changed_jails) == 0:
         jails_input = " ".join(list(jails))
-        logger.error(f"No jails matched your input: {jails_input}")
-        exit(1)
+        logger.error(f"No jails started your input: {jails_input}")
+        return False
+
+    return True
