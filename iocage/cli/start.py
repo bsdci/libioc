@@ -71,9 +71,9 @@ def autostart(
     ]
 ) -> None:
 
-    filters = ("boot=yes", "running=no",)
+    filters = ("boot=yes", "running=no", "template=no",)
 
-    ioc_jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.lib.Jails.Jails(
         logger=logger,
         filters=filters
     )
@@ -84,34 +84,37 @@ def autostart(
         key=lambda x: x.config["priority"]
     )
 
-    start_jails(jails, logger=logger, print_function=print_function)
+    failed_jails = []
+    for jail in jails:
+        try:
+            jail.start()
+        except iocage.lib.errors.IocageException:
+            failed_jails.append(jail)
+            continue
+
+        logger.log(f"{jail.humanreadable_name} running as JID {jail.jid}")
+
+    if len(failed_jails) > 0:
+        exit(1)
+
+    exit(0)
 
 
 def normal(
-    filters: typing.Set[str],
+    filters: typing.Tuple[str, ...],
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
         None
     ]
 ) -> bool:
+
+    filters += ("template=no",)
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=filters
     )
-
-    return start_jails(jails, logger=logger, print_function=print_function)
-
-
-def start_jails(
-    jails: typing.List[iocage.lib.Jails.JailsGenerator],
-    logger: iocage.lib.Logger.Logger,
-    print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
-        None
-    ]
-) -> bool:
 
     changed_jails = []
     failed_jails = []
