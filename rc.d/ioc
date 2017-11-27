@@ -26,6 +26,8 @@ load_rc_config "$name"
 
 start_cmd="ioc_start"
 stop_cmd="ioc_stop"
+status_cmd="ioc_status"
+extra_commands="status"
 export LANG=$ioc_lang
 
 ioc_start()
@@ -41,6 +43,21 @@ ioc_stop()
     if checkyesno ${rcvar}; then
         echo "* [I|O|C] stopping jails... "
         /usr/local/bin/ioc stop --rc
+    fi
+}
+
+ioc_status()
+{
+    if checkyesno ${rcvar}; then
+        echo -n "* [I|O|C] checking jails status..."
+	test -z "$(/usr/local/bin/ioc list boot=yes running=no template=no --no-header --output=name --output-format=list)"
+	status=$?
+	if test ${status} -eq 0; then
+            echo " OK"
+	else
+            echo " Failed!"
+	fi
+	exit $status
     fi
 }
 
