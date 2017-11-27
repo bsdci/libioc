@@ -33,7 +33,7 @@ export LANG=$ioc_lang
 ioc_start()
 {
     if checkyesno ${rcvar}; then
-        echo "* [I|O|C] starting jails... "
+        echo "* [iocage] starting jails... "
         /usr/local/bin/ioc start --rc
     fi
 }
@@ -41,7 +41,7 @@ ioc_start()
 ioc_stop()
 {
     if checkyesno ${rcvar}; then
-        echo "* [I|O|C] stopping jails... "
+        echo "* [iocage] stopping jails... "
         /usr/local/bin/ioc stop --rc
     fi
 }
@@ -49,7 +49,7 @@ ioc_stop()
 ioc_status()
 {
     if checkyesno ${rcvar}; then
-        echo -n "* [I|O|C] checking jails status..."
+        echo -n "* [iocage] checking jails status..."
 	test -z "$(/usr/local/bin/ioc list boot=yes running=no template=no --no-header --output=name --output-format=list)"
 	status=$?
 	if test ${status} -eq 0; then
