@@ -140,6 +140,9 @@ class Datasets:
                 "Claiming /iocage as mountpoint of the activated zpool"
             )
             mountpoint = iocage.lib.Types.AbsolutePath('/iocage')
+        
+        if self.root.mountpoint != mountpoint:
+            self.root.properties["mountpoint"] = libzfs.ZFSUserProperty(mountpoint)
 
     def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
