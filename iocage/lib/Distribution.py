@@ -91,7 +91,7 @@ class DistributionGenerator:
 
     @property
     def name(self) -> str:
-        if os.uname()[2].endswith("-HBSD"):
+        if os.path.exists("/usr/sbin/hbsd-update"):
             return "HardenedBSD"
         else:
             return platform.system()
