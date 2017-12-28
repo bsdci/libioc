@@ -98,6 +98,15 @@ def init_logger(
             return new_logger
 
 
+def get_userland_version() -> str:
+    f = open("/bin/freebsd-version", "r", re.MULTILINE, encoding="utf-8")
+    # ToDo: move out of the function
+    pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z\-]+)\"")
+    content = f.read()
+    match = pattern.search(content)
+    return match[1]
+
+
 def exec(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
