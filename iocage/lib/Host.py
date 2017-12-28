@@ -133,11 +133,10 @@ class HostGenerator:
 
     @property
     def userland_version(self) -> float:
-        return float(self.release_version.partition("-")[0])
+        return float(iocage.lib.helpers.get_userland_version())
 
     @property
     def release_version(self) -> str:
-
         if self.distribution.name == "FreeBSD":
             release_version_string = os.uname()[2]
             release_version_fragments = release_version_string.split("-")
