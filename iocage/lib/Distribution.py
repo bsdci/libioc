@@ -162,8 +162,7 @@ class DistributionGenerator:
     def _filter_available_releases(self, release_name: str) -> bool:
         if self.name != "HardenedBSD":
             return True
-        arch = release_name.split("-")[-2:][0]
-        return (self.host.processor == arch) is True
+        return (self.host.processor in release_name)
 
     def _get_eol_list(self) -> typing.List[str]:
         """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
