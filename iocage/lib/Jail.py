@@ -85,8 +85,9 @@ class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
             pass
 
         # is instance of Jail itself
-        if isinstance(self, iocage.lib.Jail.JailGenerator):
-            return self
+        if isinstance(self, JailGenerator):
+            jail = self  # type: JailGenerator
+            return jail
 
         raise Exception("This resource is not a jail or not linked to one")
 
