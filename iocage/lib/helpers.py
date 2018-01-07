@@ -101,7 +101,7 @@ def init_logger(
 def get_userland_version() -> str:
     f = open("/bin/freebsd-version", "r", re.MULTILINE, encoding="utf-8")
     # ToDo: move out of the function
-    pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z\-]+)\"")
+    pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z0-9\-]+)\"")
     content = f.read()
     match = pattern.search(content)
     return match[1]
