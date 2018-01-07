@@ -1035,15 +1035,23 @@ class JailGenerator(JailResource):
 
         ip_version = 4 + 2 * (ipv6 is True)
 
+        # router@interface syntax for static pointopoint route
+        if "@" in gateway:
+            gateway, nic = gateway.split("@", maxsplit=1)
+            self.logger.verbose(
+                f"setting pointopoint route to {gateway} via {nic}"
+            )
+            self.exec(["/sbin/route", "add", gateway, "-iface", nic])
+
         self.logger.verbose(
             f"setting default IPv{ip_version} gateway to {gateway}",
             jail=self
         )
-
-        command = ["/sbin/route", "add"] + \
-            (["-6"] if (ipv6 is True) else []) + ["default", gateway]
-
-        self.exec(command)
+        self.exec(
+            ["/sbin/route", "add"] +
+            (["-6"] if (ipv6 is True) else []) +
+            ["default", gateway]
+        )
 
     def require_jail_is_template(self, **kwargs) -> None:
         """
