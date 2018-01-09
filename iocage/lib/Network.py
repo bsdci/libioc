@@ -32,6 +32,13 @@ import iocage.lib.helpers
 
 
 class Network:
+    """
+    VNET Jails may have access to different networks. Each is identified by a
+    network interface name that is unique to the jail.
+
+    A Network is configured with IPv4 and IPv6 addresses, a bridge interface
+    and an optional MTU.
+    """
 
     def __init__(
         self,
@@ -57,11 +64,20 @@ class Network:
         self.ipv6_addresses = ipv6_addresses or []
 
     def setup(self) -> None:
+        """
+        Jails call this method to create the network after being started
+        and configure the interfaces on jail and host side according to the
+        class attributes.
+        """
         if (self.vnet is True) and (self.bridge is None):
             raise iocage.lib.errors.VnetBridgeMissing(logger=self.logger)
         self.__create_vnet_iface()
 
     def teardown(self) -> None:
+        """
+        After Jails are stopped the devices that were used by it remain on the
+        host. This method is called by jails after they terminated.
+        """
         if self.vnet is True:
             self.__down_host_interface()
             if self.bridge.secure is True:
@@ -91,7 +107,13 @@ class Network:
 
     @property
     def nic_local_name(self) -> str:
+        """
+        The Network NIC is unique per jail. Iocage appends the running jails
+        JID to the device name, so that the epair device exposed to the jail
+        host can be easily identified by the user.
 
+        Example for JID 1: `vnet0:1`
+        """
         self.jail.require_jail_running(silent=True)
         return f"{self.nic}:{self.jail.jid}"
 

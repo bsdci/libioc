@@ -26,6 +26,10 @@ import iocage.lib.helpers
 
 
 class NetworkInterface:
+    """
+    NetworkInterface abstracts interface configurations and commands executed
+    on the host or within jails. This class is internally used by Network.
+    """
 
     ifconfig_command = "/sbin/ifconfig"
     dhclient_command = "/sbin/dhclient"
@@ -90,10 +94,16 @@ class NetworkInterface:
             self.apply()
 
     def apply(self) -> None:
+        """
+        Applies the interface settings and configures IP address
+        """
         self.apply_settings()
         self.apply_addresses()
 
     def apply_settings(self) -> str:
+        """
+        Only applies the interface settings
+        """
         command = [self.ifconfig_command, self.name]
 
         if self.create is True:
@@ -121,6 +131,9 @@ class NetworkInterface:
             self.rename = False
 
     def apply_addresses(self) -> None:
+        """
+        Applies the configured IP addresses
+        """
         self.__apply_addresses(self.ipv4_addresses, ipv6=False)
         self.__apply_addresses(self.ipv6_addresses, ipv6=True)
 
