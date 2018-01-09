@@ -26,36 +26,6 @@ import typing
 import iocage.lib.helpers
 
 
-class BridgeSet(set):
-
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
-
-    def __init__(
-        self,
-        config: typing.Optional[
-            'iocage.lib.Config.Jail.JailConfig.JailConfig'
-        ]=None
-    ) -> None:
-
-        if config is not None:
-            self.config = config
-
-        set.__init__(self)
-
-    def add(self, value: str, notify: bool=True) -> None:
-        set.add(self, value)
-        if notify:
-            self.__notify()
-
-    def remove(self, value: str, notify: bool=True) -> None:
-        set.remove(self, value)
-        if notify:
-            self.__notify()
-
-    def __notify(self) -> None:
-        self.config.update_special_property("interfaces")
-
-
 class InterfaceProp(dict):
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
@@ -76,7 +46,7 @@ class InterfaceProp(dict):
 
     def set(
         self,
-        data: typing.Union[str, typing.Dict[str, BridgeSet]]
+        data: typing.Union[str, typing.Dict[str, str]]
     ) -> None:
 
         self.clear()
@@ -101,25 +71,40 @@ class InterfaceProp(dict):
     def add(
         self,
         jail_if: str,
-        bridges: typing.Optional[typing.Union[str, typing.List[str]]]=None,
-        notify: bool=True
+        bridge_if: typing.Optional[str]=None,
+        secure: typing.Optional[bool]=False,
+        notify: typing.Optional[bool]=True
     ) -> None:
+        """
+        add an interface/bridge configuration
 
-        if bridges is None or bridges == [] or bridges == "":
-            return
+        Args:
 
-        if isinstance(bridges, str):
-            bridges = [bridges]
+            jail_if (string):
+                Interface name inside the jail
+
+            bridge_if (string): (optional)
+                Interface name of the host bridge device (VNET only)
+
+            secure (bool): (default=False)
+                Enabling this option adds an epair device between the bridge
+                and the jail, so that source IP and mac address cannot be
+                manipulated from inside the jail
+
+            notify (bool): (default=True)
+                Sends an update notification to the jail config instance
+        """
 
         try:
-            prop = dict.__getitem__(self, jail_if)
-        except KeyError:
-            prop = self.__empty_prop(jail_if)
+            bridge_if = iocage.lib.helpers.parse_none(bridge_if)
+        except:
+            pass
 
-        for bridge_if in bridges:
-            prop.add(bridge_if, notify=False)
+        # ToDo: Implement secur option
 
-        if notify:
+        dict.__setitem__(self, jail_if, bridge_if)
+
+        if notify is True:
             self.__notify()
 
     def __setitem__(self, key, values):
@@ -136,17 +121,15 @@ class InterfaceProp(dict):
     def __notify(self) -> None:
         self.config.update_special_property(self.property_name)
 
-    def __empty_prop(self, key: str) -> BridgeSet:
-
-        prop = BridgeSet(self.config)
-        dict.__setitem__(self, key, prop)
-        return prop
+    def __empty_prop(self, key: str) -> str:
+        dict.__setitem__(self, key, None)
+        return None
 
     def to_string(self, value: dict) -> str:
         out = []
         for jail_if in value:
-            for bridge_if in self[jail_if]:
-                out.append(f"{jail_if}:{bridge_if}")
+            bridge_if = self[jail_if]
+            out.append(f"{jail_if}:{bridge_if}")
         return " ".join(out)
 
     def __str__(self) -> str:
