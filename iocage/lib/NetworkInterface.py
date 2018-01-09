@@ -35,12 +35,15 @@ class NetworkInterface:
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 
+    name: str
+    settings: typing.Dict[str, typing.Union[str, typing.List[str]]]
+
     def __init__(
         self,
         name: typing.Optional[str]="vnet0",
         create: typing.Optional[bool]=False,
-        ipv4_addresses: typing.Optional[str]=[],
-        ipv6_addresses: typing.Optional[str]=[],
+        ipv4_addresses: typing.Optional[typing.List[str]]=[],
+        ipv6_addresses: typing.Optional[typing.List[str]]=[],
         mac: typing.Optional[str]=None,
         mtu: typing.Optional[int]=None,
         description: typing.Optional[str]=None,
@@ -49,13 +52,16 @@ class NetworkInterface:
         addm: typing.Optional[typing.Union[str, typing.List[str]]]=None,
         vnet: typing.Optional[str]=None,
         jail: typing.Optional['iocage.lib.Jail.JailGenerator']=None,
-        extra_settings: typing.Optional[str]=["up"],
+        extra_settings: typing.Optional[typing.List[str]]=["up"],
         auto_apply: typing.Optional[bool]=True,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         self.jail = jail
         self.logger = iocage.lib.helpers.init_logger(self, logger)
+
+        if name is None:
+            raise iocage.lib.errors.InvalidInterfaceName(logger=self.logger)
 
         self.name = name
         self.create = create
@@ -100,11 +106,11 @@ class NetworkInterface:
         self.apply_settings()
         self.apply_addresses()
 
-    def apply_settings(self) -> str:
+    def apply_settings(self) -> None:
         """
         Only applies the interface settings
         """
-        command = [self.ifconfig_command, self.name]
+        command: typing.List[str] = [self.ifconfig_command, self.name]
 
         if self.create is True:
             command.append("create")
@@ -126,7 +132,7 @@ class NetworkInterface:
 
         # update name when the interface was renamed
         if self.rename:
-            self.name = self.settings["name"]
+            self.name = str(self.settings["name"])
             del self.settings["name"]
             self.rename = False
 
@@ -134,10 +140,17 @@ class NetworkInterface:
         """
         Applies the configured IP addresses
         """
-        self.__apply_addresses(self.ipv4_addresses, ipv6=False)
-        self.__apply_addresses(self.ipv6_addresses, ipv6=True)
+        if self.ipv4_addresses is not None:
+            self.__apply_addresses(self.ipv4_addresses, ipv6=False)
+        if self.ipv6_addresses is not None:
+            self.__apply_addresses(self.ipv6_addresses, ipv6=True)
 
-    def __apply_addresses(self, addresses, ipv6=False):
+    def __apply_addresses(
+        self,
+        addresses: typing.List[str],
+        ipv6: bool=False
+    ) -> None:
+
         family = "inet6" if ipv6 else "inet"
         for i, address in enumerate(addresses):
             if (ipv6 is False) and (address.lower() == "dhcp"):
@@ -151,21 +164,18 @@ class NetworkInterface:
             self.__exec(command)
 
             if (ipv6 is True) and (address.lower() == "accept_rtadv"):
-                self.exec([self.rtsold_command, self.name])
+                self.__exec([self.rtsold_command, self.name])
 
     def __exec(
         self,
         command: typing.List[str],
         force_local: typing.Optional[bool]=False
-    ) -> typing.Tuple['subprocess.Popen', str, str]:
+    ) -> None:
 
-        if self.__is_jail():
+        if self.jail is not None:
             _, stdout, _ = self.jail.exec(command)
         else:
             _, stdout, _ = iocage.lib.helpers.exec(command, logger=self.logger)
 
         if (self.create or self.rename) is True:
             self.name = stdout.strip()
-
-    def __is_jail(self) -> bool:
-        return (self.jail is not None)

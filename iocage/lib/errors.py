@@ -430,6 +430,13 @@ class ZFSPoolUnavailable(IocageException):
 # Network
 
 
+class InvalidInterfaceName(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = "Invalid NIC name"
+        super().__init__(msg, *args, **kwargs)
+
+
 class VnetBridgeMissing(IocageException):
 
     def __init__(self, *args, **kwargs) -> None:
