@@ -25,6 +25,7 @@ import typing
 import subprocess  # nosec: B404
 from hashlib import sha224
 
+import iocage.lib.BridgeInterface
 import iocage.lib.NetworkInterface
 import iocage.lib.errors
 import iocage.lib.helpers
@@ -39,7 +40,9 @@ class Network:
         ipv4_addresses: typing.Optional[typing.List[str]]=None,
         ipv6_addresses: typing.Optional[typing.List[str]]=None,
         mtu: typing.Optional[int]=1500,
-        bridge: typing.Optional[str]=None,
+        bridge: typing.Optional[
+            'iocage.lib.BridgeInterface.BridgeInterface'
+        ]=None,
         logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
 
@@ -61,10 +64,27 @@ class Network:
     def teardown(self) -> None:
         if self.vnet is True:
             self.__down_host_interface()
+            if self.bridge.secure is True:
+                self.__down_secure_mode_devices()
 
     def __down_host_interface(self) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
-                name=self.nic_local_name,
+            name=self.nic_local_name,
+            extra_settings=["destroy"],
+            logger=self.logger
+        )
+
+    def __down_secure_mode_devices(self) -> None:
+
+        self.logger.verbose("Downing secure mode devices")
+
+        for nic in [
+            f"{self.nic_local_name}:a",
+            f"{self.nic_local_name}:net"
+        ]:
+
+            iocage.lib.NetworkInterface.NetworkInterface(
+                name=nic,
                 extra_settings=["destroy"],
                 logger=self.logger
             )
@@ -75,16 +95,24 @@ class Network:
         return f"{self.nic}:{self.jail.jid}"
 
     @property
+    def nic_group_name(self) -> str:
+        self.jail.require_jail_running(silent=True)
+        return f"ioc-{self.jail.jid}"
+
+    @property
     def nic_local_description(self) -> str:
         return f"associated with jail: {self.jail.humanreadable_name}"
 
     def __create_new_epair_interface(self) -> typing.Tuple[str, str]:
-        epair_a_cmd = ["/sbin/ifconfig", "epair", "create"]
-        epair_a = subprocess.Popen(  # nosec: TODO: use exec helper?
-            epair_a_cmd, stdout=subprocess.PIPE, shell=False).communicate()[0]
-        epair_a = epair_a.decode("utf-8").strip()
-        epair_b = f"{epair_a[:-1]}b"
-        return epair_a, epair_b
+        epair_a = iocage.lib.NetworkInterface.NetworkInterface(
+            name="epair",
+            create=True,
+            group=self.nic_group_name,
+            logger=self.logger
+        )
+        epair_a_name = epair_a.name
+        epair_b_name = f"{epair_a_name[:-1]}b"
+        return epair_a_name, epair_b_name
 
     def __create_vnet_iface(
         self
@@ -108,10 +136,46 @@ class Network:
             mtu=self.mtu,
             description=self.nic_local_description,
             rename=self.nic_local_name,
+            group=self.nic_group_name,
             logger=self.logger
         )
 
-        self.__add_host_id_to_bridge()
+        if self.bridge.secure is False:
+            bridge_name = self.bridge.name
+            self.__add_nic_to_bridge(self.nic_local_name, bridge_name)
+        else:
+            epair_c, epair_d = self.__create_new_epair_interface()
+            left_if = f"{self.nic_local_name}:a"
+            right_if = f"{self.nic_local_name}:b"
+            iocage.lib.NetworkInterface.NetworkInterface(
+                name=epair_c,
+                rename=left_if,
+                mtu=self.mtu,
+                logger=self.logger
+            )
+            iocage.lib.NetworkInterface.NetworkInterface(
+                name=epair_d,
+                rename=right_if,
+                mtu=self.mtu,
+                logger=self.logger
+            )
+            # bridge_name is the secondary bridge name in secure mode
+            bridge = iocage.lib.NetworkInterface.NetworkInterface(
+                name="bridge",
+                create=True,
+                rename=f"{self.nic_local_name}:net",
+                group=self.nic_group_name,
+            )
+            bridge_name = bridge.name
+            iocage.lib.NetworkInterface.NetworkInterface(
+                name=bridge_name,
+                addm=[
+                    right_if,
+                    self.nic_local_name
+                ]
+            )
+            self.__add_nic_to_bridge(left_if, self.bridge.name)
+        
         self.__up_host_if()
 
         # assign epair_b to jail
@@ -123,7 +187,6 @@ class Network:
             mtu=self.mtu,
             rename=self.nic,
             jail=self.jail,
-            extra_settings=["up"],
             ipv4_addresses=self.ipv4_addresses,
             ipv6_addresses=self.ipv6_addresses,
             logger=self.logger
@@ -131,18 +194,16 @@ class Network:
 
         return jail_if, host_if
 
-    def __add_host_id_to_bridge(self) -> None:
+    def __add_nic_to_bridge(self, nic: str, bridge_name: str) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
-            name=self.bridge,
-            addm=self.nic_local_name,
-            extra_settings=["up"],
+            name=bridge_name,
+            addm=nic,
             logger=self.logger
         )
 
     def __up_host_if(self) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
             name=self.nic_local_name,
-            extra_settings=["up"],
             logger=self.logger
         )
 
@@ -150,6 +211,7 @@ class Network:
         iocage.lib.NetworkInterface.NetworkInterface(
             name=nic,
             vnet=jail_name,
+            extra_settings=[],
             logger=self.logger
         )
 

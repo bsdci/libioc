@@ -24,6 +24,7 @@
 import typing
 
 import iocage.lib.helpers
+import iocage.lib.BridgeInterface
 
 
 class InterfaceProp(dict):
@@ -72,7 +73,6 @@ class InterfaceProp(dict):
         self,
         jail_if: str,
         bridge_if: typing.Optional[str]=None,
-        secure: typing.Optional[bool]=False,
         notify: typing.Optional[bool]=True
     ) -> None:
         """
@@ -86,23 +86,20 @@ class InterfaceProp(dict):
             bridge_if (string): (optional)
                 Interface name of the host bridge device (VNET only)
 
-            secure (bool): (default=False)
-                Enabling this option adds an epair device between the bridge
-                and the jail, so that source IP and mac address cannot be
-                manipulated from inside the jail
+                A name beginning with ! (exclamation mark) enables the secure
+                mode, that adds a second bridge between the jail and the
+                target bridge, so that source IP and mac address cannot be
+                spoofed from within the jail
 
             notify (bool): (default=True)
                 Sends an update notification to the jail config instance
         """
-
         try:
-            bridge_if = iocage.lib.helpers.parse_none(bridge_if)
+            bridge = iocage.lib.helpers.parse_none(bridge_if)
         except:
-            pass
+            bridge = iocage.lib.BridgeInterface.BridgeInterface(bridge_if)
 
-        # ToDo: Implement secur option
-
-        dict.__setitem__(self, jail_if, bridge_if)
+        dict.__setitem__(self, jail_if, bridge)
 
         if notify is True:
             self.__notify()
