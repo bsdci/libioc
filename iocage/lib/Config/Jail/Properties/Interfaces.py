@@ -86,10 +86,12 @@ class InterfaceProp(dict):
             bridge_if (string): (optional)
                 Interface name of the host bridge device (VNET only)
 
-                A name beginning with ! (exclamation mark) enables the secure
+                A name beginning with : (colon) enables the secure
                 mode, that adds a second bridge between the jail and the
                 target bridge, so that source IP and mac address cannot be
-                spoofed from within the jail
+                spoofed from within the jail.
+
+                  ioc set interfaces="vnet0::bridge0" my-jail
 
             notify (bool): (default=True)
                 Sends an update notification to the jail config instance
