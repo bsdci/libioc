@@ -150,7 +150,10 @@ class DistributionGenerator:
                 logger=self.logger,
                 eol=self._check_eol(x, eol_list)
             ),
-            available_releases
+            filter(
+                lambda y: len(y) > 0,
+                available_releases
+            )
         ))
 
     def _map_available_release(self, release_name: str) -> str:
@@ -256,7 +259,6 @@ class DistributionGenerator:
                 )
             )
         )
-
         return list(matches)
 
 

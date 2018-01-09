@@ -153,6 +153,9 @@ class Network:
         if self.bridge is None:
             raise iocage.lib.errors.VnetBridgeMissing(logger=self.logger)
 
+        if self._is_secure_bridge is True:
+            self.firewall.ensure_firewall_enabled()
+
         epair_a, epair_b = self.__create_new_epair_interface()
 
         try:
@@ -192,11 +195,8 @@ class Network:
                 logger=self.logger
             )
 
-            # Firewall
-            if self.firewall.ipfw_enabled is False:
-                raise iocage.lib.errors.FirewallDisabled(logger=self.logger)
-
             self.logger.verbose("Configuring Secure VNET Firewall")
+
             for ipv4_address in self.ipv4_addresses:
                 address = ipv4_address.split("/", maxsplit=1)[0]
                 self.firewall.add_rule(self.jail.jid, [
@@ -234,6 +234,7 @@ class Network:
                 "via", host_if.name,
                 "out"
             ])
+            self.logger.debug("Firewall rules added")
 
             # bridge_name is the secondary bridge name in secure mode
             bridge = iocage.lib.NetworkInterface.NetworkInterface(
