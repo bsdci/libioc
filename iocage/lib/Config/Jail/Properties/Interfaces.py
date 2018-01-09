@@ -96,7 +96,7 @@ class InterfaceProp(dict):
         """
         try:
             bridge = iocage.lib.helpers.parse_none(bridge_if)
-        except:
+        except TypeError:
             bridge = iocage.lib.BridgeInterface.BridgeInterface(bridge_if)
 
         dict.__setitem__(self, jail_if, bridge)
@@ -118,9 +118,8 @@ class InterfaceProp(dict):
     def __notify(self) -> None:
         self.config.update_special_property(self.property_name)
 
-    def __empty_prop(self, key: str) -> str:
+    def __empty_prop(self, key: str) -> None:
         dict.__setitem__(self, key, None)
-        return None
 
     def to_string(self, value: dict) -> str:
         out = []

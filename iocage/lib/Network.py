@@ -22,7 +22,6 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import subprocess  # nosec: B404
 from hashlib import sha224
 
 import iocage.lib.BridgeInterface
@@ -40,10 +39,13 @@ class Network:
     and an optional MTU.
     """
 
+    bridge: typing.Optional['iocage.lib.BridgeInterface.BridgeInterface']
+    nic: str = "vnet0"
+
     def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        nic: typing.Optional[str]="vnet0",
+        nic: typing.Optional[str]=None,
         ipv4_addresses: typing.Optional[typing.List[str]]=None,
         ipv6_addresses: typing.Optional[typing.List[str]]=None,
         mtu: typing.Optional[int]=1500,
@@ -55,10 +57,12 @@ class Network:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
+        if nic is not None:
+            self.nic = nic
+
         self.vnet = True
         self.bridge = bridge
         self.jail = jail
-        self.nic = nic
         self.mtu = mtu
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv6_addresses = ipv6_addresses or []
@@ -80,7 +84,7 @@ class Network:
         """
         if self.vnet is True:
             self.__down_host_interface()
-            if self.bridge.secure is True:
+            if self._is_secure_bridge is True:
                 self.__down_secure_mode_devices()
 
     def __down_host_interface(self) -> None:
@@ -121,6 +125,10 @@ class Network:
     def nic_local_description(self) -> str:
         return f"associated with jail: {self.jail.humanreadable_name}"
 
+    @property
+    def _is_secure_bridge(self) -> bool:
+        return (self.bridge is not None) and (self.bridge.secure is True)
+
     def __create_new_epair_interface(self) -> typing.Tuple[str, str]:
         epair_a = iocage.lib.NetworkInterface.NetworkInterface(
             name="epair",
@@ -137,6 +145,9 @@ class Network:
         iocage.lib.NetworkInterface.NetworkInterface,
         iocage.lib.NetworkInterface.NetworkInterface
     ]:
+        if self.bridge is None:
+            raise iocage.lib.errors.VnetBridgeMissing(logger=self.logger)
+
         epair_a, epair_b = self.__create_new_epair_interface()
 
         try:
@@ -156,7 +167,7 @@ class Network:
             logger=self.logger
         )
 
-        if self.bridge.secure is False:
+        if self._is_secure_bridge is False:
             bridge_name = self.bridge.name
             self.__add_nic_to_bridge(self.nic_local_name, bridge_name)
         else:
@@ -190,12 +201,12 @@ class Network:
                 ]
             )
             self.__add_nic_to_bridge(left_if, self.bridge.name)
-        
+
         self.__up_host_if()
 
         # assign epair_b to jail
         self.__assign_vnet_iface_to_jail(epair_b, self.jail.identifier)
-        
+
         jail_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_b,
             mac=mac_b,
@@ -222,7 +233,11 @@ class Network:
             logger=self.logger
         )
 
-    def __assign_vnet_iface_to_jail(self, nic, jail_name):
+    def __assign_vnet_iface_to_jail(
+        self,
+        nic: str,
+        jail_name: str
+    ) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
             name=nic,
             vnet=jail_name,
@@ -230,14 +245,14 @@ class Network:
             logger=self.logger
         )
 
-    def __generate_mac_bytes(self):
+    def __generate_mac_bytes(self) -> str:
         m = sha224()
         m.update(self.jail.name.encode("utf-8"))
         m.update(self.nic.encode("utf-8"))
         prefix = self.jail.config["mac_prefix"]
         return f"{prefix}{m.hexdigest()[0:12-len(prefix)]}"
 
-    def __generate_mac_address_pair(self):
+    def __generate_mac_address_pair(self) -> typing.Tuple[str, str]:
         mac_a = self.__generate_mac_bytes()
         mac_b = hex(int(mac_a, 16) + 1)[2:].zfill(12)
         return mac_a, mac_b
