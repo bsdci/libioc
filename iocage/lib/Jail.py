@@ -892,7 +892,7 @@ class JailGenerator(JailResource):
 
         for nic in nics:
 
-            bridges = list(self.config["interfaces"][nic])
+            bridge = self.config["interfaces"][nic]
 
             try:
                 ipv4_addresses = self.config["ip4_addr"][nic]
@@ -909,7 +909,7 @@ class JailGenerator(JailResource):
                 nic=nic,
                 ipv4_addresses=ipv4_addresses,
                 ipv6_addresses=ipv6_addresses,
-                bridges=bridges,
+                bridge=bridge,
                 logger=self.logger
             )
             networks.append(net)
