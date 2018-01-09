@@ -105,11 +105,14 @@ class NetworkInterface:
 
     def __apply_addresses(self, addresses, ipv6=False):
         family = "inet6" if ipv6 else "inet"
-        for address in addresses:
+        for i, address in enumerate(addresses):
             if (ipv6 is False) and (address.lower() == "dhcp"):
                 command = [self.dhclient_command, self.name]
             else:
                 command = [self.ifconfig_command, self.name, family, address]
+
+            if i > 0:
+                command.append("alias")
 
             self.exec(command)
 
