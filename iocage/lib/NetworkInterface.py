@@ -32,7 +32,6 @@ class NetworkInterface:
     """
 
     ifconfig_command = "/sbin/ifconfig"
-    ipfw_command = "/sbin/ipfw"
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 

@@ -26,6 +26,7 @@ from hashlib import sha224
 
 import iocage.lib.BridgeInterface
 import iocage.lib.NetworkInterface
+import iocage.lib.Firewall
 import iocage.lib.errors
 import iocage.lib.helpers
 
@@ -56,6 +57,9 @@ class Network:
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.firewall = iocage.lib.Firewall.Firewall(
+            logger=self.logger
+        )
 
         if nic is not None:
             self.nic = nic
@@ -86,6 +90,7 @@ class Network:
             self.__down_host_interface()
             if self._is_secure_bridge is True:
                 self.__down_secure_mode_devices()
+                self.firewall.delete_rule(self.jail.jid)
 
     def __down_host_interface(self) -> None:
         iocage.lib.NetworkInterface.NetworkInterface(
@@ -186,6 +191,50 @@ class Network:
                 mtu=self.mtu,
                 logger=self.logger
             )
+
+            # Firewall
+            if self.firewall.ipfw_enabled is False:
+                raise iocage.lib.errors.FirewallDisabled(logger=self.logger)
+
+            self.logger.verbose("Configuring Secure VNET Firewall")
+            for ipv4_address in self.ipv4_addresses:
+                address = ipv4_address.split("/", maxsplit=1)[0]
+                self.firewall.add_rule(self.jail.jid, [
+                    "allow", "ip4",
+                    "from", address, "to", "any",
+                    "layer2",
+                    "MAC", "any", mac_b,
+                    "via", right_if,
+                    "out"
+                ])
+                self.firewall.add_rule(self.jail.jid, [
+                    "allow", "ip4",
+                    "from", "any", "to", address,
+                    "layer2",
+                    "MAC", mac_b, "any",
+                    "via", host_if.name,
+                    "out"
+                ])
+                self.firewall.add_rule(self.jail.jid, [
+                    "allow", "ip4",
+                    "from", "any", "to", address,
+                    "via", host_if.name,
+                    "out"
+                ])
+            self.firewall.add_rule(self.jail.jid, [
+                "deny", "log", "ip4",
+                "from", "any", "to", "any",
+                "layer2",
+                "via", right_if,
+                "out"
+            ])
+            self.firewall.add_rule(self.jail.jid, [
+                "deny", "log", "ip4",
+                "from", "any", "to", "any",
+                "via", host_if.name,
+                "out"
+            ])
+
             # bridge_name is the secondary bridge name in secure mode
             bridge = iocage.lib.NetworkInterface.NetworkInterface(
                 name="bridge",
