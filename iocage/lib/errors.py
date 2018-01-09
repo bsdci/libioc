@@ -459,6 +459,13 @@ class InvalidNetworkBridge(IocageException, ValueError):
         super().__init__(msg, *args, **kwargs)
 
 
+class FirewallDisabled(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        msg = "IPFW is disabled on the host system"
+        super().__init__(msg, *args, **kwargs)
+
+
 # Release
 
 
