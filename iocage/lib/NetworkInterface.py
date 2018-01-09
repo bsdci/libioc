@@ -21,32 +21,40 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+import typing
 import iocage.lib.helpers
 
 
 class NetworkInterface:
+
     ifconfig_command = "/sbin/ifconfig"
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 
-    def __init__(self,
-                 name="vnet0",
-                 ipv4_addresses=[],
-                 ipv6_addresses=[],
-                 mac=None,
-                 mtu=None,
-                 description=None,
-                 rename=None,
-                 addm=None,
-                 vnet=None,
-                 jail=None,
-                 extra_settings=[],
-                 auto_apply=True,
-                 logger=None):
+    def __init__(
+        self,
+        name: typing.Optional[str]="vnet0",
+        create: typing.Optional[bool]=False,
+        ipv4_addresses: typing.Optional[str]=[],
+        ipv6_addresses: typing.Optional[str]=[],
+        mac: typing.Optional[str]=None,
+        mtu: typing.Optional[int]=None,
+        description: typing.Optional[str]=None,
+        rename: typing.Optional[str]=None,
+        group: typing.Optional[str]=None,
+        addm: typing.Optional[typing.Union[str, typing.List[str]]]=None,
+        vnet: typing.Optional[str]=None,
+        jail: typing.Optional['iocage.lib.Jail.JailGenerator']=None,
+        extra_settings: typing.Optional[str]=["up"],
+        auto_apply: typing.Optional[bool]=True,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ) -> None:
 
         self.jail = jail
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
 
         self.name = name
+        self.create = create
         self.ipv4_addresses = ipv4_addresses
         self.ipv6_addresses = ipv6_addresses
 
@@ -68,6 +76,9 @@ class NetworkInterface:
         if addm:
             self.settings["addm"] = addm
 
+        # if group:
+        #     self.settings["group"] = group
+
         # rename interface when applying settings next time
         if isinstance(rename, str):
             self.rename = True
@@ -78,15 +89,25 @@ class NetworkInterface:
         if auto_apply:
             self.apply()
 
-    def apply(self):
+    def apply(self) -> None:
         self.apply_settings()
         self.apply_addresses()
 
-    def apply_settings(self):
+    def apply_settings(self) -> str:
         command = [self.ifconfig_command, self.name]
+
+        if self.create is True:
+            command.append("create")
+
         for key in self.settings:
-            command.append(key)
-            command.append(self.settings[key])
+            value = self.settings[key]
+            if isinstance(value, str):
+                values = [value]
+            else:
+                values = value
+            for value in values:
+                command.append(key)
+                command.append(value)
 
         if self.extra_settings:
             command += self.extra_settings
@@ -99,7 +120,7 @@ class NetworkInterface:
             del self.settings["name"]
             self.rename = False
 
-    def apply_addresses(self):
+    def apply_addresses(self) -> None:
         self.__apply_addresses(self.ipv4_addresses, ipv6=False)
         self.__apply_addresses(self.ipv6_addresses, ipv6=True)
 
@@ -119,11 +140,19 @@ class NetworkInterface:
             if (ipv6 is True) and (address.lower() == "accept_rtadv"):
                 self.exec([self.rtsold_command, self.name])
 
-    def exec(self, command, force_local=False):
-        if self.__is_jail():
-            return self.jail.exec(command)
-        else:
-            return iocage.lib.helpers.exec(command)
+    def exec(
+        self,
+        command: typing.List[str],
+        force_local: typing.Optional[bool]=False
+    ) -> typing.Tuple['subprocess.Popen', str, str]:
 
-    def __is_jail(self):
-        return self.jail is not None
+        if self.__is_jail():
+            _, stdout, _ = self.jail.exec(command)
+        else:
+            _, stdout, _ = iocage.lib.helpers.exec(command, logger=self.logger)
+
+        if (self.create or self.rename) is True:
+            self.name = stdout.strip()
+
+    def __is_jail(self) -> bool:
+        return (self.jail is not None)
