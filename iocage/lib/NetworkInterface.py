@@ -76,8 +76,8 @@ class NetworkInterface:
         if addm:
             self.settings["addm"] = addm
 
-        # if group:
-        #     self.settings["group"] = group
+        if group:
+            self.settings["group"] = group
 
         # rename interface when applying settings next time
         if isinstance(rename, str):
