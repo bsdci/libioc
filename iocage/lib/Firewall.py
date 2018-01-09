@@ -41,21 +41,23 @@ class Firewall:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
     @property
-    def _required_sysctl_properties(self):
+    def _required_sysctl_properties(self) -> typing.Dict[str, int]:
         return {
             "net.inet.ip.fw.enable": 1,
             "net.link.ether.ipfw": 1
         }
 
-    @property
-    def ipfw_enabled(self):
+    def ensure_firewall_enabled(self) -> None:
         requirements = self._required_sysctl_properties
         requirement_keys = list(requirements.keys())
         for item in sysctl.filter("net"):
             if item.name in requirement_keys:
                 if item.value != requirements[item.name]:
-                    return False
-        return True
+                    state = ("en" if (item.value == 0) else "dis") + "abled"
+                    raise iocage.lib.errors.FirewallDisabled(
+                        hint=f"sysctl {item.name} is not {state}",
+                        logger=self.logger
+                    )
 
     def delete_rule(self, rule_number: int) -> None:
         iocage.lib.helpers.exec(
@@ -72,8 +74,16 @@ class Firewall:
         rule_number: int,
         rule_arguments: typing.List[str]
     ) -> None:
-        iocage.lib.helpers.exec([
+
+        command = [
             self.IPFW_COMMAND,
             "-q", "add",
             str(rule_number + self.IPFW_RULE_OFFSET)
-        ] + rule_arguments)
+        ] + rule_arguments
+
+        try:
+            iocage.lib.helpers.exec(command)
+        except iocage.lib.errors.CommandFailure:
+            raise iocage.lib.errors.FirewallCommandFailure(
+                logger=self.logger
+            )

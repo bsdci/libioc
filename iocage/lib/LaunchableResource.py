@@ -26,6 +26,7 @@ import libzfs
 import typing
 
 import iocage.lib.Config.Jail.File.RCConf
+import iocage.lib.Config.Jail.File.SysctlConf
 import iocage.lib.Resource
 
 # MyPy
@@ -36,6 +37,9 @@ import iocage.lib.Config.Jail.File
 class LaunchableResource(iocage.lib.Resource.Resource):
 
     _rc_conf: typing.Optional[iocage.lib.Config.Jail.File.RCConf.RCConf] = None
+    _sysctl_conf: typing.Optional[
+        iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
+    ] = None
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(self, *args, **kwargs) -> None:
@@ -90,3 +94,15 @@ class LaunchableResource(iocage.lib.Resource.Resource):
                 logger=self.logger
             )
         return self._rc_conf
+
+    @property
+    def sysctl_conf(
+        self
+    ) -> 'iocage.lib.Config.Jail.File.SysctlConf.SysctlConf':
+        if self._sysctl_conf is None:
+            sysctl_conf = iocage.lib.Config.Jail.File.SysctlConf.SysctlConf(
+                resource=self,
+                logger=self.logger
+            )
+            self._sysctl_conf = sysctl_conf
+        return self._sysctl_conf

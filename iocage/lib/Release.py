@@ -47,6 +47,7 @@ import iocage.lib.Resource
 import iocage.lib.Host
 import iocage.lib.Logger
 import iocage.lib.Config.Jail.File.RCConf
+import iocage.lib.Config.Jail.File.SysctlConf
 
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
@@ -133,6 +134,10 @@ class ReleaseGenerator(ReleaseResource):
         "sendmail_submit": False,
         "sendmail_msp_queue": False,
         "sendmail_outbound": False
+    }
+
+    DEFAULT_SYSCTL_CONF_SERVICES: typing.Dict[str, int] = {
+        "net.inet.ip.fw.enable": 0
     }
 
     name: str
@@ -426,9 +431,12 @@ class ReleaseGenerator(ReleaseResource):
             )
 
         yield releaseConfigurationEvent.begin()
+        rc_conf_changed = False
         if self._set_default_rc_conf() is True:
-            yield releaseConfigurationEvent.end()
+            rc_conf_changed = True
             release_changed = True
+        if (self._set_default_sysctl_conf() or rc_conf_changed) is True:
+            yield releaseConfigurationEvent.end()
         else:
             yield releaseConfigurationEvent.skip()
 
@@ -882,6 +890,13 @@ class ReleaseGenerator(ReleaseResource):
             self.rc_conf[f"{key}_enable"] = value
 
         return self.rc_conf.save() is True
+
+    def _set_default_sysctl_conf(self) -> bool:
+
+        for key, value in self.DEFAULT_SYSCTL_CONF_SERVICES.items():
+            self.sysctl_conf[key] = value
+
+        return self.sysctl_conf.save() is True
 
     def _generate_default_rcconf_line(self, service_name: str) -> str:
         if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:
