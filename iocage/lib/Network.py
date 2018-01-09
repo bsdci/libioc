@@ -91,13 +91,9 @@ class Network:
 
     @property
     def nic_local_name(self) -> str:
+
         self.jail.require_jail_running(silent=True)
         return f"{self.nic}:{self.jail.jid}"
-
-    @property
-    def nic_group_name(self) -> str:
-        self.jail.require_jail_running(silent=True)
-        return f"ioc-{self.jail.jid}"
 
     @property
     def nic_local_description(self) -> str:
@@ -107,7 +103,6 @@ class Network:
         epair_a = iocage.lib.NetworkInterface.NetworkInterface(
             name="epair",
             create=True,
-            group=self.nic_group_name,
             logger=self.logger
         )
         epair_a_name = epair_a.name
@@ -136,7 +131,6 @@ class Network:
             mtu=self.mtu,
             description=self.nic_local_description,
             rename=self.nic_local_name,
-            group=self.nic_group_name,
             logger=self.logger
         )
 
@@ -164,7 +158,6 @@ class Network:
                 name="bridge",
                 create=True,
                 rename=f"{self.nic_local_name}:net",
-                group=self.nic_group_name,
             )
             bridge_name = bridge.name
             iocage.lib.NetworkInterface.NetworkInterface(
