@@ -122,7 +122,7 @@ class NetworkInterface:
         if self.extra_settings:
             command += self.extra_settings
 
-        self.exec(command)
+        self.__exec(command)
 
         # update name when the interface was renamed
         if self.rename:
@@ -148,12 +148,12 @@ class NetworkInterface:
             if i > 0:
                 command.append("alias")
 
-            self.exec(command)
+            self.__exec(command)
 
             if (ipv6 is True) and (address.lower() == "accept_rtadv"):
                 self.exec([self.rtsold_command, self.name])
 
-    def exec(
+    def __exec(
         self,
         command: typing.List[str],
         force_local: typing.Optional[bool]=False
