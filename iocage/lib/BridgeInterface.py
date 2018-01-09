@@ -29,13 +29,15 @@ class BridgeInterface:
     name: str
     secure: bool
 
+    SECURE_BRIDGE_PREFIX = ":"
+
     def __init__(
         self,
         name: str,
         secure: typing.Optional[bool]=None
     ) -> None:
 
-        if name.startswith("!"):
+        if name.startswith(self.SECURE_BRIDGE_PREFIX):
             self.secure = True
             self.name = name[1:]
         else:
@@ -47,6 +49,8 @@ class BridgeInterface:
             self.secure = secure
 
     def __str__(self):
-        secure_prefix = "!" if (self.secure is True) else ""
-        return f"{secure_prefix}{self.name}"
+        if self.secure is True:
+            return f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
+        else:
+            return self.name
 
