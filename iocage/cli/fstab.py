@@ -35,13 +35,10 @@ import iocage.lib.Jail
 import iocage.lib.Config.Jail.File.Fstab
 
 from .shared.jail import get_jail
-
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 FstabLine = iocage.lib.Config.Jail.File.Fstab.FstabLine
-
-
-from .shared.click import IocageClickContext
 
 
 def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
