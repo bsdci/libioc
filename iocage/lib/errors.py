@@ -427,6 +427,90 @@ class ZFSPoolUnavailable(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+# Snapshots
+
+
+class SnapshotError(IocageException):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+
+class SnapshotCreation(SnapshotError):
+
+    def __init__(
+        self,
+        reason: typing.Optional[str]=None,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "Snapshot creation failed"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class SnapshotDeletion(SnapshotError):
+
+    def __init__(
+        self,
+        reason: typing.Optional[str]=None,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "Snapshot deletion failed"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class SnapshotRollback(SnapshotError):
+
+    def __init__(
+        self,
+        reason: typing.Optional[str]=None,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "Snapshot rollback failed"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class SnapshotNotFound(SnapshotError):
+
+    def __init__(
+        self,
+        snapshot_name: str,
+        dataset_name: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = f"Snapshot not found: {dataset_name}@{snapshot_name}"
+        super().__init__(msg, *args, **kwargs)
+
+
+class InvalidSnapshotIdentifier(SnapshotError):
+
+    def __init__(
+        self,
+        identifier: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = (
+            f"Invalid snapshot identifier syntax: {identifier}"
+            "(should be <jail>@<snapshot>)"
+        )
+        super().__init__(msg, *args, **kwargs)
+
+
 # Network
 
 
