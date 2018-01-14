@@ -250,7 +250,7 @@ class ReleaseGenerator(ReleaseResource):
             annotations.add("Newer than Host")
 
         if len(annotations) > 0:
-            return f"{self.name} ({', ('.join(annotations)})"
+            return f"{self.name} ({', '.join(annotations)})"
 
         return f"{self.name}"
 
