@@ -24,7 +24,6 @@
 """list module for the cli."""
 import click
 import json
-import texttable
 import typing
 
 import iocage.lib.errors
@@ -140,34 +139,12 @@ def _print_table(
     show_header: bool,
     sort_key: typing.Optional[str]=None
 ) -> None:
-    
+
     table_data = []
     for resource in resources:
         table_data.append(_lookup_resource_values(resource, columns))
 
-    return print_table(table_data, columns, show_header, sort_key)
-    # table = texttable.Texttable(max_width=0)
-    # table.set_cols_dtype(["t"] * len(columns))
-
-    # table_head = (list(x.upper() for x in columns))
-    # table_data = []
-
-    # try:
-    #     sort_index = columns.index(sort_key)
-    # except ValueError:
-    #     sort_index = -1
-
-    
-
-    # if sort_index > -1:
-    #     table_data.sort(key=lambda x: x[sort_index])
-
-    # if show_header:
-    #     table.add_rows([table_head] + table_data)
-    # else:
-    #     table.add_rows(table_data)
-
-    # print(table.draw())
+    print_table(table_data, columns, show_header, sort_key)
 
 
 def _print_list(
