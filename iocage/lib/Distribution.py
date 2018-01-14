@@ -176,6 +176,7 @@ class DistributionGenerator:
                 "Accept-Charset": "utf-8"
             }
         )
+        self.logger.verbose(f"Downloading EOL info from {self.eol_url}")
         with urllib.request.urlopen(request) as response:  # nosec: B310
 
             if response.getcode() != 200:  # noqa: T484
