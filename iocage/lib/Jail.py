@@ -43,10 +43,14 @@ import iocage.lib.Storage
 import iocage.lib.ZFSBasejailStorage
 import iocage.lib.ZFSShareStorage
 import iocage.lib.LaunchableResource
+import iocage.lib.VersionedResource
 import iocage.lib.Config.Jail.File.Fstab
 
 
-class JailResource(iocage.lib.LaunchableResource.LaunchableResource):
+class JailResource(
+    iocage.lib.LaunchableResource.LaunchableResource,
+    iocage.lib.VersionedResource.VersionedResource
+):
 
     _jail: 'JailGenerator'
     _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab'
