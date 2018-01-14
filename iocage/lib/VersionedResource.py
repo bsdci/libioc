@@ -78,10 +78,12 @@ class ResourceSnapshots:
         return f"{self.resource.dataset.name}@{snapshot_name}"
 
     def _get_snapshot(self, snapshot_name: str) -> libzfs.ZFSSnapshot:
-        snapshot_identifier = self._get_snapshot_identifier(snapshot_name)
+        identifier = self._get_snapshot_identifier(snapshot_name)
 
         try:
-            return self.resource.zfs.get_snapshot(snapshot_identifier)
+            zfs = self.resource.zfs
+            snap = zfs.get_snapshot(identifier)  # type: libzfs.ZFSSnapshot
+            return snap
         except libzfs.ZFSException:
             raise iocage.lib.errors.SnapshotNotFound(
                 snapshot_name=snapshot_name,
