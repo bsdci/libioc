@@ -30,42 +30,77 @@ import iocage.lib.Logger
 
 from .shared.click import IocageClickContext
 from .shared.jail import get_jail
+from .shared.output import print_table
 
 __rootcmd__ = True
 
 
 @click.command(
-    name="list_or_take"
+    name="list_or_create"
 )
 @click.pass_context
-@click.argument(
-    "identifier",
-    nargs=1,
-    required=False
-)
-def cli_list_or_take(
-    ctx: IocageClickContext,
-    identifier: str
+def cli_list_or_create(
+    ctx: IocageClickContext
 ) -> None:
-    
-    if "@" in identifier:
-        return cli_take(ctx, identifier)
+    """
+    Chooses whether to list or create a snapshot
+
+    When a full snapshot identifier `<dataset>@<snapshot_name>` is seen, the
+    snapshot will be created. Otherwise existing snapshots are listed.
+    """
+
+    if "@" in ctx.info_name:
+        return _cli_create(ctx, ctx.info_name)
     else:
-        return cli_list(ctx)
+        return _cli_list(ctx, ctx.info_name)
+
 
 @click.command(
-    name="take",
-    help="Take a snapshot"
+    name="create",
+    help="Create a snapshot"
 )
 @click.pass_context
 @click.argument("identifier", nargs=1, required=True)
-def cli_take(
+def cli_create(*args, **kwargs) -> None:
+    _cli_create(*args, **kwargs)
+
+
+def _cli_create(
     ctx: IocageClickContext,
     identifier: str
 ) -> None:
-    jail, snapshot_name = identifier.split("@")
-    ioc_jail = get_jail(jail, ctx.parent)
-    print(f"TAKING A SNAPSHOT: {snapshot_name}")
+    try:
+        ioc_jail, snapshot_name = _parse_identifier(
+            ctx=ctx.parent,
+            identifier=identifier,
+            require_full_identifier=True
+        )
+        ioc_jail.snapshots.create(snapshot_name)
+    except iocage.lib.errors.IocageException:
+        pass
+
+
+@click.command(
+    name="rollback",
+    help="Rollback to a snapshot"
+)
+@click.pass_context
+@click.argument("identifier", nargs=1, required=True)
+@click.option("--force", "-f", is_flag=True, help="Force ZFS rollback")
+def cli_rollback(
+    ctx: IocageClickContext,
+    identifier: str,
+    force: bool
+) -> None:
+    try:
+        ioc_jail, snapshot_name = _parse_identifier(
+            ctx=ctx.parent,
+            identifier=identifier,
+            require_full_identifier=True
+        )
+        ioc_jail.snapshots.rollback(snapshot_name, force=force)
+    except iocage.lib.errors.IocageException:
+        pass
 
 
 @click.command(
@@ -74,26 +109,40 @@ def cli_take(
 )
 @click.pass_context
 @click.argument("jail", nargs=1, required=True)
-def cli_list(ctx: IocageClickContext, jail: str) -> None:
-    ioc_jail = get_jail(jail, ctx.parent)
-    print("LISTING SNAPSHOTS")
+def cli_list(*args, **kwargs) -> None:
+    _cli_list(*args, **kwargs)
+
+
+def _cli_list(ctx: IocageClickContext, jail: str) -> None:
+    try:
+        ioc_jail, snapshot_name = _parse_identifier(
+            ctx=ctx.parent,
+            identifier=jail,
+            require_full_identifier=False
+        )
+        columns = ["NAME"]
+        data = [[x.name.split("@", maxsplit=1)[1]] for x in ioc_jail.snapshots]
+        print_table(data, columns)
+    except iocage.lib.errors.IocageException:
+        pass
 
 
 @click.command(
     name="remove",
     help="Delete existing snapshots"
 )
-@click.argument(
-    "name",
-    nargs=1,
-    required=False
-)
 @click.argument("identifier", nargs=1, required=True)
 @click.pass_context
-def cli_remove(ctx: IocageClickContext, name: str, identifier: str) -> None:
-    jail, snapshot_name = identifier.split("@")
-    ioc_jail = get_jail(jail, ctx.parent)
-    print("DELETING SNAPSHOT")
+def cli_remove(ctx: IocageClickContext, identifier: str) -> None:
+    try:
+        ioc_jail, snapshot_name = _parse_identifier(
+            ctx=ctx.parent,
+            identifier=identifier,
+            require_full_identifier=True
+        )
+        ioc_jail.snapshots.delete(snapshot_name)
+    except iocage.lib.errors.IocageException:
+        pass
 
 
 class SnapshotCli(click.MultiCommand):
@@ -101,7 +150,7 @@ class SnapshotCli(click.MultiCommand):
     def list_commands(self, ctx: click.core.Context) -> list:
         return [
             "list",
-            "take",
+            "create",
             "rollback",
             "remove"
         ]
@@ -112,18 +161,18 @@ class SnapshotCli(click.MultiCommand):
         cmd_name: str
     ) -> click.core.Command:
 
-        command: typing.Optional[click.core.Command] = None
+        command: click.core.Command
 
         if cmd_name == "list":
             command = cli_list
-        elif cmd_name == "take":
-            command = cli_take
+        elif cmd_name == "create":
+            command = cli_create
         elif cmd_name == "remove":
             command = cli_remove
         elif cmd_name == "rollback":
             command = cli_rollback
         else:
-            command = cli_list_or_take
+            command = cli_list_or_create
 
         return command
 
@@ -144,3 +193,22 @@ def cli(
     ctx.logger = ctx.parent.logger
     ctx.host = iocage.lib.Host.HostGenerator(logger=ctx.logger)
 
+
+def _parse_identifier(
+    ctx: IocageClickContext,
+    identifier: str,
+    require_full_identifier: bool=False
+) -> typing.Tuple[iocage.lib.Jail.JailGenerator, typing.Optional[str]]:
+
+    snapshot_name: typing.Optional[str] = None
+    try:
+        jail, snapshot_name = identifier.split("@")
+    except ValueError:
+        if require_full_identifier is True:
+            raise iocage.lib.errors.InvalidSnapshotIdentifier(
+                identifier=identifier,
+                logger=ctx.parent.logger
+            )
+        jail = identifier
+
+    return get_jail(jail, ctx), snapshot_name
