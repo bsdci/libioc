@@ -309,7 +309,8 @@ class ReleaseGenerator(ReleaseResource):
             else:
                 return False
 
-        return (host_release_name[0:4] < release_name[0:4])
+        cropped_release_name = release_name[:len(host_release_name)]
+        return (host_release_name < cropped_release_name)
 
     def _pad_release_name(self, release_name: str, digits: int=4) -> str:
         """
