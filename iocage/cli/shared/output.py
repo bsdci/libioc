@@ -26,9 +26,9 @@ import texttable
 
 
 def print_table(
-    data: typing.List[typing.Union[str, int]],
+    data: typing.List[typing.List[str]],
     columns: typing.List[str],
-    show_header: bool,
+    show_header: bool=True,
     sort_key: typing.Optional[str]=None
 ) -> None:
 
@@ -38,15 +38,18 @@ def print_table(
     table_head = (list(x.upper() for x in columns))
     table_data = data
 
-    try:
-        sort_index = columns.index(sort_key)
-    except ValueError:
+    if sort_key is None:
         sort_index = -1
+    else:
+        try:
+            sort_index = columns.index(sort_key)
+        except ValueError:
+            sort_index = -1
 
     if sort_index > -1:
         table_data.sort(key=lambda x: x[sort_index])
 
-    if show_header:
+    if show_header is True:
         table.add_rows([table_head] + table_data)
     else:
         table.add_rows(table_data)

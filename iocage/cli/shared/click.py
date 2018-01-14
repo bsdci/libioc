@@ -24,13 +24,17 @@
 import typing
 import click.core
 
+import iocage.lib.events
+import iocage.lib.Logger
+import iocage.lib.Host
+
 
 class IocageClickContext(click.core.Context):
 
-    logger: 'Logger'
-    host: 'iocage.lib.Host.Host'
-    parent: 'ClickContext'
+    logger: iocage.lib.Logger.Logger
+    host: iocage.lib.Host.Host
+    parent: click.core.Context
     print_events: typing.Callable[
-        [typing.Generator['IocageEvent', None, None]],
+        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
         None
     ]
