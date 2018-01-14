@@ -38,22 +38,27 @@ class EOLParser(html.parser.HTMLParser):
     data: typing.List[str] = []
     in_id: bool = False
     td_counter: int = 0
+    current_branch: str = ""
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs) -> None:
         if tag == "td":
             self.in_id = True
             self.td_counter += 1
         elif tag == "tr":
             self.td_counter = 0
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag: str) -> None:
         if tag == "td":
             self.in_id = False
 
-    def handle_data(self, data):
-        if self.in_id and self.td_counter == 2:
-            if data != "n/a":
-                self.eol_releases.append(data)
+    def handle_data(self, data: str) -> None:
+        if self.in_id is False:
+            return  # skip non-td content
+        if (self.td_counter == 1) and data.startswith("stable/"):
+            stable_version = data[7:]
+            self.eol_releases.append(f"{stable_version}-STABLE")
+        elif (self.td_counter == 2) and (data != "n/a"):
+            self.eol_releases.append(data)
 
 
 class DistributionGenerator:
@@ -199,11 +204,14 @@ class DistributionGenerator:
             parsed_version += ".0"
         return parsed_version
 
-    def _check_eol(self, release: str, eol: typing.List[str]) -> bool:
+    def _check_eol(self, release_name: str, eol: typing.List[str]) -> bool:
         if self.host.distribution.name == "FreeBSD":
-            return release in eol
+            return release_name in eol
         elif self.host.distribution.name == "HardenedBSD":
-            return self._parse_release_version(release) in map(
+            if "STABLE" in release_name:
+                # stable releases are explicitly in the EOL list or supported
+                return release_name in eol
+            return self._parse_release_version(release_name) in map(
                 lambda x: self._parse_release_version(x),
                 eol
             )
