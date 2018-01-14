@@ -34,15 +34,14 @@ import iocage.lib.helpers
 import iocage.lib.Jail
 import iocage.lib.Config.Jail.File.Fstab
 
+from .shared.jail import get_jail
+
 
 __rootcmd__ = True
 FstabLine = iocage.lib.Config.Jail.File.Fstab.FstabLine
 
 
-class ClickContext(click.core.Context):
-    logger: 'iocage.lib.Logger.Logger'
-    host: 'iocage.lib.Host.Host'
-    parent: 'ClickContext'
+from .shared.click import IocageClickContext
 
 
 def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
@@ -67,20 +66,6 @@ def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
     )
 
 
-def _get_jail(
-    jail_name: str,
-    ctx: ClickContext
-) -> iocage.lib.Jail.JailGenerator:
-    try:
-        return iocage.lib.Jail.JailGenerator(
-            jail_name,
-            logger=ctx.logger,
-            host=ctx.host
-        )
-    except iocage.lib.errors.IocageException:
-        exit(1)
-
-
 @click.command(
     name="add"
 )
@@ -98,14 +83,14 @@ def _get_jail(
 @click.argument("jail", nargs=1, required=True)
 @click.option("--read-write", "-rw", is_flag=True, default=False)
 def cli_add(
-    ctx: ClickContext,
+    ctx: IocageClickContext,
     source: str,
     destination: typing.Tuple[str],
     jail: str,
     read_write: bool
 ) -> None:
 
-    ioc_jail = _get_jail(jail, ctx.parent)
+    ioc_jail = get_jail(jail, ctx.parent)
 
     if len(destination) == 0:
         desination_path = source
@@ -163,8 +148,8 @@ def cli_add(
 )
 @click.pass_context
 @click.argument("jail", nargs=1, required=True)
-def cli_show(ctx: ClickContext, jail: str) -> None:
-    ioc_jail = _get_jail(jail, ctx.parent)
+def cli_show(ctx: IocageClickContext, jail: str) -> None:
+    ioc_jail = get_jail(jail, ctx.parent)
     if os.path.isfile(ioc_jail.fstab.path):
         with open(ioc_jail.fstab.path, "r") as f:
             print(f.read())
@@ -180,9 +165,9 @@ def cli_show(ctx: ClickContext, jail: str) -> None:
 )
 @click.argument("jail", nargs=1, required=True)
 @click.pass_context
-def cli_rm(ctx: ClickContext, source: str, jail: str) -> None:
+def cli_rm(ctx: IocageClickContext, source: str, jail: str) -> None:
 
-    ioc_jail = _get_jail(jail, ctx.parent)
+    ioc_jail = get_jail(jail, ctx.parent)
     fstab = ioc_jail.fstab
     destination = None
     i = 0
@@ -247,7 +232,7 @@ class FstabCli(click.MultiCommand):
 )
 @click.pass_context
 def cli(
-    ctx: ClickContext
+    ctx: IocageClickContext
 ) -> None:
     """Manage a jails fstab file"""
 
