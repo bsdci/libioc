@@ -29,7 +29,7 @@ import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
 
-from .shared import IocageClickContext
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
