@@ -330,6 +330,31 @@ class JailFstabUpdate(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
+class JailForkExec(JailEvent):
+    """
+    A group of multiple action events executed sequentially
+    """
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailExec(JailEvent):
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)        
+
+
 # Release
 
 

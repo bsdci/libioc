@@ -372,6 +372,67 @@ class JailGenerator(JailResource):
 
         self._run_hook("poststart")
 
+    def fork_exec(
+        self,
+        command: typing.List[str],
+        **temporary_config_override
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """
+        Starts a jail, runs a command and exists
+        """
+        self.require_jail_existing()
+        self.require_jail_stopped()
+
+        events: typing.Any = iocage.lib.events
+        jailForkExecEvent = events.JailForkExec(jail=self)
+        jailExecEvent = events.JailExec(jail=self)
+
+        yield jailForkExecEvent.begin()
+
+        original_config = self.config
+        config_data = original_config.data
+
+        for key, value in temporary_config_override.items():
+            config_data[key] = value
+
+        self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(
+            data=original_config.data,
+            host=self.host,
+            jail=self,
+            logger=self.logger
+        )
+
+        for event in self.start():
+            yield event
+
+        yield jailExecEvent.begin()
+        try:
+            self.passthru(command)
+            yield jailExecEvent.end()
+        except:
+            yield jailExecEvent.fail()
+
+        for event in self.stop():
+            yield event
+
+        self.config = original_config
+
+        yield jailForkExecEvent.end()
+
+    @property
+    def basejail_backend(self):
+
+        if self.config["basejail"] is False:
+            return None
+
+        if self.config["basejail_type"] == "nullfs":
+            return iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
+
+        if self.config["basejail_type"] == "zfs":
+            return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
+
+        return None
+
     def _run_hook(self, hook_name: str):
 
         key = f"exec_{hook_name}"
