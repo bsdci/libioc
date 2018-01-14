@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,7 +21,6 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import typing
 import libzfs
 
 import iocage.lib.Resource
@@ -39,32 +38,63 @@ class ResourceSnapshots:
     def create(self, snapshot_name: str) -> None:
         self._ensure_dataset_unlocked()
         snapshot_identifier = self._get_snapshot_identifier(snapshot_name)
-        self.resource.dataset.snapshot(snapshot_identifier, recursive=True)
+        try:
+            self.resource.dataset.snapshot(snapshot_identifier, recursive=True)
+        except libzfs.ZFSException as e:
+            print(snapshot_identifier)
+            raise iocage.lib.errors.SnapshotCreation(
+                reason=str(e),
+                logger=self.resource.logger
+            )
+
         self.resource.logger.verbose(
             f"Snapshot created: {snapshot_identifier}"
         )
 
     def delete(self, snapshot_name: str) -> None:
         self._ensure_dataset_unlocked()
-        self._get_snapshot(snapshot_name).delete()
+        snapshot = self._get_snapshot(snapshot_name)
+        try:
+            snapshot.delete(recursive=True)
+        except libzfs.ZFSException as e:
+            raise iocage.lib.errors.SnapshotDeletion(
+                reason=str(e),
+                logger=self.resource.logger
+            )
 
-    def rollback(self, force: bool=False) -> None:
+    def rollback(self, snapshot_name: str, force: bool=False) -> None:
         self._ensure_dataset_unlocked()
-        self._get_snapshot(snapshot_name).rollback(force=force)
+
+        snapshot = self._get_snapshot(snapshot_name)
+        try:
+            snapshot.rollback(force=force)
+        except libzfs.ZFSException as e:
+            raise iocage.lib.errors.SnapshotRollback(
+                reason=str(e),
+                logger=self.resource.logger
+            )
 
     def _get_snapshot_identifier(self, snapshot_name: str) -> str:
         return f"{self.resource.dataset.name}@{snapshot_name}"
 
     def _get_snapshot(self, snapshot_name: str) -> libzfs.ZFSSnapshot:
         snapshot_identifier = self._get_snapshot_identifier(snapshot_name)
-        return self.resource.zfs.get_snapshot(snapshot_identifier)
 
-    def _ensure_dataset_unlocked(self):
+        try:
+            return self.resource.zfs.get_snapshot(snapshot_identifier)
+        except libzfs.ZFSException:
+            raise iocage.lib.errors.SnapshotNotFound(
+                snapshot_name=snapshot_name,
+                dataset_name=self.resource.dataset.name,
+                logger=self.resource.logger
+            )
+
+    def _ensure_dataset_unlocked(self) -> None:
         """
         Prevent operations on datasets in use (e.g. running jails)
         """
         if isinstance(self, iocage.lib.Jail.JailGenerator):
-            self.require_jail_stopped()
+            self.resource.require_jail_stopped()
 
 
 class VersionedResource(iocage.lib.Resource.Resource):
