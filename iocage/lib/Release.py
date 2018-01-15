@@ -493,30 +493,29 @@ class ReleaseGenerator(ReleaseResource):
         releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
         yield releaseUpdateDownloadEvent.begin()
 
-        release_updates_dir = self.release_updates_dir
-        release_update_download_dir = f"{release_updates_dir}"
-
-        if os.path.isdir(release_update_download_dir):
-            self.logger.verbose(
-                f"Deleting existing updates in {release_update_download_dir}"
-            )
-            shutil.rmtree(release_update_download_dir)
-
-        os.makedirs(release_update_download_dir)
-
         if self.host.distribution.name == "HardenedBSD":
             update_name = "hbsd-update"
             update_script_name = "hbsd-update"
             update_conf_name = "hbsd-update.conf"
+            release_updates_dir = "/var/db/hbsd-update/updates"
         else:
             update_name = "freebsd-update"
             update_script_name = "freebsd-update.sh"
             update_conf_name = "freebsd-update.conf"
+            release_updates_dir = "/var/db/freebsd-update/updates"
 
         files = {
             update_script_name: f"usr.sbin/{update_name}/{update_script_name}",
             update_conf_name: f"etc/{update_conf_name}",
         }
+
+        release_update_download_dir = f"{release_updates_dir}"
+        if os.path.isdir(release_update_download_dir):
+            self.logger.verbose(
+                f"Deleting existing updates in {release_update_download_dir}"
+            )
+            shutil.rmtree(release_update_download_dir)
+        os.makedirs(release_update_download_dir)
 
         for key in files.keys():
 
@@ -527,7 +526,6 @@ class ReleaseGenerator(ReleaseResource):
             )
 
             local_path = f"{release_updates_dir}/{key}"
-
             if os.path.isfile(local_path):
                 os.remove(local_path)
 
@@ -557,20 +555,36 @@ class ReleaseGenerator(ReleaseResource):
                 f" saved to {local_path}"
             )
 
+        self.logger.verbose(f"Fetching updates for release '{self.name}'")
         if self.host.distribution.name == "HardenedBSD":
             """
             Updates in Hardened BSD are directly executed in a jail, so that we
             do not need to pre-fetch the updates
             """
-            self.logger.debug(
-                "No pre-fetching of HardenedBSD updates required - skipping"
-            )
-            yield releaseUpdateDownloadEvent.skip(
-                message="pre-fetching not supported on HardenedBSD"
-            )
+            print("NOOP")
+	    #iocage.lib.helpers.exec([
+            #    f"{self.release_updates_dir}/{update_script_name}",
+            #    "--not-running-from-cron",
+            #    "-d",
+            #    release_update_download_dir,
+            #    "--currently-running",
+            #    self.name,
+            #    "-f",
+            #    f"{self.release_updates_dir}/{update_conf_name}",
+            #    "--not-running-from-cron",
+            #    "fetch"
+            #    # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #    update_script_path,
+            #    "-c",
+            #    update_conf_path,
+            #    "-j",
+            #    jail.identifier,
+            #    "-V",
+            #    "-t",
+            #    "/var/db/hbsd-update"
+            #], logger=self.logger)
 
         else:
-            self.logger.verbose(f"Fetching updates for release '{self.name}'")
             iocage.lib.helpers.exec([
                 f"{self.release_updates_dir}/{update_script_name}",
                 "--not-running-from-cron",
@@ -584,7 +598,7 @@ class ReleaseGenerator(ReleaseResource):
                 "fetch"
             ], logger=self.logger)
 
-            yield releaseUpdateDownloadEvent.end()
+        yield releaseUpdateDownloadEvent.end()
 
     def update(
         self
@@ -718,7 +732,10 @@ class ReleaseGenerator(ReleaseResource):
                 update_conf_path,
                 "-j",
                 jail.identifier,
-                "-V"
+                "-V",
+                "-D",  # nodownload=1
+                "-t",
+                "/var/db/hbsd-update/updates"
             ], logger=self.logger)
 
             for stdout_line in stdout:
