@@ -96,6 +96,11 @@ class JailResource(
 
     @property
     def fstab(self) -> 'iocage.lib.Config.Jail.File.Fstab.Fstab':
+        """
+        Memoized fstab wrapper of a Jail
+
+        The fstab file is stored in the top level of a Jails dataset
+        """
 
         try:
             return self._fstab
@@ -133,6 +138,13 @@ class JailResource(
 
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
+        """
+        Overrides a jails dataset name
+
+        This will cause Jail.dataset to point to this specific dataset instead
+        of an auto-detected one to enable referencing jails from datasets
+        that are not managed by iocage
+        """
         self._dataset_name = value
 
     @property
@@ -274,6 +286,14 @@ class JailGenerator(JailResource):
 
     @property
     def state(self) -> iocage.lib.JailState.JailState:
+        """
+        Memoized JailState.
+
+        This object holds information about the jail state. The information
+        is memoized on first access because the lookup is expensive. Please
+        keep in mind to update the object when executing operations that
+        potentially change a jails state.
+        """
         if "_state" not in object.__dir__(self):
             return self._init_state()
         elif object.__getattribute__(self, "_state") is None:
@@ -282,6 +302,10 @@ class JailGenerator(JailResource):
 
     @state.setter
     def state(self, value: iocage.lib.JailState):
+        """
+        A public interface to set a jails state. This behavior is part of a
+        performance optimization when dealing with large numbers of jails.
+        """
         object.__setattr__(self, '_state', value)
 
     def _init_state(self) -> iocage.lib.JailState.JailState:
@@ -445,6 +469,12 @@ class JailGenerator(JailResource):
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Change the name of a jail
+
+        Args:
+
+            new_name (str):
+                The new name of a jail. It might not be used by another Jail
+                and must differ from the current name.
         """
 
         self.require_jail_existing()
@@ -554,6 +584,11 @@ class JailGenerator(JailResource):
     ) -> None:
         """
         Create a Jail from a given Resource
+
+        Args:
+
+            resource (Jail or Release):
+                The (new) jail is created from this resource.
         """
         if isinstance(resource, JailGenerator):
             self.create_from_template(template=resource)
@@ -569,7 +604,7 @@ class JailGenerator(JailResource):
 
         Args:
 
-            resource:
+            resource (Release):
                 The jail is created from the provided resource.
                 This can be either another Jail or a Release.
         """
@@ -586,6 +621,9 @@ class JailGenerator(JailResource):
         self,
         template: 'JailGenerator'
     ) -> None:
+        """
+        Create a Jail from another Jail
+        """
 
         template.require_jail_is_template()
         self.config['release'] = template.config['release']
@@ -624,6 +662,12 @@ class JailGenerator(JailResource):
 
     @property
     def is_basejail(self):
+        """
+        Returns True if a Jail is a basejail.
+
+        If this is the case, parts of the jails dataset will be mounted
+        from its release or upstream Jail (for example a Template)
+        """
         return self.config.get("basejail", False)
 
     @property
@@ -640,6 +684,9 @@ class JailGenerator(JailResource):
             return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
     def save(self) -> None:
+        """
+        Permanently safe a Jails configuration
+        """
         self.write_config(self.config.data)
         self._save_autoconfig()
 
@@ -879,6 +926,9 @@ class JailGenerator(JailResource):
 
     @property
     def networks(self) -> typing.List[iocage.lib.Network.Network]:
+        """
+        List of a Jails configured networks
+        """
 
         networks = []
 
