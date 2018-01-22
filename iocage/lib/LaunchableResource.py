@@ -61,6 +61,9 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def root_path(self) -> str:
+        """
+        Absolute path to the root filesystem of a jail
+        """
         return str(self.root_dataset.mountpoint)
 
     @property
@@ -72,6 +75,10 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def root_dataset_name(self) -> str:
+        """
+        ZFS dataset name of a Jails root filesystem. It is always a direct
+        ancestor of a Jails dataset with the name `root`.
+        """
         return f"{self.dataset_name}/root"
 
     @property
@@ -88,6 +95,11 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.RCConf':
+        """
+        Memoized instance of a resources RCConf
+
+        Gets loaded on first access to the property
+        """
         if self._rc_conf is None:
             self._rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
                 resource=self,
@@ -99,6 +111,11 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     def sysctl_conf(
         self
     ) -> 'iocage.lib.Config.Jail.File.SysctlConf.SysctlConf':
+        """
+        Memoized instance of a resources SysctlConf
+
+        Gets loaded on first access to the property
+        """
         if self._sysctl_conf is None:
             sysctl_conf = iocage.lib.Config.Jail.File.SysctlConf.SysctlConf(
                 resource=self,
