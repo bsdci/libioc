@@ -96,6 +96,12 @@ class DistributionGenerator:
 
     @property
     def name(self) -> str:
+        """
+        Name of the host distribution
+
+        Often used to differentiate between operations for HardenedBSD or
+        standard FreeBSD.
+        """
         if os.path.exists("/usr/sbin/hbsd-update"):
             return "HardenedBSD"
         else:
@@ -103,6 +109,10 @@ class DistributionGenerator:
 
     @property
     def mirror_url(self) -> str:
+        """
+        URL that points to the top level directory of a distributions release
+        asset HTTP server.
+        """
 
         distribution = self.name
         processor = self.host.processor
@@ -117,6 +127,9 @@ class DistributionGenerator:
 
     @property
     def hash_file(self) -> str:
+        """
+        The filename of the checksum file that can be found in the mirror_url
+        """
         if self.name == "FreeBSD":
             return "MANIFEST"
         elif self.name == "HardenedBSD":
@@ -126,6 +139,9 @@ class DistributionGenerator:
         )
 
     def fetch_releases(self) -> None:
+        """
+        Fetches and caches the available releases of the current distribution
+        """
 
         self.logger.spam(f"Fetching release list from '{self.mirror_url}'")
 
@@ -249,6 +265,11 @@ class DistributionGenerator:
 
     @property
     def releases(self) -> typing.List['iocage.lib.Release.ReleaseGenerator']:
+        """
+        List of available releases
+
+        Raises an error when the releases cannot be fetched at the current time
+        """
         if self.available_releases is None:
             self.fetch_releases()
         if self.available_releases is not None:
