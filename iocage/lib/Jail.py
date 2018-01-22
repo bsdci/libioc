@@ -563,7 +563,7 @@ class JailGenerator(JailResource):
         self,
         resource: typing.Union[
             'JailGenerator',
-            'iocage.lib.Jail.ReleaseGenerator',
+            'iocage.lib.Release.ReleaseGenerator',
         ]
     ) -> None:
         """
