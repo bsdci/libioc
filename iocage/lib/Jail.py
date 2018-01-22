@@ -311,8 +311,8 @@ class JailGenerator(JailResource):
 
         yield jailLaunchEvent.begin()
 
-        if self.basejail_backend is not None:
-            self.basejail_backend.apply(self.storage, release)
+        if self.is_basejail is True:
+            self.storage_backend.apply(self.storage, release)
 
         if quick is False:
             self._save_autoconfig()
@@ -347,20 +347,6 @@ class JailGenerator(JailResource):
             yield jailServicesStartEvent.end()
 
         self._run_hook("poststart")
-
-    @property
-    def basejail_backend(self):
-
-        if self.config["basejail"] is False:
-            return None
-
-        if self.config["basejail_type"] == "nullfs":
-            return iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
-
-        if self.config["basejail_type"] == "zfs":
-            return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
-
-        return None
 
     def _run_hook(self, hook_name: str):
 
@@ -637,13 +623,20 @@ class JailGenerator(JailResource):
         self.save()
 
     @property
+    def is_basejail(self):
+        return self.config.get("basejail", False)
+
+    @property
     def storage_backend(self) -> iocage.lib.Storage.Storage:
-        is_basejail = self.config.get("basejail", False)
-        if not is_basejail:
+        """
+        Returns the class that represents the jails storage backend according
+        to its configuration.
+        """
+        if not self.is_basejail:
             return iocage.lib.StandaloneJailStorage.StandaloneJailStorage
-        if is_basejail and self.config["basejail_type"] == "nullfs":
+        if self.config["basejail_type"] == "nullfs":
             return iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
-        elif is_basejail and self.config["basejail_type"] == "zfs":
+        if self.config["basejail_type"] == "zfs":
             return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
     def save(self) -> None:
