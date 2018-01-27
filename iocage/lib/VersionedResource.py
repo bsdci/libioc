@@ -67,7 +67,8 @@ class ResourceSnapshots:
 
         snapshot = self._get_snapshot(snapshot_name)
         try:
-            snapshot.rollback(force=force)
+            for snap in reversed(list(snapshot.parent.snapshots_recursive)):
+                snap.rollback(force=force)
         except libzfs.ZFSException as e:
             raise iocage.lib.errors.SnapshotRollback(
                 reason=str(e),
