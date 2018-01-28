@@ -164,12 +164,13 @@ class Network:
         except KeyError:
             mac_config = None
         if mac_config is None or mac_config == "":
+            mac_address_pair = self.__generate_mac_address_pair()
+        else:
             mac_address_pair = iocage.lib.MacAddress.MacAddressPair(
                 mac_config,
                 logger=self.logger
             )
-        else:
-            mac_address_pair = self.__generate_mac_address_pair()
+            
 
         host_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_a,
