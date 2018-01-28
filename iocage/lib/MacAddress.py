@@ -63,8 +63,8 @@ class MacAddress:
 
 class MacAddressPair:
 
-    a: str
-    b: str
+    a: MacAddress
+    b: MacAddress
 
     def __init__(
         self,
