@@ -159,7 +159,10 @@ class Network:
 
         epair_a, epair_b = self.__create_new_epair_interface()
 
-        mac_config = self.jail.config[f"{self.nic}_mac"]
+        try:
+            mac_config = self.jail.config[f"{self.nic}_mac"]
+        except KeyError:
+            mac_config = None
         if mac_config is None or mac_config == "":
             mac_address_pair = iocage.lib.MacAddress.MacAddressPair(
                 mac_config,
@@ -304,7 +307,9 @@ class Network:
         prefix = self.jail.config["mac_prefix"]
         return f"{prefix}{m.hexdigest()[0:12-len(prefix)]}"
 
-    def __generate_mac_address_pair(self) -> typing.Tuple[str, str]:
+    def __generate_mac_address_pair(
+        self
+    ) -> iocage.lib.MacAddress.MacAddressPair:
         mac_a = self.__generate_mac_bytes()
         mac_b = hex(int(mac_a, 16) + 1)[2:].zfill(12)
         return iocage.lib.MacAddress.MacAddressPair(
