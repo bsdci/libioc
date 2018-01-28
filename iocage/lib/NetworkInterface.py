@@ -44,7 +44,9 @@ class NetworkInterface:
         create: typing.Optional[bool]=False,
         ipv4_addresses: typing.Optional[typing.List[str]]=[],
         ipv6_addresses: typing.Optional[typing.List[str]]=[],
-        mac: typing.Optional[str]=None,
+        mac: typing.Optional[
+            typing.Union[str, 'iocage.lib.MacAddress.MacAddress']
+        ]=None,
         mtu: typing.Optional[int]=None,
         description: typing.Optional[str]=None,
         rename: typing.Optional[str]=None,
@@ -117,13 +119,13 @@ class NetworkInterface:
 
         for key in self.settings:
             value = self.settings[key]
-            if isinstance(value, str):
+            if not isinstance(value, list):
                 values = [value]
             else:
                 values = value
             for value in values:
                 command.append(key)
-                command.append(value)
+                command.append(str(value))
 
         if self.extra_settings:
             command += self.extra_settings

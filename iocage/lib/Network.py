@@ -25,6 +25,7 @@ import typing
 from hashlib import sha224
 
 import iocage.lib.BridgeInterface
+import iocage.lib.MacAddress
 import iocage.lib.NetworkInterface
 import iocage.lib.Firewall
 import iocage.lib.errors
@@ -158,17 +159,18 @@ class Network:
 
         epair_a, epair_b = self.__create_new_epair_interface()
 
-        try:
-            mac_config = self.jail.config[f"{self.nic}_mac"]
-            if mac_config is None or mac_config == "":
-                raise Exception("no manual mac address")
-            mac_a, mac_b = mac_config.split(',')
-        except Exception:
-            mac_a, mac_b = self.__generate_mac_address_pair()
+        mac_config = self.jail.config[f"{self.nic}_mac"]
+        if mac_config is None or mac_config == "":
+            mac_address_pair = iocage.lib.MacAddress.MacAddressPair(
+                mac_config,
+                logger=self.logger
+            )
+        else:
+            mac_address_pair = self.__generate_mac_address_pair()
 
         host_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_a,
-            mac=mac_a,
+            mac=mac_address_pair.a,
             mtu=self.mtu,
             description=self.nic_local_description,
             rename=self.nic_local_name,
@@ -203,7 +205,7 @@ class Network:
                     "allow", "ip4",
                     "from", address, "to", "any",
                     "layer2",
-                    "MAC", "any", mac_b,
+                    "MAC", "any", str(mac_address_pair.b),
                     "via", right_if,
                     "out"
                 ])
@@ -211,7 +213,7 @@ class Network:
                     "allow", "ip4",
                     "from", "any", "to", address,
                     "layer2",
-                    "MAC", mac_b, "any",
+                    "MAC", str(mac_address_pair.b), "any",
                     "via", host_if.name,
                     "out"
                 ])
@@ -259,7 +261,7 @@ class Network:
 
         jail_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_b,
-            mac=mac_b,
+            mac=str(mac_address_pair.b),
             mtu=self.mtu,
             rename=self.nic,
             jail=self.jail,
@@ -305,4 +307,7 @@ class Network:
     def __generate_mac_address_pair(self) -> typing.Tuple[str, str]:
         mac_a = self.__generate_mac_bytes()
         mac_b = hex(int(mac_a, 16) + 1)[2:].zfill(12)
-        return mac_a, mac_b
+        return iocage.lib.MacAddress.MacAddressPair(
+            (mac_a, mac_b,),
+            logger=self.logger
+        )
