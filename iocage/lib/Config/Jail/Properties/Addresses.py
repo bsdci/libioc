@@ -103,7 +103,7 @@ class AddressesProp(dict):
             dict.__init__(self, data)
             return
 
-        ip_addresses = data.split(" ")
+        ip_addresses = data.split(",")
         for ip_address_string in ip_addresses:
 
             try:
