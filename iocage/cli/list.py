@@ -213,14 +213,14 @@ def _list_output_comumns(
             columns += [
                 "running",
                 "release",
-                "ip4.addr",
-                "ip6.addr"
+                "ip4_addr",
+                "ip6_addr"
             ]
         else:
             columns += [
                 "running",
                 "release",
-                "ip4.addr"
+                "ip4_addr"
             ]
 
         return columns
