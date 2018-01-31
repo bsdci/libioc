@@ -257,12 +257,13 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
         )
 
 
-class InvalidMacAddress(ValueError, IocageException):
+class InvalidMacAddress(IocageException, ValueError):
 
     def __init__(self, mac_address: str, **kwargs) -> None:
         reason = f"invalid mac address: \"{mac_address}\""
-        super().__init__(
-            reason=reason,
+        IocageException.__init__(
+            self,
+            message=reason,
             **kwargs
         )
 

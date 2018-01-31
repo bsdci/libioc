@@ -170,7 +170,6 @@ class Network:
                 mac_config,
                 logger=self.logger
             )
-            
 
         host_if = iocage.lib.NetworkInterface.NetworkInterface(
             name=epair_a,
