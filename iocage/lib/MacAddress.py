@@ -57,7 +57,7 @@ class MacAddress:
 
     def __str__(self) -> str:
         address = self.address
-        mac_bytes = [address[i:i+2] for i in range(0, len(address), 2)]
+        mac_bytes = [address[i:(i + 2)] for i in range(0, len(address), 2)]
         return ":".join(mac_bytes)
 
 
@@ -77,6 +77,8 @@ class MacAddressPair:
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
+        a: MacAddress
+        b: MacAddress
 
         if isinstance(mac_pair, str):
             a, b = [MacAddress(
@@ -87,7 +89,7 @@ class MacAddressPair:
             a = MacAddress(mac_pair[0], logger=self.logger)
             b = MacAddress(mac_pair[1], logger=self.logger)
         else:
-            a, b = mac_pair
+            a, b = mac_pair  # type: ignore
 
         self.a = a
         self.b = b
