@@ -128,15 +128,16 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
 class ReleaseGenerator(ReleaseResource):
 
-    DEFAULT_RC_CONF_SERVICES: typing.Dict[str, bool] = {
-        "netif": False,
-        "sendmail": False,
-        "sendmail_submit": False,
-        "sendmail_msp_queue": False,
-        "sendmail_outbound": False
+    DEFAULT_RC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
+        "netif_enable": False,
+        "sendmail_enable": False,
+        "sendmail_submit_enable": False,
+        "sendmail_msp_queue_enable": False,
+        "sendmail_outbound_enable": False,
+        "syslogd_flags": "-ss"
     }
 
-    DEFAULT_SYSCTL_CONF_SERVICES: typing.Dict[str, int] = {
+    DEFAULT_SYSCTL_CONF: typing.Dict[str, int] = {
         "net.inet.ip.fw.enable": 0
     }
 
@@ -887,24 +888,17 @@ class ReleaseGenerator(ReleaseResource):
 
     def _set_default_rc_conf(self) -> bool:
 
-        for key, value in self.DEFAULT_RC_CONF_SERVICES.items():
-            self.rc_conf[f"{key}_enable"] = value
+        for key, value in self.DEFAULT_RC_CONF.items():
+            self.rc_conf[key] = value
 
         return self.rc_conf.save() is True
 
     def _set_default_sysctl_conf(self) -> bool:
 
-        for key, value in self.DEFAULT_SYSCTL_CONF_SERVICES.items():
+        for key, value in self.DEFAULT_SYSCTL_CONF.items():
             self.sysctl_conf[key] = value
 
         return self.sysctl_conf.save() is True
-
-    def _generate_default_rcconf_line(self, service_name: str) -> str:
-        if Release.DEFAULT_RC_CONF_SERVICES[service_name] is True:
-            state = "YES"
-        else:
-            state = "NO"
-        return f"{service_name}_enable=\"{state}\""
 
     def _update_name_from_dataset(self) -> None:
         if self.dataset is not None:
