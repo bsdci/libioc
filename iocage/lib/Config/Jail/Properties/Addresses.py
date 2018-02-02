@@ -71,6 +71,7 @@ class AddressesProp(dict):
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "ip4_address"
     skip_on_error: bool
+    delimiter: str = ","
 
     def __init__(
         self,
@@ -190,4 +191,4 @@ class AddressesProp(dict):
         for nic in self:
             for address in self[nic]:
                 out.append(f"{nic}|{address}")
-        return str(" ".join(out))
+        return str(self.delimiter.join(out))

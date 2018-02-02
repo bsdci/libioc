@@ -31,6 +31,7 @@ class InterfaceProp(dict):
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "interfaces"
+    delimiter: str = ","
 
     def __init__(
         self,
@@ -128,7 +129,7 @@ class InterfaceProp(dict):
         for jail_if in value:
             bridge_if = self[jail_if]
             out.append(f"{jail_if}:{bridge_if}")
-        return " ".join(out)
+        return self.delimiter.join(out)
 
     def __str__(self) -> str:
         return self.to_string(value=self)
