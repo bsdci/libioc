@@ -22,11 +22,8 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """start module for the cli."""
-import typing
-import os.path
 import click
 
-import iocage.lib.errors
 import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
@@ -48,13 +45,13 @@ def cli(ctx, rc, jails):
 
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
-    
+
     if len(jails) == 0:
         logger.error("No jail selector provided")
         exit(1)
 
-    zfs = iocage.lib.ZFS.ZFS(logger=self.logger)
-    host = iocage.lib.Host.Host(logger=self.logger, zfs=zfs)
+    zfs = iocage.lib.ZFS.ZFS(logger=logger)
+    host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
 
     if host.distribution.name == "HardenedBSD":
         update_command = [
@@ -72,7 +69,6 @@ def cli(ctx, rc, jails):
             "-n"  # no_kernel=1
         ]
 
-
     filters = jails + ("template=no",)
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
@@ -81,6 +77,7 @@ def cli(ctx, rc, jails):
         filters=filters
     )
 
+    destination_path = "/var/db/freebsd-update"
     changed_jails = []
     failed_jails = []
     for jail in jails:
@@ -88,15 +85,10 @@ def cli(ctx, rc, jails):
         try:
             jail.require_jail_not_template()
 
-            _release_update_directory = os.path.join(
-                jail.release.root_dataset.mountpoint
-            )
-
-            jail.fstab = ioc_jail.fstab
             jail.fstab.read_file()
             jail.fstab.new_line(
-                source=f"{jail.release.root_dir}/var/db/freebsd-update",
-                destination="/var/db/freebsd-update",
+                source=f"{jail.release.root_dir}{destination_path}",
+                destination=destination_path,
                 fs_type="nullfs",
                 options="ro",
                 dump="0",
@@ -124,7 +116,7 @@ def cli(ctx, rc, jails):
             continue
 
         if _fstab_written is True:
-            del jail.fstab[len(jail.fstab)-1]
+            del jail.fstab[len(jail.fstab) - 1]
             jail.fstab.save()
             logger.verbose(f"{jail.fstab.path} restored")
 
