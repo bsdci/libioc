@@ -562,27 +562,27 @@ class ReleaseGenerator(ReleaseResource):
             do not need to pre-fetch the updates
             """
             print("NOOP")
-	    #iocage.lib.helpers.exec([
-            #    f"{self.release_updates_dir}/{update_script_name}",
-            #    "--not-running-from-cron",
-            #    "-d",
-            #    release_update_download_dir,
-            #    "--currently-running",
-            #    self.name,
-            #    "-f",
-            #    f"{self.release_updates_dir}/{update_conf_name}",
-            #    "--not-running-from-cron",
-            #    "fetch"
-            #    # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #    update_script_path,
-            #    "-c",
-            #    update_conf_path,
-            #    "-j",
-            #    jail.identifier,
-            #    "-V",
-            #    "-t",
-            #    "/var/db/hbsd-update"
-            #], logger=self.logger)
+            # iocage.lib.helpers.exec([
+            #     f"{self.release_updates_dir}/{update_script_name}",
+            #     "--not-running-from-cron",
+            #     "-d",
+            #     release_update_download_dir,
+            #     "--currently-running",
+            #     self.name,
+            #     "-f",
+            #     f"{self.release_updates_dir}/{update_conf_name}",
+            #     "--not-running-from-cron",
+            #     "fetch"
+            #     # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #     update_script_path,
+            #     "-c",
+            #     update_conf_path,
+            #     "-j",
+            #     jail.identifier,
+            #     "-V",
+            #     "-t",
+            #     "/var/db/hbsd-update"
+            # ], logger=self.logger)
 
         else:
             iocage.lib.helpers.exec([

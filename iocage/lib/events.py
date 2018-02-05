@@ -352,7 +352,7 @@ class JailExec(JailEvent):
         **kwargs
     ) -> None:
 
-        JailEvent.__init__(self, jail, **kwargs)        
+        JailEvent.__init__(self, jail, **kwargs)
 
 
 # Release

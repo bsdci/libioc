@@ -409,7 +409,7 @@ class JailGenerator(JailResource):
         try:
             self.passthru(command)
             yield jailExecEvent.end()
-        except:
+        except subprocess.CalledProcessError:
             yield jailExecEvent.fail()
 
         for event in self.stop():
