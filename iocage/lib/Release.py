@@ -635,18 +635,18 @@ class ReleaseGenerator(ReleaseResource):
         changed = False
 
         try:
+
             if self.host.distribution.name == "HardenedBSD":
-                for event in self._update_hbsd_jail(jail):
-                    if isinstance(event, iocage.lib.events.IocageEvent):
-                        yield event
-                    else:
-                        changed = event
+                _update_method = self._update_hbsd_jail
             else:
-                for event in self._update_freebsd_jail(jail):
-                    if isinstance(event, iocage.lib.events.IocageEvent):
-                        yield event
-                    else:
-                        changed = event
+                _update_method = self._update_freebsd_jail
+
+            for event in _update_method(jail):
+                if isinstance(event, iocage.lib.events.IocageEvent):
+                    yield event
+                else:
+                    changed = event
+
             jail.stop()
             yield runReleaseUpdateEvent.end()
         except Exception as e:
