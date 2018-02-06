@@ -30,6 +30,7 @@ import ucl
 
 import iocage.lib.errors
 import iocage.lib.Datasets
+import iocage.lib.Distribution
 import iocage.lib.Host
 import iocage.lib.Logger
 import iocage.lib.ZFS
@@ -39,8 +40,8 @@ import iocage.lib.Types
 
 
 def init_zfs(
-        self: typing.Any,
-        zfs: 'iocage.lib.ZFS.ZFS'=None
+    self: typing.Any,
+    zfs: 'iocage.lib.ZFS.ZFS'=None
 ) -> 'iocage.lib.ZFS.ZFS':
 
     try:
@@ -58,8 +59,8 @@ def init_zfs(
 
 
 def init_host(
-        self,
-        host: typing.Optional[iocage.lib.Host.HostGenerator]=None
+    self,
+    host: typing.Optional[iocage.lib.Host.HostGenerator]=None
 ) -> iocage.lib.Host.HostGenerator:
 
     try:
@@ -76,9 +77,28 @@ def init_host(
     )
 
 
+def init_distribution(
+    self,
+    distribution: typing.Optional[iocage.lib.Distribution.Distribution]=None
+) -> iocage.lib.Host.HostGenerator:
+
+    try:
+        return self.distribution
+    except AttributeError:
+        pass
+
+    if distribution:
+        return distribution
+
+    return iocage.lib.Distribution.Distribution(
+        logger=self.logger,
+        zfs=self.zfs
+    )
+
+
 def init_logger(
-        self,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+    self,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> iocage.lib.Logger.Logger:
 
     try:

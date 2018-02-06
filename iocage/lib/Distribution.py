@@ -79,7 +79,7 @@ class DistributionGenerator:
 
     def __init__(
         self,
-        host: 'iocage.lib.Host.Host',
+        host: typing.Optional['iocage.lib.Host.Host']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
@@ -232,36 +232,6 @@ class DistributionGenerator:
                 eol
             )
         return False
-
-    def get_release_trunk_file_url(
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        filename: str
-    ) -> str:
-
-        if self.host.distribution.name == "HardenedBSD":
-
-            return "/".join([
-                "https://raw.githubusercontent.com/HardenedBSD/hardenedBSD",
-                release.hbds_release_branch,
-                filename
-            ])
-
-        elif self.host.distribution.name == "FreeBSD":
-
-            if release.name == "11.0-RELEASE":
-                release_name = "11.0.1"
-            else:
-                fragments = release.name.split("-", maxsplit=1)
-                release_name = f"{fragments[0]}.0"
-
-            base_url = "https://svn.freebsd.org/base/release"
-            return f"{base_url}/{release_name}/{filename}"
-
-        raise iocage.lib.errors.DistributionUnknown(
-            distribution_name=self.host.distribution.name,
-            logger=self.logger
-        )
 
     @property
     def releases(self) -> typing.List['iocage.lib.Release.ReleaseGenerator']:

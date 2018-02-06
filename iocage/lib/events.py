@@ -447,6 +447,16 @@ class ReleaseUpdate(ReleaseEvent):
         ReleaseEvent.__init__(self, release, **kwargs)
 
 
+class ReleaseUpdatePull(ReleaseUpdate):
+
+    def __init__(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
+        ReleaseUpdate.__init__(self, release, **kwargs)
+
 class ReleaseUpdateDownload(ReleaseUpdate):
 
     def __init__(

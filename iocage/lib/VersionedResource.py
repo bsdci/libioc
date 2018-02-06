@@ -41,7 +41,6 @@ class ResourceSnapshots:
         try:
             self.resource.dataset.snapshot(snapshot_identifier, recursive=True)
         except libzfs.ZFSException as e:
-            print(snapshot_identifier)
             raise iocage.lib.errors.SnapshotCreation(
                 reason=str(e),
                 logger=self.resource.logger

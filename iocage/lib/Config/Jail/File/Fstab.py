@@ -123,13 +123,15 @@ class Fstab(
         jail: 'iocage.lib.Jail.JailGenerator',
         release: typing.Optional['iocage.lib.Release.ReleaseGenerator']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
-        host: typing.Optional['iocage.lib.Host.HostGenerator']=None
+        host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
+        file: typing.Optional[str]="fstab"
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.host = iocage.lib.helpers.init_host(self, host)
         self.jail = jail
         self.release = release
+        self.file = file
 
     @property
     def path(self) -> str:
@@ -138,7 +140,7 @@ class Fstab(
 
         This is the file read from and written to.
         """
-        path = f"{self.jail.dataset.mountpoint}/fstab"
+        path = f"{self.jail.dataset.mountpoint}/{self.file}"
         self._require_path_relative_to_resource(
             filepath=path,
             resource=self.jail

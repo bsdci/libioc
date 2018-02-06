@@ -22,11 +22,8 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 import typing
-import datetime
 import hashlib
 import os
-import re
-import shutil
 import tarfile
 import urllib.request
 import urllib.error
@@ -348,10 +345,6 @@ class ReleaseGenerator(ReleaseResource):
         return ["https", "http", "ftp"]
 
     @property
-    def release_updates_dir(self) -> str:
-        return f"{self.dataset.mountpoint}/updates"
-
-    @property
     def hbds_release_branch(self):
 
         if self._hbsd_release_branch is not None:
@@ -443,7 +436,7 @@ class ReleaseGenerator(ReleaseResource):
             yield releaseConfigurationEvent.skip()
 
         if fetch_updates is True:
-            for event in ReleaseGenerator.fetch_updates(self):
+            for event in self.updater.fetch():
                 yield event
 
         if update is True:
@@ -485,181 +478,8 @@ class ReleaseGenerator(ReleaseResource):
         )
         # ToDo: Memoize ReleaseResource
 
-    def fetch_updates(
-        self
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-        events = iocage.lib.events
-        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self)
-        yield releaseUpdateDownloadEvent.begin()
-
-        if self.host.distribution.name == "HardenedBSD":
-            update_name = "hbsd-update"
-            update_script_name = "hbsd-update"
-            update_conf_name = "hbsd-update.conf"
-            release_updates_dir = "/var/db/hbsd-update/updates"
-        else:
-            update_name = "freebsd-update"
-            update_script_name = "freebsd-update.sh"
-            update_conf_name = "freebsd-update.conf"
-            release_updates_dir = "/var/db/freebsd-update/updates"
-
-        files = {
-            update_script_name: f"usr.sbin/{update_name}/{update_script_name}",
-            update_conf_name: f"etc/{update_conf_name}",
-        }
-
-        release_update_download_dir = f"{release_updates_dir}"
-        if os.path.isdir(release_update_download_dir):
-            self.logger.verbose(
-                f"Deleting existing updates in {release_update_download_dir}"
-            )
-            shutil.rmtree(release_update_download_dir)
-        os.makedirs(release_update_download_dir)
-
-        for key in files.keys():
-
-            remote_path = files[key]
-            url = self.host.distribution.get_release_trunk_file_url(
-                release=self,
-                filename=remote_path
-            )
-
-            local_path = f"{release_updates_dir}/{key}"
-            if os.path.isfile(local_path):
-                os.remove(local_path)
-
-            self.logger.verbose(f"Downloading {url}")
-            urllib.request.urlretrieve(url, local_path)  # nosec: url validated
-
-            if key == update_script_name:
-                os.chmod(local_path, 0o744)
-
-            elif key == update_conf_name:
-
-                if self.host.distribution.name == "FreeBSD":
-                    with open(local_path, "r+") as f:
-                        content = f.read()
-                        pattern = re.compile("^Components .+$", re.MULTILINE)
-                        f.seek(0)
-                        f.write(pattern.sub(
-                            "Components world",
-                            content
-                        ))
-                        f.truncate()
-
-                os.chmod(local_path, 0o644)
-
-            self.logger.debug(
-                f"Update-asset {key} for release '{self.name}'"
-                f" saved to {local_path}"
-            )
-
-        self.logger.verbose(f"Fetching updates for release '{self.name}'")
-        if self.host.distribution.name == "HardenedBSD":
-            """
-            Updates in Hardened BSD are directly executed in a jail, so that we
-            do not need to pre-fetch the updates
-            """
-            print("NOOP")
-            # iocage.lib.helpers.exec([
-            #     f"{self.release_updates_dir}/{update_script_name}",
-            #     "--not-running-from-cron",
-            #     "-d",
-            #     release_update_download_dir,
-            #     "--currently-running",
-            #     self.name,
-            #     "-f",
-            #     f"{self.release_updates_dir}/{update_conf_name}",
-            #     "--not-running-from-cron",
-            #     "fetch"
-            #     # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #     update_script_path,
-            #     "-c",
-            #     update_conf_path,
-            #     "-j",
-            #     jail.identifier,
-            #     "-V",
-            #     "-t",
-            #     "/var/db/hbsd-update"
-            # ], logger=self.logger)
-
-        else:
-            iocage.lib.helpers.exec([
-                f"{self.release_updates_dir}/{update_script_name}",
-                "--not-running-from-cron",
-                "-d",
-                release_update_download_dir,
-                "--currently-running",
-                self.name,
-                "-f",
-                f"{self.release_updates_dir}/{update_conf_name}",
-                "--not-running-from-cron",
-                "fetch"
-            ], logger=self.logger)
-
-        yield releaseUpdateDownloadEvent.end()
-
-    def update(
-        self
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-        dataset = self.dataset
-        snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
-
-        runReleaseUpdateEvent = iocage.lib.events.RunReleaseUpdate(self)
-        yield runReleaseUpdateEvent.begin()
-
-        # create snapshot before the changes
-        dataset.snapshot(snapshot_name, recursive=True)
-
-        jail = iocage.lib.Jail.JailGenerator(
-            {
-                "name": self.name.replace(".", "-"),
-                "basejail": False,
-                "allow_mount_nullfs": "1",
-                "release": self.name,
-                "securelevel": "0",
-                "vnet": False,
-                "ip4_addr": None,
-                "ip6_addr": None,
-                "defaultrouter": None
-            },
-            new=True,
-            logger=self.logger,
-            zfs=self.zfs,
-            host=self.host,
-            dataset=self.dataset
-        )
-
-        changed = False
-
-        try:
-
-            if self.host.distribution.name == "HardenedBSD":
-                _update_method = self._update_hbsd_jail
-            else:
-                _update_method = self._update_freebsd_jail
-
-            for event in _update_method(jail):
-                if isinstance(event, iocage.lib.events.IocageEvent):
-                    yield event
-                else:
-                    changed = event
-
-            jail.stop()
-            yield runReleaseUpdateEvent.end()
-        except Exception as e:
-            # kill the helper jail and roll back if anything went wrong
-            self.logger.verbose(
-                "There was an error updating the Jail - reverting the changes"
-            )
-            jail.stop(force=True)
-            self.zfs.get_snapshot(snapshot_name).rollback(force=True)
-            yield runReleaseUpdateEvent.fail(e)
-            raise e
-
-        yield changed
+    def update(self) -> None:
+        return self.updater.apply()
 
     def snapshot(
         self,
@@ -706,132 +526,6 @@ class ReleaseGenerator(ReleaseResource):
         self.dataset.snapshot(snapshot_name)
         snapshot: libzfs.ZFSSnapshot = self.zfs.get_snapshot(snapshot_name)
         return snapshot
-
-    def _update_hbsd_jail(
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator'
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-        events = iocage.lib.events
-        executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
-
-        for event in jail.start():
-            yield event
-
-        yield executeReleaseUpdateEvent.begin()
-
-        update_script_path = f"{self.release_updates_dir}/hbsd-update"
-        update_conf_path = f"{self.release_updates_dir}/hbsd-update.conf"
-
-        try:
-
-            # ToDo: as bad as print() replace passthru with a nice progress bar
-            stdout = iocage.lib.helpers.exec_iter([
-                update_script_path,
-                "-c",
-                update_conf_path,
-                "-j",
-                jail.identifier,
-                "-V",
-                "-D",  # nodownload=1
-                "-t",
-                "/var/db/hbsd-update/updates"
-            ], logger=self.logger)
-
-            for stdout_line in stdout:
-                self.logger.verbose(stdout_line.strip("\n"), indent=1)
-
-            self.logger.debug(f"Update of release '{self.name}' finished")
-
-        except Exception:
-
-            raise iocage.lib.errors.ReleaseUpdateFailure(
-                release_name=self.name,
-                reason=(
-                    "hbsd-update failed"
-                ),
-                logger=self.logger
-            )
-
-        yield executeReleaseUpdateEvent.end()
-
-        for event in jail.stop():
-            yield event
-
-        self.logger.verbose(f"Release '{self.name}' updated")
-        yield True  # ToDo: yield False if nothing was updated
-
-    def _update_freebsd_jail(
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator'
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-        events = iocage.lib.events
-        executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self)
-
-        local_update_mountpoint = f"{self.root_dir}/var/db/freebsd-update"
-        if not os.path.isdir(local_update_mountpoint):
-            self.logger.spam(
-                "Creating mountpoint {local_update_mountpoint}"
-            )
-            os.makedirs(local_update_mountpoint)
-
-        jail.fstab.new_line(
-            source=self.release_updates_dir,
-            destination=local_update_mountpoint,
-            fs_type="nullfs",
-            options="rw"
-        )
-        jail.fstab.save()
-
-        for event in jail.start():
-            yield event
-
-        yield executeReleaseUpdateEvent.begin()
-        child, stdout, stderr = jail.exec([
-            "/var/db/freebsd-update/freebsd-update.sh",
-            "--not-running-from-cron",
-            "-d",
-            "/var/db/freebsd-update",
-            "--currently-running",
-            self.name,
-            "-r",
-            self.name,
-            "-f",
-            "/var/db/freebsd-update/freebsd-update.conf",
-            "install"
-        ], ignore_error=True)
-
-        if child.returncode != 0:
-            if "No updates are available to install." in stdout:
-                yield executeReleaseUpdateEvent.skip(
-                    message="already up to date"
-                )
-                self.logger.debug("Already up to date")
-            else:
-                yield executeReleaseUpdateEvent.fail()
-                raise iocage.lib.errors.ReleaseUpdateFailure(
-                    release_name=self.name,
-                    reason=(
-                        "freebsd-update.sh exited "
-                        f"with returncode {child.returncode}"
-                    ),
-                    logger=self.logger
-                )
-        else:
-            yield executeReleaseUpdateEvent.end()
-            self.logger.debug(f"Update of release '{self.name}' finished")
-
-        for event in jail.stop():
-            yield event
-
-        self.logger.verbose(f"Release '{self.name}' updated")
-        yield True  # ToDo: return False if nothing was updated
-
-    def _append_datetime(self, text: str) -> str:
-        now = datetime.datetime.utcnow()
-        text += now.strftime("%Y%m%d%H%I%S.%f")
-        return text
 
     def _ensure_dataset_mounted(self) -> None:
         if not self.dataset.mountpoint:
