@@ -375,6 +375,10 @@ class JailGenerator(JailResource):
     def fork_exec(
         self,
         command: typing.List[str],
+        error_handler: typing.Optional[typing.Callable[
+            [typing.Tuple[subprocess.Popen, str, str]],
+            typing.Tuple[bool, str],
+        ]]=None,
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
@@ -405,17 +409,35 @@ class JailGenerator(JailResource):
         for event in self.start():
             yield event
 
+        def _revert_jail_started():
+            for event in self.stop(force=True):
+                yield event
+        jailExecEvent.add_rollback_step(_revert_jail_started)
+
         yield jailExecEvent.begin()
-        try:
-            self.exec(command)
+
+        child, stdout, stderr = self.exec(command, ignore_error=True)
+        if child.returncode != 0:
+            if (error_handler is None):
+                passed = False
+                message = ""
+            else:
+                passed, message = error_handler(child, stdout, stderr)
+
+            if passed is False:
+                err = iocage.lib.errors.CommandFailure(
+                    returncode=child.returncode
+                )
+                yield jailExecEvent.fail(err)
+                raise err
+            else:
+                yield jailExecEvent.skip(err)
+                self.logger.debug(message)
+        else:
             yield jailExecEvent.end()
-        except subprocess.CalledProcessError:
-            yield jailExecEvent.fail()
 
         for event in self.stop():
             yield event
-
-        self.config = original_config
 
         yield jailForkExecEvent.end()
 
