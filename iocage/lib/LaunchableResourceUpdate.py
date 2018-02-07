@@ -32,6 +32,9 @@ import iocage.lib.events
 import iocage.lib.errors
 import iocage.lib.Jail
 
+# MyPy
+import subprocess
+
 class LaunchableResourceUpdate:
 
     update_name: str
@@ -61,11 +64,21 @@ class LaunchableResourceUpdate:
         return f"{self.resource.dataset.mountpoint}/updates"
 
     @property
+    def local_temp_dir(self):
+        # ToDo: Resolve resource deadlock when mounting rw in ro nullfs mount
+        # return f"{self.local_release_updates_dir}/temp",
+        return "/tmp/iocage-update"
+    
+    @property
     def release(self):
         if isinstance(self.resource, iocage.lib.Release.ReleaseGenerator):
             return self.resource
         return self.resource.release
     
+    @property
+    def _install_error_handler(self):
+        return None
+
     @property
     def temporary_jail(self):
         """
@@ -92,25 +105,51 @@ class LaunchableResourceUpdate:
                 dataset=self.resource.dataset
             )
             temporary_jail.config.file = "config_update.json"
+
+            root_path = temporary_jail.root_path
+            destination_dir = f"{root_path}/{self.local_release_updates_dir}"
             temporary_jail.fstab.file = "fstab_update"
             temporary_jail.fstab.new_line(
                 source=self.host_release_updates_dir,
-                destination=self.local_release_updates_dir
+                destination=destination_dir
             )
+            temp_dir = f"{root_path}{self.local_temp_dir}"
+            self._clean_create_dir(temp_dir)
+            temporary_jail.fstab.new_line(
+                source=f"{self.host_release_updates_dir}/temp",
+                destination=temp_dir,
+                options="rw"
+            )
+            temporary_jail.fstab.save()
             self._temporary_jail = temporary_jail
         return self._temporary_jail
 
     def _update_jail(self) -> None:
         return NotImplementedError("To be implemented by inheriting classes")
 
-    def _clean_create_download_dir(self) -> None:
-        if os.path.isdir(self.local_release_updates_dir):
-            self.logger.verbose(
-                f"Delete existing updates in {self.local_release_updates_dir}"
-            )
-            shutil.rmtree(self.local_release_updates_dir)
-        os.makedirs(self.local_release_updates_dir)
+    def _create_updates_dir(self) -> None:
+        self._create_dir(self.host_release_updates_dir)
 
+    def _clean_create_download_dir(self) -> None:
+        self._clean_create_dir(f"{self.host_release_updates_dir}/temp")
+
+    def _create_jail_update_dir(self) -> None:
+        root_path = self.resource.root_path 
+        jail_update_dir = f"{root_path}{self.local_release_updates_dir}"
+        self._clean_create_dir(jail_update_dir)
+        shutil.chown(jail_update_dir, "root", "wheel")
+        os.chmod(jail_update_dir, 0o755)
+
+    def _create_dir(self, directory: str) -> None:
+        if os.path.isdir(directory):
+            return
+        os.makedirs(directory)
+
+    def _clean_create_dir(self, directory: str) -> None:
+        if os.path.isdir(directory):
+            self.logger.verbose(f"Deleting existing directory {directory}")
+            shutil.rmtree(directory)
+        self._create_dir(directory)
 
     @property
     def local_release_updater_config(self) -> str:
@@ -133,6 +172,7 @@ class LaunchableResourceUpdate:
 
         self.logger.verbose(f"Downloading {url}")
         urllib.request.urlretrieve(url, local)  # nosec: url validated
+        os.chmod(local, mode)
 
         self.logger.debug(
             f"Update-asset {remote} for release '{self.release.name}'"
@@ -144,22 +184,22 @@ class LaunchableResourceUpdate:
 
     def _pull_updater(self):
 
-        self._clean_create_download_dir()
+        self._create_updates_dir()
 
         self._download_updater_asset(
             mode=0o744,
             remote=f"usr.sbin/{self.update_name}/{self.update_script_name}",
-            local=f"{self.local_release_updates_dir}/{self.update_script_name}"
+            local=f"{self.host_release_updates_dir}/{self.update_script_name}"
         )
 
         self._download_updater_asset(
             mode=0o644,
             remote=f"etc/{self.update_conf_name}",
-            local=f"{self.local_release_updates_dir}/{self.update_conf_name}"
+            local=f"{self.host_release_updates_dir}/{self.update_conf_name}"
         )
 
         self._modify_updater_config(
-            path=f"{self.local_release_updates_dir}/{self.update_conf_name}"
+            path=f"{self.host_release_updates_dir}/{self.update_conf_name}"
         )
 
     def _append_datetime(self, text: str) -> str:
@@ -180,7 +220,7 @@ class LaunchableResourceUpdate:
             self._pull_updater()
         except Exception as e:
             yield releaseUpdatePullEvent.fail(e)
-            raise          
+            raise
         yield releaseUpdatePullEvent.end()
 
         yield releaseUpdateDownloadEvent.begin()
@@ -188,6 +228,7 @@ class LaunchableResourceUpdate:
             f"Fetching updates for release '{self.release.name}'"
         )
         try:
+            self._clean_create_download_dir()
             iocage.lib.helpers.exec(
                 self._fetch_command,
                 logger=self.logger
@@ -215,6 +256,12 @@ class LaunchableResourceUpdate:
         jail = self.temporary_jail
         changed = False
 
+        def _revert_changes():
+            for event in jail.stop(force=True):
+                yield event
+            self.resource.zfs.get_snapshot(snapshot_name).rollback(force=True)
+        runReleaseUpdateEvent.add_rollback_step(_revert_changes)
+
         try:
             for event in self._update_jail(jail):
                 if isinstance(event, iocage.lib.events.IocageEvent):
@@ -222,12 +269,6 @@ class LaunchableResourceUpdate:
                 else:
                     changed = event
         except Exception as e:
-            # kill the helper jail and roll back if anything went wrong
-            self.logger.verbose(
-                "There was an error updating the Jail - reverting the changes"
-            )
-            jail.stop(force=True)
-            self.resource.zfs.get_snapshot(snapshot_name).rollback(force=True)
             yield runReleaseUpdateEvent.fail(e)
             raise e
 
@@ -244,20 +285,26 @@ class LaunchableResourceUpdate:
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self.release)
 
         try:
-            for event in jail.fork_exec(self._update_command):
+            self._create_jail_update_dir()
+            for event in jail.fork_exec(
+                self._update_command,
+                error_handler=self._install_error_handler
+            ):
                 yield event
-                self.logger.debug(
-                    f"Update of release '{self.release.name}' finished"
-                )
+            self.logger.debug(
+                f"Update of release '{self.release.name}' finished"
+            )
         except Exception:
             raise
-            raise iocage.lib.errors.ReleaseUpdateFailure(
+            err = iocage.lib.errors.ReleaseUpdateFailure(
                 release_name=self.release.name,
                 reason=(
-                    "hbsd-update failed"
+                    f"{self.update_name} failed"
                 ),
                 logger=self.logger
             )
+            yield executeReleaseUpdateEvent.fail(err)
+            raise err
 
         yield executeReleaseUpdateEvent.end()
 
@@ -281,7 +328,7 @@ class LaunchableResourceUpdateHardenedBSD(LaunchableResourceUpdate):
             "-D",  # no download
             "-T",  # keep temp
             "-t",
-            f"{self.local_release_updates_dir}/temp"
+            self.local_temp_dir
         ]
 
     @property
@@ -349,7 +396,7 @@ class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
             f"{self.local_release_updates_dir}/{self.update_script_name}",
             "--not-running-from-cron",
             "-d",
-            f"{self.local_release_updates_dir}/temp",
+            self.local_temp_dir,
             "--currently-running",
             self.release.name,
             "-r",
@@ -367,8 +414,6 @@ class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
             "-d",
             f"{self.host_release_updates_dir}/temp",
             "--currently-running",
-            self.release.name,
-            "-r",
             self.release.name,
             "-f",
             f"{self.host_release_updates_dir}/{self.update_conf_name}",
@@ -388,6 +433,20 @@ class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
             ))
             f.truncate()
 
+    @property
+    def _install_error_handler(self):
+        def error_handler(
+            child: subprocess.Popen,
+            stdout: str,
+            stderr: str
+        ) -> typing.Tuple[bool, str]:
+            if "No updates are available to install." in stdout:
+                return (True, "already up to date",)
+            else:
+                return (False, (
+                    "freebsd-update.sh exited "
+                    f"with returncode {child.returncode}"
+                ),)
 
 def get_launchable_update_resource(
     distribution: 'iocage.lib.Distribution.Distribution',
