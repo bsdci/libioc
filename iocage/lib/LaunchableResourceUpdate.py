@@ -259,6 +259,7 @@ class LaunchableResourceUpdate:
         def _revert_changes():
             for event in jail.stop(force=True):
                 yield event
+            self.logger.verbose(f"Rolling back to {snapshot_name}")
             self.resource.zfs.get_snapshot(snapshot_name).rollback(force=True)
         runReleaseUpdateEvent.add_rollback_step(_revert_changes)
 
