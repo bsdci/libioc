@@ -61,7 +61,7 @@ class LaunchableResourceUpdate:
 
     @property
     def host_release_updates_dir(self) -> str:
-        return f"{self.resource.dataset.mountpoint}/updates"
+        return f"{self.release.dataset.mountpoint}/updates"
 
     @property
     def local_temp_dir(self):
@@ -134,7 +134,7 @@ class LaunchableResourceUpdate:
         self._clean_create_dir(f"{self.host_release_updates_dir}/temp")
 
     def _create_jail_update_dir(self) -> None:
-        root_path = self.resource.root_path 
+        root_path = self.release.root_path
         jail_update_dir = f"{root_path}{self.local_release_updates_dir}"
         self._clean_create_dir(jail_update_dir)
         shutil.chown(jail_update_dir, "root", "wheel")
@@ -211,9 +211,16 @@ class LaunchableResourceUpdate:
         self
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
+        ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
+        if isinstance(self.resource, ReleaseGenerator) is False:
+            raise iocage.lib.errors.NonReleaseUpdateFetch(
+                resource=self.resource,
+                logger=self.logger
+            )
+
         events = iocage.lib.events
         releaseUpdatePullEvent = events.ReleaseUpdatePull(self.release)
-        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self.release)
+        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self.release)    
 
         yield releaseUpdatePullEvent.begin()
         try:
