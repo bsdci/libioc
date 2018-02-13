@@ -240,7 +240,10 @@ class LaunchableResourceUpdate:
 
     def apply(
         self
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+    ) -> typing.Generator[typing.Union[
+        'iocage.lib.events.IocageEvent',
+        bool
+    ], None, None]:
 
         dataset = self.resource.dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
@@ -254,7 +257,7 @@ class LaunchableResourceUpdate:
         dataset.snapshot(snapshot_name, recursive=True)
 
         jail = self.temporary_jail
-        changed = False
+        changed: bool = False
 
         def _revert_changes():
             for event in jail.stop(force=True):
@@ -280,7 +283,10 @@ class LaunchableResourceUpdate:
     def _update_jail(
         self,
         jail: 'iocage.lib.Jail.JailGenerator'
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+    ) -> typing.Generator[typing.Union[
+        'iocage.lib.events.IocageEvent',
+        bool
+    ], None, None]:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self.release)
