@@ -61,9 +61,15 @@ except subprocess.CalledProcessError:
     exit(1)
 
 
-def print_events(generator: typing.Generator[IocageEvent, None, None]) -> None:
+def print_events(
+    generator: typing.Generator[typing.Union[IocageEvent, bool], None, None]
+) -> typing.Optional[bool]:
     lines: typing.Dict[str, str] = {}
     for event in generator:
+
+        if isinstance(event, bool):
+            # a boolean terminates the event stream
+            return event
 
         if event.identifier is None:
             identifier = "generic"
