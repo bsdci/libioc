@@ -40,9 +40,8 @@ __rootcmd__ = True
 @click.argument("jails", nargs=-1)
 def cli(ctx, rc, jails):
     """
-    Starts Jails
+    Update Jails
     """
-
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
 
@@ -50,24 +49,9 @@ def cli(ctx, rc, jails):
         logger.error("No jail selector provided")
         exit(1)
 
-    zfs = iocage.lib.ZFS.ZFS(logger=logger)
+    zfs = iocage.lib.ZFS.ZFS()
+    zfs.logger = logger
     host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
-
-    if host.distribution.name == "HardenedBSD":
-        update_command = [
-            "/usr/sbin/hbsd-update",
-            "-B",  # nobase=1
-            "-n",  # no_kernel=1
-            "-t",
-            "-D",  # nodownload=1
-            "/var/db/freebsd-update/hbsd-update"
-        ]
-    else:
-        update_command = [
-            "/usr/sbin/hbsd-update",
-            "-B",  # nobase=1
-            "-n"  # no_kernel=1
-        ]
 
     filters = jails + ("template=no",)
     jails = iocage.lib.Jails.JailsGenerator(
@@ -77,50 +61,15 @@ def cli(ctx, rc, jails):
         filters=filters
     )
 
-    destination_path = "/var/db/freebsd-update"
     changed_jails = []
     failed_jails = []
     for jail in jails:
-        _fstab_written = False
         try:
-            jail.require_jail_not_template()
-
-            jail.fstab.read_file()
-            jail.fstab.new_line(
-                source=f"{jail.release.root_dir}{destination_path}",
-                destination=destination_path,
-                fs_type="nullfs",
-                options="ro",
-                dump="0",
-                passnum="0",
-                comment=None
-            )
-            jail.fstab.save()
-            logger.verbose(
-                f"{destination_path} temporarily added to {jail.fstab.path}"
-            )
-            _fstab_written = True
-
-            print_function(jail.fork_exec(
-                command=update_command,
-                vnet=False,
-                interfaces="",
-                ip4_addr=None,
-                ip6_addr=None,
-                secure_level=0,
-                allow_chflags=True
-            ))
-
-        except iocage.lib.errors.IocageException:
+            changed = print_function(jail.updater.apply())
+            if changed is True:
+                changed_jails.append(jail)
+        except iocage.lib.errors.UpdateFailure:
             failed_jails.append(jail)
-            continue
-
-        if _fstab_written is True:
-            del jail.fstab[len(jail.fstab) - 1]
-            jail.fstab.save()
-            logger.verbose(f"{jail.fstab.path} restored")
-
-        changed_jails.append(jail)
 
     if len(failed_jails) > 0:
         return False
