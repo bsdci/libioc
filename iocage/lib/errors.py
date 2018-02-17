@@ -586,7 +586,7 @@ class ReleaseListUnavailable(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
-class ReleaseUpdateFailure(IocageException):
+class UpdateFailure(IocageException):
 
     def __init__(
         self,
@@ -602,7 +602,7 @@ class ReleaseUpdateFailure(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
-class InvalidReleaseAssetSignature(ReleaseUpdateFailure):
+class InvalidReleaseAssetSignature(UpdateFailure):
 
     def __init__(
         self,
@@ -612,7 +612,7 @@ class InvalidReleaseAssetSignature(ReleaseUpdateFailure):
     ) -> None:
 
         msg = f"Asset {asset_name} has an invalid signature"
-        ReleaseUpdateFailure.__init__(
+        UpdateFailure.__init__(
             self,
             name=name,
             reason=msg,
@@ -620,7 +620,7 @@ class InvalidReleaseAssetSignature(ReleaseUpdateFailure):
         )
 
 
-class IllegalReleaseAssetContent(ReleaseUpdateFailure):
+class IllegalReleaseAssetContent(UpdateFailure):
 
     def __init__(
         self,
@@ -631,7 +631,7 @@ class IllegalReleaseAssetContent(ReleaseUpdateFailure):
     ) -> None:
 
         msg = f"Asset {asset_name} contains illegal files - {reason}"
-        ReleaseUpdateFailure.__init__(
+        UpdateFailure.__init__(
             self,
             name=name,
             reason=msg,
@@ -639,11 +639,11 @@ class IllegalReleaseAssetContent(ReleaseUpdateFailure):
         )
 
 
-class NonReleaseUpdateFetch(ReleaseUpdateFailure):
+class NonReleaseUpdateFetch(UpdateFailure):
 
     def __init__(self, resource: str, **kwargs) -> None:
         msg = f"Updates can only be fetched for releases"
-        ReleaseUpdateFailure.__init__(
+        UpdateFailure.__init__(
             self,
             name=resource.name,
             reason=msg,

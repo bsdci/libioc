@@ -60,6 +60,17 @@ class LaunchableResourceUpdate:
         return f"/var/db/{self.update_name}"
 
     @property
+    def host_release_updates_dataset_name(self):
+        return f"{self.release.dataset.name}/updates"
+
+    @property
+    def host_release_updates_dataset(self):
+        ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
+        if isinstance(self.resource, ReleaseGenerator):
+            dataset_name = self.host_release_updates_dataset_name
+            return self.zfs.get_or_create_dataset(dataset_name)
+
+    @property
     def host_release_updates_dir(self) -> str:
         return f"{self.release.dataset.mountpoint}/updates"
 
@@ -96,7 +107,9 @@ class LaunchableResourceUpdate:
                     "vnet": False,
                     "ip4_addr": None,
                     "ip6_addr": None,
-                    "defaultrouter": None
+                    "defaultrouter": None,
+                    "mount_devfs": False,
+                    "mount_fdescfs": False
                 },
                 new=True,
                 logger=self.resource.logger,
@@ -300,6 +313,7 @@ class LaunchableResourceUpdate:
 
         try:
             self._create_jail_update_dir()
+            mount_fsdesc = True
             for event in jail.fork_exec(
                 self._update_command,
                 error_handler=self._install_error_handler
@@ -310,7 +324,7 @@ class LaunchableResourceUpdate:
             )
         except Exception:
             raise
-            err = iocage.lib.errors.ReleaseUpdateFailure(
+            err = iocage.lib.errors.UpdateFailure(
                 release_name=self.release.name,
                 reason=(
                     f"{self.update_name} failed"
