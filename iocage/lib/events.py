@@ -56,8 +56,10 @@ class IocageEvent:
     skipped: bool = False
     done: bool = True
     reverted: bool = False
-    error: typing.Optional[BaseException] = None
-    _rollback_steps: typing.List[typing.Callable[[], None]]
+    error: typing.Optional[typing.Union[bool, BaseException]] = None
+    _rollback_steps: typing.List[typing.Callable[[], typing.Optional[
+        typing.Generator['IocageEvent', None, None]
+    ]]]
     _child_events: typing.List['IocageEvent'] = []
 
     def __init__(
@@ -204,7 +206,7 @@ class IocageEvent:
         return self
 
     def fail(self, exception: bool=True, **kwargs) -> 'IocageEvent':
-        actions = list(self.fail_generator(exception=exception, **kwargs))
+        list(self.fail_generator(exception=exception, **kwargs))
         return self
 
     def fail_generator(
@@ -217,7 +219,7 @@ class IocageEvent:
         self.error = exception
 
         actions = self.rollback()
-        if ((actions is None) or isinstance(actions, IocageEvent)) is False:
+        if isinstance(actions, typing.Generator):
             for action in actions:
                 yield action
 
@@ -225,7 +227,6 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
 
         yield self
-
 
     def __hash__(self) -> typing.Any:
         has_identifier = ("identifier" in self.__dir__()) is True
@@ -481,6 +482,7 @@ class ReleaseUpdatePull(ReleaseUpdate):
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
+
 
 class ReleaseUpdateDownload(ReleaseUpdate):
 

@@ -376,7 +376,7 @@ class JailGenerator(JailResource):
         self,
         command: typing.List[str],
         error_handler: typing.Optional[typing.Callable[
-            [typing.Tuple[subprocess.Popen, str, str]],
+            [subprocess.Popen, str, str],
             typing.Tuple[bool, str],
         ]]=None,
         **temporary_config_override

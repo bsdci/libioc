@@ -51,8 +51,8 @@ signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 # @formatter:on
 
 try:
-    subprocess.check_call(
-        ["/sbin/sysctl", "vfs.zfs.version.spa"],  # nosec
+    subprocess.check_call(  # nosec
+        ["/sbin/sysctl", "vfs.zfs.version.spa"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )

@@ -35,6 +35,7 @@ import iocage.lib.Jail
 # MyPy
 import subprocess
 
+
 class Updater:
 
     update_name: str
@@ -53,7 +54,7 @@ class Updater:
 
     @property
     def logger(self):
-        return self.resource.logger    
+        return self.resource.logger
 
     @property
     def local_release_updates_dir(self):
@@ -75,18 +76,18 @@ class Updater:
 
     @property
     def host_updates_dir(self) -> str:
-        return self.host_updates_dataset.mountpoint
+        return str(self.host_updates_dataset.mountpoint)
 
     @property
     def local_temp_dir(self):
         return f"{self.local_release_updates_dir}/temp"
-    
+
     @property
     def release(self):
         if isinstance(self.resource, iocage.lib.Release.ReleaseGenerator):
             return self.resource
         return self.resource.release
-    
+
     @property
     def _install_error_handler(self):
         return None
@@ -133,8 +134,20 @@ class Updater:
             self._temporary_jail = temporary_jail
         return self._temporary_jail
 
-    def _update_jail(self) -> None:
-        return NotImplementedError("To be implemented by inheriting classes")
+    @property
+    def _fetch_command(self) -> typing.List[str]:
+        raise NotImplementedError("To be implemented by inheriting classes")
+
+    @property
+    def _update_command(self) -> typing.List[str]:
+        raise NotImplementedError("To be implemented by inheriting classes")
+
+    def _get_release_trunk_file_url(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        filename: str
+    ) -> str:
+        raise NotImplementedError("To be implemented by inheriting classes")
 
     def _create_updates_dir(self) -> None:
         self._create_dir(self.host_updates_dir)
@@ -147,7 +160,7 @@ class Updater:
         jail_update_dir = f"{root_path}{self.local_release_updates_dir}"
         self._clean_create_dir(jail_update_dir)
         shutil.chown(jail_update_dir, "root", "wheel")
-        os.chmod(jail_update_dir, 0o755)
+        os.chmod(jail_update_dir, 0o755)  # nosec: executable file
 
     def _create_dir(self, directory: str) -> None:
         if os.path.isdir(directory):
@@ -180,7 +193,8 @@ class Updater:
             os.remove(local)
 
         self.logger.verbose(f"Downloading {url}")
-        urllib.request.urlretrieve(url, local)  # nosec: url validated
+        _request = urllib.request  # type: ignore
+        _request.urlretrieve(url, local)  # nosec: url validated
         os.chmod(local, mode)
 
         self.logger.debug(
@@ -191,7 +205,7 @@ class Updater:
     def _modify_updater_config(self, path: str) -> None:
         pass
 
-    def _pull_updater(self):
+    def _pull_updater(self) -> None:
 
         self._create_updates_dir()
 
@@ -229,7 +243,7 @@ class Updater:
 
         events = iocage.lib.events
         releaseUpdatePullEvent = events.ReleaseUpdatePull(self.release)
-        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self.release)    
+        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self.release)
 
         yield releaseUpdatePullEvent.begin()
         try:
@@ -271,12 +285,14 @@ class Updater:
 
         # create snapshot before the changes
         dataset.snapshot(snapshot_name, recursive=True)
-        def _rollback_snapshot():
+
+        def _rollback_snapshot() -> None:
             dataset.umount()
             snapshot = self.resource.zfs.get_snapshot(snapshot_name)
             snapshot.rollback(force=True)
             dataset.mount()
             snapshot.delete()
+
         runReleaseUpdateEvent.add_rollback_step(_rollback_snapshot)
 
         jail = self.temporary_jail
@@ -310,7 +326,6 @@ class Updater:
 
         try:
             self._create_jail_update_dir()
-            mount_fsdesc = True
             for event in jail.fork_exec(
                 self._update_command,
                 error_handler=self._install_error_handler
@@ -385,6 +400,7 @@ class HardenedBSD(Updater):
             filename
         ])
 
+
 class FreeBSD(Updater):
 
     update_name: str = "freebsd-update"
@@ -437,7 +453,6 @@ class FreeBSD(Updater):
         ]
 
     def _modify_updater_config(self, path: str) -> None:
-       
         with open(path, "r+") as f:
             content = f.read()
             pattern = re.compile("^Components .+$", re.MULTILINE)
@@ -463,11 +478,14 @@ class FreeBSD(Updater):
                     f"with returncode {child.returncode}"
                 ),)
 
+
 def get_launchable_update_resource(
     distribution: 'iocage.lib.Distribution.Distribution',
     **kwargs
 ) -> Updater:
-    
+
+    _class: typing.Type[Updater]
+
     if distribution.name == "HardenedBSD":
         _class = HardenedBSD
     else:
