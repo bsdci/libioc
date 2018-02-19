@@ -51,8 +51,11 @@ signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 # @formatter:on
 
 try:
-    subprocess.check_call(["/sbin/sysctl", "vfs.zfs.version.spa"],  # nosec
-                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.check_call(
+        ["/sbin/sysctl", "vfs.zfs.version.spa"],  # nosec
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
 except subprocess.CalledProcessError:
     logger.error(
         "ZFS is required to use iocage.\n"
