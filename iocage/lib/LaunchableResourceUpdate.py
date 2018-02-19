@@ -60,19 +60,22 @@ class LaunchableResourceUpdate:
         return f"/var/db/{self.update_name}"
 
     @property
-    def host_release_updates_dataset_name(self):
-        return f"{self.release.dataset.name}/updates"
-
-    @property
-    def host_release_updates_dataset(self):
+    def host_updates_dataset_name(self):
         ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
         if isinstance(self.resource, ReleaseGenerator):
-            dataset_name = self.host_release_updates_dataset_name
-            return self.zfs.get_or_create_dataset(dataset_name)
+            release_dataset = self.resource.dataset
+        else:
+            release_dataset = self.resource.release.dataset
+        return f"{release_dataset.name}/updates"
 
     @property
-    def host_release_updates_dir(self) -> str:
-        return f"{self.release.dataset.mountpoint}/updates"
+    def host_updates_dataset(self):
+        dataset_name = self.host_updates_dataset_name
+        return self.resource.zfs.get_or_create_dataset(dataset_name)
+
+    @property
+    def host_updates_dir(self) -> str:
+        return self.host_updates_dataset.mountpoint
 
     @property
     def local_temp_dir(self):
@@ -123,13 +126,13 @@ class LaunchableResourceUpdate:
             destination_dir = f"{root_path}/{self.local_release_updates_dir}"
             temporary_jail.fstab.file = "fstab_update"
             temporary_jail.fstab.new_line(
-                source=self.host_release_updates_dir,
+                source=self.host_updates_dir,
                 destination=destination_dir
             )
             temp_dir = f"{root_path}{self.local_temp_dir}"
             self._clean_create_dir(temp_dir)
             temporary_jail.fstab.new_line(
-                source=f"{self.host_release_updates_dir}/temp",
+                source=f"{self.host_updates_dir}/temp",
                 destination=temp_dir,
                 options="rw"
             )
@@ -141,10 +144,10 @@ class LaunchableResourceUpdate:
         return NotImplementedError("To be implemented by inheriting classes")
 
     def _create_updates_dir(self) -> None:
-        self._create_dir(self.host_release_updates_dir)
+        self._create_dir(self.host_updates_dir)
 
-    def _clean_create_download_dir(self) -> None:
-        self._clean_create_dir(f"{self.host_release_updates_dir}/temp")
+    def _create_download_dir(self) -> None:
+        self._create_dir(f"{self.host_updates_dir}/temp")
 
     def _create_jail_update_dir(self) -> None:
         root_path = self.release.root_path
@@ -202,17 +205,17 @@ class LaunchableResourceUpdate:
         self._download_updater_asset(
             mode=0o744,
             remote=f"usr.sbin/{self.update_name}/{self.update_script_name}",
-            local=f"{self.host_release_updates_dir}/{self.update_script_name}"
+            local=f"{self.host_updates_dir}/{self.update_script_name}"
         )
 
         self._download_updater_asset(
             mode=0o644,
             remote=f"etc/{self.update_conf_name}",
-            local=f"{self.host_release_updates_dir}/{self.update_conf_name}"
+            local=f"{self.host_updates_dir}/{self.update_conf_name}"
         )
 
         self._modify_updater_config(
-            path=f"{self.host_release_updates_dir}/{self.update_conf_name}"
+            path=f"{self.host_updates_dir}/{self.update_conf_name}"
         )
 
     def _append_datetime(self, text: str) -> str:
@@ -248,7 +251,7 @@ class LaunchableResourceUpdate:
             f"Fetching updates for release '{self.release.name}'"
         )
         try:
-            self._clean_create_download_dir()
+            self._create_download_dir()
             iocage.lib.helpers.exec(
                 self._fetch_command,
                 logger=self.logger
@@ -265,7 +268,7 @@ class LaunchableResourceUpdate:
         bool
     ], None, None]:
 
-        dataset = self.resource.dataset
+        dataset = self.host_updates_dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
         runReleaseUpdateEvent = iocage.lib.events.RunReleaseUpdate(
@@ -275,16 +278,16 @@ class LaunchableResourceUpdate:
 
         # create snapshot before the changes
         dataset.snapshot(snapshot_name, recursive=True)
+        def _rollback_snapshot():
+            dataset.umount()
+            snapshot = self.resource.zfs.get_snapshot(snapshot_name)
+            snapshot.rollback(force=True)
+            dataset.mount()
+            snapshot.delete()
+        runReleaseUpdateEvent.add_rollback_step(_rollback_snapshot)
 
         jail = self.temporary_jail
         changed: bool = False
-
-        def _revert_changes():
-            for event in jail.stop(force=True):
-                yield event
-            self.logger.verbose(f"Rolling back to {snapshot_name}")
-            self.resource.zfs.get_snapshot(snapshot_name).rollback(force=True)
-        runReleaseUpdateEvent.add_rollback_step(_revert_changes)
 
         try:
             for event in self._update_jail(jail):
@@ -296,7 +299,7 @@ class LaunchableResourceUpdate:
             yield runReleaseUpdateEvent.fail(e)
             raise e
 
-        jail.stop()
+        _rollback_snapshot()
         yield runReleaseUpdateEvent.end()
         yield changed
 
@@ -310,6 +313,7 @@ class LaunchableResourceUpdate:
 
         events = iocage.lib.events
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self.release)
+        yield executeReleaseUpdateEvent.begin()
 
         try:
             self._create_jail_update_dir()
@@ -323,9 +327,8 @@ class LaunchableResourceUpdate:
                 f"Update of release '{self.release.name}' finished"
             )
         except Exception:
-            raise
             err = iocage.lib.errors.UpdateFailure(
-                release_name=self.release.name,
+                name=self.release.name,
                 reason=(
                     f"{self.update_name} failed"
                 ),
@@ -362,16 +365,16 @@ class LaunchableResourceUpdateHardenedBSD(LaunchableResourceUpdate):
     @property
     def _fetch_command(self) -> typing.List[str]:
         return [
-            f"{self.host_release_updates_dir}/{self.update_script_name}"
+            f"{self.host_updates_dir}/{self.update_script_name}"
             "--not-running-from-cron",
             "-T",  # keep temp
             "-t",
-            f"{self.host_release_updates_dir}/temp",
+            f"{self.host_updates_dir}/temp",
             "-k",
             self.release.name,
             "-f",  # fetch only
             "-c",
-            f"{self.host_release_updates_dir}/{self.update_conf_name}",
+            f"{self.host_updates_dir}/{self.update_conf_name}",
             "-V"
         ]
 
@@ -437,14 +440,13 @@ class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
     @property
     def _fetch_command(self) -> typing.List[str]:
         return [
-            f"{self.host_release_updates_dir}/{self.update_script_name}",
-            "--not-running-from-cron",
+            f"{self.host_updates_dir}/{self.update_script_name}",
             "-d",
-            f"{self.host_release_updates_dir}/temp",
+            f"{self.host_updates_dir}/temp",
             "--currently-running",
             self.release.name,
             "-f",
-            f"{self.host_release_updates_dir}/{self.update_conf_name}",
+            f"{self.host_updates_dir}/{self.update_conf_name}",
             "--not-running-from-cron",
             "fetch"
         ]
