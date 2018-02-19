@@ -57,23 +57,23 @@ class IocageEvent:
     done: bool = True
     reverted: bool = False
     error: typing.Optional[BaseException] = None
-    _rollback_steps: typing.List[typing.Callable[[], None]] = []
+    _rollback_steps: typing.List[typing.Callable[[], None]]
     _child_events: typing.List['IocageEvent'] = []
 
     def __init__(
-            self,
-            message: typing.Optional[str]=None,
-            **kwargs
+        self,
+        message: typing.Optional[str]=None,
+        **kwargs
     ) -> None:
         """
         Initializes an IocageEvent
         """
-
         for event in IocageEvent.HISTORY:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
 
         self.data = kwargs
+        self._rollback_steps = []
         self.number = len(IocageEvent.HISTORY) + 1
         self.parent_count = IocageEvent.PENDING_COUNT
 
@@ -108,7 +108,9 @@ class IocageEvent:
     def add_rollback_step(self, method: typing.Callable[[], None]) -> None:
         self._rollback_steps.append(method)
 
-    def rollback(self) -> None:
+    def rollback(
+        self
+    ) -> typing.Optional[typing.Generator['IocageEvent', None, None]]:
 
         if self.reverted is True:
             return
@@ -117,11 +119,19 @@ class IocageEvent:
 
         # Notify child_events in reverse order
         for event in reversed(self._child_events):
-            event.rollback()
+            rollback_actions = event.rollback()
+            if rollback_actions is not None:
+                for rollback_action in rollback_actions:
+                    yield rollback_action
 
         # Execute rollback steps in reverse order
-        for revert_step in reversed(self._rollback_steps):
-            revert_step()
+        reversed_rollback_steps = reversed(self._rollback_steps)
+        self._rollback_steps = []
+        for revert_step in reversed_rollback_steps:
+            revert_events = revert_step()
+            if revert_events is not None:
+                for event in revert_events:
+                    yield event
 
     @property
     def type(self) -> str:
@@ -178,7 +188,6 @@ class IocageEvent:
         self._update_message(**kwargs)
         self.done = True
         self.pending = False
-        self.done = True
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
@@ -194,13 +203,29 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def fail(self, exception=True, **kwargs) -> 'IocageEvent':
+    def fail(self, exception: bool=True, **kwargs) -> 'IocageEvent':
+        actions = list(self.fail_generator(exception=exception, **kwargs))
+        return self
+
+    def fail_generator(
+        self,
+        exception: bool=True,
+        **kwargs
+    ) -> typing.Generator['IocageEvent', None, None]:
+
         self._update_message(**kwargs)
         self.error = exception
+
+        actions = self.rollback()
+        if ((actions is None) or isinstance(actions, IocageEvent)) is False:
+            for action in actions:
+                yield action
+
         self.pending = False
         self.parent_count = IocageEvent.PENDING_COUNT
-        self.rollback()
-        return self
+
+        yield self
+
 
     def __hash__(self) -> typing.Any:
         has_identifier = ("identifier" in self.__dir__()) is True

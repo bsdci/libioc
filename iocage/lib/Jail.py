@@ -428,7 +428,9 @@ class JailGenerator(JailResource):
                 err = iocage.lib.errors.CommandFailure(
                     returncode=child.returncode
                 )
-                yield jailExecEvent.fail(err)
+                for event in jailExecEvent.fail_generator(err):
+                    yield event
+                yield jailForkExecEvent.fail()
                 raise err
             else:
                 yield jailExecEvent.skip(err)
