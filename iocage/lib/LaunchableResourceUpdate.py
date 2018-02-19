@@ -35,7 +35,7 @@ import iocage.lib.Jail
 # MyPy
 import subprocess
 
-class LaunchableResourceUpdate:
+class Updater:
 
     update_name: str
     update_script_name: str
@@ -343,7 +343,7 @@ class LaunchableResourceUpdate:
         yield True  # ToDo: yield False if nothing was updated
 
 
-class LaunchableResourceUpdateHardenedBSD(LaunchableResourceUpdate):
+class HardenedBSD(Updater):
 
     update_name: str = "hbsd-update"
     update_script_name: str = "hbsd-update"
@@ -400,7 +400,7 @@ class LaunchableResourceUpdateHardenedBSD(LaunchableResourceUpdate):
         ])
 
 
-class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
+class FreeBSD(Updater):
 
     update_name: str = "freebsd-update"
     update_script_name: str = "freebsd-update.sh"
@@ -481,12 +481,12 @@ class LaunchableResourceUpdateFreeBSD(LaunchableResourceUpdate):
 def get_launchable_update_resource(
     distribution: 'iocage.lib.Distribution.Distribution',
     **kwargs
-) -> LaunchableResourceUpdate:
+) -> Updater:
     
     if distribution.name == "HardenedBSD":
-        _class = LaunchableResourceUpdateHardenedBSD
+        _class = HardenedBSD
     else:
-        _class = LaunchableResourceUpdateFreeBSD
+        _class = FreeBSD
 
     return _class(
         distribution=distribution,
