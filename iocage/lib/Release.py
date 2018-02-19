@@ -440,7 +440,7 @@ class ReleaseGenerator(ReleaseResource):
                 yield event
 
         if update is True:
-            for event in ReleaseGenerator.update(self):
+            for event in self.updater.apply():
                 if isinstance(event, iocage.lib.events.IocageEvent):
                     yield event
                 else:
@@ -477,9 +477,6 @@ class ReleaseGenerator(ReleaseResource):
             zfs=self.zfs
         )
         # ToDo: Memoize ReleaseResource
-
-    def update(self) -> None:
-        return self.updater.apply()
 
     def snapshot(
         self,
@@ -705,9 +702,3 @@ class Release(ReleaseGenerator):
             update=update,
             fetch_updates=fetch_updates
         ))
-
-    def update(  # noqa: T484
-        self
-    ) -> typing.List['iocage.lib.events.IocageEvent']:
-
-        return list(ReleaseGenerator.update(self))

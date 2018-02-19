@@ -641,7 +641,12 @@ class IllegalReleaseAssetContent(UpdateFailure):
 
 class NonReleaseUpdateFetch(UpdateFailure):
 
-    def __init__(self, resource: str, **kwargs) -> None:
+    def __init__(
+        self,
+        resource: 'iocage.lib.Resource.ResourceGenerator',
+        **kwargs
+    ) -> None:
+
         msg = f"Updates can only be fetched for releases"
         UpdateFailure.__init__(
             self,
