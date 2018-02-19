@@ -21,7 +21,6 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import os.path
 import sys
 from setuptools import find_packages, setup
 from setuptools.command import easy_install
@@ -62,11 +61,6 @@ def get_args(cls, dist, header=None):
 easy_install.ScriptWriter.get_args = get_args
 
 
-if os.path.isdir("/usr/local/etc/init.d"):
-    _data = [('/usr/local/etc/init.d', ['rc.d/ioc'])]
-else:
-    _data = [('/usr/local/etc/rc.d', ['rc.d/ioc'])]
-
 if sys.version_info < (3, 6):
     exit("Only Python 3.6 and higher is supported.")
 
@@ -90,6 +84,5 @@ setup(
             'ioc=iocage.cli:cli'
         ]
     },
-    data_files=_data,
     tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
 )

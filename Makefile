@@ -8,9 +8,19 @@ deps:
 	python3.6 -m pip install -Ur requirements.txt
 install: deps
 	python3.6 -m pip install -U .
+	@if [ -f /usr/local/etc/init.d ]; then \
+		install -m 0755 rc.d/ioc /usr/local/etc/init.d; \
+	else \
+		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
+	fi
 install-dev: deps
 	python3.6 -m pip install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 	python3.6 -m pip install -e .
+	@if [ -f /usr/local/etc/init.d ]; then \
+		install -m 0755 -o root -g wheel rc.d/ioc /usr/local/etc/init.d; \
+	else \
+		install -m 0755 -o root -g wheel rc.d/ioc /usr/local/etc/rc.d; \
+	fi
 install-travis:
 	python3.6 -m pip install flake8-mutable flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 uninstall:
