@@ -79,9 +79,7 @@ class Updater:
 
     @property
     def local_temp_dir(self):
-        # ToDo: Resolve resource deadlock when mounting rw in ro nullfs mount
-        # return f"{self.local_release_updates_dir}/temp",
-        return "/tmp/iocage-update"
+        return f"{self.local_release_updates_dir}/temp"
     
     @property
     def release(self):
@@ -107,6 +105,7 @@ class Updater:
                     "allow_mount_nullfs": "1",
                     "release": self.release.name,
                     "securelevel": "0",
+                    "allow_chflags": True,
                     "vnet": False,
                     "ip4_addr": None,
                     "ip6_addr": None,
@@ -127,13 +126,7 @@ class Updater:
             temporary_jail.fstab.file = "fstab_update"
             temporary_jail.fstab.new_line(
                 source=self.host_updates_dir,
-                destination=destination_dir
-            )
-            temp_dir = f"{root_path}{self.local_temp_dir}"
-            self._clean_create_dir(temp_dir)
-            temporary_jail.fstab.new_line(
-                source=f"{self.host_updates_dir}/temp",
-                destination=temp_dir,
+                destination=destination_dir,
                 options="rw"
             )
             temporary_jail.fstab.save()
@@ -355,6 +348,9 @@ class HardenedBSD(Updater):
             f"{self.local_release_updates_dir}/{self.update_script_name}",
             "-c",
             f"{self.local_release_updates_dir}/{self.update_conf_name}",
+            "-i",  # ignore version check (offline)
+            "-v", "latest", "-U",  # skip version check
+            "-n",  # no kernel
             "-V",
             "-D",  # no download
             "-T",  # keep temp
@@ -365,8 +361,7 @@ class HardenedBSD(Updater):
     @property
     def _fetch_command(self) -> typing.List[str]:
         return [
-            f"{self.host_updates_dir}/{self.update_script_name}"
-            "--not-running-from-cron",
+            f"{self.host_updates_dir}/{self.update_script_name}",
             "-T",  # keep temp
             "-t",
             f"{self.host_updates_dir}/temp",
@@ -384,21 +379,11 @@ class HardenedBSD(Updater):
         filename: str
     ) -> str:
 
-        # return "/".join([
-        #     "https://raw.githubusercontent.com/HardenedBSD/hardenedBSD",
-        #     release.hbds_release_branch,
-        #     filename
-        # ])
-
         return "/".join([
-            (
-                "https://raw.githubusercontent.com/gronke/hardenedBSD"
-                "/hbsd-update-fetchonly"
-            ),
+            "https://raw.githubusercontent.com/HardenedBSD/hardenedBSD",
             release.hbds_release_branch,
             filename
         ])
-
 
 class FreeBSD(Updater):
 

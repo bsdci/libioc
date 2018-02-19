@@ -416,6 +416,9 @@ class JailGenerator(JailResource):
 
         yield jailExecEvent.begin()
 
+        # print(" ".join(command))
+        # self.passthru("/bin/sh")
+
         child, stdout, stderr = self.exec(command, ignore_error=True)
         if child.returncode != 0:
             if (error_handler is None):
