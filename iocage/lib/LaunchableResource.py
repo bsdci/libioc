@@ -27,8 +27,7 @@ import typing
 import iocage.lib.Config.Jail.File.RCConf
 import iocage.lib.Config.Jail.File.SysctlConf
 import iocage.lib.Resource
-import iocage.lib.LaunchableResourceUpdate
-UpdaterModule = iocage.lib.LaunchableResourceUpdate 
+import iocage.lib.ResourceUpdater
 
 # MyPy
 import iocage.lib.Config.Jail.JailConfig
@@ -42,7 +41,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
     ] = None
     _distribution: 'iocage.lib.Distribution.Distribution' = None
-    _updater: 'UpdaterModule.LaunchableResourceUpdate' = None
+    _updater: 'iocage.lib.ResourceUpdater.LaunchableResourceUpdate' = None
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(
@@ -58,16 +57,18 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     @property
     def updater(
         self
-    ) -> iocage.lib.LaunchableResourceUpdate.LaunchableResourceUpdate:
-        if self._updater is None:
-            if self._distribution is None:
-                self._distribution = iocage.lib.helpers.init_distribution(self)
-            UpdaterModule = iocage.lib.LaunchableResourceUpdate
-            self._updater = UpdaterModule.get_launchable_update_resource(
-                resource=self,
-                distribution=self._distribution
-            )
-        return self._updater
+    ) -> iocage.lib.ResourceUpdater.Updater:
+        if self._updater is not None:
+            return self._updater
+
+        if self._distribution is None:
+            self._distribution = iocage.lib.helpers.init_distribution(self)
+        updater = iocage.lib.ResourceUpdater.get_launchable_update_resource(
+            resource=self,
+            distribution=self._distribution
+        )
+        self._updater = updater
+        return updater
 
     def create_resource(self) -> None:
         """
