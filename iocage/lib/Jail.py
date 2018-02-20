@@ -382,7 +382,7 @@ class JailGenerator(JailResource):
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
-        Starts a jail, runs a command and exists
+        Starts a jail, runs a command and shuts it down immediately
         """
         self.require_jail_existing()
         self.require_jail_stopped()
