@@ -59,7 +59,7 @@ class IocageEvent:
     error: typing.Optional[typing.Union[bool, BaseException]] = None
     _rollback_steps: typing.List[typing.Callable[[], typing.Optional[
         typing.Generator['IocageEvent', None, None]
-    ]]]
+    ]]] = []
     _child_events: typing.List['IocageEvent'] = []
 
     def __init__(
