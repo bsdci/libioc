@@ -409,15 +409,13 @@ class JailGenerator(JailResource):
         for event in self.start():
             yield event
 
+        yield jailExecEvent.begin()
+
         def _revert_jail_started():
             for event in self.stop(force=True):
                 yield event
+
         jailExecEvent.add_rollback_step(_revert_jail_started)
-
-        yield jailExecEvent.begin()
-
-        # print(" ".join(command))
-        # self.passthru("/bin/sh")
 
         child, stdout, stderr = self.exec(command, ignore_error=True)
         if child.returncode != 0:
