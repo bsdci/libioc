@@ -41,7 +41,7 @@ import iocage.lib.Types
 
 def init_zfs(
     self: typing.Any,
-    zfs: 'iocage.lib.ZFS.ZFS'=None
+    zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
 ) -> 'iocage.lib.ZFS.ZFS':
 
     try:
