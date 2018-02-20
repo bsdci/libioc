@@ -160,7 +160,7 @@ class Updater:
         jail_update_dir = f"{root_path}{self.local_release_updates_dir}"
         self._clean_create_dir(jail_update_dir)
         shutil.chown(jail_update_dir, "root", "wheel")
-        os.chmod(jail_update_dir, 0o755)  # nosec: executable file
+        os.chmod(jail_update_dir, 0o755)  # nosec: accessible directory
 
     def _create_dir(self, directory: str) -> None:
         if os.path.isdir(directory):
