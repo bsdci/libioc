@@ -88,6 +88,13 @@ def cli(ctx,
         logger.error("No target matched your input")
         exit(1)
 
+    if not force:
+        message = "These {} will be deleted:\n  - {}\nAre you sure?".format(
+            "releases" if release else "jails",
+            "\n  - ".join([r.getstring('name') for r in resources])
+        )
+        click.confirm(message, default=False, abort=True)
+
     failed_items = []
 
     for item in resources:
