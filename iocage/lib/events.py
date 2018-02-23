@@ -181,8 +181,11 @@ class IocageEvent:
             return None
 
     def _update_message(self, **kwargs) -> None:
-        if "message" in kwargs:
-            self.message = kwargs["message"]
+        for key in list(kwargs):
+            if key == "message":
+                self.message = kwargs["message"]
+            else:
+                self.data[key] = kwargs[key]
 
     def begin(self, **kwargs) -> 'IocageEvent':
         """Begin an event."""
