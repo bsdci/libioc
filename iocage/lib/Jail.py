@@ -378,6 +378,7 @@ class JailGenerator(JailResource):
             [subprocess.Popen, str, str],
             typing.Tuple[bool, str],
         ]]=None,
+        passthru: bool=False,
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Start a jail, run a command and shut it down immediately."""
@@ -414,27 +415,41 @@ class JailGenerator(JailResource):
 
         jailExecEvent.add_rollback_step(_revert_jail_started)
 
-        child, stdout, stderr = self.exec(command, ignore_error=True)
-        if child.returncode != 0:
-            if (error_handler is None):
-                passed = False
-                message = ""
-            else:
-                passed, message = error_handler(child, stdout, stderr)
-
-            if passed is False:
-                err = iocage.lib.errors.CommandFailure(
-                    returncode=child.returncode
-                )
-                for event in jailExecEvent.fail_generator(err):
-                    yield event
-                yield jailForkExecEvent.fail()
-                raise err
-            else:
-                yield jailExecEvent.skip(err)
-                self.logger.debug(message)
+        if passthru is True:
+            try:
+                self.passthru(command)
+                jailExecEvent.end()
+            except Exception as e:
+                jailExecEvent.fail(e)
         else:
-            yield jailExecEvent.end()
+            child, stdout, stderr = self.exec(
+                command,
+                ignore_error=True
+            )
+            if child.returncode != 0:
+                if (error_handler is None):
+                    passed = False
+                    message = ""
+                else:
+                    passed, message = error_handler(child, stdout, stderr)
+
+                if passed is False:
+                    err = iocage.lib.errors.CommandFailure(
+                        returncode=child.returncode
+                    )
+                    for event in jailExecEvent.fail_generator(err):
+                        yield event
+                    yield jailForkExecEvent.fail()
+                    raise err
+                else:
+                    yield jailExecEvent.skip(err)
+                    self.logger.debug(message)
+            else:
+                yield jailExecEvent.end(
+                    child=child,
+                    stdout=stdout,
+                    stderr=stderr
+                )
 
         for event in self.stop():
             yield event
@@ -660,10 +675,10 @@ class JailGenerator(JailResource):
 
     def create(
         self,
-        resource: typing.Union[
+        resource: typing.Optional[typing.Union[
             'JailGenerator',
             'iocage.lib.Release.ReleaseGenerator',
-        ]
+        ]]=None
     ) -> None:
         """
         Create a Jail from a given Resource.
@@ -672,6 +687,7 @@ class JailGenerator(JailResource):
 
             resource (Jail or Release):
                 The (new) jail is created from this resource.
+                If no resource is specified, an empty dataset will be created
         """
         if isinstance(resource, JailGenerator):
             self.create_from_template(template=resource)

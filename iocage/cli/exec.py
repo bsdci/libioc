@@ -45,7 +45,18 @@ __rootcmd__ = True
     default="root",
     help="The host user to use."
 )
-@click.option("--jail_user", "-U", help="The jail user to use.")
+@click.option(
+    "--jail_user",
+    "-U",
+    help="The jail user to use."
+)
+@click.option(
+    "--fork",
+    "-f",
+    is_flag=True,
+    default=False,
+    help="Spawns a jail to execute the command."
+)
 @click.argument("jail", required=True, nargs=1)
 @click.argument("command", nargs=-1, type=click.UNPROCESSED)
 @click.option("--log-level", "-d", default=None)
@@ -55,6 +66,7 @@ def cli(
     jail: str,
     host_user: str,
     jail_user: typing.Optional[str],
+    fork: bool,
     log_level: typing.Optional[str]
 ) -> None:
     """Run the given command inside the specified jail."""
@@ -68,8 +80,13 @@ def cli(
     user_command = " ".join(list(command))
 
     if jail_user is not None:
-        command = ["/bin/su", "-m",
-                   jail_user, "-c", user_command]
+        command = [
+            "/bin/su",
+            "-m",
+            jail_user,
+            "-c",
+            user_command
+        ]
     else:
         command = ["/bin/sh", "-c", user_command]
 
@@ -79,8 +96,11 @@ def cli(
     if not ioc_jail.exists:
         logger.error(f"The jail {ioc_jail.humanreadable_name} does not exist")
         exit(1)
-    if not ioc_jail.running:
+
+    if (fork is False) and (ioc_jail.running is False):
         logger.error(f"The jail {ioc_jail.humanreadable_name} is not running")
         exit(1)
+    elif fork is True:
+        list(ioc_jail.fork_exec(command, passthru=True))
     else:
         ioc_jail.passthru(command)
