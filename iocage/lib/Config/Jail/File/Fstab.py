@@ -25,6 +25,7 @@ import typing
 import collections
 import os.path
 import random
+import re
 
 import iocage.lib.helpers
 import iocage.lib.Config.Jail.File.Prototype
@@ -40,10 +41,13 @@ class FstabLine(dict):
         for key in keys:
             self[key] = data[key]
 
+    def _escape(self, key) -> str:
+        return str(self[key].replace(" ", "\ "))
+
     def __str__(self) -> str:
         output = "\t".join([
-            self["source"],
-            self["destination"],
+            self._escape("source"),
+            self._escape("destination"),
             self["type"],
             self["options"],
             self["dump"],
@@ -202,7 +206,11 @@ class Fstab(
             if line == "":
                 continue
 
-            fragments = line.split()
+            line = re.sub("\s\s*", " ", line)
+            line = re.sub("([^\\\\])\s", "\g<1>\n", line)
+            line = line.replace("\\ ", " ")
+
+            fragments = line.split("\n")
             if len(fragments) != 6:
                 self.logger.log(
                     f"Invalid line in fstab file {self.path}"
