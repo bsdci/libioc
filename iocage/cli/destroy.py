@@ -84,7 +84,6 @@ def cli(ctx,
     )
 
     if len(list(resources)) == 0:
-        print(filters)
         logger.error("No target matched your input")
         exit(1)
 
