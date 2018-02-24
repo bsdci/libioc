@@ -181,7 +181,7 @@ class IocageEvent:
             return None
 
     def _update_message(self, **kwargs) -> None:
-        for key in list(kwargs):
+        for key in kwargs.keys():
             if key == "message":
                 self.message = kwargs["message"]
             else:
