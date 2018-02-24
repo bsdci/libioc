@@ -52,6 +52,6 @@ def print_table(
     if show_header is True:
         table.add_rows([table_head] + table_data)
     else:
-        table.add_rows(table_data)
+        table.add_rows(table_data, header=False)
 
     print(table.draw())
