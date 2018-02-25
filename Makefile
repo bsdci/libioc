@@ -26,7 +26,7 @@ install-travis:
 uninstall:
 	python3.6 -m pip uninstall -y iocage
 check:
-	flake8 --exclude=".*" --exclude=__init__.py --ignore=E203,W391
+	flake8 --exclude=".*" --exclude=__init__.py --ignore=E203,W391,D107
 	bandit --skip B404 --exclude iocage/tests/ -r .
 test:
 	pytest --zpool $(ZPOOL) --server $(SERVER)
