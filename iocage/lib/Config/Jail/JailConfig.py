@@ -21,16 +21,17 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Configuration of a Jail or other LaunchableResource."""
 import typing
 
 import iocage.lib.helpers
 import iocage.lib.Config.Jail.BaseConfig
 
-
-_usp = iocage.lib.Config.Jail.BaseConfig.BaseConfig.update_special_property
+BaseConfig = iocage.lib.Config.Jail.BaseConfig.BaseConfig
 
 
 class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
+    """The configuration of a Jail or other LaunchableResource."""
 
     legacy: bool = False
     jail: typing.Optional['iocage.lib.Jail.JailGenerator']
@@ -68,8 +69,8 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         self.clone(data)
 
     def update_special_property(self, name: str) -> None:
-
-        _usp(
+        """Triggered when a special property was updated."""
+        BaseConfig.update_special_property(
             self,
             name=name
         )
@@ -85,6 +86,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
             return self.jail.humanreadable_name
 
     def __getitem__(self, key: str) -> typing.Any:
+        """Get the value of a configuration argument or its default."""
         try:
             return super().__getitem__(key)
         except KeyError:
@@ -93,6 +95,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     @property
     def all_properties(self) -> list:
+        """Return a list of all config properties (default and custom)."""
         jail_config_properties = set(super().all_properties)
         default_config_properties = set(
             self.host.default_config.all_properties)

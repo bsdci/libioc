@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Manage fstab files."""
 import typing
 import collections
 import os.path
@@ -32,6 +33,7 @@ import iocage.lib.Config.Jail.File.Prototype
 
 
 class FstabLine(dict):
+    """Model a line of an fstab file."""
 
     def __init__(self, data: dict) -> None:
         keys = data.keys()
@@ -45,6 +47,7 @@ class FstabLine(dict):
         return str(self[key].replace(" ", "\ "))
 
     def __str__(self) -> str:
+        """Serialize the data into an fstab line string."""
         output = "\t".join([
             self._escape("source"),
             self._escape("destination"),
@@ -61,14 +64,18 @@ class FstabLine(dict):
         return output
 
     def __hash__(self):
+        """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
 
 class FstabBasejailLine(FstabLine):
+    """Model a fstab line automatically created by a NullFS basejail."""
+
     pass
 
 
 class FstabCommentLine(dict):
+    """Model a fstab comment line (beginning with #)."""
 
     def __init__(self, data: dict) -> None:
         if "line" not in data:
@@ -77,39 +84,45 @@ class FstabCommentLine(dict):
         self["line"] = data["line"]
 
     def __str__(self) -> str:
+        """Return the untouched comment line string."""
         return str(self["line"])
 
     def __hash__(self):
+        """
+        Return a random hash value.
+
+        The same comment might appear twice for a reason.
+        """
         return hash('%030x' % random.randrange(16**32))  # nosec: B311
 
 
 class FstabAutoPlaceholderLine(dict):
-    """
-    A placeholder for auto-created fstab lines
-    """
+    """A placeholder for auto-created fstab lines."""
 
     def __init__(self, data: dict={}) -> None:
         dict.__init__(self)
 
     def __str__(self) -> str:
+        """Never print virtual lines."""
         raise NotImplementedError("this is a virtual fstab line")
 
     def __hash__(self):
+        """Do not return a hash because placeholders have none."""
         return hash(None)
 
 
 class Fstab(
-    collections.MutableSequence,
-    iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile
+    iocage.lib.Config.Jail.File.Prototype.ResourceConfig,
+    collections.MutableSequence
 ):
     """
-
-    Fstab configuration file wrapper
+    Fstab configuration file wrapper.
 
     This object allows to read, programatically edit and write fstab files.
     Bound to an iocage resource, the location of the /etc/fstab file is
-    relative to the resource's root_dataset `<resource>/root`
+    relative to the resource's root_dataset `<resource>/root`.
     """
+
     AUTO_COMMENT_IDENTIFIER = "iocage-auto"
 
     release: typing.Optional['iocage.lib.Release.ReleaseGenerator']
@@ -140,7 +153,7 @@ class Fstab(
     @property
     def path(self) -> str:
         """
-        Absolute fstab file path
+        Absolute fstab file path.
 
         This is the file read from and written to.
         """
@@ -157,7 +170,7 @@ class Fstab(
         ignore_auto_created: bool=True
     ) -> None:
         """
-        Parses the content of a fstab file
+        Parse the content of a fstab file.
 
         Args:
 
@@ -167,7 +180,6 @@ class Fstab(
             ignore_auto_created:
                 Skips reading entries that were created by iocage
         """
-
         list.clear(self._lines)
 
         line: str
@@ -243,12 +255,14 @@ class Fstab(
             self.add_line(new_line)
 
     def read_file(self) -> None:
+        """Read the fstab file."""
         if os.path.isfile(self.path):
             with open(self.path, "r") as f:
                 self._read_file_handle(f)
                 self.logger.debug(f"fstab loaded from {self.path}")
 
     def save(self) -> None:
+        """Update or create the fstab file."""
         with open(self.path, "w") as f:
             self._save_file_handle(f)
             self.logger.verbose(f"{self.path} written")
@@ -263,7 +277,7 @@ class Fstab(
     def update_and_save(
         self
     ) -> None:
-
+        """Read file and then write changes."""
         if os.path.isfile(self.path):
             f = open(self.path, "r+")
             self._read_file_handle(f)
@@ -278,9 +292,7 @@ class Fstab(
         self,
         release: typing.Optional['iocage.lib.Release.ReleaseGenerator'] = None
     ) -> None:
-        """
-        Set a new release and save the updated file
-        """
+        """Set a new release and save the updated file."""
         self.release = release
         self.update_and_save()
 
@@ -294,7 +306,11 @@ class Fstab(
         passnum="0",
         comment=None
     ) -> None:
+        """
+        Append a new line to the fstab file.
 
+        Use save() to write changes to the fstab file.
+        """
         line = FstabLine({
             "source": source,
             "destination": destination,
@@ -315,7 +331,11 @@ class Fstab(
             FstabAutoPlaceholderLine
         ]
     ) -> None:
+        """
+        Directly append a FstabLine type.
 
+        Use save() to write changes to the fstab file.
+        """
         if isinstance(line, FstabAutoPlaceholderLine):
             self.logger.debug("Setting fstab auto-creation placeholder")
         else:
@@ -332,7 +352,12 @@ class Fstab(
 
     @property
     def basejail_lines(self) -> typing.List[FstabBasejailLine]:
+        """
+        Auto-generate lines of NullFS basejails.
 
+        When a jail is a NullFS basejail, this list represent the corresponding
+        fstab lines that mount the release.
+        """
         if self.release is None:
             return []
 
@@ -362,26 +387,27 @@ class Fstab(
         return fstab_basejail_lines
 
     def __str__(self) -> str:
+        """Return the entire content of the fstab file as string."""
         return "\n".join(map(
             str,
             list(self)
         ))
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Return the number of lines in the fstab file."""
         return list.__len__(list(self.__iter__()))
 
     def __delitem__(self, index):
+        """Delete an FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
     def __getitem__(self, index):
+        """Get the FstabLine at the given index."""
         return list(self.__iter__())[index]
 
-    def __setitem__(
-        self,
-        index,
-        value
-    ):
+    def __setitem__(self, index, value):
+        """Set or overwrite the FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__setitem__(real_index, value)
 
@@ -394,7 +420,17 @@ class Fstab(
             FstabAutoPlaceholderLine
         ]
     ) -> None:
+        """
+        Insert a line at a given position.
 
+        Args:
+
+            index:
+                The numeric line insertion position
+
+            value:
+                A FstabLine, Comment or Placeholder
+        """
         target_line = list(self.__iter__())[index]
 
         if isinstance(target_line, FstabBasejailLine):
@@ -424,7 +460,7 @@ class Fstab(
         FstabLine
     ]]:
         """
-        Returns an iterator of all printable lines
+        Return an iterator of all printable lines.
 
         The output includes user configured and auto created lines for NullFS
         basejails. The previous position of auto-created entries is preserved.
@@ -452,7 +488,8 @@ class Fstab(
 
         return iter(output)
 
-    def __contains__(self, value: typing.Any) -> bool:
+    def __contains__(self, value):
+        """Check if the FstabFile already contains a specific line."""
         for entry in self:
             if value["destination"] == entry["destination"]:
                 return True
@@ -461,9 +498,7 @@ class Fstab(
         return False
 
     def replace_path(self, pattern: typing.Pattern, replacement: str) -> None:
-        """
-        Replaces a given path in all fstab entries (source or destination)
-        """
+        """Replace a path in all fstab entries (source or destination)."""
         for i, line in enumerate(self._lines):
             if not isinstance(line, FstabLine):
                 continue

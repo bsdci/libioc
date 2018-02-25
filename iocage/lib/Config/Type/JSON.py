@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage configuration stored in a JSON file."""
 import typing
 import json
 
@@ -31,14 +32,17 @@ import iocage.lib.helpers
 
 
 class ConfigJSON(iocage.lib.Config.Prototype.Prototype):
+    """iocage configuration stored in a JSON file."""
 
     config_type = "json"
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        """Parse and normalize JSON data."""
         result = json.load(data)  # type: typing.Dict[str, typing.Any]
         return result
 
     def map_output(self, data: dict) -> str:
+        """Output configuration data as JSON string."""
         return str(iocage.lib.helpers.to_json(data))
 
 
@@ -46,4 +50,6 @@ class ResourceConfigJSON(
     iocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
     ConfigJSON
 ):
+    """ResourceConfig in JSON format."""
+
     pass

@@ -21,12 +21,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Configuration stored on a resource."""
 import os.path
 import libzfs
 import iocage.lib.Config.Prototype
 
 
 class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
+    """Configuration stored on a resource."""
 
     resource: 'iocage.lib.Resource.Resource' = None
 
@@ -35,17 +37,18 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
         resource: 'iocage.lib.Resource.Resource',
         **kwargs
     ) -> None:
-
         self.resource = resource
         iocage.lib.Config.Prototype.Prototype.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
+        """Wrap the resource dataset."""
         dataset: libzfs.ZFSDataset = self.resource.dataset
         return dataset
 
     @property
     def file(self) -> str:
+        """Absolute path to the configuration file."""
         return str(os.path.join(
             self.resource.dataset.mountpoint,
             self._file
@@ -53,4 +56,5 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
 
     @file.setter
     def file(self, value: str):
+        """Set the configuration file path relative to the resource."""
         self._file = value

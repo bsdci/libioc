@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""The main CLI for ioc."""
+"""iocage configuration associated with ZFS datasets."""
 import os.path
 import libzfs
 import typing
@@ -30,6 +30,7 @@ import iocage.lib.Config.Prototype
 
 
 class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
+    """iocage configuration associated with ZFS datasets."""
 
     _dataset: libzfs.ZFSDataset
 
@@ -46,12 +47,15 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
+        """Get the configured dataset."""
         return self._dataset
 
     @property
     def file(self) -> str:
+        """Get the absolute path to the config file."""
         return str(os.path.join(self.dataset.mountpoint, self._file))
 
     @file.setter
     def file(self, value: str):
+        """Set the relative path of the config file."""
         self._file = value

@@ -21,12 +21,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Global jail configuration defaults."""
 import typing
 
 import iocage.lib.Config.Jail.BaseConfig
 
 
 class DefaultsUserData(dict):
+    """Data-structure of default configuration data."""
 
     user_properties: set = set()
 
@@ -35,10 +37,12 @@ class DefaultsUserData(dict):
         dict.__init__(self, defaults)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
+        """Set a user provided default setting."""
         dict.__setitem__(self, key, value)
         self.user_properties.add(key)
 
     def __delitem__(self, key: str) -> None:
+        """Remove a user provided default setting."""
         if key in self.defaults:
             self[key] = self.defaults[key]
         else:
@@ -47,6 +51,7 @@ class DefaultsUserData(dict):
 
     @property
     def exclusive_user_data(self) -> dict:
+        """Return a dictionary of user provided default settings."""
         data = {}
         for key in self.user_properties:
             data[key] = self[key]
@@ -54,6 +59,7 @@ class DefaultsUserData(dict):
 
 
 class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
+    """BaseConfig object filled with global defaults."""
 
     _user_data: DefaultsUserData
 
@@ -129,12 +135,15 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     @property
     def data(self) -> DefaultsUserData:
+        """Return global default configuration data including user defaults."""
         return self._user_data
 
     @data.setter
     def data(self, value: dict):
+        """Global defaults data cannot be written directly."""
         pass
 
     @property
     def user_data(self) -> dict:
+        """User provided defaults differing from the global defaults."""
         return self._user_data.exclusive_user_data

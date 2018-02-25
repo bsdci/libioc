@@ -21,9 +21,11 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage configuration stored in ZFS properties."""
 import typing
 import libzfs
 
+import iocage.lib.Config.Prototype
 import iocage.lib.Config.Dataset
 import iocage.lib.Resource
 import iocage.lib.errors
@@ -33,37 +35,37 @@ ZFS_PROPERTY_PREFIX = "org.freebsd.iocage:"
 
 
 def is_iocage_property(name: str) -> bool:
+    """Determine if a property name is prefixed as iocage configuration."""
     return name.startswith(ZFS_PROPERTY_PREFIX)
 
 
 def get_iocage_property_name(zfs_property_name: str) -> str:
-
+    """Determine if a ZFS property is an iocage configuration property."""
     if is_iocage_property(zfs_property_name) is False:
         raise iocage.lib.errors.NotAnIocageZFSProperty(
             property_name=zfs_property_name
         )
-
     return zfs_property_name[len(ZFS_PROPERTY_PREFIX):]
 
 
 class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
+    """iocage configuration stored in ZFS properties."""
 
     config_type = "zfs"
 
     def read(self) -> dict:
+        """Read the configuration from the ZFS dataset."""
         try:
             data = self.map_input(self._read_properties())
             data["legacy"] = True
-            return data
+            return dict(data)
         except AttributeError:
             return {
                 "legacy": True
             }
 
     def write(self, data: dict) -> None:
-        """
-        Writes changes to the config file
-        """
+        """Write changes to ZFS properties of the dataset."""
         output_data = {}
         for key, value in data.items():
             output_data[key] = self._to_string(value)
@@ -89,11 +91,16 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
             )
             self.dataset.properties[prop_name] = prop
 
-    def map_input(self, data: dict) -> typing.Dict[str, typing.Any]:
+    def map_input(
+        self,
+        data: typing.Dict[str, str]
+    ) -> iocage.lib.Config.Prototype.ConfigDataDict:
+        """Normalize data read from ZFS properties."""
         parse_user_input = iocage.lib.helpers.parse_user_input
         return dict([(x, parse_user_input(y)) for (x, y) in data.items()])
 
     def _to_string(self, value) -> str:
+        """Transform config data to iocage_legacy compatible values."""
         return str(iocage.lib.helpers.to_string(
             value,
             true="on",
@@ -103,9 +110,7 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
 
     @property
     def exists(self) -> bool:
-        """
-        Returns True, when this configuration was found in the dataset
-        """
+        """Signal if iocage ZFS configuration properties were found."""
         for prop in self.dataset.properties:
             if is_iocage_property(prop):
                 return True
@@ -122,34 +127,36 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
 
 
 class ConfigZFS(BaseConfigZFS):
+    """iocage ZFS jail configuration for legacy support."""
 
     def __init__(
         self,
         dataset: libzfs.ZFSDataset,
         **kwargs
     ) -> None:
-
         self._dataset = dataset
         iocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
+        """Shortcut to the config dataset."""
         return self._dataset
 
 
 class ResourceConfigZFS(ConfigZFS):
+    """iocage ZFS resource configuration for legacy support."""
 
     def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
         **kwargs
     ) -> None:
-
         self.resource = resource
         ConfigZFS.__init__(self, **kwargs)
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
+        """Shortcut to the resources main dataset."""
         dataset: libzfs.ZFSDataset
         if self._dataset is not None:
             dataset = self._dataset

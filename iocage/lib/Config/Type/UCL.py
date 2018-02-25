@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage configuration stored in an UCL file."""
 import typing
 
 import ucl
@@ -32,15 +33,18 @@ import iocage.lib.errors
 
 
 class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
+    """iocage configuration stored in an UCL file."""
 
     config_type = "ucl"
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        """Normalize data read from the UCL file."""
         result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
         result["legacy"] = True
         return result
 
     def map_output(self, data: dict) -> str:
+        """Output configuration in UCL format."""
         return str(iocage.lib.helpers.to_ucl(data))
 
 
@@ -48,4 +52,6 @@ class ResourceConfigUCL(
     iocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
     ConfigUCL
 ):
+    """ResourceConfig in UCL format."""
+
     pass
