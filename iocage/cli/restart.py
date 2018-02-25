@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""start module for the cli."""
+"""Restart a jail with the CLI."""
 import typing
 import click
 
@@ -29,6 +29,8 @@ import iocage.lib.errors
 import iocage.lib.events
 import iocage.lib.Jails
 import iocage.lib.Logger
+
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
@@ -50,11 +52,13 @@ __rootcmd__ = True
     help="Force jail shutdown during restart"
 )
 @click.argument("jails", nargs=-1)
-def cli(ctx, shutdown, force, jails):
-    """
-    Starts Jails
-    """
-
+def cli(
+    ctx: IocageClickContext,
+    shutdown: bool,
+    force: bool,
+    jails: typing.Tuple[str, ...]
+) -> None:
+    """Restart a jail."""
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
 
@@ -76,7 +80,7 @@ def cli(ctx, shutdown, force, jails):
     for jail in ioc_jails:
 
         try:
-            print_function(restart_jail(
+            print_function(_restart_jail(
                 jail,
                 shutdown=shutdown,
                 force=force
@@ -96,7 +100,7 @@ def cli(ctx, shutdown, force, jails):
     exit(0)
 
 
-def restart_jail(
+def _restart_jail(
     jail: 'iocage.lib.Jail.JailsGenerator',
     shutdown: bool=False,
     force: bool=False

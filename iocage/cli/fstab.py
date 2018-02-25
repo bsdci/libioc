@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""set module for the cli."""
+"""View and manipulate fstab files of a jail."""
 import typing
 import errno
 import click
@@ -86,7 +86,7 @@ def cli_add(
     jail: str,
     read_write: bool
 ) -> None:
-
+    """Add lines to a jails fstab file."""
     ioc_jail = get_jail(jail, ctx.parent)
 
     if len(destination) == 0:
@@ -146,6 +146,7 @@ def cli_add(
 @click.pass_context
 @click.argument("jail", nargs=1, required=True)
 def cli_show(ctx: IocageClickContext, jail: str) -> None:
+    """Show a jails fstab file."""
     ioc_jail = get_jail(jail, ctx.parent)
     if os.path.isfile(ioc_jail.fstab.path):
         with open(ioc_jail.fstab.path, "r") as f:
@@ -163,7 +164,7 @@ def cli_show(ctx: IocageClickContext, jail: str) -> None:
 @click.argument("jail", nargs=1, required=True)
 @click.pass_context
 def cli_rm(ctx: IocageClickContext, source: str, jail: str) -> None:
-
+    """Remove a line from a jails fstab file."""
     ioc_jail = get_jail(jail, ctx.parent)
     fstab = ioc_jail.fstab
     destination = None
@@ -191,8 +192,10 @@ def cli_rm(ctx: IocageClickContext, source: str, jail: str) -> None:
 
 
 class FstabCli(click.MultiCommand):
+    """Python Click fstab subcommand boilerplate."""
 
     def list_commands(self, ctx: click.core.Context) -> list:
+        """Mock subcommands for Python Click."""
         return [
             "show",
             "add",
@@ -204,7 +207,7 @@ class FstabCli(click.MultiCommand):
         ctx: click.core.Context,
         cmd_name: str
     ) -> click.core.Command:
-
+        """Wrap subcommand for Python Click."""
         command: typing.Optional[click.core.Command] = None
 
         if cmd_name == "show":
@@ -231,7 +234,6 @@ class FstabCli(click.MultiCommand):
 def cli(
     ctx: IocageClickContext
 ) -> None:
-    """Manage a jails fstab file"""
-
+    """View and manipulate a jails fstab file."""
     ctx.logger = ctx.parent.logger
     ctx.host = iocage.lib.Host.HostGenerator(logger=ctx.logger)

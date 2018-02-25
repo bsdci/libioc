@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Get a specific jails with this CLI helper function."""
 import iocage.lib.errors
 import iocage.lib.Jail
 
@@ -31,6 +32,7 @@ def get_jail(
     jail_name: str,
     ctx: IocageClickContext
 ) -> iocage.lib.Jail.JailGenerator:
+    """Return the jail matching the given name."""
     try:
         return iocage.lib.Jail.JailGenerator(
             jail_name,

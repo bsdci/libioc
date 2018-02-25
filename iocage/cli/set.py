@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""set module for the cli."""
+"""Set configuration values from the CLI."""
 import typing
 import click
 
@@ -47,15 +47,14 @@ def cli(
     props: typing.Tuple[str, ...],
     jail: str
 ) -> None:
-    """Get a list of jails and print the property."""
-
+    """Set one or many configuration properties of one jail."""
     parent: typing.Any = ctx.parent
     logger: iocage.lib.Logger.Logger = parent.logger
     host = iocage.lib.Host.HostGenerator(logger=logger)
 
     # Defaults
     if jail == "defaults":
-        updated_properties = set_properties(props, host.defaults)
+        updated_properties = _set_properties(props, host.defaults)
         if len(updated_properties) > 0:
             logger.screen("Defaults updated: " + ", ".join(updated_properties))
         else:
@@ -74,7 +73,7 @@ def cli(
 
     for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
 
-        updated_properties = set_properties(props, ioc_jail)
+        updated_properties = _set_properties(props, ioc_jail)
 
         if len(updated_properties) == 0:
             logger.screen(f"Jail '{ioc_jail.humanreadable_name}' unchanged")
@@ -93,7 +92,7 @@ def cli(
     exit(0)
 
 
-def set_properties(
+def _set_properties(
     properties: typing.Iterable[str],
     target: 'iocage.lib.LaunchableResource.LaunchableResource'
 ) -> set:

@@ -21,26 +21,43 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""exec module for the cli."""
+"""Execute commands in jails from the CLI."""
 import click
+import typing
 
 import iocage.lib.Jail
 import iocage.lib.Logger
 
+from .shared.click import IocageClickContext
+
 __rootcmd__ = True
 
 
-@click.command(context_settings=dict(ignore_unknown_options=True),
-               name="exec", help="Run a command inside a specified jail.")
+@click.command(
+    context_settings=dict(ignore_unknown_options=True),
+    name="exec",
+    help="Run a command inside a specified jail."
+)
 @click.pass_context
-@click.option("--host_user", "-u", default="root",
-              help="The host user to use.")
+@click.option(
+    "--host_user",
+    "-u",
+    default="root",
+    help="The host user to use."
+)
 @click.option("--jail_user", "-U", help="The jail user to use.")
 @click.argument("jail", required=True, nargs=1)
 @click.argument("command", nargs=-1, type=click.UNPROCESSED)
 @click.option("--log-level", "-d", default=None)
-def cli(ctx, command, jail, host_user, jail_user, log_level):
-    """Runs the command given inside the specified jail"""
+def cli(
+    ctx: IocageClickContext,
+    command: typing.List[str],
+    jail: str,
+    host_user: str,
+    jail_user: typing.Optional[str],
+    log_level: typing.Optional[str]
+) -> None:
+    """Run the given command inside the specified jail."""
     logger = ctx.parent.logger
     logger.print_level = log_level
 
@@ -50,20 +67,20 @@ def cli(ctx, command, jail, host_user, jail_user, log_level):
 
     user_command = " ".join(list(command))
 
-    if jail_user:
+    if jail_user is not None:
         command = ["/bin/su", "-m",
                    jail_user, "-c", user_command]
     else:
         command = ["/bin/sh", "-c", user_command]
 
-    jail = iocage.lib.Jail.Jail(jail, logger=logger)
-    jail.state.query()
+    ioc_jail = iocage.lib.Jail.Jail(jail, logger=logger)
+    ioc_jail.state.query()
 
-    if not jail.exists:
-        logger.error(f"The jail {jail.humanreadable_name} does not exist")
+    if not ioc_jail.exists:
+        logger.error(f"The jail {ioc_jail.humanreadable_name} does not exist")
         exit(1)
-    if not jail.running:
-        logger.error(f"The jail {jail.humanreadable_name} is not running")
+    if not ioc_jail.running:
+        logger.error(f"The jail {ioc_jail.humanreadable_name} is not running")
         exit(1)
     else:
-        jail.passthru(command)
+        ioc_jail.passthru(command)

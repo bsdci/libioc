@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Use CLI helper functions for console output."""
 import typing
 import texttable
 
@@ -31,7 +32,7 @@ def print_table(
     show_header: bool=True,
     sort_key: typing.Optional[str]=None
 ) -> None:
-
+    """Print a table to stdout."""
     table = texttable.Texttable(max_width=0)
     table.set_cols_dtype(["t"] * len(columns))
 

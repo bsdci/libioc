@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""stop module for the cli."""
+"""Stop jails with the CLI."""
 import typing
 import click
 
@@ -51,6 +51,8 @@ def cli(
     jails: typing.Tuple[str, ...]
 ) -> None:
     """
+    Stop a jail.
+
     Looks for the jail supplied and passes the uuid, path and configuration
     location to stop_jail.
     """
@@ -62,14 +64,14 @@ def cli(
             logger.error("Cannot use --rc and jail selectors simultaniously")
             exit(1)
 
-        autostop(
+        _autostop(
             logger=logger,
             print_function=ctx.parent.print_events,
             force=force
         )
 
     else:
-        if not normal(
+        if not _normal(
             jails,
             logger=logger,
             print_function=ctx.parent.print_events,
@@ -78,7 +80,7 @@ def cli(
             exit(1)
 
 
-def normal(
+def _normal(
     filters: typing.Tuple[str, ...],
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
@@ -87,7 +89,7 @@ def normal(
     ],
     force: bool
 ) -> bool:
-
+    """Stop a jail regularly."""
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=filters
@@ -120,7 +122,7 @@ def normal(
     exit(0)
 
 
-def autostop(
+def _autostop(
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -128,7 +130,7 @@ def autostop(
     ],
     force: bool=True
 ) -> None:
-
+    """Stop a bunch of autostarted jails."""
     filters = ("boot=yes", "running=yes", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(

@@ -21,10 +21,12 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""rename a jail."""
+"""Rename a jail."""
 import click
 
 import iocage.lib.Jail
+
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
@@ -33,11 +35,12 @@ __rootcmd__ = True
 @click.pass_context
 @click.argument("jail", nargs=1)
 @click.argument("name", nargs=1)
-def cli(ctx, jail, name):
-    """
-    Rename a stopped jail.
-    """
-
+def cli(
+    ctx: IocageClickContext,
+    jail: str,
+    name: str
+) -> None:
+    """Rename a stopped jail."""
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
 

@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""snapshot module for the cli."""
+"""Create and manage jail snapshots with the CLI."""
 import typing
 import click
 
@@ -43,12 +43,11 @@ def cli_list_or_create(
     ctx: IocageClickContext
 ) -> None:
     """
-    Chooses whether to list or create a snapshot
+    Choose whether to list or create a snapshot.
 
     When a full snapshot identifier `<dataset>@<snapshot_name>` is seen, the
     snapshot will be created. Otherwise existing snapshots are listed.
     """
-
     if "@" in ctx.info_name:
         return _cli_create(ctx, ctx.info_name)
     else:
@@ -62,6 +61,7 @@ def cli_list_or_create(
 @click.pass_context
 @click.argument("identifier", nargs=1, required=True)
 def cli_create(*args, **kwargs) -> None:
+    """Create a snapshot."""
     _cli_create(*args, **kwargs)
 
 
@@ -92,6 +92,7 @@ def cli_rollback(
     identifier: str,
     force: bool
 ) -> None:
+    """Rollback to a previously taken snapshot."""
     try:
         ioc_jail, snapshot_name = _parse_identifier(
             ctx=ctx.parent,
@@ -110,6 +111,7 @@ def cli_rollback(
 @click.pass_context
 @click.argument("jail", nargs=1, required=True)
 def cli_list(*args, **kwargs) -> None:
+    """List existing snapshots."""
     _cli_list(*args, **kwargs)
 
 
@@ -134,6 +136,7 @@ def _cli_list(ctx: IocageClickContext, jail: str) -> None:
 @click.argument("identifier", nargs=1, required=True)
 @click.pass_context
 def cli_remove(ctx: IocageClickContext, identifier: str) -> None:
+    """Remove a snapshot."""
     try:
         ioc_jail, snapshot_name = _parse_identifier(
             ctx=ctx.parent,
@@ -146,8 +149,10 @@ def cli_remove(ctx: IocageClickContext, identifier: str) -> None:
 
 
 class SnapshotCli(click.MultiCommand):
+    """Python Click snapshot subcommand boilerplate."""
 
     def list_commands(self, ctx: click.core.Context) -> list:
+        """Mock Click subcommands."""
         return [
             "list",
             "create",
@@ -160,7 +165,7 @@ class SnapshotCli(click.MultiCommand):
         ctx: click.core.Context,
         cmd_name: str
     ) -> click.core.Command:
-
+        """Wrap Click subcommands."""
         command: click.core.Command
 
         if cmd_name == "list":
@@ -188,8 +193,7 @@ class SnapshotCli(click.MultiCommand):
 def cli(
     ctx: IocageClickContext
 ) -> None:
-    """Take and manage resource snapshots"""
-
+    """Take and manage resource snapshots."""
     ctx.logger = ctx.parent.logger
     ctx.host = iocage.lib.Host.HostGenerator(logger=ctx.logger)
 

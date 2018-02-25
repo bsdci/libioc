@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Click helpers for the CLI."""
 import typing
 import click.core
 
@@ -30,6 +31,7 @@ import iocage.lib.Host
 
 
 class IocageClickContext(click.core.Context):
+    """ioc ctx for Click CLI."""
 
     logger: iocage.lib.Logger.Logger
     host: iocage.lib.Host.Host
