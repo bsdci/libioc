@@ -21,6 +21,8 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Unit test configuration."""
+import typing
 import helper_functions
 import libzfs
 import pytest
@@ -40,28 +42,38 @@ import iocage.lib.Release
 _force_clean = False
 
 
-def pytest_addoption(parser):
-    parser.addoption("--force-clean", action="store_true",
-                     help="Force cleaning the /iocage-test dataset")
+def pytest_addoption(parser: typing.Any):
+    """Add force option to pytest."""
+    parser.addoption(
+        "--force-clean",
+        action="store_true",
+        help="Force cleaning the /iocage-test dataset"
+    )
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc: typing.Any) -> None:
+    """Hook into collecting test functions."""
     metafunc.config.getoption("force_clean")
 
 
 @pytest.fixture
-def force_clean():
+def force_clean() -> bool:
+    """Return True when force-clean is enabled."""
     return _force_clean
 
 
 @pytest.fixture
-def zfs():
+def zfs() -> libzfs.ZFS:
+    """Make ZFS available to the tests."""
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
 
 
 @pytest.fixture
-def pool(zfs, logger):
-    # find active zpool
+def pool(
+    zfs: libzfs.ZFS,
+    logger: 'iocage.lib.Logger.Logger'
+) -> libzfs.ZFSPool:
+    """Find the active iocage pool."""
     active_pool = None
     for pool in zfs.pools:
         properties = pool.root_dataset.properties
@@ -82,7 +94,8 @@ def pool(zfs, logger):
 
 
 @pytest.fixture
-def logger():
+def logger() -> 'iocage.lib.Logger.Logger':
+    """Make the iocage Logger available to the tests."""
     return iocage.lib.Logger.Logger()
 
 
@@ -92,7 +105,7 @@ def root_dataset(
     zfs: libzfs.ZFS,
     pool: libzfs.ZFSPool
 ) -> libzfs.ZFSDataset:
-
+    """Return the root dataset for tests."""
     dataset_name = f"{pool.name}/iocage-test"
 
     if force_clean:
@@ -124,7 +137,7 @@ def host(
     logger: 'iocage.lib.Logger.Logger',
     zfs: libzfs.ZFS
 ) -> 'iocage.lib.Host.HostGenerator':
-
+    """Make the iocage.Host available to the tests."""
     host = iocage.lib.Host.Host(
         root_dataset=root_dataset, logger=logger, zfs=zfs
     )
@@ -138,7 +151,7 @@ def release(
     logger: 'iocage.lib.Logger.Logger',
     zfs: libzfs.ZFS
 ) -> 'iocage.lib.Release.ReleaseGenerator':
-
+    """Return the test release matching the host release version."""
     return iocage.lib.Release.Release(
         name=host.release_version, host=host, logger=logger, zfs=zfs
     )

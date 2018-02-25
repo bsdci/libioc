@@ -21,26 +21,36 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Unit tests for Jail."""
 import json
 import os
 import uuid
 
 import helper_functions
 import pytest
+import libzfs
 
 import iocage.lib.Jail
 
 
-def read_jail_config_json(config_file):
+def read_jail_config_json(config_file: str) -> str:
+    """Read the jail JSON config file"""
     with open(config_file, "r") as conf:
         return json.load(conf)
 
 
 class TestJail(object):
+    """Run Jail unit tests."""
 
     @pytest.fixture
-    def local_release(self, release, root_dataset, force_clean, zfs):
-
+    def local_release(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        root_dataset: 'libzfs.ZFSDataset',
+        force_clean: bool,
+        zfs: 'libzfs.ZFS'
+    ) -> 'iocage.lib.Release.ReleaseGenerator':
+        """Mock a local release."""
         if not release.fetched:
             release.fetch()
 
@@ -52,9 +62,16 @@ class TestJail(object):
 
         del release
 
-    def test_can_be_created(self, host, local_release, logger, zfs,
-                            root_dataset, capsys):
-
+    def test_can_be_created(
+        self,
+        host: 'iocage.lib.Host.Host',
+        local_release: 'iocage.lib.Release.ReleaseGenerator',
+        logger: 'iocage.lib.Logger.Logger',
+        zfs: 'libzfs.ZFS',
+        root_dataset,
+        capsys
+    ) -> None:
+        """Test if jails can be created."""
         jail = iocage.lib.Jail.Jail(
             new=True,
             host=host,
@@ -98,10 +115,17 @@ class TestJail(object):
 
 
 class TestNullFSBasejail(object):
+    """Run tests for NullFS Basejails."""
 
     @pytest.fixture
-    def local_release(self, release, root_dataset, force_clean, zfs):
-
+    def local_release(
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        root_dataset: 'libzfs.ZFSDataset',
+        force_clean: bool,
+        zfs: 'libzfs.ZFS'
+    ) -> 'iocage.lib.Release.ReleaseGenerator':
+        """Mock a local release."""
         if not release.fetched:
             release.fetch()
 
@@ -113,9 +137,16 @@ class TestNullFSBasejail(object):
 
         del release
 
-    def test_can_be_created(self, host, local_release, logger, zfs,
-                            root_dataset):
-
+    def test_can_be_created(
+        self,
+        host: 'iocage.lib.Host.Host',
+        local_release: 'iocage.lib.Release.ReleaseGenerator',
+        logger: 'iocage.lib.Logger.Logger',
+        zfs: 'libzfs.ZFS',
+        root_dataset,
+        capsys
+    ) -> None:
+        """Test if NullFS basejails can be created."""
         jail = iocage.lib.Jail.Jail(
             {
                 "basejail": True
