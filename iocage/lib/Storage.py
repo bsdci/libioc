@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Abstraction of jail storage operations."""
 import grp
 import os
 import pwd
@@ -33,6 +34,7 @@ import iocage.lib.helpers
 
 
 class Storage:
+    """Abstraction of jail storage operations."""
 
     def __init__(
         self,
@@ -54,7 +56,7 @@ class Storage:
         self,
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
-
+        """Clone a release to a the current dataset_name."""
         self.clone_zfs_dataset(
             release.root_dataset_name,
             self.jail.root_dataset_name
@@ -69,10 +71,9 @@ class Storage:
         self,
         new_name: str
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
+        """Rename the dataset and its snapshots."""
         for event in self._rename_dataset(new_name):
             yield event
-
         for event in self._rename_snapshot(new_name):
             yield event
 
@@ -139,7 +140,7 @@ class Storage:
         source: str,
         target: str
     ) -> None:
-
+        """Clone a ZFSDataset from a source to a target dataset name."""
         snapshot_name = f"{source}@{self.jail.name}"
 
         # delete target dataset if it already exists
@@ -199,6 +200,7 @@ class Storage:
         )
 
     def create_jail_mountpoint(self, basedir: str) -> None:
+        """Ensure the destination mountpoint exists relative to the jail."""
         basedir = f"{self.jail.root_dataset.mountpoint}/{basedir}"
         if not os.path.isdir(basedir):
             self.logger.verbose(f"Creating mountpoint {basedir}")

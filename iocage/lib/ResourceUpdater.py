@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Updater for Releases and other LaunchableResources like Jails."""
 import typing
 import datetime
 import os.path
@@ -37,6 +38,7 @@ import subprocess
 
 
 class Updater:
+    """Updater for Releases and other LaunchableResources like Jails."""
 
     update_name: str
     update_script_name: str
@@ -353,6 +355,7 @@ class Updater:
 
 
 class HardenedBSD(Updater):
+    """Updater for HardenedBSD."""
 
     update_name: str = "hbsd-update"
     update_script_name: str = "hbsd-update"
@@ -403,6 +406,7 @@ class HardenedBSD(Updater):
 
 
 class FreeBSD(Updater):
+    """Updater for FreeBSD."""
 
     update_name: str = "freebsd-update"
     update_script_name: str = "freebsd-update.sh"

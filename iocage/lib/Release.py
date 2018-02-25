@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Representation of an iocage release"""
 import typing
 import hashlib
 import os
@@ -48,7 +49,7 @@ import iocage.lib.Config.Jail.File.SysctlConf
 
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
-
+    """Resource that represents an iocage release."""
     _release: typing.Optional['ReleaseGenerator'] = None
 
     def __init__(
@@ -124,6 +125,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
 
 class ReleaseGenerator(ReleaseResource):
+    """Release with generator interfaces"""
 
     DEFAULT_RC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
         "netif_enable": False,
@@ -690,6 +692,7 @@ class ReleaseGenerator(ReleaseResource):
 
 
 class Release(ReleaseGenerator):
+    """Release with synchronous interfaces."""
 
     def fetch(  # noqa: T484
         self,
