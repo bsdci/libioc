@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""list module for the cli."""
+"""List jails, releases and templates with the CLI."""
 import click
 import json
 import typing
@@ -34,6 +34,7 @@ import iocage.lib.Jails
 import iocage.lib.Releases
 
 from .shared.output import print_table
+from .shared.click import IocageClickContext
 
 supported_output_formats = ['table', 'csv', 'list', 'json']
 
@@ -51,38 +52,32 @@ supported_output_formats = ['table', 'csv', 'list', 'json']
               help="Show the full uuid and ip4 address.")
 @click.option("--remote", "-R",
               is_flag=True, help="Show remote's available RELEASEs.")
-@click.option("--plugins", "-P", is_flag=True, help="Show available plugins.")
 @click.option("--sort", "-s", "_sort", default=None, nargs=1,
               help="Sorts the list by the given type")
-@click.option("--quick", "-q", is_flag=True, default=False,
-              help="Lists all jails with less processing and fields.")
 @click.option("--output", "-o", default=None)
 @click.option("--output-format", "-f", default="table",
               type=click.Choice(supported_output_formats))
 @click.option("--header/--no-header", "-H/-NH", is_flag=True, default=True,
               help="Show or hide column name heading.")
 @click.argument("filters", nargs=-1)
-def cli(ctx, dataset_type, header, _long, remote, plugins,
-        _sort, quick, output, output_format, filters):
+def cli(
+    ctx: IocageClickContext,
+    dataset_type: str,
+    header: bool,
+    _long: bool,
+    remote: bool,
+    _sort: typing.Optional[str],
+    output: typing.Optional[str],
+    output_format: str,
+    filters: typing.Tuple[str, ...]
+) -> None:
+    """List jails in various formats."""
     logger = ctx.parent.logger
 
     try:
         host = iocage.lib.Host.Host(logger=logger)
     except iocage.lib.errors.IocageNotActivated:
         exit(1)
-
-    if remote and not plugins:
-
-        try:
-            available_releases = host.distribution.releases
-            for available_release in available_releases:
-                logger.screen(available_release.name)
-            return
-        except iocage.lib.errors.IocageException:
-            exit(1)
-
-    if plugins and remote:
-        raise iocage.lib.errors.MissingFeature("Plugins", plural=True)
 
     if output is not None and _long is True:
         logger.error("--output and --long can't be used together")
@@ -97,25 +92,32 @@ def cli(ctx, dataset_type, header, _long, remote, plugins,
     if len(filters) == 0:
         filters += ("*",)
 
-    if dataset_type == "base":
-        resources_class = iocage.lib.Releases.ReleasesGenerator
-        columns = ["name"]
-    else:
-
-        if dataset_type == "template":
-            filters += ("template=yes",)
-        else:
-            filters += ("template=no,-",)
-
-        resources_class = iocage.lib.Jails.JailsGenerator
-        columns = _list_output_comumns(output, _long)
-
     try:
-        resources = resources_class(
-            logger=logger,
-            host=host,
-            filters=filters  # ToDo: allow quoted whitespaces from user input
-        )
+
+        if (dataset_type == "base") and (remote is True):
+            columns = ["name"]
+            resources = host.distribution.releases
+
+        else:
+
+            if (dataset_type == "base"):
+                resources_class = iocage.lib.Releases.ReleasesGenerator
+                columns = ["name"]
+            else:
+                resources_class = iocage.lib.Jails.JailsGenerator
+                columns = _list_output_comumns(output, _long)
+                if dataset_type == "template":
+                    filters += ("template=yes",)
+                else:
+                    filters += ("template=no,-",)
+
+            resources = resources_class(
+                logger=logger,
+                host=host,
+                # ToDo: allow quoted whitespaces from user inputs
+                filters=filters
+            )
+
     except iocage.lib.errors.IocageException:
         exit(1)
 
