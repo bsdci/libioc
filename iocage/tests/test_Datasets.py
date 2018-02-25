@@ -21,16 +21,24 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Unit tests for Datasets."""
 import pytest
+import typing
+import libzfs
 
 import iocage.lib
 
 
 class TestDatasets(object):
+    """Run Datasets unit tests."""
 
     @pytest.fixture
-    def MockedDatasets(self, logger, pool):
-
+    def MockedDatasets(
+        self,
+        logger: 'iocage.lib.Logger.Logger',
+        pool: libzfs.ZFSPool
+    ) -> typing.Generator[DatasetsMock, None, None]:
+        """Mock a dataset in a disabled pool."""
         class DatasetsMock(iocage.lib.Datasets.Datasets):
             ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
 
@@ -39,6 +47,12 @@ class TestDatasets(object):
         prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
         pool.root_dataset.properties[prop].value = "no"
 
-    def test_pool_can_be_activated(self, MockedDatasets, pool, logger):
+    def test_pool_can_be_activated(
+        self,
+        MockedDatasets: MockedDatasets,
+        pool: libzfs.ZFSPool,
+        logger: 'iocage.lib.Logger.Logger'
+    ):
+        """Test if a pool can be activated."""
         datasets = MockedDatasets(pool=pool, logger=logger)
         datasets.activate()

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Helper utilities for tests."""
 
 
 def _delete_dataset_recursive(dataset):
@@ -30,5 +31,6 @@ def _delete_dataset_recursive(dataset):
 
 
 def unmount_and_destroy_dataset_recursive(dataset):
+    """Unmount and destroy a dataset recursively."""
     dataset.umount_recursive()
     _delete_dataset_recursive(dataset)
