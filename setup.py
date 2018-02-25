@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Installs libiocage using easy_install."""
 import sys
 from setuptools import find_packages, setup
 from setuptools.command import easy_install
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
 @classmethod
 def get_args(cls, dist, header=None):
-
+    """Handle arguments for easy_install."""
     if header is None:
         header = cls.get_header()
 
