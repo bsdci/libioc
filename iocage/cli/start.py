@@ -21,13 +21,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""start module for the cli."""
+"""Start jails from the CLI.."""
 import typing
 import click
 
 import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
+
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
@@ -38,11 +40,12 @@ __rootcmd__ = True
               help="Will start all jails with boot=on, in the specified"
                    " order with smaller value for priority starting first.")
 @click.argument("jails", nargs=-1)
-def cli(ctx, rc, jails):
-    """
-    Starts Jails
-    """
-
+def cli(
+    ctx: IocageClickContext,
+    rc: bool,
+    jails: typing.Tuple[str, ...]
+) -> None:
+    """Start one or many jails."""
     logger = ctx.parent.logger
     start_args = {
         "logger": logger,
@@ -57,13 +60,13 @@ def cli(ctx, rc, jails):
         if len(jails) > 0:
             logger.error("Cannot use --rc and jail selectors simultaniously")
             exit(1)
-        autostart(**start_args)
+        _autostart(**start_args)
     else:
-        if not normal(jails, **start_args):
+        if not _normal(jails, **start_args):
             exit(1)
 
 
-def autostart(
+def _autostart(
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -100,7 +103,7 @@ def autostart(
     exit(0)
 
 
-def normal(
+def _normal(
     filters: typing.Tuple[str, ...],
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[

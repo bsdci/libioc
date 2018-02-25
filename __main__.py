@@ -30,6 +30,7 @@ from iocage.cli import cli
 
 
 def main_safe():
+    """Wrap the main function and return raised errors."""
     try:
         main()
     except BaseException as e:
@@ -37,6 +38,7 @@ def main_safe():
 
 
 def main():
+    """Execute the main Click program."""
     cli(prog_name="iocage")
 
 

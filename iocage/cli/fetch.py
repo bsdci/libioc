@@ -21,14 +21,16 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""fetch module for the cli."""
+"""Fetch releases and updates with the CLI."""
 import click
+import typing
 
 import iocage.lib.Host
 import iocage.lib.Prompts
 import iocage.lib.Release
 import iocage.lib.errors
 
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
@@ -64,7 +66,11 @@ __rootcmd__ = True
 @click.option("--files", multiple=True,
               help="Specify the files to fetch from the mirror. "
                    "(Deprecared: renamed to --file)")
-def cli(ctx, **kwargs):
+def cli(
+    ctx: IocageClickContext,
+    **kwargs
+) -> None:
+    """Fetch and update releases."""
     logger = ctx.parent.logger
     host = iocage.lib.Host.HostGenerator(logger=logger)
     prompts = iocage.lib.Prompts.Prompts(host=host, logger=logger)
@@ -95,11 +101,11 @@ def cli(ctx, **kwargs):
 
     url_or_files_selected = False
 
-    if is_option_enabled(kwargs, "url"):
+    if _is_option_enabled(kwargs, "url"):
         release.mirror_url = kwargs["url"]
         url_or_files_selected = True
 
-    if is_option_enabled(kwargs, "files"):
+    if _is_option_enabled(kwargs, "files"):
         release.assets = list(kwargs["files"])
         url_or_files_selected = True
 
@@ -116,7 +122,7 @@ def cli(ctx, **kwargs):
     exit(0)
 
 
-def is_option_enabled(args, name):
+def _is_option_enabled(args: typing.Dict[str, typing.Any], name: str) -> bool:
     try:
         value = args[name]
         if value:

@@ -21,8 +21,9 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""create module for the cli."""
+"""Create jails with the CLI."""
 import click
+import typing
 
 import iocage.lib.errors
 import iocage.lib.Host
@@ -31,11 +32,13 @@ import iocage.lib.Logger
 import iocage.lib.Release
 import iocage.lib.ZFS
 
+from .shared.click import IocageClickContext
+
 __rootcmd__ = True
 
 
 def validate_count(ctx, param, value):
-    """Takes a string, removes the commas and returns an int."""
+    """Take a string, removes the commas and returns an int."""
     if isinstance(value, str):
         try:
             value = value.replace(",", "")
@@ -51,7 +54,7 @@ def validate_count(ctx, param, value):
 
 @click.command(name="create", help="Create a jail.")
 @click.pass_context
-@click.option("--count", "-c", callback=validate_count, default="1",
+@click.option("--count", "-c", callback=validate_count, default=1,
               help="Designate a number of jails to create. Jails are"
                    " numbered sequentially.")
 @click.option("--release", "-r", required=False,
@@ -59,9 +62,6 @@ def validate_count(ctx, param, value):
 @click.option("--template", "-t", required=False,
               help="Specify the template to use for the new jail instead of"
                    " a RELEASE.")
-@click.option("--pkglist", "-p", default=None,
-              help="Specify a JSON file which manages the installation of"
-                   " each package in the newly created jail.")
 @click.option("--name", "-n", default=None,
               help="Provide a specific name instead of an UUID for this jail.")
 @click.option("--basejail", "-b", is_flag=True, default=False,
@@ -76,17 +76,25 @@ def validate_count(ctx, param, value):
                    " jails.")
 @click.option("--no-fetch", is_flag=True, default=False,
               help="Do not automatically fetch releases")
-@click.option("--force", "-f", is_flag=True, default=False,
-              help="Skip the interactive question.")
 @click.argument("props", nargs=-1)
-def cli(ctx, release, template, count, props, pkglist, basejail, basejail_type,
-        empty, name, no_fetch, force):
-
+def cli(
+    ctx: IocageClickContext,
+    release: typing.Optional[str],
+    template: typing.Optional[str],
+    count: int,
+    props: typing.Tuple[str, ...],
+    basejail: bool,
+    basejail_type: str,
+    empty: bool,
+    name: str,
+    no_fetch: bool
+) -> None:
+    """Create iocage jails."""
     zfs = iocage.lib.ZFS.get_zfs()
     logger = ctx.parent.logger
     host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
 
-    jail_data = {}
+    jail_data: typing.Dict[str, typing.Any] = {}
 
     if (release is None) and (template is None):
         logger.spam(

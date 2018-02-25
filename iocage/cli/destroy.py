@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""stop module for the cli."""
+"""Destroy a jail from the CLI."""
 import click
 import typing
 
@@ -55,6 +55,8 @@ def cli(ctx,
         download: bool=False,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None) -> None:
     """
+    Destroy a jail, release or template.
+
     Looks for the jail supplied and passes the uuid, path and configuration
     location to stop_jail.
     """

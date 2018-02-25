@@ -21,8 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""console module for the cli."""
-
+"""Console subcommand for the CLI."""
 import click
 
 import iocage.lib.Jail
@@ -36,9 +35,7 @@ __rootcmd__ = True
 @click.argument("jail")
 @click.option("--log-level", "-d", default=None)
 def cli(ctx, jail, log_level):
-    """
-    Runs jexec to login into the specified jail.
-    """
+    """Run jexec to login into the specified jail."""
     logger = ctx.parent.logger
     logger.print_level = log_level
 

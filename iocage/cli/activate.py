@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""activate module for the cli."""
+"""Activate zfs pools for iocage with the CLI."""
 import click
 
 import iocage.lib.errors
@@ -37,9 +37,7 @@ __rootcmd__ = True
 @click.argument("zpool")
 @click.option("--mountpoint", "-m", default="/iocage")
 def cli(ctx, zpool, mountpoint):
-    """
-    Calls ZFS set to change the property org.freebsd.ioc:active to yes.
-    """
+    """Call ZFS set to change the property org.freebsd.ioc:active to yes."""
     logger = ctx.parent.logger
     zfs = iocage.lib.ZFS.get_zfs()
 

@@ -21,13 +21,23 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""start module for the cli."""
+"""
+Apply operating system updates to jails.
+
+When a release was fetched, patches are downloaded. Standalone jails that
+were forked from a release that received new updates needs to apply them.
+No network connection is required, as the previously downloaded patches
+are temporarily mounted and applied with securelevel=0.
+"""
 import click
+import typing
 
 import iocage.lib.errors
 import iocage.lib.Jails
 import iocage.lib.Logger
 import iocage.lib.Config.Jail.File.Fstab
+
+from .shared.click import IocageClickContext
 
 __rootcmd__ = True
 
@@ -35,10 +45,11 @@ __rootcmd__ = True
 @click.command(name="start", help="Starts the specified jails or ALL.")
 @click.pass_context
 @click.argument("jails", nargs=-1)
-def cli(ctx, jails):
-    """
-    Update Jails
-    """
+def cli(
+    ctx: IocageClickContext,
+    jails: typing.Tuple[str, ...]
+) -> typing.Optional[bool]:
+    """Update jails with patches from their releases."""
     logger = ctx.parent.logger
     print_function = ctx.parent.print_events
 
@@ -51,7 +62,7 @@ def cli(ctx, jails):
     host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
 
     filters = jails + ("template=no",)
-    jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         host=host,
         zfs=zfs,
@@ -60,7 +71,7 @@ def cli(ctx, jails):
 
     changed_jails = []
     failed_jails = []
-    for jail in jails:
+    for jail in ioc_jails:
         try:
             changed = print_function(jail.updater.apply())
             if changed is True:

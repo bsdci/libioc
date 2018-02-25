@@ -105,7 +105,7 @@ def cli(
                 columns = ["name"]
             else:
                 resources_class = iocage.lib.Jails.JailsGenerator
-                columns = _list_output_comumns(output, _long)
+                columns = _list_output_comumns(str(output), _long)
                 if dataset_type == "template":
                     filters += ("template=yes",)
                 else:

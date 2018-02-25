@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""get module for the cli."""
+"""Get a configuration value from the CLI."""
 import typing
 import click
 
@@ -55,7 +55,6 @@ import iocage.lib.Logger
 )
 def cli(ctx, prop, _all, _pool, jail, log_level):
     """Get a list of jails and print the property."""
-
     logger = ctx.parent.logger
     logger.print_level = log_level
     host = iocage.lib.Host.Host(logger=logger)
@@ -111,10 +110,10 @@ def cli(ctx, prop, _all, _pool, jail, log_level):
     for key in source_resource.config.all_properties:
         if (prop is None) or (key == prop):
             value = source_resource.config.get_string(key)
-            print_property(key, value)
+            _print_property(key, value)
 
 
-def print_property(key: str, value: str) -> None:
+def _print_property(key: str, value: str) -> None:
     print(f"{key}:{value}")
 
 
