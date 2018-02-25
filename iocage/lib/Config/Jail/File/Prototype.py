@@ -21,12 +21,17 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Prototype of config files stored on the filesystem."""
+import typing
 import os.path
+
+import ucl
 
 import iocage.lib.LaunchableResource
 
 
-class ResourceConfigFile:
+class ResourceConfig:
+    """Shared abstract code between various config files in a resource."""
 
     def _require_path_relative_to_resource(
         self,
@@ -52,3 +57,163 @@ class ResourceConfigFile:
 
     def _resolve_path(self, filepath: str) -> str:
         return os.path.realpath(os.path.abspath(filepath))
+
+
+class ResourceConfigFile(ResourceConfig, dict):
+    """Abstraction of UCL file based config files in Resources."""
+
+    _file: str
+    _file_content_changed: bool = False
+
+    def __init__(
+        self,
+        resource: 'iocage.lib.LaunchableResource.LaunchableResource',
+        file: typing.Optional[str]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ) -> None:
+
+        dict.__init__(self, {})
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+
+        # No file was loaded yet, so we can't know the delta yet
+        self._file_content_changed = True
+
+        if file is not None:
+            self._file = file
+
+        self.resource = resource
+        self._read_file()
+
+    @property
+    def path(self) -> str:
+        """Absolute path to the file."""
+        path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
+        self._require_path_relative_to_resource(
+            filepath=path,
+            resource=self.resource
+        )
+        return os.path.abspath(path)
+
+    @property
+    def file(self) -> str:
+        """File path relative to the Resources root_dataset."""
+        return self._file
+
+    @file.setter
+    def file(self, value: str) -> None:
+        if self._file != value:
+            self._file = value
+            self._read_file()
+
+    @property
+    def changed(self) -> bool:
+        """Return true when the file was changed since reading it."""
+        return (self._file_content_changed is True)
+
+    def _read_file(
+        self,
+        silent: bool=False,
+        delete: bool=False,
+        merge: bool=False
+    ) -> None:
+        """
+        Read the config file.
+
+        Args:
+
+            silent:
+                Do not use the logger
+
+            delete:
+                Delete entries that do not exist in the file
+
+            merge:
+                Do not change already existing properties
+        """
+        try:
+            if (self.path is not None) and os.path.isfile(self.path):
+                data = self._read(silent=silent)
+            else:
+                data = {}
+        except (FileNotFoundError, ValueError):
+            data = {}
+
+        existing_keys = set(self.keys())
+        new_keys = set(data.keys())
+        delete_keys = existing_keys - new_keys
+
+        if delete is True:
+            for key in delete_keys:
+                del self[key]
+
+        for key in new_keys:
+            if key in existing_keys:
+                if (merge is True) and (self[key] != data[key]):
+                    self[key] = data[key]
+                    self._file_content_changed = True
+            else:
+                self[key] = data[key]
+                self._file_content_changed = True
+
+        if silent is False:
+            self.logger.verbose(f"Updated {self._file} data from {self.path}")
+
+        if delete is False and len(delete_keys) > 0:
+            # There are properties that are not in the file
+            self._file_content_changed = True
+        else:
+            # Current data matches with file contents
+            self._file_content_changed = False
+
+    def _read(self, silent: bool=False) -> dict:
+        data = dict(ucl.load(open(self.path).read()))
+        self.logger.spam(f"{self._file} was read from {self.path}")
+        return data
+
+    def save(self) -> bool:
+        """Save the changes to the file."""
+        if self.changed is False:
+            self.logger.debug("{self._file} was not modified - skipping write")
+            return False
+
+        with open(self.path, "w") as rcconf:
+
+            output = ucl.dump(self, ucl.UCL_EMIT_CONFIG)
+            output = output.replace(" = \"", "=\"")
+            output = output.replace("\";\n", "\"\n")
+
+            self.logger.verbose(f"Writing {self._file} to {self.path}")
+
+            rcconf.write(output)
+            rcconf.truncate()
+            rcconf.close()
+
+            self._file_content_changed = False
+            self.logger.spam(output[:-1], indent=1)
+            return True
+
+    def __setitem__(
+        self,
+        key: str,
+        value: typing.Union[str, int, bool]
+    ) -> None:
+        """Set a value in the config file."""
+        val = iocage.lib.helpers.to_string(
+            iocage.lib.helpers.parse_user_input(value),
+            true="YES",
+            false="NO"
+        )
+
+        try:
+            if self[key] == value:
+                return
+        except KeyError:
+            pass
+
+        dict.__setitem__(self, key, val)
+        self._file_content_changed = True
+
+    def __getitem__(self, key):
+        """Get a value of the config file."""
+        val = dict.__getitem__(self, key)
+        return iocage.lib.helpers.parse_user_input(val)

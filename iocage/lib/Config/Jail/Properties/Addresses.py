@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Jail config address property."""
 import typing
 import iocage.lib.errors
 import iocage.lib.helpers
@@ -31,6 +32,7 @@ import iocage.lib.Logger
 
 
 class AddressSet(set):
+    """Set of IP addresses."""
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
 
@@ -49,11 +51,13 @@ class AddressSet(set):
         self.property_name = property_name
 
     def add(self, value, notify=True) -> None:
+        """Add an address to the set."""
         set.add(self, value)
         if notify:
             self.__notify()
 
     def remove(self, value, notify=True) -> None:
+        """Remove an address from the set."""
         set.remove(self, value)
         if notify:
             self.__notify()
@@ -66,6 +70,7 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 
 
 class AddressesProp(dict):
+    """Special jail config property Addresses."""
 
     logger: 'iocage.lib.Logger.Logger'
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
@@ -91,7 +96,7 @@ class AddressesProp(dict):
         self.skip_on_error = skip_on_error
 
     def set(self, data: _AddressSetInputType) -> None:
-
+        """Set the special property value."""
         self.clear()
 
         try:
@@ -131,7 +136,7 @@ class AddressesProp(dict):
         addresses: typing.Optional[typing.Union[typing.List[str], str]]=None,
         notify: bool=True
     ) -> None:
-
+        """Add an address to a NIC."""
         if addresses is None or addresses == [] or addresses == "":
             return
 
@@ -151,9 +156,7 @@ class AddressesProp(dict):
 
     @property
     def networks(self) -> typing.List[str]:
-        """
-        Flat list of all networks configured across all nics
-        """
+        """Flat list of all networks configured across all NICs."""
         networks: list = []
         for nic, addresses in self.items():
             networks += addresses
@@ -164,7 +167,7 @@ class AddressesProp(dict):
         key: str,
         addresses: typing.Union[typing.List[str], str]
     ) -> None:
-
+        """Set all addresses of a NIC."""
         try:
             dict.__delitem__(self, key)
         except KeyError:
@@ -173,6 +176,7 @@ class AddressesProp(dict):
         self.add(key, addresses)
 
     def __delitem__(self, key: str) -> None:
+        """Delete addresses of a NIC."""
         dict.__delitem__(self, key)
         self.__notify()
 
@@ -185,6 +189,13 @@ class AddressesProp(dict):
         return prop
 
     def __str__(self) -> str:
+        """
+        Return a configuration string of the IP configuration.
+
+        The format matches the iocage address notation used in:
+          - ip4_addr
+          - ip6_addr
+        """
         if len(self) == 0:
             return ""
         out = []

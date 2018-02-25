@@ -21,19 +21,28 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Prototype of a Jail configuration."""
 import typing
 import os.path
 import iocage.lib.helpers
-import iocage.lib.Config.Prototype
 
 # mypy
 import iocage.lib.Logger
 
 
+ConfigDataDict = typing.Dict[str, typing.Optional[typing.Union[
+    int,
+    str,
+    dict,
+    list
+]]]
+
+
 class Prototype:
+    """Prototype of a JailConfig."""
 
     logger: typing.Type[iocage.lib.Logger.Logger]
-    data: dict = {}
+    data: ConfigDataDict = {}
     _file: str
 
     def __init__(
@@ -49,37 +58,65 @@ class Prototype:
 
     @property
     def file(self) -> str:
+        """Return the relative path to the config file."""
         return self._file
 
     @file.setter
-    def file(self, value: str):
+    def file(self, value: str) -> None:
         self._file = value
 
-    def read(self):
+    def read(self) -> ConfigDataDict:
+        """
+        Read from the configuration file.
+
+        This method may be overriden by non file-based implementations.
+        """
         try:
             with open(self.file, "r") as data:
                 return self.map_input(data)
         except FileNotFoundError:
             return {}
 
-    def write(self, data: dict) -> None:
+    def write(self, data: ConfigDataDict) -> None:
         """
-        Writes changes to the config file
+        Write changes to the config file.
+
+        This method may be overriden by non file-based implementations.
         """
         with open(self.file, "w") as conf:
-            conf.write(self.map_output(data))
+            text_data = str(self.map_output(data))
+            conf.write(text_data)
             conf.truncate()
 
-    def map_input(self, data: typing.Any):
-        # result = data  # type: typing.Dict[str, typing.Any]
-        # return result
-        return data
+    def map_input(
+        self,
+        data: typing.Union[typing.TextIO, ConfigDataDict]
+    ) -> ConfigDataDict:
+        """
+        Map input data (for reading from the configuration).
 
-    def map_output(self, data: typing.Any):
-        # result = data  # type: typing.Dict[str, typing.Any]
-        # return result
-        return data
+        Implementing classes may provide individual mappings.
+        """
+        if not isinstance(data, typing.TextIO):
+            return data
+
+        raise NotImplementedError("Mapping not implemented on the prototype")
+
+    def map_output(
+        self,
+        data: ConfigDataDict
+    ) -> typing.Union[str, ConfigDataDict]:
+        """
+        Map output data (for writing to the configuration).
+
+        Implementing classes may provide individual mappings.
+        """
+        if not isinstance(data, str):
+            return data
+
+        raise NotImplementedError("Mapping not implemented on the prototype")
 
     @property
     def exists(self) -> bool:
+        """Return True when the configuration file exists on the filesystem."""
         return os.path.isfile(self.file)

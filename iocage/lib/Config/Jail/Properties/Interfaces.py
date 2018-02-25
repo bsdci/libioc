@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Jail config interfaces property."""
 import typing
 
 import iocage.lib.helpers
@@ -28,6 +29,7 @@ import iocage.lib.BridgeInterface
 
 
 class InterfaceProp(dict):
+    """Special jail config property Interfaces."""
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "interfaces"
@@ -40,9 +42,7 @@ class InterfaceProp(dict):
         ]=None,
         **kwargs
     ) -> None:
-
         dict.__init__(self, {})
-
         if config is not None:
             self.config = config
 
@@ -50,7 +50,7 @@ class InterfaceProp(dict):
         self,
         data: typing.Union[str, typing.Dict[str, str]]
     ) -> None:
-
+        """Clear and set all interfaces from data."""
         self.clear()
 
         try:
@@ -77,7 +77,7 @@ class InterfaceProp(dict):
         notify: typing.Optional[bool]=True
     ) -> None:
         """
-        add an interface/bridge configuration
+        Add an interface/bridge configuration entry.
 
         Args:
 
@@ -108,13 +108,14 @@ class InterfaceProp(dict):
             self.__notify()
 
     def __setitem__(self, key, values):
-
+        """Set the bridge configuration of the specified jail NIC."""
         if key in self.keys():
             dict.__delitem__(self, key)
 
         self.add(key, values)
 
     def __delitem__(self, key) -> None:
+        """Remove a jail NIC."""
         dict.__delitem__(self, key)
         self.__notify()
 
@@ -125,6 +126,7 @@ class InterfaceProp(dict):
         dict.__setitem__(self, key, None)
 
     def to_string(self, value: dict) -> str:
+        """Return the iocage formated string of interfaces."""
         out = []
         for jail_if in value:
             bridge_if = self[jail_if]
@@ -132,4 +134,5 @@ class InterfaceProp(dict):
         return self.delimiter.join(out)
 
     def __str__(self) -> str:
+        """Return the iocage formated string of interfaces."""
         return self.to_string(value=self)

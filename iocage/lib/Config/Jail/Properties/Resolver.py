@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Jail config resolver property."""
 import typing
 import collections
 import shutil
@@ -33,6 +34,7 @@ import iocage.lib.Logger
 
 
 class ResolverProp(collections.MutableSequence):
+    """Special jail config property Resolver."""
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "resolver"
@@ -55,10 +57,12 @@ class ResolverProp(collections.MutableSequence):
 
     @property
     def conf_file_path(self) -> str:
+        """Unconfigurable path of the config file."""
         return "/etc/resolv.conf"
 
     @property
     def method(self) -> str:
+        """Return the selected configuration method."""
         return self._get_method(self.value)
 
     def _get_method(self, value: typing.Any) -> str:
@@ -71,6 +75,7 @@ class ResolverProp(collections.MutableSequence):
 
     @property
     def value(self) -> typing.Optional[str]:
+        """Return the raw configuration string or None."""
         value = self.config.data["resolver"]
         try:
             iocage.lib.helpers.parse_none(value, self.none_matches)
@@ -79,6 +84,7 @@ class ResolverProp(collections.MutableSequence):
             return str(value)
 
     def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> None:
+        """Apply the settings to a jail."""
         self.logger.verbose(
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
@@ -101,10 +107,10 @@ class ResolverProp(collections.MutableSequence):
 
     def set(
         self,
-        value: typing.Optional[typing.Union[str, list]]=None,
+        value: typing.Optional[typing.Union[str, typing.List[str]]]=None,
         notify: bool=True
     ) -> None:
-
+        """Clear and set all nameservers."""
         self._entries.clear()
         method = self._get_method(value)
         if method == "manual":
@@ -128,6 +134,7 @@ class ResolverProp(collections.MutableSequence):
         self.__notify(notify)
 
     def append(self, value: str, notify: bool=True) -> None:
+        """Add a nameserver."""
         self._entries.append(value)
         self.__notify(notify)
 
@@ -136,16 +143,20 @@ class ResolverProp(collections.MutableSequence):
         index: int,
         value: str
     ) -> None:
+        """Insert a nameserver at a given position."""
         self._entries.insert(index, value)
         self.__notify()
 
     def __delitem__(self, key) -> None:
+        """Delete the nameserver at the given position."""
         del self._entries[key]
 
     def __getitem__(self, key) -> typing.Any:
+        """Get the nameserver from the given position."""
         return self._entries[key]
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Return the number of nameservers."""
         return self._entries.__len__()
 
     def __setitem__(  # noqa: T484
@@ -153,11 +164,12 @@ class ResolverProp(collections.MutableSequence):
         key: str,
         value: str
     ) -> None:
-
+        """Set the nameserver at a given position."""
         list.__setitem__(self, key, value)   # noqa: T484
         self.__notify()
 
     def __str__(self):
+        """Return semicolon separated list of nameservers."""
         return iocage.lib.helpers.to_string(self._entries, delimiter=";")
 
     def __notify(self, notify: bool=True):

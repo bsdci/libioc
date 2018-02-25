@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""The common base of jail configurations."""
 import typing
 import re
 
@@ -34,7 +35,7 @@ import iocage.lib.Logger
 
 class BaseConfig(dict):
     """
-    Represents an iocage jail's configuration
+    Model a plain iocage jail configuration.
 
     A jail configuration can be loaded from various formats that were used
     by different versions of iocage. Technically it is possible to store
@@ -94,7 +95,7 @@ class BaseConfig(dict):
         skip_on_error: bool=False
     ) -> None:
         """
-        Apply data from a data dictionary to the JailConfig
+        Apply data from a data dictionary to the JailConfig.
 
         Existing jail configuration is not emptied using.
 
@@ -119,8 +120,13 @@ class BaseConfig(dict):
             self.__setitem__(key, value, skip_on_error=skip_on_error)
 
     def read(self, data: dict) -> None:
+        """
+        Read the input data.
 
-        # ignore name/id/uuid in config if the jail already has a name
+        Various versions of iocage had a different understanding of a jail
+        identifier. This method removes all identifiers from the input data
+        when a normalized id is already set.
+        """
         if self["id"] is not None:
             data_keys = data.keys()
             if "name" in data_keys:
@@ -133,6 +139,7 @@ class BaseConfig(dict):
         self.clone(data)
 
     def update_special_property(self, name: str) -> bool:
+        """Triggered when a special property was updated."""
         try:
             self.data[name] = str(self.special_properties[name])
             return True
@@ -140,6 +147,7 @@ class BaseConfig(dict):
             return False
 
     def attach_special_property(self, name, special_property) -> None:
+        """Attach a special property to the configuration."""
         self.special_properties[name] = special_property
 
     def _set_legacy(self, value, **kwargs) -> None:
@@ -426,21 +434,19 @@ class BaseConfig(dict):
             return self["id"]
 
     def get_string(self, key):
+        """Get the stringified value of a configuration property."""
         return self.stringify(self.__getitem__(key))
 
     def _skip_on_error(self, **kwargs):
-        """
-        A helper to resolve skip_on_error attribute
-        """
+        """Resolve the skip_on_error attribute with this helper function."""
         try:
             return kwargs["skip_on_error"] is True
         except AttributeError:
             return False
 
     def __getitem_user(self, key: str) -> typing.Any:
-
-        # passthrough existing properties
         try:
+            # passthrough existing properties
             return self.__getattribute__(key)
         except AttributeError:
             pass
@@ -463,7 +469,17 @@ class BaseConfig(dict):
         raise KeyError(f"User defined property not found: {key}")
 
     def __getitem__(self, key: str) -> typing.Any:
+        """
+        Get the user configured value of a jail configuration property.
 
+        The lookup order of such values is:
+            - native attributes
+            - special properties
+            - _get_{key} methods
+            - plain data keys (without special processing)
+
+        A KeyError is raised when no criteria applies.
+        """
         try:
             return self.__getitem_user(key)
         except KeyError:
@@ -472,6 +488,7 @@ class BaseConfig(dict):
         raise KeyError(f"Item not found: {key}")
 
     def __delitem__(self, key: str) -> None:
+        """Delete a setting from the configuration."""
         del self.data[key]
 
     def __setitem__(
@@ -480,7 +497,7 @@ class BaseConfig(dict):
         value: typing.Any,
         **kwargs
     ) -> None:
-
+        """Set a configuration value."""
         parsed_value = iocage.lib.helpers.parse_user_input(value)
 
         if self.special_properties.is_special_property(key):
@@ -499,22 +516,19 @@ class BaseConfig(dict):
 
     def set(self, key: str, value: typing.Any, **kwargs) -> bool:
         """
-        Set a JailConfig property
+        Set a JailConfig property.
 
         Args:
-
             key:
                 The jail config property name
-
             value:
                 Value to set the property to
-
             **kwargs:
                 Arguments from **kwargs are passed to setter functions
 
         Returns:
-
             bool: True if the JailConfig was changed
+
         """
         hash_before: typing.Any
         hash_after: typing.Any
@@ -542,13 +556,15 @@ class BaseConfig(dict):
 
     @property
     def user_data(self) -> typing.Dict[str, typing.Any]:
+        """Return the raw dictionary of user configured settings."""
         return self.data
 
     def __str__(self) -> str:
+        """Return the JSON object with all user configured settings."""
         return str(iocage.lib.helpers.to_json(self.data))
 
-    def __dir__(self) -> list:
-
+    def __dir__(self) -> typing.List[str]:
+        """Return a list of config object attributes."""
         properties = set()
         props = dict.__dir__(self)
         for prop in props:
@@ -562,14 +578,22 @@ class BaseConfig(dict):
 
     @property
     def all_properties(self) -> list:
+        """Return a list of all user configured settings."""
         return sorted(self.data.keys())
 
-    def stringify(self, value: typing.Any):
+    def stringify(self, value: typing.Any) -> str:
+        """Stringify user supplied values."""
         parsed_input = iocage.lib.helpers.parse_user_input(value)
-        return iocage.lib.helpers.to_string(parsed_input)
+        return str(iocage.lib.helpers.to_string(parsed_input))
 
 
 class JailConfigList(list):
+    """Jail configuration property in form of a list."""
+
+    def __init__(self, *args, delimiter: str=" ", **kwargs) -> None:
+        self.delimiter = delimiter
+        list.__init__(self, *args, **kwargs)
 
     def __str__(self) -> str:
-        return " ".join(self)
+        """Return the string representation in iocage format."""
+        return str(self.delimiter.join(self))

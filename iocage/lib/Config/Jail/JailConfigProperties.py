@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Dictionary of jail configuration properties."""
 import typing
 
 import iocage.lib.Config.Jail.Property
@@ -29,6 +30,7 @@ init_property = iocage.lib.Config.Jail.Property.init_property
 
 
 class JailConfigProperties(dict):
+    """Dictionary of jail configuration properties."""
 
     def __init__(
         self,
@@ -40,6 +42,7 @@ class JailConfigProperties(dict):
         self.config = config
 
     def is_special_property(self, property_name: str) -> bool:
+        """Signal if the property is a special property."""
         classes = iocage.lib.Config.Jail.Property.CLASSES
         return (property_name in classes.keys()) is True
 
@@ -47,7 +50,7 @@ class JailConfigProperties(dict):
         self,
         property_name: str
     ) -> typing.Any:
-
+        """Get a property and initialize it if it did not exist."""
         if property_name not in self.keys():
             self[property_name] = init_property(
                 property_name=property_name,
