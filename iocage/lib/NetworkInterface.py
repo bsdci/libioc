@@ -21,12 +21,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Model if an iocage jails network interface."""
 import typing
 import iocage.lib.helpers
 
 
 class NetworkInterface:
     """
+    Model if an iocage jails network interface.
+
     NetworkInterface abstracts interface configurations and commands executed
     on the host or within jails. This class is internally used by Network.
     """
@@ -102,16 +105,12 @@ class NetworkInterface:
             self.apply()
 
     def apply(self) -> None:
-        """
-        Applies the interface settings and configures IP address
-        """
+        """Apply the interface settings and configure IP address."""
         self.apply_settings()
         self.apply_addresses()
 
     def apply_settings(self) -> None:
-        """
-        Only applies the interface settings
-        """
+        """Apply the interface settings only."""
         command: typing.List[str] = [self.ifconfig_command, self.name]
 
         if self.create is True:
@@ -139,9 +138,7 @@ class NetworkInterface:
             self.rename = False
 
     def apply_addresses(self) -> None:
-        """
-        Applies the configured IP addresses
-        """
+        """Apply the configured IP addresses."""
         if self.ipv4_addresses is not None:
             self.__apply_addresses(self.ipv4_addresses, ipv6=False)
         if self.ipv6_addresses is not None:

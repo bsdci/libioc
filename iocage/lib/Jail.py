@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Representation of iocage jails."""
 import typing
 import os
 import re
@@ -51,7 +52,7 @@ class JailResource(
     iocage.lib.LaunchableResource.LaunchableResource,
     iocage.lib.VersionedResource.VersionedResource
 ):
-
+    """Resource that represents a jail."""
     _jail: 'JailGenerator'
     _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab'
 
@@ -1448,6 +1449,7 @@ class JailGenerator(JailResource):
 
 
 class Jail(JailGenerator):
+    """Synchronous wrapper of JailGenerator."""
 
     def start(  # noqa: T484
         self,

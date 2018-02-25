@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Jail State collection."""
 import typing
 import json
 import subprocess
@@ -40,6 +41,7 @@ def _parse_json(data: str) -> JailStatesDict:
 
 
 class JailState(dict):
+    """State of a running Resource/Jail."""
 
     name: str
     _data: typing.Optional[typing.Dict[str, str]] = None
@@ -57,7 +59,7 @@ class JailState(dict):
             self._data = data
 
     def query(self) -> typing.Dict[str, str]:
-
+        """Execute jls to update a jails state."""
         data: typing.Dict[str, str] = {}
         try:
             stdout = subprocess.check_output([
@@ -78,23 +80,28 @@ class JailState(dict):
 
     @property
     def data(self) -> typing.Dict[str, str]:
+        """Return the jail state data that was previously queried."""
         if self._data is None:
             self._data = self.query()
         return self._data
 
     def __getitem__(self, name: str) -> str:
+        """Get a value from the jail state."""
         return self.data[name]
 
     def __iter__(
         self
     ) -> typing.Iterator[str]:
+        """Iterate over the jail state entries."""
         return self.data.__iter__()
 
     def keys(self):
+        """Return all available jail state keys."""
         return self.data.keys()
 
 
 class JailStates(dict):
+    """A dictionary of JailStates."""
 
     def __init__(
         self,
@@ -107,9 +114,7 @@ class JailStates(dict):
             dict.__init__(self, states)
 
     def query(self):
-        """
-        Invoke update of the jail state from jls output
-        """
+        """Invoke update of the jail state from jls output."""
         try:
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",

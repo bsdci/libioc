@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Model of multiple iocage Releases."""
 import iocage.lib.Release
 import iocage.lib.Resource
 import iocage.lib.Filter
@@ -33,6 +34,7 @@ import libzfs
 
 
 class ReleasesGenerator(iocage.lib.Resource.ListableResource):
+    """Generator Model of multiple iocage Releases."""
 
     _class_release = iocage.lib.Release.ReleaseGenerator
 
@@ -56,6 +58,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
 
     @property
     def local(self):
+        """Return true if the release is locally available."""
         release_datasets = self.dataset.children
         return list(map(
             lambda x: self._class_release(
@@ -69,6 +72,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
 
     @property
     def available(self):
+        """Return true if the release can be fetched from the remote."""
         return self.host.distribution.releases
 
     def _create_resource_instance(
@@ -89,6 +93,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
 
 
 class Releases(ReleasesGenerator):
+    """Model of multiple iocage Releases."""
 
     _class_release = iocage.lib.Release.Release
 
