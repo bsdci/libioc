@@ -29,6 +29,12 @@ import libzfs
 import iocage.lib
 
 
+class DatasetsMock(iocage.lib.Datasets.Datasets):
+    """Mock the database."""
+
+    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+
+
 class TestDatasets(object):
     """Run Datasets unit tests."""
 
@@ -39,20 +45,17 @@ class TestDatasets(object):
         pool: libzfs.ZFSPool
     ) -> typing.Generator[DatasetsMock, None, None]:
         """Mock a dataset in a disabled pool."""
-        class DatasetsMock(iocage.lib.Datasets.Datasets):
-            ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
-
-        yield DatasetsMock
+        yield DatasetsMock  # noqa: T484
 
         prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
         pool.root_dataset.properties[prop].value = "no"
 
     def test_pool_can_be_activated(
         self,
-        MockedDatasets: MockedDatasets,
+        MockedDatasets: typing.Generator[DatasetsMock, None, None],
         pool: libzfs.ZFSPool,
         logger: 'iocage.lib.Logger.Logger'
     ):
         """Test if a pool can be activated."""
-        datasets = MockedDatasets(pool=pool, logger=logger)
+        datasets = DatasetsMock(pool=pool, logger=logger)
         datasets.activate()
