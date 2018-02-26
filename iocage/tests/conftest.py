@@ -52,7 +52,7 @@ def pytest_addoption(parser: typing.Any):
 
 
 def pytest_generate_tests(metafunc: typing.Any) -> None:
-    """Hook into collecting test functions."""
+    """Configure test function creation."""
     metafunc.config.getoption("force_clean")
 
 

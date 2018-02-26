@@ -33,10 +33,10 @@ import libzfs
 import iocage.lib.Jail
 
 
-def read_jail_config_json(config_file: str) -> str:
-    """Read the jail JSON config file"""
+def read_jail_config_json(config_file: str) -> dict:
+    """Read the jail JSON config file."""
     with open(config_file, "r") as conf:
-        return json.load(conf)
+        return dict(json.load(conf))
 
 
 class TestJail(object):
@@ -46,9 +46,9 @@ class TestJail(object):
     def local_release(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        root_dataset: 'libzfs.ZFSDataset',
+        root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
-        zfs: 'libzfs.ZFS'
+        zfs: libzfs.ZFS
     ) -> 'iocage.lib.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
@@ -67,7 +67,7 @@ class TestJail(object):
         host: 'iocage.lib.Host.Host',
         local_release: 'iocage.lib.Release.ReleaseGenerator',
         logger: 'iocage.lib.Logger.Logger',
-        zfs: 'libzfs.ZFS',
+        zfs: libzfs.ZFS,
         root_dataset,
         capsys
     ) -> None:
@@ -82,7 +82,7 @@ class TestJail(object):
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
 
-        def cleanup():
+        def cleanup() -> None:
             helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
         try:
@@ -121,9 +121,9 @@ class TestNullFSBasejail(object):
     def local_release(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        root_dataset: 'libzfs.ZFSDataset',
+        root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
-        zfs: 'libzfs.ZFS'
+        zfs: libzfs.ZFS
     ) -> 'iocage.lib.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
@@ -142,7 +142,7 @@ class TestNullFSBasejail(object):
         host: 'iocage.lib.Host.Host',
         local_release: 'iocage.lib.Release.ReleaseGenerator',
         logger: 'iocage.lib.Logger.Logger',
-        zfs: 'libzfs.ZFS',
+        zfs: libzfs.ZFS,
         root_dataset,
         capsys
     ) -> None:
@@ -160,7 +160,7 @@ class TestNullFSBasejail(object):
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
 
-        def cleanup():
+        def cleanup() -> None:
             helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
         try:
