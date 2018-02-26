@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage Host module."""
 import typing
 import os
 import platform
@@ -44,6 +45,7 @@ _distribution_types = typing.Union[
 
 
 class HostGenerator:
+    """Asynchronous representation of the jail host."""
 
     _class_distribution = iocage.lib.Distribution.DistributionGenerator
 
@@ -109,6 +111,7 @@ class HostGenerator:
 
     @property
     def defaults(self) -> 'iocage.lib.Resource.DefaultResource':
+        """Return the lazy-loaded defaults."""
         if self._defaults_initialized is False:
             self._defaults.read_config()
             self._defaults_initialized = True
@@ -118,13 +121,12 @@ class HostGenerator:
     def default_config(
         self
     ) -> 'iocage.lib.Config.Jail.BaseConfig.BaseConfig':
+        """Return the lazy-loaded default configuration."""
         return self.defaults.config
 
     @property
     def devfs(self) -> 'iocage.lib.DevfsRules.DevfsRules':
-        """
-        Lazy-loaded DevfsRules instance
-        """
+        """Return the lazy-loaded DevfsRules instance."""
         if "_devfs" not in dir(self):
             self._devfs = iocage.lib.DevfsRules.DevfsRules(
                 logger=self.logger
@@ -133,10 +135,12 @@ class HostGenerator:
 
     @property
     def userland_version(self) -> float:
+        """Return the host userland version number."""
         return float(iocage.lib.helpers.get_userland_version())
 
     @property
     def release_version(self) -> str:
+        """Return the host release version."""
         if self.distribution.name == "FreeBSD":
             release_version_string = os.uname()[2]
             release_version_fragments = release_version_string.split("-")
@@ -158,9 +162,11 @@ class HostGenerator:
 
     @property
     def processor(self) -> str:
+        """Return the hosts processor architecture."""
         return platform.processor()
 
 
 class Host(HostGenerator):
+    """Synchronous wrapper of HostGenerator."""
 
     _class_distribution = iocage.lib.Distribution.Distribution

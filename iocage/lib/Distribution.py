@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage Distribution module."""
 import typing
 import os
 import platform
@@ -33,6 +34,7 @@ import iocage.lib.helpers
 
 
 class EOLParser(html.parser.HTMLParser):
+    """Parser for EOL releases."""
 
     eol_releases: typing.List[str] = []
     data: typing.List[str] = []
@@ -41,6 +43,7 @@ class EOLParser(html.parser.HTMLParser):
     current_branch: str = ""
 
     def handle_starttag(self, tag, attrs) -> None:
+        """Handle opening HTML tags."""
         if tag == "td":
             self.in_id = True
             self.td_counter += 1
@@ -48,10 +51,12 @@ class EOLParser(html.parser.HTMLParser):
             self.td_counter = 0
 
     def handle_endtag(self, tag: str) -> None:
+        """Handle closing HTML tags."""
         if tag == "td":
             self.in_id = False
 
     def handle_data(self, data: str) -> None:
+        """Handle data in HTML tags."""
         if self.in_id is False:
             return  # skip non-td content
         if (self.td_counter == 1) and data.startswith("stable/"):
@@ -62,6 +67,7 @@ class EOLParser(html.parser.HTMLParser):
 
 
 class DistributionGenerator:
+    """Asynchronous representation of the host distribution."""
 
     release_name_blacklist = [
         "",
@@ -97,7 +103,7 @@ class DistributionGenerator:
     @property
     def name(self) -> str:
         """
-        Name of the host distribution
+        Return the name of the host distribution.
 
         Often used to differentiate between operations for HardenedBSD or
         standard FreeBSD.
@@ -110,10 +116,11 @@ class DistributionGenerator:
     @property
     def mirror_url(self) -> str:
         """
+        Return the mirror URL of the distribution.
+
         URL that points to the top level directory of a distributions release
         asset HTTP server.
         """
-
         distribution = self.name
         processor = self.host.processor
 
@@ -127,9 +134,7 @@ class DistributionGenerator:
 
     @property
     def hash_file(self) -> str:
-        """
-        The filename of the checksum file that can be found in the mirror_url
-        """
+        """Return the name of the checksum file found on the mirror."""
         if self.name == "FreeBSD":
             return "MANIFEST"
         elif self.name == "HardenedBSD":
@@ -139,10 +144,7 @@ class DistributionGenerator:
         )
 
     def fetch_releases(self) -> None:
-        """
-        Fetches and caches the available releases of the current distribution
-        """
-
+        """Fetch and cache the available releases."""
         self.logger.spam(f"Fetching release list from '{self.mirror_url}'")
 
         # the mirror_url @property is validated (enforced) @property, so:
@@ -190,7 +192,7 @@ class DistributionGenerator:
         return (self.host.processor == arch) is True
 
     def _get_eol_list(self) -> typing.List[str]:
-        """Scrapes the FreeBSD website and returns a list of EOL RELEASES"""
+        """Scrape the FreeBSD website and return a list of EOL RELEASES."""
         request = urllib.request.Request(
             self.eol_url,
             headers={
@@ -236,7 +238,7 @@ class DistributionGenerator:
     @property
     def releases(self) -> typing.List['iocage.lib.Release.ReleaseGenerator']:
         """
-        List of available releases
+        List of available releases.
 
         Raises an error when the releases cannot be fetched at the current time
         """
@@ -263,6 +265,7 @@ class DistributionGenerator:
 
 
 class Distribution(DistributionGenerator):
+    """Synchronous wrapper of the host distribution."""
 
     @property
     def _class_release(self) -> typing.Union[

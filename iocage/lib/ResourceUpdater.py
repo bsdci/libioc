@@ -56,14 +56,17 @@ class Updater:
 
     @property
     def logger(self):
+        """Shortcut to the resources logger."""
         return self.resource.logger
 
     @property
     def local_release_updates_dir(self):
+        """Return the absolute path to updater directory (os-dependend)."""
         return f"/var/db/{self.update_name}"
 
     @property
     def host_updates_dataset_name(self):
+        """Return the name of the updates dataset."""
         ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
         if isinstance(self.resource, ReleaseGenerator):
             release_dataset = self.resource.dataset
@@ -73,19 +76,23 @@ class Updater:
 
     @property
     def host_updates_dataset(self):
+        """Return the updates dataset."""
         dataset_name = self.host_updates_dataset_name
         return self.resource.zfs.get_or_create_dataset(dataset_name)
 
     @property
     def host_updates_dir(self) -> str:
+        """Return the mountpoint of the updates dataset."""
         return str(self.host_updates_dataset.mountpoint)
 
     @property
     def local_temp_dir(self):
+        """Return the update temp directory relative to the jail root."""
         return f"{self.local_release_updates_dir}/temp"
 
     @property
     def release(self):
+        """Return the associated release."""
         if isinstance(self.resource, iocage.lib.Release.ReleaseGenerator):
             return self.resource
         return self.resource.release
@@ -96,9 +103,7 @@ class Updater:
 
     @property
     def temporary_jail(self):
-        """
-        Temporary jail instance that will be created to run the update
-        """
+        """Temporary jail instance that will be created to run the update."""
         if hasattr(self, "_temporary_jail") is False:
             temporary_name = self.resource.name.replace(".", "-") + "_u"
             temporary_jail = iocage.lib.Jail.JailGenerator(
@@ -178,6 +183,7 @@ class Updater:
 
     @property
     def local_release_updater_config(self) -> str:
+        """Return the local path to the release updater config."""
         return f"{self.local_release_updates_dir}/{self.update_conf_name}"
 
     def _download_updater_asset(
@@ -236,7 +242,7 @@ class Updater:
     def fetch(
         self
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
+        """Fetch the update of a release."""
         ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
         if isinstance(self.resource, ReleaseGenerator) is False:
             raise iocage.lib.errors.NonReleaseUpdateFetch(
@@ -277,7 +283,7 @@ class Updater:
         'iocage.lib.events.IocageEvent',
         bool
     ], None, None]:
-
+        """Apply the fetched updates to the associated release or jail."""
         dataset = self.host_updates_dataset
         snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
 
@@ -488,7 +494,7 @@ def get_launchable_update_resource(
     distribution: 'iocage.lib.Distribution.Distribution',
     **kwargs
 ) -> Updater:
-
+    """Return an updater instance for the host distribution."""
     _class: typing.Type[Updater]
 
     if distribution.name == "HardenedBSD":

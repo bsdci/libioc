@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage module for host devfs rule configuration."""
 import os.path
 import re
 
@@ -28,44 +29,9 @@ import iocage.lib.errors
 import iocage.lib.helpers
 
 
-class DevfsRulesFilter:
-
-    def __init__(self, source, active_filters=[]):
-        self.source = source
-        self.active_filters = active_filters
-
-    def with_rule(self, rule):
-        return DevfsRulesFilter(filter(
-            lambda x: x.has_rule(rule),
-            self.source
-        ), self.active_filters + [rule])
-
-    def with_include(self, rule_name):
-        rule = f"add include ${rule_name}"
-        return self.with_rule(rule)
-
-    def create_ruleset(self, ruleset_name, ruleset_number):
-        """
-        Create a ruleset from the provided filters
-
-        Args:
-
-            ruleset_name (string):
-                Name of the rule that get's created
-
-            ruleset_number (int):
-                Number of the rule that get's created
-        """
-
-        ruleset = DevfsRuleset(ruleset_name, ruleset_number)
-        for line in self.active_filters:
-            ruleset.append(line)
-        return ruleset
-
-
 class DevfsRuleset(list):
     """
-    Representation of a devfs ruleset in the devfs.rules file
+    Representation of a devfs ruleset in the devfs.rules file.
 
     DevfsRuleset instances behave like standard lists and can store strings
     that multiple lines (string)
@@ -76,7 +42,7 @@ class DevfsRuleset(list):
 
     def __init__(self, value=None, number=None, comment=None):
         """
-        Initialize DevfsRuleset
+        Initialize the DevfsRuleset.
 
         Args:
 
@@ -94,7 +60,6 @@ class DevfsRuleset(list):
                 ruleset, but is like the name not required to compare the
                 ruleset with another
         """
-
         # when only one argument is passed, it's a line that need to be parsed
         if value is None and number is None:
             # name and number will be assigned later
@@ -111,7 +76,7 @@ class DevfsRuleset(list):
 
     def has_rule(self, rule):
         """
-        Returns true if the rule is part of the current ruleset
+        Return True if the rule is part of the current ruleset.
 
         Args:
 
@@ -122,12 +87,13 @@ class DevfsRuleset(list):
         return rule in self
 
     def append(self, rule):
+        """Append a rule to the devfs rules."""
         if rule not in self:
             list.append(self, rule)
 
     def clone(self, source_ruleset):
         """
-        Clones the rules from another ruleset
+        Clone the rules from another ruleset.
 
         Args:
 
@@ -150,6 +116,7 @@ class DevfsRuleset(list):
         raise SyntaxError("DevfsRuleset line parsing failed")
 
     def __str__(self):
+        """Return the devfs ruleset as string."""
         ruleset_line = f"[{self.name}={self.number}]"
         if self.comment is not None:
             ruleset_line += f" # {self.comment}"
@@ -159,15 +126,15 @@ class DevfsRuleset(list):
 
 class DevfsRules(list):
     """
-    Abstraction for the hosts /etc/devfs.rules
+    Abstraction for the hosts /etc/devfs.rules.
 
     Read and edit devfs rules in a programmatic way.
-    Restarts devfs service after applying changes.
+    Restart the devfs service after applying changes.
     """
 
     def __init__(self, rules_file="/etc/devfs.rules", logger=None):
         """
-        Initializes a DevfsRules manager for devfs.rules files
+        Initialize a DevfsRules manager for devfs.rules files.
 
         Args:
 
@@ -177,7 +144,6 @@ class DevfsRules(list):
             logger (iocage.Logger): (optional)
                 Instance of the logger that is passed to occuring errors
         """
-
         self.logger = logger
 
         # index rulesets to find duplicated and provide easy access
@@ -194,7 +160,7 @@ class DevfsRules(list):
 
     def append(self, ruleset, is_system_rule=False):
         """
-        Add a DevfsRuleset to the list
+        Add a DevfsRuleset to the list.
 
         The rulesets added become indexed, so that lookups and duplication
         checks are easy and fast
@@ -204,7 +170,6 @@ class DevfsRules(list):
             ruleset (iocage.lib.DevfsRules.DevfsRuleset|string):
                 The ruleset that gets added if it is not already in the list
         """
-
         next_line_index = len(self)
 
         if ruleset is None or isinstance(ruleset, str):
@@ -238,20 +203,18 @@ class DevfsRules(list):
 
     def new_ruleset(self, ruleset):
         """
-        Append a new ruleset
+        Append a new ruleset.
 
         Similar to append(), but automatically assigns a new number
 
         Args:
-
             ruleset (iocage.lib.DevfsRules.DevfsRuleset):
                 The new devfs ruleset that is going to be added
 
         Returns:
-
             int: The devfs ruleset number of the created ruleset
-        """
 
+        """
         ruleset.number = self.next_number
 
         if ruleset.name is None:
@@ -261,9 +224,11 @@ class DevfsRules(list):
         return ruleset.number
 
     def find_by_name(self, rule_name):
+        """Find a devfs rule by its name."""
         return self._find_by_index(rule_name, self._ruleset_name_index)
 
     def find_by_number(self, rule_number):
+        """Find a devfs rule by its rule number."""
         return self._find_by_index(rule_number, self._ruleset_number_index)
 
     def _find_by_index(self, rule_name, index):
@@ -271,18 +236,19 @@ class DevfsRules(list):
 
     @property
     def default_rules_file(self):
+        """Return the default path to the devfs rules file."""
         return "/etc/defaults/devfs.rules"
 
     @property
     def rules_file(self):
-        """
-        Path of the devfs.rules file
-        """
+        """Path of the devfs.rules file."""
         return self._rules_file
 
     @rules_file.setter
     def rules_file(self, devfs_rules_path):
         """
+        Set d different devfs rules file.
+
         When setting a new devfs.rules source, it is read automatically
         """
         self._rules_file = devfs_rules_path
@@ -294,19 +260,18 @@ class DevfsRules(list):
     @property
     def next_number(self):
         """
-        The next highest ruleset number that is available
+        Return the next highest ruleset number that is available.
 
-        This counting includes the systems default devfs rulesets
+        This counting includes the systems default devfs rulesets.
         """
         return len(self._ruleset_name_index.keys()) + 1
 
     def read_rules(self):
         """
-        Read existing devfs.rules file
+        Read existing devfs.rules file.
 
         Existing devfs rules get reset and read from the rules_file
         """
-
         if self.logger:
             self.logger.debug(f"Reading devfs.rules from {self.rules_file}")
 
@@ -350,11 +315,10 @@ class DevfsRules(list):
 
     def save(self):
         """
-        Apply changes to the devfs.rules file
+        Apply changes to the devfs.rules file.
 
-        Automatically restarts devfs service when the file was changed
+        Automatically restarts devfs service when the file was changed.
         """
-
         content_before = None
 
         if os.path.isfile(self.rules_file):
@@ -385,18 +349,13 @@ class DevfsRules(list):
         f.close()
 
     def _restart_devfs_service(self):
-        """
-        Restart devfs service after changing devfs.rules
-        """
+        """Restart devfs service after changing devfs.rules."""
         if self.logger is not None:
             self.logger.debug("Restarting devfs service")
         iocage.lib.helpers.exec(["service", "devfs", "restart"])
 
     def __str__(self):
-        """
-        Output the devfs.rules content as string
-        """
-
+        """Return the devfs.rules content as string."""
         out_lines = []
         for i, line in enumerate(self):
             if i not in self._system_rule_lines:

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage module of jail collections."""
 import libzfs
 import typing
 
@@ -31,6 +32,7 @@ import iocage.lib.helpers
 
 
 class JailsGenerator(iocage.lib.Resource.ListableResource):
+    """Asynchronous representation of a collection of jails."""
 
     _class_jail = iocage.lib.Jail.JailGenerator
     states = iocage.lib.JailState.JailStates()
@@ -89,7 +91,7 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
     def __iter__(
         self
     ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
-
+        """Iterate over all jails matching the filter criteria."""
         self.states.query()
 
         for jail in iocage.lib.Resource.ListableResource.__iter__(self):
@@ -105,5 +107,6 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
 
 
 class Jails(JailsGenerator):
+    """Synchronous wrapper ofs JailsGenerator."""
 
     _class_jail = iocage.lib.Jail.Jail

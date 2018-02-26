@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Representation of iocage jails."""
+"""iocage Jail module."""
 import typing
 import os
 import re
@@ -53,6 +53,7 @@ class JailResource(
     iocage.lib.VersionedResource.VersionedResource
 ):
     """Resource that represents a jail."""
+
     _jail: 'JailGenerator'
     _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab'
 
@@ -77,7 +78,7 @@ class JailResource(
     @property
     def jail(self) -> 'JailGenerator':
         """
-        Jail instance that belongs to the resource
+        Jail instance that belongs to the resource.
 
         Usually the resource becomes inherited from the jail itself.
         It can still be used linked to a foreign jail by passing jail as
@@ -98,11 +99,10 @@ class JailResource(
     @property
     def fstab(self) -> 'iocage.lib.Config.Jail.File.Fstab.Fstab':
         """
-        Memoized fstab wrapper of a Jail
+        Memoized fstab wrapper of a Jail.
 
         The fstab file is stored in the top level of a Jails dataset
         """
-
         try:
             return self._fstab
         except AttributeError:
@@ -120,7 +120,7 @@ class JailResource(
     @property
     def dataset_name(self) -> str:
         """
-        Name of the jail base ZFS dataset
+        Name of the jail base ZFS dataset.
 
         If the resource has no dataset or dataset_name assigned yet,
         the jail id is used to find name the dataset
@@ -140,7 +140,7 @@ class JailResource(
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
         """
-        Overrides a jails dataset name
+        Override a jails dataset name.
 
         This will cause Jail.dataset to point to this specific dataset instead
         of an auto-detected one to enable referencing jails from datasets
@@ -158,6 +158,7 @@ class JailResource(
         return f"{self.__jails_dataset_name}/{jail_id}"
 
     def get(self, key: str) -> typing.Any:
+        """Get a config value from the jail or defer to its resource."""
         try:
             out = self.jail.config[key]
             return out
@@ -169,7 +170,7 @@ class JailResource(
 
 class JailGenerator(JailResource):
     """
-    iocage unit orchestrates a jail's configuration and manages state
+    iocage unit orchestrates a jail's configuration and manages state.
 
     Jails are represented as a zfs dataset `zpool/iocage/jails/<NAME>`
 
@@ -223,7 +224,7 @@ class JailGenerator(JailResource):
         **resource_args
     ) -> None:
         """
-        Initializes a Jail
+        Initialize a Jail.
 
         Args:
 
@@ -238,9 +239,7 @@ class JailGenerator(JailResource):
 
             logger (iocage.lib.Logger): (optional)
                 Inherit an existing Logger instance from ancestor classes
-
         """
-
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
@@ -304,6 +303,8 @@ class JailGenerator(JailResource):
     @state.setter
     def state(self, value: iocage.lib.JailState):
         """
+        Return the jails JailState object.
+
         A public interface to set a jails state. This behavior is part of a
         performance optimization when dealing with large numbers of jails.
         """
@@ -319,10 +320,7 @@ class JailGenerator(JailResource):
         self,
         quick: bool=False,
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-        """
-        Start the jail.
-        """
-
+        """Start the jail."""
         self.require_jail_existing()
         self.require_jail_stopped()
 
@@ -382,9 +380,7 @@ class JailGenerator(JailResource):
         ]]=None,
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-        """
-        Starts a jail, runs a command and shuts it down immediately
-        """
+        """Start a jail, run a command and shut it down immediately."""
         self.require_jail_existing()
         self.require_jail_stopped()
 
@@ -446,8 +442,11 @@ class JailGenerator(JailResource):
         yield jailForkExecEvent.end()
 
     @property
-    def basejail_backend(self):
-
+    def basejail_backend(self) -> typing.Optional[typing.Union[
+        iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage,
+        iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
+    ]]:
+        """Return the basejail backend or None."""
         if self.config["basejail"] is False:
             return None
 
@@ -498,7 +497,6 @@ class JailGenerator(JailResource):
             force (bool): (default=False)
                 Ignores failures and enforces teardown if True
         """
-
         if force is True:
             for event in self._force_stop():
                 yield event
@@ -531,7 +529,7 @@ class JailGenerator(JailResource):
 
     def destroy(self, force: bool=False) -> None:
         """
-        Destroy a Jail and it's datasets
+        Destroy a Jail and it's datasets.
 
         Args:
 
@@ -540,7 +538,6 @@ class JailGenerator(JailResource):
                 before destroying the dataset. By default destroying a jail
                 requires it to be stopped.
         """
-
         self.state.query()
 
         if self.running is True and force is True:
@@ -555,7 +552,7 @@ class JailGenerator(JailResource):
         new_name: str
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
-        Change the name of a jail
+        Change the name of a jail.
 
         Args:
 
@@ -563,7 +560,6 @@ class JailGenerator(JailResource):
                 The new name of a jail. It might not be used by another Jail
                 and must differ from the current name.
         """
-
         self.require_jail_existing()
         self.require_jail_stopped()
         self.require_storage_backend()
@@ -670,7 +666,7 @@ class JailGenerator(JailResource):
         ]
     ) -> None:
         """
-        Create a Jail from a given Resource
+        Create a Jail from a given Resource.
 
         Args:
 
@@ -687,7 +683,7 @@ class JailGenerator(JailResource):
         release: iocage.lib.Release.ReleaseGenerator
     ) -> None:
         """
-        Create a Jail from a Release
+        Create a Jail from a Release.
 
         Args:
 
@@ -708,10 +704,7 @@ class JailGenerator(JailResource):
         self,
         template: 'JailGenerator'
     ) -> None:
-        """
-        Create a Jail from another Jail
-        """
-
+        """Create a Jail from another Jail."""
         template.require_jail_is_template()
         self.config['release'] = template.config['release']
         self.config['basejail'] = template.config['basejail']
@@ -750,7 +743,7 @@ class JailGenerator(JailResource):
     @property
     def is_basejail(self):
         """
-        Returns True if a Jail is a basejail.
+        Return True if a Jail is a basejail.
 
         If this is the case, parts of the jails dataset will be mounted
         from its release or upstream Jail (for example a Template)
@@ -760,6 +753,8 @@ class JailGenerator(JailResource):
     @property
     def storage_backend(self) -> iocage.lib.Storage.Storage:
         """
+        Return the jail storage abstraction class.
+
         Returns the class that represents the jails storage backend according
         to its configuration.
         """
@@ -771,26 +766,20 @@ class JailGenerator(JailResource):
             return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
     def save(self) -> None:
-        """
-        Permanently safe a Jails configuration
-        """
-        self.write_config(self.config.data)
+        """Permanently safe a jails configuration."""
+        super().save()
         self._save_autoconfig()
 
     def _save_autoconfig(self) -> None:
-        """
-        Saves auto-generated files
-        """
+        """Save auto-generated files."""
         self.rc_conf.save()
         self._update_fstab()
 
     def _update_fstab(self) -> None:
-
         if self.config["basejail_type"] == "nullfs":
             self.fstab.release = self.release
         else:
             self.fstab.release = None
-
         self.fstab.update_and_save()
 
     def exec(
@@ -799,14 +788,13 @@ class JailGenerator(JailResource):
         **kwargs
     ) -> typing.Tuple[subprocess.Popen, str, str]:
         """
-        Execute a command in a started jail
+        Execute a command in a running jail.
 
         command (list):
             A list of command and it's arguments
 
             Example: ["/usr/bin/whoami"]
         """
-
         command = ["/usr/sbin/jexec", self.identifier] + command
 
         child, stdout, stderr = iocage.lib.helpers.exec(
@@ -820,14 +808,13 @@ class JailGenerator(JailResource):
 
     def passthru(self, command: typing.List[str]):
         """
-        Execute a command in a started jail ans passthrough STDIN and STDOUT
+        Execute a command in a started jail ans passthrough STDIN and STDOUT.
 
         command (list):
             A list of command and it's arguments
 
             Example: ["/bin/sh"]
         """
-
         if isinstance(command, str):
             command = [command]
 
@@ -840,9 +827,7 @@ class JailGenerator(JailResource):
         )
 
     def exec_console(self):
-        """
-        Shortcut to drop into a shell of a started jail
-        """
+        """Shortcut to drop into a shell of a started jail."""
         return self.passthru(
             ["/usr/bin/login"] + self.config["login_flags"]
         )
@@ -860,9 +845,7 @@ class JailGenerator(JailResource):
 
     @property
     def _dhcp_enabled(self) -> bool:
-        """
-        True if any ip4_addr uses DHCP
-        """
+        """Return True if any ip4_addr uses DHCP."""
         if self.config["ip4_addr"] is None:
             return False
 
@@ -871,16 +854,16 @@ class JailGenerator(JailResource):
     @property
     def devfs_ruleset(self) -> iocage.lib.DevfsRules.DevfsRuleset:
         """
-        The number of the jails devfs ruleset
+        Return the number of the jails devfs ruleset.
 
         When a new combination of the base ruleset specified in
         jail.config["devfs_ruleset"] and rules automatically added by iocage
         appears, the according rule is automatically created and added to the
         /etc/devfs.rules file on the host
-        """
 
-        # users may reference a rule by numeric identifier or name
-        # numbers are automatically selected, so it's advisable to use names
+        Users may reference a rule by numeric identifier or name. This numbers
+        are automatically selected, so it's advisable to use names.1
+        """
         try:
             configured_devfs_ruleset = self.host.devfs.find_by_number(
                 int(self.config["devfs_ruleset"])
@@ -1001,9 +984,7 @@ class JailGenerator(JailResource):
             raise
 
     def _get_value(self, key: str) -> str:
-        """
-        Return jail command consumable config value string
-        """
+        """Return jail command consumable config value string."""
         return str(iocage.lib.helpers.to_string(
             self.config[key],
             true="1",
@@ -1013,10 +994,7 @@ class JailGenerator(JailResource):
 
     @property
     def networks(self) -> typing.List[iocage.lib.Network.Network]:
-        """
-        List of a Jails configured networks
-        """
-
+        """Return the list of a jails configured networks."""
         networks = []
 
         nics = self.config["interfaces"]
@@ -1188,9 +1166,7 @@ class JailGenerator(JailResource):
         )
 
     def require_jail_is_template(self, **kwargs) -> None:
-        """
-        Raise JailIsTemplate exception if the jail is a template
-        """
+        """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is False:
             raise iocage.lib.errors.JailNotTemplate(
                 jail=self,
@@ -1199,16 +1175,12 @@ class JailGenerator(JailResource):
             )
 
     def require_storage_backend(self) -> None:
-        """
-        Raise if the jail was not initialized with a storage backend
-        """
+        """Raise if the jail was not initialized with a storage backend."""
         if self.storage_backend is None:
             raise Exception("")
 
     def require_jail_not_template(self, **kwargs) -> None:
-        """
-        Raise JailIsTemplate exception if the jail is a template
-        """
+        """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is True:
             raise iocage.lib.errors.JailIsTemplate(
                 jail=self,
@@ -1217,9 +1189,7 @@ class JailGenerator(JailResource):
             )
 
     def require_jail_not_existing(self, **kwargs) -> None:
-        """
-        Raise JailAlreadyExists exception if the jail already exists
-        """
+        """Raise JailAlreadyExists exception if the jail already exists."""
         if self.exists:
             raise iocage.lib.errors.JailAlreadyExists(
                 jail=self,
@@ -1228,9 +1198,7 @@ class JailGenerator(JailResource):
             )
 
     def require_jail_existing(self, **kwargs) -> None:
-        """
-        Raise JailDoesNotExist exception if the jail does not exist
-        """
+        """Raise JailDoesNotExist exception if the jail does not exist."""
         if not self.exists:
             raise iocage.lib.errors.JailDoesNotExist(
                 jail=self,
@@ -1239,9 +1207,7 @@ class JailGenerator(JailResource):
             )
 
     def require_jail_stopped(self, **kwargs) -> None:
-        """
-        Raise JailAlreadyRunning exception if the jail is runninhg
-        """
+        """Raise JailAlreadyRunning exception if the jail is running."""
         if self.running is not False:
             raise iocage.lib.errors.JailAlreadyRunning(
                 jail=self,
@@ -1250,9 +1216,7 @@ class JailGenerator(JailResource):
             )
 
     def require_jail_running(self, **kwargs) -> None:
-        """
-        Raise JailNotRunning exception if the jail is stopped
-        """
+        """Raise JailNotRunning exception if the jail is stopped."""
         if not self.running:
             raise iocage.lib.errors.JailNotRunning(
                 jail=self,
@@ -1338,15 +1302,13 @@ class JailGenerator(JailResource):
 
     @property
     def name(self) -> str:
-        """
-        The name (formerly UUID) of the Jail
-        """
+        """Return the configured jail id."""
         return str(self.config["id"])
 
     @property
     def humanreadable_name(self) -> str:
         """
-        A human-readable identifier to print in logs and CLI output
+        Return the human-readable identifier to print in logs and CLI output.
 
         Whenever a Jail is found to have a UUID as identifier,
         a shortened string of the first 8 characters is returned
@@ -1360,26 +1322,19 @@ class JailGenerator(JailResource):
 
     @property
     def stopped(self) -> bool:
-        """
-        Boolean value that is True if a jail is stopped
-        """
+        """Return True if a jail is stopped."""
         return self.running is not True
 
     @property
     def running(self) -> bool:
-        """
-        Boolean value that is True if a jail is running
-        """
+        """Return True if a jail is running."""
         return self.jid is not None
 
     @property
     def jid(self) -> typing.Optional[int]:
-        """
-        The JID of a running jail or None if the jail is not running
-        """
-
-        # force state init when jid was requested
+        """Return a jails JID if it is running or None."""
         if "_state" not in object.__dir__(self):
+            # force state init when jid was requested
             self._init_state()
 
         try:
@@ -1389,9 +1344,7 @@ class JailGenerator(JailResource):
 
     @property
     def env(self):
-        """
-        Environment variables for hook scripts
-        """
+        """Return the environment variables for hook scripts."""
         jail_env = os.environ.copy()
 
         for prop in self.config.all_properties:
@@ -1404,17 +1357,13 @@ class JailGenerator(JailResource):
 
     @property
     def identifier(self):
-        """
-        Used internally to identify jails (in snapshots, jls, etc)
-        """
+        """Return the jail id used in snapshots, jls, etc."""
         config = object.__getattribute__(self, 'config')
         return f"ioc-{config['id']}"
 
     @property
     def release(self):
-        """
-        The iocage.Release instance linked with the jail
-        """
+        """Return the iocage.Release instance linked with the jail."""
         return iocage.lib.Release.Release(
             name=self.config["release"],
             logger=self.logger,
@@ -1423,7 +1372,7 @@ class JailGenerator(JailResource):
         )
 
     def __getattribute__(self, key: str):
-
+        """Get an attribute from the jail, state or configuration."""
         try:
             return object.__getattribute__(self, key)
         except AttributeError:
@@ -1438,13 +1387,11 @@ class JailGenerator(JailResource):
         raise AttributeError(f"Jail property {key} not found")
 
     def __dir__(self):
-
+        """Get all accessible properties of a jail."""
         properties = set()
-
         for prop in dict.__dir__(self):
             if not prop.startswith("_"):
                 properties.add(prop)
-
         return list(properties)
 
 
@@ -1456,7 +1403,7 @@ class Jail(JailGenerator):
         *args,
         **kwargs
     ) -> typing.List['iocage.lib.events.IocageEvent']:
-
+        """Start the jail."""
         return list(JailGenerator.start(self, *args, **kwargs))
 
     def stop(  # noqa: T484
@@ -1464,7 +1411,7 @@ class Jail(JailGenerator):
         *args,
         **kwargs
     ) -> typing.List['iocage.lib.events.IocageEvent']:
-
+        """Stop the jail."""
         return list(JailGenerator.stop(self, *args, **kwargs))
 
     def rename(  # noqa: T484
@@ -1472,5 +1419,5 @@ class Jail(JailGenerator):
         *args,
         **kwargs
     ) -> typing.List['iocage.lib.events.IocageEvent']:
-
+        """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage module for resource snapshots."""
 import libzfs
 
 import iocage.lib.Resource
@@ -28,14 +29,17 @@ import iocage.lib.Jail
 
 
 class ResourceSnapshots:
+    """Management module for resource snapshots."""
 
     def __init__(self, resource: iocage.lib.Resource.Resource) -> None:
         self.resource = resource
 
     def __iter__(self):
+        """Return an iterator over the snapshots."""
         return self.resource.dataset.snapshots
 
     def create(self, snapshot_name: str) -> None:
+        """Take a snapshot."""
         self._ensure_dataset_unlocked()
         snapshot_identifier = self._get_snapshot_identifier(snapshot_name)
         try:
@@ -51,6 +55,7 @@ class ResourceSnapshots:
         )
 
     def delete(self, snapshot_name: str) -> None:
+        """Delete a snapshot."""
         self._ensure_dataset_unlocked()
         snapshot = self._get_snapshot(snapshot_name)
         try:
@@ -62,6 +67,7 @@ class ResourceSnapshots:
             )
 
     def rollback(self, snapshot_name: str, force: bool=False) -> None:
+        """Rollback to a snapshot."""
         self._ensure_dataset_unlocked()
 
         snapshot = self._get_snapshot(snapshot_name)
@@ -92,20 +98,19 @@ class ResourceSnapshots:
             )
 
     def _ensure_dataset_unlocked(self) -> None:
-        """
-        Prevent operations on datasets in use (e.g. running jails)
-        """
+        """Prevent operations on datasets in use (e.g. running jails)."""
         if isinstance(self, iocage.lib.Jail.JailGenerator):
             self.resource.require_jail_stopped()
 
 
 class VersionedResource(iocage.lib.Resource.Resource):
+    """Versionable iocage resource module."""
 
     _snapshots: ResourceSnapshots
 
     @property
     def snapshots(self) -> ResourceSnapshots:
-
+        """Return the lazy-loaded resource snapshots."""
         if "_snapshots" not in object.__dir__(self):
             self._snapshots = ResourceSnapshots(self)
 

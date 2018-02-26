@@ -21,10 +21,12 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage host bridge interface module."""
 import typing
 
 
 class BridgeInterface:
+    """Representation of an iocage host bridge interface."""
 
     name: str
     secure: bool
@@ -49,6 +51,12 @@ class BridgeInterface:
             self.secure = secure
 
     def __str__(self):
+        """
+        Return the internal interface name string.
+
+        It begins with a colon when an additional virtual bridge interface is
+        used to mitigate ARP spoofing with IPFW.
+        """
         if self.secure is True:
             return f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
         else:

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage filters for ListableResource."""
 import re
 import typing
 
@@ -29,7 +30,8 @@ import iocage.lib.helpers
 import iocage.lib.Resource
 
 
-def match_filter(value: str, filter_string: str):
+def match_filter(value: str, filter_string: str) -> bool:
+    """Return True when the value matches the filter string."""
     escaped_characters = [".", "$", "^", "(", ")", "?"]
     for character in escaped_characters:
         filter_string = filter_string.replace(character, f"\\{character}")
@@ -41,6 +43,7 @@ def match_filter(value: str, filter_string: str):
 
 
 class Term(list):
+    """A single filter term."""
 
     glob_characters = ["*", "+"]
 
@@ -58,19 +61,20 @@ class Term(list):
 
     @property
     def short(self) -> bool:
+        """Return True if the short name of a UUID be used."""
         return (self.key == "name") is True
 
     def matches_resource(
         self,
         resource: 'iocage.lib.Resource.Resource'
     ) -> bool:
+        """Return True if the term matches the resource."""
         value = resource.get(self.key)
-
         return self.matches(value, self.short)
 
     def matches(self, value: typing.Any, short: bool=False) -> bool:
         """
-        Returns True if the value matches the term
+        Return True if the value matches the term.
 
         Args:
 
@@ -82,7 +86,6 @@ class Term(list):
                 to match a jail's shortname as well. This is required for
                 selecting jails with UUIDs by the first part of the name
         """
-
         # match any item of a list
         if (value is not None) and isinstance(value, list):
             # `short` not required here
@@ -182,19 +185,15 @@ class Terms(list):
         self,
         resource: 'iocage.lib.Resource.Resource'
     ) -> bool:
-        """
-        Returns True if all Terms match the resource
-        """
-
+        """Return True if all Terms match the resource."""
         for term in self:
             if term.matches_resource(resource) is False:
                 return False
-
         return True
 
     def match_key(self, key: str, value: str) -> bool:
         """
-        Check if a value matches for a given key
+        Check if a value matches for a given key.
 
         Returns True if the given value matches all terms for the specified key
         Returns Fals if one of the terms does not match

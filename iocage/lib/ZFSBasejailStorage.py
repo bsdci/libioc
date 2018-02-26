@@ -21,27 +21,27 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage ZFS basejail storage backend."""
 import iocage.lib.helpers
-import libzfs
 
 
 class ZFSBasejailStorage:
-    def prepare(self):
-        self._delete_clone_target_datasets()
+    """iocage ZFS basejail storage backend."""
 
     def apply(self, release=None):
-
+        """Attach the jail storage."""
         if release is None:
             release = self.jail.cloned_release
 
         return ZFSBasejailStorage.clone(self, release)
 
     def setup(self, release):
+        """Configure the jail storage."""
         iocage.lib.StandaloneJailStorage.StandaloneJailStorage.setup(
             self, release)
 
     def clone(self, release):
-
+        """Clone ZFS basejail datasets from a release."""
         current_basejail_type = self.jail.config["basejail_type"]
         if not current_basejail_type == "zfs":
             raise iocage.lib.errors.InvalidJailConfigValue(
@@ -60,41 +60,6 @@ class ZFSBasejailStorage:
             source_dataset_name = f"{release.base_dataset.name}/{basedir}"
             target_dataset_name = f"{self.jail.root_dataset_name}/{basedir}"
             self.clone_zfs_dataset(source_dataset_name, target_dataset_name)
-
-    def _delete_clone_target_datasets(self, root=None):
-
-        if root is None:
-            root = list(self.jail.root_dataset.children)
-
-        for child in root:
-            root_dataset_prefix = f"{self.jail.root_dataset_name}/"
-            relative_name = child.name.replace(root_dataset_prefix, "")
-            basedirs = iocage.lib.helpers.get_basedir_list()
-
-            if relative_name in basedirs:
-
-                # Unmount if mounted
-                current_mountpoint = child.mountpoint
-                if current_mountpoint is not None:
-                    child.umount()
-                    self.logger.verbose(
-                        f"Clone target {current_mountpoint} unmounted"
-                    )
-
-                # Delete existing snapshots
-                for snapshot in child.snapshots:
-                    try:
-                        snapshot.delete()
-                        self.logger.verbose(
-                            f"Snapshot {current_mountpoint} deleted"
-                        )
-                    except libzfs.ZFSException:
-                        pass
-
-                child.delete()
-
-            else:
-                self._delete_clone_target_datasets(list(child.children))
 
     def _create_mountpoints(self):
         for basedir in ["dev", "etc"]:

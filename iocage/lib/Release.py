@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Representation of an iocage release"""
+"""iocage release module."""
 import typing
 import hashlib
 import os
@@ -50,6 +50,7 @@ import iocage.lib.Config.Jail.File.SysctlConf
 
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     """Resource that represents an iocage release."""
+
     _release: typing.Optional['ReleaseGenerator'] = None
 
     def __init__(
@@ -73,7 +74,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     @property
     def release(self) -> 'ReleaseGenerator':
         """
-        Release instance that belongs to the resource
+        Return the release instance that belongs to the resource.
 
         Usually the resource becomes inherited from the Release itself.
         It can still be used linked to a foreign ReleaseGenerator by passing
@@ -92,7 +93,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     @property
     def dataset_name(self) -> str:
         """
-        Name of the release base ZFS dataset
+        Return the name of the releases ZFS dataset.
 
         If the resource has no dataset or dataset_name assigned yet,
         the release id is used to find name the dataset
@@ -106,26 +107,28 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
+        """Set the releases dataset name."""
         self._dataset_name = value
 
     @property
     def base_dataset(self) -> libzfs.ZFSDataset:
-        # base datasets are created from releases. required to start
-        # zfs-basejails
+        """
+        Return the ZFS basejail dataset belonging to the release.
+
+        base datasets are created from releases. They are required to start
+        zfs-basejails.
+        """
         ds: libzfs.ZFSDataset = self.zfs.get_dataset(self.base_dataset_name)
         return ds
 
     @property
     def base_dataset_name(self) -> str:
+        """Return the ZFS basejail datasets name belonging to the release."""
         return f"{self.__base_dataset_name}/{self.release.name}/root"
-
-    @property
-    def file(self) -> typing.Optional[str]:
-        return None
 
 
 class ReleaseGenerator(ReleaseResource):
-    """Release with generator interfaces"""
+    """Release with generator interfaces."""
 
     DEFAULT_RC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
         "netif_enable": False,
@@ -189,10 +192,12 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def resource(self) -> 'iocage.lib.Resource.Resource':
+        """Return the releases resource."""
         return self._resource
 
     @resource.setter
     def resource(self, value: 'iocage.lib.Resource.Resource') -> None:
+        """Set the releases resource."""
         if value is None:
             self._resource = ReleaseResource(
                 release=self,
@@ -205,14 +210,17 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def releases_folder(self) -> str:
+        """Return the mountpoint of the iocage/releases dataset."""
         return str(self.host.datasets.releases.mountpoint)
 
     @property
     def download_directory(self) -> str:
+        """Return the download directory."""
         return str(self.dataset.mountpoint)
 
     @property
     def root_dir(self) -> str:
+        """Return the main directory of the release."""
         try:
             if self.root_dataset.mountpoint:
                 return str(self.root_dataset.mountpoint)
@@ -223,10 +231,12 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def assets(self) -> typing.List[str]:
+        """Return a list of release assets."""
         return self._assets
 
     @assets.setter
     def assets(self, value: typing.Union[typing.List[str], str]):
+        """Set the list of release assets."""
         value = [value] if isinstance(value, str) else value
         self._assets = list(map(
             lambda x: x if not x.endswith(".txz") else x[:-4],
@@ -235,12 +245,18 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def real_name(self) -> str:
+        """Map the release name on HardenedBSD."""
         if self.host.distribution.name == "HardenedBSD":
             return f"HardenedBSD-{self.name}-{self.host.processor}-LATEST"
         return self.name
 
     @property
     def annotated_name(self) -> str:
+        """
+        Return the release name with annotations.
+
+        Annotations inform whether a release is newer then the host or EOL.
+        """
         annotations = set()
 
         if self.eol is True:
@@ -256,6 +272,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def mirror_url(self) -> str:
+        """Return the distributions release mirror URL."""
         if self._mirror_url is None:
             return str(self.host.distribution.mirror_url)
         else:
@@ -263,6 +280,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @mirror_url.setter
     def mirror_url(self, value: str) -> None:
+        """Override the default release mirror URL."""
         url = urllib.parse.urlparse(value)
         if url.scheme not in self._supported_url_schemes:
             raise ValueError(f"Invalid URL scheme '{url.scheme}'")
@@ -270,10 +288,12 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def remote_url(self) -> str:
+        """Return the releases full mirror URL."""
         return f"{self.mirror_url}/{self.real_name}"
 
     @property
     def available(self) -> bool:
+        """Return True if the release is available on the remote mirror."""
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
             resource = urllib.request.urlopen(request)  # nosec: see above
@@ -284,6 +304,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def fetched(self) -> bool:
+        """Return True if the release is fetched locally."""
         if self.exists is False:
             return False
 
@@ -297,6 +318,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def newer_than_host(self):
+        """Return True if the release is newer than the host."""
         host_release_name = self._pad_release_name(self.host.release_version)
         release_name = self._pad_release_name(self.name)
 
@@ -313,9 +335,7 @@ class ReleaseGenerator(ReleaseResource):
         return (host_release_name < cropped_release_name)
 
     def _pad_release_name(self, release_name: str, digits: int=4) -> str:
-        """
-        pads releases with 0 until it has 4 characters before the first .
-        """
+        """Pad releases with 0 until it has 4 characters before the first."""
         try:
             major_version = int(release_name.split("-")[0].split(".")[0])
             padding = str("0" * (digits - len(str(major_version))))
@@ -325,6 +345,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def zfs_pool(self) -> libzfs.ZFSPool:
+        """Return the releases ZFS pool."""
         try:
             root_pool = self.root_dataset.pool  # type: libzfs.ZFSPool
             return root_pool
@@ -334,6 +355,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def hashes(self):
+        """Return the releases asset hashes."""
         if not self._hashes:
             if not os.path.isfile(self.__get_hashfile_location()):
                 self.logger.spam("hashes have not yet been downloaded")
@@ -348,7 +370,7 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def hbds_release_branch(self):
-
+        """Translate the release into a HardenedBSD release git branch name."""
         if self._hbsd_release_branch is not None:
             return self._hbsd_release_branch
 
@@ -378,7 +400,7 @@ class ReleaseGenerator(ReleaseResource):
         update: typing.Optional[bool]=None,
         fetch_updates: typing.Optional[bool]=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
+        """Fetch the release from the remote."""
         release_changed = False
 
         events = iocage.lib.events
@@ -486,10 +508,9 @@ class ReleaseGenerator(ReleaseResource):
         force: bool=False
     ) -> libzfs.ZFSSnapshot:
         """
-        Returns a ZFS snapshot of the release
+        Create a ZFS snapshot of the release.
 
         Args:
-
             identifier:
                 This string specifies the snapshots name
 
@@ -498,10 +519,9 @@ class ReleaseGenerator(ReleaseResource):
                 it already exists for the given idenfifier
 
         Returns:
-
             libzfs.ZFSSnapshot: The ZFS snapshot object found or created
-        """
 
+        """
         snapshot_name = f"{self.dataset.name}@{identifier}"
         existing_snapshot: typing.Optional[libzfs.ZFSSnapshot] = None
         try:
@@ -551,6 +571,7 @@ class ReleaseGenerator(ReleaseResource):
                 self.logger.verbose(f"{url} was saved to {path}")
 
     def read_hashes(self) -> typing.Dict[str, str]:
+        """Read the release asset hashes."""
         # yes, this can read HardenedBSD and FreeBSD hash files
         path = self.__get_hashfile_location()
         hashes = {}
@@ -615,7 +636,7 @@ class ReleaseGenerator(ReleaseResource):
             self.name = self.dataset.name.split("/")[-2:-1]
 
     def update_base_release(self) -> None:
-
+        """Update the ZFS basejail release dataset."""
         base_dataset = self.zfs.get_or_create_dataset(self.base_dataset_name)
 
         basedirs = iocage.lib.helpers.get_basedir_list(
@@ -685,9 +706,11 @@ class ReleaseGenerator(ReleaseResource):
         )
 
     def __str__(self) -> str:
+        """Return the release name."""
         return self.name
 
     def destroy(self, force: bool=False) -> None:
+        """Delete a release."""
         self.zfs.delete_dataset_recursive(self.dataset)
 
 
@@ -699,7 +722,7 @@ class Release(ReleaseGenerator):
         update: typing.Optional[bool]=None,
         fetch_updates: typing.Optional[bool]=None
     ) -> typing.List['iocage.lib.events.IocageEvent']:
-
+        """Fetch the release from the remote synchronously."""
         return list(ReleaseGenerator.fetch(
             self,
             update=update,

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage libzfs enhancement module."""
 import typing
 import libzfs
 
@@ -30,6 +31,7 @@ import iocage.lib.errors
 
 
 class ZFS(libzfs.ZFS):
+    """libzfs enhancement module."""
 
     logger: typing.Optional[iocage.lib.Logger.Logger] = None
 
@@ -38,7 +40,7 @@ class ZFS(libzfs.ZFS):
         dataset_name: str,
         **kwargs
     ) -> libzfs.ZFSDataset:
-
+        """Automatically get the pool and create a dataset from its name."""
         pool = self.get_pool(dataset_name)
         pool.create(dataset_name, kwargs, create_ancestors=True)
 
@@ -51,7 +53,7 @@ class ZFS(libzfs.ZFS):
         dataset_name: str,
         **kwargs
     ) -> libzfs.ZFSDataset:
-
+        """Find or create the dataset, then return it."""
         try:
             return self.get_dataset(dataset_name)
         except libzfs.ZFSException:
@@ -60,6 +62,7 @@ class ZFS(libzfs.ZFS):
         return self.create_dataset(dataset_name, **kwargs)
 
     def get_pool(self, name: str) -> libzfs.ZFSPool:
+        """Get the pool with a given name."""
         pool_name = name.split("/")[0]
         for pool in self.pools:
             if pool.name == pool_name:
@@ -75,7 +78,7 @@ class ZFS(libzfs.ZFS):
         delete_snapshots: bool=True,
         delete_origin_snapshot: bool=True
     ) -> None:
-
+        """Recursively delete a dataset."""
         for child in dataset.children:
             self.delete_dataset_recursive(child)
 
@@ -114,6 +117,7 @@ def get_zfs(
     history: bool=True,
     history_prefix: str="<iocage>"
 ) -> ZFS:
+    """Get an instance of iocages enhanced ZFS class."""
     zfs = ZFS(history=history, history_prefix=history_prefix)
     zfs.logger = iocage.lib.helpers.init_logger(zfs, logger)
     return zfs

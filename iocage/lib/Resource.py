@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage Resource module."""
 import typing
 import os.path
 import abc
@@ -41,7 +42,7 @@ import iocage.lib.helpers
 
 class Resource(metaclass=abc.ABCMeta):
     """
-    iocage resource
+    Representation of an iocage resource.
 
     An iocage resource is the representation of a jail, release or base release
 
@@ -113,6 +114,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def config_json(self) -> 'iocage.lib.Config.Type.JSON.ResourceConfigJSON':
+        """Return and memoize the resources JSON config handler."""
         if "_config_json" in self.__dir__():
             return self._config_json
         default = self.DEFAULT_JSON_FILE
@@ -126,6 +128,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.ResourceConfigUCL':
+        """Return and memoize the resources UCL config handler."""
         if "_config_ucl" in self.__dir__():
             return self._config_ucl
         default = self.DEFAULT_UCL_FILE
@@ -139,6 +142,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.ResourceConfigZFS':
+        """Return and memoize the resources ZFS property config handler."""
         if "_config_zfs" in self.__dir__():
             return self._config_zfs
         if self.DEFAULT_ZFS_DATASET_SUFFIX is not None:
@@ -156,19 +160,23 @@ class Resource(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def destroy(self, force: bool=False) -> None:
+        """Destroy the resource."""
         pass
 
     @property
     def pool(self) -> libzfs.ZFSPool:
+        """Return the ZFSPool of the resources dataset."""
         zpool: libzfs.ZFSPool = self.zfs.get_pool(self.dataset_name)
         return zpool
 
     @property
     def pool_name(self) -> str:
+        """Return the name of the ZFSPool of the resources dataset."""
         return str(self.pool.name)
 
     @property
     def exists(self) -> bool:
+        """Return True if the resource exists on the filesystem."""
         try:
             mountpoint = self.dataset.mountpoint
             if isinstance(mountpoint, str):
@@ -179,9 +187,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def _assigned_dataset_name(self) -> str:
-        """
-        Name of the jail's base ZFS dataset manually assigned to this resource
-        """
+        """Name of the jail's base ZFS dataset that was manually assigned."""
         try:
             return str(self._dataset_name)
         except AttributeError:
@@ -196,14 +202,17 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def dataset_name(self) -> str:
+        """Return the name of the resources dataset."""
         return self._assigned_dataset_name
 
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
+        """Set the name of the resources dataset."""
         self._dataset_name = value
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
+        """Return the resources dataset."""
         try:
             return self._dataset
         except AttributeError:
@@ -214,6 +223,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @dataset.setter
     def dataset(self, value: libzfs.ZFSDataset) -> None:
+        """Set the resources dataset."""
         self._set_dataset(value)
 
     def _set_dataset(self, value: libzfs.ZFSDataset) -> None:
@@ -225,6 +235,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def config_type(self) -> typing.Optional[str]:
+        """Return the resources config type (JSON, UCL or ZFS)."""
         if self._config_type is None:
             return None
         elif self._config_type == self.CONFIG_TYPES.index("auto"):
@@ -233,6 +244,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @config_type.setter
     def config_type(self, value: typing.Optional[int]):
+        """Set the resources config type enum index (JSON, UCL or ZFS)."""
         if value is None:
             self._config_type = None
         else:
@@ -253,9 +265,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     @property
     def config_file(self) -> typing.Optional[str]:
-        """
-        Relative path of the resource config file
-        """
+        """Return the relative path of the resource config file."""
         if self._config_type is None:
             return None
 
@@ -272,28 +282,28 @@ class Resource(metaclass=abc.ABCMeta):
 
     @config_file.setter
     def config_file(self, value: str) -> None:
+        """Set the relative path of the resources config file."""
         self._config_file = value
 
     def create_resource(self) -> None:
-        """
-        Creates the dataset
-        """
+        """Create the dataset."""
         self.dataset = self.zfs.create_dataset(self.dataset_name)
         os.chmod(self.dataset.mountpoint, 0o700)
 
     def get_dataset(self, name: str) -> libzfs.ZFSDataset:
+        """Get the ZFSDataset relative to the resource datasets name."""
         dataset_name = f"{self.dataset_name}/{name}"
         dataset: libzfs.ZFSDataset = self.zfs.get_dataset(dataset_name)
         return dataset
 
     def get_or_create_dataset(self, name: str, **kwargs) -> libzfs.ZFSDataset:
         """
-        Get or create a child dataset
+        Get or create a child dataset.
 
         Returns:
-
             libzfs.ZFSDataset:
                 Existing or newly created ZFS Dataset
+
         """
         dataset_name = f"{self.dataset_name}/{name}"
         dataset: libzfs.ZFSDataset = self.zfs.get_or_create_dataset(
@@ -303,21 +313,26 @@ class Resource(metaclass=abc.ABCMeta):
         return dataset
 
     def abspath(self, relative_path: str) -> str:
+        """Return the absolute path of a path relative to the resource."""
         return str(os.path.join(self.dataset.mountpoint, relative_path))
 
-    def write_config(self, data: dict) -> None:
+    def _write_config(self, data: dict) -> None:
+        """Write the configuration to disk."""
         self.config_handler.write(data)
 
     def read_config(self) -> typing.Dict[str, typing.Any]:
+        """Read the configuration from disk."""
         o = self.config_handler.read()  # type: typing.Dict[str, typing.Any]
         return o
 
     @property
     def config_handler(self) -> 'iocage.lib.Config.Prototype.Prototype':
+        """Return the config handler according to the detected config_type."""
         handler = object.__getattribute__(self, f"config_{self.config_type}")
         return handler
 
     def get(self, key: str) -> typing.Any:
+        """Get any resource attribute."""
         try:
             return self.__getattribute__(key)
         except AttributeError:
@@ -325,7 +340,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     def getstring(self, key: str) -> str:
         """
-        Returns the resource propertiey string or '-'
+        Get any resource property as string or '-'.
 
         Args:
             key (string):
@@ -338,12 +353,14 @@ class Resource(metaclass=abc.ABCMeta):
         ))
 
     def save(self) -> None:
+        """Save changes - a placeholder for implementing class."""
         raise NotImplementedError(
             "This needs to be implemented by the inheriting class"
         )
 
 
 class DefaultResource(Resource):
+    """The resource storing the default configuration."""
 
     DEFAULT_JSON_FILE = "defaults.json"
     DEFAULT_UCL_FILE = "defaults"
@@ -370,18 +387,22 @@ class DefaultResource(Resource):
         )
 
     def read_config(self):
+        """Read the default configuration."""
         o = Resource.read_config(self)
         self.config.clone(o)
         return o
 
     def destroy(self, force: bool=False) -> None:
+        """Cannot destroy the default resource."""
         raise NotImplementedError("destroy unimplemented for DefaultResource")
 
     def save(self) -> None:
-        self.write_config(self.config.user_data)
+        """Save changes to the default configuration."""
+        self._write_config(self.config.user_data)
 
 
 class ListableResource(list, Resource):
+    """Representation of Resources that can be listed."""
 
     _filters: typing.Optional[iocage.lib.Filter.Terms] = None
 
@@ -405,12 +426,13 @@ class ListableResource(list, Resource):
         self.filters = filters
 
     def destroy(self, force: bool=False) -> None:
+        """Listable resources by itself cannot be destroyed."""
         raise NotImplementedError("destroy unimplemented for ListableResource")
 
     def __iter__(
         self
     ) -> typing.Generator[Resource, None, None]:
-
+        """Return an iterator over the child datasets."""
         for child_dataset in self.dataset.children:
 
             name = self._get_asset_name_from_dataset(child_dataset)
@@ -426,6 +448,7 @@ class ListableResource(list, Resource):
                     yield resource
 
     def __len__(self) -> int:
+        """Return the number of resources matching the filters."""
         return len(list(self.__iter__()))
 
     def _get_asset_name_from_dataset(
@@ -433,12 +456,11 @@ class ListableResource(list, Resource):
         dataset: libzfs.ZFSDataset
     ) -> str:
         """
-        Returns the last fragment of a dataset's name
+        Return the last fragment of a dataset's name.
 
         Example:
             /iocage/jails/foo -> foo
         """
-
         return str(dataset.name.split("/").pop())
 
     def _get_resource_from_dataset(
@@ -450,6 +472,7 @@ class ListableResource(list, Resource):
 
     @property
     def filters(self) -> typing.Optional[iocage.lib.Filter.Terms]:
+        """Return the filters that are applied on the list items."""
         return self._filters
 
     @filters.setter
@@ -457,7 +480,7 @@ class ListableResource(list, Resource):
         self,
         value: typing.Iterable[typing.Union[iocage.lib.Filter.Term, str]]
     ):
-
+        """Set the filters that are applied on the list items."""
         if isinstance(value, iocage.lib.Filter.Terms):
             self._filters = value
         else:

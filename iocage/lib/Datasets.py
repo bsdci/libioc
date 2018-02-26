@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage datasets module."""
 import typing
 import os.path
 import libzfs
@@ -35,6 +36,7 @@ import iocage.lib.Logger
 
 
 class Datasets:
+    """iocage core dataset abstraction."""
 
     ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
 
@@ -76,6 +78,7 @@ class Datasets:
 
     @property
     def active_pool(self) -> libzfs.ZFSPool:
+        """Return the currently active iocage pool."""
         pool = self._active_pool_or_none
         if pool is None:
             raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
@@ -83,6 +86,7 @@ class Datasets:
 
     @property
     def root(self):
+        """Return the iocage root dataset."""
         try:
             return self._root
         except AttributeError:
@@ -96,21 +100,24 @@ class Datasets:
 
     @property
     def releases(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage releases dataset."""
         return self._get_or_create_dataset("releases")
 
     @property
     def base(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage ZFS basejail releases dataset."""
         return self._get_or_create_dataset("base")
 
     @property
     def jails(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage jails dataset."""
         return self._get_or_create_dataset("jails")
 
     def activate(
         self,
         mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
     ) -> None:
-
+        """Activate the root pool and set the given mountpoint."""
         self.activate_pool(self.root.pool, mountpoint)
 
     def activate_pool(
@@ -118,7 +125,7 @@ class Datasets:
         pool: libzfs.ZFSPool,
         mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
     ) -> None:
-
+        """Activate the given pool and set its mountpoint."""
         if self._is_pool_active(pool):
             msg = f"ZFS pool '{pool.name}' is already active"
             self.logger.warn(msg)

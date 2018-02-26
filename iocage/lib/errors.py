@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Collection of iocage errors."""
 import typing
 
 # MyPy
@@ -32,6 +33,7 @@ import iocage.lib.Logger
 
 
 class IocageException(Exception):
+    """A well-known exception raised by libiocage."""
 
     def __init__(
         self,
@@ -55,6 +57,7 @@ class IocageException(Exception):
 
 
 class JailDoesNotExist(IocageException):
+    """Raised when the jail does not exist."""
 
     def __init__(
         self,
@@ -68,6 +71,7 @@ class JailDoesNotExist(IocageException):
 
 
 class JailAlreadyExists(IocageException):
+    """Raised when the jail already exists."""
 
     def __init__(
         self,
@@ -81,6 +85,7 @@ class JailAlreadyExists(IocageException):
 
 
 class JailNotRunning(IocageException):
+    """Raised when the jail is not running."""
 
     def __init__(
         self,
@@ -94,6 +99,7 @@ class JailNotRunning(IocageException):
 
 
 class JailAlreadyRunning(IocageException):
+    """Raised when the jail is already running."""
 
     def __init__(
         self,
@@ -107,6 +113,7 @@ class JailAlreadyRunning(IocageException):
 
 
 class JailNotFound(IocageException):
+    """Raised when the jail was not found."""
 
     def __init__(
         self,
@@ -120,6 +127,7 @@ class JailNotFound(IocageException):
 
 
 class JailNotSupplied(IocageException):
+    """Raised when no jail was supplied."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = f"Please supply a jail"
@@ -127,6 +135,7 @@ class JailNotSupplied(IocageException):
 
 
 class JailUnknownIdentifier(IocageException):
+    """Raised when the jail has an unknown identifier."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = "The jail has no identifier yet"
@@ -134,6 +143,7 @@ class JailUnknownIdentifier(IocageException):
 
 
 class JailBackendMissing(IocageException):
+    """Raised when the jails backend was not found."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = "The jail backend is unknown"
@@ -141,6 +151,7 @@ class JailBackendMissing(IocageException):
 
 
 class JailIsTemplate(IocageException):
+    """Raised when the jail is a template but should not be."""
 
     def __init__(self, jail, *args, **kwargs) -> None:
         msg = f"The jail '{jail.name}' is a template"
@@ -148,6 +159,7 @@ class JailIsTemplate(IocageException):
 
 
 class JailNotTemplate(IocageException):
+    """Raised when the jail is no template but should be one."""
 
     def __init__(self, jail, *args, **kwargs) -> None:
         msg = f"The jail '{jail.name}' is not a template"
@@ -155,6 +167,7 @@ class JailNotTemplate(IocageException):
 
 
 class JailStateUpdateFailed(IocageException):
+    """Raised when the jail state could not be obtained."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = f"Updating the jail state with jls failed"
@@ -165,6 +178,7 @@ class JailStateUpdateFailed(IocageException):
 
 
 class VirtualFstabLineHasNoRealIndex(IocageException):
+    """Raised when attempting to access the index of a virtual fstab line."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = f"The virtual fstab line does not have a real list index"
@@ -172,6 +186,7 @@ class VirtualFstabLineHasNoRealIndex(IocageException):
 
 
 class FstabDestinationExists(IocageException):
+    """Raised when the destination directory does not exist."""
 
     def __init__(self, mountpoint: str, *args, **kwargs) -> None:
         msg = f"The mountpoint {mountpoint} already exists in the fstab file"
@@ -182,6 +197,7 @@ class FstabDestinationExists(IocageException):
 
 
 class SecurityViolation(IocageException):
+    """Raised when iocage has security concerns."""
 
     def __init__(self, reason, *args, **kwargs) -> None:
         msg = f"Security violation: {reason}"
@@ -189,6 +205,7 @@ class SecurityViolation(IocageException):
 
 
 class InsecureJailPath(SecurityViolation):
+    """Raised when a a path points outside of a resource."""
 
     def __init__(self, path, *args, **kwargs) -> None:
         msg = f"Insecure path {path} jail escape attempt"
@@ -196,6 +213,7 @@ class InsecureJailPath(SecurityViolation):
 
 
 class SecurityViolationConfigJailEscape(SecurityViolation):
+    """Raised when a file symlinks to a location outside of the jail."""
 
     def __init__(self, file, *args, **kwargs) -> None:
         msg = f"The file {file} references a file outsite of the jail resource"
@@ -206,10 +224,13 @@ class SecurityViolationConfigJailEscape(SecurityViolation):
 
 
 class JailConfigError(IocageException):
+    """Raised when a general configuration error occurs."""
+
     pass
 
 
 class InvalidJailName(JailConfigError):
+    """Raised when a jail has an invalid name."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = (
@@ -220,6 +241,7 @@ class InvalidJailName(JailConfigError):
 
 
 class JailConigZFSIsNotAllowed(JailConfigError):
+    """Raised when a jail is not allowed to use ZFS shares."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = (
@@ -230,6 +252,7 @@ class JailConigZFSIsNotAllowed(JailConfigError):
 
 
 class InvalidJailConfigValue(JailConfigError):
+    """Raised when a jail configuration value is invalid."""
 
     def __init__(
         self,
@@ -248,6 +271,7 @@ class InvalidJailConfigValue(JailConfigError):
 
 
 class InvalidJailConfigAddress(InvalidJailConfigValue):
+    """Raised when a jail address is invalid."""
 
     def __init__(self, value: str, **kwargs) -> None:
         reason = f"expected \"<nic>|<address>\" but got \"{value}\""
@@ -258,6 +282,7 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
 
 
 class InvalidMacAddress(IocageException, ValueError):
+    """Raised when a jail MAC address is invalid."""
 
     def __init__(self, mac_address: str, **kwargs) -> None:
         reason = f"invalid mac address: \"{mac_address}\""
@@ -269,6 +294,7 @@ class InvalidMacAddress(IocageException, ValueError):
 
 
 class JailConfigNotFound(IocageException):
+    """Raised when a jail is not configured."""
 
     def __init__(self, config_type: str, *args, **kwargs) -> None:
         msg = f"Could not read {config_type} config"
@@ -277,6 +303,7 @@ class JailConfigNotFound(IocageException):
 
 
 class DefaultConfigNotFound(IocageException, FileNotFoundError):
+    """Raised when no default config was found on the host."""
 
     def __init__(self, config_file_path: str, *args, **kwargs) -> None:
         msg = f"Default configuration not found at {config_file_path}"
@@ -287,6 +314,7 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
 
 
 class IocageNotActivated(IocageException):
+    """Raised when iocage is not active on any ZFS pool."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = (
@@ -297,6 +325,7 @@ class IocageNotActivated(IocageException):
 
 
 class MustBeRoot(IocageException):
+    """Raised when iocage is executed without root permission."""
 
     def __init__(self, msg: str, *args, **kwargs) -> None:
         _msg = (
@@ -306,6 +335,7 @@ class MustBeRoot(IocageException):
 
 
 class CommandFailure(IocageException):
+    """Raised when iocage fails to execute a command."""
 
     def __init__(self, returncode: int, *args, **kwargs) -> None:
         msg = f"Command exited with {returncode}"
@@ -313,6 +343,7 @@ class CommandFailure(IocageException):
 
 
 class NotAnIocageZFSProperty(IocageException):
+    """Raised when iocage attempts to touch a non-iocage ZFS property."""
 
     def __init__(self, property_name: str, *args, **kwargs) -> None:
         msg = f"The ZFS property '{property_name}' is not managed by iocage"
@@ -323,6 +354,7 @@ class NotAnIocageZFSProperty(IocageException):
 
 
 class DistributionUnknown(IocageException):
+    """Raised when the host distribution is unknown or not supported."""
 
     def __init__(self, distribution_name: str, *args, **kwargs) -> None:
         msg = f"Unknown Distribution: {distribution_name}"
@@ -330,6 +362,7 @@ class DistributionUnknown(IocageException):
 
 
 class HostReleaseUnknown(IocageException):
+    """Raised when the host release could not be determined."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = f"The host release is unknown"
@@ -337,6 +370,7 @@ class HostReleaseUnknown(IocageException):
 
 
 class DistributionEOLWarningDownloadFailed(IocageException):
+    """Raised when downloading EOL warnings failed."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = f"Failed to download the EOL warnings"
@@ -347,6 +381,7 @@ class DistributionEOLWarningDownloadFailed(IocageException):
 
 
 class UnmountFailed(IocageException):
+    """Raised when an unmount operation fails."""
 
     def __init__(
         self,
@@ -360,6 +395,7 @@ class UnmountFailed(IocageException):
 
 
 class MountFailed(IocageException):
+    """Raised when a mount operation fails."""
 
     def __init__(
         self,
@@ -373,6 +409,7 @@ class MountFailed(IocageException):
 
 
 class DatasetNotMounted(IocageException):
+    """Raised when a dataset is not mounted but should be."""
 
     def __init__(
         self,
@@ -386,6 +423,7 @@ class DatasetNotMounted(IocageException):
 
 
 class DatasetNotAvailable(IocageException):
+    """Raised when a dataset is not available."""
 
     def __init__(self, dataset_name, *args, **kwargs) -> None:
         msg = f"Dataset '{dataset_name}' is not available"
@@ -393,6 +431,7 @@ class DatasetNotAvailable(IocageException):
 
 
 class DatasetNotJailed(IocageException):
+    """Raised when a ZFS share was not flagged as such."""
 
     def __init__(
         self,
@@ -409,6 +448,7 @@ class DatasetNotJailed(IocageException):
 
 
 class ZFSPoolInvalid(IocageException, TypeError):
+    """Raised when a ZFS pool is invalid."""
 
     def __init__(
         self,
@@ -426,6 +466,7 @@ class ZFSPoolInvalid(IocageException, TypeError):
 
 
 class ZFSPoolUnavailable(IocageException):
+    """Raised when a ZFS pool not available."""
 
     def __init__(
         self,
@@ -442,12 +483,14 @@ class ZFSPoolUnavailable(IocageException):
 
 
 class SnapshotError(IocageException):
+    """Raised on snapshot related errors."""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
 
 class SnapshotCreation(SnapshotError):
+    """Raised when creating a snapshot failed."""
 
     def __init__(
         self,
@@ -463,6 +506,7 @@ class SnapshotCreation(SnapshotError):
 
 
 class SnapshotDeletion(SnapshotError):
+    """Raised when deleting a snapshot failed."""
 
     def __init__(
         self,
@@ -478,6 +522,7 @@ class SnapshotDeletion(SnapshotError):
 
 
 class SnapshotRollback(SnapshotError):
+    """Raised when rolling back a snapshot failed."""
 
     def __init__(
         self,
@@ -493,6 +538,7 @@ class SnapshotRollback(SnapshotError):
 
 
 class SnapshotNotFound(SnapshotError):
+    """Raised when a snapshot was not found."""
 
     def __init__(
         self,
@@ -507,6 +553,7 @@ class SnapshotNotFound(SnapshotError):
 
 
 class InvalidSnapshotIdentifier(SnapshotError):
+    """Raised when a snapshot identifier is invalid."""
 
     def __init__(
         self,
@@ -526,6 +573,7 @@ class InvalidSnapshotIdentifier(SnapshotError):
 
 
 class InvalidInterfaceName(IocageException):
+    """Raised when a NIC name is invalid."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = "Invalid NIC name"
@@ -533,6 +581,7 @@ class InvalidInterfaceName(IocageException):
 
 
 class VnetBridgeMissing(IocageException):
+    """Raised when a vnet bridge is missing."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = "VNET is enabled and requires setting a bridge"
@@ -540,6 +589,7 @@ class VnetBridgeMissing(IocageException):
 
 
 class InvalidNetworkBridge(IocageException, ValueError):
+    """Raised when a network bridge is invalid."""
 
     def __init__(
         self,
@@ -555,6 +605,7 @@ class InvalidNetworkBridge(IocageException, ValueError):
 
 
 class FirewallDisabled(IocageException):
+    """Raised when the firewall is required but disabled (Secure VNET)."""
 
     def __init__(
         self,
@@ -569,6 +620,7 @@ class FirewallDisabled(IocageException):
 
 
 class FirewallCommandFailure(IocageException):
+    """Raised when a firewall command fails (Secure VNET)."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = "Firewall Command failed. Is IPFW enabled?"
@@ -579,6 +631,7 @@ class FirewallCommandFailure(IocageException):
 
 
 class ReleaseListUnavailable(IocageException):
+    """Raised when the list could not be downloaded from the remote."""
 
     def __init__(self, *args, **kwargs) -> None:
 
@@ -587,6 +640,7 @@ class ReleaseListUnavailable(IocageException):
 
 
 class UpdateFailure(IocageException):
+    """Raised when an update fails."""
 
     def __init__(
         self,
@@ -603,6 +657,7 @@ class UpdateFailure(IocageException):
 
 
 class InvalidReleaseAssetSignature(UpdateFailure):
+    """Raised when a release signature is invalid."""
 
     def __init__(
         self,
@@ -621,6 +676,7 @@ class InvalidReleaseAssetSignature(UpdateFailure):
 
 
 class IllegalReleaseAssetContent(UpdateFailure):
+    """Raised when a release asset archive contains malicious content."""
 
     def __init__(
         self,
@@ -640,6 +696,7 @@ class IllegalReleaseAssetContent(UpdateFailure):
 
 
 class NonReleaseUpdateFetch(UpdateFailure):
+    """Raised when attempting to fetch updates for a custom release."""
 
     def __init__(
         self,
@@ -657,6 +714,7 @@ class NonReleaseUpdateFetch(UpdateFailure):
 
 
 class ReleaseNotFetched(IocageException):
+    """Raised when a release was not yet fetched."""
 
     def __init__(self, name: str, *args, **kwargs) -> None:
         msg = f"Release '{name}' does not exist or is not fetched locally"
@@ -664,6 +722,7 @@ class ReleaseNotFetched(IocageException):
 
 
 class ReleaseUpdateBranchLookup(IocageException):
+    """Raised when failing to lookup the remote update branch."""
 
     def __init__(
         self,
@@ -683,6 +742,7 @@ class ReleaseUpdateBranchLookup(IocageException):
 
 
 class DefaultReleaseNotFound(IocageException):
+    """Raised when the default (host) release does not match a remote."""
 
     def __init__(self, host_release_name: str, *args, **kwargs) -> None:
         msg = (
@@ -696,12 +756,14 @@ class DefaultReleaseNotFound(IocageException):
 
 
 class DevfsRuleException(IocageException):
+    """Raised on errors in devfs rules."""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
 
 class InvalidDevfsRulesSyntax(DevfsRuleException):
+    """Raised when a devfs rule has invalid syntax."""
 
     def __init__(
         self,
@@ -718,6 +780,7 @@ class InvalidDevfsRulesSyntax(DevfsRuleException):
 
 
 class DuplicateDevfsRuleset(DevfsRuleException):
+    """Raised when a duplicate devfs rule was found."""
 
     def __init__(
         self,
@@ -737,12 +800,14 @@ class DuplicateDevfsRuleset(DevfsRuleException):
 
 
 class LogException(IocageException):
+    """Raised when logging fails."""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
 
 class CannotRedrawLine(LogException):
+    """Raised when manipulating previous log entries fails."""
 
     def __init__(
             self,
@@ -759,6 +824,7 @@ class CannotRedrawLine(LogException):
 
 
 class EventAlreadyFinished(IocageException):
+    """Raised when a event is touched that was already finished."""
 
     def __init__(
         self,
@@ -775,12 +841,14 @@ class EventAlreadyFinished(IocageException):
 
 
 class JailFilterException(IocageException):
+    """Raised when a jail filter is invalid."""
 
     def __init__(self, *args, **kwargs) -> None:
         IocageException.__init__(self, *args, **kwargs)
 
 
 class JailFilterInvalidName(JailFilterException):
+    """Raised when the name of a jail filter is invalid."""
 
     def __init__(self, *args, **kwargs) -> None:
         msg = (
@@ -794,6 +862,7 @@ class JailFilterInvalidName(JailFilterException):
 
 
 class MissingFeature(IocageException, NotImplementedError):
+    """Raised when an iocage feature is not fully implemented yet."""
 
     def __init__(
             self,

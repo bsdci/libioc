@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage module for launchable resources."""
 import libzfs
 import typing
 
@@ -35,6 +36,7 @@ import iocage.lib.Config.Jail.File
 
 
 class LaunchableResource(iocage.lib.Resource.Resource):
+    """Representation of launchable resources like jails."""
 
     _rc_conf: typing.Optional[iocage.lib.Config.Jail.File.RCConf.RCConf] = None
     _sysctl_conf: typing.Optional[
@@ -58,6 +60,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     def updater(
         self
     ) -> iocage.lib.ResourceUpdater.Updater:
+        """Return the lazy-loaded resource updater."""
         if self._updater is not None:
             return self._updater
 
@@ -71,9 +74,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         return updater
 
     def create_resource(self) -> None:
-        """
-        Creates the root dataset
-        """
+        """Create the resources root dataset."""
         iocage.lib.Resource.Resource.create_resource(self)
         self.zfs.create_dataset(self.root_dataset_name)
 
@@ -86,13 +87,12 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     @property
     def root_path(self) -> str:
-        """
-        Absolute path to the root filesystem of a jail
-        """
+        """Return the absolute path to the root filesystem of a jail."""
         return str(self.root_dataset.mountpoint)
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:
+        """Return the resources root dataset."""
         # ToDo: Memoize root_dataset
         root_dataset = self.get_dataset("root")  # type: libzfs.ZFSDataset
         self._require_dataset_mounted(root_dataset)
@@ -101,30 +101,30 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     @property
     def root_dataset_name(self) -> str:
         """
-        ZFS dataset name of a Jails root filesystem. It is always a direct
-        ancestor of a Jails dataset with the name `root`.
+        Return the resources root dataset name.
+
+        The root dasaset has the name `root` and is always a direct ancestor
+        of a resources top-level dataset.
         """
         return f"{self.dataset_name}/root"
 
     @property
     def dataset_name(self) -> str:
+        """Return the resources dataset name."""
         raise NotImplementedError(
             "This needs to be implemented by the inheriting class"
         )
 
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
+        """Interface for setting a resources dataset name."""
         raise NotImplementedError(
             "This needs to be implemented by the inheriting class"
         )
 
     @property
     def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.RCConf':
-        """
-        Memoized instance of a resources RCConf
-
-        Gets loaded on first access to the property
-        """
+        """Return a lazy-loaded instance of the resources RCConf."""
         if self._rc_conf is None:
             self._rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
                 resource=self,
@@ -136,11 +136,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     def sysctl_conf(
         self
     ) -> 'iocage.lib.Config.Jail.File.SysctlConf.SysctlConf':
-        """
-        Memoized instance of a resources SysctlConf
-
-        Gets loaded on first access to the property
-        """
+        """Return a lazy-loaded instance of the resources SysctlConf."""
         if self._sysctl_conf is None:
             sysctl_conf = iocage.lib.Config.Jail.File.SysctlConf.SysctlConf(
                 resource=self,

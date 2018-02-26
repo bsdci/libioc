@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage ZFS share storage backend."""
 import typing
 import libzfs
 
@@ -29,6 +30,7 @@ import iocage.lib.helpers
 
 
 class ZFSShareStorage:
+    """Storage backend for ZFS shares."""
 
     def __init__(
         self,
@@ -42,6 +44,7 @@ class ZFSShareStorage:
         self.jail = jail
 
     def mount_zfs_shares(self, auto_create: bool=False) -> None:
+        """Invoke mounting the ZFS shares."""
         self.logger.verbose("Mounting ZFS shares")
         self.jail.storage._mount_procfs()
         self._mount_jail_datasets(auto_create=auto_create)
@@ -50,7 +53,7 @@ class ZFSShareStorage:
         self,
         auto_create: bool=False
     ) -> typing.List[libzfs.ZFSDataset]:
-
+        """Get the shared ZFS datasets."""
         dataset_names = self.jail.config["jail_zfs_dataset"]
 
         datasets = set()
