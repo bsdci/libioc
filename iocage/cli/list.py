@@ -92,6 +92,8 @@ def cli(
     if len(filters) == 0:
         filters += ("*",)
 
+    columns: typing.List[str] = []
+
     try:
 
         if (dataset_type == "base") and (remote is True):
@@ -105,7 +107,7 @@ def cli(
                 columns = ["name"]
             else:
                 resources_class = iocage.lib.Jails.JailsGenerator
-                columns = _list_output_comumns(str(output), _long)
+                columns = _list_output_comumns(output, _long)
                 if dataset_type == "template":
                     filters += ("template=yes",)
                 else:
@@ -202,11 +204,11 @@ def _lookup_resource_values(resource, columns) -> typing.List[str]:
 
 
 def _list_output_comumns(
-    user_input: str="",
+    user_input: typing.Optional[str]="",
     long_mode: bool=False
-) -> list:
+) -> typing.List[str]:
 
-    if user_input:
+    if user_input is not None:
         return user_input.strip().split(',')
     else:
         columns = ["jid", "name"]
