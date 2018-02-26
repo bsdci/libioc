@@ -21,16 +21,18 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage standalone jail storage backend."""
 import iocage.lib.Storage
 
 
 class StandaloneJailStorage(iocage.lib.Storage.Storage):
+    """iocage standalone jail storage backend."""
 
     def apply(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
-
+        """Attach the jail storage."""
         self.logger.warn(
             "Standalone jails do not require storage operations to start",
             jail=self.jail
@@ -40,6 +42,6 @@ class StandaloneJailStorage(iocage.lib.Storage.Storage):
         self,
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
-
+        """Configure the jail storage."""
         self.logger.verbose("Cloning the release once to the root dataset")
         self.clone_release(release)

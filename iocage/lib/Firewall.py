@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage firewall module."""
 import typing
 
 import sysctl
@@ -29,6 +30,7 @@ import iocage.lib.helpers
 
 
 class Firewall:
+    """iocage host firewall abstraction."""
 
     IPFW_RULE_OFFSET: int = 10000
     IPFW_COMMAND: str = "/sbin/ipfw"
@@ -48,6 +50,7 @@ class Firewall:
         }
 
     def ensure_firewall_enabled(self) -> None:
+        """Raise if the firewall is not enabled."""
         requirements = self._required_sysctl_properties
         requirement_keys = list(requirements.keys())
         for item in sysctl.filter("net"):
@@ -60,6 +63,7 @@ class Firewall:
                     )
 
     def delete_rule(self, rule_number: int) -> None:
+        """Delete a firewall rule by its number."""
         iocage.lib.helpers.exec(
             [
                 self.IPFW_COMMAND,
@@ -74,7 +78,7 @@ class Firewall:
         rule_number: int,
         rule_arguments: typing.List[str]
     ) -> None:
-
+        """Add a rule to the firewall configuration."""
         command = [
             self.IPFW_COMMAND,
             "-q", "add",

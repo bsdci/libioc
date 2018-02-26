@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage events collection."""
 import typing
 from timeit import default_timer as timer
 
@@ -39,11 +40,7 @@ EVENT_STATUS = (
 
 
 class IocageEvent:
-    """
-    IocageEvent
-
-    Base class for all other iocage events
-    """
+    """The base event class of libiocage."""
 
     HISTORY: typing.List['IocageEvent'] = []
 
@@ -67,9 +64,7 @@ class IocageEvent:
         message: typing.Optional[str]=None,
         **kwargs
     ) -> None:
-        """
-        Initializes an IocageEvent
-        """
+        """Initialize an IocageEvent."""
         for event in IocageEvent.HISTORY:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
@@ -91,7 +86,7 @@ class IocageEvent:
         done: str="done",
         pending: str="pending"
     ) -> str:
-
+        """Get a humanreadable string according to the jail state."""
         if self.error is not None:
             return error
 
@@ -104,16 +99,18 @@ class IocageEvent:
         return pending
 
     def child_event(self, event: 'IocageEvent') -> 'IocageEvent':
+        """Append the event to the child_events for later notification."""
         self._child_events.append(event)
         return event
 
     def add_rollback_step(self, method: typing.Callable[[], None]) -> None:
+        """Add a rollback step that is executed when the event fails."""
         self._rollback_steps.append(method)
 
     def rollback(
         self
     ) -> typing.Optional[typing.Generator['IocageEvent', None, None]]:
-
+        """Rollback all rollback steps in reverse order."""
         if self.reverted is True:
             return
 
@@ -138,18 +135,25 @@ class IocageEvent:
     @property
     def type(self) -> str:
         """
-        The type of event
+        Return the events type.
 
-        The event type is obtained from an IocageEvent's class name
+        The event type is obtained from an IocageEvent's class name.
         """
         return type(self).__name__
 
     @property
     def pending(self) -> bool:
+        """Return True if the event is pending."""
         return self._pending
 
     @pending.setter
     def pending(self, state: bool) -> None:
+        """
+        Set the pending state.
+
+        Changes invoke internal processing as for example the calculation of
+        the event duration and the global PENDING_COUNT.
+        """
         current = self._pending
         new_state = (state is True)
 
@@ -170,6 +174,7 @@ class IocageEvent:
 
     @property
     def duration(self) -> typing.Optional[float]:
+        """Return the duration of finished events."""
         try:
             return self._stopped_at - self._started_at
         except AttributeError:
@@ -180,6 +185,7 @@ class IocageEvent:
             self.message = kwargs["message"]
 
     def begin(self, **kwargs) -> 'IocageEvent':
+        """Begin an event."""
         self._update_message(**kwargs)
         self.pending = True
         self.done = False
@@ -187,6 +193,7 @@ class IocageEvent:
         return self
 
     def end(self, **kwargs) -> 'IocageEvent':
+        """Successfully finish an event."""
         self._update_message(**kwargs)
         self.done = True
         self.pending = False
@@ -194,11 +201,13 @@ class IocageEvent:
         return self
 
     def step(self, **kwargs) -> 'IocageEvent':
+        """Reflect partial event progress."""
         self._update_message(**kwargs)
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
     def skip(self, **kwargs) -> 'IocageEvent':
+        """Mark an event as skipped."""
         self._update_message(**kwargs)
         self.skipped = True
         self.pending = False
@@ -206,6 +215,7 @@ class IocageEvent:
         return self
 
     def fail(self, exception: bool=True, **kwargs) -> 'IocageEvent':
+        """End an event with a failure."""
         list(self.fail_generator(exception=exception, **kwargs))
         return self
 
@@ -214,7 +224,7 @@ class IocageEvent:
         exception: bool=True,
         **kwargs
     ) -> typing.Generator['IocageEvent', None, None]:
-
+        """End an event with a failure via a generator of rollback steps."""
         self._update_message(**kwargs)
         self.error = exception
 
@@ -229,6 +239,7 @@ class IocageEvent:
         yield self
 
     def __hash__(self) -> typing.Any:
+        """Compare an event by its type and identifier."""
         has_identifier = ("identifier" in self.__dir__()) is True
         identifier = "generic" if has_identifier is False else self.identifier
         return hash((self.type, identifier))
@@ -238,6 +249,7 @@ class IocageEvent:
 
 
 class JailEvent(IocageEvent):
+    """Any event related to a jail."""
 
     def __init__(
         self,
@@ -254,6 +266,7 @@ class JailEvent(IocageEvent):
 
 
 class JailLaunch(JailEvent):
+    """Launch a jail."""
 
     def __init__(
         self,
@@ -265,6 +278,7 @@ class JailLaunch(JailEvent):
 
 
 class JailRename(JailEvent):
+    """Change the name of a jail."""
 
     def __init__(
         self,
@@ -280,6 +294,7 @@ class JailRename(JailEvent):
 
 
 class JailVnetConfiguration(JailEvent):
+    """Configure networking for VNET jails."""
 
     def __init__(
         self,
@@ -291,6 +306,7 @@ class JailVnetConfiguration(JailEvent):
 
 
 class JailZfsShareMount(JailEvent):
+    """Share ZFS datasets with the jail."""
 
     def __init__(
         self,
@@ -302,6 +318,7 @@ class JailZfsShareMount(JailEvent):
 
 
 class JailServicesStart(JailEvent):
+    """Start the jails services."""
 
     def __init__(
         self,
@@ -313,6 +330,7 @@ class JailServicesStart(JailEvent):
 
 
 class JailDestroy(JailEvent):
+    """Destroy the jail."""
 
     def __init__(
         self,
@@ -324,6 +342,7 @@ class JailDestroy(JailEvent):
 
 
 class JailNetworkTeardown(JailEvent):
+    """Teardown a jails VNET network devices."""
 
     def __init__(
         self,
@@ -335,6 +354,7 @@ class JailNetworkTeardown(JailEvent):
 
 
 class JailMountTeardown(JailEvent):
+    """Teardown basejail mountpoints."""
 
     def __init__(
         self,
@@ -346,6 +366,7 @@ class JailMountTeardown(JailEvent):
 
 
 class JailFstabUpdate(JailEvent):
+    """Update a jails fstab file."""
 
     def __init__(
         self,
@@ -357,9 +378,7 @@ class JailFstabUpdate(JailEvent):
 
 
 class JailForkExec(JailEvent):
-    """
-    A group of multiple action events executed sequentially
-    """
+    """A group of multiple action events executed sequentially."""
 
     def __init__(
         self,
@@ -371,6 +390,7 @@ class JailForkExec(JailEvent):
 
 
 class JailExec(JailEvent):
+    """Execute a command in a jail."""
 
     def __init__(
         self,
@@ -385,6 +405,7 @@ class JailExec(JailEvent):
 
 
 class ReleaseEvent(IocageEvent):
+    """Event related to a release."""
 
     def __init__(
         self,
@@ -397,6 +418,7 @@ class ReleaseEvent(IocageEvent):
 
 
 class FetchRelease(ReleaseEvent):
+    """Fetch release assets."""
 
     def __init__(
         self,
@@ -408,6 +430,7 @@ class FetchRelease(ReleaseEvent):
 
 
 class ReleasePrepareStorage(FetchRelease):
+    """Prepare the storage of a release before fetching it."""
 
     def __init__(
         self,
@@ -419,6 +442,7 @@ class ReleasePrepareStorage(FetchRelease):
 
 
 class ReleaseDownload(FetchRelease):
+    """Download release assets."""
 
     def __init__(
         self,
@@ -430,6 +454,7 @@ class ReleaseDownload(FetchRelease):
 
 
 class ReleaseExtraction(FetchRelease):
+    """Extract a release asset."""
 
     def __init__(
         self,
@@ -441,6 +466,7 @@ class ReleaseExtraction(FetchRelease):
 
 
 class ReleaseCopyBase(FetchRelease):
+    """Copy the basejail folders of a release into individual ZFS datasets."""
 
     def __init__(
         self,
@@ -452,6 +478,7 @@ class ReleaseCopyBase(FetchRelease):
 
 
 class ReleaseConfiguration(FetchRelease):
+    """Pre-configure a release with reasonable defaults."""
 
     def __init__(
         self,
@@ -463,6 +490,7 @@ class ReleaseConfiguration(FetchRelease):
 
 
 class ReleaseUpdate(ReleaseEvent):
+    """Update a release."""
 
     def __init__(
         self,
@@ -474,6 +502,7 @@ class ReleaseUpdate(ReleaseEvent):
 
 
 class ReleaseUpdatePull(ReleaseUpdate):
+    """Pull release updater and patches from the remote."""
 
     def __init__(
         self,
@@ -485,6 +514,7 @@ class ReleaseUpdatePull(ReleaseUpdate):
 
 
 class ReleaseUpdateDownload(ReleaseUpdate):
+    """Download release updates/patches."""
 
     def __init__(
         self,
@@ -496,6 +526,7 @@ class ReleaseUpdateDownload(ReleaseUpdate):
 
 
 class RunReleaseUpdate(ReleaseUpdate):
+    """Run the update of a release."""
 
     def __init__(
         self,
@@ -507,6 +538,7 @@ class RunReleaseUpdate(ReleaseUpdate):
 
 
 class ExecuteReleaseUpdate(ReleaseUpdate):
+    """Execute the updater script in a jail."""
 
     def __init__(
         self,
@@ -521,6 +553,7 @@ class ExecuteReleaseUpdate(ReleaseUpdate):
 
 
 class ZFSEvent(IocageEvent):
+    """Event related to ZFS storage."""
 
     def __init__(
         self,
@@ -533,6 +566,7 @@ class ZFSEvent(IocageEvent):
 
 
 class ZFSDatasetRename(ZFSEvent):
+    """Rename a ZFS dataset."""
 
     def __init__(
         self,
@@ -544,6 +578,7 @@ class ZFSDatasetRename(ZFSEvent):
 
 
 class ZFSSnapshotRename(ZFSEvent):
+    """Rename a ZFS snapshot."""
 
     def __init__(
         self,
@@ -558,6 +593,7 @@ class ZFSSnapshotRename(ZFSEvent):
 
 
 class JailRestart(JailEvent):
+    """Restart a jail."""
 
     def __init__(
         self,
@@ -569,6 +605,7 @@ class JailRestart(JailEvent):
 
 
 class JailShutdown(JailEvent):
+    """Shutdown a jail."""
 
     def __init__(
         self,
@@ -580,6 +617,7 @@ class JailShutdown(JailEvent):
 
 
 class JailSoftShutdown(JailEvent):
+    """Soft-restart a jail."""
 
     def __init__(
         self,
@@ -591,6 +629,7 @@ class JailSoftShutdown(JailEvent):
 
 
 class JailStart(JailEvent):
+    """Start a jail."""
 
     def __init__(
         self,

@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage MacAddress module."""
 import typing
 
 import iocage.lib.helpers
@@ -28,6 +29,7 @@ import iocage.lib.errors
 
 
 class MacAddress:
+    """Representation of a NICs hardware address."""
 
     _address: str
 
@@ -41,10 +43,12 @@ class MacAddress:
 
     @property
     def address(self):
+        """Return the actual hardware address."""
         return self._address
 
     @address.setter
     def address(self, mac_address: str) -> None:
+        """Set the hardware address."""
         address = mac_address.replace(":", "").replace("-", "").lower()
 
         if len(address) != 12:
@@ -56,12 +60,14 @@ class MacAddress:
         self._address = address
 
     def __str__(self) -> str:
+        """Return the hardware address as string."""
         address = self.address
         mac_bytes = [address[i:(i + 2)] for i in range(0, len(address), 2)]
         return ":".join(mac_bytes)
 
 
 class MacAddressPair:
+    """Representation of a hardware address pair (of epair devices)."""
 
     a: MacAddress
     b: MacAddress
@@ -95,4 +101,5 @@ class MacAddressPair:
         self.b = b
 
     def __str__(self) -> str:
+        """Return the epairs hardware addresses concatenated with a comma."""
         return f"{self.a},{self.b}"

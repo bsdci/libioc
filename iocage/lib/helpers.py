@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""Collection of iocage helper functions."""
 import typing
 import json
 import random
@@ -43,7 +44,7 @@ def init_zfs(
     self: typing.Any,
     zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
 ) -> 'iocage.lib.ZFS.ZFS':
-
+    """Attach or initialize a ZFS object."""
     try:
         return self.zfs
     except AttributeError:
@@ -62,7 +63,7 @@ def init_host(
     self,
     host: typing.Optional[iocage.lib.Host.HostGenerator]=None
 ) -> iocage.lib.Host.HostGenerator:
-
+    """Attach or initialize a Host object."""
     try:
         return self.host
     except AttributeError:
@@ -81,7 +82,7 @@ def init_distribution(
     self,
     distribution: typing.Optional[iocage.lib.Distribution.Distribution]=None
 ) -> iocage.lib.Host.HostGenerator:
-
+    """Attach or initialize a Distribution object."""
     try:
         return self.distribution
     except AttributeError:
@@ -100,7 +101,7 @@ def init_logger(
     self,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> iocage.lib.Logger.Logger:
-
+    """Attach or initialize a Logger object."""
     try:
         return self.logger
     except AttributeError:
@@ -119,6 +120,7 @@ def init_logger(
 
 
 def get_userland_version() -> str:
+    """Get the hosts userland version."""
     f = open("/bin/freebsd-version", "r", re.MULTILINE, encoding="utf-8")
     # ToDo: move out of the function
     pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z0-9\-]+)\"")
@@ -133,7 +135,7 @@ def exec(
     ignore_error: bool=False,
     **subprocess_args
 ) -> typing.Tuple[subprocess.Popen, str, str]:
-
+    """Execute a shell command."""
     if isinstance(command, str):
         command = [command]
 
@@ -186,6 +188,7 @@ def _prettify_output(output: str) -> str:
 
 
 def to_humanreadable_name(name: str) -> str:
+    """Return a shorted UUID or the original name."""
     return name[:8] if (is_uuid(name) is True) else name
 
 
@@ -195,6 +198,7 @@ _UUID_REGEX = re.compile(
 
 
 def is_uuid(text: str) -> bool:
+    """Return True if the input string is an UUID."""
     return _UUID_REGEX.match(text) is not None
 
 
@@ -203,6 +207,7 @@ _validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
 
 
 def validate_name(name: str) -> bool:
+    """Return True if the name matches the naming convention."""
     return _validate_name.fullmatch(name) is not None
 
 
@@ -210,27 +215,21 @@ def parse_none(
     data: typing.Any,
     none_matches: typing.List[str]=["none", "-", ""]
 ) -> None:
-
-    if data is None:
+    """Raise if the input does not translate to None."""
+    if (data is None) or (data in none_matches):
         return None
-
-    if data in none_matches:
-        return None
-
     raise TypeError("Value is not None")
 
 
 def parse_list(data: typing.Union[str, typing.List[str]]) -> typing.List[str]:
-    """
-    Transforms a comma separated string into a list
-    """
-    # ToDo: escaped commas
+    """Transform a comma separated string into a list."""
+    # ToDo: ignore escaped commas
     return data if isinstance(data, list) else data.split(",")
 
 
 def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
     """
-    try to parse booleans from strings
+    Try to parse booleans from strings.
 
     On success, it returns the parsed boolean on failure it raises a TypeError.
 
@@ -244,7 +243,6 @@ def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
           File "<stdin>", line 1, in <module>
         TypeError: Not a boolean value
     """
-
     if isinstance(data, bool):
         return data
     if isinstance(data, str):
@@ -261,6 +259,8 @@ def parse_user_input(
     data: typing.Optional[typing.Union[str, bool]]
 ) -> typing.Optional[typing.Union[str, bool]]:
     """
+    Parse user input.
+
     uses parse_bool() to partially return Boolean and None values
     All other types as returned as-is
 
@@ -273,7 +273,6 @@ def parse_user_input(
     >>> parse_user_input(8.4)
     8.4
     """
-
     try:
         return parse_bool(data)
     except TypeError:
@@ -289,6 +288,7 @@ def parse_user_input(
 
 
 def to_json(data: typing.Dict[str, typing.Any]) -> str:
+    """Create a JSON string from the input data."""
     output_data = {}
     for key, value in data.items():
         output_data[key] = to_string(
@@ -301,6 +301,7 @@ def to_json(data: typing.Dict[str, typing.Any]) -> str:
 
 
 def to_ucl(data: typing.Dict[str, typing.Any]) -> str:
+    """Create UCL content from the input data."""
     output_data = {}
     for key, value in data.items():
         output_data[key] = to_string(
@@ -326,10 +327,9 @@ def to_string(
     delimiter: str=","
 ) -> str:
     """
-    return a string boolean value using parse_bool(), of specified style
+    Translate complex types into a string.
 
     Args:
-
         true (string):
             The expected return value when data is True
 
@@ -340,11 +340,9 @@ def to_string(
             The expected return value when data is None
 
     Returns:
-
         string: Map input according to arguments or stringified input
 
     Usage:
-
         >>> to_string(True)
         "yes"
         >>> to_string(False)
@@ -357,8 +355,8 @@ def to_string(
 
         >>> to_string(None)
         "-"
-    """
 
+    """
     if data is None:
         return none
 
@@ -390,7 +388,7 @@ def exec_passthru(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Tuple[str, str]:
-
+    """Execute a command in an interactive shell."""
     if isinstance(command, str):
         command = [command]
 
@@ -399,71 +397,6 @@ def exec_passthru(
         logger.spam(f"Executing (interactive): {command_str}")
 
     return subprocess.Popen(command).communicate()  # nosec: TODO: #113
-
-
-def exec_raw(
-    command: typing.List[str],
-    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-    **kwargs
-) -> subprocess.Popen:
-
-    if isinstance(command, str):
-        command = [command]
-
-    command_str = " ".join(command)
-    if logger:
-        logger.spam(f"Executing (raw): {command_str}")
-
-    return subprocess.Popen(  # nosec: TODO: #113
-        command,
-        **kwargs
-    )
-
-
-def exec_iter(
-    command: typing.List[str],
-    logger: typing.Optional[iocage.lib.Logger.Logger]=None
-) -> typing.Generator[str, None, None]:
-
-    process = exec_raw(
-        command,
-        logger=logger,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True
-    )
-
-    for stdout_line in iter(process.stdout.readline, ""):
-        yield stdout_line
-
-    process.stdout.close()
-
-    return_code = process.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(return_code, command)
-
-
-def shell(
-    command: typing.Union[str, typing.List[str]],
-    logger: typing.Optional[iocage.lib.Logger.Logger]=None
-) -> subprocess.CompletedProcess:
-
-    if not isinstance(command, str):
-        shell_command = " ".join(command)
-    else:
-        shell_command = command
-
-    if logger:
-        logger.spam(f"Executing Shell: {command}")
-
-    child = subprocess.check_output(  # nosec: Yes, we actually want this
-        shell_command,
-        shell=True,
-        universal_newlines=True,
-        stderr=subprocess.DEVNULL
-    )
-
-    return child  # noqa: T484
 
 
 # ToDo: replace with (u)mount library
@@ -477,7 +410,7 @@ def umount(
     ignore_error: bool=False,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> None:
-
+    """Unmount a mountpoint."""
     cmd = ["/sbin/umount"]
 
     if force is True:
@@ -510,6 +443,7 @@ def umount(
 
 
 def get_random_uuid() -> str:
+    """Generate a random UUID."""
     return "-".join(map(
         lambda x: ('%030x' % random.randrange(16**x))[-x:],  # nosec: B311
         [8, 4, 4, 4, 12]
@@ -517,6 +451,7 @@ def get_random_uuid() -> str:
 
 
 def get_basedir_list(distribution_name="FreeBSD"):
+    """Return the list of basedirs according to the host distribution."""
     basedirs = [
         "bin",
         "boot",

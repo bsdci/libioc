@@ -21,16 +21,20 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage commandline prompt module."""
 import iocage.lib.errors
 import iocage.lib.helpers
 
 
 class Prompts:
+    """iocage commandline prompt module."""
+
     def __init__(self, host=None, logger=None):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.host = iocage.lib.helpers.init_host(self, host)
 
     def release(self):
+        """Prompt for a release."""
         default = None
         available_releases = self.host.distribution.releases
         for i, available_release in enumerate(available_releases):

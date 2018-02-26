@@ -21,27 +21,28 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage NullFS basejail storage backend."""
 import iocage.lib.StandaloneJailStorage
 import iocage.lib.helpers
 
 
 class NullFSBasejailStorage:
-    """
-    Iocage NullFS storage backend
-
-    This backend is used by NullFS basejails.
-    """
+    """iocage NullFS basejail storage backend."""
 
     def apply(self, release=None):
+        """Attach the jail storage."""
         NullFSBasejailStorage._create_nullfs_directories(self)
 
     def setup(self, release):
+        """Prepare the jail storage."""
         iocage.lib.StandaloneJailStorage.StandaloneJailStorage.setup(
-            self, release)
+            self,
+            release
+        )
 
     def umount_nullfs(self):
         """
-        Unmount all NullFS mounts from fstab
+        Unmount all NullFS mounts from fstab.
 
         In preparation of starting the jail with NullFS mounts all mountpoints
         that are listed in fstab need to be unmounted

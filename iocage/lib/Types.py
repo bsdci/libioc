@@ -21,12 +21,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""custom iocage types."""
 import typing
 import re
 
 
 class AbsolutePath(str):
-    """Wrapper Type for ensuring a `str` matches a Unix Path"""
+    """Wrapper Type for ensuring a `str` matches a Unix Path."""
 
     unix_path = re.compile(r"/([^/\0]+/*)+")
 
@@ -40,6 +41,7 @@ class AbsolutePath(str):
 
 
 class UserInput:
+    """Any kind of user input data."""
 
     def __init__(
         self,

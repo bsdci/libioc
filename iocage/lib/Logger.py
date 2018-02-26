@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage logging module."""
 import os
 import sys
 import typing
@@ -29,6 +30,7 @@ import iocage.lib.errors
 
 
 class LogEntry:
+    """A single log entry."""
 
     def __init__(
         self,
@@ -51,7 +53,7 @@ class LogEntry:
         message: str=None,
         indent: int=None
     ) -> None:
-
+        """Change the log entry."""
         if self.logger is None:
             raise iocage.lib.errors.CannotRedrawLine(
                 reason="No logger available"
@@ -66,10 +68,12 @@ class LogEntry:
         self.logger.redraw(self)
 
     def __len__(self) -> int:
+        """Return the number of lines of the log entry."""
         return len(self.message.split("\n"))
 
 
 class Logger:
+    """iocage Logger module."""
 
     COLORS = (
         "black",
@@ -129,10 +133,12 @@ class Logger:
 
     @property
     def default_print_level(self) -> str:
+        """Return the static default print level."""
         return "info"
 
     @property
     def print_level(self) -> str:
+        """Return the configured or default print level."""
         if self._print_level is None:
             return self.default_print_level
         else:
@@ -140,6 +146,7 @@ class Logger:
 
     @print_level.setter
     def print_level(self, value: str) -> None:
+        """Set a custom print level to override the default."""
         self._print_level = value
 
     def _set_log_directory(self, log_directory: str) -> None:
@@ -149,6 +156,7 @@ class Logger:
         self.log(f"Log directory set to '{log_directory}'", level="spam")
 
     def log(self, *args, **kwargs) -> LogEntry:
+        """Add a log entry."""
         log_args = list(args)
 
         if ("message" not in kwargs) and (len(log_args) > 0):
@@ -169,28 +177,31 @@ class Logger:
         return log_entry
 
     def verbose(self, message: str, indent: int=0, **kwargs) -> LogEntry:
+        """Add a verbose log entry."""
         return self.log(message, level="verbose", indent=indent, **kwargs)
 
     def error(self, message: str, indent: int=0, **kwargs) -> LogEntry:
+        """Add an error log entry."""
         return self.log(message, level="error", indent=indent, **kwargs)
 
     def warn(self, message: str, indent: int=0, **kwargs) -> LogEntry:
+        """Add a warning log entry."""
         return self.log(message, level="warn", indent=indent, **kwargs)
 
     def debug(self, message: str, indent: int=0, **kwargs) -> LogEntry:
+        """Add a debug log entry."""
         return self.log(message, level="debug", indent=indent, **kwargs)
 
     def spam(self, message: str, indent: int=0, **kwargs) -> LogEntry:
+        """Add a spam log entry."""
         return self.log(message, level="spam", indent=indent, **kwargs)
 
     def screen(self, message: str, indent: int=0, **kwargs) -> LogEntry:
-        """
-        Screen never gets printed to log files
-        """
+        """Screen never gets printed to log files."""
         return self.log(message, level="screen", indent=indent, **kwargs)
 
     def redraw(self, log_entry: LogEntry) -> None:
-
+        """Redraw and update a log entry that was already printed."""
         if log_entry not in self.PRINT_HISTORY:
             raise iocage.lib.errors.CannotRedrawLine(
                 reason="Log entry not found in history"

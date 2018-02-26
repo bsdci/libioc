@@ -21,6 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""iocage network abstraction module."""
 import typing
 from hashlib import sha224
 
@@ -34,6 +35,8 @@ import iocage.lib.helpers
 
 class Network:
     """
+    Networking for VNET jails.
+
     VNET Jails may have access to different networks. Each is identified by a
     network interface name that is unique to the jail.
 
@@ -74,6 +77,8 @@ class Network:
 
     def setup(self) -> None:
         """
+        Apply the network configuration.
+
         Jails call this method to create the network after being started
         and configure the interfaces on jail and host side according to the
         class attributes.
@@ -84,6 +89,8 @@ class Network:
 
     def teardown(self) -> None:
         """
+        Teardown the applied changes.
+
         After Jails are stopped the devices that were used by it remain on the
         host. This method is called by jails after they terminated.
         """
@@ -118,6 +125,8 @@ class Network:
     @property
     def nic_local_name(self) -> str:
         """
+        Return the network interface name on host side.
+
         The Network NIC is unique per jail. Iocage appends the running jails
         JID to the device name, so that the epair device exposed to the jail
         host can be easily identified by the user.
@@ -129,6 +138,7 @@ class Network:
 
     @property
     def nic_local_description(self) -> str:
+        """Return the description text of the local NIC."""
         return f"associated with jail: {self.jail.humanreadable_name}"
 
     @property
