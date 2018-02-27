@@ -140,7 +140,7 @@ class JailResource(
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
         """
-        Override a jails dataset name.
+        Override a jail's dataset name.
 
         This will cause Jail.dataset to point to this specific dataset instead
         of an auto-detected one to enable referencing jails from datasets
@@ -766,7 +766,7 @@ class JailGenerator(JailResource):
             return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
 
     def save(self) -> None:
-        """Permanently safe a jails configuration."""
+        """Permanently save a jail's configuration."""
         self._write_config(self.config.data)
         self._save_autoconfig()
 
@@ -808,7 +808,7 @@ class JailGenerator(JailResource):
 
     def passthru(self, command: typing.List[str]):
         """
-        Execute a command in a started jail ans passthrough STDIN and STDOUT.
+        Execute a command in a started jail and passthrough STDIN and STDOUT.
 
         command (list):
             A list of command and it's arguments
@@ -854,7 +854,7 @@ class JailGenerator(JailResource):
     @property
     def devfs_ruleset(self) -> iocage.lib.DevfsRules.DevfsRuleset:
         """
-        Return the number of the jails devfs ruleset.
+        Return the number of the jail's devfs ruleset.
 
         When a new combination of the base ruleset specified in
         jail.config["devfs_ruleset"] and rules automatically added by iocage

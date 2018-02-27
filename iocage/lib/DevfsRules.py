@@ -247,7 +247,7 @@ class DevfsRules(list):
     @rules_file.setter
     def rules_file(self, devfs_rules_path):
         """
-        Set d different devfs rules file.
+        Set different devfs rules file.
 
         When setting a new devfs.rules source, it is read automatically
         """
