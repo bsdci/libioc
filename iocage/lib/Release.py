@@ -168,7 +168,7 @@ class ReleaseGenerator(ReleaseResource):
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        if not iocage.lib.helpers.validate_name(name):
+        if iocage.lib.helpers.validate_name(name) is False:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name
