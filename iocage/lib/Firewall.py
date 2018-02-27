@@ -50,7 +50,7 @@ class Firewall:
         }
 
     def ensure_firewall_enabled(self) -> None:
-        """Raise if the firewall is not enabled."""
+        """Raise an FirewallDisabled exception if the firewall is disabled."""
         requirements = self._required_sysctl_properties
         requirement_keys = list(requirements.keys())
         for item in sysctl.filter("net"):

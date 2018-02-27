@@ -126,7 +126,7 @@ class InterfaceProp(dict):
         dict.__setitem__(self, key, None)
 
     def to_string(self, value: dict) -> str:
-        """Return the iocage formated string of interfaces."""
+        """Return the iocage formatted string of interfaces."""
         out = []
         for jail_if in value:
             bridge_if = self[jail_if]
@@ -134,5 +134,5 @@ class InterfaceProp(dict):
         return self.delimiter.join(out)
 
     def __str__(self) -> str:
-        """Return the iocage formated string of interfaces."""
+        """Return the iocage formatted string of interfaces."""
         return self.to_string(value=self)

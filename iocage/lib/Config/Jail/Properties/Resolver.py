@@ -34,7 +34,7 @@ import iocage.lib.Logger
 
 
 class ResolverProp(collections.MutableSequence):
-    """Special jail config property Resolver."""
+    """Handle the special jail property (DNS) Resolver."""
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "resolver"
