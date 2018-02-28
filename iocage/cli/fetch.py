@@ -35,25 +35,49 @@ from .shared.click import IocageClickContext
 __rootcmd__ = True
 
 
-@click.command(context_settings=dict(
-    max_content_width=400, ),
-    name="fetch", help="Fetch a version of FreeBSD for jail usage or a"
-                       " preconfigured plugin.")
+@click.command(
+    context_settings={
+        max_content_width: 400
+    },
+    name="fetch",
+    help="Fetch a version of FreeBSD for jail usage or a preconfigured plugin."
+)
 @click.pass_context
-@click.option("--url", "-u",
-              help="Remote URL with path to the release/snapshot directory")
-@click.option("--file", "-F", multiple=True,
-              help="Specify the files to fetch from the mirror.")
-@click.option("--release", "-r",
-              # type=release_choice(),
-              help="The FreeBSD release to fetch.")
-@click.option("--update/--no-update", "-U/-NU", default=True,
-              help="Update the release to the latest patch level.")
-@click.option("--fetch-updates/--no-fetch-updates", default=True,
-              help="Skip fetching release updates")
+@click.option(
+    "--url",
+    "-u",
+    help="Remote URL with path to the release/snapshot directory"
+)
+@click.option(
+    "--file",
+    "-F",
+    multiple=True,
+    help="Specify the files to fetch from the mirror."
+)
+@click.option(
+    "--release",
+    "-r",
+    help="The FreeBSD release to fetch."
+)
+@click.option(
+    "--update/--no-update",
+    "-U/-NU",
+    default=True,
+    help="Update the release to the latest patch level."
+)
+@click.option(
+    "--fetch-updates/--no-fetch-updates",
+    default=True,
+    help="Skip fetching release updates"
+)
 # Compat
-@click.option("--http", "-h", default=False,
-              help="Have --server define a HTTP server instead.", is_flag=True)
+@click.option(
+    "--http",
+    "-h",
+    default=False,
+    help="Have --server define a HTTP server instead.",
+    is_flag=True
+)
 # Basejail Update
 @click.option(
     "--copy-basejail-only",
@@ -63,9 +87,14 @@ __rootcmd__ = True
     help="Update basejail after changes"
 )
 # Compat files
-@click.option("--files", multiple=True,
-              help="Specify the files to fetch from the mirror. "
-                   "(Deprecared: renamed to --file)")
+@click.option(
+    "--files",
+    multiple=True,
+    help=(
+        "Specify the files to fetch from the mirror. "
+        "(Deprecared: renamed to --file)"
+    )
+)
 def cli(
     ctx: IocageClickContext,
     **kwargs
