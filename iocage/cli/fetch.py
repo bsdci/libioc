@@ -66,6 +66,11 @@ __rootcmd__ = True
     help="Update the release to the latest patch level."
 )
 @click.option(
+    "--verify/--no-verify",
+    default=True,
+    help="Verify fetched release asset signatures."
+)
+@click.option(
     "--fetch-updates/--no-fetch-updates",
     default=True,
     help="Skip fetching release updates"
@@ -120,6 +125,8 @@ def cli(
         except Exception:
             logger.error(f"Invalid Release '{release_input}'")
             exit(1)
+
+    release.check_hashes = kwargs["verify"]
 
     if kwargs["copy_basejail_only"] is True:
         try:
