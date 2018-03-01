@@ -39,7 +39,7 @@ __rootcmd__ = True
 def cli(ctx, zpool, mountpoint):
     """Call ZFS set to change the property org.freebsd.ioc:active to yes."""
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.get_zfs()
+    zfs = iocage.lib.ZFS.get_zfs(logger=logger)
 
     iocage_pool = None
 
