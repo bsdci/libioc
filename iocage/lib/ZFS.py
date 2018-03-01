@@ -130,7 +130,8 @@ class ZFS(libzfs.ZFS):
         self,
         source: libzfs.ZFSDataset,
         target: str,
-        snapshot_name: str
+        snapshot_name: str,
+        delete_existing: bool=False
     ) -> None:
         """Clone a ZFSDataset from a source to a target dataset name."""
         _snapshot_name = f"{source.name}@{snapshot_name}"
@@ -141,6 +142,10 @@ class ZFS(libzfs.ZFS):
         except libzfs.ZFSException:
             pass
         else:
+            if delete_existing is False:
+                raise iocage.lib.errors.DatasetExists(
+                    dataset_name=target
+                )
             self.logger.verbose(
                 f"Deleting existing dataset {target}"
             )

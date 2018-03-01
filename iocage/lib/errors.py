@@ -380,6 +380,20 @@ class DistributionEOLWarningDownloadFailed(IocageException):
 # Storage
 
 
+class DatasetExists(IocageException):
+    """Raised when a dataset already exists."""
+
+    def __init__(
+        self,
+        dataset_name: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = f"Dataset already exists: {dataset_name}"
+        super().__init__(msg, *args, **kwargs)
+
+
 class UnmountFailed(IocageException):
     """Raised when an unmount operation fails."""
 

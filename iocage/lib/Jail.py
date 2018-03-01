@@ -847,7 +847,8 @@ class JailGenerator(JailResource):
 
     def clone_to_dataset(
         self,
-        destination_dataset_name: str
+        destination_dataset_name: str,
+        delete_existing: bool=False
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Clones the jails dataset to another dataset with the given name."""
         jailCloneEvent = iocage.lib.events.JailClone(jail=self)
@@ -857,6 +858,7 @@ class JailGenerator(JailResource):
             self.zfs.clone_dataset(
                 source=self.dataset,
                 target=destination_dataset_name,
+                delete_existing=delete_existing,
                 snapshot_name=iocage.lib.ZFS.append_snapshot_datetime("clone")
             )
         except Exception as e:
