@@ -24,7 +24,6 @@
 """iocage Jail module."""
 import typing
 import os
-import re
 import subprocess  # nosec: B404
 import shlex
 
@@ -147,6 +146,17 @@ class JailResource(
         that are not managed by iocage
         """
         self._dataset_name = value
+
+    def autoset_dataset_name(self) -> None:
+        """
+        Automatically determine and set the dataset_name.
+
+        When a jail was created with the new attribute enabled, the dataset
+        might not exist, so that a dataset_name lookup would fail. Calling this
+        method sets the jails dataset_name to a child dataset of the hosts
+        jails dataset with the jails name.
+        """
+        self.dataset_name = f"{self.host.datasets.jails.name}/{self.name}"
 
     @property
     def _dataset_name_from_jail_name(self) -> str:
@@ -683,6 +693,26 @@ class JailGenerator(JailResource):
             raise
 
         # Update fstab to the new dataset
+        for event in self.update_fstab_paths(current_mountpoint):
+            yield event
+
+        yield jailRenameEvent.end()
+
+    def update_fstab_paths(
+        self,
+        old_path_prefix: str,
+        new_path_prefix: typing.Optional[str]=None
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """
+        Update a path in the whole fstab file.
+
+        When no new_path_prefix is provided, the jail's root dataset is used.
+        """
+        if new_path_prefix is None:
+            _new_path_prefix = self.root_dataset.mountpoint
+        else:
+            _new_path_prefix = new_path_prefix
+
         jailFstabUpdateEvent = iocage.lib.events.JailFstabUpdate(
             jail=self
         )
@@ -690,12 +720,11 @@ class JailGenerator(JailResource):
         try:
             self.fstab.read_file()
             self.fstab.replace_path(
-                re.compile(f"^{current_mountpoint}"),
-                self.dataset.mountpoint
+                old_path_prefix,
+                _new_path_prefix
             )
             self.fstab.save()
             yield jailFstabUpdateEvent.end()
-            yield jailRenameEvent.end()
         except BaseException:
             yield jailFstabUpdateEvent.fail()
             raise
@@ -791,12 +820,54 @@ class JailGenerator(JailResource):
         self,
         template: 'JailGenerator'
     ) -> None:
-        """Create a Jail from another Jail."""
+        """Create a Jail from a template Jail."""
         template.require_jail_is_template()
         self.config['release'] = template.config['release']
         self.config['basejail'] = template.config['basejail']
         self.config['basejail_type'] = template.config['basejail_type']
         self._create_from_resource(template)
+
+    def clone_from_jail(
+        self,
+        source_jail: 'JailGenerator'
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """Create a Jail from another Jail."""
+        self.autoset_dataset_name()
+        for event in source_jail.clone_to_dataset(self.dataset_name):
+            yield event
+
+        self.config.clone(source_jail.config.data)
+        self.save()
+
+        fstab_update_generator = self.update_fstab_paths(
+            source_jail.root_dataset.mountpoint
+        )
+        for event in fstab_update_generator:
+            yield event
+
+    def clone_to_dataset(
+        self,
+        destination_dataset_name: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """Clones the jails dataset to another dataset with the given name."""
+        jailCloneEvent = iocage.lib.events.JailClone(jail=self)
+        yield jailCloneEvent.begin()
+
+        try:
+            self.zfs.clone_dataset(
+                source=self.dataset,
+                target=destination_dataset_name,
+                snapshot_name=iocage.lib.ZFS.append_snapshot_datetime("clone")
+            )
+        except Exception as e:
+            err = iocage.lib.errors.ZFSException(
+                *e.args,
+                logger=self.logger
+            )
+            yield jailCloneEvent.fail(err)
+            raise err
+
+        yield jailCloneEvent.end()
 
     def _create_from_resource(
         self,
@@ -1509,3 +1580,11 @@ class Jail(JailGenerator):
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))
+
+    def update_fstab_paths(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+        """Update a path in the whole fstab file."""
+        return list(JailGenerator.update_fstab_paths(self, *args, **kwargs))

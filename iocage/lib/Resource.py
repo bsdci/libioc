@@ -322,8 +322,8 @@ class Resource(metaclass=abc.ABCMeta):
 
     def read_config(self) -> typing.Dict[str, typing.Any]:
         """Read the configuration from disk."""
-        o = self.config_handler.read()  # type: typing.Dict[str, typing.Any]
-        return o
+        data = self.config_handler.read()  # type: typing.Dict[str, typing.Any]
+        return data
 
     @property
     def config_handler(self) -> 'iocage.lib.Config.Prototype.Prototype':

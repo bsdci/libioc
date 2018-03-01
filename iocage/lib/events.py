@@ -404,6 +404,17 @@ class JailExec(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
+class JailClone(JailEvent):
+    """Clone a jail."""
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
 # Release
 
 
@@ -590,6 +601,20 @@ class ZFSSnapshotRename(ZFSEvent):
     ) -> None:
 
         ZFSEvent.__init__(self, zfs_object=snapshot, **kwargs)
+
+
+class ZFSSnapshotClone(ZFSEvent):
+    """Clone a ZFS snapshot to a target."""
+
+    def __init__(
+        self,
+        snapshot: libzfs.ZFSDataset,
+        target: str,
+        **kwargs
+    ) -> None:
+
+        msg = "Could not clone to {target}"
+        ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
 
 
 # CLI

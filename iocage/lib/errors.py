@@ -447,6 +447,18 @@ class DatasetNotJailed(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class ZFSException(IocageException):
+    """Raised when a ZFS pool not available."""
+
+    def __init__(
+        self,
+        *args,
+        **kwargs
+    ) -> None:
+
+        super().__init__(*args, **kwargs)
+
+
 class ZFSPoolInvalid(IocageException, TypeError):
     """Raised when a ZFS pool is invalid."""
 
