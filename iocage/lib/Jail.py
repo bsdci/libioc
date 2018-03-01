@@ -544,6 +544,71 @@ class JailGenerator(JailResource):
 
         self.state.query()
 
+    def restart(
+        self,
+        shutdown: bool=False,
+        force: bool=False
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """Restart the jail."""
+        failed: bool = False
+        jailRestartEvent = iocage.lib.events.JailRestart(jail=self)
+        jailShutdownEvent = iocage.lib.events.JailShutdown(jail=self)
+        JailSoftShutdownEvent = iocage.lib.events.JailSoftShutdown(jail=self)
+        jailStartEvent = iocage.lib.events.JailStart(jail=self)
+
+        yield jailRestartEvent.begin()
+
+        if shutdown is False:
+
+            # soft stop
+            yield JailSoftShutdownEvent.begin()
+            try:
+                self._run_hook("stop")
+                yield JailSoftShutdownEvent.end()
+            except iocage.lib.errors.IocageException:
+                yield JailSoftShutdownEvent.fail(exception=False)
+
+            # service start
+            yield jailStartEvent.begin()
+            try:
+                self._run_hook("start")
+                yield jailStartEvent.end()
+            except iocage.lib.errors.IocageException:
+                yield jailStartEvent.fail(exception=False)
+
+        else:
+
+            # full shutdown
+            yield jailShutdownEvent.begin()
+            try:
+                for event in self.stop():
+                    yield event
+                yield jailShutdownEvent.end()
+            except iocage.lib.errors.IocageException:
+                failed = True
+                yield jailShutdownEvent.fail(exception=False)
+                if force is False:
+                    # only continue when force is enabled
+                    yield jailRestartEvent.fail(exception=False)
+                    return
+
+            # start
+            yield jailStartEvent.begin()
+            try:
+                for event in self.start():
+                    yield event
+                yield jailStartEvent.end()
+            except iocage.lib.errors.IocageException:
+                failed = True
+                yield jailStartEvent.fail(exception=False)
+
+            # respond to failure
+            if failed is True:
+                yield jailRestartEvent.fail(exception=False)
+                return
+
+        yield jailRestartEvent.end()
+
     def destroy(self, force: bool=False) -> None:
         """
         Destroy a Jail and it's datasets.
