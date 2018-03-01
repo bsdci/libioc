@@ -80,8 +80,7 @@ def cli(
     for jail in ioc_jails:
 
         try:
-            print_function(_restart_jail(
-                jail,
+            print_function(jail.restart(
                 shutdown=shutdown,
                 force=force
             ))
@@ -98,69 +97,3 @@ def cli(
         exit(1)
 
     exit(0)
-
-
-def _restart_jail(
-    jail: 'iocage.lib.Jail.JailsGenerator',
-    shutdown: bool=False,
-    force: bool=False
-) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-    failed: bool = False
-    jailRestartEvent = iocage.lib.events.JailRestart(jail=jail)
-    jailShutdownEvent = iocage.lib.events.JailShutdown(jail=jail)
-    JailSoftShutdownEvent = iocage.lib.events.JailSoftShutdown(jail=jail)
-    jailStartEvent = iocage.lib.events.JailStart(jail=jail)
-
-    yield jailRestartEvent.begin()
-
-    if shutdown is False:
-
-        # soft stop
-        yield JailSoftShutdownEvent.begin()
-        try:
-            jail.exec_hook("start")
-            yield JailSoftShutdownEvent.end()
-        except iocage.lib.errors.IocageException:
-            yield JailSoftShutdownEvent.fail(exception=False)
-
-        # service start
-        yield jailStartEvent.begin()
-        try:
-            jail.exec_hook("start")
-            yield jailStartEvent.end()
-        except iocage.lib.errors.IocageException:
-            yield jailStartEvent.fail(exception=False)
-
-    else:
-
-        # full shutdown
-        yield jailShutdownEvent.begin()
-        try:
-            for event in jail.stop():
-                yield event
-            yield jailShutdownEvent.end()
-        except iocage.lib.errors.IocageException:
-            failed = True
-            yield jailShutdownEvent.fail(exception=False)
-            if force is False:
-                # only continue when force is enabled
-                yield jailRestartEvent.fail(exception=False)
-                return
-
-        # start
-        yield jailStartEvent.begin()
-        try:
-            for event in jail.start():
-                yield event
-            yield jailStartEvent.end()
-        except iocage.lib.errors.IocageException:
-            failed = True
-            yield jailStartEvent.fail(exception=False)
-
-        # respond to failure
-        if failed is True:
-            yield jailRestartEvent.fail(exception=False)
-            return
-
-    yield jailRestartEvent.end()
