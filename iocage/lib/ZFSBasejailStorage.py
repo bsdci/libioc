@@ -64,7 +64,8 @@ class ZFSBasejailStorage:
             self.zfs.clone_dataset(
                 source=source_dataset,
                 target=target_dataset_name,
-                snapshot_name=self.jail.name
+                snapshot_name=self.jail.name,
+                delete_existing=True
             )
 
     def _create_mountpoints(self):
