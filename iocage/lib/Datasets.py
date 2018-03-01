@@ -72,7 +72,7 @@ class Datasets:
     def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
         zpools: typing.List[libzfs.ZFSPool] = list(self.zfs.pools)
         for pool in zpools:
-            if self._is_pool_active(pool):
+            if self.is_pool_active(pool):
                 return pool
         return None
 
@@ -126,7 +126,7 @@ class Datasets:
         mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
     ) -> None:
         """Activate the given pool and set its mountpoint."""
-        if self._is_pool_active(pool):
+        if self.is_pool_active(pool):
             msg = f"ZFS pool '{pool.name}' is already active"
             self.logger.warn(msg)
 
@@ -138,9 +138,9 @@ class Datasets:
 
         other_pools = filter(lambda x: x.name != pool.name, self.zfs.pools)
         for other_pool in other_pools:
-            self._deactivate_pool(other_pool)
+            self._set_pool_activation(other_pool, False)
 
-        self._activate_pool(pool)
+        self._set_pool_activation(pool, True)
 
         if (mountpoint is None) and (os.path.ismount('/iocage') is False):
             self.logger.spam(
@@ -152,9 +152,18 @@ class Datasets:
             zfs_property = libzfs.ZFSUserProperty(mountpoint)
             self.root.properties["mountpoint"] = zfs_property
 
-    def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
+    def is_pool_active(
+        self,
+        pool: typing.Optional[libzfs.ZFSPool]=None
+    ) -> bool:
+        """Return True if the pool is activated for iocage."""
+        if isinstance(pool, libzfs.ZFSPool):
+            _pool = pool
+        else:
+            _pool = self.root.pool
+
         return iocage.lib.helpers.parse_user_input(self._get_pool_property(
-            pool,
+            _pool,
             self.ZFS_POOL_ACTIVE_PROPERTY
         )) is True
 
@@ -182,11 +191,9 @@ class Datasets:
         except KeyError:
             return None
 
-    def _activate_pool(self, pool: libzfs.ZFSPool) -> None:
-        self._set_pool_activation(pool, True)
-
-    def _deactivate_pool(self, pool: libzfs.ZFSPool) -> None:
-        self._set_pool_activation(pool, False)
+    def deactivate(self) -> None:
+        """Deactivate a ZFS pool for iocage use."""
+        self._set_pool_activation(self.root.pool, False)
 
     def _set_pool_activation(self, pool: libzfs.ZFSPool, state: bool) -> None:
         value = "yes" if state is True else "no"
