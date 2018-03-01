@@ -366,7 +366,7 @@ class JailGenerator(JailResource):
 
         if self.config["exec_start"] is not None:
             yield jailServicesStartEvent.begin()
-            self._start_services()
+            self._run_hook("start")
             yield jailServicesStartEvent.end()
 
         self._run_hook("poststart")
@@ -474,7 +474,11 @@ class JailGenerator(JailResource):
         return None
 
     def _run_hook(self, hook_name: str):
+        """
+        Execute a jail hook.
 
+        Hooks are executed during the start and stop process of the jail.
+        """
         key = f"exec_{hook_name}"
         value = self.config[key]
 
@@ -489,16 +493,14 @@ class JailGenerator(JailResource):
         lex.whitespace_split = True
         command = list(lex)
 
-        return iocage.lib.helpers.exec(
-            command,
-            logger=self.logger,
-            env=self.env
-        )
-
-    def _start_services(self) -> None:
-        command = str(self.config["exec_start"]).strip().split()
-        self.logger.debug(f"Running exec_start on {self.humanreadable_name}")
-        self.exec(command)
+        if (hook_name == "start") or (hook_name == "stop"):
+            return self.exec(command)
+        else:
+            return iocage.lib.helpers.exec(
+                command,
+                logger=self.logger,
+                env=self.env
+            )
 
     def stop(
         self,
