@@ -57,9 +57,15 @@ class ZFSBasejailStorage:
         )
 
         for basedir in basedirs:
-            source_dataset_name = f"{release.base_dataset.name}/{basedir}"
+            source_dataset = self.zfs.get_dataset(
+                f"{release.base_dataset.name}/{basedir}"
+            )
             target_dataset_name = f"{self.jail.root_dataset_name}/{basedir}"
-            self.clone_zfs_dataset(source_dataset_name, target_dataset_name)
+            self.zfs.clone_dataset(
+                source=source_dataset,
+                target=target_dataset_name,
+                snapshot_name=self.jail.name
+            )
 
     def _create_mountpoints(self):
         for basedir in ["dev", "etc"]:

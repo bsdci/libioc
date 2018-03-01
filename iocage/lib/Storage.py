@@ -27,8 +27,6 @@ import os
 import pwd
 import typing
 
-import libzfs
-
 import iocage.lib.events
 import iocage.lib.helpers
 
@@ -57,9 +55,10 @@ class Storage:
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
         """Clone a release to a the current dataset_name."""
-        self.clone_zfs_dataset(
-            release.root_dataset_name,
-            self.jail.root_dataset_name
+        self.zfs.clone_dataset(
+            source=release.root_dataset,
+            target=self.jail.root_dataset_name,
+            snapshot_name=self.jail.name
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
@@ -134,70 +133,6 @@ class Storage:
             yield renameSnapshotEvent.end()
         except BaseException as e:
             yield renameSnapshotEvent.fail(e)
-
-    def clone_zfs_dataset(
-        self,
-        source: str,
-        target: str
-    ) -> None:
-        """Clone a ZFSDataset from a source to a target dataset name."""
-        snapshot_name = f"{source}@{self.jail.name}"
-
-        # delete target dataset if it already exists
-        try:
-            existing_dataset = self.zfs.get_dataset(target)
-        except libzfs.ZFSException:
-            pass
-        else:
-            self.logger.verbose(
-                f"Deleting existing dataset {target}",
-                jail=self.jail
-            )
-            if existing_dataset.mountpoint is not None:
-                existing_dataset.umount()
-            existing_dataset.delete()
-            del existing_dataset
-
-        # delete existing snapshot if existing
-        existing_snapshot = None
-        try:
-            existing_snapshot = self.zfs.get_snapshot(snapshot_name)
-        except libzfs.ZFSException:
-            pass
-        else:
-            self.logger.verbose(
-                f"Deleting existing snapshot {snapshot_name}",
-                jail=self.jail
-            )
-            existing_snapshot.delete()
-
-        # snapshot release
-        self.zfs.get_dataset(source).snapshot(snapshot_name)
-        snapshot = self.zfs.get_snapshot(snapshot_name)
-
-        # clone snapshot
-        try:
-            self.logger.verbose(
-                f"Cloning snapshot {snapshot_name} to {target}",
-                jail=self.jail
-            )
-            snapshot.clone(target)
-        except libzfs.ZFSException:
-            parent = "/".join(target.split("/")[:-1])
-            self.logger.debug(
-                "Cloning was unsuccessful - "
-                f"trying to create the parent dataset '{parent}' first",
-                jail=self.jail
-            )
-            self.zfs.create_dataset(parent)
-            snapshot.clone(target)
-
-        target_dataset = self.zfs.get_dataset(target)
-        target_dataset.mount()
-        self.logger.verbose(
-            f"Successfully cloned {source} to {target}",
-            jail=self.jail
-        )
 
     def create_jail_mountpoint(self, basedir: str) -> None:
         """Ensure the destination mountpoint exists relative to the jail."""

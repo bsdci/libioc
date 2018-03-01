@@ -23,7 +23,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Updater for Releases and other LaunchableResources like Jails."""
 import typing
-import datetime
 import os.path
 import re
 import shutil
@@ -234,11 +233,6 @@ class Updater:
             path=f"{self.host_updates_dir}/{self.update_conf_name}"
         )
 
-    def _append_datetime(self, text: str) -> str:
-        now = datetime.datetime.utcnow()
-        text += now.strftime("%Y%m%d%H%I%S.%f")
-        return text
-
     def fetch(
         self
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
@@ -285,7 +279,9 @@ class Updater:
     ], None, None]:
         """Apply the fetched updates to the associated release or jail."""
         dataset = self.host_updates_dataset
-        snapshot_name = self._append_datetime(f"{dataset.name}@pre-update")
+        snapshot_name = iocage.lib.ZFS.append_snapshot_datetime(
+            f"{dataset.name}@pre-update"
+        )
 
         runReleaseUpdateEvent = iocage.lib.events.RunReleaseUpdate(
             self.release
