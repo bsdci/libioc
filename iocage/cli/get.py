@@ -22,13 +22,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Get a configuration value from the CLI."""
-import typing
 import click
 
 import iocage.lib.errors
 import iocage.lib.Host
 import iocage.lib.Jail
 import iocage.lib.Logger
+
+from .shared.click import IocageClickContext
 
 
 @click.command(
@@ -49,15 +50,18 @@ import iocage.lib.Logger
     help="Get the currently activated zpool.",
     is_flag=True
 )
-@click.option(
-    "--log-level", "-d",
-    default="info"
-)
-def cli(ctx, prop, _all, _pool, jail, log_level):
+def cli(
+    ctx: IocageClickContext,
+    prop: str,
+    _all: bool,
+    _pool: bool,
+    jail: str
+) -> None:
     """Get a list of jails and print the property."""
     logger = ctx.parent.logger
-    logger.print_level = log_level
     host = iocage.lib.Host.Host(logger=logger)
+
+    prop: typing.Optional[str] = None
 
     if _pool is True:
         try:
@@ -120,15 +124,18 @@ def _print_property(key: str, value: str) -> None:
 def _lookup_config_value(
     resource: 'iocage.lib.Resource.Resource',
     key: str
-) -> typing.Any:
-    return iocage.lib.helpers.to_string(resource.config[key])
+) -> str:
+    return str(iocage.lib.helpers.to_string(resource.config[key]))
 
 
-def _lookup_jail_value(resource, key: str) -> typing.Any:
+def _lookup_jail_value(
+    resource: 'iocage.lib.LaunchableResource.LaunchableResource',
+    key: str
+) -> str:
 
     if key == "running":
         value = resource.running
     else:
         value = resource.getstring(key)
 
-    return iocage.lib.helpers.to_string(value)
+    return str(iocage.lib.helpers.to_string(value))

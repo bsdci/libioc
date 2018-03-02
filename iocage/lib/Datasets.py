@@ -85,7 +85,7 @@ class Datasets:
         return pool
 
     @property
-    def root(self):
+    def root(self) -> libzfs.ZFSDataset:
         """Return the iocage root dataset."""
         try:
             return self._root

@@ -169,7 +169,7 @@ def _print_list(
         print(separator.join(_lookup_resource_values(resource, columns)))
 
 
-def _print_json(
+def _print_json(  # noqa: T484
     resources: typing.Generator[
         iocage.lib.Jails.JailsGenerator,
         None,
@@ -177,7 +177,7 @@ def _print_json(
     ],
     columns: list,
     **json_dumps_args
-):
+) -> None:
 
     if "indent" not in json_dumps_args.keys():
         json_dumps_args["indent"] = 2
@@ -196,7 +196,10 @@ def _print_json(
     print(json.dumps(output, **json_dumps_args))
 
 
-def _lookup_resource_values(resource, columns) -> typing.List[str]:
+def _lookup_resource_values(
+    resource: 'iocage.lib.Resource.Resource',
+    columns: typing.List[str]
+) -> typing.List[str]:
     return list(map(
         lambda column: str(resource.getstring(column)),
         columns

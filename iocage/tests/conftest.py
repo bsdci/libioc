@@ -42,7 +42,7 @@ import iocage.lib.Release
 _force_clean = False
 
 
-def pytest_addoption(parser: typing.Any):
+def pytest_addoption(parser: typing.Any) -> None:
     """Add force option to pytest."""
     parser.addoption(
         "--force-clean",

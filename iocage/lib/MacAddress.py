@@ -42,7 +42,7 @@ class MacAddress:
         self.address = mac_address
 
     @property
-    def address(self):
+    def address(self) -> str:
         """Return the actual hardware address."""
         return self._address
 

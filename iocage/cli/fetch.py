@@ -63,10 +63,15 @@ __rootcmd__ = True
     help="Update basejail after changes"
 )
 # Compat files
-@click.option("--files", multiple=True,
-              help="Specify the files to fetch from the mirror. "
-                   "(Deprecared: renamed to --file)")
-def cli(
+@click.option(
+    "--files",
+    multiple=True,
+    help=(
+        "Specify the files to fetch from the mirror. "
+        "(Deprecared: renamed to --file)"
+    )
+)
+def cli(  # noqa: T484
     ctx: IocageClickContext,
     **kwargs
 ) -> None:

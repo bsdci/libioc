@@ -99,7 +99,16 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
         parse_user_input = iocage.lib.helpers.parse_user_input
         return dict([(x, parse_user_input(y)) for (x, y) in data.items()])
 
-    def _to_string(self, value) -> str:
+    def _to_string(
+        self,
+        value: typing.Union[
+            str,
+            bool,
+            int,
+            None,
+            typing.List[typing.Union[str, bool, int]]
+        ]
+    ) -> str:
         """Transform config data to iocage_legacy compatible values."""
         return str(iocage.lib.helpers.to_string(
             value,

@@ -41,7 +41,7 @@ class ResolverProp(collections.MutableSequence):
     none_matches: typing.List[str] = ["/dev/null", "-", ""]
     _entries: typing.List[str] = []
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         config: 'iocage.lib.Config.Jail.JailConfig.JailConfig',
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
@@ -147,11 +147,11 @@ class ResolverProp(collections.MutableSequence):
         self._entries.insert(index, value)
         self.__notify()
 
-    def __delitem__(self, key) -> None:
+    def __delitem__(self, key: str) -> None:
         """Delete the nameserver at the given position."""
         del self._entries[key]
 
-    def __getitem__(self, key) -> typing.Any:
+    def __getitem__(self, key: str) -> typing.Any:
         """Get the nameserver from the given position."""
         return self._entries[key]
 
@@ -159,13 +159,13 @@ class ResolverProp(collections.MutableSequence):
         """Return the number of nameservers."""
         return self._entries.__len__()
 
-    def __setitem__(  # noqa: T484
+    def __setitem__(
         self,
         key: str,
         value: str
     ) -> None:
         """Set the nameserver at a given position."""
-        list.__setitem__(self, key, value)   # noqa: T484
+        list.__setitem__(self, key, value)
         self.__notify()
 
     def __str__(self):

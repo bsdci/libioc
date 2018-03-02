@@ -60,7 +60,7 @@ def init_zfs(
 
 
 def init_host(
-    self,
+    self: typing.Any,
     host: typing.Optional[iocage.lib.Host.HostGenerator]=None
 ) -> iocage.lib.Host.HostGenerator:
     """Attach or initialize a Host object."""
@@ -79,7 +79,7 @@ def init_host(
 
 
 def init_distribution(
-    self,
+    self: typing.Any,
     distribution: typing.Optional[iocage.lib.Distribution.Distribution]=None
 ) -> iocage.lib.Host.HostGenerator:
     """Attach or initialize a Distribution object."""
@@ -98,7 +98,7 @@ def init_distribution(
 
 
 def init_logger(
-    self,
+    self: typing.Any,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> iocage.lib.Logger.Logger:
     """Attach or initialize a Logger object."""
@@ -459,7 +459,7 @@ def get_random_uuid() -> str:
     ))
 
 
-def get_basedir_list(distribution_name="FreeBSD"):
+def get_basedir_list(distribution_name="FreeBSD") -> typing.List[str]:
     """Return the list of basedirs according to the host distribution."""
     basedirs = [
         "bin",

@@ -60,7 +60,7 @@ class JailResource(
         self,
         host: 'iocage.lib.Host.HostGenerator',
         jail: typing.Optional['JailGenerator']=None,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> None:
 
         self.__jails_dataset_name = host.datasets.jails.name
@@ -71,7 +71,7 @@ class JailResource(
 
         iocage.lib.LaunchableResource.LaunchableResource.__init__(
             self,
-            **kwargs
+            **kwargs  # noqa: T484
         )
 
     @property
@@ -948,7 +948,7 @@ class JailGenerator(JailResource):
     def exec(
         self,
         command: typing.List[str],
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> typing.Tuple[subprocess.Popen, str, str]:
         """
         Execute a command in a running jail.
@@ -964,7 +964,7 @@ class JailGenerator(JailResource):
             command,
             logger=self.logger,
             env=self.env,
-            **kwargs
+            **kwargs  # noqa: T484
         )
 
         return child, stdout, stderr
@@ -1229,7 +1229,7 @@ class JailGenerator(JailResource):
             iocage.lib.helpers.exec(command, logger=self.logger)
 
     @property
-    def _resource_limit_config_keys(self):
+    def _resource_limit_config_keys(self) -> typing.List[str]:
         return [
             "cputime",
             "datasize",
@@ -1306,7 +1306,7 @@ class JailGenerator(JailResource):
         if defaultrouter6:
             self._configure_route(defaultrouter6, ipv6=True)
 
-    def _configure_route(self, gateway, ipv6=False) -> None:
+    def _configure_route(self, gateway: str, ipv6: bool=False) -> None:
 
         ip_version = 4 + 2 * (ipv6 is True)
 
@@ -1328,13 +1328,12 @@ class JailGenerator(JailResource):
             ["default", gateway]
         )
 
-    def require_jail_is_template(self, **kwargs) -> None:
+    def require_jail_is_template(self) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is False:
             raise iocage.lib.errors.JailNotTemplate(
                 jail=self,
-                logger=self.logger,
-                **kwargs
+                logger=self.logger
             )
 
     def require_storage_backend(self) -> None:
@@ -1348,7 +1347,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailIsTemplate(
                 jail=self,
                 logger=self.logger,
-                **kwargs
+                **kwargs  # noqa: T484
             )
 
     def require_jail_not_existing(self, **kwargs) -> None:
@@ -1357,7 +1356,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailAlreadyExists(
                 jail=self,
                 logger=self.logger,
-                **kwargs
+                **kwargs  # noqa: T484
             )
 
     def require_jail_existing(self, **kwargs) -> None:
@@ -1366,7 +1365,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailDoesNotExist(
                 jail=self,
                 logger=self.logger,
-                **kwargs
+                **kwargs  # noqa: T484
             )
 
     def require_jail_stopped(self, **kwargs) -> None:
@@ -1375,7 +1374,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailAlreadyRunning(
                 jail=self,
                 logger=self.logger,
-                **kwargs
+                **kwargs  # noqa: T484
             )
 
     def require_jail_running(self, **kwargs) -> None:
@@ -1384,7 +1383,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailNotRunning(
                 jail=self,
                 logger=self.logger,
-                **kwargs
+                **kwargs  # noqa: T484
             )
 
     def _teardown_mounts(self) -> None:
@@ -1562,26 +1561,26 @@ class JailGenerator(JailResource):
 class Jail(JailGenerator):
     """Synchronous wrapper of JailGenerator."""
 
-    def start(  # noqa: T484
+    def start(
         self,
         *args,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Start the jail."""
         return list(JailGenerator.start(self, *args, **kwargs))
 
-    def stop(  # noqa: T484
+    def stop(
         self,
         *args,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Stop the jail."""
         return list(JailGenerator.stop(self, *args, **kwargs))
 
-    def rename(  # noqa: T484
+    def rename(
         self,
         *args,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))

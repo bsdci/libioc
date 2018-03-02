@@ -243,7 +243,7 @@ class Resource(metaclass=abc.ABCMeta):
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
-    def config_type(self, value: typing.Optional[int]):
+    def config_type(self, value: typing.Optional[int]) -> None:
         """Set the resources config type enum index (JSON, UCL or ZFS)."""
         if value is None:
             self._config_type = None
@@ -296,7 +296,11 @@ class Resource(metaclass=abc.ABCMeta):
         dataset: libzfs.ZFSDataset = self.zfs.get_dataset(dataset_name)
         return dataset
 
-    def get_or_create_dataset(self, name: str, **kwargs) -> libzfs.ZFSDataset:
+    def get_or_create_dataset(
+        self,
+        name: str,
+        **kwargs  # noqa: T484
+    ) -> libzfs.ZFSDataset:
         """
         Get or create a child dataset.
 
@@ -371,7 +375,7 @@ class DefaultResource(Resource):
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> None:
 
         Resource.__init__(
@@ -479,7 +483,7 @@ class ListableResource(list, Resource):
     def filters(
         self,
         value: typing.Iterable[typing.Union[iocage.lib.Filter.Term, str]]
-    ):
+    ) -> None:
         """Set the filters that are applied on the list items."""
         if isinstance(value, iocage.lib.Filter.Terms):
             self._filters = value
@@ -490,7 +494,7 @@ class ListableResource(list, Resource):
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset,
-        *args,
-        **kwargs
+        *args,  # noqa: T484
+        **kwargs  # noqa: T484
     ) -> Resource:
         pass

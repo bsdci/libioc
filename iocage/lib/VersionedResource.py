@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage module for resource snapshots."""
+import typing
 import libzfs
 
 import iocage.lib.Resource
@@ -34,7 +35,7 @@ class ResourceSnapshots:
     def __init__(self, resource: iocage.lib.Resource.Resource) -> None:
         self.resource = resource
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterator[libzfs.ZFSSnapshot]:
         """Return an iterator over the snapshots."""
         return self.resource.dataset.snapshots
 

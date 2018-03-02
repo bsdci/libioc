@@ -67,8 +67,7 @@ class TestJail(object):
         local_release: 'iocage.lib.Release.ReleaseGenerator',
         logger: 'iocage.lib.Logger.Logger',
         zfs: libzfs.ZFS,
-        root_dataset,
-        capsys
+        root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if jails can be created."""
         jail = iocage.lib.Jail.Jail(
@@ -141,8 +140,7 @@ class TestNullFSBasejail(object):
         local_release: 'iocage.lib.Release.ReleaseGenerator',
         logger: 'iocage.lib.Logger.Logger',
         zfs: libzfs.ZFS,
-        root_dataset,
-        capsys
+        root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if NullFS basejails can be created."""
         jail = iocage.lib.Jail.Jail(

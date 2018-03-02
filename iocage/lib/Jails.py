@@ -49,9 +49,9 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
-        host=None,
-        logger=None,
-        zfs=None
+        host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -67,18 +67,18 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset,
-        *args,
-        **kwargs
+        *class_args,  # noqa: T484
+        **class_kwargs  # noqa: T484
     ) -> iocage.lib.Jail.JailGenerator:
 
-        kwargs["data"] = {
+        class_kwargs["data"] = {
             "id": dataset.name.split("/").pop()
         }
-        kwargs["dataset"] = dataset
-        kwargs["logger"] = self.logger
-        kwargs["host"] = self.host
-        kwargs["zfs"] = self.zfs
-        jail = self._class_jail(*args, **kwargs)
+        class_kwargs["dataset"] = dataset
+        class_kwargs["logger"] = self.logger
+        class_kwargs["host"] = self.host
+        class_kwargs["zfs"] = self.zfs
+        jail = self._class_jail(*class_args, **class_kwargs)
 
         if jail.identifier in self.states:
             self.logger.spam(

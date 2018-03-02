@@ -51,7 +51,7 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         distribution: typing.Optional[
             'iocage.lib.Distribution.Distribution'
         ]=None,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> None:
         self._distribution = distribution
         iocage.lib.Resource.Resource.__init__(self, **kwargs)
