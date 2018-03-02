@@ -60,15 +60,12 @@ def cli_list_or_create(
 )
 @click.pass_context
 @click.argument("identifier", nargs=1, required=True)
-def cli_create(*args, **kwargs) -> None:
+def cli_create(ctx: IocageClickContext, identifier: str) -> None:
     """Create a snapshot."""
-    _cli_create(*args, **kwargs)
+    _cli_create(ctx, identifier)
 
 
-def _cli_create(
-    ctx: IocageClickContext,
-    identifier: str
-) -> None:
+def _cli_create(ctx: IocageClickContext, identifier: str) -> None:
     try:
         ioc_jail, snapshot_name = _parse_identifier(
             ctx=ctx.parent,
@@ -110,9 +107,9 @@ def cli_rollback(
 )
 @click.pass_context
 @click.argument("jail", nargs=1, required=True)
-def cli_list(*args, **kwargs) -> None:
+def cli_list(ctx: IocageClickContext, jail: str) -> None:
     """List existing snapshots."""
-    _cli_list(*args, **kwargs)
+    _cli_list(ctx, jail)
 
 
 def _cli_list(ctx: IocageClickContext, jail: str) -> None:
