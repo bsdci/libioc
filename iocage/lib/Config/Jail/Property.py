@@ -37,7 +37,7 @@ CLASSES: dict = dict(
 )
 
 
-def init_property(property_name: str, **kwargs) -> typing.Union[
+def init_property(property_name: str, **kwargs) -> typing.Union[  # noqa: T484
     iocage.lib.Config.Jail.Properties.Addresses.AddressesProp,
     iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp,
     iocage.lib.Config.Jail.Properties.Resolver.ResolverProp

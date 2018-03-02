@@ -53,7 +53,7 @@ class ZFS(libzfs.ZFS):
     def create_dataset(
         self,
         dataset_name: str,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> libzfs.ZFSDataset:
         """Automatically get the pool and create a dataset from its name."""
         pool = self.get_pool(dataset_name)
@@ -66,7 +66,7 @@ class ZFS(libzfs.ZFS):
     def get_or_create_dataset(
         self,
         dataset_name: str,
-        **kwargs
+        **kwargs  # noqa: T484
     ) -> libzfs.ZFSDataset:
         """Find or create the dataset, then return it."""
         try:

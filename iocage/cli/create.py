@@ -37,7 +37,11 @@ from .shared.click import IocageClickContext
 __rootcmd__ = True
 
 
-def validate_count(ctx, param, value):
+def validate_count(
+    ctx: IocageClickContext,
+    param: str,
+    value: str
+) -> None:
     """Take a string, removes the commas and returns an int."""
     if isinstance(value, str):
         try:

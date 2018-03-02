@@ -79,9 +79,9 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
             rc_conf = self.jail.rc_conf
             rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
 
-    def _get_host_hostname(self):
+    def _get_host_hostname(self) -> str:
         try:
-            return self.data["host_hostname"]
+            return str(self.data["host_hostname"])
         except KeyError:
             return self.jail.humanreadable_name
 

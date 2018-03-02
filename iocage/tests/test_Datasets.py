@@ -55,7 +55,7 @@ class TestDatasets(object):
         MockedDatasets: typing.Generator[DatasetsMock, None, None],
         pool: libzfs.ZFSPool,
         logger: 'iocage.lib.Logger.Logger'
-    ):
+    ) -> None:
         """Test if a pool can be activated."""
         datasets = DatasetsMock(pool=pool, logger=logger)
         datasets.deactivate()

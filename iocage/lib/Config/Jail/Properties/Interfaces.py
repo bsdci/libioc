@@ -35,7 +35,7 @@ class InterfaceProp(dict):
     property_name: str = "interfaces"
     delimiter: str = ","
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         config: typing.Optional[
             'iocage.lib.Config.Jail.JailConfig.JailConfig'
@@ -106,13 +106,6 @@ class InterfaceProp(dict):
 
         if notify is True:
             self.__notify()
-
-    def __setitem__(self, key, values):
-        """Set the bridge configuration of the specified jail NIC."""
-        if key in self.keys():
-            dict.__delitem__(self, key)
-
-        self.add(key, values)
 
     def __delitem__(self, key) -> None:
         """Remove a jail NIC."""

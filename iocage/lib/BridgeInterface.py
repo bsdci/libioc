@@ -50,7 +50,7 @@ class BridgeInterface:
         if secure is not None:
             self.secure = secure
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return the internal interface name string.
 

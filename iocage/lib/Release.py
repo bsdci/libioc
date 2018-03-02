@@ -52,8 +52,9 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     """Resource that represents an iocage release."""
 
     _release: typing.Optional['ReleaseGenerator'] = None
+    _hashes: typing.Optional[typing.Dict[str, str]] = None
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         host: iocage.lib.Host.HostGenerator,
         release: typing.Optional['ReleaseGenerator']=None,
@@ -153,7 +154,7 @@ class ReleaseGenerator(ReleaseResource):
     _assets: typing.List[str]
     _mirror_url: typing.Optional[str] = None
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         name: str,
         host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
@@ -235,7 +236,7 @@ class ReleaseGenerator(ReleaseResource):
         return self._assets
 
     @assets.setter
-    def assets(self, value: typing.Union[typing.List[str], str]):
+    def assets(self, value: typing.Union[typing.List[str], str]) -> None:
         """Set the list of release assets."""
         value = [value] if isinstance(value, str) else value
         self._assets = list(map(
@@ -320,7 +321,7 @@ class ReleaseGenerator(ReleaseResource):
         return True
 
     @property
-    def newer_than_host(self):
+    def newer_than_host(self) -> bool:
         """Return True if the release is newer than the host."""
         host_release_name = self._pad_release_name(self.host.release_version)
         release_name = self._pad_release_name(self.name)
@@ -357,22 +358,27 @@ class ReleaseGenerator(ReleaseResource):
             return pool
 
     @property
-    def hashes(self):
+    def hashes(self) -> typing.Dict[str, str]:
         """Return the releases asset hashes."""
-        if not self._hashes:
+        if self._hashes is None:
             if not os.path.isfile(self.__get_hashfile_location()):
                 self.logger.spam("hashes have not yet been downloaded")
                 self._fetch_hashes()
             self._hashes = self.read_hashes()
 
-        return self._hashes
+        if isinstance(self._hashes, dict):
+            return self._hashes
+        else:
+            raise iocage.lib.errors.ReleaseAssetHashesUnavailable(
+                logger=self.logger
+            )
 
     @property
     def _supported_url_schemes(self) -> typing.List[str]:
         return ["https", "http", "ftp"]
 
     @property
-    def hbds_release_branch(self):
+    def hbds_release_branch(self) -> str:
         """Translate the release into a HardenedBSD release git branch name."""
         if self._hbsd_release_branch is not None:
             return self._hbsd_release_branch
@@ -396,7 +402,7 @@ class ReleaseGenerator(ReleaseResource):
         with open(source_file, "r") as f:
             hbsd_update_conf = ucl.load(f.read())
             self._hbsd_release_branch = hbsd_update_conf["branch"]
-            return self._hbsd_release_branch
+            return str(self._hbsd_release_branch)
 
     def fetch(
         self,
@@ -600,7 +606,7 @@ class ReleaseGenerator(ReleaseResource):
         hash_file = self.host.distribution.hash_file
         return f"{self.download_directory}/{hash_file}"
 
-    def _get_asset_location(self, asset_name) -> str:
+    def _get_asset_location(self, asset_name: str) -> str:
         return f"{self.download_directory}/{asset_name}.txz"
 
     def _extract_assets(self) -> None:
@@ -688,7 +694,11 @@ class ReleaseGenerator(ReleaseResource):
                 sha256.update(block)
         return sha256.hexdigest()
 
-    def _check_tar_files(self, tar_infos, asset_name: str) -> None:
+    def _check_tar_files(
+        self,
+        tar_infos: typing.List[typing.Any],
+        asset_name: str
+    ) -> None:
         for i in tar_infos:
             self._check_tar_info(i, asset_name)
 

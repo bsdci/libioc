@@ -47,7 +47,11 @@ class Term(list):
 
     glob_characters = ["*", "+"]
 
-    def __init__(self, key, values=list()) -> None:
+    def __init__(
+        self,
+        key: str,
+        values: typing.Union[str, typing.List[str]]=[]
+    ) -> None:
         self.key = key
 
         if values is None:

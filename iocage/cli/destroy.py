@@ -33,6 +33,8 @@ import iocage.lib.Logger
 import iocage.lib.Releases
 import iocage.lib.Resource
 
+from .shared.click import IocageClickContext
+
 __rootcmd__ = True
 
 
@@ -48,12 +50,14 @@ __rootcmd__ = True
               help="Destroy the download dataset of the specified RELEASE as"
                    " well.")
 @click.argument("filters", nargs=-1)
-def cli(ctx,
-        force: bool=False,
-        release: bool=False,
-        recursive: bool=False,
-        download: bool=False,
-        filters: typing.Optional[iocage.lib.Filter.Terms]=None) -> None:
+def cli(
+    ctx: IocageClickContext,
+    force: bool=False,
+    release: bool=False,
+    recursive: bool=False,
+    download: bool=False,
+    filters: typing.Optional[iocage.lib.Filter.Terms]=None
+) -> None:
     """
     Destroy a jail, release or template.
 

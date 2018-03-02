@@ -50,13 +50,13 @@ class AddressSet(set):
         set.__init__(self)
         self.property_name = property_name
 
-    def add(self, value, notify=True) -> None:
+    def add(self, value: str, notify: bool=True) -> None:
         """Add an address to the set."""
         set.add(self, value)
         if notify:
             self.__notify()
 
-    def remove(self, value, notify=True) -> None:
+    def remove(self, value: str, notify: bool=True) -> None:
         """Remove an address from the set."""
         set.remove(self, value)
         if notify:

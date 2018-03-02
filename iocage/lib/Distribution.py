@@ -42,7 +42,7 @@ class EOLParser(html.parser.HTMLParser):
     td_counter: int = 0
     current_branch: str = ""
 
-    def handle_starttag(self, tag, attrs) -> None:
+    def handle_starttag(self, tag: str, attrs: typing.Dict[str, str]) -> None:
         """Handle opening HTML tags."""
         if tag == "td":
             self.in_id = True

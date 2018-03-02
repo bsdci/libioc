@@ -43,7 +43,7 @@ class FstabLine(dict):
         for key in keys:
             self[key] = data[key]
 
-    def _escape(self, key) -> str:
+    def _escape(self, key: str) -> str:
         return str(self[key].replace(" ", "\ "))
 
     def __str__(self) -> str:
@@ -63,7 +63,7 @@ class FstabLine(dict):
 
         return output
 
-    def __hash__(self):
+    def __hash__(self) -> hash:
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
@@ -87,7 +87,7 @@ class FstabCommentLine(dict):
         """Return the untouched comment line string."""
         return str(self["line"])
 
-    def __hash__(self):
+    def __hash__(self) -> typing.Any:
         """
         Return a random hash value.
 
@@ -397,16 +397,16 @@ class Fstab(
         """Return the number of lines in the fstab file."""
         return list.__len__(list(self.__iter__()))
 
-    def __delitem__(self, index):
+    def __delitem__(self, index: int) -> None:
         """Delete an FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         """Get the FstabLine at the given index."""
         return list(self.__iter__())[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value) -> None:
         """Set or overwrite the FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__setitem__(real_index, value)
