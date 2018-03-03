@@ -52,7 +52,7 @@ from .shared.click import IocageClickContext
 )
 def cli(
     ctx: IocageClickContext,
-    prop: str,
+    prop: typing.Optional[str],
     _all: bool,
     _pool: bool,
     jail: str
@@ -60,8 +60,6 @@ def cli(
     """Get a list of jails and print the property."""
     logger = ctx.parent.logger
     host = iocage.lib.Host.Host(logger=logger)
-
-    prop: typing.Optional[str] = None
 
     if _pool is True:
         try:
