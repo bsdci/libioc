@@ -389,6 +389,14 @@ class HostReleaseUnknown(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class HostUserlandVersionUnknown(IocageException):
+    """Raised when the hosts userland version could not be detected."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"Could not determine the hosts userland version"
+        super().__init__(msg, *args, **kwargs)
+
+
 class DistributionEOLWarningDownloadFailed(IocageException):
     """Raised when downloading EOL warnings failed."""
 
