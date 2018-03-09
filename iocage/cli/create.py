@@ -39,9 +39,13 @@ __rootcmd__ = True
 
 def validate_count(
     ctx: IocageClickContext,
-    param: str,
-    value: str
-) -> None:
+    param: typing.Union[
+        click.Option,
+        typing.Union[click.Option, click.Parameter],
+        typing.Union[bool, int, str]
+    ],
+    value: typing.Any
+) -> int:
     """Take a string, removes the commas and returns an int."""
     if isinstance(value, str):
         try:
