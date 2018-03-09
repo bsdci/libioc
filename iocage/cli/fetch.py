@@ -35,17 +35,17 @@ from .shared.click import IocageClickContext
 __rootcmd__ = True
 
 
-@click.command(context_settings=dict(
-    max_content_width=400, ),
-    name="fetch", help="Fetch a version of FreeBSD for jail usage or a"
-                       " preconfigured plugin.")
+@click.command(
+    context_settings=dict(max_content_width=400),
+    name="fetch",
+    help="Fetch and update a Release to create Jails from them."
+)
 @click.pass_context
 @click.option("--url", "-u",
               help="Remote URL with path to the release/snapshot directory")
 @click.option("--file", "-F", multiple=True,
               help="Specify the files to fetch from the mirror.")
 @click.option("--release", "-r",
-              # type=release_choice(),
               help="The FreeBSD release to fetch.")
 @click.option("--update/--no-update", "-U/-NU", default=True,
               help="Update the release to the latest patch level.")
