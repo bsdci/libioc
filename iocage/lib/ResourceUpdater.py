@@ -78,7 +78,10 @@ class Updater:
     def host_updates_dataset(self) -> libzfs.ZFSDataset:
         """Return the updates dataset."""
         dataset_name = self.host_updates_dataset_name
-        return self.resource.zfs.get_or_create_dataset(dataset_name)
+        zfs = self.resource.zfs
+        _dataset = zfs.get_or_create_dataset(dataset_name)
+        dataset = _dataset  # type: libzfs.ZFSDataset
+        return dataset
 
     @property
     def host_updates_dir(self) -> str:
