@@ -295,7 +295,7 @@ class Updater:
         yield runReleaseUpdateEvent.begin()
 
         # create snapshot before the changes
-        dataset.snapshot(snapshot_name, recursive=True)
+        dataset.snapshot(name=snapshot_name, recursive=True)
 
         def _rollback_snapshot() -> None:
             dataset.umount()
