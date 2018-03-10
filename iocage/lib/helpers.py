@@ -125,10 +125,10 @@ def get_userland_version() -> str:
     # ToDo: move out of the function
     pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z0-9\-]+)\"")
     content = f.read()
-    match = pattern.search(content)
-    if isinstance(match, typing.Match[str]):
-        return match[1]
-    raise libiocage.lib.errors.HostUserlandVersionUnknown()
+    match = pattern.search(content)  # type: typing.Match[str]
+    if match is None:
+        raise iocage.lib.errors.HostUserlandVersionUnknown()
+    return match[1]
 
 
 def exec(  # noqa: T484
@@ -459,7 +459,7 @@ def get_random_uuid() -> str:
     ))
 
 
-def get_basedir_list(distribution_name="FreeBSD") -> typing.List[str]:
+def get_basedir_list(distribution_name: str="FreeBSD") -> typing.List[str]:
     """Return the list of basedirs according to the host distribution."""
     basedirs = [
         "bin",

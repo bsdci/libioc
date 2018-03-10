@@ -213,7 +213,13 @@ class ResourceConfigFile(ResourceConfig, dict):
         dict.__setitem__(self, key, val)
         self._file_content_changed = True
 
-    def __getitem__(self, key):
+    def __getitem__(
+        self,
+        key: str
+    ) -> typing.Optional[typing.Union[str, bool]]:
         """Get a value of the config file."""
         val = dict.__getitem__(self, key)
-        return iocage.lib.helpers.parse_user_input(val)
+        output = iocage.lib.helpers.parse_user_input(val)
+        if isinstance(output, str) or isinstance(output, bool):
+            return output
+        return None

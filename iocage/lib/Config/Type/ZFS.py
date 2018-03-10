@@ -141,10 +141,15 @@ class ConfigZFS(BaseConfigZFS):
     def __init__(
         self,
         dataset: libzfs.ZFSDataset,
-        **kwargs
+        file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
         self._dataset = dataset
-        iocage.lib.Config.Dataset.DatasetConfig.__init__(self, **kwargs)
+        iocage.lib.Config.Dataset.DatasetConfig.__init__(
+            self,
+            file=file,
+            logger=logger
+        )
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
@@ -152,16 +157,26 @@ class ConfigZFS(BaseConfigZFS):
         return self._dataset
 
 
-class ResourceConfigZFS(ConfigZFS):
+class ResourceConfigZFS(BaseConfigZFS):
     """iocage ZFS resource configuration for legacy support."""
+
+    _dataset: typing.Optional[libzfs.ZFSDataset]
 
     def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
-        **kwargs
+        file: typing.Optional[str]=None,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
         self.resource = resource
-        ConfigZFS.__init__(self, **kwargs)
+        self._dataset = dataset
+        iocage.lib.Config.Dataset.DatasetConfig.__init__(
+            self,
+            file=file,
+            dataset=dataset,
+            logger=logger
+        )
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:

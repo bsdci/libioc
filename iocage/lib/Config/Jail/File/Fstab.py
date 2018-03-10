@@ -63,7 +63,7 @@ class FstabLine(dict):
 
         return output
 
-    def __hash__(self) -> hash:
+    def __hash__(self) -> int:
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
@@ -87,7 +87,7 @@ class FstabCommentLine(dict):
         """Return the untouched comment line string."""
         return str(self["line"])
 
-    def __hash__(self) -> typing.Any:
+    def __hash__(self) -> int:
         """
         Return a random hash value.
 
@@ -106,7 +106,7 @@ class FstabAutoPlaceholderLine(dict):
         """Never print virtual lines."""
         raise NotImplementedError("this is a virtual fstab line")
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Do not return a hash because placeholders have none."""
         return hash(None)
 
@@ -267,11 +267,11 @@ class Fstab(
             self._save_file_handle(f)
             self.logger.verbose(f"{self.path} written")
 
-    def _save_file_handle(self, f) -> None:
+    def _save_file_handle(self, f: typing.TextIO) -> None:
         f.write(self.__str__())
         f.truncate()
 
-    def _read_file_handle(self, f) -> None:
+    def _read_file_handle(self, f: typing.TextIO) -> None:
         self.parse_lines(f.read())
 
     def update_and_save(
@@ -298,13 +298,13 @@ class Fstab(
 
     def new_line(
         self,
-        source,
-        destination,
-        fs_type="nullfs",
-        options="ro",
-        dump="0",
-        passnum="0",
-        comment=None
+        source: str,
+        destination: str,
+        fs_type: str="nullfs",
+        options: str="ro",
+        dump: str="0",
+        passnum: str="0",
+        comment: typing.Optional[str]=None
     ) -> None:
         """
         Append a new line to the fstab file.
@@ -397,16 +397,28 @@ class Fstab(
         """Return the number of lines in the fstab file."""
         return list.__len__(list(self.__iter__()))
 
-    def __delitem__(self, index: int) -> None:
+    def __delitem__(self, index: int) -> None:  # noqa: T484
         """Delete an FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> typing.Union[  # noqa: T484
+        FstabLine,
+        FstabCommentLine,
+        FstabAutoPlaceholderLine
+    ]:
         """Get the FstabLine at the given index."""
         return list(self.__iter__())[index]
 
-    def __setitem__(self, index: int, value) -> None:
+    def __setitem__(  # noqa: T484
+        self,
+        index: int,
+        value: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
         """Set or overwrite the FstabLine at the given index."""
         real_index = self._get_real_index(index)
         self._lines.__setitem__(real_index, value)
@@ -488,7 +500,11 @@ class Fstab(
 
         return iter(output)
 
-    def __contains__(self, value):
+    def __contains__(self, value: typing.Union[  # noqa: T484
+        FstabBasejailLine,
+        FstabCommentLine,
+        FstabLine
+    ]) -> bool:
         """Check if the FstabFile already contains a specific line."""
         for entry in self:
             if value["destination"] == entry["destination"]:

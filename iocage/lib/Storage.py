@@ -160,7 +160,7 @@ class Storage:
             )
 
     # ToDo: Remove unused function?
-    def _mount_linprocfs(self):
+    def _mount_linprocfs(self) -> None:
         try:
             if not self.jail.config["mount_linprocfs"]:
                 return
@@ -184,7 +184,7 @@ class Storage:
     def _jail_mkdirp(
         self,
         directory: str,
-        permissions=0o775,
+        permissions: int=0o775,
         user: str="root",
         group: str="wheel"
     ) -> str:

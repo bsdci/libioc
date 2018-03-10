@@ -82,8 +82,11 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
     def _get_host_hostname(self) -> str:
         try:
             return str(self.data["host_hostname"])
-        except KeyError:
-            return self.jail.humanreadable_name
+        except KeyError as e:
+            jail = self.jail
+            if jail is not None:
+                return str(jail.humanreadable_name)
+            raise e
 
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""

@@ -37,7 +37,8 @@ class ResourceSnapshots:
 
     def __iter__(self) -> typing.Iterator[libzfs.ZFSSnapshot]:
         """Return an iterator over the snapshots."""
-        return self.resource.dataset.snapshots
+        snapshots = self.resource.dataset.snapshots  # type: typing.Iterator
+        return snapshots
 
     def create(self, snapshot_name: str) -> None:
         """Take a snapshot."""

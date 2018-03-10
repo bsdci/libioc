@@ -147,11 +147,11 @@ class ResolverProp(collections.MutableSequence):
         self._entries.insert(index, value)
         self.__notify()
 
-    def __delitem__(self, key: str) -> None:
+    def __delitem__(self, key: typing.Any) -> None:
         """Delete the nameserver at the given position."""
         del self._entries[key]
 
-    def __getitem__(self, key: str) -> typing.Any:
+    def __getitem__(self, key: typing.Any) -> typing.Any:
         """Get the nameserver from the given position."""
         return self._entries[key]
 
@@ -159,20 +159,19 @@ class ResolverProp(collections.MutableSequence):
         """Return the number of nameservers."""
         return self._entries.__len__()
 
-    def __setitem__(
+    def __setitem__(  # noqa: T484
         self,
-        key: str,
+        key: int,
         value: str
     ) -> None:
         """Set the nameserver at a given position."""
-        list.__setitem__(self, key, value)
+        list.__setitem__(self, key, value)  # noqa: T484
         self.__notify()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return semicolon separated list of nameservers."""
-        return iocage.lib.helpers.to_string(self._entries, delimiter=";")
+        return str(iocage.lib.helpers.to_string(self._entries, delimiter=";"))
 
-    def __notify(self, notify: bool=True):
-        if not notify:
-            return
-        self.config.update_special_property("resolver")
+    def __notify(self, notify: bool=True) -> None:
+        if notify is True:
+            self.config.update_special_property("resolver")

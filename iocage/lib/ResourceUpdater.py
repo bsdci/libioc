@@ -34,6 +34,7 @@ import iocage.lib.Jail
 
 # MyPy
 import subprocess
+import libzfs
 
 
 class Updater:
@@ -54,17 +55,17 @@ class Updater:
         self.distribution = distribution
 
     @property
-    def logger(self):
+    def logger(self) -> 'iocage.lib.Logger.Logger':
         """Shortcut to the resources logger."""
         return self.resource.logger
 
     @property
-    def local_release_updates_dir(self):
+    def local_release_updates_dir(self) -> str:
         """Return the absolute path to updater directory (os-dependend)."""
         return f"/var/db/{self.update_name}"
 
     @property
-    def host_updates_dataset_name(self):
+    def host_updates_dataset_name(self) -> str:
         """Return the name of the updates dataset."""
         ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
         if isinstance(self.resource, ReleaseGenerator):
@@ -74,7 +75,7 @@ class Updater:
         return f"{release_dataset.name}/updates"
 
     @property
-    def host_updates_dataset(self):
+    def host_updates_dataset(self) -> libzfs.ZFSDataset:
         """Return the updates dataset."""
         dataset_name = self.host_updates_dataset_name
         return self.resource.zfs.get_or_create_dataset(dataset_name)
@@ -85,23 +86,28 @@ class Updater:
         return str(self.host_updates_dataset.mountpoint)
 
     @property
-    def local_temp_dir(self):
+    def local_temp_dir(self) -> str:
         """Return the update temp directory relative to the jail root."""
         return f"{self.local_release_updates_dir}/temp"
 
     @property
-    def release(self):
+    def release(self) -> 'iocage.lib.Release.ReleaseGenerator':
         """Return the associated release."""
         if isinstance(self.resource, iocage.lib.Release.ReleaseGenerator):
             return self.resource
         return self.resource.release
 
     @property
-    def _install_error_handler(self):
-        return None
+    def _install_error_handler(
+        self
+    ) -> typing.Optional[typing.Optional[typing.Callable[
+        [subprocess.Popen, str, str],
+        typing.Tuple[bool, str],
+    ]]]:
+        pass
 
     @property
-    def temporary_jail(self):
+    def temporary_jail(self) -> 'iocage.lib.Jail.JailGenerator':
         """Temporary jail instance that will be created to run the update."""
         if hasattr(self, "_temporary_jail") is False:
             temporary_name = self.resource.name.replace(".", "-") + "_u"
@@ -471,11 +477,12 @@ class FreeBSD(Updater):
             f.truncate()
 
     @property
-    def _install_error_handler(self) -> typing.Callable[[
-        subprocess.Popen,
-        str,
-        str
-    ], typing.Tuple[bool, str]]:
+    def _install_error_handler(
+        self
+    ) -> typing.Optional[typing.Optional[typing.Callable[
+        [subprocess.Popen, str, str],
+        typing.Tuple[bool, str],
+    ]]]:
         def error_handler(
             child: subprocess.Popen,
             stdout: str,
@@ -491,7 +498,7 @@ class FreeBSD(Updater):
         return error_handler
 
 
-def get_launchable_update_resource(
+def get_launchable_update_resource(  # noqa: T484
     distribution: 'iocage.lib.Distribution.Distribution',
     **kwargs
 ) -> Updater:

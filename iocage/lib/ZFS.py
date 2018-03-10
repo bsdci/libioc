@@ -50,10 +50,10 @@ class ZFS(libzfs.ZFS):
         """Set the ZFS objects logger."""
         self._logger = logger
 
-    def create_dataset(
+    def create_dataset(  # noqa: T484
         self,
         dataset_name: str,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> libzfs.ZFSDataset:
         """Automatically get the pool and create a dataset from its name."""
         pool = self.get_pool(dataset_name)
@@ -63,10 +63,10 @@ class ZFS(libzfs.ZFS):
         dataset.mount()
         return dataset
 
-    def get_or_create_dataset(
+    def get_or_create_dataset(  # noqa: T484
         self,
         dataset_name: str,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> libzfs.ZFSDataset:
         """Find or create the dataset, then return it."""
         try:

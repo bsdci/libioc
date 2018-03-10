@@ -296,10 +296,10 @@ class Resource(metaclass=abc.ABCMeta):
         dataset: libzfs.ZFSDataset = self.zfs.get_dataset(dataset_name)
         return dataset
 
-    def get_or_create_dataset(
+    def get_or_create_dataset(  # noqa: T484
         self,
         name: str,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> libzfs.ZFSDataset:
         """
         Get or create a child dataset.
@@ -370,12 +370,12 @@ class DefaultResource(Resource):
     DEFAULT_UCL_FILE = "defaults"
     DEFAULT_ZFS_DATASET_SUFFIX = "/.defaults"
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         Resource.__init__(
@@ -390,7 +390,7 @@ class DefaultResource(Resource):
             logger=logger
         )
 
-    def read_config(self):
+    def read_config(self) -> typing.Dict[str, typing.Any]:
         """Read the default configuration."""
         o = Resource.read_config(self)
         self.config.clone(o)
@@ -491,10 +491,10 @@ class ListableResource(list, Resource):
             self._filters = iocage.lib.Filter.Terms(value)
 
     @abc.abstractmethod
-    def _create_resource_instance(
+    def _create_resource_instance(  # noqa: T484
         self,
         dataset: libzfs.ZFSDataset,
-        *args,  # noqa: T484
-        **kwargs  # noqa: T484
+        *args,
+        **kwargs
     ) -> Resource:
         pass

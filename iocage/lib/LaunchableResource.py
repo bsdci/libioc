@@ -46,12 +46,12 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     _updater: 'iocage.lib.ResourceUpdater.LaunchableResourceUpdate' = None
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         distribution: typing.Optional[
             'iocage.lib.Distribution.Distribution'
         ]=None,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
         self._distribution = distribution
         iocage.lib.Resource.Resource.__init__(self, **kwargs)

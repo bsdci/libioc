@@ -107,7 +107,7 @@ class InterfaceProp(dict):
         if notify is True:
             self.__notify()
 
-    def __delitem__(self, key) -> None:
+    def __delitem__(self, key: typing.Any) -> None:
         """Remove a jail NIC."""
         dict.__delitem__(self, key)
         self.__notify()

@@ -95,9 +95,9 @@ class JailState(dict):
         """Iterate over the jail state entries."""
         return self.data.__iter__()
 
-    def keys(self):
+    def keys(self) -> typing.List[str]:  # noqa: T484
         """Return all available jail state keys."""
-        return self.data.keys()
+        return list(self.data.keys())
 
 
 class JailStates(dict):
@@ -113,7 +113,7 @@ class JailStates(dict):
         else:
             dict.__init__(self, states)
 
-    def query(self):
+    def query(self) -> None:
         """Invoke update of the jail state from jls output."""
         try:
             stdout = subprocess.check_output([
