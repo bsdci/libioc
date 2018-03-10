@@ -36,34 +36,48 @@ __rootcmd__ = True
 
 
 @click.command(
-    context_settings=dict(max_content_width=400),
+    # context_settings=dict(max_content_width=400),
     name="fetch",
     help="Fetch and update a Release to create Jails from them."
 )
 @click.pass_context
-@click.option("--url", "-u",
-              help="Remote URL with path to the release/snapshot directory")
-@click.option("--file", "-F", multiple=True,
-              help="Specify the files to fetch from the mirror.")
-@click.option("--release", "-r",
-              help="The FreeBSD release to fetch.")
-@click.option("--update/--no-update", "-U/-NU", default=True,
-              help="Update the release to the latest patch level.")
-@click.option("--fetch-updates/--no-fetch-updates", default=True,
-              help="Skip fetching release updates")
-# Compat
-@click.option("--http", "-h", default=False,
-              help="Have --server define a HTTP server instead.", is_flag=True)
-# Basejail Update
 @click.option(
+    "--url", "-u",
+    help="Remote URL with path to the release/snapshot directory"
+)
+@click.option(  # noqa: T484
+    "--file", "-F",
+    multiple=True,
+    help="Specify the files to fetch from the mirror."
+)
+@click.option(
+    "--release", "-r",
+    help="The FreeBSD release to fetch."
+)
+@click.option(
+    "--update/--no-update", "-U/-NU",
+    default=True,
+    help="Update the release to the latest patch level."
+)
+@click.option(
+    "--fetch-updates/--no-fetch-updates",
+    default=True,
+    help="Skip fetching release updates"
+)
+@click.option(  # Compatibility
+    "--http", "-h",
+    default=False,
+    is_flag=True,
+    help="Have --server define a HTTP server instead."
+)
+@click.option(  # Basejail Update
     "--copy-basejail-only",
     "-b",
     is_flag=True,
     default=False,
     help="Update basejail after changes"
 )
-# Compat files
-@click.option(
+@click.option(  # Compatibility
     "--files",
     multiple=True,
     help=(

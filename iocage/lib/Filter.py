@@ -54,12 +54,10 @@ class Term(list):
     ) -> None:
         self.key = key
 
-        if values is None:
-            raise TypeError("Values may not be empty")
-        elif isinstance(values, str):
+        if isinstance(values, str):
             data = self._split_filter_values(values)
-        else:
-            data = [values]
+        elif isinstance(values, list):
+            data = values
 
         list.__init__(self, data)
 

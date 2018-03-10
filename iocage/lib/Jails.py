@@ -64,11 +64,11 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
             filters=filters
         )
 
-    def _create_resource_instance(
+    def _create_resource_instance(  # noqa: T484
         self,
         dataset: libzfs.ZFSDataset,
-        *class_args,  # noqa: T484
-        **class_kwargs  # noqa: T484
+        *class_args,
+        **class_kwargs
     ) -> iocage.lib.Jail.JailGenerator:
 
         class_kwargs["data"] = {

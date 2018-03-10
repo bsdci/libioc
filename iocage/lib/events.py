@@ -59,10 +59,10 @@ class IocageEvent:
     ]]] = []
     _child_events: typing.List['IocageEvent'] = []
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         message: typing.Optional[str]=None,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
         """Initialize an IocageEvent."""
         for event in IocageEvent.HISTORY:
@@ -180,14 +180,14 @@ class IocageEvent:
         except AttributeError:
             return None
 
-    def _update_message(self, **kwargs) -> None:
+    def _update_message(self, **kwargs) -> None:  # noqa: T484
         for key in kwargs.keys():
             if key == "message":
                 self.message = kwargs["message"]
             else:
                 self.data[key] = kwargs[key]
 
-    def begin(self, **kwargs) -> 'IocageEvent':
+    def begin(self, **kwargs) -> 'IocageEvent':  # noqa: T484
         """Begin an event."""
         self._update_message(**kwargs)
         self.pending = True
@@ -195,7 +195,7 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT - 1
         return self
 
-    def end(self, **kwargs) -> 'IocageEvent':
+    def end(self, **kwargs) -> 'IocageEvent':  # noqa: T484
         """Successfully finish an event."""
         self._update_message(**kwargs)
         self.done = True
@@ -203,13 +203,13 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def step(self, **kwargs) -> 'IocageEvent':
+    def step(self, **kwargs) -> 'IocageEvent':  # noqa: T484
         """Reflect partial event progress."""
         self._update_message(**kwargs)
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def skip(self, **kwargs) -> 'IocageEvent':
+    def skip(self, **kwargs) -> 'IocageEvent':  # noqa: T484
         """Mark an event as skipped."""
         self._update_message(**kwargs)
         self.skipped = True
@@ -217,15 +217,19 @@ class IocageEvent:
         self.parent_count = IocageEvent.PENDING_COUNT
         return self
 
-    def fail(self, exception: bool=True, **kwargs) -> 'IocageEvent':
+    def fail(  # noqa: T484
+        self,
+        exception: bool=True,
+        **kwargs
+    ) -> 'IocageEvent':
         """End an event with a failure."""
         list(self.fail_generator(exception=exception, **kwargs))
         return self
 
-    def fail_generator(
+    def fail_generator(  # noqa: T484
         self,
         exception: bool=True,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> typing.Generator['IocageEvent', None, None]:
         """End an event with a failure via a generator of rollback steps."""
         self._update_message(**kwargs)
@@ -254,10 +258,10 @@ class IocageEvent:
 class JailEvent(IocageEvent):
     """Any event related to a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         try:
@@ -271,10 +275,10 @@ class JailEvent(IocageEvent):
 class JailLaunch(JailEvent):
     """Launch a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -283,12 +287,12 @@ class JailLaunch(JailEvent):
 class JailRename(JailEvent):
     """Change the name of a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
         current_name: str,
         new_name: str,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         kwargs["current_name"] = current_name
@@ -299,10 +303,10 @@ class JailRename(JailEvent):
 class JailVnetConfiguration(JailEvent):
     """Configure networking for VNET jails."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -311,10 +315,10 @@ class JailVnetConfiguration(JailEvent):
 class JailZfsShareMount(JailEvent):
     """Share ZFS datasets with the jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -323,10 +327,10 @@ class JailZfsShareMount(JailEvent):
 class JailServicesStart(JailEvent):
     """Start the jails services."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -335,10 +339,10 @@ class JailServicesStart(JailEvent):
 class JailDestroy(JailEvent):
     """Destroy the jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -347,10 +351,10 @@ class JailDestroy(JailEvent):
 class JailNetworkTeardown(JailEvent):
     """Teardown a jails VNET network devices."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -359,10 +363,10 @@ class JailNetworkTeardown(JailEvent):
 class JailMountTeardown(JailEvent):
     """Teardown basejail mountpoints."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -371,10 +375,10 @@ class JailMountTeardown(JailEvent):
 class JailFstabUpdate(JailEvent):
     """Update a jails fstab file."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -383,10 +387,10 @@ class JailFstabUpdate(JailEvent):
 class JailForkExec(JailEvent):
     """A group of multiple action events executed sequentially."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -395,10 +399,10 @@ class JailForkExec(JailEvent):
 class JailExec(JailEvent):
     """Execute a command in a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -421,10 +425,10 @@ class JailClone(JailEvent):
 class ReleaseEvent(IocageEvent):
     """Event related to a release."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         self.identifier = release.name
@@ -434,10 +438,10 @@ class ReleaseEvent(IocageEvent):
 class FetchRelease(ReleaseEvent):
     """Fetch release assets."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseEvent.__init__(self, release, **kwargs)
@@ -446,10 +450,10 @@ class FetchRelease(ReleaseEvent):
 class ReleasePrepareStorage(FetchRelease):
     """Prepare the storage of a release before fetching it."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         FetchRelease.__init__(self, release, **kwargs)
@@ -458,10 +462,10 @@ class ReleasePrepareStorage(FetchRelease):
 class ReleaseDownload(FetchRelease):
     """Download release assets."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         FetchRelease.__init__(self, release, **kwargs)
@@ -470,10 +474,10 @@ class ReleaseDownload(FetchRelease):
 class ReleaseExtraction(FetchRelease):
     """Extract a release asset."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         FetchRelease.__init__(self, release, **kwargs)
@@ -482,10 +486,10 @@ class ReleaseExtraction(FetchRelease):
 class ReleaseCopyBase(FetchRelease):
     """Copy the basejail folders of a release into individual ZFS datasets."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         FetchRelease.__init__(self, release, **kwargs)
@@ -494,10 +498,10 @@ class ReleaseCopyBase(FetchRelease):
 class ReleaseConfiguration(FetchRelease):
     """Pre-configure a release with reasonable defaults."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         FetchRelease.__init__(self, release, **kwargs)
@@ -506,10 +510,10 @@ class ReleaseConfiguration(FetchRelease):
 class ReleaseUpdate(ReleaseEvent):
     """Update a release."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseEvent.__init__(self, release, **kwargs)
@@ -518,10 +522,10 @@ class ReleaseUpdate(ReleaseEvent):
 class ReleaseUpdatePull(ReleaseUpdate):
     """Pull release updater and patches from the remote."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
@@ -530,10 +534,10 @@ class ReleaseUpdatePull(ReleaseUpdate):
 class ReleaseUpdateDownload(ReleaseUpdate):
     """Download release updates/patches."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
@@ -542,10 +546,10 @@ class ReleaseUpdateDownload(ReleaseUpdate):
 class RunReleaseUpdate(ReleaseUpdate):
     """Run the update of a release."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
@@ -554,10 +558,10 @@ class RunReleaseUpdate(ReleaseUpdate):
 class ExecuteReleaseUpdate(ReleaseUpdate):
     """Execute the updater script in a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ReleaseUpdate.__init__(self, release, **kwargs)
@@ -569,10 +573,10 @@ class ExecuteReleaseUpdate(ReleaseUpdate):
 class ZFSEvent(IocageEvent):
     """Event related to ZFS storage."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         zfs_object: libzfs.ZFSObject,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         self.identifier = zfs_object.name
@@ -582,10 +586,10 @@ class ZFSEvent(IocageEvent):
 class ZFSDatasetRename(ZFSEvent):
     """Rename a ZFS dataset."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         dataset: libzfs.ZFSDataset,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
@@ -594,10 +598,10 @@ class ZFSDatasetRename(ZFSEvent):
 class ZFSSnapshotRename(ZFSEvent):
     """Rename a ZFS snapshot."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         snapshot: libzfs.ZFSDataset,
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         ZFSEvent.__init__(self, zfs_object=snapshot, **kwargs)
@@ -623,10 +627,10 @@ class ZFSSnapshotClone(ZFSEvent):
 class JailRestart(JailEvent):
     """Restart a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -635,10 +639,10 @@ class JailRestart(JailEvent):
 class JailShutdown(JailEvent):
     """Shutdown a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -647,10 +651,10 @@ class JailShutdown(JailEvent):
 class JailSoftShutdown(JailEvent):
     """Soft-restart a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
@@ -659,10 +663,10 @@ class JailSoftShutdown(JailEvent):
 class JailStart(JailEvent):
     """Start a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs  # noqa: T484
+        **kwargs
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)

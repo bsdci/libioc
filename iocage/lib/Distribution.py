@@ -42,7 +42,11 @@ class EOLParser(html.parser.HTMLParser):
     td_counter: int = 0
     current_branch: str = ""
 
-    def handle_starttag(self, tag: str, attrs: typing.Dict[str, str]) -> None:
+    def handle_starttag(  # noqa: T484
+        self,
+        tag: str,
+        attrs: typing.Dict[str, str]
+    ) -> None:
         """Handle opening HTML tags."""
         if tag == "td":
             self.in_id = True
@@ -82,6 +86,10 @@ class DistributionGenerator:
     available_releases: typing.Optional[
         typing.List['iocage.lib.Release.ReleaseGenerator']
     ] = None
+
+    host: 'iocage.lib.Host.HostGenerator'
+    zfs: 'iocage.lib.ZFS.ZFS'
+    logger: 'iocage.lib.Logger.Logger'
 
     def __init__(
         self,

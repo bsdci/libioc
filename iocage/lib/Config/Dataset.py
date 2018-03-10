@@ -37,13 +37,18 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
     def __init__(
         self,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
-        **kwargs
+        file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         if dataset is not None:
             self._dataset = dataset
 
-        iocage.lib.Config.Prototype.Prototype.__init__(self, **kwargs)
+        iocage.lib.Config.Prototype.Prototype.__init__(
+            self,
+            file=file,
+            logger=logger
+        )
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
@@ -56,6 +61,6 @@ class DatasetConfig(iocage.lib.Config.Prototype.Prototype):
         return str(os.path.join(self.dataset.mountpoint, self._file))
 
     @file.setter
-    def file(self, value: str):
+    def file(self, value: str) -> None:
         """Set the relative path of the config file."""
         self._file = value

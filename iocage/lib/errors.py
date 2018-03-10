@@ -883,11 +883,12 @@ class LogException(IocageException):
 class CannotRedrawLine(LogException):
     """Raised when manipulating previous log entries fails."""
 
-    def __init__(
-            self,
-            reason: typing.Optional[str]=None,
-            *args,
-            **kwargs) -> None:
+    def __init__(  # noqa: T484
+        self,
+        reason: typing.Optional[str]=None,
+        *args,
+        **kwargs
+    ) -> None:
         msg = "Logger can't redraw line"
         if reason is not None:
             msg += f": {reason}"
@@ -900,7 +901,7 @@ class CannotRedrawLine(LogException):
 class EventAlreadyFinished(IocageException):
     """Raised when a event is touched that was already finished."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         event: 'iocage.lib.events.IocageEvent',
         *args,

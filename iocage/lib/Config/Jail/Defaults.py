@@ -139,7 +139,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         return self._user_data
 
     @data.setter
-    def data(self, value: dict):
+    def data(self, value: dict) -> None:
         """Global defaults data cannot be written directly."""
         pass
 

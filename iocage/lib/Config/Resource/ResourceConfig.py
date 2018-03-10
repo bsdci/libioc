@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Configuration stored on a resource."""
+import typing
 import os.path
 import libzfs
 import iocage.lib.Config.Prototype
@@ -35,10 +36,15 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
     def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
-        **kwargs
+        file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
         self.resource = resource
-        iocage.lib.Config.Prototype.Prototype.__init__(self, **kwargs)
+        iocage.lib.Config.Prototype.Prototype.__init__(
+            self,
+            file=file,
+            logger=logger
+        )
 
     @property
     def dataset(self) -> libzfs.ZFSDataset:
@@ -55,6 +61,6 @@ class ResourceConfig(iocage.lib.Config.Prototype.Prototype):
         ))
 
     @file.setter
-    def file(self, value: str):
+    def file(self, value: str) -> None:
         """Set the configuration file path relative to the resource."""
         self._file = value

@@ -31,19 +31,23 @@ import typing
 
 # MyPy
 import libzfs
+ReleaseListType = typing.List[iocage.lib.Release.ReleaseGenerator]
 
 
 class ReleasesGenerator(iocage.lib.Resource.ListableResource):
     """Generator Model of multiple iocage Releases."""
 
     _class_release = iocage.lib.Release.ReleaseGenerator
+    host: 'iocage.lib.Host.HostGenerator'
+    zfs: 'iocage.lib.ZFS.ZFS'
+    logger: 'iocage.lib.Logger.Logger'
 
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
-        host=None,
-        zfs=None,
-        logger=None
+        host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
@@ -57,8 +61,8 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
         )
 
     @property
-    def local(self):
-        """Return true if the release is locally available."""
+    def local(self) -> ReleaseListType:
+        """Return the locally available releases."""
         release_datasets = self.dataset.children
         return list(map(
             lambda x: self._class_release(
@@ -71,11 +75,13 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
         ))
 
     @property
-    def available(self):
-        """Return true if the release can be fetched from the remote."""
-        return self.host.distribution.releases
+    def available(self) -> ReleaseListType:
+        """Return the list of available releases."""
+        distribution = self.host.distribution
+        releases = distribution.releases  # type: ReleaseListType
+        return releases
 
-    def _create_resource_instance(
+    def _create_resource_instance(  # noqa T484
         self,
         dataset: libzfs.ZFSDataset,
         *args,
@@ -88,7 +94,11 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
         kwargs["zfs"] = self.zfs
         return self._class_release(*args, **kwargs)
 
-    def _create_instance(self, *args, **kwargs):
+    def _create_instance(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> iocage.lib.Release.ReleaseGenerator:
         return self._class_release(*args, **kwargs)
 
 
@@ -97,5 +107,9 @@ class Releases(ReleasesGenerator):
 
     _class_release = iocage.lib.Release.Release
 
-    def _create_instance(self, *args, **kwargs):
+    def _create_instance(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> iocage.lib.Release.Release:
         return iocage.lib.Release.Release(*args, **kwargs)
