@@ -129,12 +129,16 @@ def get_userland_version() -> str:
     return match[1]
 
 
-def exec(
+def exec(  # noqa: T484
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     ignore_error: bool=False,
     **subprocess_args
-) -> typing.Tuple[subprocess.Popen, str, str]:
+) -> typing.Tuple[
+    subprocess.Popen,
+    typing.Optional[str],
+    typing.Optional[str]
+]:
     """Execute a shell command."""
     if isinstance(command, str):
         command = [command]
@@ -154,11 +158,14 @@ def exec(
     )
 
     stdout, stderr = child.communicate()
-    stdout = stdout.decode("UTF-8").strip()
-    stderr = stderr.decode("UTF-8").strip()
 
-    if logger and stdout:
-        logger.spam(_prettify_output(stdout))
+    if stderr is not None:
+        stderr = stderr.decode("UTF-8").strip()
+
+    if stdout is not None:
+        stdout = stdout.decode("UTF-8").strip()
+        if logger and stdout:
+            logger.spam(_prettify_output(stdout))
 
     if child.returncode > 0:
 
