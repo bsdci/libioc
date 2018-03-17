@@ -50,7 +50,7 @@ class DevfsRuleset(list):
         value: typing.Optional[str]=None,
         number: typing.Optional[int]=None,
         comment: typing.Optional[str]=None
-    ):
+    ) -> None:
         """
         Initialize the DevfsRuleset.
 
@@ -74,9 +74,9 @@ class DevfsRuleset(list):
         if value is None and number is None:
             # name and number will be assigned later
             name = None
-        elif number is None:
+        elif (number is None) and (isinstance(value, str) is True):
             name, number, comment = self._parse_line(value)
-        else:
+        elif isinstance(value, str) is True:
             name = int(value)
 
         self.name = name
@@ -128,7 +128,7 @@ class DevfsRuleset(list):
 
         raise SyntaxError("DevfsRuleset line parsing failed")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the devfs ruleset as string."""
         ruleset_line = f"[{self.name}={self.number}]"
         if self.comment is not None:
@@ -146,6 +146,9 @@ class DevfsRules(list):
     """
 
     _rules_file: str
+    _ruleset_number_index: typing.Dict[int, int]
+    _ruleset_name_index: typing.Dict[str, int]
+    _system_rule_lines: typing.List[int]
 
     def __init__(
         self,
@@ -177,7 +180,7 @@ class DevfsRules(list):
         # will automatically read from file - needs to be the last item
         self.rules_file = rules_file
 
-    def append(
+    def append(  # noqa: T484
         self,
         ruleset: typing.Union[DevfsRuleset, str],
         is_system_rule: bool=False
@@ -250,7 +253,7 @@ class DevfsRules(list):
         """Find a devfs rule by its name."""
         return self._find_by_index(rule_name, self._ruleset_name_index)
 
-    def find_by_number(self, rule_number: int):
+    def find_by_number(self, rule_number: int) -> DevfsRuleset:
         """Find a devfs rule by its rule number."""
         return self._find_by_index(rule_number, self._ruleset_number_index)
 
@@ -258,7 +261,7 @@ class DevfsRules(list):
         self,
         rule_name: str,
         index: typing.List[typing.Any]
-    ):
+    ) -> DevfsRuleset:
         return self[index[rule_name]]
 
     @property
@@ -308,7 +311,7 @@ class DevfsRules(list):
 
     def _read_rules_file(
         self,
-        file: typing.TextIO,
+        file: str,
         system: bool=False
     ) -> None:
 
