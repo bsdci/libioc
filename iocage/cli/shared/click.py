@@ -35,7 +35,7 @@ class IocageClickContext(click.core.Context):
 
     logger: iocage.lib.Logger.Logger
     host: iocage.lib.Host.Host
-    parent: click.core.Context
+    parent: 'IocageClickContext'
     print_events: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
         None
