@@ -494,7 +494,11 @@ class JailGenerator(JailResource):
         command = list(lex)
 
         if (hook_name == "start") or (hook_name == "stop"):
-            return self.exec(command)
+            return self.exec(
+                command,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
         else:
             return iocage.lib.helpers.exec(
                 command,
