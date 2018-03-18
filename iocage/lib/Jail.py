@@ -1439,6 +1439,7 @@ class JailGenerator(JailResource):
             jail_env[prop_name] = self.getstring(prop)
 
         jail_env["IOCAGE_JAIL_PATH"] = self.root_dataset.mountpoint
+        jail_env["IOCAGE_JID"] = str(self.jid)
 
         return jail_env
 
