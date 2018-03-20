@@ -55,10 +55,12 @@ class Storage:
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
         """Clone a release to a the current dataset_name."""
+        jail_name = self.jail.humanreadable_name
+        snapshot_name = iocage.lib.ZFS.append_snapshot_datetime(jail_name)
         self.zfs.clone_dataset(
             source=release.root_dataset,
             target=self.jail.root_dataset_name,
-            snapshot_name=self.jail.name
+            snapshot_name=snapshot_name
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(

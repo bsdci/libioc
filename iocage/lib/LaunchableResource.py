@@ -73,11 +73,6 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         self._updater = updater
         return updater
 
-    def create_resource(self) -> None:
-        """Create the resources root dataset."""
-        iocage.lib.Resource.Resource.create_resource(self)
-        self.zfs.create_dataset(self.root_dataset_name)
-
     def _require_dataset_mounted(self, dataset: libzfs.ZFSDataset) -> None:
         if dataset.mountpoint is None:
             raise iocage.lib.errors.DatasetNotMounted(

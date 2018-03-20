@@ -895,13 +895,12 @@ class JailGenerator(JailResource):
             self.logger.spam(msg, jail=self, indent=1)
 
         self.create_resource()
-        self.get_or_create_dataset("root")
-        self._update_fstab()
 
         backend = self.storage_backend
         if backend is not None:
             backend.setup(self.storage, resource)
 
+        self._update_fstab()
         self.save()
 
     @property
