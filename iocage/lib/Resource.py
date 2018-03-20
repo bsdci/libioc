@@ -436,15 +436,16 @@ class ListableResource(list, Resource):
         for child_dataset in self.dataset.children:
 
             name = self._get_asset_name_from_dataset(child_dataset)
-            if self._filters is not None and \
-               self._filters.match_key("name", name) is not True:
-                # Skip all jails that do not even match the name
-                continue
+            if self._filters is not None:
+                if self._filters.match_key("name", name) is not True:
+                    # Skip all jails that do not even match the name
+                    continue
 
             # ToDo: Do not load jail if filters do not require to
             resource = self._get_resource_from_dataset(child_dataset)
             if self._filters is not None:
                 if self._filters.match_resource(resource):
+                    print("YIELD", child_dataset.name)
                     yield resource
 
     def __len__(self) -> int:
