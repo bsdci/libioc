@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ class DevfsRuleset(list):
     PATTERN = re.compile(r"""^\[(?P<name>[a-z](?:[a-z0-9\-_]*[a-z0-9])?)=
                 (?P<number>[0-9]+)\]\s*(?:\#\s*(?P<comment>.*))?$""", re.X)
 
-    value: str
+    name: typing.Optional[str]
     number: int
     comment: typing.Optional[str]
 
@@ -70,18 +70,21 @@ class DevfsRuleset(list):
                 ruleset, but is like the name not required to compare the
                 ruleset with another
         """
+        name: typing.Optional[str]
+
         # when only one argument is passed, it's a line that need to be parsed
         if value is None and number is None:
             # name and number will be assigned later
             name = None
         elif (number is None) and (isinstance(value, str) is True):
-            name, number, comment = self._parse_line(value)
-        elif isinstance(value, str) is True:
-            name = int(value)
+            name, number, comment = self._parse_line(str(value))
 
         self.name = name
-        self.number = number
         self.comment = comment
+
+        if number is not None:
+            self.number = number
+
         list.__init__(self)
 
     def has_rule(self, rule: str) -> bool:
@@ -184,7 +187,7 @@ class DevfsRules(list):
         self,
         ruleset: typing.Union[DevfsRuleset, str],
         is_system_rule: bool=False
-    ) -> DevfsRuleset:
+    ) -> typing.Union[DevfsRuleset, str]:
         """
         Add a DevfsRuleset to the list.
 
@@ -214,6 +217,12 @@ class DevfsRules(list):
         if ruleset.number in self._ruleset_number_index.keys():
             raise iocage.lib.errors.DuplicateDevfsRuleset(
                 reason=f"Ruleset number '{ruleset.number}' already present",
+                devfs_rules_file=self.rules_file,
+                logger=self.logger
+            )
+
+        if ruleset.name is None:
+            raise iocage.lib.errors.MissingDevfsRulesetName(
                 devfs_rules_file=self.rules_file,
                 logger=self.logger
             )
@@ -251,18 +260,15 @@ class DevfsRules(list):
 
     def find_by_name(self, rule_name: str) -> DevfsRuleset:
         """Find a devfs rule by its name."""
-        return self._find_by_index(rule_name, self._ruleset_name_index)
+        index = self._ruleset_name_index
+        ruleset = self[index[rule_name]]  # type: DevfsRuleset
+        return ruleset
 
     def find_by_number(self, rule_number: int) -> DevfsRuleset:
         """Find a devfs rule by its rule number."""
-        return self._find_by_index(rule_number, self._ruleset_number_index)
-
-    def _find_by_index(
-        self,
-        rule_name: str,
-        index: typing.List[typing.Any]
-    ) -> DevfsRuleset:
-        return self[index[rule_name]]
+        index = self._ruleset_number_index
+        ruleset = self[index[rule_number]]  # type: DevfsRuleset
+        return ruleset
 
     @property
     def default_rules_file(self) -> str:
