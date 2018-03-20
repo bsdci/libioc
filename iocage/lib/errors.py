@@ -870,6 +870,19 @@ class DuplicateDevfsRuleset(DevfsRuleException):
         super().__init__(msg, *args, **kwargs)
 
 
+class MissingDevfsRulesetName(DevfsRuleException):
+    """Raised when a duplicate devfs rule was found."""
+
+    def __init__(  # noqa: T484
+        self,
+        devfs_rules_file: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "The devfs ruleset is missing a name"
+        super().__init__(msg, *args, **kwargs)
+
 # Logger
 
 
