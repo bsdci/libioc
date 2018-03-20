@@ -827,6 +827,10 @@ class JailGenerator(JailResource):
         self.config['basejail_type'] = template.config['basejail_type']
         self._create_from_resource(template)
 
+    def promote(self) -> None:
+        """Promote all datasets of the jail."""
+        self.zfs.promote_dataset(self.dataset)
+
     def clone_from_jail(
         self,
         source_jail: 'JailGenerator'
