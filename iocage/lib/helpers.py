@@ -125,7 +125,7 @@ def get_userland_version() -> str:
     # ToDo: move out of the function
     pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z0-9\-]+)\"")
     content = f.read()
-    match = pattern.search(content)  # type: typing.Match[str]
+    match = pattern.search(content)  # type: typing.Optional[typing.Match[str]]
     if match is None:
         raise iocage.lib.errors.HostUserlandVersionUnknown()
     return match[1]
