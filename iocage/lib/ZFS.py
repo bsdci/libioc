@@ -194,6 +194,25 @@ class ZFS(libzfs.ZFS):
                 f"Successfully cloned {source} to {target}"
             )
 
+    def promote_dataset(
+        self,
+        dataset: libzfs.ZFSDataset,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ):
+        """Recursively promote a dataset."""
+        datasets = list(reversed(list(dataset.children_recursive))) + [dataset]
+        for child in datasets:
+            self._promote(child, logger=logger)
+
+    def _promote(
+        self,
+        dataset: libzfs.ZFSDataset,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ) -> None:
+        if logger is not None:
+            logger.verbose(f"Promoting ZFS dataset {dataset.name}")
+        dataset.promote()
+
     def _clone_and_mount(
         self,
         snapshot: libzfs.ZFSSnapshot,
