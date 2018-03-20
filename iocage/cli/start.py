@@ -112,7 +112,7 @@ def _normal(
     ]
 ) -> bool:
 
-    filters += ("template=no",)
+    filters += ("template=no,-",)
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,

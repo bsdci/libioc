@@ -95,13 +95,12 @@ def _normal(
         filters=filters
     )
 
-    if len(jails) == 0:
-        logger.error("No jail selector provided")
-        return False
+    found_jails = False
 
     changed_jails = []
     failed_jails = []
     for jail in jails:
+        found_jails = True
         try:
             print_function(jail.stop(force=force))
         except iocage.lib.errors.IocageException:
@@ -110,6 +109,10 @@ def _normal(
 
         logger.log(f"{jail.name} stopped")
         changed_jails.append(jail)
+
+    if found_jails is False:
+        logger.error("No jail selector provided")
+        return False
 
     if len(failed_jails) > 0:
         exit(1)
