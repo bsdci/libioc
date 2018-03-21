@@ -445,7 +445,6 @@ class ListableResource(list, Resource):
             resource = self._get_resource_from_dataset(child_dataset)
             if self._filters is not None:
                 if self._filters.match_resource(resource):
-                    print("YIELD", child_dataset.name)
                     yield resource
 
     def __len__(self) -> int:
