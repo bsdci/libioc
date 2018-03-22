@@ -418,6 +418,7 @@ class ReleaseGenerator(ReleaseResource):
 
             # ToDo: allow to reach this for forced re-fetch
             self.create_resource()
+            self.get_or_create_dataset("root")
             self._ensure_dataset_mounted()
 
             yield releasePrepareStorageEvent.end()
