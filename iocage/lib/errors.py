@@ -411,7 +411,7 @@ class DistributionEOLWarningDownloadFailed(IocageException):
 class DatasetExists(IocageException):
     """Raised when a dataset already exists."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         dataset_name: str,
         *args,
@@ -498,7 +498,7 @@ class DatasetNotJailed(IocageException):
 class ZFSException(IocageException):
     """Raised when a ZFS pool not available."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         *args,
         **kwargs

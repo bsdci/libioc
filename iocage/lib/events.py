@@ -411,7 +411,7 @@ class JailExec(JailEvent):
 class JailClone(JailEvent):
     """Clone a jail."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
         **kwargs
@@ -610,7 +610,7 @@ class ZFSSnapshotRename(ZFSEvent):
 class ZFSSnapshotClone(ZFSEvent):
     """Clone a ZFS snapshot to a target."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         snapshot: libzfs.ZFSDataset,
         target: str,
