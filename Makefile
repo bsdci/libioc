@@ -3,7 +3,7 @@ SERVER=""
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
 deps:
-	which pkg && pkg install -q -y libucl py36-ucl py36-cython rsync python36 py36-libzfs py36-sysctl || true
+	which pkg && pkg install -q -y libucl py36-cython rsync python36 py36-libzfs py36-sysctl || true
 	python3.6 -m ensurepip
 	python3.6 -m pip install -Ur requirements.txt
 install: deps
