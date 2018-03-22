@@ -308,7 +308,10 @@ class ReleaseGenerator(ReleaseResource):
         if self.exists is False:
             return False
 
-        root_dir_index = os.listdir(self.root_dataset.mountpoint)
+        try:
+            root_dir_index = os.listdir(self.root_dataset.mountpoint)
+        except libzfs.ZFSException:
+            return False
 
         for expected_directory in ["dev", "var", "etc"]:
             if expected_directory not in root_dir_index:
