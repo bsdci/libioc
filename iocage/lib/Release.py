@@ -368,10 +368,10 @@ class ReleaseGenerator(ReleaseResource):
 
         if isinstance(self._hashes, dict):
             return self._hashes
-        else:
-            raise iocage.lib.errors.ReleaseAssetHashesUnavailable(
-                logger=self.logger
-            )
+
+        raise iocage.lib.errors.ReleaseAssetHashesUnavailable(
+            logger=self.logger
+        )
 
     @property
     def _supported_url_schemes(self) -> typing.List[str]:
