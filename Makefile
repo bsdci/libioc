@@ -14,7 +14,7 @@ install: deps
 		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
 	fi
 install-dev: deps
-	python3.6 -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
+	python3.6 -m pip install -Ur requirements-dev.txt
 	python3.6 -m pip install -e .
 	@if [ -f /usr/local/etc/init.d ]; then \
 		install -m 0755 -o root -g wheel rc.d/ioc /usr/local/etc/init.d; \
