@@ -130,7 +130,7 @@ class Updater:
             temporary_jail.config.file = "config_update.json"
 
             root_path = temporary_jail.root_path
-            destination_dir = f"{root_path}/{self.local_release_updates_dir}"
+            destination_dir = f"{root_path}{self.local_release_updates_dir}"
             temporary_jail.fstab.file = "fstab_update"
             temporary_jail.fstab.new_line(
                 source=self.host_updates_dir,
