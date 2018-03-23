@@ -68,7 +68,7 @@ make install-dev
 Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage pool.
 
 ```sh
-pytest
+ZPOOL=zroot make test
 ```
 
 ### Type Checking
