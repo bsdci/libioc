@@ -1,5 +1,4 @@
-ZPOOL=""
-SERVER=""
+ZPOOL?=""
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
 deps:
@@ -29,7 +28,7 @@ check:
 	flake8 --exclude=".*" --exclude=__init__.py --ignore=E203,W391,D107
 	bandit --skip B404 --exclude iocage/tests/ -r .
 test:
-	pytest --zpool $(ZPOOL) --server $(SERVER)
+	pytest iocage/tests --zpool $(ZPOOL)
 help:
 	@echo "    install"
 	@echo "        Installs libiocage"

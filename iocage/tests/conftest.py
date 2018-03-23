@@ -49,6 +49,11 @@ def pytest_addoption(parser: typing.Any):
         action="store_true",
         help="Force cleaning the /iocage-test dataset"
     )
+    parser.addoption(
+        "--zpool",
+        action="store",
+        help="Select a ZFS pool for the unit tests"
+    )
 
 
 def pytest_generate_tests(metafunc: typing.Any) -> None:
@@ -70,27 +75,34 @@ def zfs() -> libzfs.ZFS:
 
 @pytest.fixture
 def pool(
+    request,
     zfs: libzfs.ZFS,
     logger: 'iocage.lib.Logger.Logger'
 ) -> libzfs.ZFSPool:
     """Find the active iocage pool."""
-    active_pool = None
-    for pool in zfs.pools:
-        properties = pool.root_dataset.properties
-        try:
-            value = properties["org.freebsd.ioc:active"].value
-            if value == "yes":
-                active_pool = pool
-        except KeyError:
-            pass
+    requested_pool = request.config.getoption("--zpool")
 
-    if active_pool is None:
-        logger.error("No ZFS pool was activated."
-                     " Please activate or specify a pool using the"
-                     " --pool option")
+    if requested_pool is None:
+        logger.error(
+            "No ZFS pool was activated. "
+            "Please activate or specify a pool using the "
+            "--zpool option"
+        )
         exit(1)
 
-    return active_pool
+    target_pool = list(filter(
+        lambda pool: (pool.name == requested_pool),
+        zfs.pools
+    ))[0]
+    datasets = iocage.lib.Datasets.Datasets(
+        pool=target_pool,
+        zfs=zfs,
+        logger=logger
+    )
+    if datasets.is_pool_active(target_pool) is False:
+        datasets.activate(mountpoint="/iocage-tests")
+
+    return target_pool
 
 
 @pytest.fixture
