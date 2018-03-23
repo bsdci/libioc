@@ -488,6 +488,7 @@ class FreeBSD(Updater):
                     "freebsd-update.sh exited "
                     f"with returncode {child.returncode}"
                 ),)
+        return error_handler
 
 
 def get_launchable_update_resource(
