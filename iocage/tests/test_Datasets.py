@@ -58,4 +58,5 @@ class TestDatasets(object):
     ):
         """Test if a pool can be activated."""
         datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.activate()
+        datasets.deactivate()
+        datasets.activate(mountpoint="/iocage-test")

@@ -24,7 +24,6 @@
 """Unit tests for Jail."""
 import json
 import os
-import uuid
 
 import helper_functions
 import pytest
@@ -73,12 +72,13 @@ class TestJail(object):
     ) -> None:
         """Test if jails can be created."""
         jail = iocage.lib.Jail.Jail(
+            dict(id="foobar"),
             new=True,
             host=host,
             logger=logger,
             zfs=zfs
         )
-        jail.create(local_release.name)
+        jail.create(local_release)
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
 
@@ -86,8 +86,6 @@ class TestJail(object):
             helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
         try:
-            uuid.UUID(jail.name)
-            assert len(str(jail.name)) == 36
             assert not jail.config["basejail"]
             assert not jail.config["basejail_type"]
 
@@ -156,7 +154,7 @@ class TestNullFSBasejail(object):
             logger=logger,
             zfs=zfs
         )
-        jail.create(local_release.name)
+        jail.create(local_release)
 
         dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
 
@@ -164,8 +162,6 @@ class TestNullFSBasejail(object):
             helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
         try:
-            uuid.UUID(jail.name)
-            assert len(str(jail.name)) == 36
             assert jail.config["basejail"]
             assert jail.config["basejail_type"] == "nullfs"
 
