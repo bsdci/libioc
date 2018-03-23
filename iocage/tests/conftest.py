@@ -75,7 +75,7 @@ def zfs() -> libzfs.ZFS:
 
 @pytest.fixture
 def pool(
-    request,
+    request: typing.Any,
     zfs: libzfs.ZFS,
     logger: 'iocage.lib.Logger.Logger'
 ) -> libzfs.ZFSPool:
