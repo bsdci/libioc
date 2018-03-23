@@ -471,7 +471,11 @@ class FreeBSD(Updater):
             f.truncate()
 
     @property
-    def _install_error_handler(self):
+    def _install_error_handler(self) -> typing.Callable[[
+        subprocess.Popen,
+        str,
+        str
+    ], typing.Tuple[bool, str]]:
         def error_handler(
             child: subprocess.Popen,
             stdout: str,
