@@ -452,7 +452,7 @@ class JailGenerator(JailResource):
                     yield jailForkExecEvent.fail()
                     raise err
                 else:
-                    yield jailExecEvent.skip(err)
+                    yield jailExecEvent.skip()
                     self.logger.debug(message)
             else:
                 yield jailExecEvent.end(
