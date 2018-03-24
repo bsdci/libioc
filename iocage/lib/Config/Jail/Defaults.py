@@ -96,6 +96,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "allow_mount_devfs": 0,
         "allow_mount_nullfs": 0,
         "allow_mount_procfs": 0,
+        "allow_mount_fdescfs": 0,
         "allow_mount_zfs": 0,
         "allow_mount_tmpfs": 0,
         "allow_quotas": 0,

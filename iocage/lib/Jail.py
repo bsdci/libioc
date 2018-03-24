@@ -1115,6 +1115,7 @@ class JailGenerator(JailResource):
             f"allow.mount.devfs={self._get_value('allow_mount_devfs')}",
             f"allow.mount.nullfs={self._get_value('allow_mount_nullfs')}",
             f"allow.mount.procfs={self._get_value('allow_mount_procfs')}",
+            f"allow.mount.fdescfs={self._get_value('allow_mount_fdescfs')}",
             f"allow.mount.zfs={self._allow_mount_zfs}",
             f"allow.quotas={self._get_value('allow_quotas')}",
             f"allow.socket_af={self._get_value('allow_socket_af')}",
