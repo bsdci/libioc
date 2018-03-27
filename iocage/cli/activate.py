@@ -53,7 +53,7 @@ def cli(ctx, zpool, mountpoint):
 
     try:
         datasets = iocage.lib.Datasets.Datasets(
-            pool=iocage_pool,
+            root_dataset=f"{iocage_pool.name}/iocage",
             zfs=zfs,
             logger=logger
         )
