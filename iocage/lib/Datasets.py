@@ -40,15 +40,16 @@ class Datasets:
 
     ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
 
-    root: libzfs.ZFSDataset
     zfs: 'iocage.lib.ZFS.ZFS'
     logger: 'iocage.lib.Logger.Logger'
+    _root: libzfs.ZFSDataset
     _datasets: typing.Dict[str, libzfs.ZFSDataset] = {}
 
     def __init__(
         self,
-        root: typing.Optional[libzfs.ZFSDataset]=None,
-        pool: typing.Optional[libzfs.ZFSPool]=None,
+        root_dataset: typing.Optional[
+            typing.Union[libzfs.ZFSDataset, str]
+        ]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
@@ -56,17 +57,10 @@ class Datasets:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
-        if isinstance(root, libzfs.ZFSDataset):
-            self._root = root
-            return
-
-        if (pool is not None) and isinstance(pool, libzfs.ZFSPool):
-            self._root = self._get_or_create_dataset(
-                "iocage",
-                root_name=pool.name,
-                pool=pool
-            )
-            return
+        if isinstance(root_dataset, libzfs.ZFSDataset):
+            self._root = root_dataset
+        elif isinstance(root_dataset, str):
+            self._root = self.zfs.get_or_create_dataset(root_dataset)
 
     @property
     def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
@@ -79,7 +73,7 @@ class Datasets:
     @property
     def active_pool(self) -> libzfs.ZFSPool:
         """Return the currently active iocage pool."""
-        pool = self._active_pool_or_none
+        pool = self._root_dataset_or_none
         if pool is None:
             raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
         return pool
@@ -92,10 +86,11 @@ class Datasets:
         except AttributeError:
             pass
 
-        if self._active_pool_or_none is None:
+        found_pool = self._active_pool_or_none
+        if found_pool is None:
             raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
 
-        self._root = self.zfs.get_dataset(f"{self.active_pool.name}/iocage")
+        self._root = self.zfs.get_dataset(f"{found_pool.name}/iocage")
         return self._root
 
     @property
@@ -220,44 +215,9 @@ class Datasets:
 
     def _get_or_create_dataset(
         self,
-        name: str,
-        root_name: typing.Optional[str]=None,
-        pool: typing.Optional[libzfs.ZFSPool]=None,
-        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
+        asset_name: str
     ) -> libzfs.ZFSDataset:
-
-        if not iocage.lib.helpers.validate_name(name):
-            raise NameError(f"Invalid 'name' for Dataset: {name}")
-
-        try:
-            return self._datasets[name]
-        except (AttributeError, KeyError):
-            pass
-
-        if root_name is not None:
-            root_dataset_name = root_name
-        else:
-            root_dataset_name = self.root.name
-
-        target_pool: libzfs.ZFSPool
-        if pool is not None:
-            target_pool = pool
-        else:
-            target_pool = self.root.pool
-
-        dataset: libzfs.ZFSDataset
-        dataset_name = f"{root_dataset_name}/{name}"
-        try:
-            dataset = self.zfs.get_dataset(dataset_name)
-        except libzfs.ZFSException:
-            target_pool.create(dataset_name, {})
-            dataset = self.zfs.get_dataset(dataset_name)
-
-            if mountpoint is not None:
-                mountpoint_property = libzfs.ZFSUserProperty(mountpoint)
-                dataset.properties["mountpoint"] = mountpoint_property
-
-            dataset.mount()
-
-        self._datasets[name] = dataset
-        return dataset
+        return self.zfs.get_or_create_dataset(
+            f"{self.root.name}/{asset_name}"
+        )
+        
