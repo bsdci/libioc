@@ -63,7 +63,6 @@ class JailResource(
         **kwargs
     ) -> None:
 
-        self.__jails_dataset_name = host.datasets.jails.name
         self.host = iocage.lib.helpers.init_host(self, host)
 
         if jail is not None:
@@ -165,7 +164,7 @@ class JailResource(
         if jail_id is None:
             raise iocage.lib.errors.JailUnknownIdentifier()
 
-        return f"{self.__jails_dataset_name}/{jail_id}"
+        return f"{self.host.main_datasets.jails.name}/{jail_id}"
 
     def get(self, key: str) -> typing.Any:
         """Get a config value from the jail or defer to its resource."""
@@ -1458,17 +1457,17 @@ class JailGenerator(JailResource):
         if (text is None) or (len(text) == 0):
             raise iocage.lib.errors.JailNotSupplied(logger=self.logger)
 
-        jails_dataset = self.host.datasets.jails
+        for datasets_key, datasets in self.host.datasets.items():
+            for dataset in list(datasets.jails.children):
+                dataset_name = str(
+                    dataset.name[(len(datasets.jails.name) + 1):]
+                )
+                humanreadable_name = iocage.lib.helpers.to_humanreadable_name(
+                    dataset_name
+                )
 
-        for dataset in list(jails_dataset.children):
-
-            dataset_name = str(dataset.name[(len(jails_dataset.name) + 1):])
-            humanreadable_name = iocage.lib.helpers.to_humanreadable_name(
-                dataset_name
-            )
-
-            if text in [dataset_name, humanreadable_name]:
-                return dataset_name
+                if text in [dataset_name, humanreadable_name]:
+                    return dataset_name
 
         raise iocage.lib.errors.JailNotFound(text, logger=self.logger)
 

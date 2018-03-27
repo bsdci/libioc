@@ -38,7 +38,9 @@ import iocage.lib.Config.Jail.File
 class LaunchableResource(iocage.lib.Resource.Resource):
     """Representation of launchable resources like jails."""
 
-    _rc_conf: typing.Optional[iocage.lib.Config.Jail.File.RCConf.RCConf] = None
+    _rc_conf: typing.Optional[
+        iocage.lib.Config.Jail.File.RCConf.ResourceRCConf
+    ] = None
     _sysctl_conf: typing.Optional[
         iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
     ] = None
@@ -118,10 +120,10 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         )
 
     @property
-    def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.RCConf':
+    def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.ResourceRCConf':
         """Return a lazy-loaded instance of the resources RCConf."""
         if self._rc_conf is None:
-            self._rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
+            self._rc_conf = iocage.lib.Config.Jail.File.RCConf.ResourceRCConf(
                 resource=self,
                 logger=self.logger
             )
