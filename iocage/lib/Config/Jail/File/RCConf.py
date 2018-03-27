@@ -29,7 +29,13 @@ import iocage.lib.Config.Jail.File.Prototype
 import iocage.lib.Logger
 
 
-class RCConf(iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+class RCConf(iocage.lib.Config.Jail.File.Prototype.ConfigFile):
     """Model a rc.conf file."""
+
+    _file: str = "/etc/rc.conf"
+
+
+class ResourceRCConf(iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+    """Model a rc.conf file relative to a resource."""
 
     _file: str = "/etc/rc.conf"
