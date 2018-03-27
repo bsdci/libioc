@@ -59,7 +59,7 @@ class ResourceConfig:
         return os.path.realpath(os.path.abspath(filepath))
 
 
-class ResourceConfigFile(ResourceConfig, dict):
+class ConfigFile(dict):
     """Abstraction of UCL file based config files in Resources."""
 
     _file: str
@@ -67,7 +67,6 @@ class ResourceConfigFile(ResourceConfig, dict):
 
     def __init__(
         self,
-        resource: 'iocage.lib.LaunchableResource.LaunchableResource',
         file: typing.Optional[str]=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
@@ -81,18 +80,12 @@ class ResourceConfigFile(ResourceConfig, dict):
         if file is not None:
             self._file = file
 
-        self.resource = resource
         self._read_file()
 
     @property
     def path(self) -> str:
         """Absolute path to the file."""
-        path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
-        self._require_path_relative_to_resource(
-            filepath=path,
-            resource=self.resource
-        )
-        return os.path.abspath(path)
+        return self.file
 
     @property
     def file(self) -> str:
@@ -223,3 +216,27 @@ class ResourceConfigFile(ResourceConfig, dict):
         if isinstance(output, str) or isinstance(output, bool):
             return output
         return None
+
+
+class ResourceConfigFile(ConfigFile, ResourceConfig):
+    """Abstraction of UCL file based config files in Resources."""
+
+    def __init__(
+        self,
+        resource: 'iocage.lib.LaunchableResource.LaunchableResource',
+        file: typing.Optional[str]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+    ) -> None:
+
+        self.resource = resource
+        ConfigFile.__init__(self, file=file, logger=logger)
+
+    @property
+    def path(self) -> str:
+        """Absolute path to the file."""
+        path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
+        self._require_path_relative_to_resource(
+            filepath=path,
+            resource=self.resource
+        )
+        return os.path.abspath(path)
