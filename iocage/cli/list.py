@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import iocage.lib.errors
 import iocage.lib.Logger
 import iocage.lib.Host
 import iocage.lib.Resource
+import iocage.lib.ListableResource
 import iocage.lib.Jails
 import iocage.lib.Releases
 
@@ -59,6 +60,11 @@ supported_output_formats = ['table', 'csv', 'list', 'json']
               type=click.Choice(supported_output_formats))
 @click.option("--header/--no-header", "-H/-NH", is_flag=True, default=True,
               help="Show or hide column name heading.")
+@click.option(
+    "--dataset", "-d",
+    multiple=True,
+    help="Limit the command to certain root datasets specified in rc.conf."
+)
 @click.argument("filters", nargs=-1)
 def cli(
     ctx: IocageClickContext,
@@ -69,6 +75,7 @@ def cli(
     _sort: typing.Optional[str],
     output: typing.Optional[str],
     output_format: str,
+    dataset: typing.Tuple[str, ...],
     filters: typing.Tuple[str, ...]
 ) -> None:
     """List jails in various formats."""
@@ -113,11 +120,13 @@ def cli(
                 else:
                     filters += ("template=no,-",)
 
+            sources = dataset if len(dataset) > 0 else None
             resources = resources_class(
                 logger=logger,
                 host=host,
                 # ToDo: allow quoted whitespaces from user inputs
-                filters=filters
+                filters=filters,
+                sources=sources
             )
 
     except iocage.lib.errors.IocageException:
@@ -135,7 +144,7 @@ def cli(
 
 def _print_table(
     resources: typing.Generator[
-        iocage.lib.Resource.ListableResource,
+        iocage.lib.ListableResource.ListableResource,
         None,
         None
     ],
@@ -214,7 +223,7 @@ def _list_output_comumns(
     if user_input is not None:
         return user_input.strip().split(',')
     else:
-        columns = ["jid", "name"]
+        columns = ["jid", "full_name"]
 
         if long_mode is True:
             columns += [

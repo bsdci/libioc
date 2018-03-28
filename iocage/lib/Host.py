@@ -50,12 +50,10 @@ class HostGenerator:
     _class_distribution = iocage.lib.Distribution.DistributionGenerator
 
     _devfs: iocage.lib.DevfsRules.DevfsRules
-    _rc_conf: 'iocage.lib.Config.Jail.File.RCConf'
     _defaults: iocage.lib.Resource.DefaultResource
     _defaults_initialized = False
     releases_dataset: libzfs.ZFSDataset
-    datasets: typing.Dict[str, iocage.lib.Datasets.Datasets]
-    main_datasets_name: str
+    datasets: iocage.lib.Datasets.Datasets
     distribution: _distribution_types
 
     branch_pattern = re.compile(
@@ -82,25 +80,10 @@ class HostGenerator:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
-        self.datasets = {}
-        root_datasets = self._read_root_datasets_from_rc_conf()
-        if len(root_datasets) == 0:
-            # legacy support (before ioc_dataset_<name> in rc.conf)
-            main_datasets_name = "iocage"
-            self.main_datasets_name = main_datasets_name
-            self.datasets[main_datasets_name] = iocage.lib.Datasets.Datasets(
-                logger=self.logger,
-                zfs=self.zfs
-            )
-        else:
-            for key, value in root_datasets.items():
-                if len(self.datasets) == 0:
-                    self.main_datasets_name = key
-                self.datasets[key] = (iocage.lib.Datasets.Datasets(
-                    logger=self.logger,
-                    zfs=self.zfs,
-                    root_dataset=value
-                ))
+        self.datasets = iocage.lib.Datasets.Datasets(
+            logger=self.logger,
+            zfs=self.zfs
+        )
 
         self.distribution = self._class_distribution(
             host=self,
@@ -119,22 +102,10 @@ class HostGenerator:
             self._defaults = defaults
         else:
             self._defaults = iocage.lib.Resource.DefaultResource(
-                dataset=self.main_datasets.root,
+                dataset=self.datasets.main.root,
                 logger=self.logger,
                 zfs=self.zfs
             )
-
-    @property
-    def main_datasets(self) -> 'iocage.lib.Datasets.Datasets':
-        return self.datasets[self.main_datasets_name]
-
-    def get_root_datasets(
-        self,
-        dataset_name: typing.Optional[str]=None
-    ) -> 'iocage.lib.Datasets.Datasets':
-        if dataset_name is None:
-            return self.main_datasets
-        return self.datasets[dataset_name]
 
     @property
     def defaults(self) -> 'iocage.lib.Resource.DefaultResource':
@@ -191,27 +162,6 @@ class HostGenerator:
     def processor(self) -> str:
         """Return the hosts processor architecture."""
         return platform.processor()
-
-    @property
-    def rc_conf(self) -> 'iocage.lib.Config.Jail.File.RCConf.RCConf':
-        if "_rc_conf" not in self.__dir__():
-            import iocage.lib.Config.Jail.File.RCConf
-            self._rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
-                logger=self.logger
-            )
-        return self._rc_conf
-
-    def _read_root_datasets_from_rc_conf(self) -> typing.Dict[str, str]:
-        prefix = "ioc_dataset_"
-
-        rc_conf = self.rc_conf
-        rc_conf_keys = filter(lambda x: x.startswith(prefix), rc_conf)
-
-        output = dict()
-        for rc_conf_key in rc_conf_keys:
-            datasets_name = rc_conf_key[len(prefix):]
-            output[datasets_name] = rc_conf[rc_conf_key]
-        return output
 
 
 class Host(HostGenerator):

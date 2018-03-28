@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ import iocage.lib.Config.Jail.Defaults
 import iocage.lib.Config.Type.JSON
 import iocage.lib.Config.Type.UCL
 import iocage.lib.Config.Type.ZFS
-import iocage.lib.Filter
 import iocage.lib.Logger
 import iocage.lib.Types
 import iocage.lib.ZFS
@@ -403,98 +402,3 @@ class DefaultResource(Resource):
     def save(self) -> None:
         """Save changes to the default configuration."""
         self._write_config(self.config.user_data)
-
-
-class ListableResource(list, Resource):
-    """Representation of Resources that can be listed."""
-
-    _filters: typing.Optional[iocage.lib.Filter.Terms] = None
-
-    def __init__(
-        self,
-        dataset: typing.Optional[libzfs.ZFSDataset]=None,
-        filters: typing.Optional[iocage.lib.Filter.Terms]=None,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
-    ) -> None:
-
-        list.__init__(self, [])
-
-        Resource.__init__(
-            self,
-            dataset=dataset,
-            logger=logger,
-            zfs=zfs
-        )
-
-        self.filters = filters
-
-    def destroy(self, force: bool=False) -> None:
-        """Listable resources by itself cannot be destroyed."""
-        raise NotImplementedError("destroy unimplemented for ListableResource")
-
-    def __iter__(
-        self
-    ) -> typing.Generator[Resource, None, None]:
-        """Return an iterator over the child datasets."""
-        for child_dataset in self.dataset.children:
-
-            name = self._get_asset_name_from_dataset(child_dataset)
-            if self._filters is not None:
-                if self._filters.match_key("name", name) is not True:
-                    # Skip all jails that do not even match the name
-                    continue
-
-            # ToDo: Do not load jail if filters do not require to
-            resource = self._get_resource_from_dataset(child_dataset)
-            if self._filters is not None:
-                if self._filters.match_resource(resource):
-                    yield resource
-
-    def __len__(self) -> int:
-        """Return the number of resources matching the filters."""
-        return len(list(self.__iter__()))
-
-    def _get_asset_name_from_dataset(
-        self,
-        dataset: libzfs.ZFSDataset
-    ) -> str:
-        """
-        Return the last fragment of a dataset's name.
-
-        Example:
-            /iocage/jails/foo -> foo
-        """
-        return str(dataset.name.split("/").pop())
-
-    def _get_resource_from_dataset(
-        self,
-        dataset: libzfs.ZFSDataset
-    ) -> Resource:
-
-        return self._create_resource_instance(dataset)
-
-    @property
-    def filters(self) -> typing.Optional[iocage.lib.Filter.Terms]:
-        """Return the filters that are applied on the list items."""
-        return self._filters
-
-    @filters.setter
-    def filters(
-        self,
-        value: typing.Iterable[typing.Union[iocage.lib.Filter.Term, str]]
-    ) -> None:
-        """Set the filters that are applied on the list items."""
-        if isinstance(value, iocage.lib.Filter.Terms):
-            self._filters = value
-        else:
-            self._filters = iocage.lib.Filter.Terms(value)
-
-    @abc.abstractmethod
-    def _create_resource_instance(  # noqa: T484
-        self,
-        dataset: libzfs.ZFSDataset,
-        *args,
-        **kwargs
-    ) -> Resource:
-        pass

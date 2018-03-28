@@ -85,6 +85,11 @@ __rootcmd__ = True
         "(Deprecared: renamed to --file)"
     )
 )
+@click.option(
+    "--dataset", "-d",
+    multiple=True,
+    help="Limit the command to certain root datasets specified in rc.conf."
+)
 def cli(  # noqa: T484
     ctx: IocageClickContext,
     **kwargs
