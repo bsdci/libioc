@@ -53,17 +53,19 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
     _release: typing.Optional['ReleaseGenerator'] = None
     _hashes: typing.Optional[typing.Dict[str, str]] = None
+    host: 'iocage.lib.Host.HostGenerator'
+    root_datasets_name: typing.Optional[str]
 
     def __init__(  # noqa: T484
         self,
         host: iocage.lib.Host.HostGenerator,
         release: typing.Optional['ReleaseGenerator']=None,
+        root_datasets_name: typing.Optional[str]=None,
         **kwargs
     ) -> None:
 
-        self.__releases_dataset_name = host.datasets.releases.name
-        self.__base_dataset_name = host.datasets.base.name
         self.host = iocage.lib.helpers.init_host(self, host)
+        self.root_datasets_name = root_datasets_name
 
         iocage.lib.LaunchableResource.LaunchableResource.__init__(
             self,
@@ -104,7 +106,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         except AttributeError:
             pass
 
-        return f"{self.__releases_dataset_name}/{self.release.name}"
+        return self._dataset_name_from_release_name
 
     @dataset_name.setter
     def dataset_name(self, value: str) -> None:
@@ -125,7 +127,30 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     @property
     def base_dataset_name(self) -> str:
         """Return the ZFS basejail datasets name belonging to the release."""
-        return f"{self.__base_dataset_name}/{self.release.name}/root"
+        return f"{self._dataset_name_from_base_name}/root"
+
+    @property
+    def _dataset_name_from_release_name(self) -> str:
+        #return f"{self.root_dataset.releases.name}/{self.release.name}"
+        return f"{self.source_dataset.releases.name}/{self.name}"
+
+    @property
+    def _dataset_name_from_base_name(self) -> str:
+        #return f"{self.root_dataset.bases.name}/{self.release.name}"
+        return f"{self.source_dataset.base.name}/{self.name}"
+
+    @property
+    def source_dataset(self) -> 'iocage.lib.Datasets.RootDatasets':
+        try:
+            assigned_name = str(self._assigned_dataset_name)
+            return self.host.datasets.find_root_datasets(assigned_name)
+        except AttributeError:
+            pass
+
+        if self.root_datasets_name is None:
+            return self.host.datasets.main
+        else:
+            return self.host.datasets.__getitem__(self.root_datasets_name)
 
 
 class ReleaseGenerator(ReleaseResource):

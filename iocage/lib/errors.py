@@ -320,6 +320,21 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+# ListableResource
+
+
+class ListableResourceNamespaceUndefined(IocageException):
+    """Raised when a ListableResource was not defined with a namespace."""
+
+    def __init__(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> None:
+        msg = f"The ListableResource needs a namespace for this operation"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # General
 
 

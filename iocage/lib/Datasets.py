@@ -34,33 +34,17 @@ import iocage.lib.Types
 import iocage.lib.ZFS
 import iocage.lib.Logger
 
+# MyPy
+DatasetIdentifier = typing.Union[str, libzfs.ZFSDataset]
+SourceFilterType = typing.Tuple[str, ...]
 
-class Datasets:
-    """iocage core dataset abstraction."""
+
+class RCConfEmptyException(Exception): pass
+
+
+class LegacyRootPoolDatasets:
 
     ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
-
-    zfs: 'iocage.lib.ZFS.ZFS'
-    logger: 'iocage.lib.Logger.Logger'
-    _root: libzfs.ZFSDataset
-    _datasets: typing.Dict[str, libzfs.ZFSDataset] = {}
-
-    def __init__(
-        self,
-        root_dataset: typing.Optional[
-            typing.Union[libzfs.ZFSDataset, str]
-        ]=None,
-        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None
-    ) -> None:
-
-        self.logger = iocage.lib.helpers.init_logger(self, logger)
-        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
-
-        if isinstance(root_dataset, libzfs.ZFSDataset):
-            self._root = root_dataset
-        elif isinstance(root_dataset, str):
-            self._root = self.zfs.get_or_create_dataset(root_dataset)
 
     @property
     def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
@@ -77,36 +61,6 @@ class Datasets:
         if pool is None:
             raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
         return pool
-
-    @property
-    def root(self) -> libzfs.ZFSDataset:
-        """Return the iocage root dataset."""
-        try:
-            return self._root
-        except AttributeError:
-            pass
-
-        found_pool = self._active_pool_or_none
-        if found_pool is None:
-            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
-
-        self._root = self.zfs.get_dataset(f"{found_pool.name}/iocage")
-        return self._root
-
-    @property
-    def releases(self) -> libzfs.ZFSDataset:
-        """Get or create the iocage releases dataset."""
-        return self._get_or_create_dataset("releases")
-
-    @property
-    def base(self) -> libzfs.ZFSDataset:
-        """Get or create the iocage ZFS basejail releases dataset."""
-        return self._get_or_create_dataset("base")
-
-    @property
-    def jails(self) -> libzfs.ZFSDataset:
-        """Get or create the iocage jails dataset."""
-        return self._get_or_create_dataset("jails")
 
     def activate(
         self,
@@ -213,11 +167,226 @@ class Datasets:
             )
             dataset.properties[name] = libzfs.ZFSUserProperty(value)
 
+
+class RootDatasets:
+    """iocage core dataset abstraction."""
+
+    zfs: 'iocage.lib.ZFS.ZFS'
+    logger: 'iocage.lib.Logger.Logger'
+    root: libzfs.ZFSDataset
+    _datasets: typing.Dict[str, libzfs.ZFSDataset]
+
+    def __init__(
+        self,
+        root_dataset: typing.Union[libzfs.ZFSDataset, str],
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+    ) -> None:
+
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
+
+        self._datasets = {}
+
+        if isinstance(root_dataset, libzfs.ZFSDataset):
+            self.root = root_dataset
+        elif isinstance(root_dataset, str):
+            self.root = self.zfs.get_or_create_dataset(root_dataset)
+
+    @property
+    def releases(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage releases dataset."""
+        return self._get_or_create_dataset("releases")
+
+    @property
+    def base(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage ZFS basejail releases dataset."""
+        return self._get_or_create_dataset("base")
+
+    @property
+    def jails(self) -> libzfs.ZFSDataset:
+        """Get or create the iocage jails dataset."""
+        return self._get_or_create_dataset("jails")
+
     def _get_or_create_dataset(
         self,
         asset_name: str
     ) -> libzfs.ZFSDataset:
-        return self.zfs.get_or_create_dataset(
+        if asset_name in self._datasets:
+            return self._datasets[asset_name]
+
+        asset = self.zfs.get_or_create_dataset(
             f"{self.root.name}/{asset_name}"
         )
-        
+        self._datasets[asset_name] = asset
+        return asset
+
+
+class Datasets(dict, LegacyRootPoolDatasets):
+
+    zfs: 'iocage.lib.ZFS.ZFS'
+    logger: 'iocage.lib.Logger.Logger'
+
+    main_datasets_name: typing.Optional[str]
+
+    def __init__(
+        self,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+    ) -> None:
+
+        dict.__init__(self)
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
+        self.main_datasets_name = None
+
+        try:
+            self._configure_from_rc_conf()
+        except RCConfEmptyException:
+            self._configure_from_pool_property()
+
+    def _configure_from_rc_conf(self) -> None:
+        enabled_datasets = self._read_root_datasets_from_rc_conf()
+        if len(enabled_datasets) == 0:
+            raise RCConfEmptyException()
+        self.attach_sources(enabled_datasets)
+
+    def _configure_from_pool_property(self) -> None:
+        self.attach_sources(dict(iocage=self.active_pool))
+
+    @property
+    def main(self) -> 'iocage.lib.Datasets.Datasets':
+        return self[self.main_datasets_name]
+
+    def find_root_datasets_name(self, dataset_name: str) -> str:
+        for root_name, root_datasets in self.items():
+            if dataset_name.startswith(root_datasets.root.name):
+                return root_name
+
+    def find_root_dataset(self, dataset_name: str) -> RootDatasets:
+        return self.__getitem__(self.find_root_datasets_name(dataset_name))
+
+    def get_root_source(
+        self,
+        source_name: typing.Optional[str]=None
+    ) -> 'iocage.lib.Datasets.Datasets':
+        if source_name is None:
+            return self.main_datasets
+        return self.datasets[source_name]
+
+    def attach_sources(
+        self,
+        sources: typing.Dict[str, DatasetIdentifier]
+    ) -> None:
+        for key, dataset_identifier in sources.items():
+            self.attach_source(key, dataset_identifier)
+
+    def attach_source(
+        self,
+        source_name: str,
+        dataset_identifier: DatasetIdentifier
+    ) -> None:
+        self.attach_root_datasets(
+            source_name=source_name,
+            root_datasets=RootDatasets(
+                root_dataset=dataset_identifier,
+                zfs=self.zfs,
+                logger=self.logger
+            )
+        )
+
+    def attach_root_datasets(
+        self,
+        source_name: str,
+        root_datasets: RootDatasets
+    ) -> None:
+        self[source_name] = root_datasets
+        if self.main_datasets_name is None:
+            self.main_datasets_name = source_name
+
+    def _read_root_datasets_from_rc_conf(self) -> typing.Dict[str, str]:
+        prefix = "ioc_dataset_"
+
+        import iocage.lib.Config.Jail.File.RCConf
+        rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
+            logger=self.logger
+        )
+        rc_conf_keys = filter(lambda x: x.startswith(prefix), rc_conf)
+
+        output = dict()
+        for rc_conf_key in rc_conf_keys:
+            datasets_name = rc_conf_key[len(prefix):]
+            output[datasets_name] = rc_conf[rc_conf_key]
+        return output
+
+
+class FilteredDatasets(Datasets):
+    """
+    A wrapper around Datasets that limits access to certain root datasets.
+
+    Args:
+
+        datasets:
+            The Datasets hosts instance
+
+        source_filters:
+            No filters were applied when unset. The names contained in the
+            Tuple are matched against the dataset names specified in rc.conf.
+
+            For example:
+                echo 'ioc_dataset_main="zroot/iocage"' >> /etc/rc.conf
+                ioc list --source main
+
+        zfs:
+            The shared ZFS object.
+
+        logger:
+            The shared logger instance.
+    """
+
+    _source_filters = typing.Optional[SourceFilterType]
+    datasets: Datasets
+
+    def __init__(
+        self,
+        datasets: Datasets,
+        source_filters: typing.Optional[SourceFilterType]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
+    ) -> None:
+
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
+        self.datasets = datasets
+        self.source_filters = source_filters
+
+    @property
+    def source_filters(self) -> typing.Optional[SourceFilterType]:
+        return self._source_filters
+
+    @source_filters.setter
+    def source_filters(self, value: typing.Optional[SourceFilterType]) -> None:
+        self.clear()
+        self._source_filters = value
+        self._clone_from_datasets()
+
+    def _clone_from_datasets(self) -> None:
+        self.main_datasets_name = self.datasets.main_datasets_name
+        for name, root_datasets in self.datasets.items():
+            if self._name_matches_filters(name) is True:
+                self.attach_root_datasets(name, root_datasets)
+
+    def _name_matches_filters(self, name: str) -> bool:
+        return (self.source_filters is None) or (name in self.source_filters)
+
+
+def filter_datasets(
+    datasets: Datasets,
+    sources: typing.Optional[SourceFilterType]
+) -> FilteredDatasets:
+    return FilteredDatasets(
+        datasets=datasets,
+        source_filters=sources,
+        zfs=datasets.zfs,
+        logger=datasets.logger
+    )

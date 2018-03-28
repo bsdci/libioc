@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Model of multiple iocage Releases."""
 import iocage.lib.Release
-import iocage.lib.Resource
+import iocage.lib.ListableResource
 import iocage.lib.Filter
 import iocage.lib.helpers
 
@@ -34,7 +34,7 @@ import libzfs
 ReleaseListType = typing.List[iocage.lib.Release.ReleaseGenerator]
 
 
-class ReleasesGenerator(iocage.lib.Resource.ListableResource):
+class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
     """Generator Model of multiple iocage Releases."""
 
     _class_release = iocage.lib.Release.ReleaseGenerator
@@ -45,25 +45,31 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
+        sources: typing.Optional[typing.Tuple[str, ...]]=None,
         host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.lib.helpers.init_logger(self, logger)
-        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        iocage.lib.Resource.ListableResource.__init__(
+        iocage.lib.ListableResource.ListableResource.__init__(
             self,
-            dataset=self.host.datasets.releases,
-            filters=filters
+            sources=iocage.lib.Datasets.filter_datasets(
+                datasets=self.host.datasets,
+                sources=sources
+            ),
+            namespace="releases",
+            filters=filters,
+            zfs=zfs,
+            logger=logger
         )
 
     @property
     def local(self) -> ReleaseListType:
         """Return the locally available releases."""
-        release_datasets = self.dataset.children
+
+        datasets = iocage.lib.ListableResource.ListableResource.__iter__(self)
         return list(map(
             lambda x: self._class_release(
                 name=x.name.split("/").pop(),
@@ -71,7 +77,7 @@ class ReleasesGenerator(iocage.lib.Resource.ListableResource):
                 host=self.host,
                 zfs=self.zfs
             ),
-            release_datasets
+            datasets
         ))
 
     @property

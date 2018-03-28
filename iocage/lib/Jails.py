@@ -27,11 +27,11 @@ import typing
 
 import iocage.lib.Jail
 import iocage.lib.Filter
-import iocage.lib.Resource
+import iocage.lib.ListableResource
 import iocage.lib.helpers
 
 
-class JailsGenerator(iocage.lib.Resource.ListableResource):
+class JailsGenerator(iocage.lib.ListableResource.ListableResource):
     """Asynchronous representation of a collection of jails."""
 
     _class_jail = iocage.lib.Jail.JailGenerator
@@ -49,6 +49,7 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
+        sources: typing.Optional[typing.Tuple[str, ...]]=None,
         host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
@@ -58,11 +59,18 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        iocage.lib.Resource.ListableResource.__init__(
+        iocage.lib.ListableResource.ListableResource.__init__(
             self,
-            dataset=self.host.datasets.jails,
-            filters=filters
+            sources=iocage.lib.Datasets.filter_datasets(
+                datasets=self.host.datasets,
+                sources=sources
+            ),
+            namespace="jails",
+            filters=filters,
+            zfs=zfs,
+            logger=logger
         )
+
 
     def _create_resource_instance(  # noqa: T484
         self,
@@ -94,7 +102,8 @@ class JailsGenerator(iocage.lib.Resource.ListableResource):
         """Iterate over all jails matching the filter criteria."""
         self.states.query()
 
-        for jail in iocage.lib.Resource.ListableResource.__iter__(self):
+        iterator = iocage.lib.ListableResource.ListableResource.__iter__(self)
+        for jail in iterator:
 
             if jail.identifier in self.states:
                 jail.state = self.states[jail.identifier]

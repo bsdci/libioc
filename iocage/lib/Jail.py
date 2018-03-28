@@ -55,15 +55,19 @@ class JailResource(
 
     _jail: 'JailGenerator'
     _fstab: 'iocage.lib.Config.Jail.File.Fstab.Fstab'
+    host: 'iocage.lib.Host.HostGenerator'
+    root_datasets_name: typing.Optional[str]
 
     def __init__(  # noqa: T484
         self,
         host: 'iocage.lib.Host.HostGenerator',
+        root_datasets_name: typing.Optional[str]=None,
         jail: typing.Optional['JailGenerator']=None,
         **kwargs
     ) -> None:
 
         self.host = iocage.lib.helpers.init_host(self, host)
+        self.root_datasets_name = root_datasets_name
 
         if jail is not None:
             self._jail = jail
@@ -155,16 +159,32 @@ class JailResource(
         method sets the jails dataset_name to a child dataset of the hosts
         jails dataset with the jails name.
         """
-        self.dataset_name = f"{self.host.datasets.jails.name}/{self.name}"
+        if self.root_datasets_name is None:
+            base_name = self.host.datasets.main.jails.name
+        else:
+            base_name = self.host.datasets.__getitem__(
+                self.root_datasets_name
+            ).jails.name
+
+        self.dataset_name = f"{base_name}/{self.name}"
 
     @property
     def _dataset_name_from_jail_name(self) -> str:
-
         jail_id = str(self.jail.config["id"])
         if jail_id is None:
             raise iocage.lib.errors.JailUnknownIdentifier()
 
-        return f"{self.host.main_datasets.jails.name}/{jail_id}"
+        if self.root_datasets_name is None:
+            base_name = self.host.datasets.main.jails.name
+        else:
+            base_name = self.host.datasets.__getitem__(
+                self.root_datasets_name
+            ).jails.name
+        return f"{base_name}/{jail_id}"
+
+    @property
+    def source(self):
+        return self.host.datasets.find_root_datasets_name(self.dataset_name)
 
     def get(self, key: str) -> typing.Any:
         """Get a config value from the jail or defer to its resource."""
@@ -226,6 +246,7 @@ class JailGenerator(JailResource):
     def __init__(  # noqa: T484
         self,
         data: typing.Union[str, typing.Dict[str, typing.Any]]={},
+        root_datasets_name: typing.Optional[str]=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         host: typing.Optional['iocage.lib.Host.Host']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
@@ -261,6 +282,7 @@ class JailGenerator(JailResource):
         JailResource.__init__(
             self,
             jail=self,
+            root_datasets_name=root_datasets_name,
             host=self.host,
             logger=self.logger,
             zfs=self.zfs,
@@ -1458,6 +1480,7 @@ class JailGenerator(JailResource):
             raise iocage.lib.errors.JailNotSupplied(logger=self.logger)
 
         for datasets_key, datasets in self.host.datasets.items():
+            print(datasets_key)
             for dataset in list(datasets.jails.children):
                 dataset_name = str(
                     dataset.name[(len(datasets.jails.name) + 1):]
@@ -1475,6 +1498,13 @@ class JailGenerator(JailResource):
     def name(self) -> str:
         """Return the configured jail id."""
         return str(self.config["id"])
+
+    @property
+    def full_name(self):
+        if len(self.host.datasets) > 1:
+            return f"{self.source}/{self.name}"
+        else:
+            return self.name
 
     @property
     def humanreadable_name(self) -> str:
@@ -1538,6 +1568,7 @@ class JailGenerator(JailResource):
         """Return the iocage.Release instance linked with the jail."""
         return iocage.lib.Release.Release(
             name=self.config["release"],
+            root_datasets_name=self.root_datasets_name,
             logger=self.logger,
             host=self.host,
             zfs=self.zfs
