@@ -536,9 +536,10 @@ class JailGenerator(JailResource):
             )
         else:
             child, stdout, stderr = iocage.lib.helpers.exec(
-                command,
+                [value],
                 logger=self.logger,
-                env=self.env
+                env=self.env,
+                shell=True
             )
             return (child, stdout, stderr, )
 
