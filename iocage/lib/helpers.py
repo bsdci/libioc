@@ -152,10 +152,10 @@ def exec(  # noqa: T484
 
     subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
     subprocess_args["stderr"] = subprocess_args.get("stderr", subprocess.PIPE)
+    subprocess_args["shell"] = subprocess_args.get("shell", False)
 
     child = subprocess.Popen(  # nosec: TODO: #113
         command,
-        shell=False,
         **subprocess_args
     )
 
