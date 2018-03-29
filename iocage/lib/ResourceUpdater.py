@@ -302,10 +302,8 @@ class Updater:
 
         def _rollback_snapshot() -> None:
             self.logger.spam(f"Rolling back to snapshot {snapshot_name}")
-            dataset.umount()
             snapshot = self.resource.zfs.get_snapshot(snapshot_name)
             snapshot.rollback(force=True)
-            dataset.mount()
             snapshot.delete()
 
         runReleaseUpdateEvent.add_rollback_step(_rollback_snapshot)
