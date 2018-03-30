@@ -66,13 +66,17 @@ class ListableResource(list):
         if self.namespace is None:
             raise ListableResourceNamespaceUndefined(logger=self.logger)
 
+        filters = self._filters
+        has_filters = (filters is not None)
+
         for root_name, root_datasets in self.sources.items():
+            if has_filters and (filters.match_source(root_name) is False):
+                # skip when the resources defined source does not match
+                continue
             children = root_datasets.__getattribute__(self.namespace).children
             for child_dataset in children:
-
                 name = self._get_asset_name_from_dataset(child_dataset)
-                if self._filters is not None:
-                    if self._filters.match_key("name", name) is not True:
+                if has_filters and (filters.match_key("name", name) is False):
                         # Skip all jails that do not even match the name
                         continue
 

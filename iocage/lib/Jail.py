@@ -44,6 +44,7 @@ import iocage.lib.ZFSBasejailStorage
 import iocage.lib.ZFSShareStorage
 import iocage.lib.LaunchableResource
 import iocage.lib.VersionedResource
+import iocage.lib.ResourceSelector
 import iocage.lib.Config.Jail.File.Fstab
 
 
@@ -1477,11 +1478,18 @@ class JailGenerator(JailResource):
 
     def _resolve_name(self, text: str) -> str:
 
+        print(text)
         if (text is None) or (len(text) == 0):
             raise iocage.lib.errors.JailNotSupplied(logger=self.logger)
 
-        for datasets_key, datasets in self.host.datasets.items():
-            print(datasets_key)
+        resource_selector = iocage.lib.ResourceSelector.ResourceSelector(
+            name=text
+        )
+
+        jail_name = resource_selector.name
+        root_datasets = resource_selector.filter_datasets(self.datasets)
+
+        for datasets_key, datasets in root_datasets:
             for dataset in list(datasets.jails.children):
                 dataset_name = str(
                     dataset.name[(len(datasets.jails.name) + 1):]

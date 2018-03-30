@@ -71,7 +71,6 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
             logger=logger
         )
 
-
     def _create_resource_instance(  # noqa: T484
         self,
         dataset: libzfs.ZFSDataset,
