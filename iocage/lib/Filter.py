@@ -28,6 +28,10 @@ import typing
 import iocage.lib.errors
 import iocage.lib.helpers
 import iocage.lib.Resource
+import iocage.lib.ResourceSelector
+
+_ResourceSelector = iocage.lib.ResourceSelector.ResourceSelector
+_TermValuesType = typing.Union[str, typing.List[str], _ResourceSelector]
 
 
 def match_filter(value: str, filter_string: str) -> bool:
@@ -50,7 +54,7 @@ class Term(list):
     def __init__(
         self,
         key: str,
-        values: typing.Union[str, typing.List[str]]=[]
+        values: _TermValuesType=[]
     ) -> None:
         self.key = key
 
@@ -58,6 +62,8 @@ class Term(list):
             data = self._split_filter_values(values)
         elif isinstance(values, list):
             data = values
+        elif isinstance(values, _ResourceSelector):
+            data = [values]
 
         list.__init__(self, data)
 
@@ -97,21 +103,43 @@ class Term(list):
 
         for filter_value in self:
 
-            if match_filter(input_value, filter_value):
-                return True
-
-            if short is False:
-                continue
-
-            # match against humanreadable names as well
-            has_humanreadble_length = (len(filter_value) == 8)
-            has_no_globs = not self._filter_string_has_globs(filter_value)
-            if (has_humanreadble_length and has_no_globs) is True:
-                shortname = iocage.lib.helpers.to_humanreadable_name(
-                    input_value
-                )
-                if shortname == filter_value:
+            if isinstance(filter_value, str):
+                if self._match_filter(input_value, filter_value, short):
                     return True
+            elif isinstance(filter_value, _ResourceSelector):
+                if self._match_filter(input_value, filter_value.name, short):
+                    return True
+            elif isinstance(filter_value, list):
+                results = list(map(
+                    lambda x: self._match_filter(input_value, x, short),
+                    filter_value
+                ))
+                if any(results):
+                    return True
+
+        return False
+
+    def _match_filter(
+        self,
+        value: str,
+        filter_string: str,
+        short: bool=False
+    ) -> bool:
+        if match_filter(value, filter_string) is True:
+            return True
+
+        if short is False:
+            return False
+
+        # match against humanreadable names as well
+        has_humanreadble_length = (len(filter_string) == 8)
+        has_no_globs = not self._filter_string_has_globs(filter_string)
+        if (has_humanreadble_length and has_no_globs) is True:
+            shortname = iocage.lib.helpers.to_humanreadable_name(
+                input_value
+            )
+            if shortname == filter_string:
+                return True
 
         return False
 
@@ -205,11 +233,27 @@ class Terms(list):
             if term.key != key:
                 continue
 
-            short = (key == "name")
+            if (key == "name"):
+                short = True
 
             if term.matches(value, short) is False:
                 return False
 
+        return True
+
+    def match_source(self, source_name: str) -> bool:
+        """Check if the source name matches the filter terms."""
+        for term in self:
+            if term.key != "name":
+                continue
+
+            # All name terms have been transformed to ResourceSelector
+            resource_selector = term[0]
+            if resource_selector.source_name is None:
+                return True
+            return resource_selector.source_name == source_name
+
+        # no name term or none at all
         return True
 
     def _parse_term(self, user_input: str) -> typing.List[Term]:
@@ -220,7 +264,7 @@ class Terms(list):
             prop, value = user_input.split("=", maxsplit=1)
         except ValueError:
             prop = "name"
-            value = user_input
+            value = iocage.lib.ResourceSelector.ResourceSelector(user_input)
 
         terms.append(Term(prop, value))
 
