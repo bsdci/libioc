@@ -266,7 +266,10 @@ class Terms(list):
             prop, value = user_input.split("=", maxsplit=1)
         except ValueError:
             prop = "name"
-            value = iocage.lib.ResourceSelector.ResourceSelector(user_input)
+            value = user_input
+
+        if prop == "name":
+            value = iocage.lib.ResourceSelector.ResourceSelector(value)
 
         terms.append(Term(prop, value))
 
