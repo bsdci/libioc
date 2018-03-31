@@ -131,9 +131,9 @@ class ConfigFile(dict):
         except (FileNotFoundError, ValueError):
             data = {}
 
-        existing_keys = set(self.keys())
-        new_keys = set(data.keys())
-        delete_keys = existing_keys - new_keys
+        existing_keys = list(self.keys())
+        new_keys = list(data.keys())
+        delete_keys = [x for x in existing_keys if x not in new_keys]
 
         if delete is True:
             for key in delete_keys:
