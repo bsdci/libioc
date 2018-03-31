@@ -554,6 +554,20 @@ class ZFSPoolUnavailable(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class ResourceUnmanaged(IocageException):
+    """Raised when locating a resources dataset on a root dataset fails."""
+
+    def __init__(  # noqa: T484
+        self,
+        dataset_name: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = f"The resource dataset {dataset_name} is not managed by iocage"
+        super().__init__(msg, *args, **kwargs)
+
+
 # Snapshots
 
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,11 @@ import iocage.lib.Resource
 import iocage.lib.ResourceSelector
 
 _ResourceSelector = iocage.lib.ResourceSelector.ResourceSelector
-_TermValuesType = typing.Union[str, typing.List[str], _ResourceSelector]
+_TermValuesType = typing.Union[
+    str,
+    typing.List[str],
+    iocage.lib.ResourceSelector.ResourceSelector
+]
 
 
 def match_filter(value: str, filter_string: str) -> bool:
@@ -135,9 +139,7 @@ class Term(list):
         has_humanreadble_length = (len(filter_string) == 8)
         has_no_globs = not self._filter_string_has_globs(filter_string)
         if (has_humanreadble_length and has_no_globs) is True:
-            shortname = iocage.lib.helpers.to_humanreadable_name(
-                input_value
-            )
+            shortname = iocage.lib.helpers.to_humanreadable_name(value)
             if shortname == filter_string:
                 return True
 
@@ -251,7 +253,7 @@ class Terms(list):
             resource_selector = term[0]
             if resource_selector.source_name is None:
                 return True
-            return resource_selector.source_name == source_name
+            return (resource_selector.source_name == source_name) is True
 
         # no name term or none at all
         return True

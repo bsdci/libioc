@@ -52,10 +52,10 @@ def cli(ctx, zpool):
 
     try:
         datasets = iocage.lib.Datasets.Datasets(
-            pool=iocage_pool,
             zfs=zfs,
             logger=logger
         )
+        datasets.attach_source("iocage", f"{iocage_pool.name}/iocage")
         if datasets.is_pool_active():
             datasets.deactivate()
             logger.log(f"ZFS pool '{zpool}' deactivated")

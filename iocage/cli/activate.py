@@ -53,10 +53,10 @@ def cli(ctx, zpool, mountpoint):
 
     try:
         datasets = iocage.lib.Datasets.Datasets(
-            root_dataset=f"{iocage_pool.name}/iocage",
             zfs=zfs,
             logger=logger
         )
+        datasets.attach_source("iocage", f"{iocage_pool.name}/iocage")
         datasets.activate(mountpoint=mountpoint)
         logger.log(f"ZFS pool '{zpool}' activated")
     except iocage.lib.errors.IocageException:

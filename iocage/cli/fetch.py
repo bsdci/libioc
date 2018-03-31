@@ -46,7 +46,7 @@ __rootcmd__ = True
     help="Remote URL with path to the release/snapshot directory"
 )
 @click.option(  # noqa: T484
-    "--file", "-F",
+    "--file", "-F",  # noqa: T484
     multiple=True,
     help="Specify the files to fetch from the mirror."
 )

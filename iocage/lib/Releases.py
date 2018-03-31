@@ -68,7 +68,6 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
     @property
     def local(self) -> ReleaseListType:
         """Return the locally available releases."""
-
         datasets = iocage.lib.ListableResource.ListableResource.__iter__(self)
         return list(map(
             lambda x: self._class_release(

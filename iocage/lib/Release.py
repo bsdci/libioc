@@ -131,16 +131,21 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
     @property
     def _dataset_name_from_release_name(self) -> str:
-        #return f"{self.root_dataset.releases.name}/{self.release.name}"
         return f"{self.source_dataset.releases.name}/{self.name}"
 
     @property
     def _dataset_name_from_base_name(self) -> str:
-        #return f"{self.root_dataset.bases.name}/{self.release.name}"
         return f"{self.source_dataset.base.name}/{self.name}"
 
     @property
     def source_dataset(self) -> 'iocage.lib.Datasets.RootDatasets':
+        """
+        Return the releases source root dataset.
+
+        iocage can manage multiple source datasets (on different ZFS pools
+        for instance). This property returns the RootDatasets instance that
+        belongs to the release.
+        """
         try:
             assigned_name = str(self._assigned_dataset_name)
             return self.host.datasets.find_root_datasets(assigned_name)
