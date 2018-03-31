@@ -146,12 +146,18 @@ class Datasets(dict):
         self.attach_sources(_e)
 
     def _configure_from_pool_property(self) -> None:
+        active_pool = self._active_pool_or_none
+        if active_pool is None:
+            # raise internally without logging
+            raise iocage.lib.errors.IocageNotActivated()
         self.attach_sources(dict(iocage=f"{self.active_pool.name}/iocage"))
         self.logger.spam(f"Found active ZFS pool {self.active_pool.name}")
 
     @property
     def main(self) -> 'iocage.lib.Datasets.Datasets':
         """Return the source that was attached first."""
+        if self.main_datasets_name is None:
+            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
         return self[self.main_datasets_name]
 
     def find_root_datasets_name(self, dataset_name: str) -> str:
