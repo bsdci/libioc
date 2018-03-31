@@ -91,7 +91,7 @@ class Storage:
 
         try:
             new_dataset_name = "/".join([
-                self.jail.host.datasets.jails.name,
+                self.jail.host.datasets[self.jail.source].jails.name,
                 new_name
             ])
             dataset = self.jail.dataset
