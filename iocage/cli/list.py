@@ -98,7 +98,7 @@ def cli(
     try:
 
         if (dataset_type == "base") and (remote is True):
-            columns = ["name"]
+            columns = ["name", "eol"]
             resources = host.distribution.releases
 
         else:
