@@ -122,8 +122,17 @@ class Datasets(dict):
 
         try:
             self._configure_from_rc_conf()
+            return
         except RCConfEmptyException:
+            pass
+
+        try:
             self._configure_from_pool_property()
+            return
+        except iocage.lib.errors.IocageNotActivated:
+            pass
+
+        self.logger.spam("No iocage root dataset configuration found")
 
     def _configure_from_rc_conf(self) -> None:
         enabled_datasets = self._read_root_datasets_from_rc_conf()
@@ -132,7 +141,8 @@ class Datasets(dict):
         self.attach_sources(enabled_datasets)
 
     def _configure_from_pool_property(self) -> None:
-        self.attach_sources(dict(iocage=self.active_pool))
+        self.attach_sources(dict(iocage=f"{self.active_pool.name}/iocage"))
+        self.logger.spam(f"Found active ZFS pool {self.active_pool.name}")
 
     @property
     def main(self) -> 'iocage.lib.Datasets.Datasets':
