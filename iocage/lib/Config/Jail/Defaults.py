@@ -117,7 +117,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "stop_timeout": "30",
         "mount_procfs": "0",
         "mount_devfs": "1",
-        "mount_fdescfs": "1",
+        "mount_fdescfs": "0",
         "securelevel": "2",
         "tags": [],
         "template": False,
