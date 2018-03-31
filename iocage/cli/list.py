@@ -60,11 +60,6 @@ supported_output_formats = ['table', 'csv', 'list', 'json']
               type=click.Choice(supported_output_formats))
 @click.option("--header/--no-header", "-H/-NH", is_flag=True, default=True,
               help="Show or hide column name heading.")
-@click.option(
-    "--dataset", "-d",
-    multiple=True,
-    help="Limit the command to certain root datasets specified in rc.conf."
-)
 @click.argument("filters", nargs=-1)
 def cli(
     ctx: IocageClickContext,
@@ -75,7 +70,6 @@ def cli(
     _sort: typing.Optional[str],
     output: typing.Optional[str],
     output_format: str,
-    dataset: typing.Tuple[str, ...],
     filters: typing.Tuple[str, ...]
 ) -> None:
     """List jails in various formats."""
@@ -111,7 +105,7 @@ def cli(
 
             if (dataset_type == "base"):
                 resources_class = iocage.lib.Releases.ReleasesGenerator
-                columns = ["name"]
+                columns = ["full_name"]
             else:
                 resources_class = iocage.lib.Jails.JailsGenerator
                 columns = _list_output_comumns(output, _long)
@@ -120,13 +114,11 @@ def cli(
                 else:
                     filters += ("template=no,-",)
 
-            sources = dataset if len(dataset) > 0 else None
             resources = resources_class(
                 logger=logger,
                 host=host,
                 # ToDo: allow quoted whitespaces from user inputs
-                filters=filters,
-                sources=sources
+                filters=filters
             )
 
     except iocage.lib.errors.IocageException:

@@ -38,6 +38,7 @@ import iocage.lib.errors
 import iocage.lib.helpers
 import iocage.lib.events
 import iocage.lib.LaunchableResource
+import iocage.lib.ResourceSelector
 import iocage.lib.Jail
 
 # MyPy
@@ -51,8 +52,8 @@ import iocage.lib.Config.Jail.File.SysctlConf
 class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     """Resource that represents an iocage release."""
 
-    _release: typing.Optional['ReleaseGenerator'] = None
-    _hashes: typing.Optional[typing.Dict[str, str]] = None
+    _release: typing.Optional['ReleaseGenerator']
+    _hashes: typing.Optional[typing.Dict[str, str]]
     host: 'iocage.lib.Host.HostGenerator'
     root_datasets_name: typing.Optional[str]
 
@@ -73,6 +74,7 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         )
 
         self._release = release
+        self._hashes = None
 
     @property
     def release(self) -> 'ReleaseGenerator':
@@ -92,6 +94,21 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         raise Exception(
             "Resource is not a valid release itself and has no linked release"
         )
+
+    @property
+    def full_name(self) -> str:
+        """
+        Return the full identifier of a jail.
+
+        When more than one root dataset is managed by iocage, the full source
+        and name are returned. Otherwise just the name.
+
+        For example `mydataset/jailname` or just `jailname`.
+        """
+        if len(self.host.datasets) > 1:
+            return f"{self.source}/{self.name}"
+        else:
+            return str(self.name)
 
     @property
     def dataset_name(self) -> str:
@@ -157,6 +174,22 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
         else:
             return self.host.datasets.__getitem__(self.root_datasets_name)
 
+    @property
+    def source(self) -> str:
+        """Return the name of the releases source root datasets."""
+        try:
+            assigned_name = str(self._assigned_dataset_name)
+            return str(
+                self.host.datasets.find_root_datasets_name(assigned_name)
+            )
+        except AttributeError:
+            pass
+
+        if self.root_datasets_name is None:
+            return str(self.host.datasets.main_datasets_name)
+        else:
+            return str(self.root_datasets_name)
+
 
 class ReleaseGenerator(ReleaseResource):
     """Release with generator interfaces."""
@@ -187,6 +220,7 @@ class ReleaseGenerator(ReleaseResource):
     def __init__(  # noqa: T484
         self,
         name: str,
+        root_datasets_name: typing.Optional[str]=None,
         host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
@@ -199,10 +233,22 @@ class ReleaseGenerator(ReleaseResource):
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
-        if iocage.lib.helpers.validate_name(name) is False:
+        resource_selector = iocage.lib.ResourceSelector.ResourceSelector(name)
+        if resource_selector.source_name is not None:
+            is_different = resource_selector.source_name != root_datasets_name
+            if (root_datasets_name is not None) and (is_different is True):
+                # ToDo: omit root_datasets_name at all ?
+                raise iocage.lib.errors.ConflictingResourceSelection(
+                    source_a=resource_selector.source_name,
+                    source_b=root_datasets_name
+                )
+            else:
+                root_datasets_name = resource_selector.source_name
+
+        if iocage.lib.helpers.validate_name(resource_selector.name) is False:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
-        self.name = name
+        self.name = resource_selector.name
         self.eol = eol
         self._hbsd_release_branch = None
 
@@ -214,6 +260,7 @@ class ReleaseGenerator(ReleaseResource):
             host=self.host,
             logger=self.logger,
             zfs=self.zfs,
+            root_datasets_name=root_datasets_name,
             **release_resource_args
         )
 

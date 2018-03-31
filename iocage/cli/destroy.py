@@ -96,7 +96,7 @@ def cli(
     if not force:
         message = "These {} will be deleted:\n  - {}\nAre you sure?".format(
             "releases" if release else "jails",
-            "\n  - ".join([r.getstring('name') for r in resources])
+            "\n  - ".join([r.getstring('full_name') for r in resources])
         )
         click.confirm(message, default=False, abort=True)
 

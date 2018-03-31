@@ -45,20 +45,18 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
-        sources: typing.Optional[typing.Tuple[str, ...]]=None,
         host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
+        self.logger = iocage.lib.helpers.init_logger(self, logger)
+        self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
 
         iocage.lib.ListableResource.ListableResource.__init__(
             self,
-            sources=iocage.lib.Datasets.filter_datasets(
-                datasets=self.host.datasets,
-                sources=sources
-            ),
+            sources=self.host.datasets,
             namespace="releases",
             filters=filters,
             zfs=zfs,
@@ -72,6 +70,9 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
         return list(map(
             lambda x: self._class_release(
                 name=x.name.split("/").pop(),
+                root_datasets_name=self.host.datasets.find_root_datasets_name(
+                    x.name
+                ),
                 logger=self.logger,
                 host=self.host,
                 zfs=self.zfs
@@ -89,15 +90,19 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
     def _create_resource_instance(  # noqa T484
         self,
         dataset: libzfs.ZFSDataset,
-        *args,
-        **kwargs
+        *class_args,
+        **class_kwargs
     ) -> iocage.lib.Release.ReleaseGenerator:
 
-        kwargs["name"] = self._get_asset_name_from_dataset(dataset)
-        kwargs["logger"] = self.logger
-        kwargs["host"] = self.host
-        kwargs["zfs"] = self.zfs
-        return self._class_release(*args, **kwargs)
+        sources = self.sources
+        class_kwargs["name"] = self._get_asset_name_from_dataset(dataset)
+        class_kwargs["root_datasets_name"] = sources.find_root_datasets_name(
+            dataset.name
+        )
+        class_kwargs["logger"] = self.logger
+        class_kwargs["host"] = self.host
+        class_kwargs["zfs"] = self.zfs
+        return self._class_release(*class_args, **class_kwargs)
 
     def _create_instance(  # noqa: T484
         self,

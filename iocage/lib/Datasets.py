@@ -208,7 +208,7 @@ class Datasets(dict):
         rc_conf = iocage.lib.Config.Jail.File.RCConf.RCConf(
             logger=self.logger
         )
-        rc_conf_keys = filter(lambda x: x.startswith(prefix), rc_conf)
+        rc_conf_keys = list(filter(lambda x: x.startswith(prefix), rc_conf))
 
         output = dict()
         for rc_conf_key in rc_conf_keys:

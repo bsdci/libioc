@@ -84,11 +84,6 @@ def validate_count(
                    " jails.")
 @click.option("--no-fetch", is_flag=True, default=False,
               help="Do not automatically fetch releases")
-@click.option(
-    "--dataset", "-d",
-    multiple=True,
-    help="Limit the command to certain root datasets specified in rc.conf."
-)
 @click.argument("props", nargs=-1)
 def cli(
     ctx: IocageClickContext,
@@ -100,8 +95,7 @@ def cli(
     basejail_type: str,
     empty: bool,
     name: str,
-    no_fetch: bool,
-    dataset: typing.Tuple[str, ...]
+    no_fetch: bool
 ) -> None:
     """Create iocage jails."""
     logger = ctx.parent.logger
@@ -117,10 +111,9 @@ def cli(
         )
         release = host.release_version
 
-    if name:
-        jail_data["name"] = name
-
-    root_datasets_name = dataset[0] if len(dataset) > 0 else None
+    resource_selector = iocage.lib.ResourceSelector.ResourceSelector(name)
+    jail_data["name"] = resource_selector.name
+    root_datasets_name = resource_selector.source_name
 
     if release is not None:
         resource = iocage.lib.Release.ReleaseGenerator(

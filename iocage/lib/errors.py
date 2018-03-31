@@ -568,6 +568,24 @@ class ResourceUnmanaged(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class ConflictingResourceSelection(IocageException):
+    """Raised when a resource was configured with conflicting sources."""
+
+    def __init__(  # noqa: T484
+        self,
+        source_a: str,
+        source_b: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = (
+            "The resource was configured with conflicting root sources: "
+            f"{source_a} != {source_b}"
+        )
+        super().__init__(msg, *args, **kwargs)
+
+
 # Snapshots
 
 
