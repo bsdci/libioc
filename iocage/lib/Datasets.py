@@ -95,8 +95,9 @@ class RootDatasets:
         asset = self.zfs.get_or_create_dataset(
             f"{self.root.name}/{asset_name}"
         )
-        self._datasets[asset_name] = asset
-        return asset
+        _asset: libzfs.ZFSDataset = asset
+        self._datasets[asset_name] = _asset
+        return _asset
 
 
 class Datasets(dict):
@@ -138,7 +139,11 @@ class Datasets(dict):
         enabled_datasets = self._read_root_datasets_from_rc_conf()
         if len(enabled_datasets) == 0:
             raise RCConfEmptyException()
-        self.attach_sources(enabled_datasets)
+
+        _e: typing.Dict[str, typing.Union[str, libzfs.ZFSDataset]] = {}
+        for key, value in enabled_datasets.items():
+            _e[key] = value
+        self.attach_sources(_e)
 
     def _configure_from_pool_property(self) -> None:
         self.attach_sources(dict(iocage=f"{self.active_pool.name}/iocage"))
@@ -220,7 +225,7 @@ class Datasets(dict):
         )
         rc_conf_keys = list(filter(lambda x: x.startswith(prefix), rc_conf))
 
-        output = dict()
+        output: typing.Dict[str, str] = {}
         for rc_conf_key in rc_conf_keys:
             datasets_name = rc_conf_key[len(prefix):]
             output[datasets_name] = rc_conf[rc_conf_key]
