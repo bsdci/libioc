@@ -64,15 +64,18 @@ class ListableResource(list):
     ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
         """Return an iterator over the child datasets."""
         if self.namespace is None:
-            raise ListableResourceNamespaceUndefined(logger=self.logger)
+            raise iocage.lib.errors.ListableResourceNamespaceUndefined(
+                logger=self.logger
+            )
 
         filters = self._filters
         has_filters = (filters is not None)
 
         for root_name, root_datasets in self.sources.items():
-            if has_filters and (filters.match_source(root_name) is False):
-                # skip when the resources defined source does not match
-                continue
+            if (filters is not None):
+                if (filters.match_source(root_name) is False):
+                    # skip when the resources defined source does not match
+                    continue
             children = root_datasets.__getattribute__(self.namespace).children
             for child_dataset in children:
                 name = self._get_asset_name_from_dataset(child_dataset)

@@ -41,7 +41,7 @@ class ResourceSelector:
 
     @property
     def name(self) -> str:
-        """Return the name (without source)."""
+        """Return the given name without the source."""
         return self._name
 
     @name.setter

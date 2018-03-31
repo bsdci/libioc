@@ -184,8 +184,11 @@ class JailResource(
         return f"{base_name}/{jail_id}"
 
     @property
-    def source(self):
-        return self.host.datasets.find_root_datasets_name(self.dataset_name)
+    def source(self) -> str:
+        """Return the name of the jails source root datasets."""
+        return str(
+            self.host.datasets.find_root_datasets_name(self.dataset_name)
+        )
 
     def get(self, key: str) -> typing.Any:
         """Get a config value from the jail or defer to its resource."""
@@ -1486,7 +1489,6 @@ class JailGenerator(JailResource):
             name=text
         )
 
-        jail_name = resource_selector.name
         root_datasets = resource_selector.filter_datasets(self.datasets)
 
         for datasets_key, datasets in root_datasets:
@@ -1497,7 +1499,6 @@ class JailGenerator(JailResource):
                 humanreadable_name = iocage.lib.helpers.to_humanreadable_name(
                     dataset_name
                 )
-
                 if text in [dataset_name, humanreadable_name]:
                     return dataset_name
 
@@ -1509,7 +1510,15 @@ class JailGenerator(JailResource):
         return str(self.config["id"])
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
+        """
+        Return the full identifier of a jail.
+
+        When more than one root dataset is managed by iocage, the full source
+        and name are returned. Otherwise just the name.
+
+        For example `mydataset/jailname` or just `jailname`.
+        """
         if len(self.host.datasets) > 1:
             return f"{self.source}/{self.name}"
         else:

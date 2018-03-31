@@ -36,136 +36,13 @@ import iocage.lib.Logger
 
 # MyPy
 DatasetIdentifier = typing.Union[str, libzfs.ZFSDataset]
-SourceFilterType = typing.Tuple[str, ...]
+OptionalSourceFilterType = typing.Optional[typing.Tuple[str, ...]]
 
 
-class RCConfEmptyException(Exception): pass
+class RCConfEmptyException(Exception):
+    """Exception for internal use."""
 
-
-class LegacyRootPoolDatasets:
-
-    ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
-
-    @property
-    def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
-        zpools: typing.List[libzfs.ZFSPool] = list(self.zfs.pools)
-        for pool in zpools:
-            if self.is_pool_active(pool):
-                return pool
-        return None
-
-    @property
-    def active_pool(self) -> libzfs.ZFSPool:
-        """Return the currently active iocage pool."""
-        pool = self._root_dataset_or_none
-        if pool is None:
-            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
-        return pool
-
-    def activate(
-        self,
-        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
-    ) -> None:
-        """Activate the root pool and set the given mountpoint."""
-        self.activate_pool(self.root.pool, mountpoint)
-
-    def activate_pool(
-        self,
-        pool: libzfs.ZFSPool,
-        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
-    ) -> None:
-        """Activate the given pool and set its mountpoint."""
-        if self.is_pool_active(pool):
-            msg = f"ZFS pool '{pool.name}' is already active"
-            self.logger.warn(msg)
-
-        if not isinstance(pool, libzfs.ZFSPool):
-            raise iocage.lib.errors.ZFSPoolInvalid("cannot activate")
-
-        if pool.status == "UNAVAIL":
-            raise iocage.lib.errors.ZFSPoolUnavailable(pool.name)
-
-        other_pools = filter(lambda x: x.name != pool.name, self.zfs.pools)
-        for other_pool in other_pools:
-            self._set_pool_activation(other_pool, False)
-
-        self._set_pool_activation(pool, True)
-
-        if (mountpoint is None) and (os.path.ismount('/iocage') is False):
-            self.logger.spam(
-                "Claiming /iocage as mountpoint of the activated zpool"
-            )
-            mountpoint = iocage.lib.Types.AbsolutePath('/iocage')
-
-        if self.root.mountpoint != mountpoint:
-            zfs_property = libzfs.ZFSUserProperty(mountpoint)
-            self.root.properties["mountpoint"] = zfs_property
-
-    def is_pool_active(
-        self,
-        pool: typing.Optional[libzfs.ZFSPool]=None
-    ) -> bool:
-        """Return True if the pool is activated for iocage."""
-        if isinstance(pool, libzfs.ZFSPool):
-            _pool = pool
-        else:
-            _pool = self.root.pool
-
-        return iocage.lib.helpers.parse_user_input(self._get_pool_property(
-            _pool,
-            self.ZFS_POOL_ACTIVE_PROPERTY
-        )) is True
-
-    def _get_pool_property(
-        self,
-        pool: libzfs.ZFSPool,
-        prop: str
-    ) -> typing.Optional[str]:
-
-        if prop in pool.root_dataset.properties:
-            zfs_prop = pool.root_dataset.properties[prop]
-            return str(zfs_prop.value)
-
-        return None
-
-    def _get_dataset_property(
-        self,
-        dataset: libzfs.ZFSDataset,
-        prop: str
-    ) -> typing.Optional[str]:
-
-        try:
-            zfs_prop = dataset.properties[prop]
-            return str(zfs_prop.value)
-        except KeyError:
-            return None
-
-    def deactivate(self) -> None:
-        """Deactivate a ZFS pool for iocage use."""
-        self._set_pool_activation(self.root.pool, False)
-
-    def _set_pool_activation(self, pool: libzfs.ZFSPool, state: bool) -> None:
-        value = "yes" if state is True else "no"
-        self._set_zfs_property(
-            pool.root_dataset,
-            self.ZFS_POOL_ACTIVE_PROPERTY,
-            value
-        )
-
-    def _set_zfs_property(
-        self,
-        dataset: libzfs.ZFSDataset,
-        name: str,
-        value: str
-    ) -> None:
-
-        current_value = self._get_dataset_property(dataset, name)
-        if current_value != value:
-            self.logger.verbose(
-                f"Set ZFS property {name}='{value}'"
-                f" on dataset '{dataset.name}'"
-            )
-            dataset.properties[name] = libzfs.ZFSUserProperty(value)
+    pass
 
 
 class RootDatasets:
@@ -222,12 +99,15 @@ class RootDatasets:
         return asset
 
 
-class Datasets(dict, LegacyRootPoolDatasets):
+class Datasets(dict):
+    """All source datasets managed by iocage."""
 
     zfs: 'iocage.lib.ZFS.ZFS'
     logger: 'iocage.lib.Logger.Logger'
 
     main_datasets_name: typing.Optional[str]
+
+    ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
 
     def __init__(
         self,
@@ -256,28 +136,43 @@ class Datasets(dict, LegacyRootPoolDatasets):
 
     @property
     def main(self) -> 'iocage.lib.Datasets.Datasets':
+        """Return the source that was attached first."""
         return self[self.main_datasets_name]
 
     def find_root_datasets_name(self, dataset_name: str) -> str:
-        for root_name, root_datasets in self.items():
-            if dataset_name.startswith(root_datasets.root.name):
-                return root_name
+        """Return the name of the source containing the matching dataset."""
+        for source_name, source_datasets in self.items():
+            if dataset_name.startswith(source_datasets.root.name):
+                return str(source_name)
+        raise iocage.lib.errors.ResourceUnmanaged(
+            dataset_name=dataset_name,
+            logger=self.logger
+        )
 
-    def find_root_dataset(self, dataset_name: str) -> RootDatasets:
-        return self.__getitem__(self.find_root_datasets_name(dataset_name))
+    def find_root_datasets(self, dataset_name: str) -> RootDatasets:
+        """Return the RootDatasets instance containing the dataset."""
+        root_datasets_name = self.find_root_datasets_name(dataset_name)
+        root_datasets: RootDatasets = self.__getitem__(root_datasets_name)
+        return root_datasets
 
     def get_root_source(
         self,
         source_name: typing.Optional[str]=None
     ) -> 'iocage.lib.Datasets.Datasets':
+        """
+        Get the root source with a certain name.
+
+        When the source name is empty, the main source is returned.
+        """
         if source_name is None:
-            return self.main_datasets
-        return self.datasets[source_name]
+            return self.main
+        return self[source_name]
 
     def attach_sources(
         self,
         sources: typing.Dict[str, DatasetIdentifier]
     ) -> None:
+        """Attach a sources dictionary at once."""
         for key, dataset_identifier in sources.items():
             self.attach_source(key, dataset_identifier)
 
@@ -286,6 +181,7 @@ class Datasets(dict, LegacyRootPoolDatasets):
         source_name: str,
         dataset_identifier: DatasetIdentifier
     ) -> None:
+        """Attach a source by its DatasetIdentifier to the iocage scope."""
         self.attach_root_datasets(
             source_name=source_name,
             root_datasets=RootDatasets(
@@ -300,6 +196,7 @@ class Datasets(dict, LegacyRootPoolDatasets):
         source_name: str,
         root_datasets: RootDatasets
     ) -> None:
+        """Attach another RootDatasets object to the iocage scope."""
         self[source_name] = root_datasets
         if self.main_datasets_name is None:
             self.main_datasets_name = source_name
@@ -318,6 +215,127 @@ class Datasets(dict, LegacyRootPoolDatasets):
             datasets_name = rc_conf_key[len(prefix):]
             output[datasets_name] = rc_conf[rc_conf_key]
         return output
+
+    @property
+    def _active_pool_or_none(self) -> typing.Optional[libzfs.ZFSPool]:
+        zpools: typing.List[libzfs.ZFSPool] = list(self.zfs.pools)
+        for pool in zpools:
+            if self.is_pool_active(pool):
+                return pool
+        return None
+
+    @property
+    def active_pool(self) -> libzfs.ZFSPool:
+        """Return the currently active iocage pool."""
+        pool = self._active_pool_or_none
+        if pool is None:
+            raise iocage.lib.errors.IocageNotActivated(logger=self.logger)
+        return pool
+
+    def activate(
+        self,
+        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
+    ) -> None:
+        """Activate the root pool and set the given mountpoint."""
+        self.activate_pool(self.main.root.pool, mountpoint)
+
+    def activate_pool(
+        self,
+        pool: libzfs.ZFSPool,
+        mountpoint: typing.Optional[iocage.lib.Types.AbsolutePath]=None
+    ) -> None:
+        """Activate the given pool and set its mountpoint."""
+        if self.is_pool_active(pool):
+            msg = f"ZFS pool '{pool.name}' is already active"
+            self.logger.warn(msg)
+
+        if not isinstance(pool, libzfs.ZFSPool):
+            raise iocage.lib.errors.ZFSPoolInvalid("cannot activate")
+
+        if pool.status == "UNAVAIL":
+            raise iocage.lib.errors.ZFSPoolUnavailable(pool.name)
+
+        other_pools = filter(lambda x: x.name != pool.name, self.zfs.pools)
+        for other_pool in other_pools:
+            self._set_pool_activation(other_pool, False)
+
+        self._set_pool_activation(pool, True)
+
+        if (mountpoint is None) and (os.path.ismount('/iocage') is False):
+            self.logger.spam(
+                "Claiming /iocage as mountpoint of the activated zpool"
+            )
+            mountpoint = iocage.lib.Types.AbsolutePath('/iocage')
+
+        if self.main.root.mountpoint != mountpoint:
+            zfs_property = libzfs.ZFSUserProperty(mountpoint)
+            self.main.root.properties["mountpoint"] = zfs_property
+
+    def is_pool_active(
+        self,
+        pool: typing.Optional[libzfs.ZFSPool]=None
+    ) -> bool:
+        """Return True if the pool is activated for iocage."""
+        if isinstance(pool, libzfs.ZFSPool):
+            _pool = pool
+        else:
+            _pool = self.main.root.pool
+
+        return iocage.lib.helpers.parse_user_input(self._get_pool_property(
+            _pool,
+            self.ZFS_POOL_ACTIVE_PROPERTY
+        )) is True
+
+    def _get_pool_property(
+        self,
+        pool: libzfs.ZFSPool,
+        prop: str
+    ) -> typing.Optional[str]:
+
+        if prop in pool.root_dataset.properties:
+            zfs_prop = pool.root_dataset.properties[prop]
+            return str(zfs_prop.value)
+
+        return None
+
+    def _get_dataset_property(
+        self,
+        dataset: libzfs.ZFSDataset,
+        prop: str
+    ) -> typing.Optional[str]:
+
+        try:
+            zfs_prop = dataset.properties[prop]
+            return str(zfs_prop.value)
+        except KeyError:
+            return None
+
+    def deactivate(self) -> None:
+        """Deactivate a ZFS pool for iocage use."""
+        self._set_pool_activation(self.main.root.pool, False)
+
+    def _set_pool_activation(self, pool: libzfs.ZFSPool, state: bool) -> None:
+        value = "yes" if state is True else "no"
+        self._set_zfs_property(
+            pool.root_dataset,
+            self.ZFS_POOL_ACTIVE_PROPERTY,
+            value
+        )
+
+    def _set_zfs_property(
+        self,
+        dataset: libzfs.ZFSDataset,
+        name: str,
+        value: str
+    ) -> None:
+
+        current_value = self._get_dataset_property(dataset, name)
+        if current_value != value:
+            self.logger.verbose(
+                f"Set ZFS property {name}='{value}'"
+                f" on dataset '{dataset.name}'"
+            )
+            dataset.properties[name] = libzfs.ZFSUserProperty(value)
 
 
 class FilteredDatasets(Datasets):
@@ -344,13 +362,13 @@ class FilteredDatasets(Datasets):
             The shared logger instance.
     """
 
-    _source_filters = typing.Optional[SourceFilterType]
+    _source_filters = OptionalSourceFilterType
     datasets: Datasets
 
     def __init__(
         self,
         datasets: Datasets,
-        source_filters: typing.Optional[SourceFilterType]=None,
+        source_filters: OptionalSourceFilterType=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
@@ -361,13 +379,15 @@ class FilteredDatasets(Datasets):
         self.source_filters = source_filters
 
     @property
-    def source_filters(self) -> typing.Optional[SourceFilterType]:
-        return self._source_filters
+    def source_filters(self) -> OptionalSourceFilterType:
+        """Return the active source filters or None."""
+        return self._source_filters  # noqa: T484
 
     @source_filters.setter
-    def source_filters(self, value: typing.Optional[SourceFilterType]) -> None:
+    def source_filters(self, value: OptionalSourceFilterType) -> None:
+        """Set or disable source filters."""
         self.clear()
-        self._source_filters = value
+        self._source_filters = value  # noqa: T484
         self._clone_from_datasets()
 
     def _clone_from_datasets(self) -> None:
@@ -382,8 +402,9 @@ class FilteredDatasets(Datasets):
 
 def filter_datasets(
     datasets: Datasets,
-    sources: typing.Optional[SourceFilterType]
+    sources: OptionalSourceFilterType
 ) -> FilteredDatasets:
+    """Return FilteredDatasets by a tuple of sources."""
     return FilteredDatasets(
         datasets=datasets,
         source_filters=sources,
