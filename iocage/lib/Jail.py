@@ -546,7 +546,7 @@ class JailGenerator(JailResource):
                 [value],
                 logger=self.logger,
                 env=self.env,
-                shell=True
+                shell=True  # nosec: B604
             )
             return (child, stdout, stderr, )
 
