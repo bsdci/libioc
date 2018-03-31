@@ -46,8 +46,12 @@ class ZFSShareStorage:
     def mount_zfs_shares(self, auto_create: bool=False) -> None:
         """Invoke mounting the ZFS shares."""
         self.logger.verbose("Mounting ZFS shares")
-        self.jail.storage._mount_procfs()
         self._mount_jail_datasets(auto_create=auto_create)
+
+    def umount_zfs_shares(self) -> None:
+        """Invoke mounting the ZFS shares."""
+        self.logger.verbose("Unmounting ZFS shares")
+        self._umount_jail_datasets()
 
     def get_zfs_datasets(
         self,
@@ -106,7 +110,7 @@ class ZFSShareStorage:
 
             # ToDo: bake jail feature into py-libzfs
             iocage.lib.helpers.exec(
-                ["zfs", "jail", self.jail.identifier, dataset.name],
+                ["zfs", "jail", str(self.jail.jid), dataset.name],
                 logger=self.logger
             )
 
@@ -114,6 +118,13 @@ class ZFSShareStorage:
                 for child in list(dataset.children):
                     self.jail.storage._ensure_dataset_exists(child)
                     self._mount_jail_dataset(child.name)
+
+    def _umount_jail_datasets(self) -> None:
+        for dataset in self.get_zfs_datasets():
+            iocage.lib.helpers.exec(
+                ["zfs", "unjail", str(self.jail.jid), dataset.name],
+                logger=self.logger
+            )
 
     def _get_pool_name_from_dataset_name(
         self,
