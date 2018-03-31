@@ -49,7 +49,6 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
     def __init__(
         self,
         filters: typing.Optional[iocage.lib.Filter.Terms]=None,
-        sources: typing.Optional[typing.Tuple[str, ...]]=None,
         host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
@@ -61,10 +60,7 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
 
         iocage.lib.ListableResource.ListableResource.__init__(
             self,
-            sources=iocage.lib.Datasets.filter_datasets(
-                datasets=self.host.datasets,
-                sources=sources
-            ),
+            sources=self.host.datasets,
             namespace="jails",
             filters=filters,
             zfs=zfs,
@@ -78,10 +74,13 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
         **class_kwargs
     ) -> iocage.lib.Jail.JailGenerator:
 
+        sources = self.sources
         class_kwargs["data"] = {
             "id": dataset.name.split("/").pop()
         }
-        class_kwargs["dataset"] = dataset
+        class_kwargs["root_datasets_name"] = sources.find_root_datasets_name(
+            dataset.name
+        )
         class_kwargs["logger"] = self.logger
         class_kwargs["host"] = self.host
         class_kwargs["zfs"] = self.zfs

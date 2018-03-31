@@ -62,8 +62,8 @@ class JailResource(
     def __init__(  # noqa: T484
         self,
         host: 'iocage.lib.Host.HostGenerator',
-        root_datasets_name: typing.Optional[str]=None,
         jail: typing.Optional['JailGenerator']=None,
+        root_datasets_name: typing.Optional[str]=None,
         **kwargs
     ) -> None:
 
@@ -280,8 +280,11 @@ class JailGenerator(JailResource):
 
         if isinstance(data, str):
             data = {
-                "id": self._resolve_name(data)
+                "id": data
             }
+
+        if "id" in data.keys():
+            data["id"] = self._resolve_name(data["id"])
 
         JailResource.__init__(
             self,
@@ -1488,9 +1491,9 @@ class JailGenerator(JailResource):
             name=text
         )
 
-        root_datasets = resource_selector.filter_datasets(self.datasets)
+        root_datasets = resource_selector.filter_datasets(self.host.datasets)
 
-        for datasets_key, datasets in root_datasets:
+        for datasets_key, datasets in root_datasets.items():
             for dataset in list(datasets.jails.children):
                 dataset_name = str(
                     dataset.name[(len(datasets.jails.name) + 1):]
@@ -1498,7 +1501,8 @@ class JailGenerator(JailResource):
                 humanreadable_name = iocage.lib.helpers.to_humanreadable_name(
                     dataset_name
                 )
-                if text in [dataset_name, humanreadable_name]:
+                possible_names = [dataset_name, humanreadable_name]
+                if resource_selector.name in possible_names:
                     return dataset_name
 
         raise iocage.lib.errors.JailNotFound(text, logger=self.logger)

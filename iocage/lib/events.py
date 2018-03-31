@@ -265,7 +265,7 @@ class JailEvent(IocageEvent):
     ) -> None:
 
         try:
-            self.identifier = jail.humanreadable_name
+            self.identifier = jail.full_name
         except AttributeError:
             self.identifier = None
 
@@ -431,7 +431,7 @@ class ReleaseEvent(IocageEvent):
         **kwargs
     ) -> None:
 
-        self.identifier = release.name
+        self.identifier = release.full_name
         IocageEvent.__init__(self, release=release, **kwargs)
 
 
