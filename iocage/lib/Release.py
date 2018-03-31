@@ -289,7 +289,7 @@ class ReleaseGenerator(ReleaseResource):
     @property
     def releases_folder(self) -> str:
         """Return the mountpoint of the iocage/releases dataset."""
-        return str(self.host.datasets.releases.mountpoint)
+        return str(self.source_dataset.releases.mountpoint)
 
     @property
     def download_directory(self) -> str:
