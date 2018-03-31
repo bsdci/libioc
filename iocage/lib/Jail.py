@@ -1481,7 +1481,6 @@ class JailGenerator(JailResource):
 
     def _resolve_name(self, text: str) -> str:
 
-        print(text)
         if (text is None) or (len(text) == 0):
             raise iocage.lib.errors.JailNotSupplied(logger=self.logger)
 
