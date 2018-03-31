@@ -694,6 +694,9 @@ class JailGenerator(JailResource):
         self.require_jail_stopped()
         self.require_storage_backend()
 
+        if iocage.lib.helpers.validate_name(new_name) is False:
+            raise iocage.lib.errors.InvalidJailName(logger=self.logger)
+
         current_id = self.config["id"]
         current_mountpoint = self.dataset.mountpoint
 
