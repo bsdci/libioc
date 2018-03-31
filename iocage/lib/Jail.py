@@ -574,6 +574,7 @@ class JailGenerator(JailResource):
         jailDestroyEvent = events.JailDestroy(self)
         jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
         jailMountTeardownEvent = events.JailMountTeardown(self)
+        JailZfsShareUmount = events.JailZfsShareUmount(jail=self)
 
         self._run_hook("prestop")
 
@@ -589,6 +590,15 @@ class JailGenerator(JailResource):
         yield jailMountTeardownEvent.begin()
         self._teardown_mounts()
         yield jailMountTeardownEvent.end()
+
+        if self.config["jail_zfs"] is True:
+            yield JailZfsShareUmount.begin()
+            share_storage = iocage.lib.ZFSShareStorage.ZFSShareStorage(
+                jail=self,
+                logger=self.logger
+            )
+            share_storage.umount_zfs_shares()
+            yield JailZfsShareUmount.end()
 
         self.state.query()
 
@@ -774,6 +784,7 @@ class JailGenerator(JailResource):
         jailDestroyEvent = events.JailDestroy(self)
         jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
         jailMountTeardownEvent = events.JailMountTeardown(self)
+        JailZfsShareUmount = events.JailZfsShareUmount(jail=self)
 
         try:
             self._run_hook("prestop")
@@ -804,6 +815,18 @@ class JailGenerator(JailResource):
             yield jailMountTeardownEvent.end()
         except Exception as e:
             yield jailMountTeardownEvent.skip()
+
+        if self.config["jail_zfs"] is True:
+            yield JailZfsShareUmount.begin()
+            try:
+                share_storage = iocage.lib.ZFSShareStorage.ZFSShareStorage(
+                    jail=self,
+                    logger=self.logger
+                )
+                share_storage.umount_zfs_shares()
+                yield JailZfsShareUmount.end()
+            except Exception as e:
+                yield JailZfsShareUmount.skip()
 
         try:
             self.state.query()
