@@ -188,7 +188,9 @@ def cli(
             jail.create(resource)
             msg = (
                 f"{jail.humanreadable_name} successfully created"
-                f" from {resource.name}!{suffix}"
+                f" from {resource.name}"
+                f" on {jail.source}" if len(host.datasets) > 1 else ""
+                f"!{suffix}"
             )
             logger.log(msg)
         except iocage.lib.errors.IocageException:
