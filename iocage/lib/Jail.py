@@ -989,7 +989,7 @@ class JailGenerator(JailResource):
 
             Example: ["/usr/bin/whoami"]
         """
-        command = ["/usr/sbin/jexec", self.identifier] + command
+        command = ["/usr/sbin/jexec", str(self.jid)] + command
 
         child, stdout, stderr = iocage.lib.helpers.exec(
             command,
@@ -1015,7 +1015,7 @@ class JailGenerator(JailResource):
         stdout, stdin = iocage.lib.helpers.exec_passthru(
             [
                 "/usr/sbin/jexec",
-                self.identifier
+                str(self.jid)
             ] + command,
             logger=self.logger
         )
