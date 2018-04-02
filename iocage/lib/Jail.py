@@ -1608,7 +1608,7 @@ class JailGenerator(JailResource):
     def identifier(self) -> str:
         """Return the jail id used in snapshots, jls, etc."""
         config = object.__getattribute__(self, 'config')
-        return f"ioc-{self.source}-{config['id']}"
+        return f"{self.source}-{config['id']}"
 
     @property
     def release(self) -> 'iocage.lib.Release.ReleaseGenerator':
