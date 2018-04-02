@@ -87,13 +87,6 @@ class ZFSShareStorage:
 
         return list(datasets)
 
-    def _mount_jail_dataset(
-        self,
-        dataset_name: str
-    ) -> None:
-
-        self.jail.exec(['zfs', 'mount', dataset_name])
-
     def _mount_jail_datasets(
         self,
         auto_create: bool=False
@@ -114,9 +107,7 @@ class ZFSShareStorage:
                 logger=self.logger
             )
 
-            if dataset.properties['mountpoint'] is not None:
-                for child in list(dataset.children):
-                    self._mount_jail_dataset(child.name)
+        self.jail.exec(["zfs", "mount", "-a"])
 
     def _umount_jail_datasets(self) -> None:
         for dataset in self.get_zfs_datasets():
