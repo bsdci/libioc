@@ -67,7 +67,6 @@ class JailState(dict):
                 "-j",
                 self.name,
                 "-v",
-                "-h",
                 "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
             output = stdout.decode().strip()
@@ -119,7 +118,6 @@ class JailStates(dict):
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
                 "-v",
-                "-h",
                 "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
             output = stdout.decode().strip()
