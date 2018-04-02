@@ -240,7 +240,8 @@ class ReleaseGenerator(ReleaseResource):
                 # ToDo: omit root_datasets_name at all ?
                 raise iocage.lib.errors.ConflictingResourceSelection(
                     source_a=resource_selector.source_name,
-                    source_b=root_datasets_name
+                    source_b=root_datasets_name,
+                    logger=self.logger
                 )
             else:
                 root_datasets_name = resource_selector.source_name
