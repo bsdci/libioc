@@ -48,11 +48,6 @@ class ZFSShareStorage:
         self.logger.verbose("Mounting ZFS shares")
         self._mount_jail_datasets(auto_create=auto_create)
 
-    def umount_zfs_shares(self) -> None:
-        """Invoke mounting the ZFS shares."""
-        self.logger.verbose("Unmounting ZFS shares")
-        self._umount_jail_datasets()
-
     def get_zfs_datasets(
         self,
         auto_create: bool=False
@@ -108,15 +103,6 @@ class ZFSShareStorage:
             )
 
         self.jail.exec(["zfs", "mount", "-a"])
-
-    def _umount_jail_datasets(self) -> None:
-        if self.jail.jid is None:
-            return
-        for dataset in self.get_zfs_datasets():
-            iocage.lib.helpers.exec(
-                ["zfs", "unjail", str(self.jail.jid), dataset.name],
-                logger=self.logger
-            )
 
     def _get_pool_name_from_dataset_name(
         self,
