@@ -21,6 +21,32 @@ make install
 
 Please note: this will build `py-libzfs` from source, which will require `/usr/src` to be populated.
 
+## Configuration
+
+### Active ZFS pool
+
+libiocage iterates over existing ZFS pools and stops at the first one with ZFS property `org.freebsd.ioc:active` set to `yes`. This behavior is the default used by other iocage variants and is restricted to one pool managed by iocage
+
+### Root Datasets configured in /etc/rc.conf
+
+When iocage datasets are specified in the jail hosts `/etc/rc.conf`, libiocage prefers them over activated pool lookups. Every ZFS filesystem that iocage should use as root dataset has a distinct name and is configured as `ioc_dataset_<NAME>="zroot/some-dataset/iocage"`, for example:
+
+```
+$ cat /etc/rc.conf | grep ^ioc_dataset
+ioc_dataset_mysource="zroot/mysource/iocage"
+ioc_dataset_othersource="zroot/iocage"
+```
+
+iocage commands default to the first root data source specified in the file.
+Operations can be pointed to an alternative root by prefixing the subject with the source name followed by a slash.
+
+```sh
+ioc create -b -n othersource/myjail
+ioc rename othersource/myjail myjail2
+```
+
+When `othersource` is the only datasource with a jail named `myjail` the above operation would have worked without explicitly stating the dataset name.
+
 ## Usage
 
 ### Library
@@ -34,7 +60,8 @@ jail.create("11.1-RELEASE")
 
 ### CLI
 
-Libiocage comes bundles with a CLI tool called `ioc`. It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
+Libiocage comes bundles with a CLI tool called `ioc`.
+It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
 
 ### Custom Release (e.g. running -CURRENT)
 
