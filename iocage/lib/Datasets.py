@@ -150,7 +150,7 @@ class Datasets(dict):
         if active_pool is None:
             # raise internally without logging
             raise iocage.lib.errors.IocageNotActivated()
-        self.attach_sources(dict(iocage=f"{self.active_pool.name}/iocage"))
+        self.attach_sources(dict(ioc=f"{self.active_pool.name}/iocage"))
         self.logger.spam(f"Found active ZFS pool {self.active_pool.name}")
 
     @property
