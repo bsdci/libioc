@@ -134,7 +134,7 @@ def _autostop(
     force: bool=True
 ) -> None:
     """Stop a bunch of autostarted jails."""
-    filters = ("boot=yes", "running=yes", "template=no",)
+    filters = ("running=yes", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(
         logger=logger,
