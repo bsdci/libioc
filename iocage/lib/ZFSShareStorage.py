@@ -110,6 +110,8 @@ class ZFSShareStorage:
         self.jail.exec(["zfs", "mount", "-a"])
 
     def _umount_jail_datasets(self) -> None:
+        if self.jail.jid is None:
+            return
         for dataset in self.get_zfs_datasets():
             iocage.lib.helpers.exec(
                 ["zfs", "unjail", str(self.jail.jid), dataset.name],
