@@ -186,11 +186,11 @@ def cli(
         suffix = f" ({i}/{count})" if count > 1 else ""
         try:
             jail.create(resource)
+            msg_source = f" on {jail.source}" if len(host.datasets) > 1 else ""
             msg = (
                 f"{jail.humanreadable_name} successfully created"
                 f" from {resource.name}"
-                f" on {jail.source}" if len(host.datasets) > 1 else ""
-                f"!{suffix}"
+                f"{msg_source}!{suffix}"
             )
             logger.log(msg)
         except iocage.lib.errors.IocageException:
