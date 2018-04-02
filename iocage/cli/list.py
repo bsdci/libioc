@@ -49,6 +49,8 @@ supported_output_formats = ['table', 'csv', 'list', 'json']
               flag_value="base", help="List all bases.")
 @click.option("--template", "-t", "dataset_type",
               flag_value="template", help="List all templates.")
+@click.option("--dataset", "-d", "dataset_type",
+              flag_value="datasets", help="List all root data sources.")
 @click.option("--long", "-l", "_long", is_flag=True, default=False,
               help="Show the full uuid and ip4 address.")
 @click.option("--remote", "-R",
@@ -106,6 +108,14 @@ def cli(
             if (dataset_type == "base"):
                 resources_class = iocage.lib.Releases.ReleasesGenerator
                 columns = ["full_name"]
+            elif (dataset_type == "datasets"):
+                resources_class = None
+                columns = ["name", "dataset"]
+                resources = [
+                    dict(name=name, dataset=root_datasets.root.name)
+                    for name, root_datasets
+                    in host.datasets.items()
+                ]
             else:
                 resources_class = iocage.lib.Jails.JailsGenerator
                 columns = _list_output_comumns(output, _long)
@@ -114,12 +124,13 @@ def cli(
                 else:
                     filters += ("template=no,-",)
 
-            resources = resources_class(
-                logger=logger,
-                host=host,
-                # ToDo: allow quoted whitespaces from user inputs
-                filters=filters
-            )
+            if resources_class is not None:
+                resources = resources_class(
+                    logger=logger,
+                    host=host,
+                    # ToDo: allow quoted whitespaces from user inputs
+                    filters=filters
+                )
 
     except iocage.lib.errors.IocageException:
         exit(1)
@@ -201,10 +212,16 @@ def _lookup_resource_values(
     resource: 'iocage.lib.Resource.Resource',
     columns: typing.List[str]
 ) -> typing.List[str]:
-    return list(map(
-        lambda column: str(resource.getstring(column)),
-        columns
-    ))
+    if "getstring" in resource.__dir__():
+        return list(map(
+            lambda column: str(resource.getstring(column)),
+            columns
+        ))
+    else:
+        return list(map(
+            lambda column: str(resource[column]),
+            columns
+        ))
 
 
 def _list_output_comumns(
