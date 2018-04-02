@@ -573,10 +573,16 @@ class JailGenerator(JailResource):
         events: typing.Any = iocage.lib.events
         jailDestroyEvent = events.JailDestroy(self)
         jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
+        jailServicesStopEvent = events.JailServicesStop(self)
         jailMountTeardownEvent = events.JailMountTeardown(self)
         JailZfsShareUmount = events.JailZfsShareUmount(jail=self)
 
         self._run_hook("prestop")
+
+        if self.config["exec_stop"] is not None:
+            yield jailServicesStopEvent.begin()
+            self._run_hook("stop")
+            yield jailServicesStopEvent.end()
 
         yield jailDestroyEvent.begin()
         self._destroy_jail()
@@ -1174,7 +1180,6 @@ class JailGenerator(JailResource):
             f"allow.mount.zfs={self._allow_mount_zfs}",
             f"allow.quotas={self._get_value('allow_quotas')}",
             f"allow.socket_af={self._get_value('allow_socket_af')}",
-            f"exec.stop={self._get_value('exec_stop')}",
             f"exec.clean={self._get_value('exec_clean')}",
             f"exec.timeout={self._get_value('exec_timeout')}",
             f"stop.timeout={self._get_value('stop_timeout')}",

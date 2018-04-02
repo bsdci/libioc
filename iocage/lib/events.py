@@ -348,6 +348,18 @@ class JailServicesStart(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
+class JailServicesStop(JailEvent):
+    """Stops the jails services."""
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
 class JailDestroy(JailEvent):
     """Destroy the jail."""
 
