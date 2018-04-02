@@ -116,13 +116,16 @@ def cli(
     root_datasets_name = resource_selector.source_name
 
     if release is not None:
-        resource = iocage.lib.Release.ReleaseGenerator(
-            name=release,
-            root_datasets_name=root_datasets_name,
-            logger=logger,
-            host=host,
-            zfs=zfs
-        )
+        try:
+            resource = iocage.lib.Release.ReleaseGenerator(
+                name=release,
+                root_datasets_name=root_datasets_name,
+                logger=logger,
+                host=host,
+                zfs=zfs
+            )
+        except iocage.lib.errors.IocageException:
+            exit(1)
         if not resource.fetched:
             if not resource.available:
                 logger.error(
