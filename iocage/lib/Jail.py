@@ -26,6 +26,7 @@ import typing
 import os
 import subprocess  # nosec: B404
 import shlex
+import tempfile
 
 import iocage.lib.Types
 import iocage.lib.errors
@@ -869,6 +870,29 @@ class JailGenerator(JailResource):
         self.config['basejail'] = template.config['basejail']
         self.config['basejail_type'] = template.config['basejail_type']
         self._create_from_resource(template)
+
+    def export(self) -> None:
+        temp_dir = tempfile.TemporaryDirectory()
+        temp_config = iocage.lib.Config.Type.JSON.ConfigJSON(
+            file=f"{temp_dir.name}/config.json",
+            logger=self.logger
+        )
+        temp_config.data = self.config.data
+        temp_config.write(temp_config.data)
+        self.logger.verbose(f"Duplicating jail config to {temp_config.file}")
+
+        temp_root_dir = f"{temp_dir.name}/root"
+        os.mkdir(temp_root_dir)
+
+        self.logger.verbose(f"Writing jail delta to {temp_root_dir}")
+        iocage.lib.helpers.exec([
+            "rsync",
+            "-rv",
+            "--checksum",
+            f"--compare-dest={self.release.root_dataset.mountpoint}/",
+            f"{self.root_dataset.mountpoint}/",
+            temp_root_dir
+        ])
 
     def promote(self) -> None:
         """Promote all datasets of the jail."""
