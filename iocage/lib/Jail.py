@@ -871,7 +871,20 @@ class JailGenerator(JailResource):
         self.config['basejail_type'] = template.config['basejail_type']
         self._create_from_resource(template)
 
-    def export(self) -> None:
+    def export(self, destination: str) -> None:
+        """
+        Export the jail.
+
+        Jail exports contain the jails configuration and differing files
+        between the jails root dataset and its release. Other datasets in the
+        jails dataset are snapshotted and entirely attached to the export.
+
+        Args:
+
+            destination (str):
+
+                The jail is exported to this location.
+        """
         temp_dir = tempfile.TemporaryDirectory()
         temp_config = iocage.lib.Config.Type.JSON.ConfigJSON(
             file=f"{temp_dir.name}/config.json",
