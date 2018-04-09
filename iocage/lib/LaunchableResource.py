@@ -29,6 +29,7 @@ import iocage.lib.Config.Jail.File.RCConf
 import iocage.lib.Config.Jail.File.SysctlConf
 import iocage.lib.Resource
 import iocage.lib.ResourceUpdater
+import iocage.lib.ResourceBackup
 
 # MyPy
 import iocage.lib.Config.Jail.JailConfig
@@ -45,7 +46,8 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
     ] = None
     _distribution: 'iocage.lib.Distribution.Distribution' = None
-    _updater: 'iocage.lib.ResourceUpdater.LaunchableResourceUpdate' = None
+    _updater: 'iocage.lib.ResourceUpdater.LaunchableResourceUpdate'
+    _backups: 'iocage.lib.ResourceBackup.LaunchableResourceBackup'
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(  # noqa: T484
@@ -74,6 +76,20 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         )
         self._updater = updater
         return updater
+
+    @property
+    def backup(
+        self
+    ) -> iocage.lib.ResourceUpdater.Updater:
+        """Return the lazy-loaded resource backup tool."""
+        if self._backup is not None:
+            return self._backup
+
+        backup = iocage.lib.ResourceBackup.LaunchableResourceBackup(
+            resource=self
+        )
+        self._backup = backup
+        return backup
 
     def _require_dataset_mounted(self, dataset: libzfs.ZFSDataset) -> None:
         if dataset.mountpoint is None:
