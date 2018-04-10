@@ -604,7 +604,7 @@ class ReleaseGenerator(ReleaseResource):
 
             force: (default=False)
                 Enabling this option forces re-creation of a snapshot in case
-                it already exists for the given idenfifier
+                it already exists for the given identifier
 
         Returns:
             libzfs.ZFSSnapshot: The ZFS snapshot object found or created
