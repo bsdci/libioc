@@ -26,7 +26,7 @@ uninstall:
 	python3.6 -m pip uninstall -y iocage
 check:
 	flake8 --version
-	flake8 --exclude=".travis,.eggs,__init__.py" --ignore=E203,W391,D107,A002
+	flake8 --exclude=".travis,.eggs,__init__.py" --ignore=E203,W391,D107,A001,A002
 	bandit --skip B404 --exclude iocage/tests/ -r .
 test:
 	pytest iocage/tests --zpool $(ZPOOL)
