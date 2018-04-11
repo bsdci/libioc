@@ -633,6 +633,95 @@ class ZFSSnapshotClone(ZFSEvent):
         ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
 
 
+# Backup
+
+
+class ResourceBackupEvent(IocageEvent):
+    """Events that occur when backing up a resource."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        self.identifier = resource.dataset_name
+        IocageEvent.__init__(self, resource=resource, **kwargs)
+
+
+class ExportConfig(ResourceBackupEvent):
+    """Events that occur when backing up a resource."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+
+
+class ExportRootDataset(ResourceBackupEvent):
+    """Export a resources root dataset."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+
+
+class ExportOtherDatasets(ResourceBackupEvent):
+    """Event that occurs when other resource datasets get exported."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+
+
+class ExportOtherDataset(ResourceBackupEvent):
+    """Export one of a resources datasets."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        dataset: libzfs.ZFSDataset,
+        **kwargs
+    ) -> None:
+
+        self.identifier = dataset.name
+        ResourceBackupEvent.__init__(
+            self,
+            resource=resource,
+            dataset=dataset,
+            **kwargs
+        )
+
+
+class BundleBackup(ResourceBackupEvent):
+    """Bundle exported data into a backup archive."""
+
+    def __init__(  # noqa: T484
+        self,
+        destination: str,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackupEvent.__init__(
+            self,
+            resource=resource,
+            destination=destination,
+            **kwargs
+        )
+
+
 # CLI
 
 

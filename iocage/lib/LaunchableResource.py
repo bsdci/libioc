@@ -45,9 +45,15 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     _sysctl_conf: typing.Optional[
         iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
     ] = None
-    _distribution: 'iocage.lib.Distribution.Distribution' = None
-    _updater: 'iocage.lib.ResourceUpdater.LaunchableResourceUpdate'
-    _backups: 'iocage.lib.ResourceBackup.LaunchableResourceBackup'
+    _distribution: typing.Optional[
+        'iocage.lib.Distribution.Distribution'
+    ] = None
+    _updater: typing.Optional[
+        'iocage.lib.ResourceUpdater.LaunchableResourceUpdate'
+    ] = None
+    _backup: typing.Optional[
+        'iocage.lib.ResourceBackup.LaunchableResourceBackup'
+    ] = None
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(  # noqa: T484
@@ -58,6 +64,8 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         **kwargs
     ) -> None:
         self._distribution = distribution
+        self._updater = None
+        self._backup = None
         iocage.lib.Resource.Resource.__init__(self, **kwargs)
 
     @property

@@ -26,7 +26,6 @@ import typing
 import os
 import subprocess  # nosec: B404
 import shlex
-import tempfile
 
 import iocage.lib.Types
 import iocage.lib.errors
