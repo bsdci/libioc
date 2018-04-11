@@ -320,6 +320,32 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+# Backup
+
+
+class BackupInProgress(IocageException):
+    """Raised when a backup operation is already in progress."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+
+        msg = "A backup operation is already in progress"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class ExportDestinationExists(IocageException):
+    """Raised when a backup operation is already in progress."""
+
+    def __init__(  # noqa: T484
+        self,
+        destination: str,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "The backup destination {destination} already exists"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # ListableResource
 
 
