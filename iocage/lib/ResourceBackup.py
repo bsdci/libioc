@@ -130,6 +130,7 @@ class LaunchableResourceBackup:
                 The resource is exported to this location as archive file.
         """
         events = iocage.lib.events
+        resourceBackupEvent = events.ResourceBackup(self.resource)
         exportConfigEvent = events.ExportConfig(self.resource)
         exportRootDatasetEvent = events.ExportRootDataset(self.resource)
         exportOtherDatasetsEvent = events.ExportOtherDatasets(self.resource)
@@ -138,17 +139,26 @@ class LaunchableResourceBackup:
             resource=self.resource
         )
 
+        yield resourceBackupEvent.begin()
+
         self._lock()
         self._take_resource_snapshot()
 
-        yield exportConfigEvent.begin()
-        # ToDo: skip when the resource has no configuration (e.g. Release)
-        try:
-            self._export_config()
-        except iocage.lib.errors.IocageException as e:
-            yield exportConfigEvent.fail(e)
-            raise e
-        yield exportConfigEvent.end()
+        def _unlock_resource_backup() -> None:
+            self._delete_resource_snapshot()
+            self._unlock()
+
+        resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
+
+        if "config" in self.resource.__dir__():
+            # only export config when the resource has one
+            yield exportConfigEvent.begin()
+            try:
+                self._export_config()
+            except iocage.lib.errors.IocageException as e:
+                yield exportConfigEvent.fail(e)
+                raise e
+            yield exportConfigEvent.end()
 
         yield exportRootDatasetEvent.begin()
         try:
@@ -168,8 +178,6 @@ class LaunchableResourceBackup:
         else:
             yield exportOtherDatasetsEvent.end()
 
-        self._delete_resource_snapshot()
-
         yield bundleBackupEvent.begin()
         try:
             self._bundle_backup(destination=destination)
@@ -178,7 +186,8 @@ class LaunchableResourceBackup:
             raise e
         yield bundleBackupEvent.end()
 
-        self._unlock()
+        _unlock_resource_backup()
+        yield resourceBackupEvent.end()
 
     def _take_resource_snapshot(self) -> None:
         self.resource.dataset.snapshot(

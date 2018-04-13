@@ -636,7 +636,7 @@ class ZFSSnapshotClone(ZFSEvent):
 # Backup
 
 
-class ResourceBackupEvent(IocageEvent):
+class ResourceBackup(IocageEvent):
     """Events that occur when backing up a resource."""
 
     def __init__(  # noqa: T484
@@ -649,7 +649,7 @@ class ResourceBackupEvent(IocageEvent):
         IocageEvent.__init__(self, resource=resource, **kwargs)
 
 
-class ExportConfig(ResourceBackupEvent):
+class ExportConfig(ResourceBackup):
     """Events that occur when backing up a resource."""
 
     def __init__(  # noqa: T484
@@ -658,10 +658,10 @@ class ExportConfig(ResourceBackupEvent):
         **kwargs
     ) -> None:
 
-        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
 
 
-class ExportRootDataset(ResourceBackupEvent):
+class ExportRootDataset(ResourceBackup):
     """Export a resources root dataset."""
 
     def __init__(  # noqa: T484
@@ -670,10 +670,10 @@ class ExportRootDataset(ResourceBackupEvent):
         **kwargs
     ) -> None:
 
-        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
 
 
-class ExportOtherDatasets(ResourceBackupEvent):
+class ExportOtherDatasets(ResourceBackup):
     """Event that occurs when other resource datasets get exported."""
 
     def __init__(  # noqa: T484
@@ -682,10 +682,10 @@ class ExportOtherDatasets(ResourceBackupEvent):
         **kwargs
     ) -> None:
 
-        ResourceBackupEvent.__init__(self, resource=resource, **kwargs)
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
 
 
-class ExportOtherDataset(ResourceBackupEvent):
+class ExportOtherDataset(ResourceBackup):
     """Export one of a resources datasets."""
 
     def __init__(  # noqa: T484
@@ -696,7 +696,7 @@ class ExportOtherDataset(ResourceBackupEvent):
     ) -> None:
 
         self.identifier = dataset.name
-        ResourceBackupEvent.__init__(
+        ResourceBackup.__init__(
             self,
             resource=resource,
             dataset=dataset,
@@ -704,7 +704,7 @@ class ExportOtherDataset(ResourceBackupEvent):
         )
 
 
-class BundleBackup(ResourceBackupEvent):
+class BundleBackup(ResourceBackup):
     """Bundle exported data into a backup archive."""
 
     def __init__(  # noqa: T484
@@ -714,7 +714,7 @@ class BundleBackup(ResourceBackupEvent):
         **kwargs
     ) -> None:
 
-        ResourceBackupEvent.__init__(
+        ResourceBackup.__init__(
             self,
             resource=resource,
             destination=destination,
