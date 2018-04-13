@@ -129,15 +129,7 @@ class LaunchableResourceBackup:
 
                 The resource is exported to this location as archive file.
         """
-        events = iocage.lib.events
-        resourceBackupEvent = events.ResourceBackup(self.resource)
-        exportConfigEvent = events.ExportConfig(self.resource)
-        exportRootDatasetEvent = events.ExportRootDataset(self.resource)
-        exportOtherDatasetsEvent = events.ExportOtherDatasets(self.resource)
-        bundleBackupEvent = events.BundleBackup(
-            destination=destination,
-            resource=self.resource
-        )
+        resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
 
         yield resourceBackupEvent.begin()
 
@@ -152,39 +144,17 @@ class LaunchableResourceBackup:
 
         if "config" in self.resource.__dir__():
             # only export config when the resource has one
-            yield exportConfigEvent.begin()
-            try:
-                self._export_config()
-            except iocage.lib.errors.IocageException as e:
-                yield exportConfigEvent.fail(e)
-                raise e
-            yield exportConfigEvent.end()
+            for event in self._export_config():
+                yield event
 
-        yield exportRootDatasetEvent.begin()
-        try:
-            self._export_root_dataset()
-        except iocage.lib.errors.IocageException as e:
-            yield exportRootDatasetEvent.fail(e)
-            raise e
-        yield exportRootDatasetEvent.end()
-
-        yield exportOtherDatasetsEvent.begin()
-        hasExportedOtherDatasets = False
-        for event in self._export_other_datasets_recursive():
-            hasExportedOtherDatasets = True
+        for event in self._export_root_dataset():
             yield event
-        if hasExportedOtherDatasets is False:
-            yield exportOtherDatasetsEvent.skip()
-        else:
-            yield exportOtherDatasetsEvent.end()
 
-        yield bundleBackupEvent.begin()
-        try:
-            self._bundle_backup(destination=destination)
-        except iocage.lib.errors.IocageException as e:
-            yield bundleBackupEvent.fail(e)
-            raise e
-        yield bundleBackupEvent.end()
+        for event in self._export_other_datasets_recursive():
+            yield event
+
+        for event in self._bundle_backup(destination=destination):
+            yield event
 
         _unlock_resource_backup()
         yield resourceBackupEvent.end()
@@ -198,36 +168,71 @@ class LaunchableResourceBackup:
     def _delete_resource_snapshot(self) -> None:
         self.zfs.get_snapshot(self.full_snapshot_name).delete(recursive=True)
 
-    def _export_config(self) -> None:
-        temp_config = iocage.lib.Config.Type.JSON.ConfigJSON(
-            file=f"{self.temp_dir}/config.json",
-            logger=self.logger
+    def _export_config(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        exportConfigEvent = iocage.lib.events.ExportConfig(self.resource)
+        yield exportConfigEvent.begin()
+
+        try:
+            temp_config = iocage.lib.Config.Type.JSON.ConfigJSON(
+                file=f"{self.temp_dir}/config.json",
+                logger=self.logger
+            )
+            temp_config.data = self.resource.config.data
+            temp_config.write(temp_config.data)
+            self.logger.verbose(f"Config duplicated to {temp_config.file}")
+        except iocage.lib.errors.IocageException as e:
+            yield exportConfigEvent.fail(e)
+            raise e
+        yield exportConfigEvent.end()
+
+    def _export_root_dataset(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        exportRootDatasetEvent = iocage.lib.events.ExportRootDataset(
+            self.resource
         )
-        temp_config.data = self.resource.config.data
-        temp_config.write(temp_config.data)
-        self.logger.verbose(f"Config duplicated to {temp_config.file}")
+        yield exportRootDatasetEvent.begin()
 
-    def _export_root_dataset(self) -> None:
-        temp_root_dir = f"{self.temp_dir}/root"
-        os.mkdir(temp_root_dir)
+        try:
+            temp_root_dir = f"{self.temp_dir}/root"
+            compare_dest = self.resource.release.root_dataset.mountpoint
+            os.mkdir(temp_root_dir)
 
-        self.logger.verbose(f"Writing root dataset delta to {temp_root_dir}")
-        iocage.lib.helpers.exec([
-            "rsync",
-            "-rv",
-            "--checksum",
-            f"--compare-dest={self.resource.release.root_dataset.mountpoint}/",
-            f"{self.resource.root_dataset.mountpoint}/",
-            temp_root_dir
-        ])
+            self.logger.verbose(
+                f"Writing root dataset delta to {temp_root_dir}"
+            )
+            iocage.lib.helpers.exec([
+                "rsync",
+                "-rv",
+                "--checksum",
+                f"--compare-dest={compare_dest}/",
+                f"{self.resource.root_dataset.mountpoint}/",
+                temp_root_dir
+            ])
+        except iocage.lib.errors.IocageException as e:
+            yield exportRootDatasetEvent.fail(e)
+            raise e
+        yield exportRootDatasetEvent.end()
 
     def _export_other_datasets_recursive(
         self
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        exportOtherDatasetsEvent = iocage.lib.events.ExportOtherDatasets(
+            self.resource
+        )
+        yield exportOtherDatasetsEvent.begin()
+        hasExportedOtherDatasets = False
+
         for dataset in self.resource.dataset.children_recursive:
             if dataset.name == self.resource.root_dataset.name:
                 continue
 
+            hasExportedOtherDatasets = True
             exportOtherDatasetEvent = iocage.lib.events.ExportOtherDataset(
                 dataset=dataset,
                 resource=self.resource
@@ -239,6 +244,11 @@ class LaunchableResourceBackup:
                 yield exportOtherDatasetEvent.fail(e)
                 raise e
             yield exportOtherDatasetEvent.end()
+
+        if hasExportedOtherDatasets is False:
+            yield exportOtherDatasetsEvent.skip()
+        else:
+            yield exportOtherDatasetsEvent.end()
 
     def _export_other_dataset(self, dataset: libzfs.ZFSDataset) -> None:
         relative_name = self._get_relative_dataset_name(dataset)
@@ -262,12 +272,27 @@ class LaunchableResourceBackup:
         with open(absolute_asset_name, "w") as f:
             snapshot.send(f.fileno(), fromname=None)
 
-    def _bundle_backup(self, destination: str) -> None:
+    def _bundle_backup(
+        self,
+        destination: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Create the an archive file from the backup assets."""
-        self.logger.verbose(f"Bundling backup to {destination}")
-        tar = tarfile.open(destination, "w:gz")
-        tar.add(self.temp_dir, arcname=".")
-        tar.close()
+        bundleBackupEvent = iocage.lib.events.BundleBackup(
+            destination=destination,
+            resource=self.resource
+        )
+        yield bundleBackupEvent.begin()
+
+        try:
+            self.logger.verbose(f"Bundling backup to {destination}")
+            tar = tarfile.open(destination, "w:gz")
+            tar.add(self.temp_dir, arcname=".")
+            tar.close()
+        except iocage.lib.errors.IocageException as e:
+            yield bundleBackupEvent.fail(e)
+            raise e
+
+        yield bundleBackupEvent.end()
 
     def _get_relative_dataset_name(self, dataset: libzfs.ZFSDataset) -> str:
         return str(dataset.name[(len(self.resource.dataset.name) + 1):])
