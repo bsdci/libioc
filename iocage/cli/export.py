@@ -38,7 +38,7 @@ from .shared.click import IocageClickContext
 __rootcmd__ = True
 
 
-@click.command(name="destroy", help="Destroy specified resource")
+@click.command(name="export", help="Export a jail to a backup archive")
 @click.pass_context
 @click.argument("jail", required=True)
 @click.argument("destination", required=True)
