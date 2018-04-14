@@ -650,7 +650,7 @@ class ResourceBackup(IocageEvent):
 
 
 class ExportConfig(ResourceBackup):
-    """Events that occur when backing up a resource."""
+    """Event that occurs when the config of a resource is exported."""
 
     def __init__(  # noqa: T484
         self,
@@ -721,6 +721,82 @@ class BundleBackup(ResourceBackup):
             **kwargs
         )
 
+
+# Backup import/restore
+
+
+class ExtractBundle(ResourceBackup):
+    """Extract a bundled backup archive."""
+
+    def __init__(  # noqa: T484
+        self,
+        source: str,
+        destination: str,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(
+            self,
+            resource=resource,
+            destination=destination,
+            **kwargs
+        )
+
+
+class ImportConfig(ResourceBackup):
+    """Event that occurs when the config of a resource is imported."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
+
+
+class ImportRootDataset(ResourceBackup):
+    """Import data from an an archived root dataset."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
+
+
+class ImportOtherDatasets(ResourceBackup):
+    """Event that occurs when other resource datasets get exported."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
+
+
+class ImportOtherDataset(ResourceBackup):
+    """Export one of a resources datasets."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        dataset_name: str,
+        **kwargs
+    ) -> None:
+
+        self.identifier = dataset_name
+        ResourceBackup.__init__(
+            self,
+            resource=resource,
+            dataset_name=dataset_name,
+            **kwargs
+        )
 
 # CLI
 
