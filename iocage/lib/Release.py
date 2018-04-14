@@ -25,7 +25,6 @@
 import typing
 import hashlib
 import os
-import tarfile
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -40,6 +39,7 @@ import iocage.lib.events
 import iocage.lib.LaunchableResource
 import iocage.lib.ResourceSelector
 import iocage.lib.Jail
+import iocage.lib.SecureTarfile
 
 # MyPy
 import iocage.lib.Resource
@@ -694,16 +694,12 @@ class ReleaseGenerator(ReleaseResource):
             if self.check_hashes:
                 self._check_asset_hash(asset)
 
-            with tarfile.open(self._get_asset_location(asset)) as f:
-
-                self.logger.verbose(f"Verifying file structure in {asset}")
-                self._check_tar_files(f.getmembers(), asset_name=asset)
-
-                self.logger.debug(f"Extracting {asset}")
-                f.extractall(self.root_dir)
-                self.logger.verbose(
-                    f"Asset {asset} was extracted to {self.root_dir}"
-                )
+            iocage.lib.SecureTarfile.extract(
+                file=self._get_asset_location(asset),
+                compression_format="xz",
+                destination=self.root_dir,
+                logger=self.logger
+            )
 
     def _set_default_rc_conf(self) -> bool:
 
@@ -771,31 +767,6 @@ class ReleaseGenerator(ReleaseResource):
             for block in iter(lambda: f.read(65536), b''):
                 sha256.update(block)
         return sha256.hexdigest()
-
-    def _check_tar_files(
-        self,
-        tar_infos: typing.List[typing.Any],
-        asset_name: str
-    ) -> None:
-        for i in tar_infos:
-            self._check_tar_info(i, asset_name)
-
-    def _check_tar_info(self, tar_info: typing.Any, asset_name: str) -> None:
-        if tar_info.name == ".":
-            return
-        if not tar_info.name.startswith("./"):
-            reason = "Names in txz files must be relative and begin with './'"
-        elif ".." in tar_info.name:
-            reason = "Names in txz files must not contain '..'"
-        else:
-            return
-
-        raise iocage.lib.errors.IllegalReleaseAssetContent(
-            release_name=self.name,
-            asset_name=asset_name,
-            reason=reason,
-            logger=self.logger
-        )
 
     def __str__(self) -> str:
         """Return the release name."""

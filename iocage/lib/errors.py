@@ -220,6 +220,20 @@ class SecurityViolationConfigJailEscape(SecurityViolation):
         SecurityViolation.__init__(self, msg, *args, **kwargs)
 
 
+class IllegalArchiveContent(IocageException):
+    """Raised when a release asset archive contains malicious content."""
+
+    def __init__(  # noqa: T484
+        self,
+        asset_name: str,
+        reason: str,
+        **kwargs
+    ) -> None:
+
+        msg = f"Asset {asset_name} contains illegal files - {reason}"
+        super().__init__(msg, **kwargs)
+
+
 # JailConfig
 
 
@@ -809,26 +823,6 @@ class InvalidReleaseAssetSignature(UpdateFailure):
     ) -> None:
 
         msg = f"Asset {asset_name} has an invalid signature"
-        UpdateFailure.__init__(
-            self,
-            name=name,
-            reason=msg,
-            **kwargs
-        )
-
-
-class IllegalReleaseAssetContent(UpdateFailure):
-    """Raised when a release asset archive contains malicious content."""
-
-    def __init__(  # noqa: T484
-        self,
-        name: str,
-        asset_name: str,
-        reason: str,
-        **kwargs
-    ) -> None:
-
-        msg = f"Asset {asset_name} contains illegal files - {reason}"
         UpdateFailure.__init__(
             self,
             name=name,
