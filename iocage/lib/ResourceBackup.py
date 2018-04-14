@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -112,6 +112,190 @@ class LaunchableResourceBackup:
             return
         raise iocage.lib.errors.BackupInProgress(logger=self.logger)
 
+    def restore(
+        self,
+        source: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """
+        Import a resource from an archive.
+
+        Resource archives created with libiocage backup export can be restored
+        on any host. When importing a basejail the linked release needs to
+        exist on the host.
+
+        Args:
+
+            source (str):
+
+                The path to the exported archive file (tar.gz)
+        """
+        resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
+        yield resourceBackupEvent.begin()
+
+        self._lock()
+
+        def _unlock_resource_backup() -> None:
+            self._unlock()
+
+        resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
+
+        for event in self._extract_bundle(source):
+            yield event
+
+        # ToDo: Allow importing of releases or empty jails
+        config_data = iocage.lib.Config.Type.JSON.ConfigJSON(
+            file=f"{self.temp_dir}/config.json",
+            logger=self.logger
+        ).read()
+        release = iocage.lib.Release.ReleaseGenerator(
+            name=config_data["release"],
+            logger=self.logger,
+            zfs=self.zfs,
+            host=self.resource.host
+        )
+        self.resource.create_from_release(release)
+        for event in self._import_config(config_data):
+            yield event
+
+        for event in self._import_root_dataset():
+            yield event
+
+        for event in self._import_other_datasets_recursive():
+            yield event
+
+        _unlock_resource_backup()
+        yield resourceBackupEvent.end()
+
+    def _extract_bundle(
+        self,
+        source: str
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        extractBundleEvent = iocage.lib.events.ExtractBundle(
+            source=source,
+            destination=self.temp_dir,
+            resource=self.resource
+        )
+        yield extractBundleEvent.begin()
+        try:
+            iocage.lib.SecureTarfile.extract(
+                file=source,
+                compression_format="gz",
+                destination=self.temp_dir,
+                logger=self.logger
+            )
+        except iocage.lib.errors.IocageException as e:
+            yield extractBundleEvent.fail(e)
+            raise e
+
+        yield extractBundleEvent.end()
+
+    def _import_config(
+        self,
+        data: typing.Dict[str, typing.Any]
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        importConfigEvent = iocage.lib.events.ImportConfig(self.resource)
+        yield importConfigEvent.begin()
+
+        try:
+            self.resource.config.data = data
+            self.resource.config_handler.write(data)
+            self.logger.verbose(
+                f"Config imported from {self.resource.config_handler.file}"
+            )
+        except iocage.lib.errors.IocageException as e:
+            yield importConfigEvent.fail(e)
+            raise e
+
+        yield importConfigEvent.end()
+
+    def _import_root_dataset(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+        """
+        Import data from an exported root dataset.
+
+        The file structure is imported using using rsync. All assets that
+        already exist in the resources root dataset will be overwritten.
+        """
+        importRootDatasetEvent = iocage.lib.events.ImportRootDataset(
+            self.resource
+        )
+        yield importRootDatasetEvent.begin()
+
+        try:
+            temp_root_dir = f"{self.temp_dir}/root"
+            self.logger.verbose(
+                f"Importing root dataset data from {temp_root_dir}"
+            )
+            iocage.lib.helpers.exec([
+                "rsync",
+                "-rv",
+                f"{temp_root_dir}/",
+                f"{self.resource.root_dataset.mountpoint}/"
+            ])
+        except iocage.lib.errors.IocageException as e:
+            yield importRootDatasetEvent.fail(e)
+            raise e
+        yield importRootDatasetEvent.end()
+
+    def _import_other_datasets_recursive(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        importOtherDatasetsEvent = iocage.lib.events.ImportOtherDatasets(
+            self.resource
+        )
+        yield importOtherDatasetsEvent.begin()
+        hasImportedOtherDatasets = False
+
+        for dataset_name in self._list_importable_datasets():
+            absolute_asset_name = f"{self.temp_dir}/{dataset_name}.zfs"
+            importOtherDatasetEvent = iocage.lib.events.ImportOtherDataset(
+                dataset_name=dataset_name,
+                resource=self.resource
+            )
+            yield importOtherDatasetEvent.begin()
+            try:
+                with open(absolute_asset_name, "r") as f:
+                    dataset = self.resource.zfs.get_or_create_dataset(
+                        f"{self.resource.dataset.name}/{dataset_name}"
+                    )
+                    dataset.receive(f.fileno(), force=True)
+                    hasImportedOtherDatasets = True
+            except iocage.lib.errors.IocageException as e:
+                yield importOtherDatasetEvent.fail(e)
+                raise e
+            yield importOtherDatasetEvent.end()
+
+        if hasImportedOtherDatasets is False:
+            yield importOtherDatasetsEvent.skip()
+        else:
+            yield importOtherDatasetsEvent.end()
+
+    def _list_importable_datasets(
+        self,
+        current_directory: typing.Optional[str]=None
+    ) -> typing.List[str]:
+
+        if current_directory is None:
+            current_directory = self.temp_dir
+
+        suffix = ".zfs"
+
+        files: typing.List[str] = []
+        current_files = os.listdir(current_directory)
+        for current_file in current_files:
+            if current_file == f"{self.temp_dir}/root":
+                continue
+            if os.path.isdir(current_file):
+                nested_files = self._list_importable_datasets(current_file)
+                files = files + [f"{current_file}/{x}" for x in nested_files]
+            elif current_file.endswith(suffix):
+                files.append(current_file[:-len(suffix)])
+        return files
+
     def export(
         self,
         destination: str
@@ -119,7 +303,7 @@ class LaunchableResourceBackup:
         """
         Export the resource.
 
-        Jail exports contain the jails configuration and differing files
+        Resource exports contain the jails configuration and differing files
         between the jails root dataset and its release. Other datasets in the
         jails dataset are snapshotted and attached to the export entirely.
 
@@ -130,7 +314,6 @@ class LaunchableResourceBackup:
                 The resource is exported to this location as archive file.
         """
         resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
-
         yield resourceBackupEvent.begin()
 
         self._lock()
