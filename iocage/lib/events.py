@@ -645,7 +645,10 @@ class ResourceBackup(IocageEvent):
         **kwargs
     ) -> None:
 
-        self.identifier = resource.dataset_name
+        if "name" in resource.__dir__():
+            self.identifier = resource.name
+        else:
+            self.identifier = resource.dataset_name
         IocageEvent.__init__(self, resource=resource, **kwargs)
 
 
@@ -695,13 +698,14 @@ class ExportOtherDataset(ResourceBackup):
         **kwargs
     ) -> None:
 
-        self.identifier = dataset.name
         ResourceBackup.__init__(
             self,
             resource=resource,
             dataset=dataset,
             **kwargs
         )
+        # The identifier is the dataset name relative to the resource
+        self.identifier += dataset.name[len(resource.dataset_name):]
 
 
 class BundleBackup(ResourceBackup):
