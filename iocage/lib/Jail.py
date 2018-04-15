@@ -834,8 +834,16 @@ class JailGenerator(JailResource):
         """
         if isinstance(resource, JailGenerator):
             self.create_from_template(template=resource)
-        else:
+        elif isinstance(resource, iocage.lib.Release.ReleaseGenerator):
             self.create_from_release(release=resource)
+        else:
+            self.create_from_scratch()
+
+    def create_from_scratch(
+        self
+    ) -> None:
+        """Create a new jail without any root dataset content."""
+        self._create_skeletron()
 
     def create_from_release(
         self,
@@ -918,10 +926,7 @@ class JailGenerator(JailResource):
 
         yield jailCloneEvent.end()
 
-    def _create_from_resource(
-        self,
-        resource: 'iocage.lib.Resource.Resource'
-    ) -> None:
+    def _create_skeletron(self) -> None:
 
         if self.config["id"] is None:
             self.config["id"] = str(iocage.lib.helpers.get_random_uuid())
@@ -938,6 +943,13 @@ class JailGenerator(JailResource):
             self.logger.spam(msg, jail=self, indent=1)
 
         self.create_resource()
+
+    def _create_from_resource(
+        self,
+        resource: 'iocage.lib.Resource.Resource'
+    ) -> None:
+
+        self._create_skeletron()
 
         backend = self.storage_backend
         if backend is not None:

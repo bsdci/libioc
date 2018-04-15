@@ -83,6 +83,13 @@ class LaunchableResourceBackup:
         return f"{self.resource.dataset_name}@{self.snapshot_name}"
 
     @property
+    def __has_release(self) -> bool:
+        """Return True if the resource is forked from a release."""
+        if "config" in self.resource.__dir__():
+            return ("release" in self.resource.config.keys()) is True
+        return False
+
+    @property
     def __unlocked_error(self) -> Exception:
         # this error cannot occur when using public API
         return Exception("Resource backup is not locked")
@@ -153,12 +160,19 @@ class LaunchableResourceBackup:
             zfs=self.zfs,
             host=self.resource.host
         )
-        self.resource.create_from_release(release)
+
+        if self.__has_release is True:
+            self.resource.create_from_release(release)
+        else:
+            self.resource.create_from_scratch()
+
         for event in self._import_config(config_data):
             yield event
 
-        for event in self._import_root_dataset():
-            yield event
+        if self.__has_release is True:
+            # do not export root datasets of basejails
+            for event in self._import_root_dataset():
+                yield event
 
         for event in self._import_other_datasets_recursive():
             yield event
@@ -330,9 +344,11 @@ class LaunchableResourceBackup:
             for event in self._export_config():
                 yield event
 
-        for event in self._export_root_dataset():
-            yield event
+        if self.__has_release is True:
+            for event in self._export_root_dataset():
+                yield event
 
+        # other datasets include `root` when the resource is no basejail
         for event in self._export_other_datasets_recursive():
             yield event
 
@@ -412,7 +428,8 @@ class LaunchableResourceBackup:
         hasExportedOtherDatasets = False
 
         for dataset in self.resource.dataset.children_recursive:
-            if dataset.name == self.resource.root_dataset.name:
+            __is_root = (dataset.name == self.resource.root_dataset.name)
+            if (__is_root and self.__has_release) is True:
                 continue
 
             hasExportedOtherDatasets = True

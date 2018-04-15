@@ -608,6 +608,10 @@ class BaseConfig(dict):
 
         return list(properties)
 
+    def keys(self) -> typing.KeysView:
+        """Return the available configuration keys."""
+        return self.data.keys()
+
     @property
     def all_properties(self) -> list:
         """Return a list of all user configured settings."""
