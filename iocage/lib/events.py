@@ -705,7 +705,8 @@ class ExportOtherDataset(ResourceBackup):
             **kwargs
         )
         # The identifier is the dataset name relative to the resource
-        self.identifier += dataset.name[len(resource.dataset_name):]
+        relative_dataset_name = dataset.name[len(resource.dataset_name):]
+        self.identifier = str(self.identifier) + str(relative_dataset_name)
 
 
 class BundleBackup(ResourceBackup):
