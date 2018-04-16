@@ -523,13 +523,21 @@ class Fstab(
                 return False
         return False
 
-    def replace_path(self, pattern: typing.Pattern, replacement: str) -> None:
+    def replace_path(self, pattern: str, replacement: str) -> None:
         """Replace a path in all fstab entries (source or destination)."""
         for i, line in enumerate(self._lines):
             if not isinstance(line, FstabLine):
                 continue
-            line["source"] = pattern.sub(replacement, line["source"])
-            line["destination"] = pattern.sub(replacement, line["destination"])
+            line["source"] = _replace_path_prefix(
+                line["source"],
+                pattern,
+                replacement
+            )
+            line["destination"] = _replace_path_prefix(
+                line["destination"],
+                pattern,
+                replacement
+            )
             self._lines[i] = line
 
 
@@ -539,3 +547,9 @@ def _is_comment_line(text: str) -> bool:
 
 def _is_empty_line(text: str) -> bool:
     return (text.strip() == "") is True
+
+
+def _replace_path_prefix(text: str, pattern: str, replacement: str) -> str:
+    if text.startswith(pattern) is False:
+        return text
+    return replacement + text[len(pattern):]
