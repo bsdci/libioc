@@ -154,14 +154,14 @@ class LaunchableResourceBackup:
             file=f"{self.temp_dir}/config.json",
             logger=self.logger
         ).read()
-        release = iocage.lib.Release.ReleaseGenerator(
-            name=config_data["release"],
-            logger=self.logger,
-            zfs=self.zfs,
-            host=self.resource.host
-        )
 
-        if self.__has_release is True:
+        if "release" in config_data.keys():
+            release = iocage.lib.Release.ReleaseGenerator(
+                name=config_data["release"],
+                logger=self.logger,
+                zfs=self.zfs,
+                host=self.resource.host
+            )
             self.resource.create_from_release(release)
         else:
             self.resource.create_from_scratch()
@@ -169,8 +169,10 @@ class LaunchableResourceBackup:
         for event in self._import_config(config_data):
             yield event
 
+        for event in self._import_fstab():
+            yield event
+
         if self.__has_release is True:
-            # do not export root datasets of basejails
             for event in self._import_root_dataset():
                 yield event
 
@@ -223,6 +225,35 @@ class LaunchableResourceBackup:
             raise e
 
         yield importConfigEvent.end()
+
+    def _import_fstab(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        importFstabEvent = iocage.lib.events.ImportFstab(self.resource)
+        yield importFstabEvent.begin()
+
+        fstab_file_path = f"{self.temp_dir}/fstab"
+        if os.path.isfile(fstab_file_path) is False:
+            yield importFstabEvent.skip()
+            return
+
+        try:
+            fstab = self.resource.fstab
+            _old_fstab_file = fstab.file
+            fstab.file = fstab_file_path
+            fstab.read_file()
+            fstab.replace_path(
+                "backup:///",
+                self.resource.root_dataset.mountpoint
+            )
+            fstab.file = _old_fstab_file
+            fstab.save()
+            self.logger.verbose(f"Fstab restored from {fstab.file}")
+        except iocage.lib.errors.IocageException as e:
+            yield importFstabEvent.fail(e)
+            raise e
+        yield importFstabEvent.end()
 
     def _import_root_dataset(
         self
@@ -303,6 +334,8 @@ class LaunchableResourceBackup:
         for current_file in current_files:
             if current_file == f"{self.temp_dir}/root":
                 continue
+            if current_file == f"{self.temp_dir}/fstab":
+                continue
             if os.path.isdir(current_file):
                 nested_files = self._list_importable_datasets(current_file)
                 files = files + [f"{current_file}/{x}" for x in nested_files]
@@ -342,6 +375,8 @@ class LaunchableResourceBackup:
         if "config" in self.resource.__dir__():
             # only export config when the resource has one
             for event in self._export_config():
+                yield event
+            for event in self._export_fstab():
                 yield event
 
         if self.__has_release is True:
@@ -386,6 +421,33 @@ class LaunchableResourceBackup:
             yield exportConfigEvent.fail(e)
             raise e
         yield exportConfigEvent.end()
+
+    def _export_fstab(
+        self
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+
+        exportFstabEvent = iocage.lib.events.ExportFstab(self.resource)
+        yield exportFstabEvent.begin()
+
+        try:
+            fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
+                jail=self.resource,
+                release=None,
+                logger=self.resource.logger,
+                host=self.resource.host
+            )
+            fstab.read_file()
+            fstab.file = f"{self.temp_dir}/fstab"
+            fstab.replace_path(
+                self.resource.root_dataset.mountpoint,
+                "backup:///"
+            )
+            fstab.save()
+            self.logger.verbose(f"Fstab saved to {fstab.file}")
+        except iocage.lib.errors.IocageException as e:
+            yield exportFstabEvent.fail(e)
+            raise e
+        yield exportFstabEvent.end()
 
     def _export_root_dataset(
         self

@@ -111,11 +111,13 @@ class JailResource(
         except AttributeError:
             pass
 
+        jail = self.jail
+        release = None if ("release" not in jail.__dir__()) else jail.release
         fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
-            jail=self.jail,
-            release=self.jail.release,
+            jail=jail,
+            release=release,
             logger=self.logger,
-            host=self.jail.host
+            host=jail.host
         )
         self._fstab = fstab
         return fstab
