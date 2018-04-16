@@ -240,7 +240,7 @@ class Fstab(
                 )
                 continue
 
-            destination = os.path.abspath(fragments[1])
+            destination = fragments[1].strip()
 
             # skip lines with destinations overlapping self.basejail_lines
             if destination in basejail_destinations:
