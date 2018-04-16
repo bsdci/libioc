@@ -96,7 +96,6 @@ class ConfigFile(dict):
     def file(self, value: str) -> None:
         if self._file != value:
             self._file = value
-            self._read_file()
 
     @property
     def changed(self) -> bool:

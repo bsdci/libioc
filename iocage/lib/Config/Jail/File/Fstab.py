@@ -149,6 +149,8 @@ class Fstab(
         self.jail = jail
         self.release = release
         self.file = file
+        # ToDo: could be lazy-loaded
+        self.read_file()
 
     @property
     def path(self) -> str:
