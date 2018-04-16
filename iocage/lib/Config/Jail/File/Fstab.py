@@ -158,12 +158,20 @@ class Fstab(
         Absolute fstab file path.
 
         This is the file read from and written to.
+
+        When the path begins with a / it is assumed to be absolute, so that
+        the jails dataset mountpoint is not used as path prefix. This is useful
+        when moving around jail backups.
         """
-        path = f"{self.jail.dataset.mountpoint}/{self.file}"
-        self._require_path_relative_to_resource(
-            filepath=path,
-            resource=self.jail
-        )
+        if self.file.startswith("/") is True:
+            path = self.file
+        else:
+            path = f"{self.jail.dataset.mountpoint}/{self.file}"
+            self._require_path_relative_to_resource(
+                filepath=path,
+                resource=self.jail
+            )
+
         return path
 
     def parse_lines(
