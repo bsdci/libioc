@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail State collection."""
 import typing
-import json
+import shlex
 import subprocess
 
 import iocage.lib.errors
@@ -31,12 +31,20 @@ import iocage.lib.errors
 JailStatesDict = typing.Dict[str, 'JailState']
 
 
-def _parse_json(data: str) -> JailStatesDict:
-    output: typing.Dict[str, 'JailState'] = {}
-    jail_states = json.loads(data)["jail-information"]["jail"]
-    for jail_state_data in jail_states:
-        identifier = jail_state_data["name"]
-        output[identifier] = JailState(identifier, jail_state_data)
+def _parse(text: str) -> JailStatesDict:
+    output: JailStatesDict = {}
+    for line in text.split("\n"):
+        data: typing.Dict[str, str] = {}
+        for item in shlex.split(line):
+            if "=" not in item:
+                data[item] = ""
+            else:
+                pair = item.split("=", maxsplit=1)
+                if len(pair) == 2:
+                    data[pair[0]] = pair[1]
+                else:
+                    data[pair[0]] = ""
+        output[data["name"]] = JailState(data["name"], data)
     return output
 
 
@@ -50,7 +58,7 @@ class JailState(dict):
     def __init__(
         self,
         name: str,
-        data: typing.Optional[typing.Dict[str, str]]=None
+        data: typing.Optional[typing.Dict[str, str]]=None,
     ) -> None:
 
         self.name = name
@@ -67,13 +75,12 @@ class JailState(dict):
                 "-j",
                 self.name,
                 "-v",
-                "--libxo=json"
+                "-n",
+                "-q"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            output = stdout.decode().strip()
-            data = _parse_json(output)[self.name]
+            data = _parse(stdout.decode().strip())[self.name]
         except (subprocess.CalledProcessError, KeyError):
             pass
-
         self._data = data
         return data
 
@@ -118,10 +125,11 @@ class JailStates(dict):
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
                 "-v",
-                "--libxo=json"
+                "-n",
+                "-q"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
             output = stdout.decode().strip()
-            output_data = _parse_json(output)
+            output_data = _parse(output)
             for name in output_data:
                 dict.__setitem__(self, name, output_data[name])
 
