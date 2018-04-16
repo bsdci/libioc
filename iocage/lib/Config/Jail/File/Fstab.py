@@ -141,7 +141,7 @@ class Fstab(
         release: typing.Optional['iocage.lib.Release.ReleaseGenerator']=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         host: typing.Optional['iocage.lib.Host.HostGenerator']=None,
-        file: typing.Optional[str]="fstab"
+        file: str="fstab"
     ) -> None:
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
