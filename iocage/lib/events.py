@@ -664,6 +664,18 @@ class ExportConfig(ResourceBackup):
         ResourceBackup.__init__(self, resource=resource, **kwargs)
 
 
+class ExportFstab(ResourceBackup):
+    """Event that occurs when the fstab file of a jail is exported."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
+
+
 class ExportRootDataset(ResourceBackup):
     """Export a resources root dataset."""
 
@@ -751,6 +763,18 @@ class ExtractBundle(ResourceBackup):
 
 class ImportConfig(ResourceBackup):
     """Event that occurs when the config of a resource is imported."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.Resource',
+        **kwargs
+    ) -> None:
+
+        ResourceBackup.__init__(self, resource=resource, **kwargs)
+
+
+class ImportFstab(ResourceBackup):
+    """Event that occurs when the fstab file of a jail is imported."""
 
     def __init__(  # noqa: T484
         self,
