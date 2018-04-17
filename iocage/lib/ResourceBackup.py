@@ -276,7 +276,9 @@ class LaunchableResourceBackup:
             )
             iocage.lib.helpers.exec([
                 "rsync",
-                "-rv",
+                "-av",
+                "--links",
+                "--safe-links",
                 f"{temp_root_dir}/",
                 f"{self.resource.root_dataset.mountpoint}/"
             ])
@@ -468,8 +470,10 @@ class LaunchableResourceBackup:
             )
             iocage.lib.helpers.exec([
                 "rsync",
-                "-rv",
+                "-av",
                 "--checksum",
+                "--links",
+                "--safe-links",
                 f"--compare-dest={compare_dest}/",
                 f"{self.resource.root_dataset.mountpoint}/",
                 temp_root_dir
