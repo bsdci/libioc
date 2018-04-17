@@ -245,7 +245,7 @@ class LaunchableResourceBackup:
             fstab.read_file()
             fstab.replace_path(
                 "backup:///",
-                self.resource.root_dataset.mountpoint
+                self.resource.dataset.mountpoint
             )
             fstab.file = _old_fstab_file
             fstab.save()
@@ -439,7 +439,7 @@ class LaunchableResourceBackup:
             fstab.read_file()
             fstab.file = f"{self.temp_dir}/fstab"
             fstab.replace_path(
-                self.resource.root_dataset.mountpoint,
+                self.resource.dataset.mountpoint,
                 "backup:///"
             )
             fstab.save()
