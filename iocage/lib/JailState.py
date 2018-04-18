@@ -34,6 +34,8 @@ JailStatesDict = typing.Dict[str, 'JailState']
 def _parse(text: str) -> JailStatesDict:
     output: JailStatesDict = {}
     for line in text.split("\n"):
+        if line == "":
+            continue
         data: typing.Dict[str, str] = {}
         for item in shlex.split(line):
             if "=" not in item:
