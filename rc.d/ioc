@@ -4,7 +4,7 @@
 #
 
 # PROVIDE: ioc
-# REQUIRE: LOGIN cleanvar sshd ZFS
+# REQUIRE: LOGIN cleanvar sshd ZFS NETWORKING
 # BEFORE:  securelevel
 # KEYWORD: shutdown
 
