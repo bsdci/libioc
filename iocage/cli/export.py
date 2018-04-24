@@ -22,7 +22,6 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Export a jail from the CLI."""
-import typing
 import click
 import os.path
 
@@ -49,18 +48,17 @@ __rootcmd__ = True
     is_flag=True,
     help="Exports the jails root dataset independently"
 )
-@click.option(
-    "-r", "--recursive",
-    default=False,
-    is_flag=True,
-    help="Include ZFS snapshots. Implies --standalone"
-)
+# @click.option(
+#     "-r", "--recursive",
+#     default=False,
+#     is_flag=True,
+#     help="Include ZFS snapshots. Implies --standalone"
+# )
 def cli(
     ctx: IocageClickContext,
     jail: str,
     destination: str,
-    standalone: bool,
-    recursive: bool
+    standalone: bool
 ) -> None:
     """
     Backup a jail.
@@ -73,6 +71,9 @@ def cli(
     zfs.logger = logger
     host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
     print_events = ctx.parent.print_events
+
+    # Recursive exports cannot be imported at the current time
+    recursive = False
 
     ioc_jail = iocage.lib.Jail.JailGenerator(
         jail,
