@@ -33,20 +33,22 @@ __rootcmd__ = True
 @click.command(name="console", help="Login to a jail.")
 @click.pass_context
 @click.argument("jail")
-@click.option("--log-level", "-d", default=None)
-def cli(ctx, jail, log_level):
+@click.option("--start", "-s", is_flag=True, default=False)
+def cli(ctx, jail, start):
     """Run jexec to login into the specified jail."""
     logger = ctx.parent.logger
-    logger.print_level = log_level
 
-    jail = iocage.lib.Jail.Jail(jail, logger=logger)
+    jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
     jail.state.query()
 
     if not jail.exists:
         logger.error(f"The jail {jail.humanreadable_name} does not exist")
         exit(1)
     if not jail.running:
-        logger.error(f"The jail {jail.humanreadable_name} is not running")
-        exit(1)
-    else:
-        jail.exec_console()
+        if start is True:
+            ctx.parent.print_events(jail.start())
+        else:
+            logger.error(f"The jail {jail.humanreadable_name} is not running")
+            exit(1)
+
+    jail.exec_console()
