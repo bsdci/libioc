@@ -6,6 +6,21 @@ import enum
 from datetime import date
 from typing import Any, Generator, List, Dict, Optional, Union, Set
 
+
+class SendFlag(enum.Enum):
+    VERBOSE = 0
+    REPLICATE = 1
+    DOALL = 2
+    FROMORIGIN = 3
+    DEDUP = 3
+    PROPS = 4
+    DRYRUN = 5
+    PARSABLE = 6
+    PROGRESS = 7
+    LARGEBLOCK = 8
+    EMBED_DATA = 9
+
+
 DatasetType = ... # type: Any
 DiffFileType = ... # type: Any
 DiffRecordType = ... # type: Any
@@ -16,8 +31,7 @@ PoolStatus = ... # type: Any
 PropertySource = ... # type: Any
 ScanFunction = ... # type: Any
 ScanState = ... # type: Any
-SendFlag = ... # type: enum.IntEnum
-SendFlags = ... # type: Set[enum.IntEnum]
+SendFlags = ... # type: Set[SendFlag]
 VDevAuxState = ... # type: Any
 VDevState = ... # type: Any
 ZFS_PROPERTY_CONVERTERS = ... # type: Any
