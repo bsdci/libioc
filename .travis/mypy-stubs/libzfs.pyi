@@ -24,7 +24,6 @@ ZFS_PROPERTY_CONVERTERS = ... # type: Any
 ZIOType = ... # type: Any
 ZPOOL_PROPERTY_CONVERTERS = ... # type: Any
 collections = ... # type: Any
-enum = ... # type: Any
 errno = ... # type: Any
 numbers = ... # type: Any
 os = ... # type: Any

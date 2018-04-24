@@ -413,7 +413,8 @@ class LaunchableResourceBackup:
         # other datasets include `root` when the resource is no basejail
         recursive_export_events = self._export_other_datasets_recursive(
             flags=zfs_send_flags,
-            standalone=is_standalone
+            standalone=is_standalone,
+            limit_depth=(recursive is True)
         )
         for event in recursive_export_events:
             yield event
@@ -517,6 +518,7 @@ class LaunchableResourceBackup:
         self,
         standalone: bool,
         flags: libzfs.SendFlags,
+        limit_depth: bool=False
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportOtherDatasetsEvent = iocage.lib.events.ExportOtherDatasets(
@@ -525,7 +527,12 @@ class LaunchableResourceBackup:
         yield exportOtherDatasetsEvent.begin()
         hasExportedOtherDatasets = False
 
-        for dataset in self.resource.dataset.children_recursive:
+        if limit_depth is True:
+            child_datasets = self.resource.dataset.children
+        else:
+            child_datasets = self.resource.dataset.children_recursive
+
+        for dataset in child_datasets:
             __is_root = (dataset.name == self.resource.root_dataset.name)
             if __is_root and not standalone:
                 continue
