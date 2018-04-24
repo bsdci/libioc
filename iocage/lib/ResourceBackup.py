@@ -155,7 +155,10 @@ class LaunchableResourceBackup:
             logger=self.logger
         ).read()
 
-        if "release" in config_data.keys():
+        is_standalone = os.path.isfile(f"{self.temp_dir}/root.zfs") is True
+        has_release = ("release" in config_data.keys()) is True
+
+        if has_release and not is_standalone:
             release = iocage.lib.Release.ReleaseGenerator(
                 name=config_data["release"],
                 logger=self.logger,
@@ -166,17 +169,17 @@ class LaunchableResourceBackup:
         else:
             self.resource.create_from_scratch()
 
-        for event in self._import_config(config_data):
-            yield event
-
-        for event in self._import_fstab():
-            yield event
-
-        if self.__has_release is True:
+        if is_standalone is False:
             for event in self._import_root_dataset():
                 yield event
 
         for event in self._import_other_datasets_recursive():
+            yield event
+
+        for event in self._import_config(config_data):
+            yield event
+
+        for event in self._import_fstab():
             yield event
 
         _unlock_resource_backup()
@@ -347,7 +350,9 @@ class LaunchableResourceBackup:
 
     def export(
         self,
-        destination: str
+        destination: str,
+        standalone: typing.Optional[bool]=None,
+        recursive: bool=False
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Export the resource.
@@ -361,12 +366,32 @@ class LaunchableResourceBackup:
             destination (str):
 
                 The resource is exported to this location as archive file.
+
+            standalone (bool):
+
+                The default depends on whether the resource is forked from a
+                release or not. If there is a origin release, the export will
+                contain the changed files relative to the release. Enabling
+                this option will enforce ZFS dataset exports instead of rsync
+                compare-dest diffs.
+                Standalone exports will cause duplicated data on the importing
+                host, but are independent of any release.
+
+            recursive (bool):
+
+                    Includes snapshots of all exported ZFS datasets.
         """
         resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
         yield resourceBackupEvent.begin()
 
         self._lock()
         self._take_resource_snapshot()
+
+        zfs_send_flags = set()
+        if recursive is True:
+            zfs_send_flags.add(libzfs.SendFlag.REPLICATE)
+
+        is_standalone = (standalone is not False) and self.__has_release
 
         def _unlock_resource_backup() -> None:
             self._delete_resource_snapshot()
@@ -381,12 +406,16 @@ class LaunchableResourceBackup:
             for event in self._export_fstab():
                 yield event
 
-        if self.__has_release is True:
-            for event in self._export_root_dataset():
+        if is_standalone is False:
+            for event in self._export_root_dataset(flags=zfs_send_flags):
                 yield event
 
         # other datasets include `root` when the resource is no basejail
-        for event in self._export_other_datasets_recursive():
+        recursive_export_events = self._export_other_datasets_recursive(
+            flags=zfs_send_flags,
+            standalone=is_standalone
+        )
+        for event in recursive_export_events:
             yield event
 
         for event in self._bundle_backup(destination=destination):
@@ -452,7 +481,8 @@ class LaunchableResourceBackup:
         yield exportFstabEvent.end()
 
     def _export_root_dataset(
-        self
+        self,
+        flags: libzfs.SendFlags
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportRootDatasetEvent = iocage.lib.events.ExportRootDataset(
@@ -484,7 +514,9 @@ class LaunchableResourceBackup:
         yield exportRootDatasetEvent.end()
 
     def _export_other_datasets_recursive(
-        self
+        self,
+        standalone: bool,
+        flags: libzfs.SendFlags,
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportOtherDatasetsEvent = iocage.lib.events.ExportOtherDatasets(
@@ -495,17 +527,18 @@ class LaunchableResourceBackup:
 
         for dataset in self.resource.dataset.children_recursive:
             __is_root = (dataset.name == self.resource.root_dataset.name)
-            if (__is_root and self.__has_release) is True:
+            if __is_root and not standalone:
                 continue
 
             hasExportedOtherDatasets = True
             exportOtherDatasetEvent = iocage.lib.events.ExportOtherDataset(
                 dataset=dataset,
+                flags=flags,
                 resource=self.resource
             )
             yield exportOtherDatasetEvent.begin()
             try:
-                self._export_other_dataset(dataset)
+                self._export_other_dataset(dataset, flags)
             except iocage.lib.errors.IocageException as e:
                 yield exportOtherDatasetEvent.fail(e)
                 raise e
@@ -516,7 +549,11 @@ class LaunchableResourceBackup:
         else:
             yield exportOtherDatasetsEvent.end()
 
-    def _export_other_dataset(self, dataset: libzfs.ZFSDataset) -> None:
+    def _export_other_dataset(
+        self,
+        dataset: libzfs.ZFSDataset,
+        flags: libzfs.SendFlags
+    ) -> None:
         relative_name = self._get_relative_dataset_name(dataset)
         name_fragments = relative_name.split("/")
         minor_dataset_name = name_fragments.pop()
@@ -536,7 +573,7 @@ class LaunchableResourceBackup:
         )
 
         with open(absolute_asset_name, "w") as f:
-            snapshot.send(f.fileno(), fromname=None)
+            snapshot.send(f.fileno(), fromname=None, flags=flags)
 
     def _bundle_backup(
         self,

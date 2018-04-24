@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Export a jail from the CLI."""
+import typing
 import click
 import os.path
 
@@ -42,10 +43,24 @@ __rootcmd__ = True
 @click.pass_context
 @click.argument("jail", required=True)
 @click.argument("destination", required=True)
+@click.option(
+    "-s", "--standalone",
+    default=False,
+    is_flag=True,
+    help="Exports the jails root dataset independently"
+)
+@click.option(
+    "-r", "--recursive",
+    default=False,
+    is_flag=True,
+    help="Include ZFS snapshots. Implies --standalone"
+)
 def cli(
     ctx: IocageClickContext,
     jail: str,
-    destination: str
+    destination: str,
+    standalone: bool,
+    recursive: bool
 ) -> None:
     """
     Backup a jail.
@@ -71,6 +86,10 @@ def cli(
         exit(1)
 
     try:
-        print_events(ioc_jail.backup.export(destination))
+        print_events(ioc_jail.backup.export(
+            destination,
+            standalone=standalone,
+            recursive=recursive
+        ))
     except iocage.lib.errors.IocageException:
         exit(1)
