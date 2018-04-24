@@ -483,7 +483,7 @@ class LaunchableResourceBackup:
 
     def _export_root_dataset(
         self,
-        flags: libzfs.SendFlags
+        flags: typing.Set[libzfs.SendFlag]
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportRootDatasetEvent = iocage.lib.events.ExportRootDataset(
@@ -517,7 +517,7 @@ class LaunchableResourceBackup:
     def _export_other_datasets_recursive(
         self,
         standalone: bool,
-        flags: libzfs.SendFlags,
+        flags: typing.Set[libzfs.SendFlag],
         limit_depth: bool=False
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
@@ -559,7 +559,7 @@ class LaunchableResourceBackup:
     def _export_other_dataset(
         self,
         dataset: libzfs.ZFSDataset,
-        flags: libzfs.SendFlags
+        flags: typing.Set[libzfs.SendFlag]
     ) -> None:
         relative_name = self._get_relative_dataset_name(dataset)
         name_fragments = relative_name.split("/")
