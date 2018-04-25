@@ -48,7 +48,9 @@ def cli(ctx, jail, start):
         if start is True:
             ctx.parent.print_events(ioc_jail.start())
         else:
-            logger.error(f"The jail {jail.humanreadable_name} is not running")
+            logger.error(
+                f"The jail {ioc_jail.humanreadable_name} is not running"
+            )
             exit(1)
 
     jail.exec_console()
