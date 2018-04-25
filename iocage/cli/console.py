@@ -26,6 +26,7 @@ import click
 
 import iocage.lib.Jail
 import iocage.lib.Logger
+import iocage.lib.errors
 
 __rootcmd__ = True
 
@@ -47,10 +48,8 @@ def cli(ctx, jail, start):
     if not ioc_jail.running:
         if start is True:
             ctx.parent.print_events(ioc_jail.start())
-        else:
-            logger.error(
-                f"The jail {ioc_jail.humanreadable_name} is not running"
-            )
-            exit(1)
 
-    jail.exec_console()
+    try:
+        ioc_jail.exec_console()
+    except iocage.lib.errors.IocageException:
+        exit(1)

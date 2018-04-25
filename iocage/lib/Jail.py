@@ -1050,6 +1050,7 @@ class JailGenerator(JailResource):
 
     def exec_console(self) -> typing.Tuple[str, str]:
         """Shortcut to drop into a shell of a started jail."""
+        self.require_jail_running()
         return self.passthru(
             ["/usr/bin/login"] + self.config["login_flags"]
         )
