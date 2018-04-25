@@ -25,7 +25,10 @@
 import sys
 from setuptools import find_packages, setup
 from setuptools.command import easy_install
-from pip.req import parse_requirements
+try:
+    from pip._internal.req import parse_requirements
+except ModuleNotFoundError:
+    from pip.req import parse_requirements
 
 reqs = list(parse_requirements("requirements.txt", session="iocage"))
 install_requires = list(map(lambda x: f"{x.name}{x.specifier}", reqs))
