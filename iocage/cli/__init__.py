@@ -153,7 +153,6 @@ class IOCageCLI(click.MultiCommand):
                 pass
             return mod.cli
         except (ImportError, AttributeError):
-            raise
             return
 
 
