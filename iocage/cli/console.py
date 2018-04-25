@@ -38,15 +38,15 @@ def cli(ctx, jail, start):
     """Run jexec to login into the specified jail."""
     logger = ctx.parent.logger
 
-    jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
-    jail.state.query()
-
-    if not jail.exists:
-        logger.error(f"The jail {jail.humanreadable_name} does not exist")
+    try:
+        ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
+        ioc_jail.state.query()
+    except iocage.lib.errors.JailNotFound:
         exit(1)
-    if not jail.running:
+
+    if not ioc_jail.running:
         if start is True:
-            ctx.parent.print_events(jail.start())
+            ctx.parent.print_events(ioc_jail.start())
         else:
             logger.error(f"The jail {jail.humanreadable_name} is not running")
             exit(1)
