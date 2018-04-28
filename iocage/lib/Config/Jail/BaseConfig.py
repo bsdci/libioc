@@ -308,6 +308,33 @@ class BaseConfig(dict):
         if self._has_legacy_tag is True:
             del self.data["tag"]
 
+    def _get_vnet_interfaces(self) -> typing.List[str]:
+
+        data_keys = self.data.keys()
+
+        if "vnet_interfaces" in data_keys:
+            vnet_interfaces = set(list(
+                iocage.lib.helpers.parse_list(self.data["vnet_interfaces"])
+            ))
+        else:
+            vnet_interfaces = set()
+
+        return list(vnet_interfaces)
+
+    def _set_vnet_interfaces(  # noqa: T484
+        self,
+        value: typing.Union[
+            str,
+            bool,
+            int,
+            typing.List[typing.Union[str, bool, int]]
+        ],
+        **kwargs
+    ) -> None:
+
+        data = iocage.lib.helpers.to_string(value)
+        self.data["vnet_interfaces"] = data
+
     def _get_basejail(self) -> bool:
         return iocage.lib.helpers.parse_bool(self.data["basejail"]) is True
 

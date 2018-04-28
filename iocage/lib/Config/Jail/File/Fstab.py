@@ -51,10 +51,10 @@ class FstabLine(dict):
         output = "\t".join([
             self._escape("source"),
             self._escape("destination"),
-            self["type"],
-            self["options"],
-            self["dump"],
-            self["passnum"]
+            self.get("type", "nullfs"),
+            self.get("options", "ro"),
+            self.get("dump", "0"),
+            self.get("passnum", "0")
         ])
 
         if self["comment"] is not None:
@@ -351,14 +351,27 @@ class Fstab(
         else:
             self.logger.debug(f"Adding line to fstab: {line}")
 
-        for existing_line in self.__iter__():
-            if hash(existing_line) == hash(line):
-                raise iocage.lib.errors.FstabDestinationExists(
-                    mountpoint=line["destination"],
-                    logger=self.logger
-                )
+        if self.line_exists(line):
+            raise iocage.lib.errors.FstabDestinationExists(
+                mountpoint=line["destination"],
+                logger=self.logger
+            )
 
         self._lines.append(line)
+
+    def line_exists(
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> bool:
+        """Return True when the FstabLine already exists."""
+        for existing_line in self.__iter__():
+            if hash(existing_line) == hash(line):
+                return True
+        return False
 
     @property
     def basejail_lines(self) -> typing.List[FstabBasejailLine]:
