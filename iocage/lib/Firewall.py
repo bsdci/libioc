@@ -27,12 +27,13 @@ import typing
 import sysctl
 
 import iocage.lib.helpers
+import iocage.lib.CommandQueue
 
 
 class Firewall:
     """iocage host firewall abstraction."""
 
-    IPFW_RULE_OFFSET: int = 10000
+    IPFW_RULE_OFFSET: int
     IPFW_COMMAND: str = "/sbin/ipfw"
 
     def __init__(
@@ -40,6 +41,7 @@ class Firewall:
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
+        self.IPFW_RULE_OFFSET = 10000
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
     @property
@@ -62,32 +64,65 @@ class Firewall:
                         logger=self.logger
                     )
 
-    def delete_rule(self, rule_number: int) -> None:
+    def delete_rule(self, rule_number: typing.Union[int, str]) -> None:
         """Delete a firewall rule by its number."""
-        iocage.lib.helpers.exec(
-            [
-                self.IPFW_COMMAND,
-                "-q", "delete",
-                str(rule_number + self.IPFW_RULE_OFFSET)
-            ],
-            ignore_error=True
-        )
+        command = [
+            self.IPFW_COMMAND,
+            "-q", "delete",
+            self._offset_rule_number(rule_number)
+        ]
+        self._exec(command, ignore_error=True)
 
     def add_rule(
         self,
-        rule_number: int,
+        rule_number: typing.Union[int, str],
         rule_arguments: typing.List[str]
     ) -> None:
         """Add a rule to the firewall configuration."""
         command = [
             self.IPFW_COMMAND,
             "-q", "add",
-            str(rule_number + self.IPFW_RULE_OFFSET)
+            self._offset_rule_number(rule_number)
         ] + rule_arguments
 
+        self._exec(command)
+
+    def _offset_rule_number(self, rule_number: typing.Union[int, str]) -> str:
+        _rule_number = int(rule_number)
+        return _rule_number + self.IPFW_RULE_OFFSET
+
+    def _exec(
+        command: typing.List[str],
+        ignore_error: bool=False
+    ) -> None:
         try:
-            iocage.lib.helpers.exec(command)
+            iocage.lib.helpers.exec(command, ignore_error=ignore_error)
         except iocage.lib.errors.CommandFailure:
             raise iocage.lib.errors.FirewallCommandFailure(
                 logger=self.logger
             )
+
+
+class QueuingFirewall(Firewall, iocage.lib.CommandQueue.CommandQueue):
+
+    def __init__(  # noqa: T484
+        self,
+        **firewall_arguments
+    ) -> None:
+        self.clear()
+        Firewall.__init__(self, **firewall_arguments)
+
+    def _offset_rule_number(self, rule_number: typing.Union[int, str]) -> str:
+        if isinstance(rule_number, int):
+            return _rule_number + self.IPFW_RULE_OFFSET
+        return f"$(expr {rule_number} + {self.IPFW_RULE_OFFSET})"
+
+    def _exec(
+        self,
+        command: typing.List[str],
+        ignore_error: bool=False
+    ) -> None:
+        command_line = " ".join(command)
+        if ignore_error is True:
+            command_line += " || true"
+        self.command_queue.append(command_line)

@@ -165,7 +165,9 @@ class ConfigFile(dict):
     def save(self) -> bool:
         """Save the changes to the file."""
         if self.changed is False:
-            self.logger.debug("{self._file} was not modified - skipping write")
+            self.logger.debug(
+                f"{self._file} was not modified - skipping write"
+            )
             return False
 
         with open(self.path, "w") as rcconf:

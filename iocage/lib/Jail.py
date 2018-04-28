@@ -26,6 +26,7 @@ import typing
 import os
 import subprocess  # nosec: B404
 import shlex
+import shutil
 
 import iocage.lib.Types
 import iocage.lib.errors
@@ -248,6 +249,7 @@ class JailGenerator(JailResource):
 
     _class_storage = iocage.lib.Storage.Storage
     _state: typing.Optional[iocage.lib.JailState.JailState]
+    _relative_start_script_dir: str
 
     def __init__(  # noqa: T484
         self,
@@ -279,6 +281,7 @@ class JailGenerator(JailResource):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
+        self._relative_start_script_dir = "/usr/local/iocage-scripts"
 
         if isinstance(data, str):
             data = {
@@ -359,6 +362,7 @@ class JailGenerator(JailResource):
     def start(
         self,
         quick: bool=False,
+        single_command: typing.Optional[str]=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Start the jail."""
         self.require_jail_existing()
@@ -372,6 +376,49 @@ class JailGenerator(JailResource):
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
         jailServicesStartEvent = events.JailServicesStart(jail=self)
 
+        if os.path.isdir(self.launch_script_dir) is False:
+            os.mkdir(self.launch_script_dir, 0o755)
+        jail_start_script_dir = "/".join([
+            self.root_dataset.mountpoint,
+            self._relative_start_script_dir
+        ])
+        if os.path.isdir(jail_start_script_dir) is False:
+            os.mkdir(jail_start_script_dir, 0o755)
+        self._empty_file(self.prestart_script_path)
+        self._empty_file(self.poststart_script_path)
+        self._empty_file(self.start_script_path)
+
+        exec_prestart = self.config["exec_prestart"]
+        exec_start = self.config["exec_start"]
+        exec_poststart = f". {self.script_env_path}"
+
+        if self.config["vnet"]:
+            yield jailVnetConfigurationEvent.begin()
+            _pre, _post, _jail = self._start_vimage_network()
+            exec_prestart = "\n".join(_pre + [exec_prestart])
+            exec_poststart = "\n".join([exec_poststart] + _post)
+            exec_start = "\n".join(
+                [". \"$(dirname $0)/.script-env\""] +
+                _jail +
+                self._configure_localhost_commands() +
+                self._configure_routes_commands() +
+                [exec_start]
+            )
+            yield jailVnetConfigurationEvent.end()
+
+        exec_poststart += "\n" + self.config["exec_poststart"]
+
+        exec_prestart = f"set -e\n{exec_prestart}"
+
+        with open(self.prestart_script_path, "a") as f:
+            f.write(exec_prestart)
+
+        with open(self.start_script_path, "a") as f:
+            f.write(exec_start)
+
+        with open(self.poststart_script_path, "a") as f:
+            f.write(exec_poststart)
+
         yield jailLaunchEvent.begin()
 
         if self.is_basejail is True:
@@ -380,17 +427,10 @@ class JailGenerator(JailResource):
         if quick is False:
             self._save_autoconfig()
 
-        self._run_hook("prestart")
-        self._launch_jail()
+        # self._run_hook("prestart")
+        self._launch_persistent_jail()
 
         yield jailLaunchEvent.end()
-
-        if self.config["vnet"]:
-            yield jailVnetConfigurationEvent.begin()
-            self._start_vimage_network()
-            self._configure_routes()
-            self._configure_localhost()
-            yield jailVnetConfigurationEvent.end()
 
         self._limit_resources()
         self._configure_nameserver()
@@ -404,12 +444,12 @@ class JailGenerator(JailResource):
             share_storage.mount_zfs_shares()
             yield JailZfsShareMount.end()
 
-        if self.config["exec_start"] is not None:
-            yield jailServicesStartEvent.begin()
-            self._run_hook("start")
-            yield jailServicesStartEvent.end()
+        # if self.config["exec_start"] is not None:
+        #     yield jailServicesStartEvent.begin()
+        #     self._run_hook("start")
+        #     yield jailServicesStartEvent.end()
 
-        self._run_hook("poststart")
+        # self._run_hook("poststart")
 
     def fork_exec(  # noqa: T484
         self,
@@ -1000,7 +1040,22 @@ class JailGenerator(JailResource):
             self.fstab.release = self.release
         else:
             self.fstab.release = None
-        self.fstab.update_and_save()
+
+        # launch command mountpoint
+        jail_start_script_dir = "/".join([
+            self.root_dataset.mountpoint,
+            self._relative_start_script_dir
+        ])
+        iocage_helper_line = iocage.lib.Config.Jail.File.Fstab.FstabLine(dict(
+            source=self.launch_script_dir,
+            destination=jail_start_script_dir,
+            type="nullfs",
+            options="ro"
+        ))
+        self.fstab.read_file()
+        if self.fstab.line_exists(iocage_helper_line) is False:
+            self.fstab.add_line(iocage_helper_line)
+        self.fstab.save()
 
     def exec(  # noqa: T484
         self,
@@ -1116,12 +1171,16 @@ class JailGenerator(JailResource):
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
             return self.host.devfs[ruleset_line_position].number
 
-    def _launch_jail(self) -> None:
+    @property
+    def _launch_command(self):
 
         command = ["jail", "-c"]
 
         if self.config["vnet"]:
-            command.append('vnet')
+            command.append("vnet")
+            command.append(
+                f"vnet.interface={self._get_value('vnet_interfaces')}"
+            )
         else:
 
             if self.config["ip4_addr"] is not None:
@@ -1151,7 +1210,10 @@ class JailGenerator(JailResource):
             f"enforce_statfs={self._get_value('enforce_statfs')}",
             f"children.max={self._get_value('children_max')}",
             f"allow.set_hostname={self._get_value('allow_set_hostname')}",
-            f"allow.sysvipc={self._get_value('allow_sysvipc')}"
+            f"allow.sysvipc={self._get_value('allow_sysvipc')}",
+            f"exec.prestart=\"{self.prestart_script_path}\"",
+            f"exec.poststart=\"{self.poststart_script_path}\"",
+            f"exec.start=\"{self._relative_start_script_dir}/start.sh\""
         ]
 
         if self.host.userland_version > 10.3:
@@ -1185,10 +1247,19 @@ class JailGenerator(JailResource):
                 f"allow.mount.tmpfs={self._get_value('allow_mount_tmpfs')}"
             ]
 
-        command += [
-            "allow.dying",
-            "persist"
+        command += ["allow.dying"]
+        return command
+
+    def _launch_persistent_jail(self) -> None:
+        command = self._launch_command + ["persist"]
+        self._launch_jail(command)
+
+    def _launch_single_command_jail(self, jail_command: str) -> None:
+        command = self._launch_command + [
+            f"command=\"{jail_command}\""
         ]
+
+    def _launch_jail(self, command: typing.List[str]) -> None:
 
         humanreadable_name = self.humanreadable_name
         try:
@@ -1251,10 +1322,50 @@ class JailGenerator(JailResource):
 
         return networks
 
+    def _empty_file(self, file: str) -> None:
+        existed = os.path.isfile(file)
+        open(file, "w").close()
+        if existed is False:
+            shutil.chown(file, "root", "wheel")
+            os.chmod(file, 0o755)  # nosec: executable script
+
+    @property
+    def launch_script_dir(self):
+        return f"{self.jail.dataset.mountpoint}/launch-scripts"
+
+    @property
+    def prestart_script_path(self):
+        return f"{self.jail.launch_script_dir}/pre-start.sh"
+
+    @property
+    def script_env_path(self):
+        return f"{self.jail.launch_script_dir}/.script-env"
+
+    @property
+    def poststart_script_path(self):
+        return f"{self.jail.launch_script_dir}/post-start.sh"
+
+    @property
+    def start_script_path(self):
+        return f"{self.jail.launch_script_dir}/start.sh"
+
     def _start_vimage_network(self) -> None:
         self.logger.debug("Starting VNET/VIMAGE", jail=self)
+        pre: typing.List[str] = []
+        post: typing.List[str] = []
+        jail: typing.List[str] = []
         for network in self.networks:
-            network.setup()
+            _pre, _post, _jail, _new_vnet_nic = network.setup()
+            # ToDo: would be great to write as config[key] += ["iface1"]
+            vnet_interfaces = self.config["vnet_interfaces"] + [_new_vnet_nic]
+            self.config["vnet_interfaces"] = list(vnet_interfaces)
+            if _pre != "":
+                pre += _pre
+            if _post != "":
+                post += _post
+            if _jail != "":
+                jail += _jail
+        return pre, post, jail
 
     def _stop_vimage_network(self) -> None:
         for network in self.networks:
@@ -1263,8 +1374,8 @@ class JailGenerator(JailResource):
     def _configure_nameserver(self) -> None:
         self.config["resolver"].apply(self)
 
-    def _configure_localhost(self) -> None:
-        self.exec(["ifconfig", "lo0", "localhost"])
+    def _configure_localhost_commands(self) -> typing.List[str]:
+        return ["ifconfig lo0 localhost"]
 
     def _limit_resources(self) -> None:
 
@@ -1353,7 +1464,7 @@ class JailGenerator(JailResource):
         limit, action = value.split(":", maxsplit=1)
         return limit, action
 
-    def _configure_routes(self) -> None:
+    def _configure_routes_commands(self) -> typing.List[str]:
 
         defaultrouter = self.config["defaultrouter"]
         defaultrouter6 = self.config["defaultrouter6"]
@@ -1362,13 +1473,21 @@ class JailGenerator(JailResource):
             self.logger.spam("no static routes configured")
             return
 
+        commands: typing.List[str] = []
+
         if defaultrouter:
-            self._configure_route(defaultrouter)
+            commands.append(
+                self._configure_route_command(defaultrouter)
+            )
 
         if defaultrouter6:
-            self._configure_route(defaultrouter6, ipv6=True)
+            commands.append(
+                self._configure_route_command(defaultrouter6, ipv6=True)
+            )
 
-    def _configure_route(self, gateway: str, ipv6: bool=False) -> None:
+        return commands
+
+    def _configure_route_command(self, gateway: str, ipv6: bool=False) -> str:
 
         ip_version = 4 + 2 * (ipv6 is True)
 
@@ -1384,7 +1503,7 @@ class JailGenerator(JailResource):
             f"setting default IPv{ip_version} gateway to {gateway}",
             jail=self
         )
-        self.exec(
+        return " ".join(
             ["/sbin/route", "add"] +
             (["-6"] if (ipv6 is True) else []) +
             ["default", gateway]
