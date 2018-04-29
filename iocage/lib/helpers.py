@@ -409,7 +409,7 @@ def exec_passthru(
 
 
 # ToDo: replace with (u)mount library
-def umount(
+def umount_command(
     mountpoint: typing.Optional[typing.Union[
         iocage.lib.Types.AbsolutePath,
         typing.List[iocage.lib.Types.AbsolutePath],
@@ -432,6 +432,29 @@ def umount(
         cmd += mountpoint
     elif isinstance(mountpoint, iocage.lib.Types.AbsolutePath):
         cmd.append(str(mountpoint))
+
+    if ignore_error is True:
+        cmd += ["||", ":"]
+
+    return cmd
+
+
+def umount(
+    mountpoint: typing.Optional[typing.Union[
+        iocage.lib.Types.AbsolutePath,
+        typing.List[iocage.lib.Types.AbsolutePath],
+    ]]=None,
+    options: typing.Optional[typing.List[str]]=None,
+    force: bool=False,
+    ignore_error: bool=False,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
+) -> None:
+
+    cmd = umount_command(
+        mountpoint=mountpoint,
+        options=options,
+        force=force
+    )
 
     try:
         iocage.lib.helpers.exec(cmd)
