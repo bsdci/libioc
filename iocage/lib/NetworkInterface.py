@@ -135,7 +135,7 @@ class NetworkInterface:
         if self.extra_settings:
             command += self.extra_settings
 
-        self._exec(" ".join(command))
+        self._exec(command)
 
         # update name when the interface was renamed
         if self.rename:
@@ -171,13 +171,13 @@ class NetworkInterface:
             if i > 0:
                 command.append("alias")
 
-            self._exec(" ".join(command))
+            self._exec(command)
 
             if (ipv6 is True) and (address.lower() == "accept_rtadv"):
-                self._exec(" ".join([
+                self._exec([
                     self.rtsold_command,
                     self.current_nic_name
-                ]))
+                ])
 
     def _exec(
         self,
@@ -239,8 +239,9 @@ class QueuingNetworkInterface(
         else:
             return f"${self.shell_variable_nic_name}"
 
-    def _exec(self, command: str) -> str:
+    def _exec(self, command: typing.List[str]) -> str:
 
+        _command = " ".join(command)
         _has_variable_name = (self.shell_variable_nic_name is not None)
 
         if self.rename is True:
@@ -248,12 +249,11 @@ class QueuingNetworkInterface(
 
         if (_has_variable_name and self.create) is True:
             self.command_queue.append(
-                f"export {self.shell_variable_nic_name}=\"$({command})\""
+                f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
         else:
-            self.command_queue.append(command)
+            self.command_queue.append(_command)
             if (_has_variable_name and self.rename) is True:
                 self.command_queue.append(
                     f"export {self.shell_variable_nic_name}=\"{self.name}\""
                 )
-

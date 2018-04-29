@@ -249,7 +249,7 @@ class JailGenerator(JailResource):
 
     _class_storage = iocage.lib.Storage.Storage
     _state: typing.Optional[iocage.lib.JailState.JailState]
-    _relative_start_script_dir: str
+    _relative_hook_script_dir: str
 
     def __init__(  # noqa: T484
         self,
@@ -281,7 +281,7 @@ class JailGenerator(JailResource):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
-        self._relative_start_script_dir = "/usr/local/iocage-scripts"
+        self._relative_hook_script_dir = "/usr/local/iocage-scripts"
 
         if isinstance(data, str):
             data = {
@@ -372,52 +372,40 @@ class JailGenerator(JailResource):
 
         events: typing.Any = iocage.lib.events
         jailLaunchEvent = events.JailLaunch(jail=self)
-        jailVnetConfigurationEvent = events.JailVnetConfiguration(jail=self)
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
-        jailServicesStartEvent = events.JailServicesStart(jail=self)
 
         if os.path.isdir(self.launch_script_dir) is False:
             os.mkdir(self.launch_script_dir, 0o755)
         jail_start_script_dir = "/".join([
             self.root_dataset.mountpoint,
-            self._relative_start_script_dir
+            self._relative_hook_script_dir
         ])
         if os.path.isdir(jail_start_script_dir) is False:
             os.mkdir(jail_start_script_dir, 0o755)
-        self._empty_file(self.prestart_script_path)
-        self._empty_file(self.poststart_script_path)
-        self._empty_file(self.start_script_path)
 
         exec_prestart = self.config["exec_prestart"]
         exec_start = self.config["exec_start"]
-        exec_poststart = f". {self.script_env_path}"
+        exec_poststart = self.config["exec_poststart"]
 
         if self.config["vnet"]:
-            yield jailVnetConfigurationEvent.begin()
-            _pre, _post, _jail = self._start_vimage_network()
+            _pre, _start, _poststart = self._start_vimage_network()
             exec_prestart = "\n".join(_pre + [exec_prestart])
-            exec_poststart = "\n".join([exec_poststart] + _post)
             exec_start = "\n".join(
-                [". \"$(dirname $0)/.script-env\""] +
-                _jail +
+                [". \"$(dirname $0)/.env\""] +
+                _start +
                 self._configure_localhost_commands() +
                 self._configure_routes_commands() +
                 [exec_start]
             )
-            yield jailVnetConfigurationEvent.end()
+            exec_poststart = "\n".join(
+                [". \"$(dirname $0)/.env\""] +
+                _poststart +
+                [exec_poststart]
+            )
 
-        exec_poststart += "\n" + self.config["exec_poststart"]
-
-        exec_prestart = f"set -e\n{exec_prestart}"
-
-        with open(self.prestart_script_path, "a") as f:
-            f.write(exec_prestart)
-
-        with open(self.start_script_path, "a") as f:
-            f.write(exec_start)
-
-        with open(self.poststart_script_path, "a") as f:
-            f.write(exec_poststart)
+        self._write_hook_script("prestart", exec_prestart)
+        self._write_hook_script("start", exec_start)
+        self._write_hook_script("poststart", exec_poststart)
 
         yield jailLaunchEvent.begin()
 
@@ -427,7 +415,6 @@ class JailGenerator(JailResource):
         if quick is False:
             self._save_autoconfig()
 
-        # self._run_hook("prestart")
         self._launch_persistent_jail()
 
         yield jailLaunchEvent.end()
@@ -443,13 +430,6 @@ class JailGenerator(JailResource):
             )
             share_storage.mount_zfs_shares()
             yield JailZfsShareMount.end()
-
-        # if self.config["exec_start"] is not None:
-        #     yield jailServicesStartEvent.begin()
-        #     self._run_hook("start")
-        #     yield jailServicesStartEvent.end()
-
-        # self._run_hook("poststart")
 
     def fork_exec(  # noqa: T484
         self,
@@ -604,41 +584,91 @@ class JailGenerator(JailResource):
             force (bool): (default=False)
                 Ignores failures and enforces teardown if True
         """
-        if force is True:
-            for event in self._force_stop():
-                yield event
-            return
-
-        self.require_jail_existing()
-        self.require_jail_running()
+        if force is False:
+            self.require_jail_existing()
+            self.require_jail_running()
 
         events: typing.Any = iocage.lib.events
         jailDestroyEvent = events.JailDestroy(self)
-        jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
-        jailServicesStopEvent = events.JailServicesStop(self)
-        jailMountTeardownEvent = events.JailMountTeardown(self)
 
-        self._run_hook("prestop")
+        exec_prestop = ""
+        exec_stop = ""
+        exec_poststop = "\n".join(self._teardown_mounts())
 
+        if self.config["exec_prestop"] is not None:
+            exec_prestop = self.config["exec_prestop"]
         if self.config["exec_stop"] is not None:
-            yield jailServicesStopEvent.begin()
-            self._run_hook("stop")
-            yield jailServicesStopEvent.end()
-
-        yield jailDestroyEvent.begin()
-        self._destroy_jail()
-        yield jailDestroyEvent.end()
+            exec_stop = self.config["exec_stop"]
+        if self.config["exec_poststop"] is not None:
+            exec_poststop += "\n" + self.config["exec_poststop"]
 
         if self.config["vnet"]:
-            yield jailNetworkTeardownEvent.begin()
-            self._stop_vimage_network()
-            yield jailNetworkTeardownEvent.end()
+            exec_poststop = "\n".join(
+                self._stop_vimage_network() +
+                [exec_poststop]
+            )
 
-        yield jailMountTeardownEvent.begin()
-        self._teardown_mounts()
-        yield jailMountTeardownEvent.end()
+        exec_prestop = ". \"$(dirname $0)/.env\"\n" + exec_prestop
+        exec_stop = ". \"$(dirname $0)/.env\"\n" + exec_stop
+        exec_poststop = ". \"$(dirname $0)/.env\"\n" + exec_poststop
+        self._write_hook_script("prestop", exec_prestop)
+        self._write_hook_script("stop", exec_stop)
+        self._write_hook_script("poststop", exec_poststop)
 
-        self.state.query()
+        yield jailDestroyEvent.begin()
+        try:
+            self._write_jail_conf()
+            self._destroy_jail()
+        except Exception as e:
+            if force is True:
+                yield jailDestroyEvent.skip()
+                self.logger.debug(
+                    "Manually executing prestop and poststop hooks"
+                )
+                try:
+                    for hook_name in ["prestop", "poststop"]:
+                        iocage.lib.helpers.exec([
+                            "/bin/sh",
+                            self.get_hook_script_path(hook_name)
+                        ])
+                except Exception as e:
+                    self.logger.warn(str(e))
+            else:
+                yield jailDestroyEvent.fail(e)
+                raise e
+        yield jailDestroyEvent.end()
+
+        try:
+            self.state.query()
+        except Exception as e:
+            if force is True:
+                self.logger.warn(str(e))
+            else:
+                raise e
+
+    def _write_jail_conf(self) -> None:
+        content = "\n".join([
+            self.identifier + " {",
+            (
+                "exec.prestop = "
+                f"\"/bin/sh {self.get_hook_script_path('prestop')}\";"
+            ), (
+                "exec.poststop = "
+                f"\"/bin/sh {self.get_hook_script_path('poststop')}\";"
+            ),
+            (
+                "exec.stop = "
+                f"\"/bin/sh {self._relative_hook_script_dir}/stop.sh\";"
+            ),
+            "}"
+        ])
+        self.logger.debug(f"Writing jail.conf file to {self._jail_conf_file}")
+        with open(self._jail_conf_file, "w") as f:
+            f.write(content)
+
+    @property
+    def _jail_conf_file(self):
+        return f"{self.launch_script_dir}/jail.conf"
 
     def restart(
         self,
@@ -813,50 +843,6 @@ class JailGenerator(JailResource):
         except BaseException:
             yield jailFstabUpdateEvent.fail()
             raise
-
-    def _force_stop(
-        self
-    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-
-        events: typing.Any = iocage.lib.events
-        jailDestroyEvent = events.JailDestroy(self)
-        jailNetworkTeardownEvent = events.JailNetworkTeardown(self)
-        jailMountTeardownEvent = events.JailMountTeardown(self)
-
-        try:
-            self._run_hook("prestop")
-        except Exception:
-            self.logger.warn("pre-stop script failed")
-
-        yield jailDestroyEvent.begin()
-        try:
-            self._destroy_jail()
-            self.logger.debug(f"{self.humanreadable_name}: jail destroyed")
-            yield jailDestroyEvent.end()
-        except Exception as e:
-            yield jailDestroyEvent.skip()
-
-        if self.config["vnet"]:
-            yield jailNetworkTeardownEvent.begin()
-            try:
-                self._stop_vimage_network()
-                self.logger.debug(f"{self.humanreadable_name}: VNET stopped")
-                yield jailNetworkTeardownEvent.end()
-            except Exception as e:
-                yield jailNetworkTeardownEvent.skip()
-
-        yield jailMountTeardownEvent.begin()
-        try:
-            self._teardown_mounts()
-            self.logger.debug(f"{self.humanreadable_name}: mounts destroyed")
-            yield jailMountTeardownEvent.end()
-        except Exception as e:
-            yield jailMountTeardownEvent.skip()
-
-        try:
-            self.state.query()
-        except Exception as e:
-            self.logger.warn(str(e))
 
     def create(
         self,
@@ -1044,7 +1030,7 @@ class JailGenerator(JailResource):
         # launch command mountpoint
         jail_start_script_dir = "/".join([
             self.root_dataset.mountpoint,
-            self._relative_start_script_dir
+            self._relative_hook_script_dir
         ])
         iocage_helper_line = iocage.lib.Config.Jail.File.Fstab.FstabLine(dict(
             source=self.launch_script_dir,
@@ -1112,14 +1098,34 @@ class JailGenerator(JailResource):
 
     def _destroy_jail(self) -> None:
 
-        command = ["/usr/sbin/jail", "-r"]
-        command.append(self.identifier)
+        jid = self.jid
 
-        subprocess.check_output(
-            command,
-            shell=False,  # nosec; TODO use helper
-            stderr=subprocess.DEVNULL
-        )
+        commands = [
+            # [
+            #     "/usr/sbin/jail",
+            #     "-v",
+            #     "-m",
+            #     f"name={self.identifier}" if (jid is None) else f"jid={jid}",
+            #     f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
+            #     f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
+            #     f"exec.stop=\"{self._relative_hook_script_dir}/stop.sh\""
+            # ],
+            [
+                "/usr/sbin/jail",
+                "-v",
+                "-r",
+                "-f",
+                self._jail_conf_file,
+                #self.identifier if (jid is None) else str(jid)
+                self.identifier
+            ]
+        ]
+
+        for command in commands:
+            iocage.lib.helpers.exec(
+                command,
+                logger=self.logger
+            )
 
     @property
     def _dhcp_enabled(self) -> bool:
@@ -1211,9 +1217,13 @@ class JailGenerator(JailResource):
             f"children.max={self._get_value('children_max')}",
             f"allow.set_hostname={self._get_value('allow_set_hostname')}",
             f"allow.sysvipc={self._get_value('allow_sysvipc')}",
-            f"exec.prestart=\"{self.prestart_script_path}\"",
-            f"exec.poststart=\"{self.poststart_script_path}\"",
-            f"exec.start=\"{self._relative_start_script_dir}/start.sh\""
+            f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
+            f"exec.poststart=\"{self.get_hook_script_path('poststart')}\"",
+            f"exec.start=\"{self._relative_hook_script_dir}/start.sh\"",
+            #f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
+            #f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
+            #f"exec.stop=\"{self._relative_hook_script_dir}/stop.sh\"",
+            "exec.consolelog=/tmp/jail.log"
         ]
 
         if self.host.userland_version > 10.3:
@@ -1322,9 +1332,11 @@ class JailGenerator(JailResource):
 
         return networks
 
-    def _empty_file(self, file: str) -> None:
+    def _write_hook_script(self, hook_name: str, command_string: str) -> None:
+        file = self.get_hook_script_path(hook_name)
         existed = os.path.isfile(file)
-        open(file, "w").close()
+        with open(file, "w") as f:
+            f.write(f"#!/bin/sh\n{command_string}")
         if existed is False:
             shutil.chown(file, "root", "wheel")
             os.chmod(file, 0o755)  # nosec: executable script
@@ -1334,42 +1346,40 @@ class JailGenerator(JailResource):
         return f"{self.jail.dataset.mountpoint}/launch-scripts"
 
     @property
-    def prestart_script_path(self):
-        return f"{self.jail.launch_script_dir}/pre-start.sh"
-
-    @property
     def script_env_path(self):
-        return f"{self.jail.launch_script_dir}/.script-env"
+        return f"{self.launch_script_dir}/.env"
 
-    @property
-    def poststart_script_path(self):
-        return f"{self.jail.launch_script_dir}/post-start.sh"
+    def get_hook_script_path(self, hook_name: str) -> str:
+        return f"{self.jail.launch_script_dir}/{hook_name}.sh"
 
-    @property
-    def start_script_path(self):
-        return f"{self.jail.launch_script_dir}/start.sh"
-
-    def _start_vimage_network(self) -> None:
+    def _start_vimage_network(self) -> typing.Tuple[
+        'iocage.lib.Network.PrestartCommandList',
+        'iocage.lib.Network.JailCommandList',
+        'iocage.lib.Network.PoststartCommandList'
+    ]:
         self.logger.debug("Starting VNET/VIMAGE", jail=self)
-        pre: typing.List[str] = []
-        post: typing.List[str] = []
-        jail: typing.List[str] = []
-        for network in self.networks:
-            _pre, _post, _jail, _new_vnet_nic = network.setup()
-            # ToDo: would be great to write as config[key] += ["iface1"]
-            vnet_interfaces = self.config["vnet_interfaces"] + [_new_vnet_nic]
-            self.config["vnet_interfaces"] = list(vnet_interfaces)
-            if _pre != "":
-                pre += _pre
-            if _post != "":
-                post += _post
-            if _jail != "":
-                jail += _jail
-        return pre, post, jail
 
-    def _stop_vimage_network(self) -> None:
+        prestart: typing.List[str] = []
+        start: typing.List[str] = []
+        poststart: typing.List[str] = []
+
         for network in self.networks:
-            network.teardown()
+            _vnet_nic_name = f"{network.nic_prefix}:j"
+            _pre, _start, _post = network.setup()
+            # ToDo: would be great to write as config[key] += ["iface1"]
+            vnet_interfaces = self.config["vnet_interfaces"] + [_vnet_nic_name]
+            self.config["vnet_interfaces"] = list(vnet_interfaces)
+            prestart += _pre
+            start += _start
+            poststart += _post
+
+        return prestart, start, poststart
+
+    def _stop_vimage_network(self) -> typing.List[str]:
+        commands: typing.List[str] = []
+        for network in self.networks:
+            commands += network.teardown()
+        return commands
 
     def _configure_nameserver(self) -> None:
         self.config["resolver"].apply(self)
@@ -1567,7 +1577,9 @@ class JailGenerator(JailResource):
                 **kwargs  # noqa: T484
             )
 
-    def _teardown_mounts(self) -> None:
+    def _teardown_mounts(self) -> typing.List[str]:
+
+        commands: typing.List[str] = []
 
         mountpoints = list(filter(
             os.path.isdir,
@@ -1587,35 +1599,27 @@ class JailGenerator(JailResource):
             )
         ))
 
-        iocage.lib.helpers.umount(
+        commands.append(" ".join(iocage.lib.helpers.umount_command(
             mountpoints,
             force=True,
-            logger=self.logger,
             ignore_error=True
-        )
+        )))
 
-        iocage.lib.helpers.umount(
+        commands.append(" ".join(iocage.lib.helpers.umount_command(
             ["-a", "-F", self.fstab.path],
             force=True,
-            logger=self.logger,
             ignore_error=True
-        )
+        )))
 
         if self.config.legacy is True:
-            command = [
-                "/bin/sh",
-                "-c",
-                " | ".join([
-                    "mount -t nullfs",
-                    "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
-                    f"grep '^{self.root_dataset.mountpoint}/'",
-                    "xargs umount"
-                ])
-            ]
-            iocage.lib.helpers.exec(
-                command,
-                logger=self.logger
-            )
+            commands.append(" | ".join([
+                "mount -t nullfs",
+                "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
+                f"grep '^{self.root_dataset.mountpoint}/'",
+                "xargs umount"
+            ]))
+
+        return commands
 
     def _get_absolute_path_from_jail_asset(
         self,

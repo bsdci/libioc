@@ -300,18 +300,6 @@ class JailRename(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
-class JailVnetConfiguration(JailEvent):
-    """Configure networking for VNET jails."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
 class JailZfsShareMount(JailEvent):
     """Share ZFS datasets with the jail."""
 
@@ -324,56 +312,8 @@ class JailZfsShareMount(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
-class JailServicesStart(JailEvent):
-    """Start the jails services."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
-class JailServicesStop(JailEvent):
-    """Stops the jails services."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
 class JailDestroy(JailEvent):
     """Destroy the jail."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
-class JailNetworkTeardown(JailEvent):
-    """Teardown a jails VNET network devices."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
-class JailMountTeardown(JailEvent):
-    """Teardown basejail mountpoints."""
 
     def __init__(  # noqa: T484
         self,
