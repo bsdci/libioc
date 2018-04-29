@@ -398,8 +398,13 @@ class JailGenerator(JailResource):
                 [exec_start]
             )
             exec_poststart = "\n".join(
-                [". \"$(dirname $0)/.env\""] +
+                self._init_post_start_hook_scripts +
                 _poststart +
+                [exec_poststart]
+            )
+        else:
+            exec_poststart = "\n".join(
+                self._init_post_start_hook_scripts +
                 [exec_poststart]
             )
 
@@ -430,6 +435,14 @@ class JailGenerator(JailResource):
             )
             share_storage.mount_zfs_shares()
             yield JailZfsShareMount.end()
+
+    @property
+    def _init_post_start_hook_scripts(self) -> typing.List[str]:
+        """Return a list of shell commands to initialize hooks after start."""
+        return [
+            ". \"$(dirname $0)/.env\"",
+            f"export _IOCAGE_JID=$(jls -j {self.identifier} jid)"
+        ]
 
     def fork_exec(  # noqa: T484
         self,
@@ -608,9 +621,13 @@ class JailGenerator(JailResource):
                 [exec_poststop]
             )
 
-        exec_prestop = ". \"$(dirname $0)/.env\"\n" + exec_prestop
-        exec_stop = ". \"$(dirname $0)/.env\"\n" + exec_stop
-        exec_poststop = ". \"$(dirname $0)/.env\"\n" + exec_poststop
+        exec_prestop = "\n".join(
+            self._init_post_start_hook_scripts + [exec_prestop]
+        )
+        exec_stop = f". \"$(dirname $0)/.env\"\n{exec_stop}"
+        exec_poststop = "\n".join(
+            self._init_post_start_hook_scripts + [exec_poststop]
+        )
         self._write_hook_script("prestop", exec_prestop)
         self._write_hook_script("stop", exec_stop)
         self._write_hook_script("poststop", exec_poststop)
@@ -667,7 +684,7 @@ class JailGenerator(JailResource):
             f.write(content)
 
     @property
-    def _jail_conf_file(self):
+    def _jail_conf_file(self) -> str:
         return f"{self.launch_script_dir}/jail.conf"
 
     def restart(
@@ -1098,25 +1115,13 @@ class JailGenerator(JailResource):
 
     def _destroy_jail(self) -> None:
 
-        jid = self.jid
-
         commands = [
-            # [
-            #     "/usr/sbin/jail",
-            #     "-v",
-            #     "-m",
-            #     f"name={self.identifier}" if (jid is None) else f"jid={jid}",
-            #     f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
-            #     f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
-            #     f"exec.stop=\"{self._relative_hook_script_dir}/stop.sh\""
-            # ],
             [
                 "/usr/sbin/jail",
                 "-v",
                 "-r",
                 "-f",
                 self._jail_conf_file,
-                #self.identifier if (jid is None) else str(jid)
                 self.identifier
             ]
         ]
@@ -1178,7 +1183,7 @@ class JailGenerator(JailResource):
             return self.host.devfs[ruleset_line_position].number
 
     @property
-    def _launch_command(self):
+    def _launch_command(self) -> typing.List[str]:
 
         command = ["jail", "-c"]
 
@@ -1219,11 +1224,7 @@ class JailGenerator(JailResource):
             f"allow.sysvipc={self._get_value('allow_sysvipc')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\"",
-            f"exec.start=\"{self._relative_hook_script_dir}/start.sh\"",
-            #f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
-            #f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
-            #f"exec.stop=\"{self._relative_hook_script_dir}/stop.sh\"",
-            "exec.consolelog=/tmp/jail.log"
+            f"exec.start=\"{self._relative_hook_script_dir}/start.sh\""
         ]
 
         if self.host.userland_version > 10.3:
@@ -1268,6 +1269,7 @@ class JailGenerator(JailResource):
         command = self._launch_command + [
             f"command=\"{jail_command}\""
         ]
+        self._launch_jail(command)
 
     def _launch_jail(self, command: typing.List[str]) -> None:
 
@@ -1342,14 +1344,17 @@ class JailGenerator(JailResource):
             os.chmod(file, 0o755)  # nosec: executable script
 
     @property
-    def launch_script_dir(self):
+    def launch_script_dir(self) -> str:
+        """Return the launch-scripts directory path of the jail."""
         return f"{self.jail.dataset.mountpoint}/launch-scripts"
 
     @property
-    def script_env_path(self):
+    def script_env_path(self) -> str:
+        """Return the absolute path to the jail script env file."""
         return f"{self.launch_script_dir}/.env"
 
     def get_hook_script_path(self, hook_name: str) -> str:
+        """Return the absolute path to the hook script file."""
         return f"{self.jail.launch_script_dir}/{hook_name}.sh"
 
     def _start_vimage_network(self) -> typing.Tuple[
@@ -1366,9 +1371,11 @@ class JailGenerator(JailResource):
         for network in self.networks:
             _vnet_nic_name = f"{network.nic_prefix}:j"
             _pre, _start, _post = network.setup()
+
             # ToDo: would be great to write as config[key] += ["iface1"]
             vnet_interfaces = self.config["vnet_interfaces"] + [_vnet_nic_name]
             self.config["vnet_interfaces"] = list(vnet_interfaces)
+
             prestart += _pre
             start += _start
             poststart += _post
@@ -1481,7 +1488,7 @@ class JailGenerator(JailResource):
 
         if not defaultrouter or defaultrouter6:
             self.logger.spam("no static routes configured")
-            return
+            return []
 
         commands: typing.List[str] = []
 

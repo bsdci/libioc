@@ -418,8 +418,8 @@ def umount_command(
     force: bool=False,
     ignore_error: bool=False,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
-) -> None:
-    """Unmount a mountpoint."""
+) -> typing.List[str]:
+    """Return the command to unmount a mountpoint."""
     cmd = ["/sbin/umount"]
 
     if force is True:
@@ -449,7 +449,7 @@ def umount(
     ignore_error: bool=False,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> None:
-
+    """Unmount a mountpoint."""
     cmd = umount_command(
         mountpoint=mountpoint,
         options=options,
