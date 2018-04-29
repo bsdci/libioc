@@ -89,9 +89,10 @@ class Firewall:
 
     def _offset_rule_number(self, rule_number: typing.Union[int, str]) -> str:
         _rule_number = int(rule_number)
-        return _rule_number + self.IPFW_RULE_OFFSET
+        return str(_rule_number + self.IPFW_RULE_OFFSET)
 
     def _exec(
+        self,
         command: typing.List[str],
         ignore_error: bool=False
     ) -> None:
@@ -104,6 +105,7 @@ class Firewall:
 
 
 class QueuingFirewall(Firewall, iocage.lib.CommandQueue.CommandQueue):
+    """Command queuing Firewall for bulk execution."""
 
     def __init__(  # noqa: T484
         self,
@@ -114,7 +116,7 @@ class QueuingFirewall(Firewall, iocage.lib.CommandQueue.CommandQueue):
 
     def _offset_rule_number(self, rule_number: typing.Union[int, str]) -> str:
         if isinstance(rule_number, int):
-            return _rule_number + self.IPFW_RULE_OFFSET
+            return str(rule_number + self.IPFW_RULE_OFFSET)
         return f"$(expr {rule_number} + {self.IPFW_RULE_OFFSET})"
 
     def _exec(

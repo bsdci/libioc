@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, iocage
+# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ class NetworkInterface:
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 
-    name: str
+    name: typing.Optional[str]
     settings: typing.Dict[str, typing.Union[str, typing.List[str]]]
     rename: bool
     create: bool
@@ -48,7 +48,7 @@ class NetworkInterface:
     def __init__(
         self,
         name: typing.Optional[str]="vnet0",
-        create: typing.Optional[bool]=False,
+        create: bool=False,
         ipv4_addresses: typing.Optional[typing.List[str]]=[],
         ipv6_addresses: typing.Optional[typing.List[str]]=[],
         mac: typing.Optional[
@@ -68,9 +68,6 @@ class NetworkInterface:
 
         self.jail = jail
         self.logger = iocage.lib.helpers.init_logger(self, logger)
-
-        # if name is None:
-        #     raise iocage.lib.errors.InvalidInterfaceName(logger=self.logger)
 
         self.name = name
         self.create = create
@@ -151,8 +148,9 @@ class NetworkInterface:
             self.__apply_addresses(self.ipv6_addresses, ipv6=True)
 
     @property
-    def current_nic_name(self):
-        return self.name
+    def current_nic_name(self) -> str:
+        """Return the current NIC reference for usage in shell scripts."""
+        return str(self.name)
 
     def __apply_addresses(
         self,
@@ -179,11 +177,7 @@ class NetworkInterface:
                     self.current_nic_name
                 ])
 
-    def _exec(
-        self,
-        command: typing.List[str],
-        force_local: typing.Optional[bool]=False
-    ) -> None:
+    def _exec(self, command: typing.List[str]) -> str:
 
         if self.jail is not None:
             _, stdout, _ = self.jail.exec(command)
@@ -192,7 +186,9 @@ class NetworkInterface:
 
         self._handle_exec_stdout(stdout)
 
-    def _handle_exec_stdout(stdout: str) -> None:
+        return str(stdout)
+
+    def _handle_exec_stdout(self, stdout: str) -> None:
         if (self.create or self.rename) is True:
             self.name = stdout.strip()
 
@@ -224,6 +220,7 @@ class QueuingNetworkInterface(
         self,
         name: typing.Optional[str]=None
     ) -> None:
+        """Append an environment variable for the current NIC to the queue."""
         _name = self.name if name is None else name
         if (_name is None) or (self.shell_variable_nic_name is None):
             return
@@ -231,13 +228,12 @@ class QueuingNetworkInterface(
         self.command_queue.append(setter_command)
 
     @property
-    def current_nic_name(self):
-        if self.shell_variable_nic_name is None:
-            return self.name
-        elif (self.create is True) and (self.name is not None):
-            return self.name
-        else:
-            return f"${self.shell_variable_nic_name}"
+    def current_nic_name(self) -> str:
+        """Return the current NIC reference for usage in shell scripts."""
+        _has_no_variable_name = (self.shell_variable_nic_name is None)
+        if _has_no_variable_name and self.create and (self.name is not None):
+            return str(self.name)
+        return f"${self.shell_variable_nic_name}"
 
     def _exec(self, command: typing.List[str]) -> str:
 
@@ -245,15 +241,17 @@ class QueuingNetworkInterface(
         _has_variable_name = (self.shell_variable_nic_name is not None)
 
         if self.rename is True:
-            self.name = self.settings["name"]
+            new_name = self.settings["name"]
+            if isinstance(new_name, str) is True:
+                self.name = str(new_name)
+            else:
+                raise TypeError("Cannot rename multiple interfaces")
 
-        if (_has_variable_name and self.create) is True:
+        if (_has_variable_name and (self.create or self.rename)) is True:
             self.command_queue.append(
                 f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
         else:
             self.command_queue.append(_command)
-            if (_has_variable_name and self.rename) is True:
-                self.command_queue.append(
-                    f"export {self.shell_variable_nic_name}=\"{self.name}\""
-                )
+
+        return ""
