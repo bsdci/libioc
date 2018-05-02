@@ -174,6 +174,35 @@ class JailStateUpdateFailed(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+class JailLaunchFailed(IocageException):
+    """Raised when the jail state could not be obtained."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"Jail launch failed"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class JailCommandFailed(IocageException):
+    """Raised when a jail command fails with an exit code > 0."""
+
+    def __init__(self, returncode: int, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"Jail command exited with {returncode}"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class JailExecutionAborted(IocageException):
+    """Raised when a jail command fails with an exit code > 0."""
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:  # noqa: T484
+        msg = f"Jail execution aborted."
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # Jail Fstab
 
 

@@ -27,6 +27,7 @@ import json
 import random
 import re
 import subprocess  # nosec: B404
+import sys
 import ucl
 
 import iocage.lib.errors
@@ -137,9 +138,9 @@ def exec(  # noqa: T484
     ignore_error: bool=False,
     **subprocess_args
 ) -> typing.Tuple[
-    subprocess.Popen,
     typing.Optional[str],
-    typing.Optional[str]
+    typing.Optional[str],
+    int
 ]:
     """Execute a shell command."""
     if isinstance(command, str):
@@ -147,7 +148,7 @@ def exec(  # noqa: T484
 
     command_str = " ".join(command)
 
-    if logger:
+    if logger is not None:
         logger.log(f"Executing: {command_str}", level="spam")
 
     subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
@@ -169,12 +170,13 @@ def exec(  # noqa: T484
         if logger and stdout:
             logger.spam(_prettify_output(stdout))
 
-    if child.returncode > 0:
+    returncode = child.wait()
+    if returncode > 0:
 
         if logger:
             log_level = "spam" if ignore_error else "warn"
             logger.log(
-                f"Command exited with {child.returncode}: {command_str}",
+                f"Command exited with {returncode}: {command_str}",
                 level=log_level
             )
             if stderr:
@@ -182,11 +184,11 @@ def exec(  # noqa: T484
 
         if ignore_error is False:
             raise iocage.lib.errors.CommandFailure(
-                returncode=child.returncode,
+                returncode=returncode,
                 logger=logger
             )
 
-    return child, stdout, stderr
+    return stdout, stderr, returncode
 
 
 def _prettify_output(output: str) -> str:
@@ -393,19 +395,81 @@ def to_string(
     return str(parsed_data)
 
 
-def exec_passthru(
+def exec_generator(
     command: typing.List[str],
-    logger: typing.Optional[iocage.lib.Logger.Logger]=None
-) -> typing.Tuple[str, str]:
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+    **subprocess_args: typing.Dict[str, typing.Any]
+) -> typing.Generator[str, None, typing.Tuple[str, str, int]]:
     """Execute a command in an interactive shell."""
     if isinstance(command, str):
         command = [command]
 
     command_str = " ".join(command)
-    if logger:
+
+    if logger is not None:
         logger.spam(f"Executing (interactive): {command_str}")
 
-    return subprocess.Popen(command).communicate()  # nosec: TODO: #113
+    subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
+    subprocess_args["stderr"] = subprocess_args.get(
+        "stderr",
+        subprocess.STDOUT
+    )
+    subprocess_args["encoding"] = subprocess_args.get(
+        "encoding",
+        subprocess.STDOUT
+    )
+    subprocess_args["universal_newlines"] = subprocess_args.get(
+        "universal_newlines",
+        subprocess.STDOUT
+    )
+
+    try:
+        child = subprocess.Popen(  # nosec: TODO: #113
+            command,
+            **subprocess_args
+        )
+
+        stdout = ""
+        if child.stdout is not None:
+            for line in iter(child.stdout.readline, ""):
+                if (line is "") and (child.poll() is not None):
+                    continue
+                stdout += f"{line}"
+                yield line.replace("\r", "").replace("\n", "")
+            child.stdout.close()
+
+        if child.stderr is not None:
+            stderr = child.stderr.read()
+            child.stderr.close()
+        else:
+            stderr = ""
+    except KeyboardInterrupt:
+        child.terminate()
+        raise
+
+    return stdout, stderr, child.wait()
+
+
+def exec_passthru(
+    command: typing.List[str],
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+    print_lines: bool=True
+) -> typing.Tuple[str, str, int]:
+    """Execute a command in an interactive shell."""
+
+    lines = exec_generator(
+        command,
+        logger=logger,
+        stdout=sys.stdout
+    )
+    try:
+        while True:
+            line = next(lines)
+            if print_lines is True:
+                print(line)
+                sys.stdout.flush()
+    except StopIteration as return_statement:
+        return return_statement.value
 
 
 # ToDo: replace with (u)mount library
@@ -434,7 +498,7 @@ def umount_command(
         cmd.append(str(mountpoint))
 
     if ignore_error is True:
-        cmd += ["||", ":"]
+        cmd.append(">/dev/null 2>&1 || :")
 
     return cmd
 

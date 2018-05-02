@@ -42,8 +42,10 @@ class NetworkInterface:
 
     name: typing.Optional[str]
     settings: typing.Dict[str, typing.Union[str, typing.List[str]]]
+    extra_settings: typing.List[str]
     rename: bool
     create: bool
+    _destroy: bool
 
     def __init__(
         self,
@@ -61,7 +63,8 @@ class NetworkInterface:
         addm: typing.Optional[typing.Union[str, typing.List[str]]]=None,
         vnet: typing.Optional[str]=None,
         jail: typing.Optional['iocage.lib.Jail.JailGenerator']=None,
-        extra_settings: typing.Optional[typing.List[str]]=["up"],
+        extra_settings: typing.Optional[typing.List[str]]=None,
+        destroy: bool=False,
         auto_apply: typing.Optional[bool]=True,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
@@ -71,11 +74,14 @@ class NetworkInterface:
 
         self.name = name
         self.create = create
+        self.destroy = destroy
         self.ipv4_addresses = ipv4_addresses
         self.ipv6_addresses = ipv6_addresses
-
-        self.extra_settings = extra_settings
         self.settings = {}
+        if (extra_settings is None):
+            self.extra_settings = ["up"]
+        else:
+            self.extra_settings = extra_settings
 
         if mac:
             self.settings["link"] = mac
@@ -105,6 +111,22 @@ class NetworkInterface:
         if auto_apply:
             self.apply()
 
+    @property
+    def destroy(self) -> bool:
+        """Return True when the network interface is to be destroyed."""
+        return self._destroy
+
+    @destroy.setter
+    def destroy(self, value: bool) -> None:
+        """
+        Set whether the interface should be destroyed.
+
+        When combined with self.create the interface is forced to be destroyed
+        before the new interface with the same name is created. The name of the
+        deleted interface may be overridden by the rename flag.
+        """
+        self._destroy = (value is True)
+
     def apply(self) -> None:
         """Apply the interface settings and configure IP address."""
         self.apply_settings()
@@ -128,6 +150,18 @@ class NetworkInterface:
             for value in values:
                 command.append(key)
                 command.append(str(value))
+
+        if self.destroy is True:
+            if "name" in self.settings:
+                nic_name_to_destroy = self.settings["name"]
+            else:
+                nic_name_to_destroy = self.current_nic_name
+            self.command_queue.append(" ".join([
+                self.ifconfig_command,
+                nic_name_to_destroy,
+                "destroy"
+                " 2>/dev/null || :"
+            ]))
 
         if self.extra_settings:
             command += self.extra_settings
@@ -177,12 +211,15 @@ class NetworkInterface:
                     self.current_nic_name
                 ])
 
-    def _exec(self, command: typing.List[str]) -> str:
+    def _exec(
+        self,
+        command: typing.List[str]
+    ) -> str:
 
         if self.jail is not None:
-            _, stdout, _ = self.jail.exec(command)
+            stdout, _, _ = self.jail.exec(command)
         else:
-            _, stdout, _ = iocage.lib.helpers.exec(command, logger=self.logger)
+            stdout, _, _ = iocage.lib.helpers.exec(command, logger=self.logger)
 
         self._handle_exec_stdout(stdout)
 
@@ -231,7 +268,7 @@ class QueuingNetworkInterface(
     def current_nic_name(self) -> str:
         """Return the current NIC reference for usage in shell scripts."""
         _has_no_variable_name = (self.shell_variable_nic_name is None)
-        if _has_no_variable_name and self.create and (self.name is not None):
+        if (_has_no_variable_name or self.create) and (self.name is not None):
             return str(self.name)
         return f"${self.shell_variable_nic_name}"
 
@@ -249,8 +286,21 @@ class QueuingNetworkInterface(
 
         if (_has_variable_name and (self.create or self.rename)) is True:
             self.command_queue.append(
+                # export the ifconfig output
                 f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
+
+            if self.jail is None:
+                self.command_queue += [
+                    # persist env immediately
+                    (
+                        "echo \"export IOCAGE_JID=$IOCAGE_JID\" > "
+                        "\"$(dirname $0)/.env\""
+                    ), (
+                        "env | grep ^IOCAGE_NIC | sed 's/^/export /' >> "
+                        "\"$(dirname $0)/.env\""
+                    )
+                ]
         else:
             self.command_queue.append(_command)
 

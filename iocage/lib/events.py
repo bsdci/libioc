@@ -348,18 +348,6 @@ class JailForkExec(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
-class JailExec(JailEvent):
-    """Execute a command in a jail."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
 class JailClone(JailEvent):
     """Clone a jail."""
 

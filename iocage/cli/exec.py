@@ -59,7 +59,6 @@ __rootcmd__ = True
 )
 @click.argument("jail", required=True, nargs=1)
 @click.argument("command", nargs=-1, type=click.UNPROCESSED)
-@click.option("--log-level", "-d", default=None)
 def cli(
     ctx: IocageClickContext,
     command: typing.List[str],
@@ -67,11 +66,9 @@ def cli(
     host_user: str,
     jail_user: typing.Optional[str],
     fork: bool,
-    log_level: typing.Optional[str]
 ) -> None:
     """Run the given command inside the specified jail."""
     logger = ctx.parent.logger
-    logger.print_level = log_level
 
     if jail.startswith("-"):
         logger.error("Please specify a jail first!")
@@ -89,8 +86,9 @@ def cli(
         ]
     else:
         command = ["/bin/sh", "-c", user_command]
+        command = user_command.split()
 
-    ioc_jail = iocage.lib.Jail.Jail(jail, logger=logger)
+    ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
     ioc_jail.state.query()
 
     if not ioc_jail.exists:
@@ -100,7 +98,17 @@ def cli(
     if (fork is False) and (ioc_jail.running is False):
         logger.error(f"The jail {ioc_jail.humanreadable_name} is not running")
         exit(1)
-    elif fork is True:
-        list(ioc_jail.fork_exec(command, passthru=True))
-    else:
-        ioc_jail.passthru(command)
+
+    try:
+        if fork is True:
+            events = ioc_jail.fork_exec(
+                command,
+                passthru=True,
+                exec_timeout=0
+            )
+            for event in events:
+                continue
+        else:
+            ioc_jail.passthru(command)
+    except iocage.lib.errors.IocageException:
+        exit(1)

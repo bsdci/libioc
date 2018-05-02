@@ -115,7 +115,7 @@ class Network:
 
         if self._is_secure_bridge is True:
             commands += self.__down_secure_mode_devices()
-            firewall_rule_number = "$_IOCAGE_SEC_EPAIR_NUMBER"
+            firewall_rule_number = f"$IOCAGE_NIC_ID_{self._unic}"
             self.firewall.delete_rule(firewall_rule_number)
             commands += self.firewall.read_commands()
 
@@ -123,7 +123,7 @@ class Network:
 
     def __down_host_interface(self) -> typing.List[str]:
         nic = iocage.lib.NetworkInterface.QueuingNetworkInterface(
-            name=f"{self.nic}:{self.jail.jid}",
+            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
             extra_settings=["destroy"],
             logger=self.logger
         )
@@ -134,8 +134,8 @@ class Network:
         self.logger.verbose("Downing secure mode devices")
         commands: typing.List[str] = []
         secure_mode_nics = [
-            f"{self.nic}:{self.jail.jid}:a",
-            f"{self.nic}:{self.jail.jid}:net"
+            f"$IOCAGE_NIC_EPAIR_C_{self._unic}",
+            f"$IOCAGE_NIC_BRIDGE_{self._unic}"
         ]
         for nic in secure_mode_nics:
             commands += iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -154,9 +154,14 @@ class Network:
         return (self.bridge is not None) and (self.bridge.secure is True)
 
     @property
-    def nic_prefix(self) -> str:
+    def temporary_nic_prefix(self) -> str:
         """Return the default NIC name prefix."""
         return f"ioc:{self.epair_id}"
+
+    @property
+    def _unic(self):
+        """Return the uppercase nic name."""
+        return self.nic.upper()
 
     @property
     def epair_id(self) -> int:
@@ -168,9 +173,9 @@ class Network:
 
     def __create_new_epair_interface(
         self,
-        variable_name_a: str="_IOCAGE_NIC_EPAIR_A",
-        variable_name_b: str="_IOCAGE_NIC_EPAIR_B",
-        variable_epair_id: str="_IOCAGE_NIC_EPAIR_NUMBER",
+        variable_name_a: str,
+        variable_name_b: str,
+        variable_epair_id: typing.Optional[str]=None,
         nic_suffix_a: str=":a",
         nic_suffix_b: str=":b",
         **nic_args: typing.Any
@@ -192,13 +197,15 @@ class Network:
             f"$(echo ${variable_name_a} | sed 's/.$/b/')"
         )
 
-        commands_start.append(
-            f"export {variable_epair_id}={self.epair_id}"
-        )
+        if variable_epair_id is not None:
+            commands_start.append(
+                f"export {variable_epair_id}={self.epair_id}"
+            )
 
         epair_a = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            rename=f"{self.nic_prefix}{nic_suffix_a}",
+            rename=f"{self.temporary_nic_prefix}{nic_suffix_a}",
+            destroy=True,
             shell_variable_nic_name=variable_name_a,
             logger=self.logger,
             **nic_args
@@ -207,7 +214,8 @@ class Network:
 
         epair_b = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            rename=f"{self.nic_prefix}{nic_suffix_b}",
+            rename=f"{self.temporary_nic_prefix}{nic_suffix_b}",
+            destroy=True,
             shell_variable_nic_name=variable_name_b,
             logger=self.logger,
             **nic_args
@@ -233,8 +241,8 @@ class Network:
             self.firewall.ensure_firewall_enabled()
 
         commands_prestart = self.__create_new_epair_interface(
-            variable_name_a="_IOCAGE_NIC_EPAIR_A",
-            variable_name_b="_IOCAGE_NIC_EPAIR_B",
+            variable_name_a=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
+            variable_name_b=f"IOCAGE_NIC_EPAIR_B_{self._unic}",
             nic_suffix_a="",
             nic_suffix_b=":j"
         )
@@ -251,11 +259,18 @@ class Network:
                 logger=self.logger
             )
 
-        firewall_rule_number = "$_IOCAGE_SEC_EPAIR_NUMBER"
+        firewall_variable_name = f"IOCAGE_NIC_ID_{self._unic}"
+        commands_prestart.append(
+            f"export {firewall_variable_name}=\"{self.epair_id}\""
+        )
+        commands_poststart.append(
+            f"export {firewall_variable_name}=\"\\$IOCAGE_JID\""
+        )
+        firewall_rule_number = f"${firewall_variable_name}"
 
         host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name="_IOCAGE_NIC_EPAIR_A",
+            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
             mac=mac_address_pair.a,
             mtu=self.mtu,
             description=self.nic_local_description,
@@ -267,23 +282,23 @@ class Network:
         # rename host_if after jail start
         _host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name="_IOCAGE_NIC_EPAIR_A",
-            rename=f"{self.nic}:$_IOCAGE_JID"
+            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
+            rename=f"{self.nic}:$IOCAGE_JID"
         )
         commands_poststart += _host_if.read_commands()
 
         if self._is_secure_bridge is False:
             jail_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
                 name=self.bridge.name,
-                addm="$_IOCAGE_NIC_EPAIR_A",
+                addm=f"$IOCAGE_NIC_EPAIR_A_{self._unic}",
                 logger=self.logger
             )
             commands_prestart += jail_bridge.read_commands()
         else:
             commands_prestart += self.__create_new_epair_interface(
-                variable_name_a="_IOCAGE_NIC_EPAIR_C",
-                variable_name_b="_IOCAGE_NIC_EPAIR_D",
-                variable_epair_id="_IOCAGE_SEC_EPAIR_NUMBER",
+                variable_name_a=f"IOCAGE_NIC_EPAIR_C_{self._unic}",
+                variable_name_b=f"IOCAGE_NIC_EPAIR_D_{self._unic}",
+                variable_epair_id=f"IOCAGE_NIC_EPAIR_ID_{self._unic}",
                 nic_suffix_a=":a",
                 nic_suffix_b=":b",
                 mtu=self.mtu
@@ -298,7 +313,7 @@ class Network:
                     "from", address, "to", "any",
                     "layer2",
                     "MAC", "any", str(mac_address_pair.b),
-                    "via", "$_IOCAGE_NIC_EPAIR_D",
+                    "via", f"$IOCAGE_NIC_EPAIR_D_{self._unic}",
                     "out"
                 ])
                 self.firewall.add_rule(firewall_rule_number, [
@@ -319,7 +334,7 @@ class Network:
                 "deny", "log", "ip4",
                 "from", "any", "to", "any",
                 "layer2",
-                "via", "$_IOCAGE_NIC_EPAIR_D",
+                "via", f"$IOCAGE_NIC_EPAIR_D_{self._unic}",
                 "out"
             ])
             self.firewall.add_rule(firewall_rule_number, [
@@ -337,22 +352,23 @@ class Network:
             sec_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
                 name="bridge",
                 create=True,
+                destroy=True,
                 rename=f"ioc:{self.epair_id}:net",
-                shell_variable_nic_name="_IOCAGE_SEC_BRIDGE"
+                shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._unic}"
             )
             commands_prestart += sec_bridge.read_commands()
 
             _rename_cmd = iocage.lib.NetworkInterface.QueuingNetworkInterface(
-                rename=f"{self.nic}:$_IOCAGE_JID:net",
-                shell_variable_nic_name="_IOCAGE_SEC_BRIDGE"
+                rename=f"{self.nic}:$IOCAGE_JID:net",
+                shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._unic}"
             ).read_commands()
             _rename_cmd += iocage.lib.NetworkInterface.QueuingNetworkInterface(
-                rename=f"{self.nic}:$_IOCAGE_JID:a",
-                shell_variable_nic_name="_IOCAGE_NIC_EPAIR_C"
+                rename=f"{self.nic}:$IOCAGE_JID:a",
+                shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_C_{self._unic}"
             ).read_commands()
             _rename_cmd += iocage.lib.NetworkInterface.QueuingNetworkInterface(
-                rename=f"{self.nic}:$_IOCAGE_JID:b",
-                shell_variable_nic_name="_IOCAGE_NIC_EPAIR_D"
+                rename=f"{self.nic}:$IOCAGE_JID:b",
+                shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_D_{self._unic}"
             ).read_commands()
             commands_poststart += _rename_cmd
             commands_poststart += firewall_commands
@@ -360,26 +376,19 @@ class Network:
             # add nic to secure bridge
             sec_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
                 name=None,
-                shell_variable_nic_name="_IOCAGE_SEC_BRIDGE",
+                shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._unic}",
                 addm=[
-                    "$_IOCAGE_NIC_EPAIR_A",
-                    "$_IOCAGE_NIC_EPAIR_D",
+                    f"$IOCAGE_NIC_EPAIR_A_{self._unic}",
+                    f"$IOCAGE_NIC_EPAIR_D_{self._unic}"
                 ],
                 logger=self.logger
             )
             commands_prestart += sec_bridge.read_commands()
 
-            _sec_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
-                name=None,
-                shell_variable_nic_name="_IOCAGE_SEC_BRIDGE",
-                rename=f"{self.nic}:$_IOCAGE_JID:net"
-            )
-            commands_prestart += _sec_bridge.read_commands()
-
             # add nic to jail bridge
             jail_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
                 name=self.bridge.name,
-                addm="$_IOCAGE_NIC_EPAIR_C",
+                addm=f"$IOCAGE_NIC_EPAIR_C_{self._unic}",
                 logger=self.logger
             )
             commands_prestart += jail_bridge.read_commands()
@@ -389,7 +398,7 @@ class Network:
         # configure network inside the jail
         jail_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name="_IOCAGE_NIC_EPAIR_B",
+            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_B_{self._unic}",
             mac=str(mac_address_pair.b),
             mtu=self.mtu,
             rename=self.nic,
@@ -400,19 +409,8 @@ class Network:
         )
         commands_start += jail_if.read_commands()
 
-        # copy env variables from pre-start to post-start
-        update_env_cmd = (
-            "env | grep ^_IOCAGE_ | sed 's/^/export /' > "
-            f"{self.jail.script_env_path}"
-        )
-        commands_prestart.append(update_env_cmd)
-        commands_poststart = (
-            ["export _IOCAGE_SEC_EPAIR_NUMBER=$_IOCAGE_JID"] +
-            commands_poststart +
-            [update_env_cmd]
-        )
-
         if self._is_secure_bridge is True:
+            # replace the temporary rule created during prestart
             self.firewall.delete_rule(firewall_rule_number)
             delete_firewall_command = self.firewall.read_commands()
             commands_poststart = delete_firewall_command + commands_poststart
@@ -422,11 +420,49 @@ class Network:
     def __up_host_if(self) -> typing.List[str]:
         host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name="_IOCAGE_NIC_EPAIR_A",
+            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
             logger=self.logger
         )
         commands: typing.List[str] = host_if.read_commands()
         return commands
+
+    @property
+    def env(self) -> typing.Dict[str, str]:
+        """
+        Return a dict of env variables used by the started jail.
+
+        Not all jail variables might be used, but it is more convenient to
+        always provide them all (especially for the *stop hooks).
+        """
+        if self.jail.running:
+            return self._env_running
+        else:
+            return self._env_temporary
+
+    @property
+    def _env_running(self):
+        script_env: typing.Dict[str, str] = {
+            f"IOCAGE_NIC_EPAIR_A_{self._unic}": f"{self.nic}:$IOCAGE_JID",
+            f"IOCAGE_NIC_EPAIR_B_{self._unic}": self.nic,
+            f"IOCAGE_NIC_EPAIR_C_{self._unic}": f"{self.nic}:$IOCAGE_JID:a",
+            f"IOCAGE_NIC_EPAIR_D_{self._unic}": f"{self.nic}:$IOCAGE_JID:b",
+            f"IOCAGE_NIC_BRIDGE_{self._unic}": f"{self.nic}:$IOCAGE_JID:net",
+            f"IOCAGE_NIC_ID_{self._unic}": self.epair_id
+        }
+        return script_env
+
+    @property
+    def _env_temporary(self):
+        identifier = self.temporary_nic_prefix
+        script_env: typing.Dict[str, str] = {
+            f"IOCAGE_NIC_EPAIR_A_{self._unic}": identifier,
+            f"IOCAGE_NIC_EPAIR_B_{self._unic}": f"{identifier}:j",
+            f"IOCAGE_NIC_EPAIR_C_{self._unic}": f"{identifier}:a",
+            f"IOCAGE_NIC_EPAIR_D_{self._unic}": f"{identifier}:b",
+            f"IOCAGE_NIC_BRIDGE_{self._unic}": f"{identifier}:net",
+            f"IOCAGE_NIC_ID_{self._unic}": self.epair_id
+        }
+        return script_env
 
     def __generate_mac_bytes(self) -> str:
         m = sha224()

@@ -39,14 +39,12 @@ __rootcmd__ = True
 @click.option("--rc", default=False, is_flag=True,
               help="Will stop all jails with boot=on, in the specified"
                    " order with higher value for priority stopping first.")
-@click.option("--log-level", "-d", default=None)
 @click.option("--force", "-f", is_flag=True, default=False,
               help="Skip checks and enforce jail shutdown")
 @click.argument("jails", nargs=-1)
 def cli(
     ctx: IocageClickContext,
     rc: bool,
-    log_level: str,
     force: bool,
     jails: typing.Tuple[str, ...]
 ) -> None:
