@@ -26,6 +26,7 @@ import typing
 import os
 import platform
 import re
+import sysctl
 
 import libzfs
 
@@ -162,6 +163,11 @@ class HostGenerator:
     def processor(self) -> str:
         """Return the hosts processor architecture."""
         return platform.processor()
+
+    @property
+    def ipfw_enabled(self):
+        _sysctl = sysctl.filter("net.inet.ip.fw.enable")
+        return ((len(_sysctl) == 1) and (_sysctl[0].value == 1))
 
 
 class Host(HostGenerator):
