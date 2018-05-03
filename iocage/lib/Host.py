@@ -165,7 +165,8 @@ class HostGenerator:
         return platform.processor()
 
     @property
-    def ipfw_enabled(self):
+    def ipfw_enabled(self) -> bool:
+        """Return True if ipfw is enabled on the host system."""
         _sysctl = sysctl.filter("net.inet.ip.fw.enable")
         return ((len(_sysctl) == 1) and (_sysctl[0].value == 1))
 

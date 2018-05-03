@@ -159,7 +159,7 @@ class Network:
         return f"ioc:{self.epair_id}"
 
     @property
-    def _unic(self):
+    def _unic(self) -> str:
         """Return the uppercase nic name."""
         return self.nic.upper()
 
