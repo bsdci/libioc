@@ -427,7 +427,7 @@ class Network:
         return commands
 
     @property
-    def env(self) -> typing.Dict[str, str]:
+    def env(self) -> typing.Dict[str, typing.Union[str, int]]:
         """
         Return a dict of env variables used by the started jail.
 
@@ -440,8 +440,8 @@ class Network:
             return self._env_temporary
 
     @property
-    def _env_running(self):
-        script_env: typing.Dict[str, str] = {
+    def _env_running(self) -> typing.Dict[str, typing.Union[str, int]]:
+        script_env: typing.Dict[str, typing.Union[str, int]] = {
             f"IOCAGE_NIC_EPAIR_A_{self._unic}": f"{self.nic}:$IOCAGE_JID",
             f"IOCAGE_NIC_EPAIR_B_{self._unic}": self.nic,
             f"IOCAGE_NIC_EPAIR_C_{self._unic}": f"{self.nic}:$IOCAGE_JID:a",
@@ -452,9 +452,9 @@ class Network:
         return script_env
 
     @property
-    def _env_temporary(self):
+    def _env_temporary(self) -> typing.Dict[str, typing.Union[str, int]]:
         identifier = self.temporary_nic_prefix
-        script_env: typing.Dict[str, str] = {
+        script_env: typing.Dict[str, typing.Union[str, int]] = {
             f"IOCAGE_NIC_EPAIR_A_{self._unic}": identifier,
             f"IOCAGE_NIC_EPAIR_B_{self._unic}": f"{identifier}:j",
             f"IOCAGE_NIC_EPAIR_C_{self._unic}": f"{identifier}:a",
