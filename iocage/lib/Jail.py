@@ -24,7 +24,6 @@
 """iocage Jail module."""
 import typing
 import os
-import random
 import subprocess  # nosec: B404
 import shlex
 import shutil
