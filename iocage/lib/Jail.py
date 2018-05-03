@@ -1393,8 +1393,6 @@ class JailGenerator(JailResource):
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
         ]
 
-        humanreadable_name = self.humanreadable_name
-
         stdout, stderr, returncode = self._exec_launch_command(
             command=command,
             passthru=passthru
@@ -1450,7 +1448,6 @@ class JailGenerator(JailResource):
             f"{self._relative_hook_script_dir}/command.sh"
         ]
 
-        EOF_IDENTIFIER = f"EOF{random.getrandbits(64)}"
         self._write_hook_script("command", "\n".join(
             (["service ipfw onestop"] if self.host.ipfw_enabled else []) +
             [
