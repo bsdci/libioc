@@ -424,22 +424,27 @@ class JailGenerator(JailResource):
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
 
-        exec_prestart = self._wrap_hook_script_command_string(
-            exec_prestart,
-            ignore_errors=False
+        self._write_hook_script(
+            "prestart",
+            self._wrap_hook_script_command_string(
+                exec_prestart,
+                ignore_errors=False
+            )
         )
-        exec_start = self._wrap_hook_script_command_string(
-            exec_start,
-            jailed=True,
-            ignore_errors=False
+        self._write_hook_script(
+            "start",
+            self._wrap_hook_script_command_string(
+                exec_start,
+                jailed=True,
+                ignore_errors=False
+            )
         )
-        exec_poststart = self._wrap_hook_script_command_string(
-            exec_poststart
+        self._write_hook_script(
+            "poststart",
+            self._wrap_hook_script_command_string(
+                exec_poststart
+            )
         )
-
-        self._write_hook_script("prestart", exec_prestart)
-        self._write_hook_script("start", exec_start)
-        self._write_hook_script("poststart", exec_poststart)
 
         yield jailLaunchEvent.begin()
 
@@ -645,61 +650,42 @@ class JailGenerator(JailResource):
             os.mkdir(self.launch_script_dir, 0o755)
 
     def _prepare_stop(self) -> None:
-        exec_prestop = ""
-        exec_stop = ""
-        exec_poststop = "\n".join(self._teardown_mounts())
+        exec_prestop = []
+        exec_stop = []
+        exec_poststop = self._teardown_mounts()
 
         # ToDo: self.config.get("exec_prestop", "")
         if self.config["exec_prestop"] is not None:
-            exec_prestop = self.config["exec_prestop"]
+            exec_prestop.append(self.config["exec_prestop"])
         if self.config["exec_stop"] is not None:
-            exec_stop = self.config["exec_stop"]
+            exec_stop.append(self.config["exec_stop"])
         if self.config["exec_poststop"] is not None:
-            exec_poststop += "\n" + self.config["exec_poststop"]
+            exec_poststop.append(self.config["exec_poststop"])
 
         if self.config["vnet"]:
-            exec_poststop = self._stop_vimage_network() + [exec_poststop]
+            exec_poststop = self._stop_vimage_network() + exec_poststop
 
-        exec_prestop = self._wrap_hook_script_command_string(
-            exec_prestop
+
+        self._write_hook_script(
+            "prestop",
+            self._wrap_hook_script_command_string(exec_prestop)
         )
-
-        exec_stop = self._wrap_hook_script_command_string(
-            exec_stop,
-            jailed=True,
-            ignore_errors=True
-        )
-
-        exec_poststop = self._wrap_hook_script_command_string(
-            exec_poststop,
-            write_env=False,
-            ignore_errors=True
-        )
-
-        if self.running and (os.path.isfile(self.script_env_path) is False):
-            self.logger.debug(
-                f"Overwriting the hook script .env file {self.script_env_path}"
-                f" for JID {self.jid}"
+        self._write_hook_script(
+            "stop",
+            self._wrap_hook_script_command_string(
+                exec_stop,
+                jailed=True,
+                ignore_errors=True
             )
-            script_env: typing.Dict[str, str] = {}
-            for network in self.networks:
-                for key, value in network.env.items():
-                    script_env[key] = str(value).replace("$", "\\$")
-
-            self._ensure_script_dir()
-            with open(self.script_env_path, "w") as f:
-                f.write("\n".join(
-                    [f"export IOCAGE_JID={self.jid}"] +
-                    [
-                        f"export {key}=\"{value}\""
-                        for key, value
-                        in script_env.items()
-                    ]
-                ))
-
-        self._write_hook_script("prestop", exec_prestop)
-        self._write_hook_script("stop", exec_stop)
-        self._write_hook_script("poststop", exec_poststop)
+        )
+        self._write_hook_script(
+            "poststop",
+            self._wrap_hook_script_command_string(
+                exec_poststop,
+                write_env=False,
+                ignore_errors=True
+            )
+        )
 
     def stop(
         self,
