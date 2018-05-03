@@ -857,7 +857,10 @@ class JailGenerator(JailResource):
 
         yield jailRestartEvent.end()
 
-    def destroy(self, force: bool=False) -> None:
+    def destroy(
+        self,
+        force: bool=False
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Destroy a Jail and it's datasets.
 
@@ -871,11 +874,22 @@ class JailGenerator(JailResource):
         self.state.query()
 
         if self.running is True and force is True:
-            self.stop(force=True)
+            for event in JailGenerator.stop(self, force=True):
+                yield event
         else:
             self.require_jail_stopped()
 
-        self.zfs.delete_dataset_recursive(self.dataset)
+        zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
+            dataset=self.dataset
+        )
+
+        yield zfsDatasetDestroyEvent.begin()
+        try:
+            self.zfs.delete_dataset_recursive(self.dataset)
+        except Exception as e:
+            zfsDatasetDestroyEvent.fail(e)
+            raise e
+        yield zfsDatasetDestroyEvent.end()
 
     def rename(
         self,
@@ -1975,3 +1989,19 @@ class Jail(JailGenerator):
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Update a path in the whole fstab file."""
         return list(JailGenerator.update_fstab_paths(self, *args, **kwargs))
+
+    def destroy(  # noqa: T484
+        self,
+        force: bool=False
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+        """
+        Destroy a Jail and it's datasets.
+
+        Args:
+
+            force (bool): (default=False)
+                This flag enables whether an existing jail should be shut down
+                before destroying the dataset. By default destroying a jail
+                requires it to be stopped.
+        """
+        return list(JailGenerator.destroy(self, force=force))
