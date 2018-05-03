@@ -772,9 +772,10 @@ class JailGenerator(JailResource):
             ), (
                 "exec.poststop = "
                 f"\"/bin/sh {self.get_hook_script_path('poststop')}\";"
-            ),
-            (
+            ), (
                 f"exec.stop = \"{stop_command}\";"
+            ), (
+                f"exec.jail_user = {self._get_value('exec_jail_user')};"
             ),
             "}"
         ])
@@ -1324,7 +1325,8 @@ class JailGenerator(JailResource):
             f"allow.sysvipc={self._get_value('allow_sysvipc')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
             f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
-            f"exec.poststop=\"{self.get_hook_script_path('poststop')}\""
+            f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
+            f"exec.jail_user={self._get_value('exec_jail_user')}"
         ]
 
         if self.host.userland_version > 10.3:
