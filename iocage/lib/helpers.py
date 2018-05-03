@@ -133,11 +133,11 @@ def get_userland_version() -> str:
     return match[1]
 
 
-def exec(  # noqa: T484
+def exec(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     ignore_error: bool=False,
-    **subprocess_args
+    **subprocess_args: typing.Any
 ) -> typing.Tuple[
     typing.Optional[str],
     typing.Optional[str],

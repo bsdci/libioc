@@ -193,12 +193,12 @@ class JailCommandFailed(IocageException):
 class JailExecutionAborted(IocageException):
     """Raised when a jail command fails with an exit code > 0."""
 
-    def __init__(
+    def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
         *args,
         **kwargs
-    ) -> None:  # noqa: T484
+    ) -> None:
         msg = f"Jail execution aborted."
         IocageException.__init__(self, msg, *args, **kwargs)
 
