@@ -380,7 +380,7 @@ class JailGenerator(JailResource):
 
                 Execute commands in an interactive shell.
 
-            single_command (bool):
+            single_command (str):
 
                 When set the jail is launched non-persistent. The startup cycle
                 reduces to the `prestart`, `command` and `poststop` hooks with
