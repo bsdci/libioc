@@ -200,7 +200,7 @@ class Fstab(
             self.basejail_lines
         )
 
-        for line in input_text.rstrip("\n").split("\n"):
+        for line in input_text.rstrip("\n").splitlines():
 
             if _is_comment_line(line) or _is_empty_line(line):
                 self.add_line(FstabCommentLine({
@@ -232,7 +232,7 @@ class Fstab(
             line = re.sub("([^\\\\])\s", "\g<1>\n", line)
             line = line.replace("\\ ", " ")
 
-            fragments = line.split("\n")
+            fragments = line.splitlines()
             if len(fragments) != 6:
                 self.logger.log(
                     f"Invalid line in fstab file {self.path}"
