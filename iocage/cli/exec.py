@@ -24,6 +24,7 @@
 """Execute commands in jails from the CLI."""
 import click
 import typing
+import shlex
 
 import iocage.lib.Jail
 import iocage.lib.Logger
@@ -40,15 +41,9 @@ __rootcmd__ = True
 )
 @click.pass_context
 @click.option(
-    "--host_user",
+    "--user",
     "-u",
-    default="root",
-    help="The host user to use."
-)
-@click.option(
-    "--jail_user",
-    "-U",
-    help="The jail user to use."
+    help="The jail user who executes the command."
 )
 @click.option(
     "--fork",
@@ -63,8 +58,7 @@ def cli(
     ctx: IocageClickContext,
     command: typing.List[str],
     jail: str,
-    host_user: str,
-    jail_user: typing.Optional[str],
+    user: typing.Optional[str],
     fork: bool,
 ) -> None:
     """Run the given command inside the specified jail."""
@@ -74,18 +68,17 @@ def cli(
         logger.error("Please specify a jail first!")
         exit(1)
 
-    user_command = " ".join(list(command))
+    command_list = list(command)
 
-    if jail_user is not None:
-        command = [
-            "/bin/su",
+    if user is not None:
+        user_command = " ".join(command_list)
+        command_list = [
+            "/usr/bin/su",
             "-m",
-            jail_user,
+            shlex.quote(user),
             "-c",
-            user_command
+            shlex.quote(user_command)
         ]
-    else:
-        command = user_command.split()
 
     ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
     ioc_jail.state.query()
@@ -101,13 +94,13 @@ def cli(
     try:
         if fork is True:
             events = ioc_jail.fork_exec(
-                " ".join(command),
+                " ".join(command_list),
                 passthru=True,
                 exec_timeout=0
             )
             for event in events:
                 continue
         else:
-            ioc_jail.passthru(command)
+            ioc_jail.passthru(command_list)
     except iocage.lib.errors.IocageException:
         exit(1)
