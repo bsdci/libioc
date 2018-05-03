@@ -273,7 +273,7 @@ class QueuingNetworkInterface(
             if isinstance(new_name, str) is True:
                 self.name = str(new_name)
             else:
-                raise TypeError("Cannot rename multiple interfaces")
+                raise ValueError("Cannot rename multiple interfaces")
 
         if (_has_variable_name and (self.create or self.rename)) is True:
             self.command_queue.append(
