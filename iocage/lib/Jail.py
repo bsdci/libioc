@@ -471,7 +471,7 @@ class JailGenerator(JailResource):
             else:
                 self._prepare_stop()
                 stdout, stderr, returncode = self._launch_single_command_jail(
-                    " ".join(single_command),
+                    single_command,
                     passthru=passthru
                 )
         except Exception as e:
@@ -558,7 +558,7 @@ class JailGenerator(JailResource):
 
     def fork_exec(  # noqa: T484
         self,
-        command: typing.List[str],
+        command: str,
         error_handler: typing.Optional[typing.Callable[
             [subprocess.Popen, str, str],
             typing.Tuple[bool, str],

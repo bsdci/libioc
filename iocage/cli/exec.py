@@ -85,7 +85,6 @@ def cli(
             user_command
         ]
     else:
-        command = ["/bin/sh", "-c", user_command]
         command = user_command.split()
 
     ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
@@ -102,7 +101,7 @@ def cli(
     try:
         if fork is True:
             events = ioc_jail.fork_exec(
-                command,
+                " ".join(command),
                 passthru=True,
                 exec_timeout=0
             )
