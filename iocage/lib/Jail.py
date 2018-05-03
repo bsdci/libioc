@@ -588,8 +588,21 @@ class JailGenerator(JailResource):
             logger=self.logger
         )
 
-        list(JailGenerator.start(self, single_command=command, passthru=True))
-        yield jailForkExecEvent.end()
+        try:
+            fork_exec_events = JailGenerator.start(
+                self,
+                single_command=command,
+                passthru=True
+            )
+            for event in fork_exec_events:
+                continue
+        except iocage.lib.errors.IocageException as e:
+            jailForkExecEvent.fail(e)
+            raise e
+        else:
+            yield jailForkExecEvent.end()
+        finally:
+            self.config = original_config
 
     @property
     def basejail_backend(self) -> typing.Optional[typing.Union[
