@@ -535,6 +535,18 @@ class ZFSDatasetRename(ZFSEvent):
         ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
 
 
+class ZFSDatasetDestroy(ZFSEvent):
+    """Rename a ZFS dataset."""
+
+    def __init__(  # noqa: T484
+        self,
+        dataset: libzfs.ZFSDataset,
+        **kwargs
+    ) -> None:
+
+        ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
+
+
 class ZFSSnapshotRename(ZFSEvent):
     """Rename a ZFS snapshot."""
 
