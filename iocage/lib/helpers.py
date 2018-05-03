@@ -39,6 +39,7 @@ import iocage.lib.ZFS
 
 # MyPy
 import iocage.lib.Types
+CommandOutput = typing.Tuple[typing.Optional[str], typing.Optional[str], int]
 
 
 def init_zfs(
@@ -398,8 +399,12 @@ def to_string(
 def exec_generator(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-    **subprocess_args: typing.Dict[str, typing.Any]
-) -> typing.Generator[str, None, typing.Tuple[str, str, int]]:
+    **subprocess_args: typing.Any
+) -> typing.Generator[
+    str,
+    None,
+    CommandOutput
+]:
     """Execute a command in an interactive shell."""
     if isinstance(command, str):
         command = [command]
@@ -454,9 +459,8 @@ def exec_passthru(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
     print_lines: bool=True
-) -> typing.Tuple[str, str, int]:
+) -> CommandOutput:
     """Execute a command in an interactive shell."""
-
     lines = exec_generator(
         command,
         logger=logger,
@@ -469,7 +473,10 @@ def exec_passthru(
                 print(line)
                 sys.stdout.flush()
     except StopIteration as return_statement:
-        return return_statement.value
+
+        output: CommandOutput
+        output = return_statement.value
+        return output
 
 
 # ToDo: replace with (u)mount library
