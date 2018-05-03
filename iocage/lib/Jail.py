@@ -637,13 +637,9 @@ class JailGenerator(JailResource):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-        else:
-            return iocage.lib.helpers.exec(
-                [value],
-                logger=self.logger,
-                env=self.env,
-                shell=True  # nosec: B604
-            )
+
+        # ToDo: Deprecate and remove this method
+        raise NotImplemented("_run_hook only supports start/stop")
 
     def _ensure_script_dir(self) -> None:
         if os.path.isdir(self.launch_script_dir) is False:
