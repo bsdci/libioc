@@ -437,10 +437,11 @@ def exec_generator(
         stdout = ""
         if child.stdout is not None:
             for line in iter(child.stdout.readline, ""):
+                line = line.replace("\r\n", "\n").replace("\r", "")
                 if (line is "") and (child.poll() is not None):
                     continue
                 stdout += f"{line}"
-                yield line.replace("\r", "").replace("\n", "")
+                yield line.split()
             child.stdout.close()
 
         if child.stderr is not None:
