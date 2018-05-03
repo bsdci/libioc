@@ -45,7 +45,7 @@ class NetworkInterface:
     extra_settings: typing.List[str]
     rename: bool
     create: bool
-    _destroy: bool
+    destroy: bool
 
     def __init__(
         self,
@@ -111,22 +111,6 @@ class NetworkInterface:
         if auto_apply:
             self.apply()
 
-    @property
-    def destroy(self) -> bool:
-        """Return True when the network interface is to be destroyed."""
-        return self._destroy
-
-    @destroy.setter
-    def destroy(self, value: bool) -> None:
-        """
-        Set whether the interface should be destroyed.
-
-        When combined with self.create the interface is forced to be destroyed
-        before the new interface with the same name is created. The name of the
-        deleted interface may be overridden by the rename flag.
-        """
-        self._destroy = (value is True)
-
     def apply(self) -> None:
         """Apply the interface settings and configure IP address."""
         self.apply_settings()
@@ -151,20 +135,12 @@ class NetworkInterface:
                 command.append(key)
                 command.append(str(value))
 
-        if self.destroy is True:
-            if "name" in self.settings:
-                nic_name_to_destroy = self.settings["name"]
-            else:
-                nic_name_to_destroy = self.current_nic_name
-            self.command_queue.append(" ".join([
-                self.ifconfig_command,
-                nic_name_to_destroy,
-                "destroy"
-                " 2>/dev/null || :"
-            ]))
-
         if self.extra_settings:
             command += self.extra_settings
+
+        has_name = "name" in self.settings
+        if self.destroy and has_name and not self.rename:
+            self.destroy_interface()
 
         self._exec(command)
 
@@ -173,6 +149,21 @@ class NetworkInterface:
             self.name = str(self.settings["name"])
             del self.settings["name"]
             self.rename = False
+
+    def destroy_interface(self) -> None:
+        """Destroy the interface."""
+        if isinstance(self.settings["name"], str):
+            self._destroy_interfaces([self.settings["name"]])
+        else:
+            self._destroy_interfaces(self.settings["name"])
+
+    def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
+        for nic_name_to_destroy in nic_names:
+            iocage.lib.helper.exec([
+                self.ifconfig_command,
+                nic_name_to_destroy,
+                "destroy"
+            ])
 
     def apply_addresses(self) -> None:
         """Apply the configured IP addresses."""
@@ -305,3 +296,12 @@ class QueuingNetworkInterface(
             self.command_queue.append(_command)
 
         return ""
+
+    def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
+        for nic_name_to_destroy in nic_names:
+            self.command_queue.append(" ".join([
+                self.ifconfig_command,
+                nic_name_to_destroy,
+                "destroy"
+                " 2>/dev/null || :"
+            ]))
