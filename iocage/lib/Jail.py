@@ -665,6 +665,9 @@ class JailGenerator(JailResource):
         if self.config["vnet"]:
             exec_poststop = self._stop_vimage_network() + exec_poststop
 
+        if self.running and (os.path.isfile(self.script_env_path) is False):
+            # when a jail was started from other iocage variants
+            self._write_temporary_script_env()
 
         self._write_hook_script(
             "prestop",
@@ -738,6 +741,27 @@ class JailGenerator(JailResource):
                 self.logger.warn(str(e))
             else:
                 raise e
+
+    def _write_temporary_script_env(self) -> None:
+        self.logger.debug(
+            f"Overwriting the hook script .env file {self.script_env_path}"
+            f" for JID {self.jid}"
+        )
+        script_env: typing.Dict[str, str] = {}
+        for network in self.networks:
+            for key, value in network.env.items():
+                script_env[key] = str(value).replace("$", "\\$")
+
+        self._ensure_script_dir()
+        with open(self.script_env_path, "w") as f:
+            f.write("\n".join(
+                [f"export IOCAGE_JID={self.jid}"] +
+                [
+                    f"export {key}=\"{value}\""
+                    for key, value
+                    in script_env.items()
+                ]
+            ))
 
     def _write_jail_conf(self, force: bool=False) -> None:
         if force is True:
