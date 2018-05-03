@@ -719,10 +719,10 @@ class JailGenerator(JailResource):
                 )
                 try:
                     for hook_name in ["prestop", "poststop"]:
-                        iocage.lib.helpers.exec([
-                            "/bin/sh",
-                            self.get_hook_script_path(hook_name)
-                        ], logger=self.logger)
+                        iocage.lib.helpers.exec(
+                            [self.get_hook_script_path(hook_name)],
+                            logger=self.logger
+                        )
                 except Exception as e:
                     self.logger.warn(str(e))
             else:
