@@ -195,7 +195,7 @@ def exec(
 def _prettify_output(output: str) -> str:
     return "\n".join(map(
         lambda line: f"    {line}",
-        output.split("\n")
+        output.splitlines()
     ))
 
 
@@ -437,11 +437,10 @@ def exec_generator(
         stdout = ""
         if child.stdout is not None:
             for line in iter(child.stdout.readline, ""):
-                line = line.replace("\r\n", "\n").replace("\r", "")
                 if (line is "") and (child.poll() is not None):
                     continue
                 stdout += f"{line}"
-                yield line.split()
+                yield line.replace("\r", "").replace("\n", "")
             child.stdout.close()
 
         if child.stderr is not None:

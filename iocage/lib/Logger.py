@@ -69,7 +69,7 @@ class LogEntry:
 
     def __len__(self) -> int:
         """Return the number of lines of the log entry."""
-        return len(self.message.split("\n"))
+        return len(self.message.splitlines())
 
 
 class Logger:
@@ -301,7 +301,7 @@ class Logger:
 
     def _indent(self, message: str, level: int) -> str:
         indent = Logger.INDENT_PREFIX * level
-        return "\n".join(map(lambda x: f"{indent}{x}", message.split("\n")))
+        return "\n".join(map(lambda x: f"{indent}{x}", message.splitlines()))
 
     def _get_log_file_path(
         self,

@@ -33,7 +33,7 @@ JailStatesDict = typing.Dict[str, 'JailState']
 
 def _parse(text: str) -> JailStatesDict:
     output: JailStatesDict = {}
-    for line in text.split("\n"):
+    for line in text.splitlines():
         if line == "":
             continue
         data: typing.Dict[str, str] = {}

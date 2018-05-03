@@ -664,7 +664,7 @@ class ReleaseGenerator(ReleaseResource):
         path = self.__get_hashfile_location()
         hashes = {}
         with open(path, "r") as f:
-            for line in f.read().split("\n"):
+            for line in f.read().splitlines():
                 s = set(line.replace("\t", " ").split(" "))
                 fingerprint = None
                 asset = None
