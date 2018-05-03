@@ -608,10 +608,9 @@ class JailGenerator(JailResource):
 
         return None
 
-    def _run_hook(
-        self,
-        hook_name: str
-    ) -> typing.Optional[typing.Tuple[str, str, int]]:
+    def _run_hook(self, hook_name: str) -> typing.Optional[
+        iocage.lib.helpers.CommandOutput
+    ]:
         """
         Execute a jail hook.
 
@@ -1183,7 +1182,7 @@ class JailGenerator(JailResource):
         self,
         command: typing.List[str],
         **kwargs
-    ) -> typing.Tuple[str, str, int]:
+    ) -> iocage.lib.helpers.CommandOutput:
         """
         Execute a command in a running jail.
 
@@ -1206,7 +1205,7 @@ class JailGenerator(JailResource):
     def passthru(
         self,
         command: typing.List[str]
-    ) -> typing.Tuple[str, str, int]:
+    ) -> iocage.lib.helpers.CommandOutput:
         """
         Execute a command in a started jail and passthrough STDIN and STDOUT.
 
@@ -1226,7 +1225,9 @@ class JailGenerator(JailResource):
             logger=self.logger
         )
 
-    def exec_console(self) -> typing.Tuple[str, str]:
+    def exec_console(
+        self
+    ) -> iocage.lib.helpers.CommandOutput:
         """Shortcut to drop into a shell of a started jail."""
         self.require_jail_running()
         return self.passthru(
@@ -1385,7 +1386,7 @@ class JailGenerator(JailResource):
     def _launch_persistent_jail(
         self,
         passthru: bool
-    ) -> typing.Union[str, str, int]:
+    ) -> iocage.lib.helpers.CommandOutput:
         command = self._launch_command + [
             "persist",
             f"exec.start=\"{self._relative_hook_script_dir}/start.sh\"",
@@ -1416,9 +1417,8 @@ class JailGenerator(JailResource):
         self,
         command: typing.List[str],
         passthru: bool
-    ) -> typing.Tuple[str, str, int]:
+    ) -> iocage.lib.helpers.CommandOutput:
 
-        aborted = False
         try:
             if passthru is True:
                 return iocage.lib.helpers.exec_passthru(
@@ -1426,12 +1426,13 @@ class JailGenerator(JailResource):
                     logger=self.logger
                 )
             else:
-                return iocage.lib.helpers.exec(command, logger=self.logger)
+                o: iocage.lib.helpers.CommandOutput = iocage.lib.helpers.exec(
+                    command,
+                    logger=self.logger
+                )
+                return o
         except (KeyboardInterrupt, SystemExit):
             list(self.stop(force=True))
-            aborted = True
-
-        if aborted is True:
             raise iocage.lib.errors.JailExecutionAborted(
                 jail=self,
                 logger=None
@@ -1441,7 +1442,7 @@ class JailGenerator(JailResource):
         self,
         jail_command: str,
         passthru: bool
-    ) -> typing.Tuple[str, str, int]:
+    ) -> iocage.lib.helpers.CommandOutput:
         command = self._launch_command + [
             "nopersist",
             f"exec.poststart=\"{self.get_hook_script_path('poststop')}\"",
