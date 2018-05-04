@@ -339,7 +339,8 @@ class Updater:
 
         try:
             self._create_jail_update_dir()
-            for event in jail.fork_exec(
+            for event in iocage.lib.Jail.JailGenerator.fork_exec(
+                jail,
                 " ".join(self._update_command),
                 error_handler=self._install_error_handler
             ):
