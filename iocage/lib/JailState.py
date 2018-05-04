@@ -23,12 +23,18 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail State collection."""
 import typing
-import json
 import subprocess
 
 import iocage.lib.errors
+import iocage.lib.helpers
 
 JailStatesDict = typing.Dict[str, 'JailState']
+
+_userland_version = float(iocage.lib.helpers.get_userland_version())
+if _userland_version >= 11:
+    import json
+else:
+    import shlex
 
 
 def _parse(text: str) -> JailStatesDict:
@@ -66,12 +72,16 @@ class JailState(dict):
     _data: typing.Optional[typing.Dict[str, str]] = None
     updated = False
 
+    logger: typing.Optional['iocage.lib.Logger.Logger']
+
     def __init__(
         self,
         name: str,
-        data: typing.Optional[typing.Dict[str, str]]=None
+        data: typing.Optional[typing.Dict[str, str]]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
 
+        self.logger = logger
         self.name = name
 
         if data is not None:
@@ -79,20 +89,51 @@ class JailState(dict):
 
     def query(self) -> typing.Dict[str, str]:
         """Execute jls to update a jails state."""
+        if _userland_version >= 11:
+            return self._query_libxo()
+        else:
+            return self._query_list()
+
+    def _query_libxo(self) -> typing.Dict[str, str]:
         data: typing.Dict[str, str] = {}
-        try:
-            stdout = subprocess.check_output([
+        stdout, _, returncode = iocage.lib.helpers.exec(
+            [
                 "/usr/sbin/jls",
                 "-j",
                 self.name,
                 "-v",
                 "--libxo=json"
-            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            output = stdout.decode().strip()
-            data = _parse_json(output)[self.name]
-        except (subprocess.CalledProcessError, KeyError):
-            pass
+            ],
+            stderr=subprocess.DEVNULL,
+            logger=self.logger
+        )
 
+        if returncode > 0:
+            raise iocage.lib.errors.JailStateUpdateFailed()
+
+        data = _parse_json(stdout)[self.name]
+        self._data = data
+        return data
+
+    def _query_list(self) -> typing.Dict[str, str]:
+        data: typing.Dict[str, str] = {}
+        stdout, _, returncode = iocage.lib.helpers.exec(
+            [
+                "/usr/sbin/jls",
+                "-j",
+                self.name,
+                "-v",
+                "-n",
+                "-q"
+            ],
+            stderr=subprocess.DEVNULL,
+            logger=self.logger
+        )
+
+        if returncode > 0:
+            raise iocage.lib.errors.JailStateUpdateFailed()
+
+        data = _parse(stdout)[self.name]
         self._data = data
         return data
 
@@ -121,6 +162,8 @@ class JailState(dict):
 class JailStates(dict):
     """A dictionary of JailStates."""
 
+    logger: typing.Optional['iocage.lib.Logger.Logger']
+
     def __init__(
         self,
         states: typing.Optional[JailStatesDict]=None
@@ -131,18 +174,52 @@ class JailStates(dict):
         else:
             dict.__init__(self, states)
 
-    def query(self) -> None:
+    def query(
+        self,
+        logger: 'iocage.lib.Logger.Logger'=None
+    ) -> None:
         """Invoke update of the jail state from jls output."""
         try:
-            stdout = subprocess.check_output([
+            if _userland_version >= 11:
+                self._query_libxo(logger=logger)
+            else:
+                self._query_list(logger=logger)
+        except BaseException:
+            raise iocage.lib.errors.JailStateUpdateFailed()
+
+    def _query_libxo(self, logger: 'iocage.lib.Logger.Logger'=None) -> None:
+        stdout, _, returncode = iocage.lib.helpers.exec(
+            [
                 "/usr/sbin/jls",
                 "-v",
                 "--libxo=json"
-            ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            output = stdout.decode().strip()
-            output_data = _parse_json(output)
-            for name in output_data:
-                dict.__setitem__(self, name, output_data[name])
+            ],
+            stderr=subprocess.DEVNULL,
+            logger=logger
+        )
 
-        except BaseException:
+        if returncode > 0:
             raise iocage.lib.errors.JailStateUpdateFailed()
+
+        output_data = _parse_json(stdout)
+        for name in output_data:
+            dict.__setitem__(self, name, output_data[name])
+
+    def _query_list(self, logger: 'iocage.lib.Logger.Logger'=None) -> None:
+        stdout, _, returncode = iocage.lib.helpers.exec(
+            [
+                "/usr/sbin/jls",
+                "-v",
+                "-n",
+                "-q"
+            ],
+            stderr=subprocess.DEVNULL,
+            logger=logger
+        )
+
+        if returncode > 0:
+            raise iocage.lib.errors.JailStateUpdateFailed()
+
+        output_data = _parse(stdout)
+        for name in output_data:
+            dict.__setitem__(self, name, output_data[name])
