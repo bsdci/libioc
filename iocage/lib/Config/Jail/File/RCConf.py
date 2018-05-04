@@ -23,19 +23,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Manage rc.conf files."""
 import iocage.lib.helpers
-import iocage.lib.Config.Jail.File.Prototype
+import iocage.lib.Config.Jail.File
 
 # MyPy
 import iocage.lib.Logger
 
 
-class RCConf(iocage.lib.Config.Jail.File.Prototype.ConfigFile):
+class RCConf(iocage.lib.Config.Jail.File.ConfigFile):
     """Model a rc.conf file."""
 
     _file: str = "/etc/rc.conf"
 
 
-class ResourceRCConf(iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+class ResourceRCConf(iocage.lib.Config.Jail.File.ResourceConfigFile):
     """Model a rc.conf file relative to a resource."""
 
     _file: str = "/etc/rc.conf"
