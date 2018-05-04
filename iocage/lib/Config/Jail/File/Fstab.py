@@ -29,7 +29,7 @@ import random
 import re
 
 import iocage.lib.helpers
-import iocage.lib.Config.Jail.File.Prototype
+import iocage.lib.Config.Jail.File
 
 
 class FstabLine(dict):
@@ -112,7 +112,7 @@ class FstabAutoPlaceholderLine(dict):
 
 
 class Fstab(
-    iocage.lib.Config.Jail.File.Prototype.ResourceConfig,
+    iocage.lib.Config.Jail.File.ResourceConfig,
     collections.MutableSequence
 ):
     """

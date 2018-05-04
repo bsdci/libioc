@@ -23,13 +23,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Manage sysctl.conf files."""
 import iocage.lib.helpers
-import iocage.lib.Config.Jail.File.Prototype
+import iocage.lib.Config.Jail.File
 
 # MyPy
 import iocage.lib.Logger
 
 
-class SysctlConf(iocage.lib.Config.Jail.File.Prototype.ResourceConfigFile):
+class SysctlConf(iocage.lib.Config.Jail.File.ResourceConfigFile):
     """Abstract the sysctl.conf file."""
 
     _file: str = "/etc/sysctl.conf"
