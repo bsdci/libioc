@@ -340,7 +340,7 @@ class Updater:
         try:
             self._create_jail_update_dir()
             for event in jail.fork_exec(
-                self._update_command,
+                " ".join(self._update_command),
                 error_handler=self._install_error_handler
             ):
                 yield event
