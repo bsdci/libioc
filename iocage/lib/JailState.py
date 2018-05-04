@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail State collection."""
 import typing
-import shlex
+import json
 import subprocess
 
 import iocage.lib.errors
@@ -50,6 +50,15 @@ def _parse(text: str) -> JailStatesDict:
     return output
 
 
+def _parse_json(data: str) -> JailStatesDict:
+    output: typing.Dict[str, 'JailState'] = {}
+    jail_states = json.loads(data)["jail-information"]["jail"]
+    for jail_state_data in jail_states:
+        identifier = jail_state_data["name"]
+        output[identifier] = JailState(identifier, jail_state_data)
+    return output
+
+
 class JailState(dict):
     """State of a running Resource/Jail."""
 
@@ -60,7 +69,7 @@ class JailState(dict):
     def __init__(
         self,
         name: str,
-        data: typing.Optional[typing.Dict[str, str]]=None,
+        data: typing.Optional[typing.Dict[str, str]]=None
     ) -> None:
 
         self.name = name
@@ -77,12 +86,13 @@ class JailState(dict):
                 "-j",
                 self.name,
                 "-v",
-                "-n",
-                "-q"
+                "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
-            data = _parse(stdout.decode().strip())[self.name]
+            output = stdout.decode().strip()
+            data = _parse_json(output)[self.name]
         except (subprocess.CalledProcessError, KeyError):
             pass
+
         self._data = data
         return data
 
@@ -127,11 +137,10 @@ class JailStates(dict):
             stdout = subprocess.check_output([
                 "/usr/sbin/jls",
                 "-v",
-                "-n",
-                "-q"
+                "--libxo=json"
             ], shell=False, stderr=subprocess.DEVNULL)  # nosec TODO use helper
             output = stdout.decode().strip()
-            output_data = _parse(output)
+            output_data = _parse_json(output)
             for name in output_data:
                 dict.__setitem__(self, name, output_data[name])
 
