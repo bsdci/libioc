@@ -28,7 +28,7 @@ import ucl
 
 import iocage.lib.Config
 import iocage.lib.Config.Prototype
-import iocage.lib.Config.Resource.ResourceConfig
+import iocage.lib.Config.Resource
 import iocage.lib.errors
 
 
@@ -49,7 +49,7 @@ class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
 
 
 class ResourceConfigUCL(
-    iocage.lib.Config.Resource.ResourceConfig.ResourceConfig,
+    iocage.lib.Config.Resource.ResourceConfig,
     ConfigUCL
 ):
     """ResourceConfig in UCL format."""
