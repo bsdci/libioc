@@ -48,8 +48,8 @@ class ConfigUCL(iocage.lib.Config.Prototype.Prototype):
         return str(iocage.lib.helpers.to_ucl(data))
 
 
-class ResourceConfigUCL(
-    iocage.lib.Config.Resource.ResourceConfig,
+class DatasetConfigUCL(
+    iocage.lib.Config.Dataset.DatasetConfig,
     ConfigUCL
 ):
     """ResourceConfig in UCL format."""

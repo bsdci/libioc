@@ -135,7 +135,7 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
         return data
 
 
-class ConfigZFS(BaseConfigZFS):
+class DatasetConfigZFS(BaseConfigZFS):
     """iocage ZFS jail configuration for legacy support."""
 
     def __init__(
@@ -155,35 +155,3 @@ class ConfigZFS(BaseConfigZFS):
     def dataset(self) -> libzfs.ZFSDataset:
         """Shortcut to the config dataset."""
         return self._dataset
-
-
-class ResourceConfigZFS(BaseConfigZFS):
-    """iocage ZFS resource configuration for legacy support."""
-
-    _dataset: typing.Optional[libzfs.ZFSDataset]
-
-    def __init__(
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        file: typing.Optional[str]=None,
-        dataset: typing.Optional[libzfs.ZFSDataset]=None,
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None
-    ) -> None:
-        self.resource = resource
-        self._dataset = dataset
-        iocage.lib.Config.Dataset.DatasetConfig.__init__(
-            self,
-            file=file,
-            dataset=dataset,
-            logger=logger
-        )
-
-    @property
-    def dataset(self) -> libzfs.ZFSDataset:
-        """Shortcut to the resources main dataset."""
-        dataset: libzfs.ZFSDataset
-        if self._dataset is not None:
-            dataset = self._dataset
-        else:
-            dataset = self.resource.dataset
-        return dataset

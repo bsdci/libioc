@@ -86,9 +86,9 @@ class Resource(metaclass=abc.ABCMeta):
     _dataset: libzfs.ZFSDataset
     _dataset_name: str
 
-    _config_json: iocage.lib.Config.Type.JSON.ResourceConfigJSON
-    _config_ucl: iocage.lib.Config.Type.UCL.ResourceConfigUCL
-    _config_zfs: iocage.lib.Config.Type.ZFS.ResourceConfigZFS
+    _config_json: iocage.lib.Config.Type.JSON.DatasetConfigJSON
+    _config_ucl: iocage.lib.Config.Type.UCL.DatasetConfigUCL
+    _config_zfs: iocage.lib.Config.Type.ZFS.DatasetConfigZFS
 
     def __init__(
         self,
@@ -112,35 +112,35 @@ class Resource(metaclass=abc.ABCMeta):
             self.dataset = dataset
 
     @property
-    def config_json(self) -> 'iocage.lib.Config.Type.JSON.ResourceConfigJSON':
+    def config_json(self) -> 'iocage.lib.Config.Type.JSON.DatasetConfigJSON':
         """Return and memoize the resources JSON config handler."""
         if "_config_json" in self.__dir__():
             return self._config_json
         default = self.DEFAULT_JSON_FILE
         file = self._config_file if self._config_file is not None else default
-        self._config_json = iocage.lib.Config.Type.JSON.ResourceConfigJSON(
+        self._config_json = iocage.lib.Config.Type.JSON.DatasetConfigJSON(
             file=file,
-            resource=self,
+            dataset=self.dataset,
             logger=self.logger
         )
         return self._config_json
 
     @property
-    def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.ResourceConfigUCL':
+    def config_ucl(self) -> 'iocage.lib.Config.Type.UCL.DatasetConfigUCL':
         """Return and memoize the resources UCL config handler."""
         if "_config_ucl" in self.__dir__():
             return self._config_ucl
         default = self.DEFAULT_UCL_FILE
         file = self._config_file if self._config_file is not None else default
-        self._config_ucl = iocage.lib.Config.Type.UCL.ResourceConfigUCL(
+        self._config_ucl = iocage.lib.Config.Type.UCL.DatasetConfigUCL(
             file=file,
-            resource=self,
+            dataset=self.dataset,
             logger=self.logger
         )
         return self._config_ucl
 
     @property
-    def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.ResourceConfigZFS':
+    def config_zfs(self) -> 'iocage.lib.Config.Type.ZFS.DatasetConfigZFS':
         """Return and memoize the resources ZFS property config handler."""
         if "_config_zfs" in self.__dir__():
             return self._config_zfs
@@ -150,8 +150,7 @@ class Resource(metaclass=abc.ABCMeta):
         else:
             dataset = None
 
-        self._config_zfs = iocage.lib.Config.Type.ZFS.ResourceConfigZFS(
-            resource=self,
+        self._config_zfs = iocage.lib.Config.Type.ZFS.DatasetConfigZFS(
             dataset=dataset,
             logger=self.logger
         )
