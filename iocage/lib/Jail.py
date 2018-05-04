@@ -592,7 +592,7 @@ class JailGenerator(JailResource):
             fork_exec_events = JailGenerator.start(
                 self,
                 single_command=command,
-                passthru=True
+                passthru=passthru
             )
             for event in fork_exec_events:
                 continue

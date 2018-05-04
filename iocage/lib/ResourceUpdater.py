@@ -342,6 +342,7 @@ class Updater:
             for event in iocage.lib.Jail.JailGenerator.fork_exec(
                 jail,
                 " ".join(self._update_command),
+                passthru=False,
                 error_handler=self._install_error_handler
             ):
                 yield event
