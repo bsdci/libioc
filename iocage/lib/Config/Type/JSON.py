@@ -27,7 +27,7 @@ import json
 
 import iocage.lib.Config
 import iocage.lib.Config.Prototype
-import iocage.lib.Config.Resource
+import iocage.lib.Config.Dataset
 import iocage.lib.helpers
 
 
@@ -46,8 +46,8 @@ class ConfigJSON(iocage.lib.Config.Prototype.Prototype):
         return str(iocage.lib.helpers.to_json(data))
 
 
-class ResourceConfigJSON(
-    iocage.lib.Config.Resource.ResourceConfig,
+class DatasetConfigJSON(
+    iocage.lib.Config.Dataset.DatasetConfig,
     ConfigJSON
 ):
     """ResourceConfig in JSON format."""
