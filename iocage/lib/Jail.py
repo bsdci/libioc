@@ -354,7 +354,10 @@ class JailGenerator(JailResource):
         object.__setattr__(self, '_state', value)
 
     def _init_state(self) -> iocage.lib.JailState.JailState:
-        state = iocage.lib.JailState.JailState(self.identifier)
+        state = iocage.lib.JailState.JailState(
+            self.identifier,
+            logger=self.logger
+        )
         self.state = state
         state.query()
         return state
