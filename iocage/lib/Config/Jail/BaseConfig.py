@@ -25,7 +25,7 @@
 import typing
 import re
 
-import iocage.lib.Config.Jail.JailConfigProperties
+import iocage.lib.Config.Jail.Properties
 import iocage.lib.errors
 import iocage.lib.helpers
 
@@ -67,10 +67,7 @@ class BaseConfig(dict):
 
     """
 
-    special_properties: (
-        'iocage.lib.Config.Jail.'
-        'JailConfigProperties.JailConfigProperties'
-    )
+    special_properties: 'iocage.lib.Config.Jail.Properties.Properties'
     data: typing.Dict[str, typing.Any]
 
     def __init__(
@@ -83,8 +80,8 @@ class BaseConfig(dict):
 
         self.logger = iocage.lib.helpers.init_logger(self, logger)
 
-        tmp = iocage.lib.Config.Jail.JailConfigProperties
-        self.special_properties = tmp.JailConfigProperties(
+        Properties = iocage.lib.Config.Jail.Properties.JailConfigProperties
+        self.special_properties = Properties(
             config=self,
             logger=self.logger
         )
@@ -149,10 +146,7 @@ class BaseConfig(dict):
     def attach_special_property(
         self,
         name: str,
-        special_property: (
-            'iocage.lib.Config.Jail.'
-            'JailConfigProperties.JailConfigProperties'
-        )
+        special_property: 'iocage.lib.Config.Jail.Properties.Property'
     ) -> None:
         """Attach a special property to the configuration."""
         self.special_properties[name] = special_property
