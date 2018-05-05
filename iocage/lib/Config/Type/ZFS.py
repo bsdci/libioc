@@ -120,6 +120,8 @@ class BaseConfigZFS(iocage.lib.Config.Dataset.DatasetConfig):
     @property
     def exists(self) -> bool:
         """Signal if iocage ZFS configuration properties were found."""
+        if self.dataset is None:
+            return False
         for prop in self.dataset.properties:
             if is_iocage_property(prop):
                 return True
