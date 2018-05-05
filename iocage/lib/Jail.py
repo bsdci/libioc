@@ -281,7 +281,7 @@ class JailGenerator(JailResource):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
-        self._relative_hook_script_dir = "/usr/local/iocage-scripts"
+        self._relative_hook_script_dir = "/.iocage"
 
         if isinstance(data, str):
             data = {
