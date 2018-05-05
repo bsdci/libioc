@@ -679,6 +679,7 @@ class JailGenerator(JailResource):
         if self.running and (os.path.isfile(self.script_env_path) is False):
             # when a jail was started from other iocage variants
             self._write_temporary_script_env()
+            exec_poststop.append(f"rm \"{shlex.quote(self.script_env_path)}\"")
 
         self._write_hook_script(
             "prestop",
