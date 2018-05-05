@@ -601,7 +601,7 @@ class JailGenerator(JailResource):
             for event in fork_exec_events:
                 continue
         except iocage.lib.errors.IocageException as e:
-            jailForkExecEvent.fail(e)
+            yield jailForkExecEvent.fail(e)
             raise e
         else:
             yield jailForkExecEvent.end()
