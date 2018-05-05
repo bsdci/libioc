@@ -658,8 +658,18 @@ class JailGenerator(JailResource):
         raise NotImplemented("_run_hook only supports start/stop")
 
     def _ensure_script_dir(self) -> None:
-        if os.path.isdir(self.launch_script_dir) is False:
-            os.mkdir(self.launch_script_dir, 0o755)
+        jail_mountpoint_absolute_dir = "/".join([
+            self.root_dataset.mountpoint,
+            self._relative_hook_script_dir
+        ])
+        for _dir in [self.launch_script_dir, jail_mountpoint_absolute_dir]:
+            realpath = os.path.realpath(_dir)
+            if realpath.startswith(self.dataset.mountpoint) is False:
+                raise iocage.lib.errors.SecurityViolationConfigJailEscape(
+                    file=realpath
+                )
+            if os.path.isdir(realpath) is False:
+                os.makedirs(realpath, 0o755)
 
     def _prepare_stop(self) -> None:
         exec_prestop = []
@@ -1024,6 +1034,8 @@ class JailGenerator(JailResource):
             self.create_from_release(release=resource)
         else:
             self.create_from_scratch()
+
+        self._ensure_script_dir()
 
     def create_from_scratch(
         self
