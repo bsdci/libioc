@@ -1944,7 +1944,7 @@ class JailGenerator(JailResource):
     @property
     def release(self) -> 'iocage.lib.Release.ReleaseGenerator':
         """Return the iocage.Release instance linked with the jail."""
-        return iocage.lib.Release.Release(
+        return iocage.lib.Release.ReleaseGenerator(
             name=self.config["release"],
             root_datasets_name=self.root_datasets_name,
             logger=self.logger,
