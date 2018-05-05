@@ -166,14 +166,6 @@ class JailNotTemplate(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
-class JailStateUpdateFailed(IocageException):
-    """Raised when the jail state could not be obtained."""
-
-    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"Updating the jail state with jls failed"
-        IocageException.__init__(self, msg, *args, **kwargs)
-
-
 class JailLaunchFailed(IocageException):
     """Raised when the jail state could not be obtained."""
 
