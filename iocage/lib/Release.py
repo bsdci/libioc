@@ -28,6 +28,7 @@ import os
 import urllib.request
 import urllib.error
 import urllib.parse
+import re
 
 import libzfs
 import ucl
@@ -207,7 +208,8 @@ class ReleaseGenerator(ReleaseResource):
         "net.inet.ip.fw.enable": 0
     }
 
-    name: str
+    _name: str
+    patchlevel: typing.Optional[int]
     eol: bool = False
 
     logger: iocage.lib.Logger.Logger
@@ -268,6 +270,22 @@ class ReleaseGenerator(ReleaseResource):
         self._assets = ["base"]
         if self.host.distribution.name != "HardenedBSD":
             self._assets.append("lib32")
+
+    @property
+    def name(self) -> str:
+        """Return the releases identifier."""
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        """Set the releases identifier (optionally including patchlevel)."""
+        patchlevel_match = re.match(r"^(.*)-p([0-9]+)$", value)
+        if patchlevel_match is None:
+            self._name = value
+            self.patchlevel = None
+        else:
+            self._name = patchlevel_match[1]
+            self.patchlevel = int(patchlevel_match[2])
 
     @property
     def resource(self) -> 'iocage.lib.Resource.Resource':
