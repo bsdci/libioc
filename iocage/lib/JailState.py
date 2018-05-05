@@ -105,11 +105,13 @@ class JailState(dict):
                 "--libxo=json"
             ],
             stderr=subprocess.DEVNULL,
+            ignore_error=True,
             logger=self.logger
         )
 
         if returncode > 0:
-            raise iocage.lib.errors.JailStateUpdateFailed()
+            self.clear()
+            return {}
 
         data = _parse_json(stdout)[self.name]
         self._data = data
@@ -127,11 +129,13 @@ class JailState(dict):
                 "-q"
             ],
             stderr=subprocess.DEVNULL,
+            ignore_error=True,
             logger=self.logger
         )
 
         if returncode > 0:
-            raise iocage.lib.errors.JailStateUpdateFailed()
+            self.clear()
+            return {}
 
         data = _parse(stdout)[self.name]
         self._data = data
@@ -195,11 +199,13 @@ class JailStates(dict):
                 "--libxo=json"
             ],
             stderr=subprocess.DEVNULL,
+            ignore_error=True,
             logger=logger
         )
 
         if returncode > 0:
-            raise iocage.lib.errors.JailStateUpdateFailed()
+            self.clear()
+            return
 
         output_data = _parse_json(stdout)
         for name in output_data:
@@ -214,11 +220,13 @@ class JailStates(dict):
                 "-q"
             ],
             stderr=subprocess.DEVNULL,
+            ignore_error=True,
             logger=logger
         )
 
         if returncode > 0:
-            raise iocage.lib.errors.JailStateUpdateFailed()
+            self.clear()
+            return
 
         output_data = _parse(stdout)
         for name in output_data:
