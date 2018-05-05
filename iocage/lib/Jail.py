@@ -515,7 +515,8 @@ class JailGenerator(JailResource):
         if jailed is False:
             pre_commands.append(
                 f"export IOCAGE_JID="
-                f"$(/usr/sbin/jls -j {self.identifier} jid 2>/dev/null || :)"
+                f"$(/usr/sbin/jls -j {shlex.quote(self.identifier)} jid"
+                " 2>/dev/null || :)"
             )
 
         if isinstance(commands, str):
@@ -526,11 +527,11 @@ class JailGenerator(JailResource):
             _commands = commands
 
         post_commands: typing.List[str] = []
-        env_path = self.script_env_path
         if (jailed is False) and (write_env is True):
             if self.running:
                 post_commands.append(
-                    f"echo \"export IOCAGE_JID={self.jid}\" > {env_path}"
+                    f"echo \"export IOCAGE_JID={shlex.quote(str(self.jid))}\""
+                    f" > {shlex.quote(self.script_env_path)}"
                 )
                 file_pipe = ">>"
             else:
@@ -538,7 +539,7 @@ class JailGenerator(JailResource):
 
             post_commands += [(
                 f"env | grep ^IOCAGE_NIC | sed 's/^/export /' {file_pipe} "
-                f"{self.jail.script_env_path}"
+                f"{shlex.quote(self.jail.script_env_path)}"
             )]
         else:
             post_commands = []
