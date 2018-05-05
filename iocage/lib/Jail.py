@@ -399,12 +399,12 @@ class JailGenerator(JailResource):
         JailZfsShareMount = events.JailZfsShareMount(jail=self)
 
         self._ensure_script_dir()
-        jail_start_script_dir = "/".join([
+        jail_start_script_dir = "".join([
             self.root_dataset.mountpoint,
             self._relative_hook_script_dir
         ])
         if os.path.isdir(jail_start_script_dir) is False:
-            os.mkdir(jail_start_script_dir, 0o755)
+            os.makedirs(jail_start_script_dir, 0o755)
 
         exec_prestart: typing.List[str] = []
         exec_start: typing.List[str] = []
