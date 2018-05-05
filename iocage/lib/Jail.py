@@ -727,6 +727,7 @@ class JailGenerator(JailResource):
         try:
             self._write_jail_conf(force=force)
             self._destroy_jail()
+            self._remove_script_env_file()
         except Exception as e:
             if force is True:
                 yield jailDestroyEvent.skip()
@@ -753,6 +754,10 @@ class JailGenerator(JailResource):
                 self.logger.warn(str(e))
             else:
                 raise e
+
+    def _remove_script_env_file(self) -> None:
+        if os.path.isfile(self.script_env_path) is True:
+            os.remove(self.script_env_path)
 
     def _write_temporary_script_env(self) -> None:
         self.logger.debug(
