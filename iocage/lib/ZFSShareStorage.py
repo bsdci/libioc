@@ -97,12 +97,12 @@ class ZFSShareStorage:
             self._unmount_local(dataset)
 
             # ToDo: bake jail feature into py-libzfs
-            iocage.lib.helpers.exec(
+            self._exec(
                 ["zfs", "jail", str(self.jail.jid), dataset.name],
                 logger=self.logger
             )
 
-        self.jail.exec(["zfs", "mount", "-a"])
+        self._exec_jail(["zfs", "mount", "-a"])
 
     def _get_pool_name_from_dataset_name(
         self,
@@ -142,3 +142,46 @@ class ZFSShareStorage:
     def _unmount_local(self, dataset: libzfs.ZFSDataset) -> None:
         if dataset.mountpoint is not None:
             dataset.umount()
+
+    def _exec(
+        self,
+        command: typing.List[str],
+        **exec_arguments: typing.Dict[str, typing.Any]
+    ) -> iocage.lib.helpers.CommandOutput:
+        return iocage.lib.helpers.exec(command, **exec_arguments)
+
+    def _exec_jail(
+        self,
+        command: typing.List[str]
+    ) -> iocage.lib.helpers.CommandOutput:
+        self.jail.exec(command)
+
+
+class QueuingZFSShareStorage(
+    ZFSShareStorage,
+    iocage.lib.CommandQueue.CommandQueue
+):
+    """Delay ZFSShareStorage commands for bulk execution."""
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None
+    ) -> None:
+        self.clear_command_queue()
+        ZFSShareStorage.__init__(self, jail=jail, logger=logger, zfs=zfs)
+
+    def _exec(
+        self,
+        command: typing.List[str],
+        **exec_arguments: typing.Dict[str, typing.Any]
+    ) -> iocage.lib.helpers.CommandOutput:
+        self.append_command_queue(" ".join(command))
+
+    def _exec_jail(
+        self,
+        command: typing.List[str],
+        **exec_arguments: typing.Dict[str, typing.Any]
+    ) -> iocage.lib.helpers.CommandOutput:
+        self.append_command_queue(" ".join(command), queue_name="jail")
