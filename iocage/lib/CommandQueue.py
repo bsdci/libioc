@@ -28,14 +28,35 @@ import typing
 class CommandQueue:
     """Class extension that queues command for bulk execution."""
 
-    command_queue: typing.List[str]
+    command_queues: typing.Dict[str, typing.List[str]]
 
-    def clear(self) -> None:
+    def clear_command_queue(self) -> None:
         """Clear the command queue."""
-        self.command_queue: typing.List[str] = []
+        command_queues: typing.Dict[str, typing.List[str]] = {}
+        self.command_queues = command_queues
 
-    def read_commands(self) -> typing.List[str]:
+    def _clear_queue(self, queue_name: str) -> None:
+        """Empty a specific queue."""
+        self.command_queues[queue_name] = []
+
+    def get_command_queue(self, queue_name: str="default") -> typing.List[str]:
+        """Create or return the queue with the given name."""
+        if queue_name not in self.command_queues.keys():
+            self._clear_queue(queue_name)
+        return self.command_queues[queue_name]
+
+    def append_command_queue(
+        self,
+        *commands: str,
+        queue_name: str="default"
+    ) -> None:
+        """Append commands to the queue with the selected name."""
+        if queue_name not in self.command_queues.keys():
+            self._clear_queue(queue_name)
+        self.command_queues[queue_name] += commands
+
+    def read_commands(self, queue_name: str="default") -> typing.List[str]:
         """Return the collected jail commands and clear the queue."""
-        queue = self.command_queue
-        self.command_queue = []
+        queue = self.get_command_queue(queue_name)
+        self._clear_queue(queue_name)
         return queue

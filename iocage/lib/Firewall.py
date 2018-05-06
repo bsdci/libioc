@@ -111,7 +111,7 @@ class QueuingFirewall(Firewall, iocage.lib.CommandQueue.CommandQueue):
         self,
         **firewall_arguments
     ) -> None:
-        self.clear()
+        self.clear_command_queue()
         Firewall.__init__(self, **firewall_arguments)
 
     def _offset_rule_number(self, rule_number: typing.Union[int, str]) -> str:
@@ -127,4 +127,4 @@ class QueuingFirewall(Firewall, iocage.lib.CommandQueue.CommandQueue):
         command_line = " ".join(command)
         if ignore_error is True:
             command_line += " || true"
-        self.command_queue.append(command_line)
+        self.append_command_queue(command_line)

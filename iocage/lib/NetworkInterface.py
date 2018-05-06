@@ -238,7 +238,7 @@ class QueuingNetworkInterface(
 
         self.shell_variable_nic_name = shell_variable_nic_name
 
-        self.clear()
+        self.clear_command_queue()
         NetworkInterface.__init__(self, name=name, **network_interface_options)
 
         if (self.create or self.rename) is False:
@@ -253,7 +253,7 @@ class QueuingNetworkInterface(
         if (_name is None) or (self.shell_variable_nic_name is None):
             return
         setter_command = f"export {self.shell_variable_nic_name}=\"{_name}\""
-        self.command_queue.append(setter_command)
+        self.append_command_queue(setter_command)
 
     @property
     def current_nic_name(self) -> str:
@@ -276,13 +276,13 @@ class QueuingNetworkInterface(
                 raise ValueError("Cannot rename multiple interfaces")
 
         if (_has_variable_name and (self.create or self.rename)) is True:
-            self.command_queue.append(
+            self.append_command_queue(
                 # export the ifconfig output
                 f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
 
             if self.jail is None:
-                self.command_queue += [
+                self.append_command_queue(
                     # persist env immediately
                     (
                         "echo \"export IOCAGE_JID=$IOCAGE_JID\" > "
@@ -291,15 +291,15 @@ class QueuingNetworkInterface(
                         "env | grep ^IOCAGE_NIC | sed 's/^/export /' >> "
                         "\"$(dirname $0)/.env\""
                     )
-                ]
+                )
         else:
-            self.command_queue.append(_command)
+            self.append_command_queue(_command)
 
         return ""
 
     def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
         for nic_name_to_destroy in nic_names:
-            self.command_queue.append(" ".join([
+            self.append_command_queue(" ".join([
                 self.ifconfig_command,
                 nic_name_to_destroy,
                 "destroy"
