@@ -109,6 +109,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "exec_clean": 1,
         "exec_fib": 1,
         "exec_prestart": None,
+        "exec_started": None,
         "exec_start": "/bin/sh /etc/rc",
         "exec_poststart": None,
         "exec_prestop": None,

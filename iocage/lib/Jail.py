@@ -407,6 +407,7 @@ class JailGenerator(JailResource):
 
         exec_prestart: typing.List[str] = []
         exec_start: typing.List[str] = []
+        exec_started: typing.List[str] = []
         exec_poststart: typing.List[str] = []
 
         if self.config["vnet"]:
@@ -430,10 +431,10 @@ class JailGenerator(JailResource):
 
         if self.config["exec_prestart"] is not None:
             exec_prestart += [self.config["exec_prestart"]]
-
+        if self.config["exec_started"] is not None:
+            exec_started += [self.config["exec_started"]]
         if self.config["exec_start"] is not None and (single_command is None):
             exec_start += [self.config["exec_start"]]
-
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
 
@@ -442,6 +443,12 @@ class JailGenerator(JailResource):
             self._wrap_hook_script_command_string(
                 exec_prestart,
                 ignore_errors=False
+            )
+        )
+        self._write_hook_script(
+            "started",
+            self._wrap_hook_script_command_string(
+                exec_started,
             )
         )
         self._write_hook_script(
@@ -1371,6 +1378,7 @@ class JailGenerator(JailResource):
             f"allow.set_hostname={self._get_value('allow_set_hostname')}",
             f"allow.sysvipc={self._get_value('allow_sysvipc')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
+            f"exec.started=\"{self.get_hook_script_path('started')}\"",
             f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
             f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
             f"exec.jail_user={self._get_value('exec_jail_user')}"
