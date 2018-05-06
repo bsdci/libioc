@@ -1710,20 +1710,24 @@ class JailGenerator(JailResource):
         commands: typing.List[str] = []
 
         if defaultrouter:
-            commands.append(
-                self._configure_route_command(defaultrouter)
-            )
+            commands += self._configure_route_command(defaultrouter)
 
         if defaultrouter6:
-            commands.append(
-                self._configure_route_command(defaultrouter6, ipv6=True)
+            commands += self._configure_route_command(
+                defaultrouter6,
+                ipv6=True
             )
 
         return commands
 
-    def _configure_route_command(self, gateway: str, ipv6: bool=False) -> str:
+    def _configure_route_command(
+        self,
+        gateway: str,
+        ipv6: bool=False
+    ) -> typing.List[str]:
 
         ip_version = 4 + 2 * (ipv6 is True)
+        commands: typing.List[str] = []
 
         # router@interface syntax for static pointopoint route
         if "@" in gateway:
@@ -1731,17 +1735,21 @@ class JailGenerator(JailResource):
             self.logger.verbose(
                 f"setting pointopoint route to {gateway} via {nic}"
             )
-            self.exec(["/sbin/route", "-q", "add", gateway, "-iface", nic])
+            commands.append(" ".join(
+                ["/sbin/route", "-q", "add", gateway, "-iface", nic]
+            ))
 
         self.logger.verbose(
             f"setting default IPv{ip_version} gateway to {gateway}",
             jail=self
         )
-        return " ".join(
+        commands.append(" ".join(
             ["/sbin/route", "-q", "add"] +
             (["-6"] if (ipv6 is True) else []) +
             ["default", gateway]
-        )
+        ))
+
+        return commands
 
     def require_jail_is_template(self) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
