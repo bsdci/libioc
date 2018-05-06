@@ -396,7 +396,6 @@ class JailGenerator(JailResource):
 
         events: typing.Any = iocage.lib.events
         jailLaunchEvent = events.JailLaunch(jail=self)
-        JailZfsShareMount = events.JailZfsShareMount(jail=self)
 
         self._ensure_script_dir()
         jail_start_script_dir = "".join([
@@ -419,6 +418,15 @@ class JailGenerator(JailResource):
             if self.host.ipfw_enabled is True:
                 exec_start.append("service ipfw onestop")
             exec_poststart += _poststart
+
+        if self.config["jail_zfs"] is True:
+            share_storage = iocage.lib.ZFSShareStorage.QueuingZFSShareStorage(
+                jail=self,
+                logger=self.logger
+            )
+            share_storage.mount_zfs_shares()
+            exec_start += share_storage.read_commands("jail")
+            exec_started += share_storage.read_commands()
 
         if self.config["exec_prestart"] is not None:
             exec_prestart += [self.config["exec_prestart"]]
@@ -487,15 +495,6 @@ class JailGenerator(JailResource):
 
         self._limit_resources()
         self._configure_nameserver()
-
-        if self.config["jail_zfs"] is True:
-            yield JailZfsShareMount.begin()
-            share_storage = iocage.lib.ZFSShareStorage.ZFSShareStorage(
-                jail=self,
-                logger=self.logger
-            )
-            share_storage.mount_zfs_shares()
-            yield JailZfsShareMount.end()
 
     def _run_poststop_hook_manually(self) -> None:
         self.logger.debug("Running poststop hook manually")

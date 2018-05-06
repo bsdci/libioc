@@ -300,18 +300,6 @@ class JailRename(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
-class JailZfsShareMount(JailEvent):
-    """Share ZFS datasets with the jail."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
 class JailDestroy(JailEvent):
     """Destroy the jail."""
 
