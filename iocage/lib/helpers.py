@@ -233,8 +233,18 @@ def parse_none(
     raise TypeError("Value is not None")
 
 
-def parse_list(data: typing.Union[str, typing.List[str]]) -> typing.List[str]:
+def parse_list(
+    data: typing.Optional[typing.Union[str, typing.List[str]]]
+) -> typing.List[str]:
     """Transform a comma separated string into a list."""
+    empty_list: typing.List[str] = []
+    try:
+        parse_none(data)
+        return empty_list
+    except TypeError:
+        pass
+    if data is None:
+        return empty_list
     # ToDo: ignore escaped commas
     return data if isinstance(data, list) else data.split(",")
 
