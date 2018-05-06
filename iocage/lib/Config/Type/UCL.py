@@ -28,7 +28,7 @@ import ucl
 
 import iocage.lib.Config
 import iocage.lib.Config.Prototype
-import iocage.lib.Config.Resource
+import iocage.lib.Config.Dataset
 import iocage.lib.errors
 
 
