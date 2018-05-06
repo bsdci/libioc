@@ -133,10 +133,13 @@ def cli(  # noqa: T484
         exit(1)
 
     fetch_updates = bool(kwargs["fetch_updates"])
-    ctx.parent.print_events(release.fetch(
-        update=kwargs["update"],
-        fetch_updates=fetch_updates
-    ))
+    try:
+        ctx.parent.print_events(release.fetch(
+            update=kwargs["update"],
+            fetch_updates=fetch_updates
+        ))
+    except iocage.lib.errors.IocageException:
+        exit(1)
 
     exit(0)
 
