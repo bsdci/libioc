@@ -166,9 +166,9 @@ def exec(
     if stderr is not None:
         stderr = stderr.decode("UTF-8").strip()
 
-    if stdout is not None:
+    if (stdout is not None):
         stdout = stdout.decode("UTF-8").strip()
-        if logger and stdout:
+        if logger:
             logger.spam(_prettify_output(stdout))
 
     returncode = child.wait()
@@ -195,7 +195,7 @@ def exec(
 def _prettify_output(output: str) -> str:
     return "\n".join(map(
         lambda line: f"    {line}",
-        output.splitlines()
+        output.strip().splitlines()
     ))
 
 

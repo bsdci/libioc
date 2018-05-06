@@ -477,7 +477,7 @@ class JailGenerator(JailResource):
                     single_command,
                     passthru=passthru
                 )
-        except Exception as e:
+        except iocage.lib.errors.IocageException as e:
             yield jailLaunchEvent.fail(e)
             raise e
 
@@ -563,10 +563,6 @@ class JailGenerator(JailResource):
     def fork_exec(  # noqa: T484
         self,
         command: str,
-        error_handler: typing.Optional[typing.Callable[
-            [subprocess.Popen, str, str],
-            typing.Tuple[bool, str],
-        ]]=None,
         passthru: bool=False,
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
@@ -973,7 +969,7 @@ class JailGenerator(JailResource):
                     raise event.error
         except BaseException as e:
             yield jailRenameEvent.fail(e)
-            raise
+            raise e
 
         # Update fstab to the new dataset
         for event in self.update_fstab_paths(current_mountpoint):
@@ -1008,9 +1004,9 @@ class JailGenerator(JailResource):
             )
             self.fstab.save()
             yield jailFstabUpdateEvent.end()
-        except BaseException:
-            yield jailFstabUpdateEvent.fail()
-            raise
+        except BaseException as e:
+            yield jailFstabUpdateEvent.fail(e)
+            raise e
 
     def create(
         self,
@@ -1461,7 +1457,8 @@ class JailGenerator(JailResource):
             else:
                 o: iocage.lib.helpers.CommandOutput = iocage.lib.helpers.exec(
                     command,
-                    logger=self.logger
+                    logger=self.logger,
+                    ignore_error=True
                 )
                 return o
         except (KeyboardInterrupt, SystemExit):
@@ -1484,7 +1481,9 @@ class JailGenerator(JailResource):
         ]
 
         self._write_hook_script("command", "\n".join(
+            ["set +e"] +
             (["service ipfw onestop"] if self.host.ipfw_enabled else []) +
+            ["set -e"] +
             [
                 f". {self._relative_hook_script_dir}/start.sh",
                 "set -e",
@@ -1500,7 +1499,7 @@ class JailGenerator(JailResource):
         if returncode > 0:
             raise iocage.lib.errors.JailCommandFailed(
                 returncode=returncode,
-                logger=self.logger
+                logger=None
             )
 
         return stdout, stderr, returncode
