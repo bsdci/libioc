@@ -33,7 +33,6 @@ import iocage.lib.errors
 import iocage.lib.Jail
 
 # MyPy
-import subprocess
 import libzfs
 
 
@@ -100,14 +99,8 @@ class Updater:
             return self.resource
         return self.resource.release
 
-    @property
-    def _install_error_handler(
-        self
-    ) -> typing.Optional[typing.Optional[typing.Callable[
-        [subprocess.Popen, str, str],
-        typing.Tuple[bool, str],
-    ]]]:
-        pass
+    def _wrap_command(self, command: str) -> str:
+        return command
 
     @property
     def temporary_jail(self) -> 'iocage.lib.Jail.JailGenerator':
@@ -120,14 +113,14 @@ class Updater:
                     "basejail": False,
                     "allow_mount_nullfs": "1",
                     "release": self.release.name,
-                    "exec_start": "/usr/bin/true",
+                    "exec.start": None,
                     "securelevel": "0",
                     "allow_chflags": True,
                     "vnet": False,
                     "ip4_addr": None,
                     "ip6_addr": None,
                     "defaultrouter": None,
-                    "mount_devfs": False,
+                    "mount_devfs": True,
                     "mount_fdescfs": False
                 },
                 new=True,
@@ -319,7 +312,7 @@ class Updater:
                     changed = event
         except Exception as e:
             yield runReleaseUpdateEvent.fail(e)
-            raise e
+            raise
 
         _rollback_snapshot()
         yield runReleaseUpdateEvent.end()
@@ -341,15 +334,14 @@ class Updater:
             self._create_jail_update_dir()
             for event in iocage.lib.Jail.JailGenerator.fork_exec(
                 jail,
-                " ".join(self._update_command),
-                passthru=False,
-                error_handler=self._install_error_handler
+                self._wrap_command(" ".join(self._update_command)),
+                passthru=False
             ):
                 yield event
             self.logger.debug(
                 f"Update of release '{self.release.name}' finished"
             )
-        except Exception:
+        except Exception as e:
             err = iocage.lib.errors.UpdateFailure(
                 name=self.release.name,
                 reason=(
@@ -358,7 +350,7 @@ class Updater:
                 logger=self.logger
             )
             yield executeReleaseUpdateEvent.fail(err)
-            raise err
+            raise e
 
         yield executeReleaseUpdateEvent.end()
 
@@ -480,26 +472,20 @@ class FreeBSD(Updater):
             ))
             f.truncate()
 
-    @property
-    def _install_error_handler(
-        self
-    ) -> typing.Optional[typing.Optional[typing.Callable[
-        [subprocess.Popen, str, str],
-        typing.Tuple[bool, str],
-    ]]]:
-        def error_handler(
-            child: subprocess.Popen,
-            stdout: str,
-            stderr: str
-        ) -> typing.Tuple[bool, str]:
-            if "No updates are available to install." in stdout:
-                return (True, "already up to date",)
-            else:
-                return (False, (
-                    "freebsd-update.sh exited "
-                    f"with returncode {child.returncode}"
-                ),)
-        return error_handler
+    def _wrap_command(self, command: str) -> str:
+        _command = "\n".join([
+            "set +e",
+            f"OUTPUT=\"$({command})\"",
+            "RC=$?",
+            "if [ $RC -gt 0 ]; then",
+            (
+                "echo $OUTPUT"
+                " | grep -c 'No updates are available to install.'"
+                " >> /dev/null || exit $RC"
+            ),
+            "fi"
+        ])
+        return _command
 
 
 def get_launchable_update_resource(  # noqa: T484
