@@ -351,6 +351,18 @@ class Updater:
             )
             yield executeReleaseUpdateEvent.fail(err)
             raise e
+        finally:
+            jail.state.query()
+            if jail.running:
+                self.logger.debug(
+                    "The update jail is still running. "
+                    "Force-stopping it now."
+                )
+                for event in iocage.lib.Jail.JailGenerator.stop(
+                    jail,
+                    force=True
+                ):
+                    yield event
 
         yield executeReleaseUpdateEvent.end()
 
