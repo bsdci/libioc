@@ -422,8 +422,10 @@ class JailGenerator(JailResource):
 
         if self.config["exec_prestart"] is not None:
             exec_prestart += [self.config["exec_prestart"]]
-        if self.config["exec_start"] is not None:
+
+        if self.config["exec_start"] is not None and (single_command is None):
             exec_start += [self.config["exec_start"]]
+
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
 
