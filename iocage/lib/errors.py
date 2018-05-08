@@ -162,15 +162,20 @@ class JailNotTemplate(IocageException):
     """Raised when the jail is no template but should be one."""
 
     def __init__(self, jail, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"The jail '{jail.name}' is not a template"
+        msg = f"The jail '{jail.full_name}' is not a template"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailLaunchFailed(IocageException):
     """Raised when the jail state could not be obtained."""
 
-    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"Jail launch failed"
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+        msg = f"Launching jail {jail.full_name} failed"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
