@@ -24,6 +24,7 @@
 """iocage Jail module."""
 import typing
 import os
+import random
 import subprocess  # nosec: B404
 import shlex
 import shutil
@@ -391,7 +392,6 @@ class JailGenerator(JailResource):
         """
         self.require_jail_existing()
         self.require_jail_stopped()
-
         release = self.release
 
         events: typing.Any = iocage.lib.events
@@ -435,6 +435,26 @@ class JailGenerator(JailResource):
             exec_started += [self.config["exec_started"]]
         if self.config["exec_start"] is not None and (single_command is None):
             exec_start += [self.config["exec_start"]]
+
+        if self._has_multiple_interfaces:
+            self.logger.debug(
+                "Running exec.start in multiple VNET compatibility mode"
+            )
+            # the jail command misses the ability to run host commands when the
+            # jail was launched, so exec.start execution has to be delayed
+            if single_command is not None:
+                raise iocage.lib.errors.MissingFeature(
+                    "Multiple VNET interfaces are not supported yet."
+                )
+            # attach all jail NICs that weren't attached by jail vnet.interface
+            for network in self.networks[1:]:
+                exec_poststart += iocage.lib.NetworkInterface.NetworkInterface(
+                    name=network.nic,
+                    extra_settings=["vnet", "$IOCAGE_JID", "up"]
+                )
+            exec_poststart += self._wrap_jail_command(exec_start)
+            exec_start = []
+
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
 
@@ -513,6 +533,25 @@ class JailGenerator(JailResource):
     def _run_poststop_hook_manually(self) -> None:
         self.logger.debug("Running poststop hook manually")
         iocage.lib.helpers.exec(self.get_hook_script_path("poststop"))
+
+    def _wrap_jail_command(
+        self,
+        commands: typing.Optional[typing.List[str]]
+    ) -> typing.List[str]:
+        """Wrap a jail hook command for a host hook script."""
+        if commands is None:
+            return []
+
+        EOF_IDENTIFIER = f"EOF{random.getrandbits(64)}"
+        output: typing.List[str] = [
+            "set -e",
+            "echo 'Executing jail start scripts'",
+            "jexec -j {self.identifier} /bin/sh <<{EOF_IDENTIFIER}"
+        ] + commands + [
+            EOF_IDENTIFIER,
+            "set +e"
+        ]
+        return output
 
     def _wrap_hook_script_command(
         self,
@@ -1360,9 +1399,10 @@ class JailGenerator(JailResource):
 
         if self.config["vnet"]:
             command.append("vnet")
-            command.append(
-                f"vnet.interface={self._get_value('vnet_interfaces')}"
-            )
+            if len(self.config["vnet_interfaces"]) > 0:
+                command.append(
+                    f"vnet.interface={self.config['vnet_interfaces'][0]}"
+                )
         else:
 
             if self.config["ip4_addr"] is not None:
@@ -1625,6 +1665,10 @@ class JailGenerator(JailResource):
             poststart += _post
 
         return prestart, start, poststart
+
+    @property
+    def _has_multiple_interfaces(self) -> bool:
+        return (len(self.networks) > 1)
 
     def _stop_vimage_network(self) -> typing.List[str]:
         commands: typing.List[str] = []
