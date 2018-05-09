@@ -1269,7 +1269,7 @@ class JailGenerator(JailResource):
 
     def _destroy_jail(self) -> None:
 
-        commands = [
+        self._exec_host_command(
             [
                 "/usr/sbin/jail",
                 "-v",
@@ -1277,14 +1277,9 @@ class JailGenerator(JailResource):
                 "-f",
                 self._jail_conf_file,
                 self.identifier
-            ]
-        ]
-
-        for command in commands:
-            iocage.lib.helpers.exec(
-                command,
-                logger=self.logger
-            )
+            ],
+            passthru=False
+        )
 
     @property
     def _dhcp_enabled(self) -> bool:
@@ -1426,7 +1421,7 @@ class JailGenerator(JailResource):
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
         ]
 
-        stdout, stderr, returncode = self._exec_launch_command(
+        stdout, stderr, returncode = self._exec_host_command(
             command=command,
             passthru=passthru
         )
@@ -1444,7 +1439,7 @@ class JailGenerator(JailResource):
 
         return stdout, stderr, returncode
 
-    def _exec_launch_command(
+    def _exec_host_command(
         self,
         command: typing.List[str],
         passthru: bool
@@ -1495,7 +1490,7 @@ class JailGenerator(JailResource):
             ]
         ))
 
-        stdout, stderr, returncode = self._exec_launch_command(
+        stdout, stderr, returncode = self._exec_host_command(
             command,
             passthru=passthru
         )
