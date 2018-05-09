@@ -106,7 +106,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "sysvmsg": "new",
         "sysvsem": "new",
         "sysvshm": "new",
-        "exec_clean": 1,
+        "exec_clean": 0,
         "exec_fib": 1,
         "exec_prestart": "/usr/bin/true",
         "exec_start": "/bin/sh /etc/rc",

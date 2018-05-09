@@ -1454,13 +1454,15 @@ class JailGenerator(JailResource):
             if passthru is True:
                 return iocage.lib.helpers.exec_passthru(
                     command,
-                    logger=self.logger
+                    logger=self.logger,
+                    env=self.env
                 )
             else:
                 o: iocage.lib.helpers.CommandOutput = iocage.lib.helpers.exec(
                     command,
                     logger=self.logger,
-                    ignore_error=True
+                    ignore_error=True,
+                    env=self.env
                 )
                 return o
         except (KeyboardInterrupt, SystemExit):
