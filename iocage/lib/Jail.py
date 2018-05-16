@@ -1334,7 +1334,7 @@ class JailGenerator(JailResource):
     @property
     def _launch_command(self) -> typing.List[str]:
 
-        command = ["jail", "-c"]
+        command = ["/usr/sbin/jail", "-c"]
 
         if self.config["vnet"]:
             command.append("vnet")
@@ -1395,7 +1395,6 @@ class JailGenerator(JailResource):
             f"allow.mount.zfs={self._allow_mount_zfs}",
             f"allow.quotas={self._get_value('allow_quotas')}",
             f"allow.socket_af={self._get_value('allow_socket_af')}",
-            f"exec.clean={self._get_value('exec_clean')}",
             f"exec.timeout={self._get_value('exec_timeout')}",
             f"stop.timeout={self._get_value('stop_timeout')}",
             f"mount.fstab={self.fstab.path}",
@@ -1942,7 +1941,10 @@ class JailGenerator(JailResource):
     @property
     def env(self) -> typing.Dict[str, str]:
         """Return the environment variables for hook scripts."""
-        jail_env = os.environ.copy()  # type: typing.Dict[str, str]
+        if self.config["exec_clean"] is False:
+            jail_env = os.environ.copy()  # type: typing.Dict[str, str]
+        else:
+            jail_env = {}  # type: typing.Dict[str, str]
 
         for prop in self.config.all_properties:
             prop_name = f"IOCAGE_{prop.upper()}"
