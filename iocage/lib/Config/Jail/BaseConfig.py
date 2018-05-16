@@ -271,6 +271,33 @@ class BaseConfig(dict):
     def _has_legacy_tag(self) -> bool:
         return "tag" in self.data.keys()
 
+    def _get_vnet_interfaces(self) -> typing.List[str]:
+        return list(
+            iocage.lib.helpers.parse_list(self.data["vnet_interfaces"])
+        )
+
+    def _set_vnet_interfaces(  # noqa: T484
+        self,
+        value: typing.Union[str, typing.List[str]],
+        **kwargs
+    ) -> None:
+        if isinstance(value, str) is True:
+            self.data["vnet_interfaces"] = value
+        else:
+            self.data["vnet_interfaces"] = iocage.lib.helpers.to_string(value)
+
+    def _get_exec_clean(self) -> bool:
+        return (self.data["exec_clean"] == 1) is True
+
+    def _set_exec_clean(  # noqa: T484
+        self,
+        value: typing.Union[str, int, bool],
+        **kwargs
+    ) -> None:
+        if isinstance(value, str):
+            value = int(value)
+        self.data["exec_clean"] = 1 if ((value is True) or (value == 1)) else 0
+
     def _get_tags(self) -> typing.List[str]:
 
         data_keys = self.data.keys()
@@ -301,33 +328,6 @@ class BaseConfig(dict):
 
         if self._has_legacy_tag is True:
             del self.data["tag"]
-
-    def _get_vnet_interfaces(self) -> typing.List[str]:
-
-        data_keys = self.data.keys()
-
-        if "vnet_interfaces" in data_keys:
-            vnet_interfaces = set(list(
-                iocage.lib.helpers.parse_list(self.data["vnet_interfaces"])
-            ))
-        else:
-            vnet_interfaces = set()
-
-        return list(vnet_interfaces)
-
-    def _set_vnet_interfaces(  # noqa: T484
-        self,
-        value: typing.Union[
-            str,
-            bool,
-            int,
-            typing.List[typing.Union[str, bool, int]]
-        ],
-        **kwargs
-    ) -> None:
-
-        data = iocage.lib.helpers.to_string(value)
-        self.data["vnet_interfaces"] = data
 
     def _get_basejail(self) -> bool:
         return iocage.lib.helpers.parse_bool(self.data["basejail"]) is True
