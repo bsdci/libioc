@@ -77,6 +77,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "mac_prefix": "02ff60",
         "vnet": False,
         "interfaces": [],
+        "vnet_interfaces": [],
         "ip4": "new",
         "ip4_saddrsel": 1,
         "ip4_addr": None,
