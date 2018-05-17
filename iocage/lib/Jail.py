@@ -1941,10 +1941,11 @@ class JailGenerator(JailResource):
     @property
     def env(self) -> typing.Dict[str, str]:
         """Return the environment variables for hook scripts."""
+        jail_env: typing.Dict[str, str]
         if self.config["exec_clean"] is False:
-            jail_env = os.environ.copy()  # type: typing.Dict[str, str]
+            jail_env = os.environ.copy()
         else:
-            jail_env = {}  # type: typing.Dict[str, str]
+            jail_env = {}
 
         for prop in self.config.all_properties:
             prop_name = f"IOCAGE_{prop.upper()}"
