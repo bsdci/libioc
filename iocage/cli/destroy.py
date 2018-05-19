@@ -82,44 +82,38 @@ def cli(
     else:
         resources_class = iocage.lib.Jails.JailsGenerator
 
-    resources = resources_class(
+    resources = list(resources_class(
         filters=filters,
         zfs=zfs,
         host=host,
         logger=logger
-    )
-    resources_list = list(resources)
+    ))
 
-    if len(resources_list) == 0:
+    if len(resources) == 0:
         logger.error("No target matched your input")
         exit(1)
 
     if not force:
         message = "These {} will be deleted:\n  - {}\nAre you sure?".format(
             "releases" if release else "jails",
-            "\n  - ".join([r.getstring('full_name') for r in resources_list])
+            "\n  - ".join([r.getstring('full_name') for r in resources])
         )
         click.confirm(message, default=False, abort=True)
 
     failed_items = []
 
-    for item in resources_list:
+    for item in resources:
 
         old_mountpoint = item.dataset.mountpoint
 
-        # ToDo: generalize and move this Method from Jail to LaunchableResource
-        if isinstance(item, iocage.lib.Jail.JailGenerator):
-            try:
-                item.require_jail_stopped()
-            except iocage.lib.errors.IocageException:
-                logger.log(
-                    f"Jail '{item.name}' must be stopped before destruction"
-                )
-                failed_items.append(item)
-                continue
+        if (force and item.running) is True:
+            ctx.parent.print_events(item.stop(force=True))
 
-        item.destroy()
-        logger.screen(f"{old_mountpoint} destroyed")
+        try:
+            ctx.parent.print_events(item.destroy())
+            logger.screen(f"{old_mountpoint} destroyed")
+        except iocage.lib.errors.IocageException:
+            failed_items.append(item)
 
     if len(failed_items) > 0:
         exit(1)

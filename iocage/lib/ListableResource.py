@@ -55,6 +55,22 @@ class ListableResource(list):
         self.sources = sources
         self.filters = filters
 
+    @property
+    def filters(self) -> typing.Optional['iocage.lib.Filter.Terms']:
+        """Return the filters that are applied on the list items."""
+        return self._filters
+
+    @filters.setter
+    def filters(
+        self,
+        value: typing.Iterable[typing.Union['iocage.lib.Filter.Term', str]]
+    ) -> None:
+        """Set the filters that are applied on the list items."""
+        if isinstance(value, iocage.lib.Filter.Terms):
+            self._filters = value
+        else:
+            self._filters = iocage.lib.Filter.Terms(value)
+
     def destroy(self, force: bool=False) -> None:
         """Listable resources by itself cannot be destroyed."""
         raise NotImplementedError("destroy unimplemented for ListableResource")
@@ -112,22 +128,6 @@ class ListableResource(list):
 
         return self._create_resource_instance(dataset)
 
-    @property
-    def filters(self) -> typing.Optional['iocage.lib.Filter.Terms']:
-        """Return the filters that are applied on the list items."""
-        return self._filters
-
-    @filters.setter
-    def filters(
-        self,
-        value: typing.Iterable[typing.Union['iocage.lib.Filter.Term', str]]
-    ) -> None:
-        """Set the filters that are applied on the list items."""
-        if isinstance(value, iocage.lib.Filter.Terms):
-            self._filters = value
-        else:
-            self._filters = iocage.lib.Filter.Terms(value)
-
     @abc.abstractmethod
     def _create_resource_instance(  # noqa: T484
         self,
@@ -136,3 +136,4 @@ class ListableResource(list):
         **kwargs
     ) -> 'iocage.lib.Resource.Resource':
         pass
+
