@@ -167,6 +167,7 @@ class JailStates(dict):
     """A dictionary of JailStates."""
 
     logger: typing.Optional['iocage.lib.Logger.Logger']
+    queried: bool
 
     def __init__(
         self,
@@ -175,8 +176,10 @@ class JailStates(dict):
 
         if states is None:
             dict.__init__(self, {})
+            self.queried = False
         else:
             dict.__init__(self, states)
+            self.queried = True
 
     def query(
         self,
@@ -190,6 +193,7 @@ class JailStates(dict):
                 self._query_list(logger=logger)
         except BaseException:
             raise iocage.lib.errors.JailStateUpdateFailed()
+        self.queried = True
 
     def _query_libxo(self, logger: 'iocage.lib.Logger.Logger'=None) -> None:
         stdout, _, returncode = iocage.lib.helpers.exec(

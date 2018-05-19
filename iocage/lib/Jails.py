@@ -98,7 +98,8 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
         self
     ) -> typing.Generator['iocage.lib.Resource.Resource', None, None]:
         """Iterate over all jails matching the filter criteria."""
-        self.states.query(logger=self.logger)
+        if self.states.queried is False:
+            self.states.query(logger=self.logger)
 
         iterator = iocage.lib.ListableResource.ListableResource.__iter__(self)
         for jail in iterator:
