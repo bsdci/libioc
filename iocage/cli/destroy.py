@@ -88,21 +88,22 @@ def cli(
         host=host,
         logger=logger
     )
+    resources_list = list(resources)
 
-    if len(list(resources)) == 0:
+    if len(resources_list) == 0:
         logger.error("No target matched your input")
         exit(1)
 
     if not force:
         message = "These {} will be deleted:\n  - {}\nAre you sure?".format(
             "releases" if release else "jails",
-            "\n  - ".join([r.getstring('full_name') for r in resources])
+            "\n  - ".join([r.getstring('full_name') for r in resources_list])
         )
         click.confirm(message, default=False, abort=True)
 
     failed_items = []
 
-    for item in resources:
+    for item in resources_list:
 
         old_mountpoint = item.dataset.mountpoint
 
