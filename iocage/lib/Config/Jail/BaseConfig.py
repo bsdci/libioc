@@ -278,9 +278,16 @@ class BaseConfig(dict):
 
     def _set_vnet_interfaces(  # noqa: T484
         self,
-        value: typing.Union[str, typing.List[str]],
+        value: typing.Optional[typing.Union[str, typing.List[str]]],
         **kwargs
     ) -> None:
+        try:
+            iocage.lib.helpers.parse_none(value)
+            self.data["vnet_interfaces"] = []
+            return
+        except TypeError:
+            pass
+
         if isinstance(value, str) is True:
             self.data["vnet_interfaces"] = value
         else:
