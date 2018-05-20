@@ -94,10 +94,11 @@ def cli(
         exit(1)
 
     if not force:
-        message = "These {} will be deleted:\n  - {}\nAre you sure?".format(
-            "releases" if release else "jails",
-            "\n  - ".join([r.getstring('full_name') for r in resources])
-        )
+        target = "releases" if release else "jails"
+        message = "\n- ".join(
+            [f"These {target} will be deleted"] +
+            [r.getstring('full_name') for r in resources]
+        ) + "\nAre you sure?"
         click.confirm(message, default=False, abort=True)
 
     failed_items = []
