@@ -790,9 +790,21 @@ class ReleaseGenerator(ReleaseResource):
         """Return the release name."""
         return self.name
 
-    def destroy(self, force: bool=False) -> None:
+    def destroy(
+        self,
+        force: bool=False
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Delete a release."""
-        self.zfs.delete_dataset_recursive(self.dataset)
+        zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
+            dataset=self.dataset
+        )
+        yield zfsDatasetDestroyEvent.begin()
+        try:
+            self.zfs.delete_dataset_recursive(self.dataset)
+        except Exception as e:
+            zfsDatasetDestroyEvent.fail(e)
+            raise e
+        yield zfsDatasetDestroyEvent.end()
 
 
 class Release(ReleaseGenerator):
@@ -809,3 +821,11 @@ class Release(ReleaseGenerator):
             update=update,
             fetch_updates=fetch_updates
         ))
+
+    def destroy(  # noqa: T484
+        self,
+        force: bool=False
+    ) -> typing.List['iocage.lib.events.IocageEvent']:
+        """Delete a release."""
+        return list(ReleaseGenerator.destroy(self, force=force))
+
