@@ -148,6 +148,10 @@ class JailState(dict):
             self._data = self.query()
         return self._data
 
+    def clear(self) -> None:
+        """Clear the jail state."""
+        self._data = None
+
     def __getitem__(self, name: str) -> str:
         """Get a value from the jail state."""
         return self.data[name]
