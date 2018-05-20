@@ -48,6 +48,17 @@ class ZFSShareStorage:
         self.logger.verbose("Mounting ZFS shares")
         self._mount_jail_datasets(auto_create=auto_create)
 
+    def umount_zfs_shares(self) -> None:
+        """Unmount a running jails shared ZFS datasets."""
+        for dataset in self.get_zfs_datasets():
+            self.logger.verbose(f"Unmounting ZFS Dataset {dataset.name}")
+            self._exec([
+                "/sbin/zfs",
+                "unjail",
+                self.jail.identifier,
+                dataset.name
+            ])
+
     def get_zfs_datasets(
         self,
         auto_create: bool=False
@@ -91,18 +102,16 @@ class ZFSShareStorage:
             self._require_datasets_exist_and_jailed()
 
         for dataset in self.get_zfs_datasets():
-
             self.logger.verbose(f"Mounting ZFS Dataset {dataset.name}")
-
-            self._unmount_local(dataset)
+            self._umount_dataset(dataset)
 
             # ToDo: bake jail feature into py-libzfs
             self._exec(
-                ["zfs", "jail", str(self.jail.jid), dataset.name],
+                ["/sbin/zfs", "jail", str(self.jail.jid), dataset.name],
                 logger=self.logger
             )
 
-        self._exec_jail(["zfs", "mount", "-a"])
+        self._exec_jail(["/sbin/zfs", "mount", "-a"])
 
     def _get_pool_name_from_dataset_name(
         self,
@@ -139,7 +148,7 @@ class ZFSShareStorage:
                     logger=self.logger
                 )
 
-    def _unmount_local(self, dataset: libzfs.ZFSDataset) -> None:
+    def _umount_dataset(self, dataset: libzfs.ZFSDataset) -> None:
         if dataset.mountpoint is not None:
             dataset.umount()
 
