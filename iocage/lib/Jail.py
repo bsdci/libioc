@@ -1039,7 +1039,7 @@ class JailGenerator(JailResource):
         self
     ) -> None:
         """Create a new jail without any root dataset content."""
-        self._create_skeletron()
+        self._create_skeleton()
 
     def create_from_release(
         self,
@@ -1122,7 +1122,7 @@ class JailGenerator(JailResource):
 
         yield jailCloneEvent.end()
 
-    def _create_skeletron(self) -> None:
+    def _create_skeleton(self) -> None:
 
         if self.config["id"] is None:
             self.config["id"] = str(iocage.lib.helpers.get_random_uuid())
@@ -1145,7 +1145,7 @@ class JailGenerator(JailResource):
         resource: 'iocage.lib.Resource.Resource'
     ) -> None:
 
-        self._create_skeletron()
+        self._create_skeleton()
 
         backend = self.storage_backend
         if backend is not None:
