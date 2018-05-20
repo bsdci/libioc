@@ -157,7 +157,10 @@ class Resource(metaclass=abc.ABCMeta):
         return self._config_zfs
 
     @abc.abstractmethod
-    def destroy(self, force: bool=False) -> None:
+    def destroy(
+        self,
+        force: bool=False
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Destroy the resource."""
         pass
 
@@ -394,7 +397,10 @@ class DefaultResource(Resource):
         self.config.clone(o)
         return o
 
-    def destroy(self, force: bool=False) -> None:
+    def destroy(
+        self,
+        force: bool=False
+    ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Cannot destroy the default resource."""
         raise NotImplementedError("destroy unimplemented for DefaultResource")
 
