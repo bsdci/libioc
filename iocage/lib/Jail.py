@@ -691,6 +691,15 @@ class JailGenerator(JailResource):
         if self.config["vnet"]:
             exec_poststop = self._stop_vimage_network() + exec_poststop
 
+        if self.config["jail_zfs"] is True:
+            share_storage = iocage.lib.ZFSShareStorage.QueuingZFSShareStorage(
+                jail=self,
+                logger=self.logger
+            )
+            share_storage.umount_zfs_shares()
+            zfs_umount_commands = share_storage.read_commands()
+            exec_prestop += zfs_umount_commands
+
         if self.running and (os.path.isfile(self.script_env_path) is False):
             # when a jail was started from other iocage variants
             self._write_temporary_script_env()
