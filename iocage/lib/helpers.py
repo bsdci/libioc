@@ -458,13 +458,15 @@ def exec_generator(
 def exec_passthru(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-    print_lines: bool=True
+    print_lines: bool=True,
+    **subprocess_args: typing.Any
 ) -> CommandOutput:
     """Execute a command in an interactive shell."""
     lines = exec_generator(
         command,
         logger=logger,
-        stdout=sys.stdout
+        stdout=sys.stdout,
+        **subprocess_args
     )
     try:
         while True:
