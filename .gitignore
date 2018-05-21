@@ -114,3 +114,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+*.orig
+*.rej
