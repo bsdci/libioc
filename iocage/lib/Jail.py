@@ -1494,10 +1494,20 @@ class JailGenerator(JailResource):
     ) -> iocage.lib.helpers.CommandOutput:
         command = self._launch_command + [
             "nopersist",
-            f"exec.poststart=\"{self.get_hook_script_path('poststop')}\"",
-            "command=/bin/sh",
-            f"{self._relative_hook_script_dir}/command.sh"
+            f"exec.poststart=\"{self.get_hook_script_path('host_command')}\"",
+            "command=/usr/bin/true"
         ]
+
+        self._write_hook_script("host_command", "\n".join(
+            [
+                f"/bin/sh {self.get_hook_script_path('started')}",
+                (
+                    f"/usr/sbin/jexec {self.identifier} "
+                    f"{self._relative_hook_script_dir}/command.sh"
+                ),
+                f"/bin/sh {self.get_hook_script_path('poststop')}",
+            ]
+        ))
 
         self._write_hook_script("command", "\n".join(
             ["set +e"] +
