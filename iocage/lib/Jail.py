@@ -406,8 +406,8 @@ class JailGenerator(JailResource):
             os.makedirs(jail_start_script_dir, 0o755)
 
         exec_prestart: typing.List[str] = []
-        exec_start: typing.List[str] = ["set -x"]
-        exec_started: typing.List[str] = ["sex -x"]
+        exec_start: typing.List[str] = []
+        exec_started: typing.List[str] = []
         exec_poststart: typing.List[str] = []
 
         if self.config["vnet"]:
@@ -462,7 +462,6 @@ class JailGenerator(JailResource):
         self._write_hook_script(
             "poststart",
             self._wrap_hook_script_command_string([
-                "set -x",
                 "/bin/echo running exec.started hook on the host",
                 f"/bin/sh {self.get_hook_script_path('started')}",
                 "/bin/echo running exec.start hook in the jail",
@@ -1395,7 +1394,6 @@ class JailGenerator(JailResource):
             f"allow.set_hostname={self._get_value('allow_set_hostname')}",
             f"allow.sysvipc={self._get_value('allow_sysvipc')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
-            # f"exec.started=\"{self.get_hook_script_path('started')}\"",
             f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
             f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
             f"exec.jail_user={self._get_value('exec_jail_user')}"
@@ -1440,7 +1438,6 @@ class JailGenerator(JailResource):
     ) -> iocage.lib.helpers.CommandOutput:
         command = self._launch_command + [
             "persist",
-            # f"exec.start=\"{self._relative_hook_script_dir}/start.sh\"",
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
         ]
 
