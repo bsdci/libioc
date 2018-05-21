@@ -107,11 +107,19 @@ class ZFSShareStorage:
 
             # ToDo: bake jail feature into py-libzfs
             self._exec(
-                ["/sbin/zfs", "jail", str(self.jail.jid), dataset.name],
+                self._zfs_jail_command + [dataset.name],
                 logger=self.logger
             )
 
         self._exec_jail(["/sbin/zfs", "mount", "-a"])
+
+    @property
+    def _zfs_jail_command(self) -> typing.List[str]:
+        return ["/sbin/zfs", "jail", str(self.jail.jid)]
+
+    @property
+    def _zfs_unjail_command(self) -> typing.List[str]:
+        return ["/sbin/zfs", "unjail", str(self.jail.jid)]
 
     def _get_pool_name_from_dataset_name(
         self,
@@ -194,3 +202,11 @@ class QueuingZFSShareStorage(
         **exec_arguments: typing.Dict[str, typing.Any]
     ) -> iocage.lib.helpers.CommandOutput:
         self.append_command_queue(" ".join(command), queue_name="jail")
+
+    @property
+    def _zfs_jail_command(self) -> typing.List[str]:
+        return ["/sbin/zfs", "jail", "$IOCAGE_JID"]
+
+    @property
+    def _zfs_unjail_command(self) -> typing.List[str]:
+        return ["/sbin/zfs", "unjail", "$IOCAGE_JID"]
