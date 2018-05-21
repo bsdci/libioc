@@ -236,7 +236,13 @@ def parse_none(
 def parse_list(
     data: typing.Optional[typing.Union[str, typing.List[str]]]
 ) -> typing.List[str]:
-    """Transform a comma separated string into a list."""
+    """
+    Transform a comma separated string into a list.
+
+    Always returns a list of strings. This list is empty when an empty string
+    is provided or the value is None. In any other case the string is split by
+    comma and returned as list.
+    """
     empty_list: typing.List[str] = []
     try:
         parse_none(data)
