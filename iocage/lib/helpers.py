@@ -251,8 +251,50 @@ def parse_list(
         pass
     if data is None:
         return empty_list
-    # ToDo: ignore escaped commas
-    return data if isinstance(data, list) else data.split(",")
+    if isinstance(data, list):
+        return data
+    return split_list_string(data)
+
+
+def split_list_string(
+    data: str,
+    separator: str=","
+) -> typing.List[str]:
+    r"""
+    Split by separator but keep escaped ones.
+
+    Args:
+
+        data (str):
+
+            Input data that will be split by the separator.
+
+        separator(str): (optional, default=",")
+
+            Input data is split by this separator.
+
+
+    Example:
+
+        >> split_strlist("foo,bar\,baz")
+        ["foo", "bar,baz"]
+
+    Returns a list of strings from the input data where escaped separators are
+    ignored and unescaped.
+    """
+    output = []
+    buf = ""
+    escaped = False
+    for c in data:
+        if (c == separator) and (escaped is False):
+            output.append(buf)
+            buf = ""
+            continue
+        escaped = (c == "\\") is True
+        if escaped is False:
+            buf += c
+    output.append(buf)
+    return output
 
 
 def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
