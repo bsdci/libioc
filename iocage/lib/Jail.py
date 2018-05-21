@@ -407,18 +407,19 @@ class JailGenerator(JailResource):
 
         exec_prestart: typing.List[str] = []
         exec_start: typing.List[str] = []
-        exec_started: typing.List[str] = []
+        exec_started: typing.List[str] = [
+            f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}"
+        ]
         exec_poststart: typing.List[str] = []
 
         if self.config["vnet"]:
-            _pre, _start, _poststart = self._start_vimage_network()
-            exec_prestart += _pre
+            _started, _start = self._start_vimage_network()
+            exec_started += _started
             exec_start += _start
             exec_start += self._configure_localhost_commands()
             exec_start += self._configure_routes_commands()
             if self.host.ipfw_enabled is True:
                 exec_start.append("service ipfw onestop")
-            exec_poststart += _poststart
 
         if self.config["jail_zfs"] is True:
             share_storage = iocage.lib.ZFSShareStorage.QueuingZFSShareStorage(
@@ -435,26 +436,6 @@ class JailGenerator(JailResource):
             exec_started += [self.config["exec_started"]]
         if self.config["exec_start"] is not None and (single_command is None):
             exec_start += [self.config["exec_start"]]
-
-        if self._has_multiple_interfaces:
-            self.logger.debug(
-                "Running exec.start in multiple VNET compatibility mode"
-            )
-            # the jail command misses the ability to run host commands when the
-            # jail was launched, so exec.start execution has to be delayed
-            if single_command is not None:
-                raise iocage.lib.errors.MissingFeature(
-                    "Multiple VNET interfaces are not supported yet."
-                )
-            # attach all jail NICs that weren't attached by jail vnet.interface
-            for network in self.networks[1:]:
-                exec_poststart += iocage.lib.NetworkInterface.NetworkInterface(
-                    name=network.nic,
-                    extra_settings=["vnet", "$IOCAGE_JID", "up"]
-                )
-            exec_poststart += self._wrap_jail_command(exec_start)
-            exec_start = []
-
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
 
@@ -561,44 +542,12 @@ class JailGenerator(JailResource):
         write_env: bool=True
     ) -> typing.List[str]:
 
-        pre_commands: typing.List[str] = []
-        pre_commands.append(f"set {'+' if ignore_errors else '-'}e")
-        pre_commands.append(
-            "[ -f \"$(dirname $0)/.env\" ] && . \"$(dirname $0)/.env\""
-        )
-        if jailed is False:
-            pre_commands.append(
-                f"export IOCAGE_JID="
-                f"$(/usr/sbin/jls -j {shlex.quote(self.identifier)} jid"
-                " 2>/dev/null || :)"
-            )
-
         if isinstance(commands, str):
-            _commands = [commands]
+            return [commands]
         elif commands is None:
-            _commands = []
+            return []
         else:
-            _commands = commands
-
-        post_commands: typing.List[str] = []
-        if (jailed is False) and (write_env is True):
-            if self.running:
-                post_commands.append(
-                    f"echo \"export IOCAGE_JID={shlex.quote(str(self.jid))}\""
-                    f" > {shlex.quote(self.script_env_path)}"
-                )
-                file_pipe = ">>"
-            else:
-                file_pipe = ">"
-
-            post_commands += [(
-                f"env | grep ^IOCAGE_NIC | sed 's/^/export /' {file_pipe} "
-                f"{shlex.quote(self.jail.script_env_path)}"
-            )]
-        else:
-            post_commands = []
-
-        return pre_commands + _commands + post_commands
+            return commands
 
     def _wrap_hook_script_command_string(
         self,
@@ -797,7 +746,6 @@ class JailGenerator(JailResource):
         try:
             self._write_jail_conf(force=force)
             self._destroy_jail()
-            self._remove_script_env_file()
         except Exception as e:
             if force is True:
                 yield jailDestroyEvent.skip()
@@ -825,30 +773,14 @@ class JailGenerator(JailResource):
             else:
                 raise e
 
-    def _remove_script_env_file(self) -> None:
-        if os.path.isfile(self.script_env_path) is True:
-            os.remove(self.script_env_path)
-
     def _write_temporary_script_env(self) -> None:
         self.logger.debug(
-            f"Overwriting the hook script .env file {self.script_env_path}"
+            f"Writing the hook script .env file {self.script_env_path}"
             f" for JID {self.jid}"
         )
-        script_env: typing.Dict[str, str] = {}
-        for network in self.networks:
-            for key, value in network.env.items():
-                script_env[key] = str(value).replace("$", "\\$")
-
         self._ensure_script_dir()
         with open(self.script_env_path, "w") as f:
-            f.write("\n".join(
-                [f"export IOCAGE_JID={self.jid}"] +
-                [
-                    f"export {key}=\"{value}\""
-                    for key, value
-                    in script_env.items()
-                ]
-            ))
+            f.write(f"export IOCAGE_JID={self.jid}")
 
     def _write_jail_conf(self, force: bool=False) -> None:
         if force is True:
@@ -1399,10 +1331,6 @@ class JailGenerator(JailResource):
 
         if self.config["vnet"]:
             command.append("vnet")
-            if len(self.config["vnet_interfaces"]) > 0:
-                command.append(
-                    f"vnet.interface={self.config['vnet_interfaces'][0]}"
-                )
         else:
 
             if self.config["ip4_addr"] is not None:
@@ -1621,8 +1549,24 @@ class JailGenerator(JailResource):
     def _write_hook_script(self, hook_name: str, command_string: str) -> None:
         file = self.get_hook_script_path(hook_name)
         existed = os.path.isfile(file)
+        if hook_name in ["started", "poststart", "prestop"]:
+            command_string = (
+                "IOCAGE_JID="
+                f"$(/usr/sbin/jls -j {shlex.quote(self.identifier)} jid)"
+                "\necho JID JID JID $IOCAGE_JID"
+                "\n" + command_string
+            )
+        if hook_name == "poststop":
+            command_string = (
+                "[ -f \"$(dirname $0)/.env\" ] && "
+                ". \"$(dirname $0)/.env\""
+                "\n"
+            ) + command_string
         with open(file, "w") as f:
-            f.write(f"#!/bin/sh\n{command_string}")
+            f.write("\n".join([
+                "#!/bin/sh",
+                command_string
+            ]))
         if existed is False:
             shutil.chown(file, "root", "wheel")
             os.chmod(file, 0o755)  # nosec: executable script
@@ -1642,33 +1586,21 @@ class JailGenerator(JailResource):
         return f"{self.jail.launch_script_dir}/{hook_name}.sh"
 
     def _start_vimage_network(self) -> typing.Tuple[
-        'iocage.lib.Network.PrestartCommandList',
-        'iocage.lib.Network.JailCommandList',
-        'iocage.lib.Network.PoststartCommandList'
+        'iocage.lib.Network.StartedCommandList',
+        'iocage.lib.Network.JailCommandList'
     ]:
         self.logger.debug("Starting VNET/VIMAGE", jail=self)
 
-        prestart: typing.List[str] = []
+        started: typing.List[str] = []
         start: typing.List[str] = []
-        poststart: typing.List[str] = []
 
         for network in self.networks:
-            _vnet_nic_name = f"{network.temporary_nic_prefix}:j"
-            _pre, _start, _post = network.setup()
+            _started, _start = network.setup()
 
-            # ToDo: would be great to write as config[key] += ["iface1"]
-            vnet_interfaces = self.config["vnet_interfaces"] + [_vnet_nic_name]
-            self.config["vnet_interfaces"] = list(vnet_interfaces)
-
-            prestart += _pre
+            started += _started
             start += _start
-            poststart += _post
 
-        return prestart, start, poststart
-
-    @property
-    def _has_multiple_interfaces(self) -> bool:
-        return (len(self.networks) > 1)
+        return started, start
 
     def _stop_vimage_network(self) -> typing.List[str]:
         commands: typing.List[str] = []
