@@ -491,12 +491,12 @@ class JailGenerator(JailResource):
             self._save_autoconfig()
 
         try:
+            self._prepare_stop()
             if single_command is None:
                 stdout, stderr, returncode = self._launch_persistent_jail(
                     passthru=passthru
                 )
             else:
-                self._prepare_stop()
                 stdout, stderr, returncode = self._launch_single_command_jail(
                     single_command,
                     passthru=passthru
@@ -704,8 +704,8 @@ class JailGenerator(JailResource):
                 logger=self.logger
             )
             share_storage.umount_zfs_shares()
-            zfs_umount_commands = share_storage.read_commands()
-            exec_prestop += zfs_umount_commands
+            exec_stop += share_storage.read_commands("jail")
+            exec_poststop += share_storage.read_commands()
 
         if self.running and (os.path.isfile(self.script_env_path) is False):
             # when a jail was started from other iocage variants
