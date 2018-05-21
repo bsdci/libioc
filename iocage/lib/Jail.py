@@ -1357,7 +1357,7 @@ class JailGenerator(JailResource):
     @property
     def _launch_command(self) -> typing.List[str]:
 
-        command = ["/usr/sbin/jail", "-c", "-v"]
+        command = ["/usr/sbin/jail", "-c"]
 
         if self.config["vnet"]:
             command.append("vnet")
