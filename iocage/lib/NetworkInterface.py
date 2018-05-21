@@ -280,18 +280,6 @@ class QueuingNetworkInterface(
                 # export the ifconfig output
                 f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
-
-            if self.jail is None:
-                self.append_command_queue(
-                    # persist env immediately
-                    (
-                        "echo \"export IOCAGE_JID=$IOCAGE_JID\" > "
-                        "\"$(dirname $0)/.env\""
-                    ), (
-                        "env | grep ^IOCAGE_NIC | sed 's/^/export /' >> "
-                        "\"$(dirname $0)/.env\""
-                    )
-                )
         else:
             self.append_command_queue(_command)
 
