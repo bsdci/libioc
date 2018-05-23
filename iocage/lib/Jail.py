@@ -1458,6 +1458,7 @@ class JailGenerator(JailResource):
                         stdout=slave_pts
                     )
                     stdout = os.read(master_pts, 10240).decode("UTF-8")
+                    os.fsync(delegate_pts)
                 finally:
                     os.close(master_pts)
                     os.close(slave_pts)
