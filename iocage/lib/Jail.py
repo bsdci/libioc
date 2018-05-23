@@ -503,6 +503,7 @@ class JailGenerator(JailResource):
                     single_command,
                     passthru=passthru
                 )
+            self.logger.spam(stdout)
         except iocage.lib.errors.IocageException as e:
             yield jailLaunchEvent.fail(e)
             raise e
