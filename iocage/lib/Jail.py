@@ -1463,7 +1463,6 @@ class JailGenerator(JailResource):
                 output = (stdout, None, output[2],)
                 return output
         except (KeyboardInterrupt, SystemExit):
-            list(self.stop(force=True))
             raise iocage.lib.errors.JailExecutionAborted(
                 jail=self,
                 logger=None
