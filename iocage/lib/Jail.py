@@ -24,6 +24,7 @@
 """iocage Jail module."""
 import typing
 import os
+import pty
 import random
 import subprocess  # nosec: B404
 import shlex
@@ -1441,13 +1442,25 @@ class JailGenerator(JailResource):
                     env=self.env
                 )
             else:
-                o: iocage.lib.helpers.CommandOutput = iocage.lib.helpers.exec(
-                    command,
-                    logger=self.logger,
-                    ignore_error=True,
-                    env=self.env
-                )
-                return o
+                master_pts, slave_pts = pty.openpty()
+                output: iocage.lib.helpers.CommandOutput
+                try:
+                    output = iocage.lib.helpers.exec(
+                        command,
+                        logger=self.logger,
+                        ignore_error=True,
+                        env=self.env,
+                        close_fds=True,
+                        stdin=slave_pts,
+                        stderr=slave_pts,
+                        stdout=slave_pts
+                    )
+                    stdout = os.read(master_pts, 10240).decode("UTF-8")
+                finally:
+                    os.close(master_pts)
+                    os.close(slave_pts)
+                output = (stdout, None, output[2],)
+                return output
         except (KeyboardInterrupt, SystemExit):
             list(self.stop(force=True))
             raise iocage.lib.errors.JailExecutionAborted(
