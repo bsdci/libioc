@@ -330,6 +330,7 @@ class Updater:
         executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self.release)
         yield executeReleaseUpdateEvent.begin()
 
+        skipped = False
         try:
             self._create_jail_update_dir()
             for event in iocage.lib.Jail.JailGenerator.fork_exec(
@@ -337,6 +338,10 @@ class Updater:
                 self._wrap_command(" ".join(self._update_command)),
                 passthru=False
             ):
+                if isinstance(event, iocage.lib.events.JailLaunch) is True:
+                    if event.done is True:
+                        _skipped_text = "No updates are available to install."
+                        skipped = (_skipped_text in event.stdout)
                 yield event
             self.logger.debug(
                 f"Update of release '{self.release.name}' finished"
@@ -364,7 +369,10 @@ class Updater:
                 ):
                     yield event
 
-        yield executeReleaseUpdateEvent.end()
+        if skipped is True:
+            yield executeReleaseUpdateEvent.skip()
+        else:
+            yield executeReleaseUpdateEvent.end()
 
         self.logger.verbose(f"Release '{self.release.name}' updated")
         yield True  # ToDo: yield False if nothing was updated
