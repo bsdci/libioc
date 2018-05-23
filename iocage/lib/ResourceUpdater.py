@@ -488,6 +488,7 @@ class FreeBSD(Updater):
         _command = "\n".join([
             "set +e",
             f"OUTPUT=\"$({command})\"",
+            "echo $OUTPUT",
             "RC=$?",
             "if [ $RC -gt 0 ]; then",
             (
