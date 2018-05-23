@@ -1435,7 +1435,6 @@ class JailGenerator(JailResource):
         command: typing.List[str],
         passthru: bool
     ) -> iocage.lib.helpers.CommandOutput:
-
         try:
             if passthru is True:
                 return iocage.lib.helpers.exec_passthru(
