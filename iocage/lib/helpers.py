@@ -533,7 +533,6 @@ def exec_passthru(
                 print(line)
                 sys.stdout.flush()
     except StopIteration as return_statement:
-
         output: CommandOutput
         output = return_statement.value
         return output
