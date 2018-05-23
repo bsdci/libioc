@@ -275,13 +275,20 @@ class JailEvent(IocageEvent):
 class JailLaunch(JailEvent):
     """Launch a jail."""
 
+    stdout: typing.Optional[str]
+
     def __init__(  # noqa: T484
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
         **kwargs
     ) -> None:
-
+        self.stdout = None
         JailEvent.__init__(self, jail, **kwargs)
+
+    def end(self, stdout, **kwargs) -> 'IocageEvent':  # noqa: T484
+        """Successfully finish an event."""
+        self.stdout = stdout
+        return IocageEvent.end(self, **kwargs)
 
 
 class JailRename(JailEvent):

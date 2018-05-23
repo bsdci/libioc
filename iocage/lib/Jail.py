@@ -508,7 +508,7 @@ class JailGenerator(JailResource):
             yield jailLaunchEvent.fail(e)
             raise e
 
-        yield jailLaunchEvent.end()
+        yield jailLaunchEvent.end(stdout=stdout)
 
         self._limit_resources()
         self._configure_nameserver()
@@ -600,7 +600,7 @@ class JailGenerator(JailResource):
                 passthru=passthru
             )
             for event in fork_exec_events:
-                continue
+                yield event
         except iocage.lib.errors.IocageException as e:
             yield jailForkExecEvent.fail(e)
             raise e
