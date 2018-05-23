@@ -1444,7 +1444,7 @@ class JailGenerator(JailResource):
                     env=self.env
                 )
             else:
-                master_pts, slave_pts = pty.openpty()
+                controller_pts, delegate_pts = pty.openpty()
                 output: iocage.lib.helpers.CommandOutput
                 try:
                     output = iocage.lib.helpers.exec(
@@ -1453,15 +1453,15 @@ class JailGenerator(JailResource):
                         ignore_error=True,
                         env=self.env,
                         close_fds=True,
-                        stdin=slave_pts,
-                        stderr=slave_pts,
-                        stdout=slave_pts
+                        stdin=delegate_pts,
+                        stderr=delegate_pts,
+                        stdout=delegate_pts
                     )
-                    stdout = os.read(master_pts, 10240).decode("UTF-8")
                     os.fsync(delegate_pts)
+                    stdout = os.read(controller_pts, 10240).decode("UTF-8")
                 finally:
-                    os.close(master_pts)
-                    os.close(slave_pts)
+                    os.close(controller_pts)
+                    os.close(delegate_pts)
                 output = (stdout, None, output[2],)
                 return output
         except (KeyboardInterrupt, SystemExit):
