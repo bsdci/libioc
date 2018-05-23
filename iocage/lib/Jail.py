@@ -1566,7 +1566,6 @@ class JailGenerator(JailResource):
             command_string = (
                 "IOCAGE_JID="
                 f"$(/usr/sbin/jls -j {shlex.quote(self.identifier)} jid)"
-                "\necho JID JID JID $IOCAGE_JID"
                 "\n" + command_string
             )
         if hook_name == "poststop":
