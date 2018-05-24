@@ -47,6 +47,7 @@ import iocage.lib.ZFSBasejailStorage
 import iocage.lib.ZFSShareStorage
 import iocage.lib.LaunchableResource
 import iocage.lib.VersionedResource
+import iocage.lib.Config.Jail.Properties.ResourceLimit
 import iocage.lib.ResourceSelector
 import iocage.lib.Config.Jail.File.Fstab
 
@@ -1277,6 +1278,8 @@ class JailGenerator(JailResource):
             passthru=False
         )
 
+        self._release_resource_limits()
+
     @property
     def _dhcp_enabled(self) -> bool:
         """Return True if any ip4_addr uses DHCP."""
@@ -1540,12 +1543,12 @@ class JailGenerator(JailResource):
 
             try:
                 ipv4_addresses = self.config["ip4_addr"][nic]
-            except KeyError:
+            except (KeyError, TypeError):
                 ipv4_addresses = []
 
             try:
                 ipv6_addresses = self.config["ip6_addr"][nic]
-            except KeyError:
+            except (KeyError, TypeError):
                 ipv6_addresses = []
 
             net = iocage.lib.Network.Network(
@@ -1633,53 +1636,29 @@ class JailGenerator(JailResource):
             self.logger.verbose("Resource limits disabled")
             return
 
-        for key, limit, action in map(
-            lambda name: (
-                (name, ) + self._get_resource_limit(name)  # noqa: T484
-            ),
-            self._resource_limit_config_keys
-        ):
-
-            if (limit is None) and (action is None):
-                # this resource is not limited (limit disabled)
+        for key in iocage.lib.Config.Jail.Properties.ResourceLimit.properties:
+            try:
+                rlimit_prop = self.config[key]
+            except KeyError:
                 continue
-
             command = [
                 "/usr/bin/rctl",
                 "-a",
-                f"jail:{self.identifier}:{key}:{action}={limit}"
+                f"jail:{self.identifier}:{key}:{rlimit_prop.limit_string}"
             ]
             iocage.lib.helpers.exec(command, logger=self.logger)
 
-    @property
-    def _resource_limit_config_keys(self) -> typing.List[str]:
-        return [
-            "cputime",
-            "datasize",
-            "stacksize",
-            "coredumpsize",
-            "memoryuse",
-            "memorylocked",
-            "maxproc",
-            "openfiles",
-            "vmemoryuse",
-            "pseudoterminals",
-            "swapuse",
-            "nthr",
-            "msgqqueued",
-            "msgqsize",
-            "nmsgq",
-            "nsem",
-            "nsemop",
-            "nshm",
-            "shmsize",
-            "wallclock",
-            "pcpu",
-            "readbps",
-            "writebps",
-            "readiops",
-            "writeiops"
-        ]
+    def _release_resource_limits(self) -> None:
+
+        if self.config['rlimits'] is False:
+            return
+
+        self.logger.verbose("Clearing resource limits")
+        iocage.lib.helpers.exec(
+            ["/usr/bin/rctl", "-r", f"jail:{self.identifier}"],
+            logger=self.logger,
+            ignore_error=True
+        )
 
     @property
     def _allow_mount(self) -> str:
@@ -1692,27 +1671,6 @@ class JailGenerator(JailResource):
         if self.config["jail_zfs"] is True:
             return "1"
         return self._get_value("allow_mount_zfs")
-
-    def _get_resource_limit(
-        self,
-        key: str
-    ) -> typing.Union[typing.Tuple[str, str], typing.Tuple[None, None]]:
-
-        try:
-            if isinstance(self.config[key], str):
-                return self._parse_resource_limit(self.config[key])
-        except KeyError:
-            pass
-
-        return None, None
-
-    def _parse_resource_limit(
-        self,
-        value: str
-    ) -> typing.Tuple[str, str]:
-
-        limit, action = value.split(":", maxsplit=1)
-        return limit, action
 
     def _configure_routes_commands(self) -> typing.List[str]:
 

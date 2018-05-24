@@ -219,6 +219,25 @@ class FstabDestinationExists(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
+# Jail Resource Limits
+
+
+class ResourceLimitSyntax(IocageException):
+    """Raised when a resource limit has invalid syntax."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"The resource limit has invalid syntax"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class ResourceLimitUnknown(IocageException):
+    """Raised when a resource limit has invalid syntax."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"The specified resource limit is unknown"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
 # Security
 
 

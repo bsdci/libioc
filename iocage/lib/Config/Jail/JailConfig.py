@@ -70,10 +70,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
-        BaseConfig.update_special_property(
-            self,
-            name=name
-        )
+        BaseConfig.update_special_property(self, name)
 
         if (name == "ip6_addr") and (self.jail is not None):
             rc_conf = self.jail.rc_conf
@@ -87,6 +84,26 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
             if jail is not None:
                 return str(jail.humanreadable_name)
             raise e
+
+    def __setitem__(  # noqa: T484
+        self,
+        key: str,
+        value: typing.Any,
+        **kwargs
+    ) -> None:
+        """Set a configuration value."""
+        BaseConfig.__setitem__(
+            self,
+            key=key,
+            value=value,
+            **kwargs
+        )
+
+    def _getitem_user(self, key: str) -> typing.Any:
+        return BaseConfig._getitem_user(
+            self,
+            key=key
+        )
 
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""
