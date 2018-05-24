@@ -26,6 +26,7 @@ import typing
 import iocage.lib.Config.Jail.Properties.Addresses
 import iocage.lib.Config.Jail.Properties.Interfaces
 import iocage.lib.Config.Jail.Properties.Resolver
+import iocage.lib.Config.Jail.Properties.ResourceLimit
 
 Property = typing.Union[
     'iocage.lib.Config.Jail.Properties.Addresses.AddressesProp',
@@ -36,12 +37,16 @@ Property = typing.Union[
 
 def _get_class(property_name: str) -> Property:
 
+    ResourceLimit = iocage.lib.Config.Jail.Properties.ResourceLimit
+
     if (property_name == "ip4_addr") or (property_name == "ip6_addr"):
         return iocage.lib.Config.Jail.Properties.Addresses.AddressesProp
     elif property_name == "interfaces":
         return iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp
     elif property_name == "resolver":
         return iocage.lib.Config.Jail.Properties.Resolver.ResolverProp
+    elif property_name in ResourceLimit.properties:
+        return ResourceLimit.ResourceLimitProp
 
     raise ValueError("A special property class with this name was not found")
 

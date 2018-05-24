@@ -67,8 +67,8 @@ class BaseConfig(dict):
 
     """
 
-    special_properties: 'iocage.lib.Config.Jail.Properties.Properties'
     data: typing.Dict[str, typing.Any]
+    special_properties: 'iocage.lib.Config.Jail.Properties.Properties'
 
     def __init__(
         self,
@@ -134,22 +134,6 @@ class BaseConfig(dict):
                 del data["uuid"]
 
         self.clone(data)
-
-    def update_special_property(self, name: str) -> bool:
-        """Triggered when a special property was updated."""
-        try:
-            self.data[name] = str(self.special_properties[name])
-            return True
-        except KeyError:
-            return False
-
-    def attach_special_property(
-        self,
-        name: str,
-        special_property: 'iocage.lib.Config.Jail.Properties.Property'
-    ) -> None:
-        """Attach a special property to the configuration."""
-        self.special_properties[name] = special_property
 
     def _set_legacy(  # noqa: T484
         self,
@@ -499,13 +483,14 @@ class BaseConfig(dict):
         except AttributeError:
             return False
 
-    def __getitem_user(self, key: str) -> typing.Any:
+    def _getitem_user(self, key: str) -> typing.Any:
         try:
             # passthrough existing properties
             return self.__getattribute__(key)
         except AttributeError:
             pass
 
+        # special property
         is_special_property = self.special_properties.is_special_property(key)
         is_existing = key in self.data.keys()
         if (is_special_property and is_existing) is True:
@@ -536,7 +521,7 @@ class BaseConfig(dict):
         A KeyError is raised when no criteria applies.
         """
         try:
-            return self.__getitem_user(key)
+            return self._getitem_user(key)
         except KeyError:
             pass
 
@@ -553,14 +538,13 @@ class BaseConfig(dict):
         **kwargs
     ) -> None:
         """Set a configuration value."""
-        parsed_value = iocage.lib.helpers.parse_user_input(value)
-
         if self.special_properties.is_special_property(key):
             special_property = self.special_properties.get_or_create(key)
             special_property.set(value)
             self.update_special_property(key)
             return
 
+        parsed_value = iocage.lib.helpers.parse_user_input(value)
         setter_method_name = f"_set_{key}"
         if setter_method_name in object.__dir__(self):
             setter_method = self.__getattribute__(setter_method_name)
@@ -568,6 +552,18 @@ class BaseConfig(dict):
             return
 
         self.data[key] = parsed_value
+
+    def update_special_property(self, name: str) -> None:
+        """Triggered when a special property was updated."""
+        self.data[name] = str(self.special_properties[name])
+
+    def attach_special_property(
+        self,
+        name: str,
+        special_property: 'iocage.lib.Config.Jail.Properties.Property'
+    ) -> None:
+        """Attach a special property to the configuration."""
+        self.special_properties[name] = special_property
 
     def set(  # noqa: T484
         self,
@@ -596,7 +592,7 @@ class BaseConfig(dict):
         existed_before = key in self.user_data
 
         try:
-            hash_before = str(self.__getitem_user(key)).__hash__()
+            hash_before = str(self._getitem_user(key)).__hash__()
         except Exception:
             hash_before = None
 
@@ -605,7 +601,7 @@ class BaseConfig(dict):
         exists_after = key in self.user_data
 
         try:
-            hash_after = str(self.__getitem_user(key)).__hash__()
+            hash_after = str(self._getitem_user(key)).__hash__()
         except Exception:
             hash_after = None
 
