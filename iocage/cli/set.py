@@ -73,7 +73,10 @@ def cli(
 
     for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
 
-        updated_properties = _set_properties(props, ioc_jail)
+        try:
+            updated_properties = _set_properties(props, ioc_jail)
+        except iocage.lib.errors.IocageException:
+            exit(1)
 
         if len(updated_properties) == 0:
             logger.screen(f"Jail '{ioc_jail.humanreadable_name}' unchanged")
