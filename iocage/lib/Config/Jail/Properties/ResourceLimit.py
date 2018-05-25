@@ -119,10 +119,10 @@ class ResourceLimitProp(ResourceLimitValue):
 
     def __init__(
         self,
+        property_name: str,
         config: typing.Optional[
             'iocage.lib.Config.Jail.BaseConfig.BaseConfig'
         ]=None,
-        property_name: str="ip4_address",
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         skip_on_error: bool=False
     ) -> None:
