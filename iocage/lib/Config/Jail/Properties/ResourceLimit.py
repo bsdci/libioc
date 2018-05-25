@@ -55,40 +55,37 @@ properties: typing.List[str] = [
 
 
 class ResourceLimitValue:
+    """Model of a resource limits value."""
 
-    amount: str
-    action: str
-    per: str
+    amount: typing.Optional[str]
+    action: typing.Optional[str]
+    per: typing.Optional[str]
 
-    def __init__(self, data: str) -> None:
-        amount, action, per = self._parse_resource_limit(data)
-        self.amount = amount
-        self.action = action
-        self.per = per
+    def __init__(self) -> None:
+        self.amount = None
+        self.action = None
+        self.per = None
 
     def _parse_resource_limit(
         self,
         value: str
     ) -> typing.Tuple[str, str, str]:
 
-        try:
-            if ("=" not in value) and (":" not in value):
-                # simplified syntax vmemoryuse=128M
-                amount = value
-                action = "deny"
-                per = "jail"
-            elif "=" in value:
-                # rctl syntax
-                action, _rest = value.split("=", maxsplit=1)
-                amount, per = _rest.split("/", maxsplit=1)
-            elif ":" in value:
-                # iocage legacy syntax
-                amount, action = value.split(":", maxsplit=1)
-                per = "jail"
-            else:
-                raise ValueError("invalid syntax")
-        except ValueError:
-            raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
+        if ("=" not in value) and (":" not in value):
+            # simplified syntax vmemoryuse=128M
+            amount = value
+            action = "deny"
+            per = "jail"
+        elif "=" in value:
+            # rctl syntax
+            action, _rest = value.split("=", maxsplit=1)
+            amount, per = _rest.split("/", maxsplit=1)
+        elif ":" in value:
+            # iocage legacy syntax
+            amount, action = value.split(":", maxsplit=1)
+            per = "jail"
+        else:
+            raise ValueError("invalid syntax")
 
         return amount, action, per
 
@@ -105,6 +102,7 @@ class ResourceLimitValue:
 
     @property
     def limit_string(self) -> str:
+        """Return the limit string in rctl syntax."""
         return f"{self.action}={self.amount}/{self.per}"
 
 
@@ -115,10 +113,6 @@ _ResourceLimitInputType = typing.Optional[
 
 class ResourceLimitProp(ResourceLimitValue):
     """Special jail config property for resource limits."""
-
-    amount: typing.Optional[str]
-    action: typing.Optional[str]
-    per: typing.Optional[str]
 
     def __init__(
         self,
@@ -137,23 +131,37 @@ class ResourceLimitProp(ResourceLimitValue):
         if property_name not in properties:
             raise iocage.lib.errors.ResourceLimitUnknown(logger=self.logger)
 
-        self.__update_from_config()
+        try:
+            self.__update_from_config()
+        except ValueError:
+            raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
+
+        ResourceLimitValue.__init__(self)
 
     def __update_from_config(self) -> None:
-        if self.property_name not in self.config.data.keys():
-            self.amount = None
-            self.action = None
-            self.per = None
+        name = self.property_name
+        if (self.config is None) or (name not in self.config.data.keys()):
+            self.set(None)
         else:
-            ResourceLimitValue.__init__(self.config.data[self.property_name])
+            self.set(
+                self.config.data[self.property_name]
+            )
 
     def set(self, data: _ResourceLimitInputType) -> None:
+        """
+        Set the resource limit value.
+
+        Setting it to None will remove it from the configuration.
+        """
         if data is None:
-            self.config.data.__delitem__(self.property_name),
+            name = self.property_name
+            config = self.config
+            if (config is not None) and (name in config.data.keys()):
+                config.data.__delitem__(name)
             amount = None
             action = None
             per = None
-        if isinstance(data, str):
+        elif isinstance(data, str):
             amount, action, per = self._parse_resource_limit(data)
         elif isinstance(data, ResourceLimitValue):
             amount = data.amount
@@ -165,7 +173,8 @@ class ResourceLimitProp(ResourceLimitValue):
         self.amount = amount
         self.action = action
         self.per = per
-        self.__notify()
 
     def __notify(self) -> None:
+        if self.config is None:
+            return
         self.config.update_special_property(self.property_name)
