@@ -87,6 +87,9 @@ class ResourceLimitValue:
         else:
             raise ValueError("invalid syntax")
 
+        if (amount == "") or (action == "") or (per == ""):
+            raise ValueError("value may not be empty")
+
         return amount, action, per
 
     def __str__(self) -> str:
@@ -137,6 +140,15 @@ class ResourceLimitProp(ResourceLimitValue):
             raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
 
         ResourceLimitValue.__init__(self)
+
+    def _parse_resource_limit(
+        self,
+        value: str
+    ) -> typing.Tuple[str, str, str]:
+        try:
+            return ResourceLimitValue._parse_resource_limit(self, value=value)
+        except ValueError:
+            raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
 
     def __update_from_config(self) -> None:
         name = self.property_name

@@ -222,7 +222,7 @@ class FstabDestinationExists(IocageException):
 # Jail Resource Limits
 
 
-class ResourceLimitSyntax(IocageException):
+class ResourceLimitSyntax(IocageException, ValueError):
     """Raised when a resource limit has invalid syntax."""
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: T484
@@ -230,7 +230,7 @@ class ResourceLimitSyntax(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
-class ResourceLimitUnknown(IocageException):
+class ResourceLimitUnknown(IocageException, KeyError):
     """Raised when a resource limit has is unknown."""
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: T484
@@ -286,6 +286,14 @@ class JailConfigError(IocageException):
     """Raised when a general configuration error occurs."""
 
     pass
+
+
+class JailConfigValueError(JailConfigError, ValueError):
+    """Raised when a jail config value is invalid."""
+
+    def __init__(self, key: str, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"Invalid config value for '{key}'"
+        super().__init__(msg, *args, **kwargs)
 
 
 class InvalidJailName(JailConfigError):
