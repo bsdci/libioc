@@ -231,7 +231,7 @@ class ResourceLimitSyntax(IocageException):
 
 
 class ResourceLimitUnknown(IocageException):
-    """Raised when a resource limit has invalid syntax."""
+    """Raised when a resource limit has is unknown."""
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: T484
         msg = f"The specified resource limit is unknown"
