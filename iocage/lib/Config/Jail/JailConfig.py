@@ -85,18 +85,18 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
                 return str(jail.humanreadable_name)
             raise e
 
-    def __setitem__(  # noqa: T484
+    def __setitem__(
         self,
         key: str,
         value: typing.Any,
-        **kwargs
+        skip_on_error: bool=False
     ) -> None:
         """Set a configuration value."""
         BaseConfig.__setitem__(
             self,
             key=key,
             value=value,
-            **kwargs
+            skip_on_error=skip_on_error
         )
 
     def _getitem_user(self, key: str) -> typing.Any:

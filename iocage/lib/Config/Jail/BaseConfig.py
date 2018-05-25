@@ -114,9 +114,13 @@ class BaseConfig(dict):
             if (key in ["id", "name", "uuid"]) and (current_id is not None):
                 value = current_id
 
-            self.__setitem__(key, value, skip_on_error=skip_on_error)
+            self.__setitem__(  # noqa: T484
+                key,
+                value,
+                skip_on_error=skip_on_error
+            )
 
-    def read(self, data: dict) -> None:
+    def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
         Read the input data.
 
@@ -133,7 +137,7 @@ class BaseConfig(dict):
             if "uuid" in data_keys:
                 del data["uuid"]
 
-        self.clone(data)
+        self.clone(data, skip_on_error=skip_on_error)
 
     def _set_legacy(  # noqa: T484
         self,
@@ -531,27 +535,39 @@ class BaseConfig(dict):
         """Delete a setting from the configuration."""
         del self.data[key]
 
-    def __setitem__(  # noqa: T484
+    def __setitem__(  # noqa: T400
         self,
         key: str,
         value: typing.Any,
-        **kwargs
+        skip_on_error: bool=False
     ) -> None:
         """Set a configuration value."""
-        if self.special_properties.is_special_property(key):
-            special_property = self.special_properties.get_or_create(key)
-            special_property.set(value)
-            self.update_special_property(key)
-            return
+        try:
+            if self.special_properties.is_special_property(key):
+                special_property = self.special_properties.get_or_create(key)
+                special_property.set(value)
+                self.update_special_property(key)
+                return
 
-        parsed_value = iocage.lib.helpers.parse_user_input(value)
-        setter_method_name = f"_set_{key}"
-        if setter_method_name in object.__dir__(self):
-            setter_method = self.__getattribute__(setter_method_name)
-            setter_method(parsed_value, **kwargs)
-            return
+            parsed_value = iocage.lib.helpers.parse_user_input(value)
+            setter_method_name = f"_set_{key}"
+            if setter_method_name in object.__dir__(self):
+                setter_method = self.__getattribute__(setter_method_name)
+                setter_method(
+                    parsed_value,
+                    skip_on_error=skip_on_error
+                )
+                return
 
-        self.data[key] = parsed_value
+            self.data[key] = parsed_value
+        except ValueError:
+            error = iocage.lib.errors.JailConfigValueError(
+                key=key,
+                logger=self.logger,
+                level=("warn" if (skip_on_error is True) else "error")
+            )
+            if skip_on_error is False:
+                raise error
 
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
@@ -569,18 +585,21 @@ class BaseConfig(dict):
         self,
         key: str,
         value: typing.Any,
-        **kwargs
+        skip_on_error: bool=False
     ) -> bool:
         """
         Set a JailConfig property.
 
         Args:
-            key:
+
+            key (str):
                 The jail config property name
+
             value:
                 Value to set the property to
-            **kwargs:
-                Arguments from **kwargs are passed to setter functions
+
+            skip_on_error (bool):
+                This argument is passed through to __setitem__
 
         Returns:
             bool: True if the JailConfig was changed
@@ -596,7 +615,7 @@ class BaseConfig(dict):
         except Exception:
             hash_before = None
 
-        self.__setitem__(key, value, **kwargs)
+        self.__setitem__(key, value, skip_on_error=skip_on_error)  # noqa: T484
 
         exists_after = key in self.user_data
 

@@ -326,7 +326,7 @@ class JailGenerator(JailResource):
         )
 
         if new is False:
-            self.config.read(data=self.read_config())
+            self.config.read(data=self.read_config(), skip_on_error=True)
             if self.config["id"] is None:
                 self.config["id"] = self.dataset_name.split("/").pop()
 
