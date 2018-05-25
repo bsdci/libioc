@@ -107,7 +107,7 @@ def cli(
 
         old_mountpoint = item.dataset.mountpoint
 
-        if (force and item.running) is True:
+        if (not release and force and item.running) is True:
             ctx.parent.print_events(item.stop(force=True))
             item.state.query()
 
