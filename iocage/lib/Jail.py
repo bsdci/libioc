@@ -987,7 +987,7 @@ class JailGenerator(JailResource):
         When no new_path_prefix is provided, the jail's root dataset is used.
         """
         if new_path_prefix is None:
-            _new_path_prefix = self.root_dataset.mountpoint
+            _new_path_prefix = self.dataset.mountpoint
         else:
             _new_path_prefix = new_path_prefix
 
