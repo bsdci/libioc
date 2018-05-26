@@ -49,15 +49,15 @@ class IocageEvent:
     identifier: typing.Optional[str]
     _started_at: float
     _stopped_at: float
-    _pending: bool = False
-    skipped: bool = False
-    done: bool = True
-    reverted: bool = False
-    error: typing.Optional[typing.Union[bool, BaseException]] = None
+    _pending: bool
+    skipped: bool
+    done: bool
+    reverted: bool
+    error: typing.Optional[typing.Union[bool, BaseException]]
     _rollback_steps: typing.List[typing.Callable[[], typing.Optional[
         typing.Generator['IocageEvent', None, None]
-    ]]] = []
-    _child_events: typing.List['IocageEvent'] = []
+    ]]]
+    _child_events: typing.List['IocageEvent']
 
     def __init__(  # noqa: T484
         self,
@@ -68,6 +68,14 @@ class IocageEvent:
         for event in IocageEvent.HISTORY:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
+
+        self._pending = False
+        self.skipped = False
+        self.done = True
+        self.reverted = False
+        self.error = None
+        self._rollback_steps = []
+        self._child_events = []
 
         self.data = kwargs
         self._rollback_steps = []
