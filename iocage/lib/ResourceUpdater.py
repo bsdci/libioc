@@ -285,10 +285,10 @@ class Updater:
             f"{dataset.name}@pre-update"
         )
 
-        runReleaseUpdateEvent = iocage.lib.events.RunReleaseUpdate(
-            self.release
+        runResourceUpdateEvent = iocage.lib.events.RunResourceUpdate(
+            self.resource
         )
-        yield runReleaseUpdateEvent.begin()
+        yield runResourceUpdateEvent.begin()
 
         # create snapshot before the changes
         dataset.snapshot(name=snapshot_name, recursive=True)
@@ -299,7 +299,7 @@ class Updater:
             snapshot.rollback(force=True)
             snapshot.delete()
 
-        runReleaseUpdateEvent.add_rollback_step(_rollback_snapshot)
+        runResourceUpdateEvent.add_rollback_step(_rollback_snapshot)
 
         jail = self.temporary_jail
         changed: bool = False
@@ -309,13 +309,13 @@ class Updater:
                 if isinstance(event, iocage.lib.events.IocageEvent):
                     yield event
                 else:
-                    changed = event
+                    changed = (event is True)
         except Exception as e:
-            yield runReleaseUpdateEvent.fail(e)
+            yield runResourceUpdateEvent.fail(e)
             raise
 
         _rollback_snapshot()
-        yield runReleaseUpdateEvent.end()
+        yield runResourceUpdateEvent.end()
         yield changed
 
     def _update_jail(
@@ -327,8 +327,10 @@ class Updater:
     ], None, None]:
 
         events = iocage.lib.events
-        executeReleaseUpdateEvent = events.ExecuteReleaseUpdate(self.release)
-        yield executeReleaseUpdateEvent.begin()
+        executeResourceUpdateEvent = events.ExecuteResourceUpdate(
+            self.resource
+        )
+        yield executeResourceUpdateEvent.begin()
 
         skipped = False
         try:
@@ -344,7 +346,7 @@ class Updater:
                         skipped = (_skipped_text in event.stdout)
                 yield event
             self.logger.debug(
-                f"Update of release '{self.release.name}' finished"
+                f"Update of resource '{self.resource.name}' finished"
             )
         except Exception as e:
             err = iocage.lib.errors.UpdateFailure(
@@ -354,7 +356,7 @@ class Updater:
                 ),
                 logger=self.logger
             )
-            yield executeReleaseUpdateEvent.fail(err)
+            yield executeResourceUpdateEvent.fail(err)
             raise e
         finally:
             jail.state.query()
@@ -370,11 +372,11 @@ class Updater:
                     yield event
 
         if skipped is True:
-            yield executeReleaseUpdateEvent.skip()
+            yield executeResourceUpdateEvent.skip()
         else:
-            yield executeReleaseUpdateEvent.end()
+            yield executeResourceUpdateEvent.end()
 
-        self.logger.verbose(f"Release '{self.release.name}' updated")
+        self.logger.verbose(f"Resource '{self.resource.name}' updated")
         yield True  # ToDo: yield False if nothing was updated
 
 

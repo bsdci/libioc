@@ -378,6 +378,18 @@ class ReleaseEvent(IocageEvent):
         IocageEvent.__init__(self, release=release, **kwargs)
 
 
+class ReleaseUpdate(ReleaseEvent):
+    """Update a release."""
+
+    def __init__(  # noqa: T484
+        self,
+        release: 'iocage.lib.Release.ReleaseGenerator',
+        **kwargs
+    ) -> None:
+
+        ReleaseEvent.__init__(self, release, **kwargs)
+
+
 class FetchRelease(ReleaseEvent):
     """Fetch release assets."""
 
@@ -450,20 +462,8 @@ class ReleaseConfiguration(FetchRelease):
         FetchRelease.__init__(self, release, **kwargs)
 
 
-class ReleaseUpdate(ReleaseEvent):
-    """Update a release."""
-
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        ReleaseEvent.__init__(self, release, **kwargs)
-
-
 class ReleaseUpdatePull(ReleaseUpdate):
-    """Pull release updater and patches from the remote."""
+    """Pull resource updater and patches from the remote."""
 
     def __init__(  # noqa: T484
         self,
@@ -475,7 +475,7 @@ class ReleaseUpdatePull(ReleaseUpdate):
 
 
 class ReleaseUpdateDownload(ReleaseUpdate):
-    """Download release updates/patches."""
+    """Download resource updates/patches."""
 
     def __init__(  # noqa: T484
         self,
@@ -486,28 +486,56 @@ class ReleaseUpdateDownload(ReleaseUpdate):
         ReleaseUpdate.__init__(self, release, **kwargs)
 
 
-class RunReleaseUpdate(ReleaseUpdate):
-    """Run the update of a release."""
+# Resource
+
+
+class ResourceEvent(IocageEvent):
+    """Event with a resource."""
 
     def __init__(  # noqa: T484
         self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
+        resource: 'iocage.lib.Resource.ResourceGenerator',
         **kwargs
     ) -> None:
 
-        ReleaseUpdate.__init__(self, release, **kwargs)
+        self.identifier = resource.full_name
+        IocageEvent.__init__(self, **kwargs)
 
 
-class ExecuteReleaseUpdate(ReleaseUpdate):
+class ResourceUpdate(ResourceEvent):
+    """Update a resource."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.ResourceGenerator',
+        **kwargs
+    ) -> None:
+
+        ResourceEvent.__init__(self, resource, **kwargs)
+
+
+class RunResourceUpdate(ResourceUpdate):
+    """Run the update of a resource."""
+
+    def __init__(  # noqa: T484
+        self,
+        resource: 'iocage.lib.Resource.ResourceGenerator',
+        **kwargs
+    ) -> None:
+
+        ResourceUpdate.__init__(self, resource, **kwargs)
+
+
+class ExecuteResourceUpdate(ResourceUpdate):
     """Execute the updater script in a jail."""
 
     def __init__(  # noqa: T484
         self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
+        resource: 'iocage.lib.Resource.ResourceGenerator',
         **kwargs
     ) -> None:
 
-        ReleaseUpdate.__init__(self, release, **kwargs)
+        ResourceUpdate.__init__(self, resource, **kwargs)
 
 
 # ZFS
