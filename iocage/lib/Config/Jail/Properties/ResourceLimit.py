@@ -134,10 +134,7 @@ class ResourceLimitProp(ResourceLimitValue):
         if property_name not in properties:
             raise iocage.lib.errors.ResourceLimitUnknown(logger=self.logger)
 
-        try:
-            self.__update_from_config()
-        except ValueError:
-            raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
+        self.__update_from_config()
 
         ResourceLimitValue.__init__(self)
 
@@ -145,10 +142,7 @@ class ResourceLimitProp(ResourceLimitValue):
         self,
         value: str
     ) -> typing.Tuple[str, str, str]:
-        try:
-            return ResourceLimitValue._parse_resource_limit(self, value=value)
-        except ValueError:
-            raise iocage.lib.errors.ResourceLimitSyntax(logger=self.logger)
+        return ResourceLimitValue._parse_resource_limit(self, value=value)
 
     def __update_from_config(self) -> None:
         name = self.property_name

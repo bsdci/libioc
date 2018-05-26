@@ -219,25 +219,6 @@ class FstabDestinationExists(IocageException):
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
-# Jail Resource Limits
-
-
-class ResourceLimitSyntax(IocageException, ValueError):
-    """Raised when a resource limit has invalid syntax."""
-
-    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"The resource limit has invalid syntax"
-        IocageException.__init__(self, msg, *args, **kwargs)
-
-
-class ResourceLimitUnknown(IocageException, KeyError):
-    """Raised when a resource limit has is unknown."""
-
-    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"The specified resource limit is unknown"
-        IocageException.__init__(self, msg, *args, **kwargs)
-
-
 # Security
 
 
@@ -288,14 +269,6 @@ class JailConfigError(IocageException):
     pass
 
 
-class JailConfigValueError(JailConfigError, ValueError):
-    """Raised when a jail config value is invalid."""
-
-    def __init__(self, key: str, *args, **kwargs) -> None:  # noqa: T484
-        msg = f"Invalid config value for '{key}'"
-        super().__init__(msg, *args, **kwargs)
-
-
 class InvalidJailName(JailConfigError):
     """Raised when a jail has an invalid name."""
 
@@ -318,7 +291,7 @@ class JailConigZFSIsNotAllowed(JailConfigError):
         super().__init__(msg, *args, **kwargs)
 
 
-class InvalidJailConfigValue(JailConfigError):
+class InvalidJailConfigValue(JailConfigError, ValueError):
     """Raised when a jail configuration value is invalid."""
 
     def __init__(  # noqa: T484
@@ -358,6 +331,14 @@ class InvalidMacAddress(IocageException, ValueError):
             message=reason,
             **kwargs
         )
+
+
+class ResourceLimitUnknown(IocageException, KeyError):
+    """Raised when a resource limit has is unknown."""
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"The specified resource limit is unknown"
+        IocageException.__init__(self, msg, *args, **kwargs)
 
 
 class JailConfigNotFound(IocageException):
