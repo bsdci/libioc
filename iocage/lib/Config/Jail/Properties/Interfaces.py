@@ -64,6 +64,10 @@ class InterfaceProp(dict):
             return
 
         nic_pairs = data.replace(",", " ").split(" ")
+
+        if not all([(":" in nic_pair) for nic_pair in nic_pairs]):
+            raise ValueError("Invalid NIC pair (should be <nic>:<bridge>)")
+
         for nic_pair in nic_pairs:
             jail_if, bridge_if = nic_pair.split(":", maxsplit=1)
             self.add(jail_if, bridge_if, notify=False)
