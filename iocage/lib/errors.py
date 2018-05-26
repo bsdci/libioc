@@ -312,7 +312,7 @@ class JailConigZFSIsNotAllowed(JailConfigError):
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: T484
         msg = (
-            "jail_zfs is disabled"
+            "jail_zfs is disabled "
             "despite jail_zfs_dataset is configured"
         )
         super().__init__(msg, *args, **kwargs)
