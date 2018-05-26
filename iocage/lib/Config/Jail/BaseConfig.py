@@ -560,8 +560,9 @@ class BaseConfig(dict):
                 return
 
             self.data[key] = parsed_value
-        except ValueError:
+        except ValueError as err:
             error = iocage.lib.errors.InvalidJailConfigValue(
+                reason=str(err),
                 property_name=key,
                 logger=self.logger,
                 level=("warn" if (skip_on_error is True) else "error")
