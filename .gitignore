@@ -118,3 +118,4 @@ ENV/
 *.orig
 *.rej
 .pytest_cache/
+.vscode/
