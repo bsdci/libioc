@@ -55,9 +55,17 @@ def cli(
     location to stop_jail.
     """
     logger = ctx.parent.logger
+    stop_args = {
+        "logger": logger,
+        "print_function": ctx.parent.print_events,
+        "force": force
+    }
 
-    if rc is True:
+    if (rc is False) and (len(jails) == 0):
+        logger.error("No jail selector provided")
+        exit(1)
 
+    elif rc is True:
         if len(jails) > 0:
             logger.error("Cannot use --rc and jail selectors simultaniously")
             exit(1)
@@ -67,14 +75,8 @@ def cli(
             print_function=ctx.parent.print_events,
             force=force
         )
-
     else:
-        if not _normal(
-            jails,
-            logger=logger,
-            print_function=ctx.parent.print_events,
-            force=force
-        ):
+        if not _normal(jails, **stop_args):
             exit(1)
 
 
@@ -87,18 +89,17 @@ def _normal(
     ],
     force: bool
 ) -> bool:
-    """Stop a jail regularly."""
+
+    filters += ("template=no,-",)
+
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         filters=filters
     )
 
-    found_jails = False
-
     changed_jails = []
     failed_jails = []
     for jail in jails:
-        found_jails = True
         try:
             print_function(jail.stop(force=force))
         except iocage.lib.errors.IocageException:
@@ -108,19 +109,15 @@ def _normal(
         logger.log(f"{jail.name} stopped")
         changed_jails.append(jail)
 
-    if found_jails is False:
-        logger.error("No jail selector provided")
-        return False
-
     if len(failed_jails) > 0:
-        exit(1)
+        return False
 
     if len(changed_jails) == 0:
         jails_input = " ".join(list(jails))
         logger.error(f"No jails matched your input: {jails_input}")
-        exit(1)
+        return False
 
-    exit(0)
+    return True
 
 
 def _autostop(
@@ -131,7 +128,7 @@ def _autostop(
     ],
     force: bool=True
 ) -> None:
-    """Stop a bunch of autostarted jails."""
+
     filters = ("running=yes", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(
@@ -157,4 +154,3 @@ def _autostop(
 
     if len(failed_jails) > 0:
         exit(1)
-
