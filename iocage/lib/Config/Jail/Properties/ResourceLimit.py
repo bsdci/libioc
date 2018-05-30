@@ -68,21 +68,23 @@ class ResourceLimitValue:
 
     def _parse_resource_limit(
         self,
-        value: str
+        value: typing.Union[str, int]
     ) -> typing.Tuple[str, str, str]:
 
-        if ("=" not in value) and (":" not in value):
+        _value = str(value)
+
+        if ("=" not in _value) and (":" not in _value):
             # simplified syntax vmemoryuse=128M
-            amount = value
+            amount = _value
             action = "deny"
             per = "jail"
-        elif "=" in value:
+        elif "=" in _value:
             # rctl syntax
-            action, _rest = value.split("=", maxsplit=1)
+            action, _rest = _value.split("=", maxsplit=1)
             amount, per = _rest.split("/", maxsplit=1)
-        elif ":" in value:
+        elif ":" in _value:
             # iocage legacy syntax
-            amount, action = value.split(":", maxsplit=1)
+            amount, action = _value.split(":", maxsplit=1)
             per = "jail"
         else:
             raise ValueError("invalid syntax")
@@ -110,7 +112,7 @@ class ResourceLimitValue:
 
 
 _ResourceLimitInputType = typing.Optional[
-    typing.Union[str, ResourceLimitValue]
+    typing.Union[int, str, ResourceLimitValue]
 ]
 
 
@@ -167,7 +169,7 @@ class ResourceLimitProp(ResourceLimitValue):
             amount = None
             action = None
             per = None
-        elif isinstance(data, str):
+        elif isinstance(data, str) or isinstance(data, int):
             amount, action, per = self._parse_resource_limit(data)
         elif isinstance(data, ResourceLimitValue):
             amount = data.amount
