@@ -39,7 +39,11 @@ __rootcmd__ = True
 def cli(ctx, zpool, mountpoint):
     """Call ZFS set to change the property org.freebsd.ioc:active to yes."""
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.get_zfs(logger=logger)
+    zfs = ctx.parent.zfs
+
+    if ctx.parent.user_sources is not None:
+        logger.error("Cannot activate when executed with explicit sources.")
+        exit(1)
 
     iocage_pool = None
 

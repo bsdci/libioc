@@ -74,6 +74,7 @@ class HostGenerator:
     def __init__(
         self,
         defaults: typing.Optional[iocage.lib.Resource.DefaultResource]=None,
+        datasets: typing.Optional[iocage.lib.Datasets.Datasets]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
@@ -81,10 +82,13 @@ class HostGenerator:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
 
-        self.datasets = iocage.lib.Datasets.Datasets(
-            logger=self.logger,
-            zfs=self.zfs
-        )
+        if datasets is not None:
+            self.datasets = datasets
+        else:
+            self.datasets = iocage.lib.Datasets.Datasets(
+                logger=self.logger,
+                zfs=self.zfs
+            )
 
         self.distribution = self._class_distribution(
             host=self,

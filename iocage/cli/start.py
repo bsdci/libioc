@@ -48,6 +48,7 @@ def cli(
     """Start one or many jails."""
     logger = ctx.parent.logger
     start_args = {
+        "host": ctx.parent.host,
         "logger": logger,
         "print_function": ctx.parent.print_events
     }
@@ -67,6 +68,7 @@ def cli(
 
 
 def _autostart(
+    host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -77,6 +79,7 @@ def _autostart(
     filters = ("boot=yes", "running=no", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(
+        host=host,
         logger=logger,
         filters=filters
     )
@@ -105,6 +108,7 @@ def _autostart(
 
 def _normal(
     filters: typing.Tuple[str, ...],
+    host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
