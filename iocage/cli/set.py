@@ -50,7 +50,7 @@ def cli(
     """Set one or many configuration properties of one jail."""
     parent: typing.Any = ctx.parent
     logger: iocage.lib.Logger.Logger = parent.logger
-    host = iocage.lib.Host.HostGenerator(logger=logger)
+    host: iocage.lib.Host.HostGenerator = parent.host
 
     # Defaults
     if jail == "defaults":
