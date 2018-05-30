@@ -32,7 +32,8 @@ echo "create a template"
 $IOC_COMMAND create --basejail --name tpl-web ip4_addr="$JAIL_NIC|$JAIL_IP.2/$JAIL_NET"
 $IOC_COMMAND start tpl-web
 $IOC_COMMAND exec tpl-web env ASSUME_ALWAYS_YES=YES pkg bootstrap
-$IOC_COMMAND exec tpl-web pkg install -y apache24
+$IOC_COMMAND exec tpl-web pkg install -y lighttpd
+$IOC_COMMAND exec tpl-web sysrc enable_lighttpd=YES
 $IOC_COMMAND stop tpl-web
 $IOC_COMMAND set template=yes tpl-web
 
@@ -41,6 +42,7 @@ $IOC_COMMAND create --basejail --name tpl-db --release 10.4-RELEASE ip4_addr="$J
 $IOC_COMMAND start tpl-db
 $IOC_COMMAND exec tpl-db env ASSUME_ALWAYS_YES=YES pkg bootstrap
 $IOC_COMMAND exec tpl-db env pkg install -y mysql57-server
+$IOC_COMMAND exec tpl-db sysrc enable_mysql=YES
 $IOC_COMMAND stop tpl-db
 $IOC_COMMAND set template=yes tpl-db
 
