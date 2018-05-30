@@ -423,6 +423,19 @@ class IocageNotActivated(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class InvalidLogLevel(IocageException):
+    """Raised when the logger was initialized with an invalid log level."""
+
+    def __init__(self, log_level: str, *args, **kwargs) -> None:  # noqa: T484
+        available_log_levels = iocage.lib.Logger.Logger.LOG_LEVELS
+        available_log_levels_string = ", ".join(available_log_levels[:-1])
+        msg = (
+            f"Invalid log-level {log_level}. Choose one of "
+            f"{available_log_levels_string} or {available_log_levels[-1]}"
+        )
+        super().__init__(msg, *args, **kwargs)
+
+
 class MustBeRoot(IocageException):
     """Raised when iocage is executed without root permission."""
 

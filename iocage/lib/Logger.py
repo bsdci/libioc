@@ -147,6 +147,11 @@ class Logger:
     @print_level.setter
     def print_level(self, value: str) -> None:
         """Set a custom print level to override the default."""
+        if value not in Logger.LOG_LEVELS:
+            raise iocage.lib.errors.InvalidLogLevel(
+                log_level=value,
+                logger=self
+            )
         self._print_level = value
 
     def _set_log_directory(self, log_directory: str) -> None:

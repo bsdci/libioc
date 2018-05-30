@@ -33,6 +33,7 @@ import click
 
 from ..lib.Logger import Logger
 from ..lib.events import IocageEvent
+from ..lib.errors import InvalidLogLevel
 
 logger = Logger()
 
@@ -162,5 +163,8 @@ class IOCageCLI(click.MultiCommand):
 @click.pass_context
 def cli(ctx, log_level):
     """A jail manager."""
-    logger.print_level = log_level
+    try:
+        logger.print_level = log_level
+    except InvalidLogLevel:
+        exit(1)
     ctx.logger = logger
