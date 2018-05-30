@@ -71,6 +71,8 @@ def cli(
         exit(1)
 
     ioc_jails = iocage.lib.Jails.JailsGenerator(
+        host=ctx.parent.host,
+        zfs=ctx.parent.zfs,
         logger=logger,
         filters=jails
     )

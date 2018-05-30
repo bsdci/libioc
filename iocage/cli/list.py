@@ -76,8 +76,7 @@ def cli(
 ) -> None:
     """List jails in various formats."""
     logger = ctx.parent.logger
-    zfs = ctx.parent.zfs
-    host = ctx.parent.host
+    host: iocage.lib.Host.HostGenerator = ctx.parent.host
 
     if output is not None and _long is True:
         logger.error("--output and --long can't be used together")
@@ -125,7 +124,7 @@ def cli(
                 resources = resources_class(
                     logger=logger,
                     host=host,
-                    zfs=zfs,
+                    zfs=ctx.parent.zfs,
                     # ToDo: allow quoted whitespaces from user inputs
                     filters=filters
                 )

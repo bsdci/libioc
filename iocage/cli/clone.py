@@ -57,19 +57,20 @@ def cli(
     """Clone and promote jails."""
     print_function = ctx.parent.print_events
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.get_zfs(logger=logger)
 
     ioc_source_jail = iocage.lib.Jail.JailGenerator(
         dict(id=source),
         logger=logger,
-        zfs=zfs
+        zfs=ctx.parent.zfs,
+        host=ctx.parent.host
     )
 
     ioc_destination_jail = iocage.lib.Jail.JailGenerator(
         dict(id=destination),
         new=True,
         logger=logger,
-        zfs=zfs
+        zfs=ctx.parent.zfs,
+        host=ctx.parent.host
     )
 
     try:

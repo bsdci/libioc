@@ -48,8 +48,10 @@ def cli(
         ioc_jail = iocage.lib.Jail.Jail(
             jail,
             logger=logger,
+            zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
         print_function(ioc_jail.rename(name))
     except iocage.lib.errors.IocageException:
         exit(1)
+
