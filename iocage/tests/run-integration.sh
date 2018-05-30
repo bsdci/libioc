@@ -62,7 +62,11 @@ $IOC_COMMAND stop '*'
 echo "cleanup"
 $IOC_COMMAND destroy --force '*01'
 yes | $IOC_COMMAND destroy '*02'
-$IOC_COMMAND destroy --force template=yes
+
+# ToDo: Fix and remove sleep
+sleep 1
+
+$IOC_COMMAND destroy --force --template +
 
 yes | $IOC_COMMAND destroy --release 10.4-RELEASE
 $IOC_COMMAND destroy --force --release 11.1-RELEASE
