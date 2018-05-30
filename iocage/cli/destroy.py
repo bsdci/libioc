@@ -42,8 +42,18 @@ __rootcmd__ = True
 @click.pass_context
 @click.option("--force", "-f", default=False, is_flag=True,
               help="Destroy the jail without warnings or more user input.")
-@click.option("--release", "-r", default=False, is_flag=True,
-              help="Destroy a specified RELEASE dataset.")
+@click.option(
+    "--template", "-t",
+    "dataset_type",
+    flag_value="template",
+    help="List all templates."
+)
+@click.option(
+    "--release", "-r",
+    "dataset_type",
+    flag_value="release",
+    help="Destroy a specified RELEASE dataset."
+)
 @click.option("--recursive", "-R", default=False, is_flag=True,
               help="Bypass the children prompt, best used with --force (-f).")
 @click.option("--download", "-d", default=False, is_flag=True,
@@ -52,11 +62,11 @@ __rootcmd__ = True
 @click.argument("filters", nargs=-1)
 def cli(
     ctx: IocageClickContext,
-    force: bool=False,
-    release: bool=False,
-    recursive: bool=False,
     download: bool=False,
-    filters: typing.Optional[iocage.lib.Filter.Terms]=None
+    force: bool,
+    dataset_type: typing.Optional[str],
+    recursive: bool,
+    filters: typing.Tuple[str, ...]
 ) -> None:
     """
     Destroy a jail, release or template.
@@ -69,6 +79,14 @@ def cli(
     if filters is None or len(filters) == 0:
         logger.error("No filter specified - cannot select a target to delete")
         exit(1)
+
+    if dataset_type is None:
+        filters += ("template=no",)
+        dataset_type = "jail"
+    elif dataset_type == "template":
+        filters += ("template=yes",)
+
+    release = (dataset_type == "release") is True
 
     resources_class: typing.Union[
         typing.Type[iocage.lib.Releases.ReleasesGenerator],
@@ -91,9 +109,8 @@ def cli(
         exit(1)
 
     if not force:
-        target = "releases" if release else "jails"
         message = "\n- ".join(
-            [f"These {target} will be deleted"] +
+            [f"These {dataset_type}s will be deleted"] +
             [r.getstring('full_name') for r in resources]
         ) + "\nAre you sure?"
         click.confirm(message, default=False, abort=True)
