@@ -33,7 +33,7 @@ check:
 	bandit --skip B404 --exclude iocage/tests/ -r .
 test:
 	pytest iocage/tests --zpool $(ZPOOL)
-regressions: install
+regression-test: install
 	iocage/tests/run-integration.sh
 
 help:
