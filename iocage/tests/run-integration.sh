@@ -71,4 +71,5 @@ $IOC_COMMAND destroy --force --template +
 yes | $IOC_COMMAND destroy --release 10.4-RELEASE
 $IOC_COMMAND destroy --force --release 11.1-RELEASE
 
-zfs destroy -r "$IOCAGE_DATASET"
+#sleep 2
+#zfs destroy -r "$IOCAGE_DATASET"
