@@ -2,18 +2,11 @@
 set -e
 set -u
 set -x
-ZPOOL=${ZPOOL:-}
 JAIL_NIC=${JAIL_NIC:-vtnet0}
 JAIL_IP=${JAIL_IP:-172.16.0}
 JAIL_NET=${JAIL_IP:-16}
 
-# can be activated
-ioc activate "$ZPOOL"
-ioc deactivate "$ZPOOL"
-# can be activated with special mount-point
-ioc activate "$ZPOOL"  --mountpoint "/$ZPOOL/iocage-tests"
-mount | grep -q "$ZPOOL/iocage on /$ZPOOL/iocage-tests"
-# fetch default release:
+echo "libiocage regression tests"
 yes "" | ioc fetch
 ioc list --release --no-header --output-format=list | grep -q 11.1-RELEASE
 # fetch older release:
@@ -59,4 +52,3 @@ ioc destroy --force template=yes
 # cleanup
 yes | ioc destroy --release 10.4-RELEASE
 ioc destroy --force --release 11.1-RELEASE
-ioc deactivate "$ZPOOL"
