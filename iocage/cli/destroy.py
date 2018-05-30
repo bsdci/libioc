@@ -56,13 +56,9 @@ __rootcmd__ = True
 )
 @click.option("--recursive", "-R", default=False, is_flag=True,
               help="Bypass the children prompt, best used with --force (-f).")
-@click.option("--download", "-d", default=False, is_flag=True,
-              help="Destroy the download dataset of the specified RELEASE as"
-                   " well.")
 @click.argument("filters", nargs=-1)
 def cli(
     ctx: IocageClickContext,
-    download: bool=False,
     force: bool,
     dataset_type: typing.Optional[str],
     recursive: bool,
