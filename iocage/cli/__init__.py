@@ -163,8 +163,9 @@ class IOCageCLI(click.MultiCommand):
 @click.pass_context
 def cli(ctx, log_level):
     """A jail manager."""
-    try:
-        logger.print_level = log_level
-    except InvalidLogLevel:
-        exit(1)
+    if log_level is not None:
+        try:
+            logger.print_level = log_level
+        except InvalidLogLevel:
+            exit(1)
     ctx.logger = logger
