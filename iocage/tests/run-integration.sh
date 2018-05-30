@@ -7,13 +7,15 @@ JAIL_IP=${JAIL_IP:-172.16.0}
 JAIL_NET=${JAIL_IP:-16}
 
 echo "libiocage regression tests"
+
+echo "fetch default release:"
 yes "" | ioc fetch
 ioc list --release --no-header --output-format=list | grep -q 11.1-RELEASE
-# fetch older release:
+echo "fetch older release"
 ioc fetch --release 10.4-RELEASE
 ioc list --release --no-header --output-format=list | grep -q 10.4-RELEASE
 
-# create a template
+echo "create a template"
 ioc create --basejail --name tpl-web ip4_addr="$JAIL_NIC|$JAIL_IP.2/$JAIL_NET"
 ioc start tpl-web
 ioc exec tpl-web env ASSUME_ALWAYS_YES=YES pkg bootstrap
@@ -21,7 +23,7 @@ ioc exec tpl-web env ASSUME_ALWAYS_YES=YES pkg install -y apache24
 ioc stop tpl-web
 ioc set template=yes tpl-web
 
-# template from 10.4-RELEASE
+echo "template from 10.4-RELEASE"
 ioc create --basejail --name tpl-db --release 10.4-RELEASE ip4_addr="$JAIL_NIC|$JAIL_IP.3/$JAIL_NET"
 ioc start tpl-db
 ioc exec tpl-db env ASSUME_ALWAYS_YES=YES pkg bootstrap
@@ -39,16 +41,15 @@ ioc create --basejail --template tpl-web --name web02 ip4_addr="$JAIL_NIC|$JAIL_
 ioc start 'web0*'
 ioc list --no-header --output-format=list | grep -c web0 | grep -qw 2
 
-# stop all
+echo "stop all"
 ioc stop '*'
 
-# cleanup
+echo "cleanup"
 ioc destroy --force '*01'
 yes | ioc destroy '*02'
 # sleep for (u)mounts to settle:
 sleep 2
 ioc destroy --force template=yes
 
-# cleanup
 yes | ioc destroy --release 10.4-RELEASE
 ioc destroy --force --release 11.1-RELEASE
