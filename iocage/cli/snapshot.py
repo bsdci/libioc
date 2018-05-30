@@ -192,7 +192,7 @@ def cli(
 ) -> None:
     """Take and manage resource snapshots."""
     ctx.logger = ctx.parent.logger
-    ctx.host = iocage.lib.Host.HostGenerator(logger=ctx.logger)
+    ctx.host = ctx.parent.host
 
 
 def _parse_identifier(

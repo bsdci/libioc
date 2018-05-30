@@ -57,15 +57,11 @@ def cli(
         logger.error("No jail selector provided")
         exit(1)
 
-    zfs = iocage.lib.ZFS.ZFS()
-    zfs.logger = logger
-    host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
-
     filters = jails + ("template=no",)
     ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
-        host=host,
-        zfs=zfs,
+        host=ctx.parent.host,
+        zfs=ctx.parent.zfs,
         filters=filters
     )
 

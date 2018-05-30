@@ -45,9 +45,8 @@ def cli(
 ) -> None:
     """Restore a jail from a backup archive."""
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.ZFS()
-    zfs.logger = logger
-    host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
+    zfs: iocage.lib.ZFS.ZFS = ctx.parent.zfs
+    host: iocage.lib.Host.HostGenerator = ctx.parent.host
     print_events = ctx.parent.print_events
 
     ioc_jail = iocage.lib.Jail.JailGenerator(
