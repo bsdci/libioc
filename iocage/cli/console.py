@@ -40,7 +40,11 @@ def cli(ctx, jail, start):
     logger = ctx.parent.logger
 
     try:
-        ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
+        ioc_jail = iocage.lib.Jail.JailGenerator(
+            jail,
+            logger=logger,
+            host=ctx.parent.host
+        )
         ioc_jail.state.query()
     except iocage.lib.errors.JailNotFound:
         exit(1)
