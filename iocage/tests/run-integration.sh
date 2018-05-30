@@ -52,8 +52,6 @@ ioc stop '*'
 echo "cleanup"
 ioc destroy --force '*01'
 yes | ioc destroy '*02'
-# sleep for (u)mounts to settle:
-sleep 2
 ioc destroy --force template=yes
 
 yes | ioc destroy --release 10.4-RELEASE
