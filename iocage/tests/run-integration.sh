@@ -5,8 +5,13 @@ set -x
 JAIL_NIC=${JAIL_NIC:-vtnet0}
 JAIL_IP=${JAIL_IP:-172.16.0}
 JAIL_NET=${JAIL_IP:-16}
+IOCAGE_DATASET=${$IOCAGE_DATASET:-zroot/iocage-regression-test}
+IOCAGE_MOUNTPOINT=${IOCAGE_MOUNTPOINT:-/iocage-regression-test}
 
 echo "libiocage regression tests"
+
+echo "preparing host"
+zfs create -o mountpoint="$IOCAGE_MOUNTPOINT" "$IOCAGE_DATASET"
 
 echo "fetch default release:"
 yes "" | ioc fetch
@@ -53,3 +58,5 @@ ioc destroy --force template=yes
 
 yes | ioc destroy --release 10.4-RELEASE
 ioc destroy --force --release 11.1-RELEASE
+
+zfs destroy -r "$IOCAGE_DATASET"
