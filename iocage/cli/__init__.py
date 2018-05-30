@@ -33,7 +33,10 @@ import click
 
 from ..lib.Logger import Logger
 from ..lib.events import IocageEvent
-from ..lib.errors import InvalidLogLevel
+from ..lib.errors import InvalidLogLevel, IocageNotActivated
+from ..lib.ZFS import get_zfs
+from ..lib.Datasets import Datasets
+from ..lib.Host import HostGenerator
 
 logger = Logger()
 
@@ -63,6 +66,12 @@ except subprocess.CalledProcessError:
         "Try calling 'kldload zfs' as root."
     )
     exit(1)
+
+
+def set_to_dict(data: typing.Set[str]) -> typing.Dict[str, str]:
+    """Convert a set of values to a dictionary."""
+    keys, values = zip(*[x.split("=", maxsplit=1) for x in data])
+    return dict(zip(keys, values))
 
 
 def print_events(
@@ -158,10 +167,11 @@ class IOCageCLI(click.MultiCommand):
 
 
 @click.option("--log-level", "-d", default=None)
+@click.option("--source", multiple=True, type=str)
 @click.command(cls=IOCageCLI)
 @click.version_option(version="0.2.12 09/17/2017", prog_name="ioc")
 @click.pass_context
-def cli(ctx, log_level):
+def cli(ctx, log_level: str, source: set) -> None:
     """A jail manager."""
     if log_level is not None:
         try:
@@ -169,3 +179,25 @@ def cli(ctx, log_level):
         except InvalidLogLevel:
             exit(1)
     ctx.logger = logger
+
+    ctx.zfs = get_zfs(logger=ctx.logger)
+
+    ctx.user_sources = None if (len(source) == 0) else set_to_dict(source)
+
+    if ctx.invoked_subcommand in ["activate", "deactivate"]:
+        return
+
+    try:
+        datasets = Datasets(
+            sources=ctx.user_sources,
+            zfs=ctx.zfs,
+            logger=ctx.logger
+        )
+        ctx.host = HostGenerator(
+            datasets=datasets,
+            logger=ctx.logger,
+            zfs=ctx.zfs
+        )
+    except IocageNotActivated:
+        exit(1)
+

@@ -57,6 +57,7 @@ def cli(
     logger = ctx.parent.logger
     stop_args = {
         "logger": logger,
+        "host": ctx.parent.host,
         "print_function": ctx.parent.print_events,
         "force": force
     }
@@ -71,6 +72,7 @@ def cli(
             exit(1)
 
         _autostop(
+            host=ctx.parent.host,
             logger=logger,
             print_function=ctx.parent.print_events,
             force=force
@@ -82,6 +84,7 @@ def cli(
 
 def _normal(
     filters: typing.Tuple[str, ...],
+    host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -93,6 +96,7 @@ def _normal(
     filters += ("template=no,-",)
 
     jails = iocage.lib.Jails.JailsGenerator(
+        host=host,
         logger=logger,
         filters=filters
     )
@@ -121,6 +125,7 @@ def _normal(
 
 
 def _autostop(
+    host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
         [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
@@ -132,6 +137,7 @@ def _autostop(
     filters = ("running=yes", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(
+        host=host,
         logger=logger,
         filters=filters
     )

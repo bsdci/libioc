@@ -76,12 +76,8 @@ def cli(
 ) -> None:
     """List jails in various formats."""
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.get_zfs(logger=logger)
-
-    try:
-        host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
-    except iocage.lib.errors.IocageNotActivated:
-        exit(1)
+    zfs = ctx.parent.zfs
+    host = ctx.parent.host
 
     if output is not None and _long is True:
         logger.error("--output and --long can't be used together")

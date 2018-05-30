@@ -112,6 +112,9 @@ class Datasets(dict):
 
     def __init__(
         self,
+        sources: typing.Optional[
+            typing.Dict[str, typing.Union[str, libzfs.ZFSDataset]]
+        ]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
@@ -120,6 +123,10 @@ class Datasets(dict):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.main_datasets_name = None
+
+        if sources is not None:
+            self.attach_sources(sources)
+            return
 
         try:
             self._configure_from_rc_conf()
