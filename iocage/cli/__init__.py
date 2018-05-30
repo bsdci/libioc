@@ -166,8 +166,20 @@ class IOCageCLI(click.MultiCommand):
             return
 
 
-@click.option("--log-level", "-d", default=None)
-@click.option("--source", multiple=True, type=str)
+@click.option(
+    "--log-level",
+    "-d",
+    default=None,
+    help=(
+        f"Set the CLI log level {Logger.LOG_LEVELS}"
+    )
+)
+@click.option(
+    "--source",
+    multiple=True,
+    type=str,
+    help="Globally override the activated iocage dataset(s)"
+)
 @click.command(cls=IOCageCLI)
 @click.version_option(version="0.2.12 09/17/2017", prog_name="ioc")
 @click.pass_context
