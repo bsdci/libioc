@@ -8,17 +8,24 @@ JAIL_NET=${JAIL_IP:-16}
 IOCAGE_DATASET=${IOCAGE_DATASET:-zroot/iocage-regression-test}
 IOCAGE_MOUNTPOINT=${IOCAGE_MOUNTPOINT:-/iocage-regression-test}
 IOC_COMMAND="python3.6 . --source ioc=$IOCAGE_DATASET"
+FETCH_FLAGS=""
 
 echo "libiocage regression tests"
 
 echo "preparing host"
-zfs create -o mountpoint="$IOCAGE_MOUNTPOINT" "$IOCAGE_DATASET" || zfs set mountpoint="$IOCAGE_MOUNTPOINT" "$IOCAGE_DATASET"
+zfs list $IOCAGE_DATASET && _CLEAN=1 || _CLEAN=0
+if [ $_CLEAN -eq 0 ]; then
+    zfs create -o mountpoint="$IOCAGE_MOUNTPOINT" "$IOCAGE_DATASET"
+else
+    zfs set mountpoint="$IOCAGE_MOUNTPOINT" "$IOCAGE_DATASET"
+    FETCH_FLAGS="--no-fetch-updates --no-update"
+fi
 
 echo "fetch default release:"
-yes "" | $IOC_COMMAND fetch
+yes "" | $IOC_COMMAND fetch $FETCH_FLAGS
 $IOC_COMMAND list --release --no-header --output-format=list | grep -q 11.1-RELEASE
 echo "fetch older release"
-$IOC_COMMAND fetch --release 10.4-RELEASE
+$IOC_COMMAND fetch --release 10.4-RELEASE $FETCH_FLAGS
 $IOC_COMMAND list --release --no-header --output-format=list | grep -q 10.4-RELEASE
 
 echo "create a template"
