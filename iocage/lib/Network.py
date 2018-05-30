@@ -238,8 +238,6 @@ class Network:
                 logger=self.logger
             )
 
-        firewall_rule_number = f"$IOCAGE_JID"
-
         host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
             shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
@@ -267,47 +265,9 @@ class Network:
                 mtu=self.mtu
             )
 
-            self.logger.verbose("Configuring Secure VNET Firewall")
-
-            for ipv4_address in self.ipv4_addresses:
-                address = ipv4_address.split("/", maxsplit=1)[0]
-                self.firewall.add_rule(firewall_rule_number, [
-                    "allow", "ip4",
-                    "from", address, "to", "any",
-                    "layer2",
-                    "MAC", "any", str(mac_address_pair.b),
-                    "via", f"{self.nic}:$IOCAGE_JID:b",
-                    "out"
-                ])
-                self.firewall.add_rule(firewall_rule_number, [
-                    "allow", "ip4",
-                    "from", "any", "to", address,
-                    "layer2",
-                    "MAC", str(mac_address_pair.b), "any",
-                    "via", f"{self.nic}:$IOCAGE_JID",
-                    "out"
-                ])
-                self.firewall.add_rule(firewall_rule_number, [
-                    "allow", "ip4",
-                    "from", "any", "to", address,
-                    "via", f"{self.nic}:$IOCAGE_JID",
-                    "out"
-                ])
-            self.firewall.add_rule(firewall_rule_number, [
-                "deny", "log", "ip4",
-                "from", "any", "to", "any",
-                "layer2",
-                "via", f"{self.nic}:$IOCAGE_JID:b",
-                "out"
-            ])
-            self.firewall.add_rule(firewall_rule_number, [
-                "deny", "log", "ip4",
-                "from", "any", "to", "any",
-                "via", f"{self.nic}:$IOCAGE_JID",
-                "out"
-            ])
-            self.logger.debug("Firewall rules added")
-            commands_started += self.firewall.read_commands()
+            commands_started += self.__configure_firewall(
+                mac_address=str(mac_address_pair.b)
+            )
 
             # the secondary bridge in secure mode
             sec_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -364,6 +324,54 @@ class Network:
         commands_start += jail_if.read_commands()
 
         return commands_started, commands_start
+
+    def __configure_firewall(self, mac_address: str) -> typing.List[str]:
+
+        self.logger.verbose("Configuring Secure VNET Firewall")
+        firewall_rule_number = f"$IOCAGE_JID"
+
+        for protocol in ["ipv4", "ipv6"]:
+            addresses = self.__getattribute__(f"{protocol}_addresses")
+            for address in addresses:
+                _address = address.split("/", maxsplit=1)[0]
+                self.firewall.add_rule(firewall_rule_number, [
+                    "allow", protocol,
+                    "from", _address, "to", "any",
+                    "layer2",
+                    "MAC", "any", mac_address,
+                    "via", f"{self.nic}:$IOCAGE_JID:b",
+                    "out"
+                ])
+                self.firewall.add_rule(firewall_rule_number, [
+                    "allow", protocol,
+                    "from", "any", "to", _address,
+                    "layer2",
+                    "MAC", mac_address, "any",
+                    "via", f"{self.nic}:$IOCAGE_JID",
+                    "out"
+                ])
+                self.firewall.add_rule(firewall_rule_number, [
+                    "allow", protocol,
+                    "from", "any", "to", _address,
+                    "via", f"{self.nic}:$IOCAGE_JID",
+                    "out"
+                ])
+            self.firewall.add_rule(firewall_rule_number, [
+                "deny", "log", protocol,
+                "from", "any", "to", "any",
+                "layer2",
+                "via", f"{self.nic}:$IOCAGE_JID:b",
+                "out"
+            ])
+            self.firewall.add_rule(firewall_rule_number, [
+                "deny", "log", protocol,
+                "from", "any", "to", "any",
+                "via", f"{self.nic}:$IOCAGE_JID",
+                "out"
+            ])
+        self.logger.debug("Firewall rules added")
+        commands: typing.List[str] = self.firewall.read_commands()
+        return commands
 
     def __up_host_if(self) -> typing.List[str]:
         host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
