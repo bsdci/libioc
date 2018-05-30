@@ -48,6 +48,7 @@ def cli(
     """Start one or many jails."""
     logger = ctx.parent.logger
     start_args = {
+        "zfs": ctx.parent.zfs,
         "host": ctx.parent.host,
         "logger": logger,
         "print_function": ctx.parent.print_events
@@ -68,6 +69,7 @@ def cli(
 
 
 def _autostart(
+    zfs: iocage.lib.ZFS.ZFS,
     host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
@@ -79,6 +81,7 @@ def _autostart(
     filters = ("boot=yes", "running=no", "template=no",)
 
     ioc_jails = iocage.lib.Jails.Jails(
+        zfs=zfs,
         host=host,
         logger=logger,
         filters=filters
@@ -108,6 +111,7 @@ def _autostart(
 
 def _normal(
     filters: typing.Tuple[str, ...],
+    zfs: iocage.lib.ZFS.ZFS,
     host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
     print_function: typing.Callable[
@@ -120,6 +124,8 @@ def _normal(
 
     jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
+        zfs=zfs,
+        host=host,
         filters=filters
     )
 

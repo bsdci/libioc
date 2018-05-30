@@ -91,7 +91,8 @@ def cli(  # noqa: T484
 ) -> None:
     """Fetch and update releases."""
     logger = ctx.parent.logger
-    host = iocage.lib.Host.HostGenerator(logger=logger)
+    host = ctx.parent.host
+    zfs = ctx.parent.zfs
     prompts = iocage.lib.Prompts.Prompts(host=host, logger=logger)
 
     release_input = kwargs["release"]
@@ -105,6 +106,7 @@ def cli(  # noqa: T484
             release = iocage.lib.Release.ReleaseGenerator(
                 name=release_input,
                 host=host,
+                zfs=zfs,
                 logger=logger
             )
         except Exception:

@@ -43,6 +43,7 @@ def cli(ctx, jail, start):
         ioc_jail = iocage.lib.Jail.JailGenerator(
             jail,
             logger=logger,
+            zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
         ioc_jail.state.query()

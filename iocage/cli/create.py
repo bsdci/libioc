@@ -99,8 +99,8 @@ def cli(
 ) -> None:
     """Create iocage jails."""
     logger = ctx.parent.logger
-    zfs = iocage.lib.ZFS.get_zfs(logger=logger)
-    host = iocage.lib.Host.Host(logger=logger, zfs=zfs)
+    zfs: iocage.lib.ZFS.ZFS = ctx.parent.zfs
+    host: iocage.lib.Host.Host = ctx.parent.host
 
     jail_data: typing.Dict[str, typing.Any] = {}
 

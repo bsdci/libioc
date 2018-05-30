@@ -80,7 +80,12 @@ def cli(
             shlex.quote(user_command)
         ]
 
-    ioc_jail = iocage.lib.Jail.JailGenerator(jail, logger=logger)
+    ioc_jail = iocage.lib.Jail.JailGenerator(
+        jail,
+        logger=logger,
+        zfs=ctx.parent.zfs,
+        host=ctx.parent.host
+    )
     ioc_jail.state.query()
 
     if not ioc_jail.exists:
