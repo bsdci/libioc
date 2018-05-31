@@ -411,8 +411,7 @@ class JailGenerator(JailResource):
         exec_start: typing.List[str] = []
         exec_started: typing.List[str] = [
             f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
-            "set -e",
-            "set -u",
+            "set -eu",
         ]
         exec_poststart: typing.List[str] = []
 
@@ -467,9 +466,7 @@ class JailGenerator(JailResource):
         self._write_hook_script(
             "poststart",
             self._wrap_hook_script_command_string([
-                "set -u",
-                "set -e",
-                "set -x",
+                "set -eu",
                 "/bin/echo running exec.started hook on the host",
                 f"/bin/sh {self.get_hook_script_path('started')} 2>&1",
                 "/bin/echo running exec.start hook in the jail",
@@ -539,7 +536,7 @@ class JailGenerator(JailResource):
 
         EOF_IDENTIFIER = f"EOF{random.getrandbits(64)}"
         output: typing.List[str] = [
-            "set -e",
+            "set -eu",
             "echo 'Executing jail start scripts'",
             "jexec -j {self.identifier} /bin/sh <<{EOF_IDENTIFIER}"
         ] + commands + [
@@ -1506,10 +1503,9 @@ class JailGenerator(JailResource):
         self._write_hook_script("command", "\n".join(
             ["set +e"] +
             (["service ipfw onestop"] if self.host.ipfw_enabled else []) +
-            ["set -e"] +
             [
+                "set -e"
                 f". {self._relative_hook_script_dir}/start.sh",
-                "set -e",
                 jail_command,
             ]
         ))
