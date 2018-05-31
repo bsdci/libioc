@@ -410,7 +410,9 @@ class JailGenerator(JailResource):
         exec_prestart: typing.List[str] = []
         exec_start: typing.List[str] = []
         exec_started: typing.List[str] = [
-            f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}"
+            f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
+            "set -e",
+            "set -u",
         ]
         exec_poststart: typing.List[str] = []
 
@@ -465,8 +467,11 @@ class JailGenerator(JailResource):
         self._write_hook_script(
             "poststart",
             self._wrap_hook_script_command_string([
+                "set -u",
+                "set -e",
+                "set -x",
                 "/bin/echo running exec.started hook on the host",
-                f"/bin/sh {self.get_hook_script_path('started')}",
+                f"/bin/sh {self.get_hook_script_path('started')} 2>&1",
                 "/bin/echo running exec.start hook in the jail",
                 (
                     f"/usr/sbin/jexec {self.identifier} "
@@ -506,6 +511,11 @@ class JailGenerator(JailResource):
                 )
             if stdout is not None:
                 self.logger.spam(stdout)
+            if returncode != 0:
+                raise iocage.lib.errors.JailLaunchFailed(
+                    jail=self,
+                    logger=self.logger
+                )
         except iocage.lib.errors.IocageException as e:
             yield jailLaunchEvent.fail(e)
             raise e
@@ -1421,10 +1431,7 @@ class JailGenerator(JailResource):
             passthru=passthru
         )
         if returncode > 0:
-            raise iocage.lib.errors.JailLaunchFailed(
-                jail=self,
-                logger=self.logger
-            )
+            return stdout, stderr, returncode
 
         self.state.query()
         self.logger.verbose(
@@ -1492,8 +1499,7 @@ class JailGenerator(JailResource):
                     f"{self._relative_hook_script_dir}/command.sh"
                     " 2>&1"
                 ),
-                f"/bin/sh {self.get_hook_script_path('poststop')}",
-                "exit 0"
+                f"/bin/sh {self.get_hook_script_path('poststop')}"
             ]
         ))
 
