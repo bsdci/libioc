@@ -236,4 +236,4 @@ def cli(
 ) -> None:
     """View and manipulate a jails fstab file."""
     ctx.logger = ctx.parent.logger
-    ctx.host = ctx.parent.logger
+    ctx.host = ctx.parent.host
