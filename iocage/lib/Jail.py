@@ -1679,7 +1679,7 @@ class JailGenerator(JailResource):
         defaultrouter = self.config["defaultrouter"]
         defaultrouter6 = self.config["defaultrouter6"]
 
-        if not defaultrouter or defaultrouter6:
+        if (defaultrouter is None) and (defaultrouter6 is None):
             self.logger.spam("no static routes configured")
             return []
 
