@@ -48,7 +48,8 @@ class Firewall:
     def _required_sysctl_properties(self) -> typing.Dict[str, int]:
         return {
             "net.inet.ip.fw.enable": 1,
-            "net.link.ether.ipfw": 1
+            "net.link.ether.ipfw": 1,
+            "net.link.bridge.ipfw": 1
         }
 
     def ensure_firewall_enabled(self) -> None:
