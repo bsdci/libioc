@@ -99,7 +99,7 @@ class Updater:
             return self.resource
         return self.resource.release
 
-    def _wrap_command(self, command: str) -> str:
+    def _wrap_command(self, command: str, kind: str) -> str:
         return command
 
     @property
@@ -265,7 +265,8 @@ class Updater:
         try:
             self._create_download_dir()
             iocage.lib.helpers.exec(
-                self._fetch_command,
+                self._wrap_command(" ".join(self._fetch_command), "fetch"),
+                shell=True,  # nosec: B604
                 logger=self.logger
             )
         except Exception as e:
@@ -337,7 +338,7 @@ class Updater:
             self._create_jail_update_dir()
             for event in iocage.lib.Jail.JailGenerator.fork_exec(
                 jail,
-                self._wrap_command(" ".join(self._update_command)),
+                self._wrap_command(" ".join(self._update_command), "update"),
                 passthru=False
             ):
                 if isinstance(event, iocage.lib.events.JailLaunch) is True:
@@ -494,18 +495,30 @@ class FreeBSD(Updater):
             ))
             f.truncate()
 
-    def _wrap_command(self, command: str) -> str:
+    def _wrap_command(self, command: str, kind: str) -> str:
+
+        if kind == "update":
+            tolerated_error_message = (
+                "echo $OUTPUT"
+                " | grep -c 'No updates are available to install.'"
+                " >> /dev/null || exit $RC"
+            )
+        elif kind == "fetch":
+            tolerated_error_message = (
+                "echo $OUTPUT"
+                " | grep -c 'HAS PASSED ITS END-OF-LIFE DATE.'"
+                " >> /dev/null || exit $RC"
+            )
+        else:
+            raise ValueError
+
         _command = "\n".join([
             "set +e",
             f"OUTPUT=\"$({command})\"",
             "echo $OUTPUT",
             "RC=$?",
             "if [ $RC -gt 0 ]; then",
-            (
-                "echo $OUTPUT"
-                " | grep -c 'No updates are available to install.'"
-                " >> /dev/null || exit $RC"
-            ),
+            tolerated_error_message,
             "fi"
         ])
         return _command
