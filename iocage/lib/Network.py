@@ -243,7 +243,6 @@ class Network:
         host_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name=None,
             shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._unic}",
-            rename=f"{self.nic}:$IOCAGE_JID",
             mac=mac_address_pair.a,
             mtu=self.mtu,
             description=self.nic_local_description,
