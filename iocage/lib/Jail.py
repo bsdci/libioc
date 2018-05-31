@@ -1428,6 +1428,10 @@ class JailGenerator(JailResource):
             passthru=passthru
         )
         if returncode > 0:
+            self.logger.verbose(
+                f"Jail '{self.humanreadable_name}' was not started",
+                jail=self
+            )
             return stdout, stderr, returncode
 
         self.state.query()
@@ -1514,6 +1518,12 @@ class JailGenerator(JailResource):
             command,
             passthru=passthru
         )
+
+        if returncode > 0:
+            message = f"Jail {self.humanreadable_name} command failed."
+        else:
+            message = f"Jail {self.humanreadable_name} command finished."
+        self.logger.verbose(message)
 
         return stdout, stderr, returncode
 
