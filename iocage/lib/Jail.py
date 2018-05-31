@@ -1489,8 +1489,10 @@ class JailGenerator(JailResource):
                 (
                     f"/usr/sbin/jexec {self.identifier} "
                     f"{self._relative_hook_script_dir}/command.sh"
+                    " 2>&1"
                 ),
                 f"/bin/sh {self.get_hook_script_path('poststop')}",
+                "exit 0"
             ]
         ))
 
