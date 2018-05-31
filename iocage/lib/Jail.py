@@ -1515,12 +1515,6 @@ class JailGenerator(JailResource):
             passthru=passthru
         )
 
-        if returncode > 0:
-            raise iocage.lib.errors.JailCommandFailed(
-                returncode=returncode,
-                logger=None
-            )
-
         return stdout, stderr, returncode
 
     def _get_value(self, key: str) -> str:
