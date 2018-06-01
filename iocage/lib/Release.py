@@ -407,9 +407,16 @@ class ReleaseGenerator(ReleaseResource):
         return self._parse_release_version(self.name)
 
     def _parse_release_version(self, release_version_string: str) -> float:
-        parsed_version = release_version_string.split("-", maxsplit=1)[0]
+        parsed_version, suffix = release_version_string.split("-", maxsplit=1)
         try:
-            return float(parsed_version)
+            version = float(parsed_version)
+            if self.host.distribution.name == "HardenedBSD":
+                has_stable_suffix = (suffix.upper() == "STABLE") is True
+                if (version == 10.0) and has_stable_suffix:
+                    return 10.4
+                elif (version == 11.0) and has_stable_suffix:
+                    return 11.1
+            return version
         except ValueError:
             return float(0)
 
