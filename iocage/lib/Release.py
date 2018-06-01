@@ -210,14 +210,14 @@ class ReleaseGenerator(ReleaseResource):
 
     _name: str
     patchlevel: typing.Optional[int]
-    eol: bool = False
+    check_eol: bool
 
     logger: iocage.lib.Logger.Logger
     zfs: iocage.lib.ZFS.ZFS
     host: iocage.lib.Host.HostGenerator
     _resource: iocage.lib.Resource.Resource
     _assets: typing.List[str]
-    _mirror_url: typing.Optional[str] = None
+    _mirror_url: typing.Optional[str]
 
     def __init__(  # noqa: T484
         self,
@@ -227,7 +227,7 @@ class ReleaseGenerator(ReleaseResource):
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         check_hashes: bool=True,
-        eol: bool=False,
+        check_eol: bool=True,
         **release_resource_args
     ) -> None:
 
@@ -252,11 +252,12 @@ class ReleaseGenerator(ReleaseResource):
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = resource_selector.name
-        self.eol = eol
         self._hbsd_release_branch = None
+        self._mirror_url = None
 
         self._hashes = None
         self.check_hashes = check_hashes is True
+        self.check_eol = check_eol is True
 
         ReleaseResource.__init__(
             self,
@@ -366,6 +367,18 @@ class ReleaseGenerator(ReleaseResource):
             return f"{self.name} ({', '.join(annotations)})"
 
         return f"{self.name}"
+
+    @property
+    def eol(self) -> typing.Optional[bool]:
+        """
+        Return whether the release is EOL or checks are disabled.
+
+        When check_eol is disabled, None is returned, True when the release
+        name was found in the distributions eol_list.
+        """
+        if not self.check_eol:
+            return None
+        return (self.name in self.host.distribution.eol_list) is True
 
     @property
     def mirror_url(self) -> str:
