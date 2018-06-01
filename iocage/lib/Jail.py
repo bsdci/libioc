@@ -1508,7 +1508,7 @@ class JailGenerator(JailResource):
             ["set +e"] +
             (["service ipfw onestop"] if self.host.ipfw_enabled else []) +
             [
-                "set -e"
+                "set -e",
                 f". {self._relative_hook_script_dir}/start.sh",
                 jail_command,
             ]
