@@ -385,17 +385,22 @@ class ReleaseGenerator(ReleaseResource):
             if "STABLE" in self.name:
                 # stable releases are explicitly in the EOL list or supported
                 return (self.name in self.host.distribution.eol_list) is True
-            return (self._parse_release_version(self.name) in map(
+            return (self.version_number in map(
                 lambda x: self._parse_release_version(x),
                 self.host.distribution.eol_list
             )) is True
         return False
 
-    def _parse_release_version(self, release_version_string: str) -> str:
+    @property
+    def version_number(self) -> float:
+        return self._parse_release_version(self.name)
+
+    def _parse_release_version(self, release_version_string: str) -> float:
         parsed_version = release_version_string.split("-", maxsplit=1)[0]
-        if "." not in parsed_version:
-            parsed_version += ".0"
-        return parsed_version
+        try:
+            return float(parsed_version)
+        except ValueError:
+            return float(0)
 
     @property
     def mirror_url(self) -> str:

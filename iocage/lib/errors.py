@@ -53,6 +53,27 @@ class IocageException(Exception):
             super().__init__(message)
 
 
+# Missing Features
+
+
+class MissingFeature(IocageException, NotImplementedError):
+    """Raised when an iocage feature is not fully implemented yet."""
+
+    def __init__(  # noqa: T484
+            self,
+            feature_name: str,
+            plural: bool=False,
+            *args,
+            **kwargs
+    ) -> None:
+        message = (
+            f"Missing Feature: '{feature_name}' "
+            "are" if plural is True else "is"
+            " not implemented yet"
+        )
+        IocageException.__init__(self, message, *args, **kwargs)
+
+
 # Jails
 
 
@@ -921,6 +942,19 @@ class ReleaseUpdateBranchLookup(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class UnsupportedRelease(MissingFeature):
+    """Raised when interacting with an unsupported release."""
+
+    def __init__(  # noqa: T484
+        self,
+        version: float,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = f"Release version {version} is currently not supported"
+        super().__init__(msg, plural=True *args, **kwargs)
+
 # Prompts
 
 
@@ -1058,24 +1092,3 @@ class JailFilterInvalidName(JailFilterException):
             "Cannot select jail with illegal name"
         )
         JailFilterException.__init__(self, msg, *args, **kwargs)
-
-
-# Missing Features
-
-
-class MissingFeature(IocageException, NotImplementedError):
-    """Raised when an iocage feature is not fully implemented yet."""
-
-    def __init__(  # noqa: T484
-            self,
-            feature_name: str,
-            plural: bool=False,
-            *args,
-            **kwargs
-    ) -> None:
-        message = (
-            f"Missing Feature: '{feature_name}' "
-            "are" if plural is True else "is"
-            " not implemented yet"
-        )
-        IocageException.__init__(self, message, *args, **kwargs)
