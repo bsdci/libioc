@@ -339,18 +339,6 @@ class JailFstabUpdate(JailEvent):
         JailEvent.__init__(self, jail, **kwargs)
 
 
-class JailForkExec(JailEvent):
-    """A group of multiple action events executed sequentially."""
-
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
-
-
 class JailClone(JailEvent):
     """Clone a jail."""
 

@@ -584,11 +584,6 @@ class JailGenerator(JailResource):
         self.require_jail_existing()
         self.require_jail_stopped()
 
-        events: typing.Any = iocage.lib.events
-        jailForkExecEvent = events.JailForkExec(jail=self)
-
-        yield jailForkExecEvent.begin()
-
         original_config = self.config
         config_data = original_config.data
 
@@ -610,11 +605,6 @@ class JailGenerator(JailResource):
             )
             for event in fork_exec_events:
                 yield event
-        except iocage.lib.errors.IocageException as e:
-            yield jailForkExecEvent.fail(e)
-            raise e
-        else:
-            yield jailForkExecEvent.end()
         finally:
             self.config = original_config
 
