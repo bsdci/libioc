@@ -394,7 +394,7 @@ class ReleaseGenerator(ReleaseResource):
     def _require_release_supported(self) -> None:
         if self.host.distribution.name == "HardenedBSD":
             version = self.release.version_number
-            if (version == 0) or (version >= 10.3):
+            if (version == 0) or (version >= 10.4):
                 return
             raise iocage.lib.errors.UnsupportedRelease(
                 version=version,
