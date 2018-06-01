@@ -1201,7 +1201,8 @@ class JailGenerator(JailResource):
             source=self.launch_script_dir,
             destination=jail_start_script_dir,
             type="nullfs",
-            options="ro"
+            options="ro",
+            comment=self.fstab.AUTO_COMMENT_IDENTIFIER
         ))
         self.fstab.read_file()
         if self.fstab.line_exists(iocage_helper_line) is False:
