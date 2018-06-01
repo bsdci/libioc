@@ -391,8 +391,19 @@ class ReleaseGenerator(ReleaseResource):
             )) is True
         return False
 
+    def _require_release_supported(self) -> None:
+        if self.host.distribution.name == "HardenedBSD":
+            version = self.release.version_number
+            if (version == 0) or (version >= 10.3):
+                return
+            raise iocage.lib.errors.UnsupportedRelease(
+                version=version,
+                logger=self.logger
+            )
+
     @property
     def version_number(self) -> float:
+        """Return the numeric release version number or 0 for CURRENT."""
         return self._parse_release_version(self.name)
 
     def _parse_release_version(self, release_version_string: str) -> float:
@@ -542,6 +553,7 @@ class ReleaseGenerator(ReleaseResource):
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Fetch the release from the remote."""
         release_changed = False
+        self._require_release_supported()
 
         events = iocage.lib.events
         fetchReleaseEvent = events.FetchRelease(self)

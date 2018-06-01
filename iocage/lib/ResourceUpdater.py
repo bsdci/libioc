@@ -151,9 +151,6 @@ class Updater:
     def _update_command(self) -> typing.List[str]:
         raise NotImplementedError("To be implemented by inheriting classes")
 
-    def _ensure_release_is_supported(self) -> None:
-        return
-
     def _get_release_trunk_file_url(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
@@ -249,7 +246,7 @@ class Updater:
                 logger=self.logger
             )
 
-        self._ensure_release_is_supported()
+        self.resource._require_release_supported()
 
         events = iocage.lib.events
         releaseUpdatePullEvent = events.ReleaseUpdatePull(self.release)
@@ -430,15 +427,11 @@ class HardenedBSD(Updater):
             ]  # keep temp
         elif version >= 10.3:
             return ["-t", self.local_temp_dir]
-
-    def _ensure_release_is_supported(self) -> None:
-        version = self.release.version_number
-        if (version == 0) or (version >= 10.3):
-            return
-        raise iocage.lib.errors.UnsupportedRelease(
-            version=version,
-            logger=self.logger
-        )
+        else:
+            raise iocage.lib.errors.UnsupportedRelease(
+                version=version,
+                logger=self.logger
+            )
 
     def _get_release_trunk_file_url(
         self,

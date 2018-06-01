@@ -68,8 +68,7 @@ class MissingFeature(IocageException, NotImplementedError):
     ) -> None:
         message = (
             f"Missing Feature: '{feature_name}' "
-            "are" if plural is True else "is"
-            " not implemented yet"
+            f"{'are' if plural is True else 'is'} not implemented yet"
         )
         IocageException.__init__(self, message, *args, **kwargs)
 
@@ -948,12 +947,15 @@ class UnsupportedRelease(MissingFeature):
     def __init__(  # noqa: T484
         self,
         version: float,
-        *args,
         **kwargs
     ) -> None:
 
-        msg = f"Release version {version} is currently not supported"
-        super().__init__(msg, plural=True *args, **kwargs)
+        feature_name = f"Support for release version {version}"
+        super().__init__(
+            feature_name=feature_name,
+            plural=True,
+            **kwargs
+        )
 
 # Prompts
 
