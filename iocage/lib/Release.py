@@ -378,7 +378,24 @@ class ReleaseGenerator(ReleaseResource):
         """
         if not self.check_eol:
             return None
-        return (self.name in self.host.distribution.eol_list) is True
+
+        if self.host.distribution.name == "FreeBSD":
+            return (self.name in self.host.distribution.eol_list) is True
+        elif self.host.distribution.name == "HardenedBSD":
+            if "STABLE" in self.name:
+                # stable releases are explicitly in the EOL list or supported
+                return (self.name in self.host.distribution.eol_list) is True
+            return (self._parse_release_version(self.name) in map(
+                lambda x: self._parse_release_version(x),
+                self.host.distribution.eol_list
+            )) is True
+        return False
+
+    def _parse_release_version(self, release_version_string: str) -> str:
+        parsed_version = release_version_string.split("-", maxsplit=1)[0]
+        if "." not in parsed_version:
+            parsed_version += ".0"
+        return parsed_version
 
     @property
     def mirror_url(self) -> str:

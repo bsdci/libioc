@@ -235,25 +235,6 @@ class DistributionGenerator:
 
             return parser.eol_releases
 
-    def _parse_release_version(self, release_version_string: str) -> str:
-        parsed_version = release_version_string.split("-", maxsplit=1)[0]
-        if "." not in parsed_version:
-            parsed_version += ".0"
-        return parsed_version
-
-    def _check_eol(self, release_name: str, eol: typing.List[str]) -> bool:
-        if self.host.distribution.name == "FreeBSD":
-            return release_name in eol
-        elif self.host.distribution.name == "HardenedBSD":
-            if "STABLE" in release_name:
-                # stable releases are explicitly in the EOL list or supported
-                return release_name in eol
-            return self._parse_release_version(release_name) in map(
-                lambda x: self._parse_release_version(x),
-                eol
-            )
-        return False
-
     @property
     def releases(self) -> typing.List['iocage.lib.Release.ReleaseGenerator']:
         """
