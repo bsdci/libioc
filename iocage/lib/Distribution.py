@@ -81,11 +81,12 @@ class DistributionGenerator:
     ]
 
     eol_url: str = "https://www.freebsd.org/security/unsupported.html"
+    _eol_list: typing.Optional[typing.List[str]]
 
     mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
-    available_releases: typing.Optional[
+    _available_releases: typing.Optional[
         typing.List['iocage.lib.Release.ReleaseGenerator']
-    ] = None
+    ]
 
     host: 'iocage.lib.Host.HostGenerator'
     zfs: 'iocage.lib.ZFS.ZFS'
@@ -100,6 +101,8 @@ class DistributionGenerator:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
+        self._eol_list = None
+        self._available_releases = None
 
     @property
     def _class_release(self) -> typing.Union[
@@ -161,7 +164,6 @@ class DistributionGenerator:
         response = resource.read().decode(charset if charset else "UTF-8")
 
         found_releases = self._parse_links(response)
-        eol_list = self._get_eol_list()
 
         available_releases = sorted(
             map(  # map long HardenedBSD release names
@@ -173,13 +175,12 @@ class DistributionGenerator:
             )
         )
 
-        self.available_releases = list(map(
+        self._available_releases = list(map(
             lambda x: self._class_release(
                 name=x,
                 host=self.host,
                 zfs=self.zfs,
-                logger=self.logger,
-                eol=self._check_eol(x, eol_list)
+                logger=self.logger
             ),
             filter(
                 lambda y: len(y) > 0,
@@ -199,7 +200,17 @@ class DistributionGenerator:
         arch = release_name.split("-")[-2:][0]
         return (self.host.processor == arch) is True
 
-    def _get_eol_list(self) -> typing.List[str]:
+    @property
+    def eol_list(self) -> typing.List[str]:
+        """Return the (memoized) list of release names listed as EOL."""
+        if self._eol_list is None:
+            eol_list = self._query_eol_list()
+            self._eol_list = eol_list
+            return eol_list
+        else:
+            return self._eol_list
+
+    def _query_eol_list(self) -> typing.List[str]:
         """Scrape the FreeBSD website and return a list of EOL RELEASES."""
         request = urllib.request.Request(
             self.eol_url,
@@ -250,10 +261,10 @@ class DistributionGenerator:
 
         Raises an error when the releases cannot be fetched at the current time
         """
-        if self.available_releases is None:
+        if self._available_releases is None:
             self.fetch_releases()
-        if self.available_releases is not None:
-            return self.available_releases
+        if self._available_releases is not None:
+            return self._available_releases
         raise iocage.lib.errors.ReleaseListUnavailable()
 
     def _parse_links(self, text: str) -> typing.List[str]:
