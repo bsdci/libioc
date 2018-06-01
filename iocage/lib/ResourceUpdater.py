@@ -400,8 +400,11 @@ class HardenedBSD(Updater):
             "-v", "latest", "-U",  # skip version check
             "-n",  # no kernel
             "-V",
-            "-D",  # no download
-        ] + self._version_dependent_command_attributes
+            "-D",  # no download,
+            "-T",
+            "-t",
+            self.local_temp_dir
+        ]
 
     @property
     def _fetch_command(self) -> typing.List[str]:
@@ -413,25 +416,11 @@ class HardenedBSD(Updater):
             "-f",  # fetch only
             "-c",
             f"{self.host_updates_dir}/{self.update_conf_name}",
-            "-V"
-        ] + self._version_dependent_command_attributes
-
-    @property
-    def _version_dependent_command_attributes(self) -> typing.List[str]:
-        version = self.release.version_number
-        if (version >= 10.4) or (version == 0):
-            return [
-                "-T",
-                "-t",
-                self.local_temp_dir
-            ]  # keep temp
-        elif version >= 10.3:
-            return ["-t", self.local_temp_dir]
-        else:
-            raise iocage.lib.errors.UnsupportedRelease(
-                version=version,
-                logger=self.logger
-            )
+            "-V",
+            "-T",
+            "-t",
+            self.local_temp_dir
+        ]
 
     def _get_release_trunk_file_url(
         self,
