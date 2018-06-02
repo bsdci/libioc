@@ -39,12 +39,20 @@ EVENT_STATUS = (
 )
 
 
+class Scope(list):
+    """An independent event history scope."""
+
+    PENDING_COUNT: int
+
+    def __init__(self) -> None:
+        self.PENDING_COUNT = 0
+        super().__init__([])
+
+
 class IocageEvent:
     """The base event class of libiocage."""
 
-    HISTORY: typing.List['IocageEvent'] = []
-
-    PENDING_COUNT: int = 0
+    _scope: Scope
 
     identifier: typing.Optional[str]
     _started_at: float
@@ -62,10 +70,12 @@ class IocageEvent:
     def __init__(  # noqa: T484
         self,
         message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None,
         **kwargs
     ) -> None:
         """Initialize an IocageEvent."""
-        for event in IocageEvent.HISTORY:
+        self.scope = scope
+        for event in self.scope:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
 
@@ -79,13 +89,22 @@ class IocageEvent:
 
         self.data = kwargs
         self._rollback_steps = []
-        self.number = len(IocageEvent.HISTORY) + 1
-        self.parent_count = IocageEvent.PENDING_COUNT
+        self.number = len(self.scope) + 1
+        self.parent_count = self.scope.PENDING_COUNT
 
         self.message = message
 
-        if self not in IocageEvent.HISTORY:
-            IocageEvent.HISTORY.append(self)
+    @property
+    def scope(self) -> Scope:
+        """Return the currently used event scope."""
+        return self._scope
+
+    @scope.setter
+    def scope(self, scope: typing.Optional[Scope]) -> None:
+        if scope is None:
+            self._scope = Scope()
+        else:
+            self._scope = scope
 
     def get_state_string(
         self,
@@ -178,7 +197,7 @@ class IocageEvent:
             self._stopped_at = float(timer())
 
         self._pending = new_state
-        IocageEvent.PENDING_COUNT += 1 if (state is True) else -1
+        self.scope.PENDING_COUNT += 1 if (state is True) else -1
 
     @property
     def duration(self) -> typing.Optional[float]:
@@ -200,7 +219,7 @@ class IocageEvent:
         self._update_message(**kwargs)
         self.pending = True
         self.done = False
-        self.parent_count = IocageEvent.PENDING_COUNT - 1
+        self.parent_count = self.scope.PENDING_COUNT - 1
         return self
 
     def end(self, **kwargs) -> 'IocageEvent':  # noqa: T484
@@ -208,13 +227,13 @@ class IocageEvent:
         self._update_message(**kwargs)
         self.done = True
         self.pending = False
-        self.parent_count = IocageEvent.PENDING_COUNT
+        self.parent_count = self.scope.PENDING_COUNT
         return self
 
     def step(self, **kwargs) -> 'IocageEvent':  # noqa: T484
         """Reflect partial event progress."""
         self._update_message(**kwargs)
-        self.parent_count = IocageEvent.PENDING_COUNT
+        self.parent_count = self.scope.PENDING_COUNT
         return self
 
     def skip(self, **kwargs) -> 'IocageEvent':  # noqa: T484
@@ -222,7 +241,7 @@ class IocageEvent:
         self._update_message(**kwargs)
         self.skipped = True
         self.pending = False
-        self.parent_count = IocageEvent.PENDING_COUNT
+        self.parent_count = self.scope.PENDING_COUNT
         return self
 
     def fail(  # noqa: T484
@@ -249,7 +268,7 @@ class IocageEvent:
                 yield action
 
         self.pending = False
-        self.parent_count = IocageEvent.PENDING_COUNT
+        self.parent_count = self.scope.PENDING_COUNT
 
         yield self
 

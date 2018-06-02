@@ -558,19 +558,39 @@ class ReleaseGenerator(ReleaseResource):
     def fetch(
         self,
         update: typing.Optional[bool]=None,
-        fetch_updates: typing.Optional[bool]=None
+        fetch_updates: typing.Optional[bool]=None,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Fetch the release from the remote."""
         release_changed = False
         self._require_release_supported()
 
         events = iocage.lib.events
-        fetchReleaseEvent = events.FetchRelease(self)
-        releasePrepareStorageEvent = events.ReleasePrepareStorage(self)
-        releaseDownloadEvent = events.ReleaseDownload(self)
-        releaseExtractionEvent = events.ReleaseExtraction(self)
-        releaseConfigurationEvent = events.ReleaseConfiguration(self)
-        releaseCopyBaseEvent = events.ReleaseCopyBase(self)
+        fetchReleaseEvent = events.FetchRelease(
+            self,
+            scope=event_scope
+        )
+        _scope = fetchReleaseEvent.scope
+        releasePrepareStorageEvent = events.ReleasePrepareStorage(
+            self,
+            scope=_scope
+        )
+        releaseDownloadEvent = events.ReleaseDownload(
+            self,
+            scope=_scope
+        )
+        releaseExtractionEvent = events.ReleaseExtraction(
+            self,
+            scope=_scope
+        )
+        releaseConfigurationEvent = events.ReleaseConfiguration(
+            self,
+            scope=_scope
+        )
+        releaseCopyBaseEvent = events.ReleaseCopyBase(
+            self,
+            scope=_scope
+        )
 
         if self.fetched is False:
 
@@ -622,7 +642,7 @@ class ReleaseGenerator(ReleaseResource):
             yield releaseConfigurationEvent.skip()
 
         if fetch_updates is True:
-            for event in self.updater.fetch():
+            for event in self.updater.fetch(event_scope=_scope):
                 yield event
 
         if update is True:
@@ -848,11 +868,13 @@ class ReleaseGenerator(ReleaseResource):
 
     def destroy(
         self,
-        force: bool=False
+        force: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Delete a release."""
         zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
-            dataset=self.dataset
+            dataset=self.dataset,
+            scope=event_scope
         )
         yield zfsDatasetDestroyEvent.begin()
         try:
@@ -869,19 +891,26 @@ class Release(ReleaseGenerator):
     def fetch(  # noqa: T484
         self,
         update: typing.Optional[bool]=None,
-        fetch_updates: typing.Optional[bool]=None
+        fetch_updates: typing.Optional[bool]=None,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Fetch the release from the remote synchronously."""
         return list(ReleaseGenerator.fetch(
             self,
             update=update,
-            fetch_updates=fetch_updates
+            fetch_updates=fetch_updates,
+            event_scope=event_scope
         ))
 
     def destroy(  # noqa: T484
         self,
-        force: bool=False
+        force: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Delete a release."""
-        return list(ReleaseGenerator.destroy(self, force=force))
+        return list(ReleaseGenerator.destroy(
+            self,
+            force=force,
+            event_scope=event_scope
+        ))
 

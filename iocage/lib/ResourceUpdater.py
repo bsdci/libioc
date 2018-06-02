@@ -236,7 +236,8 @@ class Updater:
         )
 
     def fetch(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Fetch the update of a release."""
         ReleaseGenerator = iocage.lib.Release.ReleaseGenerator
@@ -249,8 +250,14 @@ class Updater:
         self.resource._require_release_supported()
 
         events = iocage.lib.events
-        releaseUpdatePullEvent = events.ReleaseUpdatePull(self.release)
-        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(self.release)
+        releaseUpdatePullEvent = events.ReleaseUpdatePull(
+            self.release,
+            scope=event_scope
+        )
+        releaseUpdateDownloadEvent = events.ReleaseUpdateDownload(
+            self.release,
+            scope=releaseUpdatePullEvent.scope
+        )
 
         yield releaseUpdatePullEvent.begin()
         try:
@@ -277,7 +284,8 @@ class Updater:
         yield releaseUpdateDownloadEvent.end()
 
     def apply(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator[typing.Union[
         'iocage.lib.events.IocageEvent',
         bool
@@ -289,8 +297,10 @@ class Updater:
         )
 
         runResourceUpdateEvent = iocage.lib.events.RunResourceUpdate(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
+        _scope = runResourceUpdateEvent.scope
         yield runResourceUpdateEvent.begin()
 
         # create snapshot before the changes
@@ -308,7 +318,7 @@ class Updater:
         changed: bool = False
 
         try:
-            for event in self._update_jail(jail):
+            for event in self._update_jail(jail, event_scope=_scope):
                 if isinstance(event, iocage.lib.events.IocageEvent):
                     yield event
                 else:
@@ -323,7 +333,8 @@ class Updater:
 
     def _update_jail(
         self,
-        jail: 'iocage.lib.Jail.JailGenerator'
+        jail: 'iocage.lib.Jail.JailGenerator',
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator[typing.Union[
         'iocage.lib.events.IocageEvent',
         bool
@@ -331,8 +342,10 @@ class Updater:
 
         events = iocage.lib.events
         executeResourceUpdateEvent = events.ExecuteResourceUpdate(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
+        _scope = executeResourceUpdateEvent.scope
         yield executeResourceUpdateEvent.begin()
 
         skipped = False
@@ -341,7 +354,8 @@ class Updater:
             for event in iocage.lib.Jail.JailGenerator.fork_exec(
                 jail,
                 self._wrap_command(" ".join(self._update_command), "update"),
-                passthru=False
+                passthru=False,
+                event_scope=_scope
             ):
                 if isinstance(event, iocage.lib.events.JailLaunch) is True:
                     if event.done is True:
@@ -370,7 +384,8 @@ class Updater:
                 )
                 for event in iocage.lib.Jail.JailGenerator.stop(
                     jail,
-                    force=True
+                    force=True,
+                    event_scope=executeResourceUpdateEvent.scope
                 ):
                     yield event
 

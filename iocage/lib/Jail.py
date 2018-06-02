@@ -369,7 +369,8 @@ class JailGenerator(JailResource):
         self,
         quick: bool=False,
         passthru: bool=False,
-        single_command: typing.Optional[str]=None
+        single_command: typing.Optional[str]=None,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Start the jail.
@@ -397,7 +398,7 @@ class JailGenerator(JailResource):
         release = self.release
 
         events: typing.Any = iocage.lib.events
-        jailLaunchEvent = events.JailLaunch(jail=self)
+        jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
         self._ensure_script_dir()
         jail_start_script_dir = "".join([
@@ -481,9 +482,13 @@ class JailGenerator(JailResource):
         yield jailLaunchEvent.begin()
 
         def _stop_failed_jail(
-        ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
+        ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
             if single_command is None:
-                for event in self.stop(force=True):
+                stop_events = self.stop(
+                    force=True,
+                    event_scope=jailLaunchEvent.scope
+                )
+                for event in stop_events:
                     yield event
             else:
                 self._run_poststop_hook_manually()
@@ -578,6 +583,7 @@ class JailGenerator(JailResource):
         self,
         command: str,
         passthru: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None,
         **temporary_config_override
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Start a jail, run a command and shut it down immediately."""
@@ -601,7 +607,8 @@ class JailGenerator(JailResource):
             fork_exec_events = JailGenerator.start(
                 self,
                 single_command=command,
-                passthru=passthru
+                passthru=passthru,
+                event_scope=event_scope
             )
             for event in fork_exec_events:
                 yield event
@@ -724,7 +731,8 @@ class JailGenerator(JailResource):
 
     def stop(
         self,
-        force: bool=False
+        force: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Stop a jail.
@@ -739,7 +747,7 @@ class JailGenerator(JailResource):
             self.require_jail_running()
 
         events: typing.Any = iocage.lib.events
-        jailDestroyEvent = events.JailDestroy(self)
+        jailDestroyEvent = events.JailDestroy(self, scope=event_scope)
 
         self._prepare_stop()
 
@@ -819,14 +827,27 @@ class JailGenerator(JailResource):
     def restart(
         self,
         shutdown: bool=False,
-        force: bool=False
+        force: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Restart the jail."""
         failed: bool = False
-        jailRestartEvent = iocage.lib.events.JailRestart(jail=self)
-        jailShutdownEvent = iocage.lib.events.JailShutdown(jail=self)
-        JailSoftShutdownEvent = iocage.lib.events.JailSoftShutdown(jail=self)
-        jailStartEvent = iocage.lib.events.JailStart(jail=self)
+        jailRestartEvent = iocage.lib.events.JailRestart(
+            jail=self,
+            scope=event_scope
+        )
+        jailShutdownEvent = iocage.lib.events.JailShutdown(
+            jail=self,
+            scope=jailRestartEvent.scope
+        )
+        JailSoftShutdownEvent = iocage.lib.events.JailSoftShutdown(
+            jail=self,
+            scope=jailRestartEvent.scope
+        )
+        jailStartEvent = iocage.lib.events.JailStart(
+            jail=self,
+            scope=jailRestartEvent.scope
+        )
 
         yield jailRestartEvent.begin()
 
@@ -883,7 +904,8 @@ class JailGenerator(JailResource):
 
     def destroy(
         self,
-        force: bool=False
+        force: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Destroy a Jail and it's datasets.
@@ -897,14 +919,23 @@ class JailGenerator(JailResource):
         """
         self.state.query()
 
+        if event_scope is None:
+            event_scope = iocage.lib.events.Scope()
+
         if self.running is True and force is True:
-            for event in JailGenerator.stop(self, force=True):
+            stop_events = JailGenerator.stop(
+                self,
+                force=True,
+                event_scope=event_scope
+            )
+            for event in stop_events:
                 yield event
         else:
             self.require_jail_stopped()
 
         zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
-            dataset=self.dataset
+            dataset=self.dataset,
+            scope=event_scope
         )
 
         yield zfsDatasetDestroyEvent.begin()
@@ -917,7 +948,8 @@ class JailGenerator(JailResource):
 
     def rename(
         self,
-        new_name: str
+        new_name: str,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Change the name of a jail.
@@ -941,7 +973,8 @@ class JailGenerator(JailResource):
         jailRenameEvent = iocage.lib.events.JailRename(
             jail=self,
             current_name=current_id,
-            new_name=new_name
+            new_name=new_name,
+            scope=event_scope
         )
 
         self.config["id"] = new_name  # validates new_name
@@ -957,7 +990,8 @@ class JailGenerator(JailResource):
         try:
             events = self.storage_backend.rename(
                 self.storage,
-                new_name=new_name
+                new_name=new_name,
+                event_scope=jailRenameEvent.scope
             )
             for event in events:
                 yield jailRenameEvent.child_event(event)
@@ -968,7 +1002,11 @@ class JailGenerator(JailResource):
             raise e
 
         # Update fstab to the new dataset
-        for event in self.update_fstab_paths(current_mountpoint):
+        fstab_path_events = self.update_fstab_paths(
+            current_mountpoint,
+            event_scope=jailRenameEvent.scope
+        )
+        for event in fstab_path_events:
             yield event
 
         yield jailRenameEvent.end()
@@ -976,7 +1014,8 @@ class JailGenerator(JailResource):
     def update_fstab_paths(
         self,
         old_path_prefix: str,
-        new_path_prefix: typing.Optional[str]=None
+        new_path_prefix: typing.Optional[str]=None,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Update a path in the whole fstab file.
@@ -989,7 +1028,8 @@ class JailGenerator(JailResource):
             _new_path_prefix = new_path_prefix
 
         jailFstabUpdateEvent = iocage.lib.events.JailFstabUpdate(
-            jail=self
+            jail=self,
+            scope=event_scope
         )
         yield jailFstabUpdateEvent.begin()
         try:
@@ -1074,18 +1114,26 @@ class JailGenerator(JailResource):
 
     def clone_from_jail(
         self,
-        source_jail: 'JailGenerator'
+        source_jail: 'JailGenerator',
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Create a Jail from another Jail."""
         self.autoset_dataset_name()
-        for event in source_jail.clone_to_dataset(self.dataset_name):
-            yield event
+        if event_scope is None:
+            event_scope = iocage.lib.events.Scope()
+        clone_events = source_jail.clone_to_dataset(
+            self.dataset_name,
+            event_scope=event_scope
+        )
+        for clone_event in clone_events:
+            yield clone_event
 
         self.config.clone(source_jail.config.data)
         self.save()
 
         fstab_update_generator = self.update_fstab_paths(
-            source_jail.root_dataset.mountpoint
+            source_jail.root_dataset.mountpoint,
+            event_scope=event_scope
         )
         for event in fstab_update_generator:
             yield event
@@ -1093,10 +1141,14 @@ class JailGenerator(JailResource):
     def clone_to_dataset(
         self,
         destination_dataset_name: str,
-        delete_existing: bool=False
+        delete_existing: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Clones the jails dataset to another dataset with the given name."""
-        jailCloneEvent = iocage.lib.events.JailClone(jail=self)
+        jailCloneEvent = iocage.lib.events.JailClone(
+            jail=self,
+            scope=event_scope
+        )
         yield jailCloneEvent.begin()
 
         try:
