@@ -121,7 +121,8 @@ class LaunchableResourceBackup:
 
     def restore(
         self,
-        source: str
+        source: str,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Import a resource from an archive.
@@ -136,7 +137,11 @@ class LaunchableResourceBackup:
 
                 The path to the exported archive file (tar.gz)
         """
-        resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
+        resourceBackupEvent = iocage.lib.events.ResourceBackup(
+            self.resource,
+            scope=event_scope
+        )
+        _scope = resourceBackupEvent.scope
         yield resourceBackupEvent.begin()
 
         self._lock()
@@ -146,7 +151,7 @@ class LaunchableResourceBackup:
 
         resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
 
-        for event in self._extract_bundle(source):
+        for event in self._extract_bundle(source, event_scope=_scope):
             yield event
 
         # ToDo: Allow importing of releases or empty jails
@@ -170,16 +175,16 @@ class LaunchableResourceBackup:
             self.resource.create_from_scratch()
 
         if is_standalone is False:
-            for event in self._import_root_dataset():
+            for event in self._import_root_dataset(event_scope=_scope):
                 yield event
 
-        for event in self._import_other_datasets_recursive():
+        for event in self._import_other_datasets_recursive(event_scope=_scope):
             yield event
 
-        for event in self._import_config(config_data):
+        for event in self._import_config(config_data, event_scope=_scope):
             yield event
 
-        for event in self._import_fstab():
+        for event in self._import_fstab(event_scope=_scope):
             yield event
 
         _unlock_resource_backup()
@@ -187,13 +192,15 @@ class LaunchableResourceBackup:
 
     def _extract_bundle(
         self,
-        source: str
+        source: str,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         extractBundleEvent = iocage.lib.events.ExtractBundle(
             source=source,
             destination=self.temp_dir,
-            resource=self.resource
+            resource=self.resource,
+            scope=event_scope
         )
         yield extractBundleEvent.begin()
         try:
@@ -211,10 +218,14 @@ class LaunchableResourceBackup:
 
     def _import_config(
         self,
-        data: typing.Dict[str, typing.Any]
+        data: typing.Dict[str, typing.Any],
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
-        importConfigEvent = iocage.lib.events.ImportConfig(self.resource)
+        importConfigEvent = iocage.lib.events.ImportConfig(
+            self.resource,
+            scope=event_scope
+        )
         yield importConfigEvent.begin()
 
         try:
@@ -230,10 +241,14 @@ class LaunchableResourceBackup:
         yield importConfigEvent.end()
 
     def _import_fstab(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
-        importFstabEvent = iocage.lib.events.ImportFstab(self.resource)
+        importFstabEvent = iocage.lib.events.ImportFstab(
+            self.resource,
+            scope=event_scope
+        )
         yield importFstabEvent.begin()
 
         fstab_file_path = f"{self.temp_dir}/fstab"
@@ -259,7 +274,8 @@ class LaunchableResourceBackup:
         yield importFstabEvent.end()
 
     def _import_root_dataset(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Import data from an exported root dataset.
@@ -268,7 +284,8 @@ class LaunchableResourceBackup:
         already exist in the resources root dataset will be overwritten.
         """
         importRootDatasetEvent = iocage.lib.events.ImportRootDataset(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
         yield importRootDatasetEvent.begin()
 
@@ -292,11 +309,13 @@ class LaunchableResourceBackup:
         yield importRootDatasetEvent.end()
 
     def _import_other_datasets_recursive(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         importOtherDatasetsEvent = iocage.lib.events.ImportOtherDatasets(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
         yield importOtherDatasetsEvent.begin()
         hasImportedOtherDatasets = False
@@ -305,7 +324,8 @@ class LaunchableResourceBackup:
             absolute_asset_name = f"{self.temp_dir}/{dataset_name}.zfs"
             importOtherDatasetEvent = iocage.lib.events.ImportOtherDataset(
                 dataset_name=dataset_name,
-                resource=self.resource
+                resource=self.resource,
+                scope=importOtherDatasetsEvent.scope
             )
             yield importOtherDatasetEvent.begin()
             try:
@@ -353,7 +373,8 @@ class LaunchableResourceBackup:
         self,
         destination: str,
         standalone: typing.Optional[bool]=None,
-        recursive: bool=False
+        recursive: bool=False,
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Export the resource.
@@ -382,7 +403,11 @@ class LaunchableResourceBackup:
 
                     Includes snapshots of all exported ZFS datasets.
         """
-        resourceBackupEvent = iocage.lib.events.ResourceBackup(self.resource)
+        resourceBackupEvent = iocage.lib.events.ResourceBackup(
+            self.resource,
+            scope=event_scope
+        )
+        _scope = resourceBackupEvent.scope
         yield resourceBackupEvent.begin()
 
         self._lock()
@@ -402,25 +427,34 @@ class LaunchableResourceBackup:
 
         if "config" in self.resource.__dir__():
             # only export config when the resource has one
-            for event in self._export_config():
+            for event in self._export_config(event_scope=_scope):
                 yield event
-            for event in self._export_fstab():
+            for event in self._export_fstab(event_scope=_scope):
                 yield event
 
         if is_standalone is False:
-            for event in self._export_root_dataset(flags=zfs_send_flags):
+            export_root_dataset_events = self._export_root_dataset(
+                flags=zfs_send_flags,
+                event_scope=_scope
+            )
+            for event in export_root_dataset_events:
                 yield event
 
         # other datasets include `root` when the resource is no basejail
         recursive_export_events = self._export_other_datasets_recursive(
             flags=zfs_send_flags,
             standalone=is_standalone,
-            limit_depth=(recursive is True)
+            limit_depth=(recursive is True),
+            event_scope=_scope
         )
         for event in recursive_export_events:
             yield event
 
-        for event in self._bundle_backup(destination=destination):
+        bundle_backup_events = self._bundle_backup(
+            destination=destination,
+            event_scope=_scope
+        )
+        for event in bundle_backup_events:
             yield event
 
         _unlock_resource_backup()
@@ -436,10 +470,14 @@ class LaunchableResourceBackup:
         self.zfs.get_snapshot(self.full_snapshot_name).delete(recursive=True)
 
     def _export_config(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
-        exportConfigEvent = iocage.lib.events.ExportConfig(self.resource)
+        exportConfigEvent = iocage.lib.events.ExportConfig(
+            self.resource,
+            scope=event_scope
+        )
         yield exportConfigEvent.begin()
 
         try:
@@ -456,10 +494,14 @@ class LaunchableResourceBackup:
         yield exportConfigEvent.end()
 
     def _export_fstab(
-        self
+        self,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
-        exportFstabEvent = iocage.lib.events.ExportFstab(self.resource)
+        exportFstabEvent = iocage.lib.events.ExportFstab(
+            self.resource,
+            scope=event_scope
+        )
         yield exportFstabEvent.begin()
 
         try:
@@ -484,11 +526,13 @@ class LaunchableResourceBackup:
 
     def _export_root_dataset(
         self,
-        flags: typing.Set[libzfs.SendFlag]
+        flags: typing.Set[libzfs.SendFlag],
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportRootDatasetEvent = iocage.lib.events.ExportRootDataset(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
         yield exportRootDatasetEvent.begin()
 
@@ -509,8 +553,8 @@ class LaunchableResourceBackup:
                 "--safe-links",
                 f"--compare-dest={compare_dest}/",
                 f"{self.resource.root_dataset.mountpoint}/",
-                temp_root_dir
-            ])
+                temp_root_dir,
+            ], logger=self.logger)
         except iocage.lib.errors.IocageException as e:
             yield exportRootDatasetEvent.fail(e)
             raise e
@@ -520,11 +564,13 @@ class LaunchableResourceBackup:
         self,
         standalone: bool,
         flags: typing.Set[libzfs.SendFlag],
-        limit_depth: bool=False
+        event_scope: typing.Optional['iocage.lib.events.Scope'],
+        limit_depth: bool=False,
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         exportOtherDatasetsEvent = iocage.lib.events.ExportOtherDatasets(
-            self.resource
+            self.resource,
+            scope=event_scope
         )
         yield exportOtherDatasetsEvent.begin()
         hasExportedOtherDatasets = False
@@ -543,7 +589,8 @@ class LaunchableResourceBackup:
             exportOtherDatasetEvent = iocage.lib.events.ExportOtherDataset(
                 dataset=dataset,
                 flags=flags,
-                resource=self.resource
+                resource=self.resource,
+                scope=exportOtherDatasetsEvent.scope
             )
             yield exportOtherDatasetEvent.begin()
             try:
@@ -586,12 +633,14 @@ class LaunchableResourceBackup:
 
     def _bundle_backup(
         self,
-        destination: str
+        destination: str,
+        event_scope: typing.Optional['iocage.lib.events.Scope']
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Create the an archive file from the backup assets."""
         bundleBackupEvent = iocage.lib.events.BundleBackup(
             destination=destination,
-            resource=self.resource
+            resource=self.resource,
+            scope=event_scope
         )
         yield bundleBackupEvent.begin()
 

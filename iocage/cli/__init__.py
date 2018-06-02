@@ -77,6 +77,7 @@ def set_to_dict(data: typing.Set[str]) -> typing.Dict[str, str]:
 def print_events(
     generator: typing.Generator[typing.Union[IocageEvent, bool], None, None]
 ) -> typing.Optional[bool]:
+
     lines: typing.Dict[str, str] = {}
     for event in generator:
 

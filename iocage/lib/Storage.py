@@ -70,22 +70,25 @@ class Storage:
 
     def rename(
         self,
-        new_name: str
+        new_name: str,
+        event_scope: typing.Optional[int]=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """Rename the dataset and its snapshots."""
-        for event in self._rename_dataset(new_name):
+        for event in self._rename_dataset(new_name, event_scope=event_scope):
             yield event
-        for event in self._rename_snapshot(new_name):
+        for event in self._rename_snapshot(new_name, event_scope=event_scope):
             yield event
 
     def _rename_dataset(
         self,
-        new_name: str
+        new_name: str,
+        event_scope: typing.Optional[int]
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         current_dataset_name = self.jail.dataset.name
         renameDatasetEvent = iocage.lib.events.ZFSDatasetRename(
-            dataset=self.jail.dataset
+            dataset=self.jail.dataset,
+            scope=event_scope
         )
         yield renameDatasetEvent.begin()
 
@@ -107,13 +110,15 @@ class Storage:
 
     def _rename_snapshot(
         self,
-        new_name: str
+        new_name: str,
+        event_scope: typing.Optional[int]
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 
         root_dataset_properties = self.jail.root_dataset.properties
 
         renameSnapshotEvent = iocage.lib.events.ZFSSnapshotRename(
-            snapshot=self.jail.dataset
+            snapshot=self.jail.dataset,
+            scope=event_scope
         )
         yield renameSnapshotEvent.begin()
 
