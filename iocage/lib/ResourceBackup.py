@@ -281,6 +281,7 @@ class LaunchableResourceBackup:
                 "rsync",
                 "-av",
                 "--links",
+                "--hard-links",
                 "--safe-links",
                 f"{temp_root_dir}/",
                 f"{self.resource.root_dataset.mountpoint}/"
@@ -504,6 +505,7 @@ class LaunchableResourceBackup:
                 "-av",
                 "--checksum",
                 "--links",
+                "--hard-links",
                 "--safe-links",
                 f"--compare-dest={compare_dest}/",
                 f"{self.resource.root_dataset.mountpoint}/",
