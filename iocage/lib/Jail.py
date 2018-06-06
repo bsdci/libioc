@@ -2076,3 +2076,18 @@ class Jail(JailGenerator):
                 requires it to be stopped.
         """
         return list(JailGenerator.destroy(self, force=force))
+
+    def fork_exec(  # noqa: T484
+        self,
+        command: str,
+        **temporary_config_override
+    ) -> str:
+        """Execute a one-shot jail and return its stdout."""
+        events = JailGenerator.fork_exec(
+            self,
+            command=command,
+            passthru=False
+        )
+        for event in events:
+            if isinstance(event, iocage.lib.events.JailLaunch) and event.done:
+                return str(event.stdout)
