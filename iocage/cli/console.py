@@ -50,11 +50,12 @@ def cli(ctx, jail, start):
     except iocage.lib.errors.JailNotFound:
         exit(1)
 
-    if not ioc_jail.running:
-        if start is True:
-            ctx.parent.print_events(ioc_jail.start())
-
     try:
+        if not ioc_jail.running:
+            if start is True:
+                ctx.parent.print_events(ioc_jail.start())
+
         ioc_jail.exec_console()
     except iocage.lib.errors.IocageException:
         exit(1)
+
