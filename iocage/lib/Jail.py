@@ -115,10 +115,15 @@ class JailResource(
         except AttributeError:
             pass
 
+        try:
+            release = self.release
+        except AttributeError:
+            release = None
+
         jail = self.jail
         fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
             jail=jail,
-            release=self.config["release"],
+            release=release,
             logger=self.logger,
             host=jail.host
         )
