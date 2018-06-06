@@ -406,7 +406,7 @@ class JailGenerator(JailResource):
         if os.path.isdir(jail_start_script_dir) is False:
             os.makedirs(jail_start_script_dir, 0o755)
 
-        exec_prestart: typing.List[str] = []
+        exec_prestart: typing.List[str] = self._get_resource_limits_commands()
         exec_start: typing.List[str] = []
         exec_started: typing.List[str] = [
             f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
@@ -522,7 +522,6 @@ class JailGenerator(JailResource):
 
         yield jailLaunchEvent.end(stdout=stdout)
 
-        self._limit_resources()
         self._configure_nameserver()
 
     def _run_poststop_hook_manually(self) -> None:
@@ -679,7 +678,7 @@ class JailGenerator(JailResource):
     def _prepare_stop(self) -> None:
         exec_prestop = []
         exec_stop = []
-        exec_poststop = self._teardown_mounts()
+        exec_poststop = self._teardown_mounts() + self._clear_resource_limits()
 
         # ToDo: self.config.get("exec_prestop", "")
         if self.config["exec_prestop"] is not None:
@@ -1330,8 +1329,6 @@ class JailGenerator(JailResource):
             passthru=False
         )
 
-        self._release_resource_limits()
-
     @property
     def _dhcp_enabled(self) -> bool:
         """Return True if any ip4_addr uses DHCP."""
@@ -1684,11 +1681,13 @@ class JailGenerator(JailResource):
     def _configure_localhost_commands(self) -> typing.List[str]:
         return ["ifconfig lo0 localhost"]
 
-    def _limit_resources(self) -> None:
+    def _get_resource_limits_commands(self) -> typing.List[str]:
+
+        commands: typing.List[str] = []
 
         if self.config['rlimits'] is False:
             self.logger.verbose("Resource limits disabled")
-            return
+            return commands
 
         for key in iocage.lib.Config.Jail.Properties.ResourceLimit.properties:
             try:
@@ -1697,24 +1696,20 @@ class JailGenerator(JailResource):
                     continue
             except KeyError:
                 continue
-            command = [
+            commands.append(" ".join([
                 "/usr/bin/rctl",
                 "-a",
                 f"jail:{self.identifier}:{key}:{rlimit_prop.limit_string}"
-            ]
-            iocage.lib.helpers.exec(command, logger=self.logger)
+            ]))
+        return commands
 
-    def _release_resource_limits(self) -> None:
+    def _clear_resource_limits(self) -> typing.List[str]:
 
         if self.config['rlimits'] is False:
-            return
+            return []
 
         self.logger.verbose("Clearing resource limits")
-        iocage.lib.helpers.exec(
-            ["/usr/bin/rctl", "-r", f"jail:{self.identifier}"],
-            logger=self.logger,
-            ignore_error=True
-        )
+        return [f"/usr/bin/rctl -r jail:{self.identifier} 2>/dev/null || true"]
 
     @property
     def _allow_mount(self) -> str:
