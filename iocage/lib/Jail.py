@@ -1049,6 +1049,7 @@ class JailGenerator(JailResource):
         resource: typing.Optional[typing.Union[
             'JailGenerator',
             'iocage.lib.Release.ReleaseGenerator',
+            str
         ]]=None
     ) -> None:
         """
@@ -1060,6 +1061,9 @@ class JailGenerator(JailResource):
                 The (new) jail is created from this resource.
                 If no resource is specified, an empty dataset will be created
         """
+        if isinstance(resource, str):
+            resource = iocage.Release(resource)
+
         if isinstance(resource, JailGenerator):
             self.create_from_template(template=resource)
         elif isinstance(resource, iocage.lib.Release.ReleaseGenerator):
