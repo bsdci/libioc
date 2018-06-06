@@ -66,25 +66,28 @@ class ResourceLimitValue:
         self.action = None
         self.per = None
 
-    def _parse_resource_limit(
-        self,
-        value: typing.Union[str, int]
-    ) -> typing.Tuple[str, str, str]:
+    def _parse_resource_limit(self, value: str) -> typing.Tuple[
+        typing.Optional[str],
+        typing.Optional[str],
+        typing.Optional[str]
+    ]:
 
-        _value = str(value)
-
-        if ("=" not in _value) and (":" not in _value):
+        if (value is False) or (value is None):
+            amount = None
+            action = None
+            per = None
+        elif ("=" not in value) and (":" not in value):
             # simplified syntax vmemoryuse=128M
-            amount = _value
+            amount = value
             action = "deny"
             per = "jail"
-        elif "=" in _value:
+        elif "=" in value:
             # rctl syntax
-            action, _rest = _value.split("=", maxsplit=1)
+            action, _rest = value.split("=", maxsplit=1)
             amount, per = _rest.split("/", maxsplit=1)
-        elif ":" in _value:
+        elif ":" in value:
             # iocage legacy syntax
-            amount, action = _value.split(":", maxsplit=1)
+            amount, action = value.split(":", maxsplit=1)
             per = "jail"
         else:
             raise ValueError("invalid syntax")
@@ -140,10 +143,11 @@ class ResourceLimitProp(ResourceLimitValue):
 
         ResourceLimitValue.__init__(self)
 
-    def _parse_resource_limit(
-        self,
-        value: typing.Union[str, int]
-    ) -> typing.Tuple[str, str, str]:
+    def _parse_resource_limit(self, value: str) -> typing.Tuple[
+        typing.Optional[str],
+        typing.Optional[str],
+        typing.Optional[str]
+    ]:
         return ResourceLimitValue._parse_resource_limit(self, value=value)
 
     def __update_from_config(self) -> None:
@@ -170,7 +174,7 @@ class ResourceLimitProp(ResourceLimitValue):
             action = None
             per = None
         elif isinstance(data, str) or isinstance(data, int):
-            amount, action, per = self._parse_resource_limit(data)
+            amount, action, per = self._parse_resource_limit(str(data))
         elif isinstance(data, ResourceLimitValue):
             amount = data.amount
             action = data.action
