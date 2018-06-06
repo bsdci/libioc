@@ -281,7 +281,7 @@ class QueuingNetworkInterface(
                 f"export {self.shell_variable_nic_name}=\"$({_command})\""
             )
         else:
-            self.append_command_queue(_command)
+            self.append_command_queue(f"{_command} > /dev/null")
 
         return ""
 
