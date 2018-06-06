@@ -1693,6 +1693,8 @@ class JailGenerator(JailResource):
         for key in iocage.lib.Config.Jail.Properties.ResourceLimit.properties:
             try:
                 rlimit_prop = self.config[key]
+                if rlimit_prop.is_unset is True:
+                    continue
             except KeyError:
                 continue
             command = [

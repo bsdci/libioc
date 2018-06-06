@@ -66,13 +66,18 @@ class ResourceLimitValue:
         self.action = None
         self.per = None
 
+    @property
+    def is_unset(self) -> bool:
+        """Return whether any parameter is None."""
+        return (None in [self.amount, self.action, self.per]) is True
+
     def _parse_resource_limit(self, value: str) -> typing.Tuple[
         typing.Optional[str],
         typing.Optional[str],
         typing.Optional[str]
     ]:
 
-        if (value is False) or (value is None):
+        if (value is False) or (value is None) or (value == "None=None/None"):
             amount = None
             action = None
             per = None
