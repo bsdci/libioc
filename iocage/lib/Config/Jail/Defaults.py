@@ -46,7 +46,7 @@ class DefaultsUserData(dict):
         if key in self.defaults:
             self[key] = self.defaults[key]
         else:
-            del self[key]
+            dict.__delitem__(self, key)
         self.user_properties.remove(key)
 
     @property
