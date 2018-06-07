@@ -116,10 +116,9 @@ class JailResource(
             pass
 
         jail = self.jail
-        release = None if ("release" not in jail.__dir__()) else jail.release
         fstab = iocage.lib.Config.Jail.File.Fstab.Fstab(
             jail=jail,
-            release=release,
+            release=self.config["release"],
             logger=self.logger,
             host=jail.host
         )
@@ -395,7 +394,6 @@ class JailGenerator(JailResource):
         """
         self.require_jail_existing()
         self.require_jail_stopped()
-        release = self.release
 
         events: typing.Any = iocage.lib.events
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
@@ -495,7 +493,7 @@ class JailGenerator(JailResource):
         jailLaunchEvent.add_rollback_step(_stop_failed_jail)
 
         if self.is_basejail is True:
-            self.storage_backend.apply(self.storage, release)
+            self.storage_backend.apply(self.storage, self.release)
 
         if quick is False:
             self._save_autoconfig()
