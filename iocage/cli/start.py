@@ -78,7 +78,7 @@ def _autostart(
     ]
 ) -> None:
 
-    filters = ("boot=yes", "running=no", "template=no",)
+    filters = ("boot=yes", "running=no", "template=no,-",)
 
     ioc_jails = iocage.lib.Jails.Jails(
         zfs=zfs,

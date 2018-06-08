@@ -139,7 +139,7 @@ def _autostop(
     force: bool=True
 ) -> None:
 
-    filters = ("running=yes", "template=no",)
+    filters = ("running=yes", "template=no,-",)
 
     ioc_jails = iocage.lib.Jails.Jails(
         host=host,

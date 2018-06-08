@@ -77,7 +77,7 @@ def cli(
         exit(1)
 
     if dataset_type is None:
-        filters += ("template=no",)
+        filters += ("template=no,-",)
         dataset_type = "jail"
     elif dataset_type == "template":
         filters += ("template=yes",)
