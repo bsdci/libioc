@@ -50,7 +50,7 @@ ioc_status()
 {
     if checkyesno ${rcvar}; then
         echo -n "* [iocage] checking jails status..."
-	test -z "$(/usr/local/bin/ioc list boot=yes running=no template=no --no-header --output=name --output-format=list)"
+	test -z "$(/usr/local/bin/ioc list boot=yes running=no template=no,- --no-header --output=name --output-format=list)"
 	status=$?
 	if test ${status} -eq 0; then
             echo " OK"

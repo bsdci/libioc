@@ -57,7 +57,7 @@ def cli(
         logger.error("No jail selector provided")
         exit(1)
 
-    filters = jails + ("template=no",)
+    filters = jails + ("template=no,-",)
     ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         host=ctx.parent.host,
