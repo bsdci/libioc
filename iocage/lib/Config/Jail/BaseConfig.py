@@ -150,7 +150,7 @@ class BaseConfig(dict):
             self.legacy = False
 
     def _get_id(self) -> str:
-        return str(self.data["id"])
+        return iocage.lib.helpers.to_string(self.data["id"])
 
     def _set_id(self, name: str, **kwargs) -> None:  # noqa: T484
 
@@ -382,7 +382,7 @@ class BaseConfig(dict):
 
     def _get_jail_zfs_dataset(self) -> typing.List[str]:
         try:
-            jail_zfs_dataset = str(self.data["jail_zfs_dataset"])
+            jail_zfs_dataset = iocage.lib.helpers.to_string(self.data["jail_zfs_dataset"])
             return jail_zfs_dataset.split()
         except KeyError:
             return []
