@@ -63,13 +63,12 @@ def cli(
     host = iocage.lib.Host.Host(logger=logger)
 
     if _pool is True:
-        exit_status = 0
         try:
             print(host.datasets.active_pool.name)
         except Exception:
-            exit_status = 1
             print("No active pool found")
-        exit(exit_status)
+            exit(1)
+        exit(0)
 
     if jail == "":
         prop = ""
