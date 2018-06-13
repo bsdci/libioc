@@ -1109,6 +1109,10 @@ class JailGenerator(JailResource):
     ) -> None:
         """Create a Jail from a template Jail."""
         template.require_jail_is_template()
+        for key in template.config.keys():
+            if key in ["id", "name", "template"]:
+                continue
+            self.config[key] = template.config[key]
         self.config['release'] = template.config['release']
         self.config['basejail'] = template.config['basejail']
         self.config['basejail_type'] = template.config['basejail_type']
