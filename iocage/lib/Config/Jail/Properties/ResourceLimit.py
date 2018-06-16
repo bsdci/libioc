@@ -53,6 +53,12 @@ properties: typing.List[str] = [
     "writeiops"
 ]
 
+ResourceLimitValueTuple = typing.Tuple[
+    typing.Optional[str],
+    typing.Optional[str],
+    typing.Optional[str]
+]
+
 
 class ResourceLimitValue:
     """Model of a resource limits value."""
@@ -66,7 +72,7 @@ class ResourceLimitValue:
         *args: typing.List[str],
         **kwargs: typing.Dict[str, typing.Union[int, str]]
     ) -> None:
-        _values = (None, None, None,)
+        _values: ResourceLimitValueTuple = (None, None, None,)
         if len(args) > 0:
             _values = self._parse_resource_limit(str(args[0]))
         self.amount = kwargs.get("amount", _values[0])
@@ -78,11 +84,7 @@ class ResourceLimitValue:
         """Return whether any parameter is None."""
         return (None in [self.amount, self.action, self.per]) is True
 
-    def _parse_resource_limit(self, value: str) -> typing.Tuple[
-        typing.Optional[str],
-        typing.Optional[str],
-        typing.Optional[str]
-    ]:
+    def _parse_resource_limit(self, value: str) -> ResourceLimitValueTuple:
 
         if (value is False) or (value is None) or (value == "None=None/None"):
             amount = None
