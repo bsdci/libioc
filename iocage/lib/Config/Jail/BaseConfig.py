@@ -512,6 +512,19 @@ class BaseConfig(dict):
 
         raise KeyError(f"User defined property not found: {key}")
 
+    def get(
+        self,
+        key: str,
+        *args: typing.Any
+    ) -> typing.Any:
+        """Return the config value or its given default."""
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            if len(args) == 0:
+                raise
+            return args[0]
+
     def __getitem__(self, key: str) -> typing.Any:
         """
         Get the user configured value of a jail configuration property.
