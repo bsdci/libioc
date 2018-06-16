@@ -518,6 +518,10 @@ class BaseConfig(dict):
         *args: typing.Any
     ) -> typing.Any:
         """Return the config value or its given default."""
+        if len(args) > 1:
+            raise TypeError(
+                f"get() takes 1 positional argument but {len(args)} were given"
+            )
         try:
             return self.__getitem__(key)
         except KeyError:
