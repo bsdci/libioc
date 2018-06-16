@@ -673,9 +673,28 @@ class BaseConfig(dict):
         """Return the available configuration keys."""
         return self.data.keys()
 
+    def items(self) -> typing.List[typing.Tuple[str, typing.Any]]:
+        """Return the combined config properties."""
+        return [(key, self[key],) for key in self.all_properties
+
+    def __iter__(self) -> typing.Iterator[str]:
+        """Return the combined config properties."""
+        return self.data.__iter__()
+
+    def values(self) -> typing.List[str]:
+        """Return all config values."""
+        return [self[key] for key in self._sorted_user_properties]
+
+    def __len__(self) -> typing.Any:
+        return len(self._sorted_user_properties)
+
     @property
-    def all_properties(self) -> list:
+    def all_properties(self) -> typing.List[str]:
         """Return a list of all user configured settings."""
+        return self._sorted_user_properties
+
+    @property
+    def _sorted_user_properties(self) -> typing.List[str]:
         return sorted(self.data.keys())
 
     def stringify(self, value: typing.Any) -> str:
