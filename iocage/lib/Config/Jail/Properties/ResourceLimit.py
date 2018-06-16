@@ -61,10 +61,17 @@ class ResourceLimitValue:
     action: typing.Optional[str]
     per: typing.Optional[str]
 
-    def __init__(self) -> None:
-        self.amount = None
-        self.action = None
-        self.per = None
+    def __init__(
+        self,
+        *args: typing.List[str],
+        **kwargs: typing.Dict[str, typing.Union[int, str]]
+    ) -> None:
+        _values = (None, None, None,)
+        if len(args) > 0:
+            _values = self._parse_resource_limit(str(args[0]))
+        self.amount = kwargs.get("amount", _values[0])
+        self.action = kwargs.get("action", _values[1])
+        self.per = kwargs.get("per", _values[2])
 
     @property
     def is_unset(self) -> bool:
