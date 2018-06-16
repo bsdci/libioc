@@ -669,13 +669,38 @@ class BaseConfig(dict):
 
         return list(properties)
 
-    def keys(self) -> typing.KeysView:
+    def keys(self) -> typing.KeysView[str]:
         """Return the available configuration keys."""
-        return self.data.keys()
+        return self._sorted_user_properties
+
+    def values(self) -> typing.List[typing.Any]:
+        """Return all config values."""
+        return [self[key] for key in self._sorted_user_properties]
+
+    def items(self) -> typing.ItemsView[str, typing.Any]:
+        """Return the combined config properties."""
+        return dict.items(
+            zip(
+                list(self.keys),
+                list(self.values)
+            )
+        )
+
+    def __iter__(self) -> typing.Iterator[str]:
+        """Return the combined config properties."""
+        return self.data.__iter__()
+
+    def __len__(self) -> typing.Any:
+        """Return the number of user configuration properties."""
+        return len(self._sorted_user_properties)
 
     @property
-    def all_properties(self) -> list:
+    def all_properties(self) -> typing.List[str]:
         """Return a list of all user configured settings."""
+        return self._sorted_user_properties
+
+    @property
+    def _sorted_user_properties(self) -> typing.List[str]:
         return sorted(self.data.keys())
 
     def stringify(self, value: typing.Any) -> str:
