@@ -41,7 +41,7 @@ iocage commands default to the first root data source specified in the file.
 Operations can be pointed to an alternative root by prefixing the subject with the source name followed by a slash.
 
 ```sh
-ioc create -b othersource/myjail
+ioc create othersource/myjail
 ioc rename othersource/myjail myjail2
 ```
 
