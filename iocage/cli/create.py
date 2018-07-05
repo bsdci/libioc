@@ -70,10 +70,16 @@ def validate_count(
 @click.option("--template", "-t", required=False,
               help="Specify the template to use for the new jail instead of"
                    " a RELEASE.")
-@click.option("--basejail", "-b", is_flag=True, default=False,
-              help="Set the new jail type to a basejail. Basejails"
-                   " mount the specified RELEASE directories"
-                   " over the jail's directories.")
+@click.option(
+    "--basejail/--no-basejail", "-b/-nb",
+    is_flag=True,
+    default=True,
+    help=(
+        "Set the new jail type to a basejail (default). "
+        "Basejails mount the specified RELEASE directories over the "
+        "jail's directories."
+    )
+)
 @click.option("--basejail-type", type=click.Choice(['nullfs', 'zfs']),
               help="The method of mounting release datasets into"
                    " the basejail on start.")
