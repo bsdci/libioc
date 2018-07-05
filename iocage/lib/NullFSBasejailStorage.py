@@ -22,11 +22,12 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage NullFS basejail storage backend."""
+import iocage.lib.Storage
 import iocage.lib.StandaloneJailStorage
 import iocage.lib.helpers
 
 
-class NullFSBasejailStorage:
+class NullFSBasejailStorage(iocage.lib.Storage.Storage):
     """iocage NullFS basejail storage backend."""
 
     def apply(self, release=None):
