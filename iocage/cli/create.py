@@ -70,8 +70,6 @@ def validate_count(
 @click.option("--template", "-t", required=False,
               help="Specify the template to use for the new jail instead of"
                    " a RELEASE.")
-@click.option("--name", "-n", default=None,
-              help="Provide a specific name instead of an UUID for this jail.")
 @click.option("--basejail", "-b", is_flag=True, default=False,
               help="Set the new jail type to a basejail. Basejails"
                    " mount the specified RELEASE directories"
@@ -84,6 +82,7 @@ def validate_count(
                    " jails.")
 @click.option("--no-fetch", is_flag=True, default=False,
               help="Do not automatically fetch releases")
+@click.argument("name")
 @click.argument("props", nargs=-1)
 def cli(
     ctx: IocageClickContext,
