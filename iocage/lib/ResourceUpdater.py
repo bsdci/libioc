@@ -139,6 +139,8 @@ class Updater:
                 destination=destination_dir,
                 options="rw"
             )
+            if os.path.isdir(destination_dir) is False:
+                os.makedirs(destination_dir, 0o755)
             temporary_jail.fstab.save()
             self._temporary_jail = temporary_jail
         return self._temporary_jail
