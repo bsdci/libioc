@@ -37,8 +37,6 @@ class NetworkInterface:
     """
 
     ifconfig_command = "/sbin/ifconfig"
-    dhclient_command = "/sbin/dhclient"
-    rtsold_command = "/usr/sbin/rtsold"
 
     name: typing.Optional[str]
     settings: typing.Dict[str, typing.Union[str, typing.List[str]]]
@@ -185,11 +183,12 @@ class NetworkInterface:
 
         family = "inet6" if ipv6 else "inet"
         for i, address in enumerate(addresses):
+
+            if address.lower() == "dhcp":
+                continue
+
             name = self.current_nic_name
-            if (ipv6 is False) and (address.lower() == "dhcp"):
-                command = [self.dhclient_command, name]
-            else:
-                command = [self.ifconfig_command, name, family, address]
+            command = [self.ifconfig_command, name, family, address]
 
             if i > 0:
                 command.append("alias")

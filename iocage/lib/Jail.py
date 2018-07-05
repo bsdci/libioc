@@ -427,6 +427,18 @@ class JailGenerator(JailResource):
             exec_start += self._configure_routes_commands()
             if self.host.ipfw_enabled is True:
                 exec_start.append("service ipfw onestop")
+        else:
+            for nic_name, ip4_addresses in self.config["ip4_addr"].items():
+                for ip4_addr in ip4_addresses:
+                    if ip4_addr.lower() == "dhcp":
+                        exec_start += [f"/sbin/dhclient {nic_name}"]
+                        break
+
+            for nic_name, ip6_addresses in self.config["ip6_addr"].items():
+                for ip6_addr in ip6_addresses:
+                    if ip6_addr.lower() == "accept_rtadv":
+                        exec_start += [f"/usr/sbin/rtsold {nic_name}"]
+                        break
 
         if self.config["jail_zfs"] is True:
             share_storage = iocage.lib.ZFSShareStorage.QueuingZFSShareStorage(
@@ -1398,7 +1410,13 @@ class JailGenerator(JailResource):
         else:
 
             if self.config["ip4_addr"] is not None:
-                ip4_addr = self.config["ip4_addr"]
+                ip4_addrs: typing.List[str] = []
+                for _nic, _ips in self.config["ip4_addr"].items():
+                    for _ip in _ips:
+                        if str(_ip) == "dhcp":
+                            continue
+                        ip4_addrs.append(f"{_nic}|{_ip}")
+                ip4_addr = ",".join(ip4_addrs)
                 command += [
                     f"ip4.addr={ip4_addr}",
                     f"ip4.saddrsel={self.config['ip4_saddrsel']}",
