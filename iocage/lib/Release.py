@@ -398,7 +398,7 @@ class ReleaseGenerator(ReleaseResource):
 
         When no snapshot was taken before `p0` is automatically created.
         """
-        version_snapshots = sorted(self.version_snapshots)
+        version_snapshots = self.version_snapshots
         if len(version_snapshots) == 0:
             self.logger.verbose("No release snapshot found - using @p0")
             return self.snapshot("p0")
