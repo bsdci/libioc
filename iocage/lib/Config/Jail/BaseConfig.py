@@ -430,6 +430,16 @@ class BaseConfig(dict):
             false="off"
         )
 
+    def _set_cloned_release(  # noqa: T484
+        self,
+        value: typing.Optional[str],
+        **kwargs
+    ) -> None:
+        if (value is None) and "cloned_release" in self.data.keys():
+            del self.data["cloned_release"]
+        self["release"] = value
+        self.data["cloned_release"] = value
+
     def _get_cloned_release(self) -> typing.Optional[str]:
         try:
             return str(self.data["cloned_release"])

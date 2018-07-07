@@ -51,6 +51,7 @@ import iocage.lib.VersionedResource
 import iocage.lib.Config.Jail.Properties.ResourceLimit
 import iocage.lib.ResourceSelector
 import iocage.lib.Config.Jail.File.Fstab
+import iocage.lib.Provisioning
 
 
 class JailResource(
@@ -258,6 +259,7 @@ class JailGenerator(JailResource):
     _class_storage = iocage.lib.Storage.Storage
     _state: typing.Optional[iocage.lib.JailState.JailState]
     _relative_hook_script_dir: str
+    _provisioner: 'iocage.lib.Provisioning.Prototype'
 
     def __init__(  # noqa: T484
         self,
@@ -360,6 +362,22 @@ class JailGenerator(JailResource):
         performance optimization when dealing with large numbers of jails.
         """
         object.__setattr__(self, '_state', value)
+
+    @property
+    def provisioner(self) -> 'iocage.lib.Provisioning.prototype.Provisioner':
+        """
+        Return the jails Provisioner instance.
+
+        The provisioner itself is going to interpret the jails configuration
+        dynamically, so that the Provisioner instance can be memoized.
+        """
+        try:
+            return self._provisioner
+        except AttributeError:
+            pass
+
+        self._provisioner = iocage.lib.Provisioning.Provisioner(jail=self)
+        return self._provisioner
 
     def _init_state(self) -> iocage.lib.JailState.JailState:
         state = iocage.lib.JailState.JailState(

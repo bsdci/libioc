@@ -86,6 +86,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "ip6_saddrsel": 1,
         "ip6_addr": None,
         "resolver": "/etc/resolv.conf",
+        "host_hostuuid": None,
         "host_hostname": None,
         "host_domainname": None,
         "devfs_ruleset": 4,
@@ -131,7 +132,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "provisioning": {
             "method": None,
             "source": None,
-            "revision": "master"
+            "rev": "master"
         }
     }
 
