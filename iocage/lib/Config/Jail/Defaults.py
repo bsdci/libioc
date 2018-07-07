@@ -127,7 +127,12 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "tags": [],
         "template": False,
         "jail_zfs": False,
-        "jail_zfs_dataset": None
+        "jail_zfs_dataset": None,
+        "provisioning": {
+            "method": None,
+            "source": None,
+            "revision": "master"
+        }
     }
 
     def __init__(

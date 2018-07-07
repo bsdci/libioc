@@ -54,7 +54,12 @@ def cli(
 
     # Defaults
     if jail == "defaults":
-        updated_properties = _set_properties(props, host.defaults)
+        updated_properties = _set_properties(
+            properties=props,
+            target=host.defaults,
+            logger=logger,
+            host=host
+        )
         if len(updated_properties) > 0:
             logger.screen("Defaults updated: " + ", ".join(updated_properties))
         else:
@@ -74,7 +79,12 @@ def cli(
     for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
 
         try:
-            updated_properties = _set_properties(props, ioc_jail)
+            updated_properties = _set_properties(
+                properties=props,
+                target=ioc_jail,
+                logger=logger,
+                host=host
+            )
         except iocage.lib.errors.IocageException:
             exit(1)
 
@@ -97,7 +107,9 @@ def cli(
 
 def _set_properties(
     properties: typing.Iterable[str],
-    target: 'iocage.lib.LaunchableResource.LaunchableResource'
+    target: 'iocage.lib.LaunchableResource.LaunchableResource',
+    logger: iocage.lib.Logger.Logger,
+    host: iocage.lib.Host.HostGenerator
 ) -> set:
 
     updated_properties = set()
