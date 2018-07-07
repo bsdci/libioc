@@ -1127,3 +1127,14 @@ class PkgNotFound(IocageException):
 
         msg = "The pkg package was not found in the local mirror."
         IocageException.__init__(self, msg, *args, **kwargs)
+
+
+# Provisioning
+
+
+class UnknownProvisioner(IocageException):
+    """Raised when an unsupported provisioner method is used."""
+
+    def __init__(self, name: str, *args, **kwargs) -> None:  # noqa: T484
+        msg = f"Unknown provisioner: {name}"
+        IocageException.__init__(self, msg, *args, **kwargs)

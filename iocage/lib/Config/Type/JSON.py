@@ -38,6 +38,8 @@ class ConfigJSON(iocage.lib.Config.Prototype.Prototype):
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
         """Parse and normalize JSON data."""
+        if data == "":
+            return {}
         result = json.load(data)  # type: typing.Dict[str, typing.Any]
         return result
 

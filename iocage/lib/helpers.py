@@ -375,16 +375,26 @@ def parse_user_input(
     return data
 
 
+def _normalize_data(
+    data: typing.Dict[str, typing.Any]
+) -> typing.Dict[str, typing.Any]:
+    output_data: typing.Dict[str, typing.Any] = {}
+    for key, value in data.items():
+        if type(value) == dict:
+            output_data[key] = _normalize_data(value)
+        else:
+            output_data[key] = to_string(
+                value,
+                true="yes",
+                false="no",
+                none="none"
+            )
+    return output_data
+
+
 def to_json(data: typing.Dict[str, typing.Any]) -> str:
     """Create a JSON string from the input data."""
-    output_data = {}
-    for key, value in data.items():
-        output_data[key] = to_string(
-            value,
-            true="yes",
-            false="no",
-            none="none"
-        )
+    output_data = _normalize_data(data)
     return str(json.dumps(output_data, sort_keys=True, indent=4))
 
 

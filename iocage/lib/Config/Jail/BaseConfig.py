@@ -114,9 +114,18 @@ class BaseConfig(dict):
                 self["id"] = data[key]
                 break
 
-        for key, value in data.items():
-            if key in ["id", "name", "uuid"]:
+        current_id = self["id"]
+        items = list(data.items())
+        while len(items) > 0:
+            key, value = items.pop()
+
+            if type(value) == dict:
+                items += [(f"{key}.{k}", v) for k, v in value.items()]
                 continue
+
+            if (key in ["id", "name", "uuid"]) and (current_id is not None):
+                value = current_id
+
             self.__setitem__(  # noqa: T484
                 key,
                 value,
@@ -528,10 +537,22 @@ class BaseConfig(dict):
             return get_method()
 
         # plain data attribute
-        if key in self.data.keys():
-            return self.data[key]
+        return self._get_data(key)
 
-        raise KeyError(f"User defined property not found: {key}")
+    def _get_data(
+        self,
+        key: str,
+        data: typing.Optional[typing.Dict[str, typing.Any]]=None
+    ) -> typing.Any:
+        data = self.data if (data is None) else data
+        if "." not in key:
+            if key in data.keys():
+                return data[key]
+            else:
+                raise KeyError(f"User defined property not found: {key}")
+        else:
+            current_key, rest_key = key.split(".", maxsplit=1)
+            return self._get_data(rest_key, data[current_key])
 
     def get(
         self,
@@ -571,7 +592,24 @@ class BaseConfig(dict):
 
     def __delitem__(self, key: str) -> None:
         """Delete a setting from the configuration."""
-        del self.data[key]
+        self.__deleteitem(key, self.data)
+
+    def __deleteitem(
+        self,
+        key: str,
+        data: typing.Dict[str, typing.Any]
+    ) -> None:
+        if "." in key:
+            current_key, rest_key = key.split(".", maxsplit=1)
+            self.__deleteitem(rest_key, data[current_key])
+
+            if len(data[current_key]) == 0:
+                # delete parent when it became empty
+                del data[current_key]
+
+            return
+
+        del data[key]
 
     def __setitem__(  # noqa: T400
         self,
@@ -597,7 +635,7 @@ class BaseConfig(dict):
                 )
                 return
 
-            self.data[key] = parsed_value
+            self._set_data(key, parsed_value)
         except ValueError as err:
             error = iocage.lib.errors.InvalidJailConfigValue(
                 reason=str(err),
@@ -607,6 +645,22 @@ class BaseConfig(dict):
             )
             if skip_on_error is False:
                 raise error
+
+    def _set_data(
+        self,
+        key: str,
+        value: typing.Any,
+        data: typing.Optional[typing.Dict[str, typing.Any]]=None
+    ) -> None:
+
+        data = self.data if (data is None) else data
+        if "." not in key:
+            data[key] = value
+        else:
+            current_key, rest_key = key.split(".", maxsplit=1)
+            if current_key not in data.keys():
+                data[current_key] = dict()
+            self._set_data(rest_key, value, data[current_key])
 
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
@@ -647,7 +701,7 @@ class BaseConfig(dict):
         hash_before: typing.Any
         hash_after: typing.Any
 
-        existed_before = key in self.user_data
+        existed_before = key in self.keys()
 
         try:
             hash_before = str(self._getitem_user(key)).__hash__()
@@ -656,7 +710,7 @@ class BaseConfig(dict):
 
         self.__setitem__(key, value, skip_on_error=skip_on_error)  # noqa: T484
 
-        exists_after = key in self.user_data
+        exists_after = key in self.keys()
 
         try:
             hash_after = str(self._getitem_user(key)).__hash__()
@@ -667,11 +721,6 @@ class BaseConfig(dict):
             return True
 
         return (hash_before != hash_after) is True
-
-    @property
-    def user_data(self) -> typing.Dict[str, typing.Any]:
-        """Return the raw dictionary of user configured settings."""
-        return self.data
 
     def __str__(self) -> str:
         """Return the JSON object with all user configured settings."""
@@ -689,20 +738,26 @@ class BaseConfig(dict):
 
     def keys(self) -> typing.KeysView[str]:
         """Return the available configuration keys."""
-        return self.data.keys()
+        return dict.keys(dict(self.items()))
 
     def values(self) -> typing.ValuesView[typing.Any]:
         """Return all config values."""
-        return self.data.values()
+        return dict.values(dict(self.items()))
 
     def items(self) -> typing.ItemsView[str, typing.Any]:
         """Return the combined config properties."""
-        return dict.items(
-            dict(zip(
-                list(self.keys()),
-                list(self.values())
-            ))
-        )
+        out: typing.Dict[str, typing.Any] = {}
+
+        items = list(self.data.items())
+
+        while len(items) > 0:
+            key, value = items.pop()
+            if type(value) == dict:
+                items += [(f"{key}.{k}", v) for k, v in value.items()]
+            else:
+                out[key] = value
+
+        return dict.items(out)
 
     def __iter__(self) -> typing.Iterator[str]:
         """Return the combined config properties."""
@@ -723,7 +778,7 @@ class BaseConfig(dict):
 
     @property
     def _sorted_user_properties(self) -> typing.List[str]:
-        return sorted(self.data.keys())
+        return sorted(self.keys())
 
     def stringify(self, value: typing.Any) -> str:
         """Stringify user supplied values."""
