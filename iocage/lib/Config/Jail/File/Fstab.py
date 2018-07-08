@@ -315,7 +315,8 @@ class Fstab(
         dump: str="0",
         passnum: str="0",
         comment: typing.Optional[str]=None,
-        replace: bool=False
+        replace: bool=False,
+        auto_create_destination: bool=False
     ) -> None:
         """
         Append a new line to the fstab file.
@@ -332,7 +333,11 @@ class Fstab(
             "comment": comment
         })
 
-        self.add_line(line, replace=replace)
+        self.add_line(
+            line=line,
+            replace=replace,
+            auto_create_destination=auto_create_destination
+        )
 
     def add_line(
         self,
@@ -341,7 +346,8 @@ class Fstab(
             FstabCommentLine,
             FstabAutoPlaceholderLine
         ],
-        replace: bool=False
+        replace: bool=False,
+        auto_create_destination: bool=False
     ) -> None:
         """
         Directly append a FstabLine type.
@@ -365,6 +371,22 @@ class Fstab(
                     mountpoint=destination,
                     logger=self.logger
                 )
+
+        if type(line) == FstabLine:
+            # destination is always relative to the jail resource
+            if line["destination"].startswith(self.jail.root_path) is False:
+                line["destination"] = "/".join([
+                    self.jail.root_path,
+                    line["destination"]
+                ])
+
+            if auto_create_destination is True:
+                _destination = line["destination"]
+                if os.path.isdir(_destination) is False:
+                    self.logger.verbose(
+                        f"Auto-creating fstab destination {_destination}"
+                    )
+                    os.makedirs(line["destination"], 0o700)
 
         self._lines.append(line)
 

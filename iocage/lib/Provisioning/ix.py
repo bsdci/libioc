@@ -26,6 +26,9 @@ import typing
 import json
 import urllib.error
 import urllib.request
+import libzfs
+
+import git
 
 import iocage.lib.errors
 import iocage.lib.events
@@ -33,6 +36,7 @@ import iocage.lib.Provisioning
 
 
 class PluginDefinition(dict):
+    """ix-iocage-plugin definition."""
 
     _name: str
 
@@ -47,7 +51,7 @@ class PluginDefinition(dict):
     @property
     def name(self) -> str:
         """Return the ix-iocage-plugins name."""
-        return self._name
+        return str(self._name)
 
     @name.setter
     def name(self, value: str) -> None:
@@ -62,7 +66,8 @@ class PluginDefinition(dict):
 
     @property
     def url(self) -> str:
-        return self.get_url(self.name)
+        """Return the remote URL of the ix-iocage-plugins definition file."""
+        return self.__get_url(self.name)
 
     def __get_url(self, name: str) -> str:
         return (
@@ -113,6 +118,7 @@ def provision(
 
     yield jailProvisioningEvent.begin()
 
+    # download provisioning assets
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = PluginDefinition(
@@ -124,8 +130,42 @@ def provision(
         yield jailProvisioningAssetDownloadEvent.fail(e)
         raise e
 
-    for event in self.jail.fork_exec("whoami"):
+    # clone plugin
+    plugin_dataset_name = f"{self.jail.dataset.name}/ix-plugin"
+    plugin_dataset = __get_empty_dataset(plugin_dataset_name, self.jail.zfs)
+    git.Repo.clone_from(
+        pluginDefinition["artifact"],
+        plugin_dataset.mountpoint
+    )
+
+    self.jail.fstab.file = "fstab_provisioning"
+    self.jail.fstab.new_line(
+        source=plugin_dataset.mountpoint,
+        destination="/.ix-plugin",
+        options="ro",
+        auto_create_destination=True
+    )
+    self.jail.fstab.save()
+
+    commands = [
+        f"pkg install {pluginDefinition.name}"
+        "./ix-plugin/post_install.sh"
+    ]
+
+    for event in self.jail.fork_exec("\n".join(commands)):
         yield event
 
     yield jailProvisioningEvent.end()
 
+
+def __get_empty_dataset(
+    dataset_name: str,
+    zfs: 'iocage.lib.ZFS.ZFS'
+) -> libzfs.ZFSDataset:
+    try:
+        dataset = zfs.get_dataset(dataset_name)
+        zfs.delete_dataset_recursive(dataset)
+    except libzfs.ZFSException:
+        pass
+    output: libzfs.ZFSDataset = zfs.get_or_create_dataset(dataset_name)
+    return output
