@@ -1559,9 +1559,9 @@ class JailGenerator(JailResource):
             ]
         ))
 
+        _ipfw_enabled = self.host.ipfw_enabled
         self._write_hook_script("command", "\n".join(
-            ["set +e"] +
-            (["service ipfw onestop"] if self.host.ipfw_enabled else []) +
+            (["set +e", "service ipfw onestop"] if _ipfw_enabled else []) +
             [
                 "set -e",
                 f". {self._relative_hook_script_dir}/start.sh",
