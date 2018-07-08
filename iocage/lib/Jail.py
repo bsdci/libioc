@@ -1549,6 +1549,7 @@ class JailGenerator(JailResource):
         self._write_hook_script("host_command", "\n".join(
             [
                 f"IOCAGE_JID=$(jls -j {self.identifier} jid)",
+                "set -e",
                 f"/bin/sh {self.get_hook_script_path('started')}",
                 (
                     f"/usr/sbin/jexec {self.identifier} "
