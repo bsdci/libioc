@@ -121,16 +121,29 @@ def init_logger(
             return new_logger
 
 
-def get_userland_version() -> str:
+def get_os_version() -> typing.Dict[str, typing.Union[str, int, float]]:
     """Get the hosts userland version."""
     f = open("/bin/freebsd-version", "r", re.MULTILINE, encoding="utf-8")
     # ToDo: move out of the function
-    pattern = re.compile("USERLAND_VERSION=\"(\d{2}\.\d)\-([A-z0-9\-]+)\"")
+    pattern = re.compile(
+        "USERLAND_VERSION=\""
+        "(?P<userland>\d{1,2}(?:\.\d)?)"
+        "\-"
+        "(?P<name>[A-z0-9\-]+?)"
+        "(?:-"
+        "p(?P<patch>\d+)"
+        ")?\""
+    )
     content = f.read()
     match = pattern.search(content)  # type: typing.Optional[typing.Match[str]]
     if match is None:
         raise iocage.lib.errors.HostUserlandVersionUnknown()
-    return match[1]
+    output: typing.Dict[str, typing.Union[str, int, float]] = {
+        "userland": float(match["userland"]),
+        "name": match["name"],
+        "patch": int(match["patch"] if (match["patch"] is not None) else 0)
+    }
+    return output
 
 
 def exec(

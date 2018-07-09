@@ -30,7 +30,7 @@ import iocage.lib.helpers
 
 JailStatesDict = typing.Dict[str, 'JailState']
 
-_userland_version = float(iocage.lib.helpers.get_userland_version())
+_userland_version = float(iocage.lib.helpers.get_os_version()["userland"])
 if _userland_version >= 11:
     import json
 else:

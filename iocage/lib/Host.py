@@ -139,7 +139,7 @@ class HostGenerator:
     @property
     def userland_version(self) -> float:
         """Return the host userland version number."""
-        return float(iocage.lib.helpers.get_userland_version())
+        return float(iocage.lib.helpers.get_os_version()["userland"])
 
     @property
     def release_version(self) -> str:
