@@ -392,7 +392,10 @@ class Fstab(
         )
 
         fstab_basejail_lines = []
-        release_root_path = self.release.root_dataset.mountpoint
+        release_root_path = "/".join([
+            self.release.root_dataset.mountpoint,
+            f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
+        ])
         for basedir in basedirs:
 
             source = f"{release_root_path}/{basedir}"

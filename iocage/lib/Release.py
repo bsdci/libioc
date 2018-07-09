@@ -391,6 +391,35 @@ class ReleaseGenerator(ReleaseResource):
             )) is True
         return False
 
+    @property
+    def latest_snapshot(self) -> libzfs.ZFSSnapshot:
+        """
+        Return or create the latest version snapshot.
+
+        When no snapshot was taken before `p0` is automatically created.
+        """
+        version_snapshots = sorted(self.version_snapshots)
+        if len(version_snapshots) == 0:
+            self.logger.verbose("No release snapshot found - using @p0")
+            return self.snapshot("p0")
+        else:
+            return version_snapshots[0]
+
+    @property
+    def version_snapshots(self) -> typing.List['libzfs.ZFSSnapshot']:
+        """Return the sorted list of taken version snapshots (e.g. p3)."""
+        versions: typing.List[int] = []
+        snapshots: typing.Dict[int, 'libzfs.ZFSSnapshot'] = {}
+        pattern = re.compile("^p(\d+)$")
+        for snapshot in self.dataset.snapshots:
+            match = pattern.match(snapshot.snapshot_name)
+            if match is None:
+                continue
+            patch_level = int(match[1])
+            versions.append(patch_level)
+            snapshots[patch_level] = snapshot
+        return [snapshots[i] for i in sorted(versions)]
+
     def _require_release_supported(self) -> None:
         if self.host.distribution.name == "HardenedBSD":
             version = self.release.version_number

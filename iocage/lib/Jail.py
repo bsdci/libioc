@@ -30,6 +30,8 @@ import subprocess  # nosec: B404
 import shlex
 import shutil
 
+import libzfs
+
 import iocage.lib.Types
 import iocage.lib.errors
 import iocage.lib.events
@@ -2001,7 +2003,7 @@ class JailGenerator(JailResource):
         return f"{self.source}-{config['id']}"
 
     @property
-    def release(self) -> 'iocage.lib.Release.ReleaseGenerator':
+    def release(self) -> iocage.lib.Release.ReleaseGenerator:
         """Return the iocage.Release instance linked with the jail."""
         return iocage.lib.Release.ReleaseGenerator(
             name=self.config["release"],
@@ -2010,6 +2012,12 @@ class JailGenerator(JailResource):
             host=self.host,
             zfs=self.zfs
         )
+
+    @property
+    def release_snapshot(self) -> libzfs.ZFSSnapshot:
+        """Return the matching release verion snaphsot."""
+        snapshot: libzfs.ZFSSnapshot = self.release.latest_snapshot
+        return snapshot
 
     def __getattribute__(self, key: str) -> typing.Any:
         """Get an attribute from the jail, state or configuration."""
