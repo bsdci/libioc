@@ -60,16 +60,30 @@ def validate_count(
         return int(value)
 
 
-@click.command(name="create", help="Create a jail.")
+@click.command(
+    name="create",
+    help="Create a jail."
+)
 @click.pass_context
-@click.option("--count", "-c", callback=validate_count, default=1,
-              help="Designate a number of jails to create. Jails are"
-                   " numbered sequentially.")
-@click.option("--release", "-r", required=False,
-              help="Specify the RELEASE to use for the new jail.")
-@click.option("--template", "-t", required=False,
-              help="Specify the template to use for the new jail instead of"
-                   " a RELEASE.")
+@click.option(
+    "--count", "-c",
+    callback=validate_count,
+    default=1,
+    help=(
+        "Designate a number of jails to create."
+        "Jails are numbered sequentially."
+    )
+)
+@click.option(
+    "--release", "-r",
+    required=False,
+    help="Specify the RELEASE to use for the new jail."
+)
+@click.option(
+    "--template", "-t",
+    required=False,
+    help="Specify the template to use for the new jail instead of a RELEASE."
+)
 @click.option(
     "--basejail/--no-basejail", "-b/-nb",
     is_flag=True,
@@ -80,11 +94,17 @@ def validate_count(
         "jail's directories."
     )
 )
-@click.option("--empty", "-e", is_flag=True, default=False,
-              help="Create an empty jail used for unsupported or custom"
-                   " jails.")
-@click.option("--no-fetch", is_flag=True, default=False,
-              help="Do not automatically fetch releases")
+@click.option(
+    "--empty", "-e",
+    is_flag=True,
+    default=False,
+    help="Create an empty jail used for unsupported or custom jails.")
+@click.option(
+    "--no-fetch",
+    is_flag=True,
+    default=False,
+    help="Do not automatically fetch releases"
+)
 @click.argument("name")
 @click.argument("props", nargs=-1)
 def cli(
