@@ -80,9 +80,6 @@ def validate_count(
         "jail's directories."
     )
 )
-@click.option("--basejail-type", type=click.Choice(['nullfs', 'zfs']),
-              help="The method of mounting release datasets into"
-                   " the basejail on start.")
 @click.option("--empty", "-e", is_flag=True, default=False,
               help="Create an empty jail used for unsupported or custom"
                    " jails.")
@@ -97,7 +94,6 @@ def cli(
     count: int,
     props: typing.Tuple[str, ...],
     basejail: bool,
-    basejail_type: str,
     empty: bool,
     name: str,
     no_fetch: bool
@@ -163,13 +159,6 @@ def cli(
 
     if basejail:
         jail_data["basejail"] = True
-
-    if basejail_type is not None:
-        if not basejail:
-            logger.error(
-                "Cannot set --basejail-type without --basejail option")
-            exit(1)
-        jail_data["basejail_type"] = basejail_type
 
     if props:
         for prop in props:
