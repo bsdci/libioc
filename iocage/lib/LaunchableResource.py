@@ -41,29 +41,31 @@ class LaunchableResource(iocage.lib.Resource.Resource):
 
     _rc_conf: typing.Optional[
         iocage.lib.Config.Jail.File.RCConf.ResourceRCConf
-    ] = None
+    ]
     _sysctl_conf: typing.Optional[
         iocage.lib.Config.Jail.File.SysctlConf.SysctlConf
-    ] = None
-    _distribution: typing.Optional[
-        'iocage.lib.Distribution.Distribution'
-    ] = None
+    ]
+    host: 'iocage.lib.Host.HostGenerator'
     _updater: typing.Optional[
         'iocage.lib.ResourceUpdater.LaunchableResourceUpdate'
-    ] = None
+    ]
     _backup: typing.Optional[
         'iocage.lib.ResourceBackup.LaunchableResourceBackup'
-    ] = None
+    ]
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
     def __init__(  # noqa: T484
         self,
-        distribution: typing.Optional[
-            'iocage.lib.Distribution.Distribution'
+        host: typing.Optional[
+            'iocage.lib.Host.HostGenerator'
         ]=None,
         **kwargs
     ) -> None:
-        self._distribution = distribution
+        self.host = iocage.lib.helpers.init_host(self, host)
+        self._updater = None
+        self._backup = None
+        self._rc_conf = None
+        self._sysctl_conf = None
         self._updater = None
         self._backup = None
         iocage.lib.Resource.Resource.__init__(self, **kwargs)
@@ -76,11 +78,9 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         if self._updater is not None:
             return self._updater
 
-        if self._distribution is None:
-            self._distribution = iocage.lib.helpers.init_distribution(self)
         updater = iocage.lib.ResourceUpdater.get_launchable_update_resource(
             resource=self,
-            distribution=self._distribution
+            host=self.host
         )
         self._updater = updater
         return updater

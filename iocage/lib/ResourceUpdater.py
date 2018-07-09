@@ -48,10 +48,10 @@ class Updater:
     def __init__(
         self,
         resource: 'iocage.lib.LaunchableResource.LaunchableResource',
-        distribution: 'iocage.lib.Distribution.Distribution'
+        host: 'iocage.lib.Host.HostGenerator'
     ) -> None:
         self.resource = resource
-        self.distribution = distribution
+        self.host = host
 
     @property
     def logger(self) -> 'iocage.lib.Logger.Logger':
@@ -545,18 +545,18 @@ class FreeBSD(Updater):
 
 
 def get_launchable_update_resource(  # noqa: T484
-    distribution: 'iocage.lib.Distribution.Distribution',
+    host: 'iocage.lib.Host.HostGenerator',
     **kwargs
 ) -> Updater:
     """Return an updater instance for the host distribution."""
     _class: typing.Type[Updater]
 
-    if distribution.name == "HardenedBSD":
+    if host.distribution.name == "HardenedBSD":
         _class = HardenedBSD
     else:
         _class = FreeBSD
 
     return _class(
-        distribution=distribution,
+        host=host,
         **kwargs
     )
