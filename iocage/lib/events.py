@@ -607,7 +607,21 @@ class ZFSSnapshotClone(ZFSEvent):
         **kwargs
     ) -> None:
 
-        msg = "Could not clone to {target}"
+        msg = f"Could not clone to {target}"
+        ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
+
+
+class ZFSSnapshotRollback(ZFSEvent):
+    """Rollback a ZFS dataset to a snapshot."""
+
+    def __init__(  # noqa: T484
+        self,
+        snapshot: libzfs.ZFSSnapshot,
+        target: str,
+        **kwargs
+    ) -> None:
+
+        msg = f"Rolling back {target} to snapshot {snapshot.snapshot_name}"
         ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
 
 

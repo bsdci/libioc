@@ -121,9 +121,11 @@ def init_logger(
             return new_logger
 
 
-def get_os_version() -> typing.Dict[str, typing.Union[str, int, float]]:
+def get_os_version(
+        version_file: str="/bin/freebsd-version"
+) -> typing.Dict[str, typing.Union[str, int, float]]:
     """Get the hosts userland version."""
-    f = open("/bin/freebsd-version", "r", re.MULTILINE, encoding="utf-8")
+    f = open(version_file, "r", re.MULTILINE, encoding="utf-8")
     # ToDo: move out of the function
     pattern = re.compile(
         "USERLAND_VERSION=\""

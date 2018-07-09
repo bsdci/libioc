@@ -103,6 +103,15 @@ class Updater:
         return command
 
     @property
+    def patch_version(self) -> int:
+        """
+        Return the latest known patch version.
+
+        When no patch version is known the release was not updated yet.
+        """
+        return 0
+
+    @property
     def temporary_jail(self) -> 'iocage.lib.Jail.JailGenerator':
         """Temporary jail instance that will be created to run the update."""
         if hasattr(self, "_temporary_jail") is False:
@@ -280,10 +289,14 @@ class Updater:
                 shell=True,  # nosec: B604
                 logger=self.logger
             )
+            self._snapshot_after_release_update()
         except Exception as e:
             yield releaseUpdateDownloadEvent.fail(e)
             raise
         yield releaseUpdateDownloadEvent.end()
+
+    def _snapshot_after_release_update(self) -> None:
+        self.release.snapshot(f"p{self.patch_version}")
 
     def apply(
         self,
@@ -451,6 +464,44 @@ class HardenedBSD(Updater):
             filename
         ])
 
+    @property
+    def release_branch_name(self) -> str:
+        """Return the branch name of the HBSD release."""
+        return f"hardened/{self.host.release_version.lower()}/master"
+
+    def _pull_updater(self) -> None:
+        super()._pull_updater()
+        update_info_url = "/".join([
+            "https://updates.hardenedbsd.org/pub/HardenedBSD/updates/",
+            self.release_branch_name,
+            self.host.processor,
+            "update-latest.txt"
+        ])
+        local_path = f"{self.host_updates_dir}/update-latest.txt"
+        _request = urllib.request  # type: ignore
+        _request.urlretrieve(  # nosec: official HardenedBSD URL
+            update_info_url,
+            local_path
+        )
+        os.chmod(local_path, 0o744)
+
+    @property
+    def patch_version(self) -> int:
+        """
+        Return the latest known patch version.
+
+        On HardenedBSD this version is published among the updated downloaded
+        by hbsd-update. Right before fetching an updater this file is
+        downloaded, so that the revision mentioned can be used for snapshot
+        creation.
+        """
+        local_path = f"{self.host_updates_dir}/update-latest.txt"
+        if os.path.isfile(local_path):
+            with open(local_path, "r") as f:
+                return int(f.read().split("|")[1].split("-")[1][1:])
+        else:
+            return 0
+
 
 class FreeBSD(Updater):
     """Updater for FreeBSD."""
@@ -542,6 +593,17 @@ class FreeBSD(Updater):
             "fi"
         ])
         return _command
+
+    @property
+    def patch_version(self) -> int:
+        """
+        Return the latest known patch version.
+
+        This version is parsed from FreeBSDs /bin/freebsd-version file.
+        """
+        return int(iocage.lib.helpers.get_os_version(
+            f"{self.resource.root_path}/bin/freebsd-version"
+        )["patch"])
 
 
 def get_launchable_update_resource(  # noqa: T484
