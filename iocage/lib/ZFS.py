@@ -232,6 +232,20 @@ class ZFS(libzfs.ZFS):
         dataset = self.get_dataset(target)
         dataset.mount()
 
+    def rename_snapshot_recursive(
+        self,
+        snapshot: libzfs.ZFSSnapshot,
+        new_name: str
+    ) -> None:
+        """Rename a snapshot recursively."""
+        # ToDo: replace after https://github.com/freenas/py-libzfs/pull/10
+        snapshots_recursive = filter(
+            lambda x: x.snapshot_name == snapshot.snapshot_name,
+            snapshot.parent.snapshots_recursive
+        )
+        for _snapshot in snapshots_recursive:
+            _snapshot.rename(new_name)
+
     @property
     def _has_logger(self) -> bool:
         return ("_logger" in self.__dir__())
