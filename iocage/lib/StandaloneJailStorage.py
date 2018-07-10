@@ -40,8 +40,8 @@ class StandaloneJailStorage(iocage.lib.Storage.Storage):
 
     def setup(
         self,
-        release: 'iocage.lib.Release.ReleaseGenerator'
+        resource: 'iocage.lib.Resource.Resource'
     ) -> None:
         """Configure the jail storage."""
         self.logger.verbose("Cloning the release once to the root dataset")
-        self.clone_release(release)
+        self.clone_resource(resource)
