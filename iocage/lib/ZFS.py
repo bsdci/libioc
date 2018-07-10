@@ -130,7 +130,6 @@ class ZFS(libzfs.ZFS):
         self,
         source: libzfs.ZFSDataset,
         target: str,
-        snapshot_name: str,
         delete_existing: bool=False
     ) -> None:
         """Clone a ZFSDataset from a source to a target dataset name."""
@@ -152,25 +151,31 @@ class ZFS(libzfs.ZFS):
             existing_dataset.delete()
             del existing_dataset
 
-        self._clone_with_snapshot_name(
-            source=source,
-            target=target,
-            snapshot_name=snapshot_name
-        )
-
-    def _clone_with_snapshot_name(
-        self,
-        source: libzfs.ZFSDataset,
-        target: str,
-        snapshot_name: str
-    ) -> None:
-        _snapshot_name = f"{source.name}@{snapshot_name}"
+        snapshot_name = append_snapshot_datetime("clone")
+        snapshot_identifier = f"{source.name}@{snapshot_name}"
         try:
-            snapshot = self.get_snapshot(_snapshot_name)
+            snapshot = self.get_snapshot(snapshot_identifier)
+            delete_snapshot = False
         except libzfs.ZFSException:
-            source.snapshot(_snapshot_name, recursive=True)
-            snapshot = self.get_snapshot(_snapshot_name)
-        self.clone_snapshot(snapshot, target)
+            source.snapshot(snapshot_identifier, recursive=True)
+            snapshot = self.get_snapshot(snapshot_identifier)
+            delete_snapshot = True
+
+        snapshot_error = None
+        try:
+            self.clone_snapshot(snapshot, target)
+        except libzfs.ZFSException as e:
+            snapshot_error = e
+
+        if delete_snapshot is True:
+            snapshot.delete(recursive=True)
+
+        if snapshot_error is not None:
+            raise iocage.lib.errors.SnapshotCreation(
+                reason=str(snapshot_error),
+                logger=self.logger
+            )
+
         if self._has_logger:
             self.logger.verbose(
                 f"Successfully cloned {source} to {target}"
@@ -187,19 +192,13 @@ class ZFS(libzfs.ZFS):
                 f"Cloning snapshot {snapshot.name} to {target}"
             )
 
-        self._clone_and_mount(snapshot, target)
-
-        source_ds_prefix = "/".join(snapshot.parent.name.split("/")[-1])
-        source_ds_len = len(source_dataset_prefix)
+        source_prefix = snapshot.parent.name
+        source_prefix_len = len(source_prefix)
         for current_snapshot in snapshot.parent.snapshots_recursive:
             if current_snapshot.snapshot_name != snapshot.snapshot_name:
                 continue
-            source_len = len(snapshot.parent.name)
-            unprefixed_dataset_name = dataset.name[source_len:].strip("/")
-            current_snapshot = self.get_snapshot(
-                f"{dataset.name}@{snapshot.snapshot_name}"
-            )
-            current_target = f"{target}/{unprefixed_dataset_name}"
+            _ds = current_snapshot.parent.name[source_prefix_len:].strip("/")
+            current_target = f"{target}/{_ds}".strip("/")
             self._clone_and_mount(current_snapshot, current_target)
 
     def promote_dataset(
@@ -228,7 +227,9 @@ class ZFS(libzfs.ZFS):
     ) -> None:
         parent_name = "/".join(target.split("/")[:-1])
         self.get_or_create_dataset(parent_name)
+
         snapshot.clone(target)
+
         dataset = self.get_dataset(target)
         dataset.mount()
 
