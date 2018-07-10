@@ -903,7 +903,10 @@ class ReleaseGenerator(ReleaseResource):
 
     def __str__(self) -> str:
         """Return the release name."""
-        return self.name
+        if self.patchlevel is None:
+            return self.name
+        else:
+            return f"{self.name}-p{self.patchlevel}"
 
     def destroy(
         self,
