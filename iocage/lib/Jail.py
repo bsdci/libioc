@@ -2016,7 +2016,7 @@ class JailGenerator(JailResource):
     @property
     def release_snapshot(self) -> libzfs.ZFSSnapshot:
         """Return the matching release verion snaphsot."""
-        snapshot: libzfs.ZFSSnapshot = self.release.latest_snapshot
+        snapshot: libzfs.ZFSSnapshot = self.release.current_snapshot
         return snapshot
 
     def __getattribute__(self, key: str) -> typing.Any:
