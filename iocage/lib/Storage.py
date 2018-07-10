@@ -50,19 +50,43 @@ class Storage:
         # jailed=on already exist
         self.safe_mode = safe_mode
 
-    def clone_release(
+    def clone_resource(
+        self,
+        resource: 'iocage.lib.Resource.Resource'
+    ) -> None:
+        """Clone another resource to a the current dataset_name."""
+        if isinstance(resource, iocage.lib.Release.ReleaseGenerator) is True:
+            self._clone_release(resource)
+        else:
+            self._clone_jail(resource)
+
+    def _clone_release(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator'
     ) -> None:
         """Clone a release to a the current dataset_name."""
-        jail_name = self.jail.humanreadable_name
         self.zfs.clone_snapshot(
-            snapshot=release.latest_snapshot,
-            target=self.jail.root_dataset_name
+            release.latest_snapshot,
+            self.jail.root_dataset_name
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
             f"Cloned release '{release.name}' to {jail_name}",
+            jail=self.jail
+        )
+
+    def _clone_jail(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator'
+    ) -> None:
+        """Clone a release to a the current dataset_name."""
+        self.zfs.clone_dataset(
+            jail.root_dataset,
+            self.jail.root_dataset_name
+        )
+        jail_name = self.jail.humanreadable_name
+        self.logger.verbose(
+            f"Cloned jail '{jail.name}' to {jail_name}",
             jail=self.jail
         )
 
