@@ -39,7 +39,9 @@ class ZFSBasejailStorage(iocage.lib.Storage.Storage):
     def setup(self, release):
         """Configure the jail storage."""
         iocage.lib.StandaloneJailStorage.StandaloneJailStorage.setup(
-            self, release)
+            self,
+            release
+        )
 
     def clone(self, release):
         """Clone ZFS basejail datasets from a release."""
@@ -65,7 +67,6 @@ class ZFSBasejailStorage(iocage.lib.Storage.Storage):
             self.zfs.clone_dataset(
                 source=source_dataset,
                 target=target_dataset_name,
-                snapshot_name=self.jail.name,
                 delete_existing=True
             )
 

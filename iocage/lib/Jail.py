@@ -1167,8 +1167,7 @@ class JailGenerator(JailResource):
             self.zfs.clone_dataset(
                 source=self.dataset,
                 target=destination_dataset_name,
-                delete_existing=delete_existing,
-                snapshot_name=iocage.lib.ZFS.append_snapshot_datetime("clone")
+                delete_existing=delete_existing
             )
         except Exception as e:
             err = iocage.lib.errors.ZFSException(
