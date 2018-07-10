@@ -411,7 +411,7 @@ class ReleaseGenerator(ReleaseResource):
         versions: typing.List[int] = []
         snapshots: typing.Dict[int, 'libzfs.ZFSSnapshot'] = {}
         pattern = re.compile("^p(\d+)$")
-        for snapshot in self.dataset.snapshots:
+        for snapshot in self.root_dataset.snapshots:
             match = pattern.match(snapshot.snapshot_name)
             if match is None:
                 continue
@@ -733,7 +733,7 @@ class ReleaseGenerator(ReleaseResource):
             libzfs.ZFSSnapshot: The ZFS snapshot object found or created
 
         """
-        snapshot_name = f"{self.dataset.name}@{identifier}"
+        snapshot_name = f"{self.root_dataset.name}@{identifier}"
         existing_snapshot: typing.Optional[libzfs.ZFSSnapshot] = None
         try:
             existing_snapshot = self.zfs.get_snapshot(snapshot_name)
@@ -753,7 +753,7 @@ class ReleaseGenerator(ReleaseResource):
             existing_snapshot.delete()
             existing_snapshot = None
 
-        self.dataset.snapshot(snapshot_name)
+        self.root_dataset.snapshot(snapshot_name)
         snapshot: libzfs.ZFSSnapshot = self.zfs.get_snapshot(snapshot_name)
         return snapshot
 
