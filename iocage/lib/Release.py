@@ -392,6 +392,16 @@ class ReleaseGenerator(ReleaseResource):
         return False
 
     @property
+    def current_snapshot(self) -> libzfs.ZFSSnapshot:
+        """Return the manually configured or the latest release snapshot."""
+        if self.patchlevel is not None:
+            for snapshot in self.version_snapshots:
+                if snapshot.snapshot_name == f"p{self.patchlevel}":
+                    return snapshot
+
+        return self.latest_snapshot
+
+    @property
     def latest_snapshot(self) -> libzfs.ZFSSnapshot:
         """
         Return or create the latest version snapshot.
