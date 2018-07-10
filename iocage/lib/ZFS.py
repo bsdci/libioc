@@ -91,7 +91,7 @@ class ZFS(libzfs.ZFS):
         self,
         dataset: libzfs.ZFSDataset,
         delete_snapshots: bool=True,
-        delete_origin_snapshot: bool=True
+        delete_origin_snapshot: bool=False
     ) -> None:
         """Recursively delete a dataset."""
         for child in dataset.children:
