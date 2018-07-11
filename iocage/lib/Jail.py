@@ -51,7 +51,6 @@ import iocage.lib.VersionedResource
 import iocage.lib.Config.Jail.Properties.ResourceLimit
 import iocage.lib.ResourceSelector
 import iocage.lib.Config.Jail.File.Fstab
-import iocage.lib.Provisioning
 
 
 class JailResource(
@@ -376,6 +375,7 @@ class JailGenerator(JailResource):
         except AttributeError:
             pass
 
+        import iocage.lib.Provisioning
         self._provisioner = iocage.lib.Provisioning.Provisioner(jail=self)
         return self._provisioner
 
@@ -1296,14 +1296,20 @@ class JailGenerator(JailResource):
         """
         command = ["/usr/sbin/jexec", str(self.jid)] + command
 
-        child, stdout, stderr = iocage.lib.helpers.exec(
+        command_env = self.env
+        if "env" in kwargs:
+            for env_key, env_value in kwargs["env"].items():
+                command_env[env_key] = env_value
+            del kwargs["env"]
+
+        stdout, stderr, returncode = iocage.lib.helpers.exec(
             command,
             logger=self.logger,
-            env=self.env,
+            env=command_env,
             **kwargs  # noqa: T484
         )
 
-        return child, stdout, stderr
+        return stdout, stderr, returncode
 
     def passthru(
         self,
