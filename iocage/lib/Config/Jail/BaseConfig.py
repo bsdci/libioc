@@ -199,6 +199,9 @@ class BaseConfig(dict):
     def _get_name(self) -> str:
         return self._get_id()
 
+    def _set_name(self, name: str, **kwargs) -> None:  # noqa: T484
+        return self._set_id(name=name, **kwargs)
+
     def _get_uuid(self) -> str:
         return self._get_id()
 
