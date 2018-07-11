@@ -22,8 +22,11 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Get a specific jails with this CLI helper function."""
+import typing
+
 import iocage.lib.errors
 import iocage.lib.Jail
+import iocage.lib.Logger
 
 from .click import IocageClickContext
 
@@ -41,3 +44,35 @@ def get_jail(
         )
     except iocage.lib.errors.IocageException:
         exit(1)
+
+
+def set_properties(
+    properties: typing.Iterable[str],
+    target: 'iocage.lib.LaunchableResource.LaunchableResource'
+) -> set:
+    """Set a bunch of jail properties from a Click option tuple."""
+    updated_properties = set()
+
+    for prop in properties:
+
+        if _is_setter_property(prop):
+            key, value = prop.split("=", maxsplit=1)
+            changed = target.config.set(key, value)
+            if changed:
+                updated_properties.add(key)
+        else:
+            key = prop
+            try:
+                del target.config[key]
+                updated_properties.add(key)
+            except (iocage.lib.errors.IocageException, KeyError):
+                pass
+
+    if len(updated_properties) > 0:
+        target.save()
+
+    return updated_properties
+
+
+def _is_setter_property(property_string: str) -> bool:
+    return ("=" in property_string)
