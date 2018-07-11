@@ -30,6 +30,7 @@ import iocage.lib.Logger
 import iocage.lib.helpers
 import iocage.lib.Resource
 import iocage.lib.Jails
+from .shared.jail import set_properties
 
 __rootcmd__ = True
 
@@ -54,11 +55,9 @@ def cli(
 
     # Defaults
     if jail == "defaults":
-        updated_properties = _set_properties(
+        updated_properties = set_properties(
             properties=props,
-            target=host.defaults,
-            logger=logger,
-            host=host
+            target=host.defaults
         )
         if len(updated_properties) > 0:
             logger.screen("Defaults updated: " + ", ".join(updated_properties))
@@ -79,11 +78,9 @@ def cli(
     for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
 
         try:
-            updated_properties = _set_properties(
+            updated_properties = set_properties(
                 properties=props,
-                target=ioc_jail,
-                logger=logger,
-                host=host
+                target=ioc_jail
             )
         except iocage.lib.errors.IocageException:
             exit(1)
@@ -103,37 +100,3 @@ def cli(
         exit(1)
 
     exit(0)
-
-
-def _set_properties(
-    properties: typing.Iterable[str],
-    target: 'iocage.lib.LaunchableResource.LaunchableResource',
-    logger: iocage.lib.Logger.Logger,
-    host: iocage.lib.Host.HostGenerator
-) -> set:
-
-    updated_properties = set()
-
-    for prop in properties:
-
-        if _is_setter_property(prop):
-            key, value = prop.split("=", maxsplit=1)
-            changed = target.config.set(key, value)
-            if changed:
-                updated_properties.add(key)
-        else:
-            key = prop
-            try:
-                del target.config[key]
-                updated_properties.add(key)
-            except (iocage.lib.errors.IocageException, KeyError):
-                pass
-
-    if len(updated_properties) > 0:
-        target.save()
-
-    return updated_properties
-
-
-def _is_setter_property(property_string: str) -> bool:
-    return ("=" in property_string)

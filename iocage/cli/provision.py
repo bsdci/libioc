@@ -30,6 +30,7 @@ import iocage.lib.Jails
 import iocage.lib.Logger
 
 from .shared.click import IocageClickContext
+from .shared.jail import set_properties
 
 __rootcmd__ = True
 
@@ -37,9 +38,16 @@ __rootcmd__ = True
 @click.command(name="start", help="Trigger provisioning of jails.")
 @click.pass_context
 @click.argument("jails", nargs=-1)
+@click.option(
+    "--option", "-o",
+    "temporary_config_override",
+    multiple=True,
+    help="Temporarily override jail config options"
+)
 def cli(
     ctx: IocageClickContext,
-    jails: typing.Tuple[str, ...]
+    jails: typing.Tuple[str, ...],
+    temporary_config_override: typing.Tuple[str, ...]
 ) -> None:
     """Run jail provisioner as defined in jail config."""
     logger = ctx.parent.logger
@@ -50,12 +58,17 @@ def cli(
         "print_function": ctx.parent.print_events
     }
 
-    if not _provision(jails, **start_args):
+    if not _provision(
+        filters=jails,
+        temporary_config_override=temporary_config_override,
+        **start_args
+    ):
         exit(1)
 
 
 def _provision(
     filters: typing.Tuple[str, ...],
+    temporary_config_override: typing.Tuple[str, ...],
     zfs: iocage.lib.ZFS.ZFS,
     host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
@@ -76,7 +89,14 @@ def _provision(
     failed_jails = []
     for jail in jails:
         try:
-            print_function(jail.provisioner.provision())
+            set_properties(
+                properties=temporary_config_override,
+                target=jail
+            )
+        except iocage.lib.errors.IocageException:
+            exit(1)
+        try:
+            print_function(_execute_provisioner(jail))
         except iocage.lib.errors.IocageException:
             failed_jails.append(jail)
             continue
@@ -92,3 +112,12 @@ def _provision(
         return False
 
     return True
+
+
+def _execute_provisioner(
+    jail: 'iocage.lib.Jail.JailsGenerator'
+) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+    for event in jail.provisioner.provision():
+        if isinstance(event, iocage.lib.events.JailLaunch) and event.done:
+            print(event.stdout)
+        yield event
