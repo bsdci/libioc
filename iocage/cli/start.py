@@ -30,19 +30,33 @@ import iocage.lib.Jails
 import iocage.lib.Logger
 
 from .shared.click import IocageClickContext
+from .shared.jail import set_properties
 
 __rootcmd__ = True
 
 
 @click.command(name="start", help="Starts the specified jails or ALL.")
 @click.pass_context
-@click.option("--rc", default=False, is_flag=True,
-              help="Will start all jails with boot=on, in the specified"
-                   " order with smaller value for priority starting first.")
+@click.option(
+    "--rc",
+    default=False,
+    is_flag=True,
+    help=(
+        "Will start all jails with boot=on, in the specified "
+        "order with smaller value for priority starting first."
+    )
+)
+@click.option(
+    "--option", "-o",
+    "temporary_config_override",
+    multiple=True,
+    help="Temporarily override jail config options"
+)
 @click.argument("jails", nargs=-1)
 def cli(
     ctx: IocageClickContext,
     rc: bool,
+    temporary_config_override: typing.Tuple[str, ...],
     jails: typing.Tuple[str, ...]
 ) -> None:
     """Start one or many jails."""
@@ -64,7 +78,12 @@ def cli(
             exit(1)
         _autostart(**start_args)
     else:
-        if not _normal(jails, **start_args):
+        start_normal_successful = _normal(
+            jails,
+            temporary_config_override=temporary_config_override,
+            **start_args
+        )
+        if start_normal_successful is False:
             exit(1)
 
 
@@ -111,6 +130,7 @@ def _autostart(
 
 def _normal(
     filters: typing.Tuple[str, ...],
+    temporary_config_override: typing.Tuple[str, ...],
     zfs: iocage.lib.ZFS.ZFS,
     host: iocage.lib.Host.HostGenerator,
     logger: iocage.lib.Logger.Logger,
@@ -132,6 +152,13 @@ def _normal(
     changed_jails = []
     failed_jails = []
     for jail in jails:
+        try:
+            set_properties(
+                properties=temporary_config_override,
+                target=jail
+            )
+        except iocage.lib.errors.IocageException:
+            exit(1)
         try:
             jail.require_jail_not_template()
             print_function(jail.start())
