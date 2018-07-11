@@ -95,6 +95,7 @@ def _provision(
             )
         except iocage.lib.errors.IocageException:
             exit(1)
+
         try:
             print_function(_execute_provisioner(jail))
         except iocage.lib.errors.IocageException:
@@ -118,6 +119,7 @@ def _execute_provisioner(
     jail: 'iocage.lib.Jail.JailsGenerator'
 ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
     for event in jail.provisioner.provision():
-        if isinstance(event, iocage.lib.events.JailLaunch) and event.done:
-            print(event.stdout)
         yield event
+        if isinstance(event, iocage.lib.events.JailCommandExecution):
+            if event.done is True:
+                print(event.stdout)

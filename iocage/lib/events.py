@@ -912,7 +912,6 @@ class JailCommandExecution(JailEvent):
         self.stdout = stdout
         return IocageEvent.end(self, **kwargs)
 
-
 # PKG
 
 

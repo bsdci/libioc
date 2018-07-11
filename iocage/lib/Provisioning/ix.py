@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage provisioner for ix-plugins."""
 import typing
+import os.path
 import json
 import urllib.error
 import urllib.request
@@ -33,6 +34,24 @@ import git
 import iocage.lib.errors
 import iocage.lib.events
 import iocage.lib.Provisioning
+
+
+class PackageUpdateEvent(iocage.lib.events.JailCommandExecution):
+    """IocageEvent for package update fetching."""
+
+    pass
+
+
+class PackageInstallEvent(iocage.lib.events.JailCommandExecution):
+    """IocageEvent for package installation."""
+
+    pass
+
+
+class PostInstallExecutionEvent(iocage.lib.events.JailCommandExecution):
+    """IocageEvent for post_install.sh execution."""
+
+    pass
 
 
 class PluginDefinition(dict):
@@ -110,13 +129,24 @@ def provision(
         jail=self.jail,
         event_scope=event_scope
     )
+    yield jailProvisioningEvent.begin()
     _scope = jailProvisioningEvent.scope
-    jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
+    event_kargs = dict(
         jail=self.jail,
         event_scope=_scope
     )
-
-    yield jailProvisioningEvent.begin()
+    jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
+        **event_kargs
+    )
+    packageUpdateEvent = PackageUpdateEvent(
+        **event_kargs
+    )
+    packageInstallEvent = PackageInstallEvent(
+        **event_kargs
+    )
+    postInstallExecutionEvent = PostInstallExecutionEvent(
+        **event_kargs
+    )
 
     # download provisioning assets
     try:
@@ -148,18 +178,51 @@ def provision(
     self.jail.fstab.save()
 
     if "pkgs" in pluginDefinition.keys():
-        pkg_packages = " ".join(pluginDefinition["pkgs"])
+        pkg_packages = list(pluginDefinition["pkgs"])
     else:
-        pkg_packages = pluginDefinition.name
+        pkg_packages = [pluginDefinition.name]
 
-    commands = [
-        "ASSUME_ALWAYS_YES=true pkg update",
-        f"ASSUME_ALWAYS_YES=true pkg install -y {pkg_packages}",
-        "./ix-plugin/post_install.sh"
-    ]
-
-    for event in self.jail.fork_exec("\n".join(commands)):
+    for event in self.jail.start():
         yield event
+
+    try:
+        yield packageUpdateEvent.begin()
+        try:
+            stdout, stderr, returncode = self.jail.exec(
+                ["pkg", "update"],
+                env=dict(ASSUME_ALWAYS_YES="true")
+            )
+            yield packageUpdateEvent.end(stdout=stdout)
+        except iocage.lib.errors.IocageException as e:
+            yield packageUpdateEvent.fail(e)
+            raise e
+
+        yield packageInstallEvent.begin()
+        try:
+            stdout, stderr, returncode = self.jail.exec(
+                ["pkg", "install", "-y"] + pkg_packages,
+                env=dict(ASSUME_ALWAYS_YES="true")
+            )
+            yield packageInstallEvent.end(stdout=stdout)
+        except iocage.lib.errors.IocageException as e:
+            yield packageInstallEvent.fail(e)
+            raise e
+
+        yield postInstallExecutionEvent.begin()
+        try:
+            if os.path.isfile(f"{plugin_dataset.mountpoint}/post_install.sh"):
+                stdout, stderr, returncode = self.jail.exec(
+                    ["/.ix-plugin/post_install.sh"]
+                )
+                yield postInstallExecutionEvent.end(stdout=stdout)
+            else:
+                yield postInstallExecutionEvent.skip()
+        except iocage.lib.errors.IocageException as e:
+            yield postInstallExecutionEvent.fail(e)
+            raise e
+    finally:
+        for event in self.jail.stop(force=True):
+            yield event
 
     yield jailProvisioningEvent.end()
 
@@ -170,6 +233,7 @@ def __get_empty_dataset(
 ) -> libzfs.ZFSDataset:
     try:
         dataset = zfs.get_dataset(dataset_name)
+        dataset.umount()
         zfs.delete_dataset_recursive(dataset)
     except libzfs.ZFSException:
         pass
