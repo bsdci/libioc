@@ -147,8 +147,14 @@ def provision(
     )
     self.jail.fstab.save()
 
+    if "pkgs" in pluginDefinition.keys():
+        pkg_packages = " ".join(pluginDefinition["pkgs"])
+    else:
+        pkg_packages = pluginDefinition.name
+
     commands = [
-        f"pkg install {pluginDefinition.name}"
+        "ASSUME_ALWAYS_YES=true pkg update",
+        f"ASSUME_ALWAYS_YES=true pkg install -y {pkg_packages}",
         "./ix-plugin/post_install.sh"
     ]
 
