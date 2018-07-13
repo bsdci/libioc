@@ -77,6 +77,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/*.rst
+docs/make.bat
 
 # PyBuilder
 target/
@@ -119,3 +121,4 @@ ENV/
 *.rej
 .pytest_cache/
 .vscode/
+docs/_build/
