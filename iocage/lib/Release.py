@@ -230,7 +230,6 @@ class ReleaseGenerator(ReleaseResource):
         check_eol: bool=True,
         **release_resource_args
     ) -> None:
-
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.host = iocage.lib.helpers.init_host(self, host)
@@ -251,7 +250,7 @@ class ReleaseGenerator(ReleaseResource):
         if iocage.lib.helpers.validate_name(resource_selector.name) is False:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
-        self.name = resource_selector.name
+        self.name = name
         self._hbsd_release_branch = None
         self._mirror_url = None
 
@@ -280,7 +279,7 @@ class ReleaseGenerator(ReleaseResource):
     @name.setter
     def name(self, value: str) -> None:
         """Set the releases identifier (optionally including patchlevel)."""
-        patchlevel_match = re.match(r"^(.*)-p([0-9]+)$", value)
+        patchlevel_match = re.match(r"^(?:.*/)?(.*)-p([0-9]+)$", value)
         if patchlevel_match is None:
             self._name = value
             self.patchlevel = None
