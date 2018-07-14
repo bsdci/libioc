@@ -71,6 +71,7 @@ class JailConfigDefaults(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         "legacy": False,
         "priority": 0,
         "basejail": False,
+        "basejail_type": "nullfs",
         "clonejail": False,
         "defaultrouter": None,
         "defaultrouter6": None,
