@@ -390,7 +390,7 @@ class FilteredDatasets(Datasets):
             The shared logger instance.
     """
 
-    _source_filters = OptionalSourceFilterType
+    _source_filters: OptionalSourceFilterType
     datasets: Datasets
 
     def __init__(
@@ -404,6 +404,8 @@ class FilteredDatasets(Datasets):
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
         self.datasets = datasets
+
+        self._source_filters = None
         self.source_filters = source_filters
 
     @property
@@ -415,7 +417,7 @@ class FilteredDatasets(Datasets):
     def source_filters(self, value: OptionalSourceFilterType) -> None:
         """Set or disable source filters."""
         self.clear()
-        self._source_filters = value  # noqa: T484
+        self._source_filters = value
         self._clone_from_datasets()
 
     def _clone_from_datasets(self) -> None:
