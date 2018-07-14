@@ -75,9 +75,15 @@ class ResourceLimitValue:
         _values: ResourceLimitValueTuple = (None, None, None,)
         if len(args) > 0:
             _values = self._parse_resource_limit(str(args[0]))
-        self.amount = kwargs.get("amount", _values[0])
-        self.action = kwargs.get("action", _values[1])
-        self.per = kwargs.get("per", _values[2])
+
+        amount = kwargs.get("amount", _values[0])
+        self.amount = amount if isinstance(amount, str) else None
+
+        action = kwargs.get("action", _values[1])
+        self.action = action if isinstance(action, str) else None
+
+        per = kwargs.get("per", _values[2])
+        self.per = per if isinstance(per, str) else None
 
     @property
     def is_unset(self) -> bool:
