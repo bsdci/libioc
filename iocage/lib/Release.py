@@ -428,7 +428,7 @@ class ReleaseGenerator(ReleaseResource):
             patch_level = int(match[1])
             versions.append(patch_level)
             snapshots[patch_level] = snapshot
-        return [snapshots[i] for i in sorted(versions)]
+        return [snapshots[i] for i in reversed(sorted(versions))]
 
     def _require_release_supported(self) -> None:
         if self.host.distribution.name == "HardenedBSD":
