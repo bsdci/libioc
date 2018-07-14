@@ -2004,13 +2004,23 @@ class JailGenerator(JailResource):
     @property
     def release(self) -> iocage.lib.Release.ReleaseGenerator:
         """Return the iocage.Release instance linked with the jail."""
-        return iocage.lib.Release.ReleaseGenerator(
-            name=self.config["release"],
-            root_datasets_name=self.root_datasets_name,
-            logger=self.logger,
-            host=self.host,
-            zfs=self.zfs
-        )
+        release_name = self.config["release"]
+        try:
+            memoized = (self.__memoized_release_name == release_name) is True
+        except AttributeError:
+            memoized = False
+
+        if memoized is False:
+            self.__memoized_release = iocage.lib.Release.ReleaseGenerator(
+                name=self.config["release"],
+                root_datasets_name=self.root_datasets_name,
+                logger=self.logger,
+                host=self.host,
+                zfs=self.zfs
+            )
+            self.__memoized_release_name = self.config["release"]
+
+        return self.__memoized_release
 
     @property
     def release_snapshot(self) -> libzfs.ZFSSnapshot:
