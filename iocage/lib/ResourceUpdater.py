@@ -441,7 +441,7 @@ class HardenedBSD(Updater):
             "-c",
             f"{self.local_release_updates_dir}/{self.update_conf_name}",
             "-i",  # ignore version check (offline)
-            "-v", "latest", "-U",  # skip version check
+            "-v", str(self.patch_version), "-U",  # skip version check
             "-n",  # no kernel
             "-V",
             "-D",  # no download,
@@ -454,7 +454,6 @@ class HardenedBSD(Updater):
     def _fetch_command(self) -> typing.List[str]:
         return [
             f"{self.host_updates_dir}/{self.update_script_name}",
-            f"{self.host_updates_dir}/temp",
             "-k",
             self.release.name,
             "-f",  # fetch only
@@ -463,7 +462,9 @@ class HardenedBSD(Updater):
             "-V",
             "-T",
             "-t",
-            self.local_temp_dir
+            f"{self.host_updates_dir}/temp",
+            "-r"
+            f"{self.resource.root_path}"
         ]
 
     def _get_release_trunk_file_url(
