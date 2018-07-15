@@ -293,6 +293,11 @@ class Updater:
             raise
 
         yield releaseUpdateDownloadEvent.begin()
+
+        if releaseUpdatePullEvent.skipped is True:
+            yield releaseUpdateDownloadEvent.skip()
+            return
+
         self.logger.verbose(
             f"Fetching updates for release '{self.release.name}'"
         )
