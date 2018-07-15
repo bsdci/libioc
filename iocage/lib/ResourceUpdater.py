@@ -303,7 +303,6 @@ class Updater:
                 shell=True,  # nosec: B604
                 logger=self.logger
             )
-            self._snapshot_after_release_update()
         except Exception as e:
             yield releaseUpdateDownloadEvent.fail(e)
             raise
@@ -357,6 +356,7 @@ class Updater:
             raise
 
         _rollback_snapshot()
+        self._snapshot_after_release_update()
         yield runResourceUpdateEvent.end()
         yield changed
 
