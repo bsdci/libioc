@@ -273,10 +273,24 @@ class Updater:
         yield releaseUpdatePullEvent.begin()
         try:
             self._pull_updater()
+
+            # Additional pre-fetch check on HardenedBSD
+            if self.host.distribution.name == "HardenedBSD":
+                _version_snapshot_name = (
+                    f"{self.release.root_dataset.name}"
+                    f"@p{self.patch_version}"
+                )
+                try:
+                    self.resource.zfs.get_snapshot(_version_snapshot_name)
+                    yield releaseUpdatePullEvent.skip()
+                except libzfs.ZFSException:
+                    yield releaseUpdatePullEvent.end()
+            else:
+                yield releaseUpdatePullEvent.end()
+
         except Exception as e:
             yield releaseUpdatePullEvent.fail(e)
             raise
-        yield releaseUpdatePullEvent.end()
 
         yield releaseUpdateDownloadEvent.begin()
         self.logger.verbose(
