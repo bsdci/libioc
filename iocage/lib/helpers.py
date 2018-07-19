@@ -24,6 +24,7 @@
 """Collection of iocage helper functions."""
 import typing
 import json
+import os
 import random
 import re
 import subprocess  # nosec: B404
@@ -649,3 +650,22 @@ def get_basedir_list(distribution_name: str="FreeBSD") -> typing.List[str]:
         basedirs.append("usr/lib32")
 
     return basedirs
+
+
+def makedirs_safe(
+    target: str,
+    mode: int=0o700,
+    logger: typing.Optional['iocage.lib.Logger.Logger']=None
+) -> None:
+    """Create a directory without following symlinks."""
+    directories = target.split("/")
+    while len(directories) > 0:
+        current_directory = "/".join(directories)
+        if os.path.exists(current_directory):
+            if os.path.islink(current_directory):
+                raise iocage.lib.errors.SecurityViolation(
+                    reason="Refusing to create a directory below a symlink",
+                    logger=logger
+                )
+        directories.pop()
+    os.makedirs(target, mode=mode, exist_ok=True)
