@@ -868,3 +868,91 @@ class JailStart(JailEvent):
     ) -> None:
 
         JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailProvisioning(JailEvent):
+    """Provision a jail."""
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailProvisioningAssetDownload(JailEvent):
+    """Provision a jail."""
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail, **kwargs)
+
+
+class JailCommandExecution(JailEvent):
+    """Run command in a jail."""
+
+    stdout: typing.Optional[str]
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+        self.stdout = None
+        JailEvent.__init__(self, jail, **kwargs)
+
+    def end(self, stdout, **kwargs) -> 'IocageEvent':  # noqa: T484
+        """Successfully finish an event."""
+        self.stdout = stdout
+        return IocageEvent.end(self, **kwargs)
+
+
+# PKG
+
+
+class PackageFetch(IocageEvent):
+    """Fetch packages for offline installation."""
+
+    packages: typing.List[str]
+
+    def __init__(  # noqa: T484
+        self,
+        packages: typing.List[str],
+        **kwargs
+    ) -> None:
+
+        self.identifier = "global"
+        self.packages = packages
+        IocageEvent.__init__(self, **kwargs)
+
+
+class PackageInstall(JailEvent):
+    """Install packages in a jail."""
+
+    def __init__(  # noqa: T484
+        self,
+        packages: typing.List[str],
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        self.packages = packages
+        JailEvent.__init__(self, jail=jail, **kwargs)
+
+
+class PackageConfiguration(JailEvent):
+    """Install packages in a jail."""
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        **kwargs
+    ) -> None:
+
+        JailEvent.__init__(self, jail=jail, **kwargs)

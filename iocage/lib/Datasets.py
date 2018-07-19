@@ -85,6 +85,11 @@ class RootDatasets:
         """Get or create the iocage jails dataset."""
         return self._get_or_create_dataset("jails")
 
+    @property
+    def pkg(self) -> libzfs.ZFSDataset:
+        """Get or create the pkg cache."""
+        return self._get_or_create_dataset("pkg")
+
     def _get_or_create_dataset(
         self,
         asset_name: str
