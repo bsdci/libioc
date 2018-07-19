@@ -664,9 +664,6 @@ class BaseConfig(dict):
             if not prop.startswith("_"):
                 properties.add(prop)
 
-        for key in self.data.keys():
-            properties.add(key)
-
         return list(properties)
 
     def keys(self) -> typing.KeysView[str]:
