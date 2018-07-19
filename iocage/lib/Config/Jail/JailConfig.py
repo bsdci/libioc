@@ -92,6 +92,21 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         skip_on_error: bool=False
     ) -> None:
         """Set a configuration value."""
+        # require the config property to be defined in the defaults
+        key_is_default = key in self.host.defaults.config.keys()
+        key_is_setter = f"_set_{key}" in dict.__dir__(self)
+        key_is_special = key in iocage.lib.Config.Jail.Properties.properties
+
+        if (key_is_default or key_is_setter or key_is_special) is False:
+            err = iocage.lib.errors.UnknownJailConfigProperty(
+                jail=self.jail,
+                key=key,
+                logger=self.logger,
+                level=("warn" if skip_on_error else None)
+            )
+            if skip_on_error is False:
+                raise err
+
         BaseConfig.__setitem__(
             self,
             key=key,
