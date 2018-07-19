@@ -34,6 +34,12 @@ Property = typing.Union[
     'iocage.lib.Config.Jail.Properties.Resolver.ResolverProp'
 ]
 
+properties: typing.List[str] = [
+    "ip4_addr",
+    "ip6_addr",
+    "interfaces",
+    "resolver"
+] + ResourceLimit.properties
 
 def _get_class(property_name: str) -> Property:
 

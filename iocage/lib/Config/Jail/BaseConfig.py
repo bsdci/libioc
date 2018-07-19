@@ -693,8 +693,12 @@ class BaseConfig(dict):
 
     @property
     def all_properties(self) -> typing.List[str]:
-        """Return a list of all user configured settings."""
-        return list(self._sorted_user_properties)
+        """Return a list of config object attributes."""
+        properties: typing.Set[str] = set()
+        properties = properties.union(self.data.keys())
+        special_properties = iocage.lib.Config.Jail.Properties.properties
+        properties = properties.union(special_properties)
+        return list(properties)
 
     @property
     def _sorted_user_properties(self) -> typing.List[str]:
