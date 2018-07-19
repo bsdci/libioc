@@ -118,5 +118,6 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         """Return a list of all config properties (default and custom)."""
         jail_config_properties = set(super().all_properties)
         default_config_properties = set(
-            self.host.default_config.all_properties)
+            self.host.default_config.all_properties
+        )
         return sorted(list(jail_config_properties | default_config_properties))
