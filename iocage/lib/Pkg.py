@@ -66,7 +66,7 @@ class Pkg:
         yield packageFetchEvent.begin()
         try:
             iocage.lib.helpers.exec([
-                "pkg",
+                "/usr/sbin/pkg",
                 "fetch",
                 "--yes",
                 "--dependencies",
@@ -112,7 +112,7 @@ class Pkg:
         yield packageInstallEvent.begin()
         try:
             self._get_temporary_jail(jail).fork_exec(" ".join([
-                "pkg",
+                "/usr/sbin/pkg",
                 "install",
                 "--yes",
                 "--repository", "libiocage"
