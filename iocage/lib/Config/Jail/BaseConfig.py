@@ -108,12 +108,15 @@ class BaseConfig(dict):
         if len(data.keys()) == 0:
             return
 
-        current_id = self["id"]
+        # the name is used in many other variables and needs to be set first
+        for key in ["id", "name", "uuid"]:
+            if key in data.keys():
+                self["id"] = data[key]
+                break
+
         for key, value in data.items():
-
-            if (key in ["id", "name", "uuid"]) and (current_id is not None):
-                value = current_id
-
+            if key in ["id", "name", "uuid"]:
+                continue
             self.__setitem__(  # noqa: T484
                 key,
                 value,

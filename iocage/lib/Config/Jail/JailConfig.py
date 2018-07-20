@@ -39,7 +39,6 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
     def __init__(
         self,
-        data: dict={},
         jail: typing.Optional['iocage.lib.Jail.JailGenerator']=None,
         new: bool=False,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
@@ -52,21 +51,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         )
 
         self.host = iocage.lib.helpers.init_host(self, host)
-
-        if len(data.keys()) == 0:
-            self.data = {
-                "id": None
-            }
-
         self.jail = jail
-
-        # the name is used in many other variables and needs to be set first
-        for key in ["id", "name", "uuid"]:
-            if key in data.keys():
-                self["id"] = data[key]
-                break
-
-        self.clone(data)
 
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
