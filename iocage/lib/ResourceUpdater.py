@@ -122,7 +122,7 @@ class Updater:
                     "basejail": False,
                     "allow_mount_nullfs": "1",
                     "release": self.release.name,
-                    "exec.start": None,
+                    "exec_start": None,
                     "securelevel": "0",
                     "allow_chflags": True,
                     "vnet": False,
