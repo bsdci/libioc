@@ -102,7 +102,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
                 jail=self.jail,
                 key=key,
                 logger=self.logger,
-                level=("warn" if skip_on_error else None)
+                level=("warn" if skip_on_error else "error")
             )
             if skip_on_error is False:
                 raise err
