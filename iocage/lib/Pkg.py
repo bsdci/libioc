@@ -68,9 +68,9 @@ class Pkg:
             iocage.lib.helpers.exec([
                 "pkg",
                 "fetch",
-                "-y",
-                "-d",
-                "-o", self.dataset.mountpoint,
+                "--yes",
+                "--dependencies",
+                "--output", self.dataset.mountpoint,
                 " ".join(packages)
             ])
             yield packageFetchEvent.end()
@@ -114,8 +114,8 @@ class Pkg:
             self._get_temporary_jail(jail).fork_exec(" ".join([
                 "pkg",
                 "install",
-                "-y",
-                "-r", "libiocage"
+                "--yes",
+                "--repository", "libiocage"
                 " ".join(packages)
             ]))
         except Exception as e:
