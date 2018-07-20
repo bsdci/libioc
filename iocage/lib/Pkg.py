@@ -39,6 +39,7 @@ class Pkg:
 
     _dataset: libzfs.ZFSDataset
     package_source_directory: str = "/.iocage/pkg"
+    pkg_repository_name: str = "libiocage"
 
     def __init__(
         self,
@@ -115,7 +116,7 @@ class Pkg:
                 "/usr/sbin/pkg",
                 "install",
                 "--yes",
-                "--repository", "libiocage"
+                "--repository", self.pkg_repository_name,
                 " ".join(packages)
             ]))
         except Exception as e:
@@ -159,7 +160,7 @@ class Pkg:
         )
 
         repo_config_data = {
-            "libiocage": {
+            self.pkg_repository_name: {
                 "ENABLED": False,
                 "URL": self.package_source_directory
             }
