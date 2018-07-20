@@ -318,11 +318,11 @@ class JailGenerator(JailResource):
                 pass
 
         self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(
-            data=data,
             host=self.host,
             jail=self,
             logger=self.logger
         )
+        self.config.clone(data)
 
         self.storage = self._class_storage(
             safe_mode=False,
