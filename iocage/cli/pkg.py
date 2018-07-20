@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Console subcommand for the CLI."""
+"""Jail package management subcommand for the CLI."""
 import click
 
 import iocage.lib.Jail
@@ -38,7 +38,7 @@ __rootcmd__ = True
 @click.argument("jail")
 @click.argument("packages", nargs=-1)
 def cli(ctx, jail, packages):
-    """Run jexec to login into the specified jail."""
+    """Manage packages within jails using an offline mirror."""
     logger = ctx.parent.logger
 
     try:
