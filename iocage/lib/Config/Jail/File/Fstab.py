@@ -314,7 +314,8 @@ class Fstab(
         options: str="ro",
         dump: str="0",
         passnum: str="0",
-        comment: typing.Optional[str]=None
+        comment: typing.Optional[str]=None,
+        replace: bool=False
     ) -> None:
         """
         Append a new line to the fstab file.
@@ -331,7 +332,7 @@ class Fstab(
             "comment": comment
         })
 
-        self.add_line(line)
+        self.add_line(line, replace=replace)
 
     def add_line(
         self,
@@ -339,7 +340,8 @@ class Fstab(
             FstabLine,
             FstabCommentLine,
             FstabAutoPlaceholderLine
-        ]
+        ],
+        replace: bool=False
     ) -> None:
         """
         Directly append a FstabLine type.
@@ -352,10 +354,17 @@ class Fstab(
             self.logger.debug(f"Adding line to fstab: {line}")
 
         if self.line_exists(line):
-            raise iocage.lib.errors.FstabDestinationExists(
-                mountpoint=line["destination"],
-                logger=self.logger
-            )
+            destination = line["destination"]
+            if replace is True:
+                self.logger.spam(
+                    f"Replacing fstab line with destination {destination}"
+                )
+                return
+            else:
+                raise iocage.lib.errors.FstabDestinationExists(
+                    mountpoint=destination,
+                    logger=self.logger
+                )
 
         self._lines.append(line)
 
