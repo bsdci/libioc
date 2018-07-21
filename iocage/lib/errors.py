@@ -1111,3 +1111,19 @@ class JailFilterInvalidName(JailFilterException):
             "Cannot select jail with illegal name"
         )
         JailFilterException.__init__(self, msg, *args, **kwargs)
+
+
+# pkg
+
+
+class PkgNotFound(IocageException):
+    """Raised when the pkg package was not found in the local mirror."""
+
+    def __init__(  # noqa: T484
+        self,
+        *args,
+        **kwargs
+    ) -> None:
+
+        msg = "The pkg package was not found in the local mirror."
+        IocageException.__init__(self, msg, *args, **kwargs)
