@@ -668,4 +668,6 @@ def makedirs_safe(
                     logger=logger
                 )
         directories.pop()
+    if logger is not None:
+        logger.verbose(f"Safely creating {target} directory")
     os.makedirs(target, mode=mode, exist_ok=True)
