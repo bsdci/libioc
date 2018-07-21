@@ -54,6 +54,7 @@ def cli(ctx, jail, packages):
     try:
         pkg = iocage.lib.Pkg.Pkg(
             logger=logger,
+            zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
         events = pkg.fetch_and_install(
