@@ -598,11 +598,11 @@ class JailGenerator(JailResource):
             config_data[key] = value
 
         self.config = iocage.lib.Config.Jail.JailConfig.JailConfig(
-            data=original_config.data,
             host=self.host,
             jail=self,
             logger=self.logger
         )
+        self.config.clone(original_config.data)
 
         try:
             fork_exec_events = JailGenerator.start(
