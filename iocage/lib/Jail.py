@@ -488,15 +488,12 @@ class JailGenerator(JailResource):
 
         def _stop_failed_jail(
         ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
-            if single_command is None:
-                stop_events = self.stop(
-                    force=True,
-                    event_scope=jailLaunchEvent.scope
-                )
-                for event in stop_events:
-                    yield event
-            else:
-                self._run_poststop_hook_manually()
+            stop_events = self.stop(
+                force=True,
+                event_scope=jailLaunchEvent.scope
+            )
+            for event in stop_events:
+                yield event
         jailLaunchEvent.add_rollback_step(_stop_failed_jail)
 
         if self.is_basejail is True:
