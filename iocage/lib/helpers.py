@@ -552,27 +552,18 @@ def exec_generator(
 def exec_passthru(
     command: typing.List[str],
     logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-    print_lines: bool=True,
     **subprocess_args: typing.Any
-) -> CommandOutput:
+) -> None:
     """Execute a command in an interactive shell."""
-    lines = exec_generator(
+    child = subprocess.Popen(  # nosec: B603
         command,
-        logger=logger,
         stdin=sys.stdin,
-        buffer_lines=False,
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        close_fds=True,
         **subprocess_args
     )
-    try:
-        while True:
-            line = next(lines)
-            if print_lines is True:
-                sys.stdout.buffer.write(line)
-                sys.stdout.flush()
-    except StopIteration as return_statement:
-        output: CommandOutput
-        output = return_statement.value
-        return output
+    child.wait()
 
 
 # ToDo: replace with (u)mount library
