@@ -52,12 +52,11 @@ class ZFS(libzfs.ZFS):
 
     def create_dataset(  # noqa: T484
         self,
-        dataset_name: str,
-        **kwargs
+        dataset_name: str
     ) -> libzfs.ZFSDataset:
         """Automatically get the pool and create a dataset from its name."""
         pool = self.get_pool(dataset_name)
-        pool.create(dataset_name, kwargs, create_ancestors=True)
+        pool.create(dataset_name, {}, create_ancestors=True)
 
         dataset = self.get_dataset(dataset_name)
         dataset.mount()
@@ -65,8 +64,7 @@ class ZFS(libzfs.ZFS):
 
     def get_or_create_dataset(  # noqa: T484
         self,
-        dataset_name: str,
-        **kwargs
+        dataset_name: str
     ) -> libzfs.ZFSDataset:
         """Find or create the dataset, then return it."""
         try:
@@ -74,7 +72,7 @@ class ZFS(libzfs.ZFS):
         except libzfs.ZFSException:
             pass
 
-        return self.create_dataset(dataset_name, **kwargs)
+        return self.create_dataset(dataset_name)
 
     def get_pool(self, name: str) -> libzfs.ZFSPool:
         """Get the pool with a given name."""
