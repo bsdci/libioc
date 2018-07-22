@@ -256,12 +256,6 @@ class Fstab(
                 "comment": comment
             })
 
-            if new_line in self._lines:
-                self.logger.error(
-                    "Duplicate mountpoint in fstab: "
-                    f"{destination} already mounted"
-                )
-
             self.add_line(new_line)
 
     def read_file(self) -> None:
