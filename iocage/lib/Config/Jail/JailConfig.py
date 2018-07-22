@@ -79,6 +79,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
 
         raise iocage.lib.errors.UnknownJailConfigProperty(
             key=key,
+            jail=self,
             logger=self.logger
         )
 
