@@ -33,25 +33,8 @@ import git
 
 import iocage.lib.errors
 import iocage.lib.events
+import iocage.lib.Pkg
 import iocage.lib.Provisioning
-
-
-class PackageUpdateEvent(iocage.lib.events.JailCommandExecution):
-    """IocageEvent for package update fetching."""
-
-    pass
-
-
-class PackageInstallEvent(iocage.lib.events.JailCommandExecution):
-    """IocageEvent for package installation."""
-
-    pass
-
-
-class PostInstallExecutionEvent(iocage.lib.events.JailCommandExecution):
-    """IocageEvent for post_install.sh execution."""
-
-    pass
 
 
 class PluginDefinition(dict):
@@ -138,15 +121,6 @@ def provision(
     jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
         **event_kargs
     )
-    packageUpdateEvent = PackageUpdateEvent(
-        **event_kargs
-    )
-    packageInstallEvent = PackageInstallEvent(
-        **event_kargs
-    )
-    postInstallExecutionEvent = PostInstallExecutionEvent(
-        **event_kargs
-    )
 
     # download provisioning assets
     try:
@@ -168,7 +142,6 @@ def provision(
         plugin_dataset.mountpoint
     )
 
-    self.jail.fstab.file = "fstab_provisioning"
     self.jail.fstab.new_line(
         source=plugin_dataset.mountpoint,
         destination="/.ix-plugin",
@@ -182,49 +155,26 @@ def provision(
     else:
         pkg_packages = [pluginDefinition.name]
 
-    for event in self.jail.start():
-        yield event
-
     try:
-        yield packageUpdateEvent.begin()
-        try:
-            stdout, stderr, returncode = self.jail.exec(
-                ["pkg", "update"],
-                env=dict(ASSUME_ALWAYS_YES="true")
-            )
-            yield packageUpdateEvent.end(stdout=stdout)
-        except iocage.lib.errors.IocageException as e:
-            yield packageUpdateEvent.fail(e)
-            raise e
+        pkg = iocage.lib.Pkg.Pkg(
+            logger=self.jail.logger,
+            zfs=self.jail.zfs,
+            host=self.jail.host
+        )
 
-        yield packageInstallEvent.begin()
-        try:
-            stdout, stderr, returncode = self.jail.exec(
-                ["pkg", "install", "-y"] + pkg_packages,
-                env=dict(ASSUME_ALWAYS_YES="true")
-            )
-            yield packageInstallEvent.end(stdout=stdout)
-        except iocage.lib.errors.IocageException as e:
-            yield packageInstallEvent.fail(e)
-            raise e
+        if os.path.isfile(f"{plugin_dataset.mountpoint}/post_install.sh"):
+            postinstall = ["/.ix-plugin/post_install.sh"]
+        else:
+            postinstall = []
 
-        yield postInstallExecutionEvent.begin()
-        try:
-            if os.path.isfile(f"{plugin_dataset.mountpoint}/post_install.sh"):
-                stdout, stderr, returncode = self.jail.exec(
-                    ["/.ix-plugin/post_install.sh"]
-                )
-                yield postInstallExecutionEvent.end(stdout=stdout)
-            else:
-                yield postInstallExecutionEvent.skip()
-        except iocage.lib.errors.IocageException as e:
-            yield postInstallExecutionEvent.fail(e)
-            raise e
-    finally:
-        for event in self.jail.stop(force=True):
-            yield event
-
-    yield jailProvisioningEvent.end()
+        yield from pkg.fetch_and_install(
+            jail=self.jail,
+            packages=pkg_packages,
+            postinstall=postinstall
+        )
+    except Exception as e:
+        yield jailProvisioningEvent.fail(e)
+        raise e
 
 
 def __get_empty_dataset(
