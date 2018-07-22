@@ -146,7 +146,8 @@ def provision(
         source=plugin_dataset.mountpoint,
         destination="/.ix-plugin",
         options="ro",
-        auto_create_destination=True
+        auto_create_destination=True,
+        replace=True
     )
     self.jail.fstab.save()
 
