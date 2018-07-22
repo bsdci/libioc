@@ -70,6 +70,11 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
                 return str(jail.humanreadable_name)
             raise e
 
+    def _is_known_property(self, key: str) -> bool:
+        key_is_default = key in self.host.defaults.config.keys()
+        key_is_setter = f"_set_{key}" in dict.__dir__(self)
+        key_is_special = key in iocage.lib.Config.Jail.Properties.properties
+        return (key_is_default or key_is_setter or key_is_special) is True
 
     def __setitem__(
         self,
@@ -79,11 +84,7 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
     ) -> None:
         """Set a configuration value."""
         # require the config property to be defined in the defaults
-        key_is_default = key in self.host.defaults.config.keys()
-        key_is_setter = f"_set_{key}" in dict.__dir__(self)
-        key_is_special = key in iocage.lib.Config.Jail.Properties.properties
-
-        if (key_is_default or key_is_setter or key_is_special) is False:
+        if self._is_known_property(key) is False:
             err = iocage.lib.errors.UnknownJailConfigProperty(
                 jail=self.jail,
                 key=key,
