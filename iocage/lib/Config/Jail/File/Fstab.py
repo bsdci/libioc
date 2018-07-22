@@ -377,7 +377,7 @@ class Fstab(
             if line["destination"].startswith(self.jail.root_path) is False:
                 line["destination"] = "/".join([
                     self.jail.root_path,
-                    line["destination"]
+                    line["destination"].strip("/")
                 ])
 
             if auto_create_destination is True:
