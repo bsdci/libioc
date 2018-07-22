@@ -1530,7 +1530,10 @@ class JailGenerator(JailResource):
                 )
                 try:
                     while True:
-                        self.logger.spam(next(exec_events), indent=1)
+                        self.logger.spam(
+                            next(exec_events).decode("UTF-8"),
+                            indent=1
+                        )
                 except StopIteration as return_statement:
                     output: iocage.lib.helpers.CommandOutput
                     output = return_statement.value
