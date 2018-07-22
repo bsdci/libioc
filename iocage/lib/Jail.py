@@ -69,11 +69,15 @@ class JailResource(
         host: 'iocage.lib.Host.HostGenerator',
         jail: typing.Optional['JailGenerator']=None,
         root_datasets_name: typing.Optional[str]=None,
+        fstab: typing.Optional['iocage.lib.Config.Jail.File.Fstab']=None,
         **kwargs
     ) -> None:
 
         self.host = iocage.lib.helpers.init_host(self, host)
         self.root_datasets_name = root_datasets_name
+
+        if fstab is not None:
+            self._fstab = fstab
 
         if jail is not None:
             self._jail = jail
