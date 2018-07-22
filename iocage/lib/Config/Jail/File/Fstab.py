@@ -256,7 +256,7 @@ class Fstab(
                 "comment": comment
             })
 
-            self.add_line(new_line)
+            self.add_line(new_line, skip_existing=True)
 
     def read_file(self) -> None:
         """Read the fstab file."""
@@ -340,6 +340,7 @@ class Fstab(
             FstabCommentLine,
             FstabAutoPlaceholderLine
         ],
+        skip_existing: bool=False,
         replace: bool=False,
         auto_create_destination: bool=False
     ) -> None:
@@ -348,16 +349,16 @@ class Fstab(
 
         Use save() to write changes to the fstab file.
         """
-        if isinstance(line, FstabAutoPlaceholderLine):
-            self.logger.debug("Setting fstab auto-creation placeholder")
-        else:
-            self.logger.debug(f"Adding line to fstab: {line}")
-
         if self.line_exists(line):
             destination = line["destination"]
             if replace is True:
-                self.logger.spam(
+                self.logger.verbose(
                     f"Replacing fstab line with destination {destination}"
+                )
+                del self[self.index(line)]
+            elif skip_existing is True:
+                self.logger.verbose(
+                    f"Skipping existing fstab line: {line}"
                 )
                 return
             else:
@@ -365,6 +366,11 @@ class Fstab(
                     mountpoint=destination,
                     logger=self.logger
                 )
+        else:
+            if isinstance(line, FstabAutoPlaceholderLine):
+                self.logger.debug("Setting fstab auto-creation placeholder")
+            else:
+                self.logger.debug(f"Adding line to fstab: {line}")
 
         if type(line) == FstabLine:
             # destination is always relative to the jail resource
