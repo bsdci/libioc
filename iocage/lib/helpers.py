@@ -30,6 +30,8 @@ import re
 import subprocess  # nosec: B404
 import sys
 import ucl
+import pty
+import select
 
 import iocage.lib.errors
 import iocage.lib.Datasets
@@ -472,10 +474,15 @@ def to_string(
 
 def exec_generator(
     command: typing.List[str],
-    logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-    **subprocess_args: typing.Any
+    buffer_lines: bool=True,
+    summarize: bool=True,
+    encoding: str="UTF-8",
+    universal_newlines: bool=True,
+    stdin: typing.Optional[typing.Union[typing.TextIO, int]]=None,
+    stdout: typing.Optional[typing.TextIO]=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Generator[
-    str,
+    bytes,
     None,
     CommandOutput
 ]:
@@ -488,45 +495,58 @@ def exec_generator(
     if logger is not None:
         logger.spam(f"Executing (interactive): {command_str}")
 
-    subprocess_args["stdout"] = subprocess_args.get("stdout", subprocess.PIPE)
-    subprocess_args["stderr"] = subprocess_args.get(
-        "stderr",
-        subprocess.STDOUT
-    )
-    subprocess_args["encoding"] = subprocess_args.get(
-        "encoding",
-        subprocess.STDOUT
-    )
-    subprocess_args["universal_newlines"] = subprocess_args.get(
-        "universal_newlines",
-        subprocess.STDOUT
-    )
+    controller_pts, delegate_pts = pty.openpty()
 
+    if stdin is None:
+        stdin = delegate_pts
+
+    stdout_result = b""
+    stdout_line_buf = b""
     try:
         child = subprocess.Popen(  # nosec: TODO: #113
             command,
-            **subprocess_args
+            encoding=encoding,
+            stdin=stdin,
+            stdout=delegate_pts,
+            stderr=subprocess.STDOUT,
+            close_fds=False,
+            universal_newlines=universal_newlines
         )
+        while child.poll() is None:
+            read, _, _ = select.select([controller_pts], [], [], 0)
+            if read:
+                stdout_chunk = os.read(controller_pts, 512)
 
-        stdout = ""
-        if child.stdout is not None:
-            for line in iter(child.stdout.readline, ""):
-                if (line is "") and (child.poll() is not None):
-                    continue
-                stdout += f"{line}"
-                yield line.replace("\r", "").replace("\n", "")
-            child.stdout.close()
+                if summarize is True:
+                    stdout_result += stdout_chunk
 
-        if child.stderr is not None:
-            stderr = child.stderr.read()
-            child.stderr.close()
-        else:
-            stderr = ""
+                # pipe to stdout if it was set
+                if stdout is not None:
+                    stdout.write(stdout_chunk.decode("UTF-8"))
+
+                if buffer_lines is False:
+                    # unbuffered chunk output
+                    yield stdout_chunk
+                else:
+                    # line buffered output
+                    stdout_line_buf += stdout_chunk
+                    while b"\n" in stdout_line_buf:
+                        lines = stdout_line_buf.split(b"\n", maxsplit=1)
+                        stdout_line_buf = lines.pop()
+                        yield from lines
+
     except KeyboardInterrupt:
         child.terminate()
         raise
+    finally:
+        os.close(controller_pts)
+        os.close(delegate_pts)
+        # push last line when buffering lines
+        if len(stdout_line_buf) > 0:
+            yield stdout_line_buf
 
-    return stdout, stderr, child.wait()
+    _stdout = stdout_result.decode(encoding) if (summarize is True) else None
+    return _stdout, None, child.returncode
 
 
 def exec_passthru(
@@ -539,14 +559,15 @@ def exec_passthru(
     lines = exec_generator(
         command,
         logger=logger,
-        stdout=sys.stdout,
+        stdin=sys.stdin,
+        buffer_lines=False,
         **subprocess_args
     )
     try:
         while True:
             line = next(lines)
             if print_lines is True:
-                print(line)
+                sys.stdout.buffer.write(line)
                 sys.stdout.flush()
     except StopIteration as return_statement:
         output: CommandOutput

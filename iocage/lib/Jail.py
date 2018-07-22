@@ -24,7 +24,6 @@
 """iocage Jail module."""
 import typing
 import os
-import pty
 import random
 import subprocess  # nosec: B404
 import shlex
@@ -513,8 +512,6 @@ class JailGenerator(JailResource):
                     single_command,
                     passthru=passthru
                 )
-            if stdout is not None:
-                self.logger.spam(stdout)
             if returncode != 0:
                 raise iocage.lib.errors.JailLaunchFailed(
                     jail=self,
@@ -1503,26 +1500,17 @@ class JailGenerator(JailResource):
                     env=self.env
                 )
             else:
-                controller_pts, delegate_pts = pty.openpty()
-                output: iocage.lib.helpers.CommandOutput
+                exec_events = iocage.lib.helpers.exec_generator(
+                    command,
+                    logger=self.logger
+                )
                 try:
-                    output = iocage.lib.helpers.exec(
-                        command,
-                        logger=self.logger,
-                        ignore_error=True,
-                        env=self.env,
-                        close_fds=True,
-                        stdin=delegate_pts,
-                        stderr=delegate_pts,
-                        stdout=delegate_pts
-                    )
-                    os.fsync(delegate_pts)
-                    stdout = os.read(controller_pts, 10240).decode("UTF-8")
-                finally:
-                    os.close(controller_pts)
-                    os.close(delegate_pts)
-                output = (stdout, None, output[2],)
-                return output
+                    while True:
+                        self.logger.spam(next(exec_events), indent=1)
+                except StopIteration as return_statement:
+                    output: iocage.lib.helpers.CommandOutput
+                    output = return_statement.value
+                    return output
         except (KeyboardInterrupt, SystemExit):
             raise iocage.lib.errors.JailExecutionAborted(
                 jail=self,
