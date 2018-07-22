@@ -373,14 +373,9 @@ class Pkg:
                 source=dataset.mountpoint,
                 destination=destination_dir,
                 options="ro",
+                auto_create_destination=True,
                 replace=True
             )
-            if os.path.isdir(destination_dir) is False:
-                iocage.lib.helpers.makedirs_safe(
-                    destination_dir,
-                    mode=0o755,
-                    logger=self.logger
-                )
             temporary_jail.fstab.save()
         except iocage.lib.errors.FstabDestinationExists:
             pass
