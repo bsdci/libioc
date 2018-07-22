@@ -183,9 +183,12 @@ def __get_empty_dataset(
 ) -> libzfs.ZFSDataset:
     try:
         dataset = zfs.get_dataset(dataset_name)
+    except libzfs.ZFSException as e:
+        dataset = None
+        pass
+    if dataset is not None:
         dataset.umount()
         zfs.delete_dataset_recursive(dataset)
-    except libzfs.ZFSException:
-        pass
+
     output: libzfs.ZFSDataset = zfs.get_or_create_dataset(dataset_name)
     return output
