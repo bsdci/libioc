@@ -399,10 +399,11 @@ class Fstab(
         ]
     ) -> bool:
         """Return True when the FstabLine already exists."""
-        for existing_line in self.__iter__():
-            if hash(existing_line) == hash(line):
-                return True
-        return False
+        try:
+            self.index(line)
+            return True
+        except ValueError:
+            return False
 
     @property
     def basejail_lines(self) -> typing.List[FstabBasejailLine]:
