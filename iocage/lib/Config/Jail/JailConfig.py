@@ -70,18 +70,6 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
                 return str(jail.humanreadable_name)
             raise e
 
-    def __delitem__(self, key: str) -> None:
-        """Delete a setting from the configuration."""
-        for default_key in self.host.defaults.config.keys():
-            if default_key.startswith(f"{key}.") or (default_key == key):
-                BaseConfig.__delitem__(self, key)
-                return
-
-        raise iocage.lib.errors.UnknownJailConfigProperty(
-            key=key,
-            jail=self,
-            logger=self.logger
-        )
 
     def __setitem__(
         self,
