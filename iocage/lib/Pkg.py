@@ -150,7 +150,8 @@ class Pkg:
         self,
         packages: typing.Union[str, typing.List[str]],
         jail: 'iocage.lib.Jail.JailGenerator',
-        event_scope: typing.Optional['iocage.lib.events.Scope']=None
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None,
+        postinstall: typing.List[str]=[]
     ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
@@ -201,7 +202,7 @@ class Pkg:
                     "--repository", "libiocage",
                     " ".join(packages)
                 ])
-            ])
+            ] + postinstall)
             temporary_jail = self._get_temporary_jail(jail)
             jail_exec_events = temporary_jail.fork_exec(
                 command,
@@ -236,13 +237,21 @@ class Pkg:
         self,
         packages: typing.Union[str, typing.List[str]],
         jail: 'iocage.lib.Jail.JailGenerator',
-        event_scope: typing.Optional['iocage.lib.events.Scope']=None
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None,
+        postinstall: typing.List[str]=[]
     ) -> typing.Generator[iocage.lib.events.IocageEvent, None, None]:
         """Mirror and install packages to a jail."""
-        for event in self.fetch(packages, jail.release, event_scope):
-            yield event
-        for event in self.install(packages, jail, event_scope):
-            yield event
+        yield from self.fetch(
+            packages=packages,
+            release=jail.release,
+            event_scope=event_scope
+        )
+        yield from self.install(
+            packages=packages,
+            jail=jail,
+            event_scope=event_scope,
+            postinstall=postinstall
+        )
 
     def _normalize_packages(
         self,
