@@ -356,6 +356,7 @@ class Pkg:
                 "mount_fdescfs": False
             },
             new=True,
+            fstab=source_jail.fstab,
             logger=self.logger,
             zfs=source_jail.zfs,
             host=source_jail.host,
