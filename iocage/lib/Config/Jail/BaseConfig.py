@@ -784,7 +784,7 @@ class BaseConfig(dict):
     def all_properties(self) -> typing.List[str]:
         """Return a list of config object attributes."""
         properties: typing.Set[str] = set()
-        properties = properties.union(self.data.keys())
+        properties = properties.union(self.keys())
         special_properties = iocage.lib.Config.Jail.Properties.properties
         properties = properties.union(special_properties)
         return list(properties)
