@@ -538,10 +538,10 @@ class BaseConfig(dict):
             pass
 
         # special property
-        is_special_property = self.special_properties.is_special_property(key)
-        is_existing = key in self.data.keys()
-        if (is_special_property and is_existing) is True:
-            return self.special_properties.get_or_create(key)
+        if self.special_properties.is_special_property(key) is True:
+            is_existing = key in self.data.keys()
+            if is_existing is True:
+                return self.special_properties.get_or_create(key)
 
         # data with mappings
         method_name = f"_get_{key}"
