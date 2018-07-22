@@ -27,7 +27,6 @@ import typing
 import math
 import os.path
 import re
-import urllib
 
 import libzfs
 import ucl
@@ -184,34 +183,29 @@ class Pkg:
             pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
             command = "\n".join([
                 "export ASSUME_ALWAYS_YES=yes",
-                "set -xe",
                 " ".join([
                     "/usr/sbin/pkg",
                     "add",
-                    f"{self.package_source_directory}/All/{pkg_archive_name}",
-                    "2>&1 | cat -",
+                    f"{self.package_source_directory}/All/{pkg_archive_name}"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "update",
                     "--force",
-                    "--repository", "libiocage",
-                    "2>&1 | cat -",
+                    "--repository", "libiocage"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "install",
                     "--yes",
                     "--repository", "libiocage",
-                    " ".join(packages),
-                    "2>&1 | cat -",
-                ]),
-                "exit 0"
+                    " ".join(packages)
+                ])
             ])
             temporary_jail = self._get_temporary_jail(jail)
             jail_exec_events = temporary_jail.fork_exec(
                 command,
-                passthru=True,
+                passthru=False,
                 event_scope=packageInstallEvent.scope
             )
             skipped = False
@@ -329,9 +323,10 @@ class Pkg:
         release_major_version: int
     ) -> libzfs.ZFSDataset:
         """Return the global package mirror dataset for the release."""
-        return self.zfs.get_or_create_dataset(
+        dataset: libzfs.ZFSDataset = self.zfs.get_or_create_dataset(
             f"{self.host.datasets.main.pkg.name}/{release_major_version}"
         )
+        return dataset
 
     def _get_temporary_jail(
         self,
