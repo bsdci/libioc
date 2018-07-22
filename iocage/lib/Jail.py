@@ -1861,12 +1861,12 @@ class JailGenerator(JailResource):
 
         commands: typing.List[str] = []
 
-        mountpoints = list(filter(
+        fstab_destinations = [line["destination"] for line in self.fstab]
+        system_mountpoints = list(filter(
             os.path.isdir,
             map(
                 self._get_absolute_path_from_jail_asset,
                 [
-                    "/usr/bin",
                     "/dev/fd",
                     "/dev",
                     "/proc",
@@ -1878,6 +1878,8 @@ class JailGenerator(JailResource):
                 ]
             )
         ))
+
+        mountpoints = fstab_destinations + system_mountpoints
 
         commands.append(" ".join(iocage.lib.helpers.umount_command(
             mountpoints,
