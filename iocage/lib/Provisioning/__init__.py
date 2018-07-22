@@ -96,5 +96,4 @@ class Provisioner(Prototype):
 	) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
 		"""Run the provision method on the enabled provisioner."""
 		Prototype.check_requirements(self)
-		for event in self.__provisioning_module.provision(self):
-			yield event
+		yield from self.__provisioning_module.provision(self)
