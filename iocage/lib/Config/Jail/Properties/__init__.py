@@ -45,8 +45,10 @@ def _get_class(property_name: str) -> Property:
 
     ResourceLimit = iocage.lib.Config.Jail.Properties.ResourceLimit
 
-    if (property_name == "ip4_addr") or (property_name == "ip6_addr"):
-        return iocage.lib.Config.Jail.Properties.Addresses.AddressesProp
+    if (property_name == "ip4_addr"):
+        return iocage.lib.Config.Jail.Properties.Addresses.IPv4AddressesProp
+    elif (property_name == "ip6_addr"):
+        return iocage.lib.Config.Jail.Properties.Addresses.IPv6AddressesProp
     elif property_name == "interfaces":
         return iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp
     elif property_name == "resolver":

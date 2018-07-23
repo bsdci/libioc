@@ -858,6 +858,21 @@ class FirewallCommandFailure(IocageException):
         super().__init__(msg, *args, **kwargs)
 
 
+class InvalidIPAddress(IocageException):
+    """Raised when an invalid IP address was assigned to a network."""
+
+    def __init__(  # noqa: T484
+        self,
+        reason: str,
+        ipv6: bool,
+        *args,
+        **kwargs
+    ) -> None:
+        ip_version = 4 + 2 * (ipv6 is True)
+        msg = f"Invalid IPv{ip_version} address: {reason}"
+        super().__init__(msg, *args, **kwargs)
+
+
 # Release
 
 
