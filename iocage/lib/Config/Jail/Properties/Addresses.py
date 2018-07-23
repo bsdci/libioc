@@ -23,6 +23,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail config address property."""
 import typing
+import ipaddress
+
 import iocage.lib.errors
 import iocage.lib.helpers
 
@@ -30,11 +32,32 @@ import iocage.lib.helpers
 import iocage.lib.Config.Jail
 import iocage.lib.Logger
 
+IPv4AddressInput = typing.Union[
+    str,
+    ipaddress.IPv4Interface
+]
+
+IPv6AddressInput = typing.Union[
+    str,
+    ipaddress.IPv6Interface
+]
+
+IPAddressInput = typing.Union[
+    str,
+    ipaddress.IPv4Interface,
+    ipaddress.IPv6Interface
+]
+
+IPInterfaceList = typing.Union[
+    typing.List[ipaddress.IPv4Interface],
+    typing.List[ipaddress.IPv6Interface]
+]
+
 
 class AddressSet(set):
     """Set of IP addresses."""
 
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
+    config: typing.Optional['iocage.lib.Config.Jail.JailConfig.JailConfig']
 
     def __init__(
         self,
@@ -43,27 +66,42 @@ class AddressSet(set):
         ]=None,
         property_name: str="ip4_address"
     ) -> None:
-
-        if config is not None:
-            self.config = config
-
+        self.config = config
         set.__init__(self)
         self.property_name = property_name
 
-    def add(self, value: str, notify: bool=True) -> None:
+    def add(
+        self,
+        value: typing.Union[
+            IPv4AddressInput,
+            IPv6AddressInput
+        ],
+        notify: bool=True
+    ) -> None:
         """Add an address to the set."""
-        set.add(self, value)
+        set.add(self, self.__parse_address(value))
         if notify:
             self.__notify()
 
-    def remove(self, value: str, notify: bool=True) -> None:
+    def remove(self, value: IPAddressInput, notify: bool=True) -> None:
         """Remove an address from the set."""
-        set.remove(self, value)
+        set.remove(self, self.__parse_address(value))
         if notify:
             self.__notify()
 
     def __notify(self) -> None:
-        self.config.update_special_property(self.property_name)
+        if self.config is not None:
+            self.config.update_special_property(self.property_name)
+
+    def __parse_address(
+        self,
+        address: IPAddressInput
+    ) -> typing.Union[str, ipaddress.IPv4Interface, ipaddress.IPv6Interface]:
+        if isinstance(address, str) is True:
+            address = str(address).lower()
+            if address in ["accept_rtadv", "dhcp"]:
+                return address
+        return ipaddress.ip_interface(address)
 
 
 _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
@@ -77,6 +115,8 @@ class AddressesProp(dict):
     property_name: str = "ip4_address"
     skip_on_error: bool
     delimiter: str = ","
+
+    IP_VERSION: int
 
     def __init__(
         self,
@@ -114,11 +154,8 @@ class AddressesProp(dict):
 
             try:
                 nic, address = ip_address_string.split("|", maxsplit=1)
-                self.add(nic, address)
             except ValueError:
-
                 level = "warn" if (self.skip_on_error is True) else "error"
-
                 iocage.lib.errors.InvalidJailConfigAddress(
                     jail=self.config.jail,
                     value=ip_address_string,
@@ -126,22 +163,20 @@ class AddressesProp(dict):
                     logger=self.logger,
                     level=level
                 )
-
                 if self.skip_on_error is False:
                     exit(1)
 
-    def add(
+            self.add(nic, address)  # noqa: T484 (exists on implementing class)
+
+    def _add_ip_addresses(
         self,
         nic: str,
-        addresses: typing.Optional[typing.Union[typing.List[str], str]]=None,
+        addresses: IPInterfaceList,
         notify: bool=True
     ) -> None:
         """Add an address to a NIC."""
-        if addresses is None or addresses == [] or addresses == "":
+        if (addresses is None) or (len(addresses) == 0):
             return
-
-        if isinstance(addresses, str):
-            addresses = [addresses]
 
         try:
             prop = self[nic]
@@ -154,6 +189,46 @@ class AddressesProp(dict):
         if notify:
             self.__notify()
 
+    def add(
+        self,
+        nic: str,
+        addresses: typing.Union[
+            IPAddressInput,
+            typing.List[IPAddressInput]
+        ]=None,
+        notify: bool=True
+    ) -> None:
+        """Add one or many IP addresses to an interface."""
+        if isinstance(addresses, list) is False:
+            _address: IPAddressInput = addresses  # noqa: T484
+            self.add(
+                nic=nic,
+                addresses=[_address],
+                notify=False
+            )
+            self.__notify()
+            return
+
+        try:
+            own_class = self.ADDRESS_CLASS  # noqa: T484
+            _class: typing.Union[
+                typing.Callable[..., ipaddress.IPv4Interface],
+                typing.Callable[..., ipaddress.IPv4Interface]
+            ] = own_class
+            _addresses = [_class(x) for x in list(addresses)]  # type: ignore
+            err = None
+        except ipaddress.AddressValueError as e:
+            err = e
+        finally:
+            if err is not None:
+                raise iocage.lib.errors.InvalidIPAddress(
+                    reason=str(err),
+                    ipv6=(self.IP_VERSION == 6),
+                    logger=self.logger
+                )
+        self._add_ip_addresses(nic=nic, addresses=_addresses, notify=False)
+        self.__notify()
+
     @property
     def networks(self) -> typing.List[str]:
         """Flat list of all networks configured across all NICs."""
@@ -165,7 +240,10 @@ class AddressesProp(dict):
     def __setitem__(
         self,
         key: str,
-        addresses: typing.Union[typing.List[str], str]
+        addresses: typing.Union[
+            IPAddressInput,
+            typing.List[IPAddressInput]
+        ]
     ) -> None:
         """Set all addresses of a NIC."""
         try:
@@ -203,3 +281,17 @@ class AddressesProp(dict):
             for address in self[nic]:
                 out.append(f"{nic}|{address}")
         return str(self.delimiter.join(out))
+
+
+class IPv4AddressesProp(AddressesProp):
+    """Special jail config for IPv4 addresses."""
+
+    IP_VERSION = 4
+    ADDRESS_CLASS = ipaddress.IPv4Interface
+
+
+class IPv6AddressesProp(AddressesProp):
+    """Special jail config for IPv6 addresses."""
+
+    IP_VERSION = 6
+    ADDRESS_CLASS = ipaddress.IPv6Interface

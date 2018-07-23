@@ -357,7 +357,10 @@ class BaseConfig(dict):
 
     def _get_defaultrouter(self) -> typing.Optional[str]:
         value = self.data['defaultrouter']
-        return str(value) if (value != "none" and value is not None) else None
+        try:
+            iocage.lib.helpers.parse_none(value)
+        except TypeError:
+            return str(value)
 
     def _set_defaultrouter(  # noqa: T484
         self,
@@ -370,7 +373,10 @@ class BaseConfig(dict):
 
     def _get_defaultrouter6(self) -> typing.Optional[str]:
         value = self.data['defaultrouter6']
-        return str(value) if (value != "none" and value is not None) else None
+        try:
+            iocage.lib.helpers.parse_none(value)
+        except TypeError:
+            return str(value)
 
     def _set_defaultrouter6(  # noqa: T484
         self,
