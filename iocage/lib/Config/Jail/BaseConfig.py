@@ -475,9 +475,27 @@ class BaseConfig(dict):
 
     def _get_host_hostuuid(self) -> str:
         try:
-            return str(self.data["host_hostuuid"])
-        except KeyError:
+            hostuuid = self.data["host_hostuuid"]
+            if hostuuid is None:
+                raise ValueError
+            return str(hostuuid)
+        except (KeyError, ValueError):
             return str(self["id"])
+
+    def _get_host_hostname(self) -> str:
+        try:
+            hostname = self.data["host_hostname"]
+            if hostname is None:
+                raise ValueError
+            return str(hostname)
+        except (KeyError, ValueError):
+            return str(self["id"])
+
+    def _get_host_domainname(self) -> str:
+        try:
+            return str(self.data["host_domainname"])
+        except KeyError:
+            return "local"
 
     def get_string(self, key: str) -> str:
         """Get the stringified value of a configuration property."""
