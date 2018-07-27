@@ -166,6 +166,9 @@ class Storage:
     def create_jail_mountpoint(self, basedir: str) -> None:
         """Ensure the destination mountpoint exists relative to the jail."""
         basedir = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+        if os.path.islink(basedir):
+            self.logger.verbose("Deleting existing symlink {basedir}")
+            os.unlink(basedir)
         iocage.lib.helpers.makedirs_safe(basedir)
 
     def _mount_procfs(self) -> None:
