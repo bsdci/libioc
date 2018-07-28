@@ -89,6 +89,8 @@ class JailState(dict):
 
     def query(self) -> typing.Dict[str, str]:
         """Execute jls to update a jails state."""
+        if isinstance(self.logger, iocage.lib.Logger.Logger):
+            self.logger.verbose(f"Querying jail status of {self.name}")
         if _userland_version >= 11:
             return self._query_libxo()
         else:
@@ -106,7 +108,7 @@ class JailState(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=self.logger
+            logger=None
         )
 
         if returncode > 0:
@@ -130,7 +132,7 @@ class JailState(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=self.logger
+            logger=None
         )
 
         if returncode > 0:
@@ -190,16 +192,18 @@ class JailStates(dict):
         logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
         """Invoke update of the jail state from jls output."""
+        if logger is not None:
+            logger.verbose("Querying all running jails status")
         try:
             if _userland_version >= 11:
-                self._query_libxo(logger=logger)
+                self._query_libxo()
             else:
-                self._query_list(logger=logger)
+                self._query_list()
         except BaseException:
             raise iocage.lib.errors.JailStateUpdateFailed()
         self.queried = True
 
-    def _query_libxo(self, logger: 'iocage.lib.Logger.Logger'=None) -> None:
+    def _query_libxo(self) -> None:
         stdout, _, returncode = iocage.lib.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -208,7 +212,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=logger
+            logger=None
         )
 
         if returncode > 0:
@@ -219,7 +223,7 @@ class JailStates(dict):
         for name in output_data:
             dict.__setitem__(self, name, output_data[name])
 
-    def _query_list(self, logger: 'iocage.lib.Logger.Logger'=None) -> None:
+    def _query_list(self) -> None:
         stdout, _, returncode = iocage.lib.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -229,7 +233,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=logger
+            logger=None
         )
 
         if returncode > 0:
