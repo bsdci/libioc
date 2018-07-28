@@ -1788,7 +1788,9 @@ class JailGenerator(JailResource):
                 f"setting pointopoint route to {gateway} via {nic}"
             )
             commands.append(" ".join(
-                ["/sbin/route", "-q", "add", gateway, "-iface", nic]
+                ["/sbin/route", "-q", "add"] +
+                (["-6"] if (ipv6 is True) else []) +
+                [gateway, "-iface", nic]
             ))
 
         self.logger.verbose(
