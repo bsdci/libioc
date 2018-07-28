@@ -289,7 +289,7 @@ class Pkg:
         self._update_repo_conf(
             repo_name=repo_name,
             directory="/usr/local/etc/pkg/repos",
-            enabled=True,
+            enabled=False,
             url=f"pkg+{base_url}",
             mirror_type="srv",
             fingerprints="/usr/share/keys/pkg"
