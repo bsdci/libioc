@@ -112,8 +112,10 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
         try:
             return super().__getitem__(key)
         except KeyError:
-            # fall back to default
-            return self.host.defaults.config[key]
+            pass
+
+        # fall back to default
+        return self.host.defaults.config[key]
 
     @property
     def all_properties(self) -> list:
