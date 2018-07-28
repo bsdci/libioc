@@ -132,16 +132,19 @@ class Term(list):
         if match_filter(value, filter_string) is True:
             return True
 
-        if short is False:
-            return False
-
-        # match against humanreadable names as well
-        has_humanreadble_length = (len(filter_string) == 8)
         has_no_globs = not self._filter_string_has_globs(filter_string)
-        if (has_humanreadble_length and has_no_globs) is True:
-            shortname = iocage.lib.helpers.to_humanreadable_name(value)
-            if shortname == filter_string:
-                return True
+        if has_no_globs is True:
+            # match against humanreadable names as well
+            has_humanreadble_length = (len(filter_string) == 8)
+            if (has_humanreadble_length is True) and (short is True):
+                shortname = iocage.lib.helpers.to_humanreadable_name(value)
+                if shortname == filter_string:
+                    return True
+
+            _parse_user_input = iocage.lib.helpers.parse_user_input
+            parsed_value = _parse_user_input(value)
+            parsed_filter = _parse_user_input(filter_string)
+            return (parsed_value == parsed_filter) is True
 
         return False
 
