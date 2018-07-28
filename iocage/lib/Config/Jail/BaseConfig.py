@@ -533,10 +533,14 @@ class BaseConfig(dict):
     def _getitem_user(self, key: str) -> typing.Any:
 
         # special property
+        _rlimits = iocage.lib.Config.Jail.Properties.ResourceLimit.properties
         if self.special_properties.is_special_property(key) is True:
             is_existing = key in self.data.keys()
+            is_resource_limit = key in _rlimits
             if is_existing is True:
                 return self.special_properties.get_or_create(key)
+            elif is_resource_limit is True:
+                return None
 
         # data with mappings
         method_name = f"_get_{key}"
