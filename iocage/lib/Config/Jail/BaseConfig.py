@@ -597,7 +597,7 @@ class BaseConfig(dict):
         """
         try:
             return self._getitem_user(key)
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         raise KeyError(f"Item not found: {key}")
