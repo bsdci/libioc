@@ -531,11 +531,6 @@ class BaseConfig(dict):
             return False
 
     def _getitem_user(self, key: str) -> typing.Any:
-        try:
-            # passthrough existing properties
-            return self.__getattribute__(key)
-        except AttributeError:
-            pass
 
         # special property
         if self.special_properties.is_special_property(key) is True:
