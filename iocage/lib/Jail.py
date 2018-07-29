@@ -435,7 +435,9 @@ class JailGenerator(JailResource):
             os.makedirs(jail_start_script_dir, 0o755)
 
         exec_prestart: typing.List[str] = self._get_resource_limits_commands()
-        exec_start: typing.List[str] = []
+        exec_start: typing.List[str] = [
+            f". {self._relative_hook_script_dir}/.env"
+        ]
         exec_started: typing.List[str] = [
             f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
             "set -eu",
