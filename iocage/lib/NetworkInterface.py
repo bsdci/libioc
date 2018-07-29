@@ -186,7 +186,7 @@ class NetworkInterface:
         ]
     ) -> None:
 
-        for i, address in enumerate(list(addresses)):
+        for i, address in enumerate(list(addresses)):  # noqa: T484
             name = self.current_nic_name
             is_ipv4 = isinstance(address, ipaddress.IPv4Interface) is True
             is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
