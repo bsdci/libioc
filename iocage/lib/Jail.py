@@ -1723,7 +1723,7 @@ class JailGenerator(JailResource):
                 rlimit_prop = self.config[key]
                 if rlimit_prop.is_unset is True:
                     continue
-            except KeyError:
+            except (KeyError, AttributeError):
                 continue
             commands.append(" ".join([
                 "/usr/bin/rctl",
