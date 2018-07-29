@@ -332,7 +332,7 @@ class Network:
         for protocol in ["ipv4", "ipv6"]:
             addresses = self.__getattribute__(f"{protocol}_addresses")
             for address in addresses:
-                _address = address.split("/", maxsplit=1)[0]
+                _address = str(address.ip)
                 self.firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", _address, "to", "any",

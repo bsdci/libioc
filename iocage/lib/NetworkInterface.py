@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Model if an iocage jails network interface."""
 import typing
+import ipaddress
 
 import iocage.lib.helpers
 import iocage.lib.CommandQueue
@@ -51,8 +52,8 @@ class NetworkInterface:
         self,
         name: typing.Optional[str]="vnet0",
         create: bool=False,
-        ipv4_addresses: typing.Optional[typing.List[str]]=[],
-        ipv6_addresses: typing.Optional[typing.List[str]]=[],
+        ipv4_addresses: typing.List[ipaddress.IPv4Interface]=[],
+        ipv6_addresses: typing.List[ipaddress.IPv6Interface]=[],
         mac: typing.Optional[
             typing.Union[str, 'iocage.lib.MacAddress.MacAddress']
         ]=None,
@@ -168,9 +169,9 @@ class NetworkInterface:
     def apply_addresses(self) -> None:
         """Apply the configured IP addresses."""
         if self.ipv4_addresses is not None:
-            self.__apply_addresses(self.ipv4_addresses, ipv6=False)
+            self.__apply_addresses(self.ipv4_addresses)
         if self.ipv6_addresses is not None:
-            self.__apply_addresses(self.ipv6_addresses, ipv6=True)
+            self.__apply_addresses(self.ipv6_addresses)
 
     @property
     def current_nic_name(self) -> str:
@@ -179,24 +180,28 @@ class NetworkInterface:
 
     def __apply_addresses(
         self,
-        addresses: typing.List[str],
-        ipv6: bool=False
+        addresses: typing.Union[
+            typing.List[ipaddress.IPv4Interface],
+            typing.List[ipaddress.IPv6Interface]
+        ]
     ) -> None:
 
-        family = "inet6" if ipv6 else "inet"
-        for i, address in enumerate(addresses):
+        for i, address in enumerate(list(addresses)):
             name = self.current_nic_name
-            if (ipv6 is False) and (address.lower() == "dhcp"):
+            is_ipv4 = isinstance(address, ipaddress.IPv4Interface) is True
+            is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
+            family = "inet6" if is_ipv6 else "inet"
+            if is_ipv4 and (str(address).lower() == "dhcp"):
                 command = [self.dhclient_command, name]
             else:
-                command = [self.ifconfig_command, name, family, address]
+                command = [self.ifconfig_command, name, family, str(address)]
 
             if i > 0:
                 command.append("alias")
 
             self._exec(command)
 
-            if (ipv6 is True) and (address.lower() == "accept_rtadv"):
+            if is_ipv6 and (str(address).lower() == "accept_rtadv"):
                 self._exec([
                     self.rtsold_command,
                     self.current_nic_name
