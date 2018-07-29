@@ -355,38 +355,6 @@ class BaseConfig(dict):
     ) -> None:
         self.data["clonejail"] = self.stringify(value)
 
-    def _get_defaultrouter(self) -> typing.Optional[str]:
-        value = self.data['defaultrouter']
-        try:
-            iocage.lib.helpers.parse_none(value)
-        except TypeError:
-            return str(value)
-
-    def _set_defaultrouter(  # noqa: T484
-        self,
-        value: typing.Optional[str],
-        **kwargs
-    ) -> None:
-        if value is None:
-            value = 'none'
-        self.data['defaultrouter'] = value
-
-    def _get_defaultrouter6(self) -> typing.Optional[str]:
-        value = self.data['defaultrouter6']
-        try:
-            iocage.lib.helpers.parse_none(value)
-        except TypeError:
-            return str(value)
-
-    def _set_defaultrouter6(  # noqa: T484
-        self,
-        value: typing.Optional[str],
-        **kwargs
-    ) -> None:
-        if value is None:
-            value = 'none'
-        self.data['defaultrouter6'] = value
-
     def _get_vnet(self) -> bool:
         return iocage.lib.helpers.parse_user_input(self.data["vnet"]) is True
 
