@@ -217,7 +217,7 @@ class AddressesProp(dict):
             ] = own_class
             _addresses = [_class(x) for x in list(addresses)]  # type: ignore
             err = None
-        except ipaddress.AddressValueError as e:
+        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError) as e:
             err = e
         finally:
             if err is not None:
