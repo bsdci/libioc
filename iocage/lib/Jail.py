@@ -1755,51 +1755,16 @@ class JailGenerator(JailResource):
         defaultrouter = self.config["defaultrouter"]
         defaultrouter6 = self.config["defaultrouter6"]
 
-        if (defaultrouter is None) and (defaultrouter6 is None):
+        commands: typing.List[str] = []
+
+        if defaultrouter is not None:
+            commands += list(defaultrouter.apply(jail=self))
+
+        if defaultrouter6 is not None:
+            commands += list(defaultrouter6.apply(jail=self))
+
+        if len(commands) == 0:
             self.logger.spam("no static routes configured")
-            return []
-
-        commands: typing.List[str] = []
-
-        if defaultrouter:
-            commands += self._configure_route_command(defaultrouter)
-
-        if defaultrouter6:
-            commands += self._configure_route_command(
-                defaultrouter6,
-                ipv6=True
-            )
-
-        return commands
-
-    def _configure_route_command(
-        self,
-        gateway: str,
-        ipv6: bool=False
-    ) -> typing.List[str]:
-
-        ip_version = 4 + 2 * (ipv6 is True)
-        commands: typing.List[str] = []
-
-        # router@interface syntax for static pointopoint route
-        if "@" in gateway:
-            gateway, nic = gateway.split("@", maxsplit=1)
-            self.logger.verbose(
-                f"setting pointopoint route to {gateway} via {nic}"
-            )
-            commands.append(" ".join(
-                ["/sbin/route", "-q", "add", gateway, "-iface", nic]
-            ))
-
-        self.logger.verbose(
-            f"setting default IPv{ip_version} gateway to {gateway}",
-            jail=self
-        )
-        commands.append(" ".join(
-            ["/sbin/route", "-q", "add"] +
-            (["-6"] if (ipv6 is True) else []) +
-            ["default", gateway]
-        ))
 
         return commands
 

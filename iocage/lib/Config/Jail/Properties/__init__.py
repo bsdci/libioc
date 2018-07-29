@@ -27,6 +27,7 @@ import iocage.lib.Config.Jail.Properties.Addresses
 import iocage.lib.Config.Jail.Properties.Interfaces
 import iocage.lib.Config.Jail.Properties.Resolver
 import iocage.lib.Config.Jail.Properties.ResourceLimit
+import iocage.lib.Config.Jail.Properties.Defaultrouter
 
 Property = typing.Union[
     'iocage.lib.Config.Jail.Properties.Addresses.AddressesProp',
@@ -38,12 +39,15 @@ properties: typing.List[str] = [
     "ip4_addr",
     "ip6_addr",
     "interfaces",
+    "defaultrouter",
+    "defaultrouter6",
     "resolver"
 ] + ResourceLimit.properties
 
 def _get_class(property_name: str) -> Property:
 
     ResourceLimit = iocage.lib.Config.Jail.Properties.ResourceLimit
+    DefaultrouterModule = iocage.lib.Config.Jail.Properties.Defaultrouter
 
     if (property_name == "ip4_addr"):
         return iocage.lib.Config.Jail.Properties.Addresses.IPv4AddressesProp
@@ -53,6 +57,10 @@ def _get_class(property_name: str) -> Property:
         return iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp
     elif property_name == "resolver":
         return iocage.lib.Config.Jail.Properties.Resolver.ResolverProp
+    elif property_name == "defaultrouter":
+        return DefaultrouterModule.DefaultrouterProp
+    elif property_name == "defaultrouter6":
+        return DefaultrouterModule.Defaultrouter6Prop
     elif property_name in ResourceLimit.properties:
         return ResourceLimit.ResourceLimitProp
 
@@ -71,6 +79,8 @@ def init_property(property_name: str, **kwargs) -> Property:  # noqa: T484
                 - ip6_addr
                 - interfaces
                 - resolver
+                - defaultrouter
+                - defaultrouter6
 
         **kwargs:
             Arguments passed to the special property class
