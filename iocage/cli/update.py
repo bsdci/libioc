@@ -57,7 +57,7 @@ def cli(
         logger.error("No jail selector provided")
         exit(1)
 
-    filters = jails + ("template=no,-",)
+    filters = jails + ("template=no,-", "basejail=no",)
     ioc_jails = iocage.lib.Jails.JailsGenerator(
         logger=logger,
         host=ctx.parent.host,
@@ -81,7 +81,7 @@ def cli(
     if len(changed_jails) == 0:
         jails_input = " ".join(list(jails))
         logger.error(
-            f"No jail was updated or matched your input: {jails_input}"
+            f"No non-basejail was updated or matched your input: {jails_input}"
         )
         return False
 
