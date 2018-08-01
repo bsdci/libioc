@@ -24,6 +24,7 @@
 """Jail config resolver property."""
 import typing
 import collections
+import os.path
 import shutil
 
 import iocage.lib.helpers
@@ -83,34 +84,56 @@ class ResolverProp(collections.MutableSequence):
         except TypeError:
             return str(value)
 
-    def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> None:
+    def apply(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None
+    ) -> typing.Generator['iocage.lib.events.JailResolverConfig', None, None]:
         """Apply the settings to a jail."""
         self.logger.verbose(
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
 
-        remote_path = os.path.realpath(
-            f"{jail.root_path}/{self.conf_file_path}"
+        jailResolverConfigEvent = iocage.lib.events.JailResolverConfig(
+            jail=self,
+            scope=event_scope
         )
-        if remote_path.startswith(jail.root_path) is False:
-            raise iocage.lib.errors.InsecureJailPath(
-                path=remote_path,
-                logger=self.logger
+        yield jailResolverConfigEvent.begin()
+
+        try:
+            remote_path = os.path.realpath(
+                f"{jail.root_path}/{self.conf_file_path}"
             )
+            if remote_path.startswith(jail.root_path) is False:
+                raise iocage.lib.errors.InsecureJailPath(
+                    path=remote_path,
+                    logger=self.logger
+                )
 
-        if self.method == "skip":
-            self.logger.verbose("resolv.conf untouched")
+            if self.method == "skip":
+                self.logger.verbose("resolv.conf untouched")
+                yield jailResolverConfigEvent.skip()
+                return
 
-        elif self.method == "copy":
-            shutil.copy(self.conf_file_path, remote_path)
-            self.logger.verbose("resolv.conf copied from host")
+            elif self.method == "copy":
+                shutil.copy(self.conf_file_path, remote_path)
+                self.logger.verbose("resolv.conf copied from host")
 
-        elif self.method == "manual":
-            lines = map(lambda address: f"nameserver {address}", self._entries)
-            with open(remote_path, "w") as f:
-                f.write("\n".join(lines))
-                f.close()
-            self.logger.verbose("resolv.conf written manually")
+            elif self.method == "manual":
+                lines = map(
+                    lambda address: f"nameserver {address}",
+                    self._entries
+                )
+                with open(remote_path, "w") as f:
+                    f.write("\n".join(lines))
+                    f.close()
+                self.logger.verbose("resolv.conf written manually")
+        except Exception as e:
+            print(e)
+            yield jailResolverConfigEvent.fail(e)
+            raise e
+        else:
+            yield jailResolverConfigEvent.end()
 
     def set(
         self,

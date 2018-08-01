@@ -423,6 +423,14 @@ class JailGenerator(JailResource):
         self.require_jail_existing()
         self.require_jail_stopped()
 
+        try:
+            yield from self.config["resolver"].apply(
+                jail=self,
+                event_scope=event_scope
+            )
+        except Exception as e:
+            raise e
+
         events: typing.Any = iocage.lib.events
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
@@ -546,8 +554,6 @@ class JailGenerator(JailResource):
             raise e
 
         yield jailLaunchEvent.end(stdout=stdout)
-
-        self._configure_nameserver()
 
     def _run_poststop_hook_manually(self) -> None:
         self.logger.debug("Running poststop hook manually")
@@ -1702,9 +1708,6 @@ class JailGenerator(JailResource):
         for network in self.networks:
             commands += network.teardown()
         return commands
-
-    def _configure_nameserver(self) -> None:
-        self.config["resolver"].apply(self)
 
     def _configure_localhost_commands(self) -> typing.List[str]:
         return ["ifconfig lo0 localhost"]
