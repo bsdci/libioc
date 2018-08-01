@@ -1283,8 +1283,7 @@ class JailGenerator(JailResource):
             comment=self.fstab.AUTO_COMMENT_IDENTIFIER
         ))
         self.fstab.read_file()
-        if self.fstab.line_exists(iocage_helper_line) is False:
-            self.fstab.add_line(iocage_helper_line)
+        self.fstab.add_line(iocage_helper_line, replace=True)
         self.fstab.save()
 
     def exec(  # noqa: T484
