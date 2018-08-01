@@ -349,7 +349,7 @@ class Fstab(
 
         Use save() to write changes to the fstab file.
         """
-        if self.line_exists(line):
+        if self.__contains__(line):
             destination = line["destination"]
             if replace is True:
                 self.logger.verbose(
@@ -390,7 +390,30 @@ class Fstab(
 
         self._lines.append(line)
 
-    def line_exists(
+    def index(
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ],
+        start: typing.Optional[int]=None,
+        end: typing.Optional[int]=None
+    ) -> int:
+        """Find the index position of a FstabLine in the Fstab instance."""
+        i: int = 0
+        items = list(self)
+        start = 0 if (start is None) else start
+        end = (len(items) - 1) if (end is None) else end
+        for existing_line in items:
+            if (i >= start) and (hash(existing_line) == hash(line)):
+                return i
+            i += 1
+            if (i > end):
+                break
+        raise ValueError("Fstab line does not exist")
+
+    def __contains__(  # noqa: T484
         self,
         line: typing.Union[
             FstabLine,
@@ -557,19 +580,6 @@ class Fstab(
             output = self.basejail_lines + self._lines  # noqa: T484
 
         return iter(output)
-
-    def __contains__(self, value: typing.Union[  # noqa: T484
-        FstabBasejailLine,
-        FstabCommentLine,
-        FstabLine
-    ]) -> bool:
-        """Check if the FstabFile already contains a specific line."""
-        for entry in self:
-            if value["destination"] == entry["destination"]:
-                return True
-            else:
-                return False
-        return False
 
     def replace_path(self, pattern: str, replacement: str) -> None:
         """Replace a path in all fstab entries (source or destination)."""
