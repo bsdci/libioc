@@ -44,7 +44,7 @@ class DefaultrouterMixin:
     skip_on_error: bool
     interface_delimiter: str = "@"
 
-    _ip: int  # from ipaddress.IPv4Address or ipaddress.IPv6Address class
+    _ip: typing.Optional[int]  # from ipaddress.IPv*Address class
     static_interface: typing.Optional[str]
 
     def __init__(
@@ -72,20 +72,26 @@ class DefaultrouterMixin:
         ]]
         static_interface = None
 
+        if isinstance(data, str) is True:
+            data = iocage.lib.helpers.parse_user_input(data)
+
         if data is None:
             gateway = None
-        elif isinstance(data, str) is True:
-            _data = str(data)
-            if "@" in _data:
-                address, static_interface = _data.split("@", maxsplit=1)
-            else:
-                address = _data
-            gateway = self._ipaddress_class(address)
+            self._ip = None
+            return
         else:
-            gateway = data
+            if isinstance(data, str) is True:
+                _data = str(data)
+                if "@" in _data:
+                    address, static_interface = _data.split("@", maxsplit=1)
+                else:
+                    address = _data
+                gateway = self._ipaddress_class(address)
+            else:
+                gateway = data
+            self._ipaddress_class.__init__(self, gateway)  # noqa: T484
+            self.static_interface = static_interface
 
-        self._ipaddress_class.__init__(self, gateway)  # noqa: T484
-        self.static_interface = static_interface
         self.__notify(notify)
 
     @property
@@ -111,9 +117,12 @@ class DefaultrouterMixin:
         return self._tostring()
 
     def _tostring(self, delimiter: str="@") -> str:
+        gateway = self._gateway_address
+        if gateway is None:
+            return ""
         if self.static_interface is None:
-            return str(self._gateway_address)
-        return f"{self._gateway_address}{delimiter}{self.static_interface}"
+            return str(gateway)
+        return f"{gateway}{delimiter}{self.static_interface}"
 
 
 class DefaultrouterProp(DefaultrouterMixin, ipaddress.IPv4Address):
