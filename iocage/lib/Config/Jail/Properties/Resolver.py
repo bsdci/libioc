@@ -89,7 +89,14 @@ class ResolverProp(collections.MutableSequence):
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
         )
 
-        remote_path = f"{jail.root_path}/{self.conf_file_path}"
+        remote_path = os.path.realpath(
+            f"{jail.root_path}/{self.conf_file_path}"
+        )
+        if remote_path.startswith(jail.root_path) is False:
+            raise iocage.lib.errors.InsecureJailPath(
+                path=remote_path,
+                logger=self.logger
+            )
 
         if self.method == "skip":
             self.logger.verbose("resolv.conf untouched")
