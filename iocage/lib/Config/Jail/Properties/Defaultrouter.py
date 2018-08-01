@@ -100,8 +100,11 @@ class DefaultrouterMixin:
             self.config.update_special_property(self.property_name)
 
     @property
-    def _gateway_address(self) -> str:
-        return self._ipaddress_class.__str__(self)  # noqa: T484
+    def _gateway_address(self) -> typing.Optional[str]:
+        try:
+            return self._ipaddress_class.__str__(self)  # noqa: T484
+        except AttributeError:
+            return None
 
     def __str__(self) -> str:
         """Return the gateway address including the static interface."""
@@ -126,7 +129,12 @@ class DefaultrouterProp(DefaultrouterMixin, ipaddress.IPv4Address):
     def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> typing.List[str]:
         """Return a list of commands that configure the default IPv4 route."""
         commands: typing.List[str] = []
-        gateway = self._gateway_address
+        gateway_address = self._gateway_address
+
+        if gateway_address is None:
+            return []
+
+        gateway = str(gateway_address)
 
         if self.static_interface is not None:
             nic = self.static_interface
@@ -157,11 +165,14 @@ class Defaultrouter6Prop(DefaultrouterMixin, ipaddress.IPv6Address):
     def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> typing.List[str]:
         """Return a list of commands that configure the default IPv6 route."""
         commands: typing.List[str] = []
+        gateway_address = self._gateway_address
 
-        if self._gateway_address.startswith("fe80:") is True:
+        if gateway_address is None:
+            return []
+        elif gateway_address.startswith("fe80:") is True:
             gateway = str(self._tostring(delimiter="%"))
         else:
-            gateway = str(self._gateway_address)
+            gateway = str(gateway_address)
             if self.static_interface is not None:
                 nic = self.static_interface
                 self.logger.verbose(
