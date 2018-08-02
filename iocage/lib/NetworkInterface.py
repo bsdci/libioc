@@ -24,6 +24,7 @@
 """Model if an iocage jails network interface."""
 import typing
 import ipaddress
+import shlex
 
 import iocage.lib.helpers
 import iocage.lib.CommandQueue
@@ -42,11 +43,20 @@ class NetworkInterface:
     rtsold_command = "/usr/sbin/rtsold"
 
     name: typing.Optional[str]
-    settings: typing.Dict[str, typing.Union[str, typing.List[str]]]
+    settings: typing.Dict[
+        str,
+        typing.Union[
+            str,
+            int,
+            typing.List[str],
+            typing.List[int]
+        ]
+    ]
     extra_settings: typing.List[str]
     rename: bool
     create: bool
     destroy: bool
+    insecure: bool
 
     def __init__(
         self,
@@ -67,11 +77,15 @@ class NetworkInterface:
         extra_settings: typing.Optional[typing.List[str]]=None,
         destroy: bool=False,
         auto_apply: typing.Optional[bool]=True,
-        logger: typing.Optional['iocage.lib.Logger.Logger']=None
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        insecure: bool=False
     ) -> None:
 
         self.jail = jail
         self.logger = iocage.lib.helpers.init_logger(self, logger)
+
+        # disable shlex quoting on purpose (use with caution)
+        self.insecure = (insecure is True)
 
         self.name = name
         self.create = create
@@ -85,22 +99,26 @@ class NetworkInterface:
             self.extra_settings = extra_settings
 
         if mac:
+            if isinstance(mac, str):
+                mac = iocage.lib.MacAddress.MacAddress(mac, logger=self.logger)
             self.settings["link"] = mac
 
         if mtu:
-            self.settings["mtu"] = str(mtu)
+            self.settings["mtu"] = None if (mtu is None) else int(mtu)
 
         if description:
-            self.settings["description"] = f"\"{description}\""
+            self.settings["description"] = str(shlex.quote(description))
 
-        if vnet:
-            self.settings["vnet"] = vnet
+        if vnet is not None:
+            self.settings["vnet"] = str(self._escape(vnet))
 
-        if addm:
-            self.settings["addm"] = addm
+        if addm is not None:
+            _addm_list = self._escape_list(addm)
+            if _addm_list is not None:
+                self.settings["addm"] = _addm_list
 
-        if group:
-            self.settings["group"] = group
+        if group is not None:
+            self.settings["group"] = str(self._escape(group))
 
         # rename interface when applying settings next time
         if isinstance(rename, str):
@@ -126,15 +144,17 @@ class NetworkInterface:
         if self.create is True:
             command.append("create")
 
+        values: typing.List[str]
         for key in self.settings:
             value = self.settings[key]
-            if not isinstance(value, list):
-                values = [value]
+            if isinstance(value, list) is True:
+                _value: typing.Any = value
+                values = [str(x) for x in _value]
             else:
-                values = value
-            for value in values:
+                values = [str(value)]
+            for _value in values:
                 command.append(key)
-                command.append(str(value))
+                command.append(_value)
 
         if self.extra_settings:
             command += self.extra_settings
@@ -153,16 +173,21 @@ class NetworkInterface:
 
     def destroy_interface(self) -> None:
         """Destroy the interface."""
-        if isinstance(self.settings["name"], str):
-            self._destroy_interfaces([self.settings["name"]])
+        name = self.settings["name"]  # typing.Union[str, typing.List[str]]
+        names: typing.List[str]
+        if isinstance(name, str):
+            names = [str(name)]
+        elif isinstance(name, list):
+            names = [str(x) for x in name]
         else:
-            self._destroy_interfaces(self.settings["name"])
+            raise ValueError("Invalid NetworkInterface name")
+        self._destroy_interfaces(names)
 
     def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
         for nic_name_to_destroy in nic_names:
             iocage.lib.helper.exec([
                 self.ifconfig_command,
-                nic_name_to_destroy,
+                self._escape(nic_name_to_destroy),
                 "destroy"
             ])
 
@@ -176,7 +201,7 @@ class NetworkInterface:
     @property
     def current_nic_name(self) -> str:
         """Return the current NIC reference for usage in shell scripts."""
-        return str(self.name)
+        return str(self._escape(self.name))
 
     def __apply_addresses(
         self,
@@ -204,7 +229,7 @@ class NetworkInterface:
             if is_ipv6 and (str(address).lower() == "accept_rtadv"):
                 self._exec([
                     self.rtsold_command,
-                    self.current_nic_name
+                    name
                 ])
 
     def _exec(
@@ -224,6 +249,23 @@ class NetworkInterface:
     def _handle_exec_stdout(self, stdout: str) -> None:
         if (self.create or self.rename) is True:
             self.name = stdout.strip()
+
+    def _escape(self, value: typing.Optional[str]) -> typing.Optional[str]:
+        if value is None:
+            return None
+        elif self.insecure is True:
+            return value
+        else:
+            return str(shlex.quote(value))
+
+    def _escape_list(
+        self,
+        value: typing.Optional[typing.Union[str, typing.List[str]]]
+    ) -> typing.Optional[typing.List[str]]:
+        if value is None:
+            return None
+        value_list = [value] if (isinstance(value, str) is True) else value
+        return [str(self._escape(str(x))) for x in value_list]
 
 
 class QueuingNetworkInterface(
@@ -247,17 +289,18 @@ class QueuingNetworkInterface(
         NetworkInterface.__init__(self, name=name, **network_interface_options)
 
         if (self.create or self.rename) is False:
-            self.set_shell_variable_nic_name()
+            self._set_shell_variable_nic_name()
 
-    def set_shell_variable_nic_name(
+    def _set_shell_variable_nic_name(
         self,
         name: typing.Optional[str]=None
     ) -> None:
         """Append an environment variable for the current NIC to the queue."""
-        _name = self.name if name is None else name
-        if (_name is None) or (self.shell_variable_nic_name is None):
+        name = self.name if name is None else name
+        if (name is None) or (self.shell_variable_nic_name is None):
             return
-        setter_command = f"export {self.shell_variable_nic_name}=\"{_name}\""
+        _name = str(self._escape(name))
+        setter_command = f"export {self.shell_variable_nic_name}={_name}"
         self.append_command_queue(setter_command)
 
     @property
@@ -265,7 +308,7 @@ class QueuingNetworkInterface(
         """Return the current NIC reference for usage in shell scripts."""
         _has_no_variable_name = (self.shell_variable_nic_name is None)
         if (_has_no_variable_name or self.create) and (self.name is not None):
-            return str(self.name)
+            return str(self._escape(self.name))
         return f"${self.shell_variable_nic_name}"
 
     def _exec(self, command: typing.List[str]) -> str:
@@ -276,7 +319,7 @@ class QueuingNetworkInterface(
         if self.rename is True:
             new_name = self.settings["name"]
             if isinstance(new_name, str) is True:
-                self.name = str(new_name)
+                self.name = str(self._escape(str(new_name)))
             else:
                 raise ValueError("Cannot rename multiple interfaces")
 
@@ -294,7 +337,7 @@ class QueuingNetworkInterface(
         for nic_name_to_destroy in nic_names:
             self.append_command_queue(" ".join([
                 self.ifconfig_command,
-                nic_name_to_destroy,
+                str(self._escape(nic_name_to_destroy)),
                 "destroy"
                 " 2>/dev/null || :"
             ]))
