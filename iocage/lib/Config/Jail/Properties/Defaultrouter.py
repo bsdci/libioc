@@ -109,7 +109,7 @@ class DefaultrouterMixin:
     def _gateway_address(self) -> typing.Optional[str]:
         try:
             return self._ipaddress_class.__str__(self)  # noqa: T484
-        except AttributeError:
+        except Exception:
             return None
 
     def __str__(self) -> str:
