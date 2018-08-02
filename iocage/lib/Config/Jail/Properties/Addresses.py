@@ -27,30 +27,34 @@ import ipaddress
 
 import iocage.lib.errors
 import iocage.lib.helpers
+import iocage.lib.IPAddress
 
 # mypy
 import iocage.lib.Config.Jail
 import iocage.lib.Logger
 
+IPv4Interface = iocage.lib.IPAddress.IPv4Interface
+IPv6Interface = iocage.lib.IPAddress.IPv6Interface
+
 IPv4AddressInput = typing.Union[
     str,
-    ipaddress.IPv4Interface
+    iocage.lib.IPAddress.IPv4Interface
 ]
 
 IPv6AddressInput = typing.Union[
     str,
-    ipaddress.IPv6Interface
+    iocage.lib.IPAddress.IPv6Interface
 ]
 
 IPAddressInput = typing.Union[
     str,
-    ipaddress.IPv4Interface,
-    ipaddress.IPv6Interface
+    iocage.lib.IPAddress.IPv4Interface,
+    iocage.lib.IPAddress.IPv6Interface
 ]
 
 IPInterfaceList = typing.Union[
-    typing.List[ipaddress.IPv4Interface],
-    typing.List[ipaddress.IPv6Interface]
+    typing.List[iocage.lib.IPAddress.IPv4Interface],
+    typing.List[iocage.lib.IPAddress.IPv6Interface]
 ]
 
 
@@ -96,12 +100,17 @@ class AddressSet(set):
     def __parse_address(
         self,
         address: IPAddressInput
-    ) -> typing.Union[str, ipaddress.IPv4Interface, ipaddress.IPv6Interface]:
-        if isinstance(address, str) is True:
-            address = str(address).lower()
-            if address in ["accept_rtadv", "dhcp"]:
-                return address
-        return ipaddress.ip_interface(address)
+    ) -> typing.Union[
+        str,
+        iocage.lib.IPAddress.IPv4Interface,
+        iocage.lib.IPAddress.IPv6Interface
+    ]:
+        _address = str(address).lower()
+        if _address == "accept_rtadv":
+            return iocage.lib.IPAddress.IPv6Interface(_address)
+        elif _address == "dhcp":
+            return iocage.lib.IPAddress.IPv4Interface(_address)
+        return address
 
 
 _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
@@ -209,12 +218,12 @@ class AddressesProp(dict):
             self.__notify()
             return
 
+        own_class = self.ADDRESS_CLASS  # noqa: T484
+        _class: typing.Union[
+            typing.Callable[..., iocage.lib.IPAddress.IPv4Interface],
+            typing.Callable[..., iocage.lib.IPAddress.IPv6Interface]
+        ] = own_class
         try:
-            own_class = self.ADDRESS_CLASS  # noqa: T484
-            _class: typing.Union[
-                typing.Callable[..., ipaddress.IPv4Interface],
-                typing.Callable[..., ipaddress.IPv4Interface]
-            ] = own_class
             _addresses = [_class(x) for x in list(addresses)]  # type: ignore
             err = None
         except (ipaddress.AddressValueError, ipaddress.NetmaskValueError) as e:
@@ -287,11 +296,11 @@ class IPv4AddressesProp(AddressesProp):
     """Special jail config for IPv4 addresses."""
 
     IP_VERSION = 4
-    ADDRESS_CLASS = ipaddress.IPv4Interface
+    ADDRESS_CLASS = IPv4Interface
 
 
 class IPv6AddressesProp(AddressesProp):
     """Special jail config for IPv6 addresses."""
 
     IP_VERSION = 6
-    ADDRESS_CLASS = ipaddress.IPv6Interface
+    ADDRESS_CLASS = IPv6Interface
