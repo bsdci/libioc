@@ -23,32 +23,54 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage host bridge interface module."""
 import typing
+import shlex
 
 
 class BridgeInterface:
     """Representation of an iocage host bridge interface."""
 
     name: str
-    secure: bool
+    secure_vnet: bool
+    insecure: bool
 
     SECURE_BRIDGE_PREFIX = ":"
 
     def __init__(
         self,
         name: str,
-        secure: typing.Optional[bool]=None
+        secure_vnet: typing.Optional[bool]=None,
+        insecure: bool=False
     ) -> None:
+        """
+        Initialize a (Secure VNET) bridge interface.
 
+        Args:
+
+            name (string):
+                The bridge interface name.
+
+            secure_vnet (bool): (optional)
+                Secure VNET interfaces are prefixed with a colon. Either this
+                flag can be set to True or the name may begin with `:` to
+                enable this mode. The use of this flag and class property is
+                to toggle the colon notation on output.
+
+            insecure (bool): (default=False)
+                Disables shlex.quote when returning the bridge name as string.
+        """
         if name.startswith(self.SECURE_BRIDGE_PREFIX):
-            self.secure = True
-            self.name = name[1:]
+            self.secure_vnet = True
+            _name = name[len(self.SECURE_BRIDGE_PREFIX):]
         else:
-            self.name = name
-            self.secure = False
+            self.secure_vnet = (secure_vnet or (secure_vnet is None)) is False
+            _name = name
 
-        # may override name set secure mode
-        if secure is not None:
-            self.secure = secure
+        self.insecure = (insecure is True)
+        self.name = self._escape(_name)
+
+        # may override name set secure_vnet mode
+        if secure_vnet is not None:
+            self.secure_vnet = secure_vnet
 
     def __str__(self) -> str:
         """
@@ -57,8 +79,11 @@ class BridgeInterface:
         It begins with a colon when an additional virtual bridge interface is
         used to mitigate ARP spoofing with IPFW.
         """
-        if self.secure is True:
-            return f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
+        if self.secure_vnet is True:
+            output = f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
         else:
-            return self.name
+            output = self.name
+        return self._escape(output)
 
+    def _escape(self, value: str) -> str:
+        return value if self.insecure else str(shlex.quote(value))
