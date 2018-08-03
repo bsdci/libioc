@@ -607,7 +607,7 @@ class BaseConfig(dict):
         try:
             if self.special_properties.is_special_property(key):
                 special_property = self.special_properties.get_or_create(key)
-                special_property.set(value)
+                special_property.set(value, skip_on_error=skip_on_error)
                 self.update_special_property(key)
                 return
 

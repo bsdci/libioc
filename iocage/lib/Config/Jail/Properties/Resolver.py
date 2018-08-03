@@ -129,7 +129,6 @@ class ResolverProp(collections.MutableSequence):
                     f.close()
                 self.logger.verbose("resolv.conf written manually")
         except Exception as e:
-            print(e)
             yield jailResolverConfigEvent.fail(e)
             raise e
         else:
@@ -138,9 +137,11 @@ class ResolverProp(collections.MutableSequence):
     def set(
         self,
         value: typing.Optional[typing.Union[str, typing.List[str]]]=None,
-        notify: bool=True
+        notify: bool=True,
+        skip_on_error: bool=False
     ) -> None:
         """Clear and set all nameservers."""
+        error_log_level = "warn" if (skip_on_error is True) else "error"
         self._entries.clear()
         method = self._get_method(value)
         if method == "manual":
@@ -149,7 +150,13 @@ class ResolverProp(collections.MutableSequence):
             elif isinstance(value, list):
                 self._entries += list(value)  # noqa: T484
             else:
-                raise TypeError("value can be list or string")
+                raise iocage.lib.errors.InvalidJailConfigValue(
+                    reason="value can be list or string",
+                    property_name=self.property_name,
+                    jail=self.config.jail,
+                    logger=self.logger,
+                    level=error_log_level
+                )
         elif method == "skip":
             # directly set config property
             self.config.data["resolver"] = None
@@ -157,9 +164,15 @@ class ResolverProp(collections.MutableSequence):
             if isinstance(value, str):
                 self.append(str(value), notify=False)
             else:
-                raise ValueError(
-                    "list of strings or ; separated string expected"
+                e = iocage.lib.errors.InvalidJailConfigValue(
+                    reason="list of strings or ; separated string expected",
+                    property_name=self.property_name,
+                    jail=self.config.jail,
+                    logger=self.logger,
+                    level=error_log_level
                 )
+                if skip_on_error is False:
+                    raise e
 
         self.__notify(notify)
 
