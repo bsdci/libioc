@@ -351,7 +351,9 @@ class Network:
 
     def __configure_firewall(self, mac_address: str) -> typing.List[str]:
 
-        self.logger.verbose("Configuring Secure VNET Firewall")
+        self.logger.verbose(
+            f"Configuring Secure VNET Firewall for {self._escaped_nic_name}"
+        )
         firewall_rule_number = f"$IOCAGE_JID"
 
         for protocol in ["ipv4", "ipv6"]:
