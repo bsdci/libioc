@@ -63,7 +63,12 @@ class DefaultrouterMixin:
         self.skip_on_error = skip_on_error
         self.static_interface = None
 
-    def set(self, data: IPAddressInput, notify: bool=True) -> None:
+    def set(
+        self,
+        data: IPAddressInput,
+        notify: bool=True,
+        skip_on_error: bool=False
+    ) -> None:
         """Set the defaultrouter property."""
         gateway: typing.Optional[typing.Union[
             str,

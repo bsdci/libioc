@@ -80,12 +80,17 @@ class AddressSet(set):
             IPv4AddressInput,
             IPv6AddressInput
         ],
-        notify: bool=True
+        notify: bool=True,
+        skip_on_error: bool=False
     ) -> None:
         """Add an address to the set."""
-        set.add(self, self.__parse_address(value))
-        if notify:
-            self.__notify()
+        try:
+            set.add(self, self.__parse_address(value))
+            if notify:
+                self.__notify()
+        except Exception as e:
+            if skip_on_error is False:
+                raise e
 
     def remove(self, value: IPAddressInput, notify: bool=True) -> None:
         """Remove an address from the set."""
@@ -144,9 +149,14 @@ class AddressesProp(dict):
         self.property_name = property_name
         self.skip_on_error = skip_on_error
 
-    def set(self, data: _AddressSetInputType) -> None:
+    def set(
+        self,
+        data: _AddressSetInputType,
+        skip_on_error: bool=False
+    ) -> None:
         """Set the special property value."""
         self.clear()
+        error_log_level = "warn" if (skip_on_error is True) else "error"
 
         try:
             iocage.lib.helpers.parse_none(data)
@@ -164,24 +174,24 @@ class AddressesProp(dict):
             try:
                 nic, address = ip_address_string.split("|", maxsplit=1)
             except ValueError:
-                level = "warn" if (self.skip_on_error is True) else "error"
                 iocage.lib.errors.InvalidJailConfigAddress(
                     jail=self.config.jail,
                     value=ip_address_string,
                     property_name=self.property_name,
                     logger=self.logger,
-                    level=level
+                    level=error_log_level
                 )
                 if self.skip_on_error is False:
                     exit(1)
 
-            self.add(nic, address)  # noqa: T484 (exists on implementing class)
+            self.add(nic, address, skip_on_error=skip_on_error)  # noqa: T484
 
     def _add_ip_addresses(
         self,
         nic: str,
         addresses: IPInterfaceList,
-        notify: bool=True
+        notify: bool=True,
+        skip_on_error: bool=False
     ) -> None:
         """Add an address to a NIC."""
         if (addresses is None) or (len(addresses) == 0):
@@ -193,7 +203,7 @@ class AddressesProp(dict):
             prop = self.__empty_prop(nic)
 
         for address in addresses:
-            prop.add(address, notify=False)
+            prop.add(address, notify=False, skip_on_error=skip_on_error)
 
         if notify:
             self.__notify()
@@ -205,7 +215,8 @@ class AddressesProp(dict):
             IPAddressInput,
             typing.List[IPAddressInput]
         ]=None,
-        notify: bool=True
+        notify: bool=True,
+        skip_on_error: bool=False
     ) -> None:
         """Add one or many IP addresses to an interface."""
         if isinstance(addresses, list) is False:
@@ -213,10 +224,13 @@ class AddressesProp(dict):
             self.add(
                 nic=nic,
                 addresses=[_address],
-                notify=False
+                notify=False,
+                skip_on_error=skip_on_error
             )
             self.__notify()
             return
+
+        error_log_level = "warn" if (skip_on_error is True) else "error"
 
         own_class = self.ADDRESS_CLASS  # noqa: T484
         _class: typing.Union[
@@ -230,12 +244,21 @@ class AddressesProp(dict):
             err = e
         finally:
             if err is not None:
-                raise iocage.lib.errors.InvalidIPAddress(
+                _e = iocage.lib.errors.InvalidIPAddress(
                     reason=str(err),
                     ipv6=(self.IP_VERSION == 6),
-                    logger=self.logger
+                    logger=self.logger,
+                    level=error_log_level
                 )
-        self._add_ip_addresses(nic=nic, addresses=_addresses, notify=False)
+                if skip_on_error is False:
+                    raise _e
+                return
+        self._add_ip_addresses(
+            nic=nic,
+            addresses=_addresses,
+            notify=False,
+            skip_on_error=skip_on_error
+        )
         self.__notify()
 
     @property

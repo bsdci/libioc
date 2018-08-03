@@ -179,12 +179,17 @@ class ResourceLimitProp(ResourceLimitValue):
                 self.config.data[self.property_name]
             )
 
-    def set(self, data: _ResourceLimitInputType) -> None:
+    def set(
+        self,
+        data: _ResourceLimitInputType,
+        skip_on_error: bool=False
+    ) -> None:
         """
         Set the resource limit value.
 
         Setting it to None will remove it from the configuration.
         """
+        error_log_level = "warn" if (skip_on_error is True) else "error"
         if data is None:
             name = self.property_name
             config = self.config
@@ -200,7 +205,15 @@ class ResourceLimitProp(ResourceLimitValue):
             action = data.action
             per = data.per
         else:
-            raise TypeError("invalid ResourceLimit input type")
+            e = iocage.lib.errors.InvalidJailConfigValue(
+                reason="invalid ResourceLimit input type",
+                property_name=self.property_name,
+                jail=self.config.jail,
+                logger=self.logger,
+                level=error_log_level
+            )
+            if skip_on_error is False:
+                raise e
 
         self.amount = amount
         self.action = action

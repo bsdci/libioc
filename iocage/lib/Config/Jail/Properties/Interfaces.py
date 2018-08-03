@@ -40,18 +40,22 @@ class InterfaceProp(dict):
         config: typing.Optional[
             'iocage.lib.Config.Jail.JailConfig.JailConfig'
         ]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         **kwargs
     ) -> None:
         dict.__init__(self, {})
+        self.logger = logger
         if config is not None:
             self.config = config
 
     def set(
         self,
-        data: typing.Union[str, typing.Dict[str, str]]
+        data: typing.Union[str, typing.Dict[str, str]],
+        skip_on_error: bool=False
     ) -> None:
         """Clear and set all interfaces from data."""
         self.clear()
+        error_log_level = "warn" if (skip_on_error is True) else "error"
 
         try:
             iocage.lib.helpers.parse_none(data)
@@ -66,7 +70,15 @@ class InterfaceProp(dict):
         nic_pairs = data.replace(",", " ").split(" ")
 
         if not all([(":" in nic_pair) for nic_pair in nic_pairs]):
-            raise ValueError("Invalid NIC pair (should be <nic>:<bridge>)")
+            e = iocage.lib.errors.InvalidJailConfigValue(
+                reason="Invalid NIC pair (should be <nic>:<bridge>)",
+                property_name=self.property_name,
+                jail=self.config.jail,
+                logger=self.logger,
+                level=error_log_level
+            )
+            if skip_on_error is False:
+                raise e
 
         for nic_pair in nic_pairs:
             jail_if, bridge_if = nic_pair.split(":", maxsplit=1)
