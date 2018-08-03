@@ -24,6 +24,7 @@
 """iocage network abstraction module."""
 import typing
 import shlex
+import ipaddress
 from hashlib import sha224
 
 import iocage.lib.BridgeInterface
@@ -356,7 +357,13 @@ class Network:
         for protocol in ["ipv4", "ipv6"]:
             addresses = self.__getattribute__(f"{protocol}_addresses")
             for address in addresses:
-                _address = str(address)
+                try:
+                    _address = str(address.ip)
+                except ipaddress.AddressValueError as e:
+                    self.logger.warn(
+                        f"Firewall permit not possible for address '{address}'"
+                    )
+                    continue
                 self.firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", _address, "to", "any",
