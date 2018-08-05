@@ -110,8 +110,7 @@ def cli(  # noqa: T484
                 zfs=zfs,
                 logger=logger
             )
-        except Exception:
-            logger.error(f"Invalid Release '{release_input}'")
+        except iocage.lib.errors.IocageException:
             exit(1)
 
     if kwargs["copy_basejail_only"] is True:
