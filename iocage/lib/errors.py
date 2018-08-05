@@ -990,6 +990,20 @@ class UnsupportedRelease(MissingFeature):
             **kwargs
         )
 
+
+class InvalidReleaseName(IocageException):
+    """Raised when interacting with an unsupported release."""
+
+    def __init__(  # noqa: T484
+        self,
+        name: str,
+        **kwargs
+    ) -> None:
+
+        msg = f"Invalid release name: {name}"
+        super().__init__(msg, **kwargs)
+
+
 # Prompts
 
 
