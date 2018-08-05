@@ -280,16 +280,21 @@ class ReleaseGenerator(ReleaseResource):
     @name.setter
     def name(self, value: str) -> None:
         """Set the releases identifier (optionally including patchlevel)."""
-        match = re.match(r"^(?:(.*)/)?(.*)(?:-p([0-9]+))?$", value)
+        match = re.match((
+            r"^(?:(?P<source_dataset_name>.*)/)?"
+            r"(?P<release_name>.*)"
+            r"(?:-p(?P<patchlevel>[0-9]+))?$"
+        ), value)
         if match is None:
             raise iocage.lib.errors.InvalidReleaseName(
                 name=value,
                 logger=self.logger
             )
-        self._name = match[2]
-        self.patchlevel = None if (match[3] is None) else int(match[3])
-        if match[1] is not None:
-            self.root_datasets_name = match[1]
+        self._name = match.group("release_name")
+        patchlevel = match.group("patchlevel")
+        self.patchlevel = None if (patchlevel is None) else int(patchlevel)
+        if match.group("source_dataset_name") is not None:
+            self.root_datasets_name = match.group("source_dataset_name")
 
     @property
     def resource(self) -> 'iocage.lib.Resource.Resource':
