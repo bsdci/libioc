@@ -101,7 +101,7 @@ def _migrate_jails(
 
         try:
             new_jail = iocage.lib.Jail.JailGenerator(
-                dict(id=jail.config["tag"]),
+                dict(name=jail.config["tag"]),
                 new=True,
                 logger=logger,
                 zfs=zfs,
