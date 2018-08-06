@@ -107,10 +107,9 @@ def _migrate_jails(
                 zfs=zfs,
                 host=host
             )
-            new_jail.clone_from_jail(jail)
-            new_jail.config['host_hostname'] = new_jail.config['hostname']
+            yield from new_jail.clone_from_jail(jail, event_scope=event.scope)
             new_jail.save()
-            jail.destroy()
+            yield from jail.destroy()
             yield event.end()
         except iocage.lib.errors.IocageException as e:
             yield event.fail(e)
