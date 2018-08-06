@@ -212,8 +212,26 @@ class ZFS(libzfs.ZFS):
     ) -> None:
         """Recursively promote a dataset."""
         datasets = list(reversed(list(dataset.children_recursive))) + [dataset]
+        promoted_source_datasets: typing.List[libzfs.ZFSDataset] = []
+        error: typing.Optional[Exception] = None
         for child in datasets:
-            self._promote(child, logger=logger)
+            source_dataset = child.properties["origin"].value
+            if source_dataset == "":
+                # already promoted
+                continue
+            try:
+                self._promote(child, logger=logger)
+                promoted_source_datasets.append(source_dataset)
+            except libzfs.ZFSException as e:
+                error = e
+                break
+
+        if error is not None:
+            if logger is not None:
+                self.logger.verbose("Promotion failed: Reverting changes.")
+            for dataset in promoted_source_datasets:
+                self.get_dataset(dataset).promote()
+            raise error
 
     def _promote(
         self,
