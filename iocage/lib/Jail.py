@@ -1158,12 +1158,10 @@ class JailGenerator(JailResource):
         self.autoset_dataset_name()
         if event_scope is None:
             event_scope = iocage.lib.events.Scope()
-        clone_events = source_jail.clone_to_dataset(
+        yield from source_jail.clone_to_dataset(
             self.dataset_name,
             event_scope=event_scope
         )
-        for clone_event in clone_events:
-            yield clone_event
 
         self.config.clone(source_jail.config.data)
         self.save()
