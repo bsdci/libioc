@@ -234,7 +234,7 @@ def is_uuid(text: str) -> bool:
 
 
 # helper function to validate names
-_validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{0,31}', re.I)
+_validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{1,31}', re.I)
 
 
 def validate_name(name: str) -> bool:
