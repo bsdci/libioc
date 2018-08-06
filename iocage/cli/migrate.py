@@ -107,8 +107,30 @@ def _migrate_jails(
                 zfs=zfs,
                 host=host
             )
+            if new_jail.exists is True:
+                raise iocage.lib.errors.JailAlreadyExists(
+                    jail=new_jail,
+                    logger=logger
+                )
+
+            def _destroy_unclean_migration() -> typing.Generator[
+                'iocage.lib.events.IocageEvents',
+                None,
+                None
+            ]:
+                _name = new_jail.humanreadable_name
+                logger.verbose(
+                    f"Destroying unfinished migration target jail {_name}"
+                )
+                yield from new_jail.destroy(
+                    force=True,
+                    event_scope=event.scope
+                )
+            event.add_rollback_step(_destroy_unclean_migration)
+
             yield from new_jail.clone_from_jail(jail, event_scope=event.scope)
             new_jail.save()
+            new_jail.promote()
             yield from jail.destroy()
             yield event.end()
         except iocage.lib.errors.IocageException as e:
