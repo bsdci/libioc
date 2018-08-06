@@ -1163,7 +1163,7 @@ class JailGenerator(JailResource):
             event_scope=event_scope
         )
 
-        self.config.clone(source_jail.config.data)
+        self.config.clone(source_jail.config.data, skip_on_error=True)
         self.save()
 
         fstab_update_generator = self.update_fstab_paths(
