@@ -27,6 +27,7 @@ import click
 
 import iocage.lib.events
 import iocage.lib.errors
+import iocage.lib.helpers
 import iocage.lib.Jails
 import iocage.lib.Logger
 
@@ -99,9 +100,17 @@ def _migrate_jails(
             yield event.fail(iocage.lib.errors.JailAlreadyRunning(jail=jail))
             continue
 
+        if iocage.lib.helpers.validate_name(jail.config["tag"]):
+            name = jail.config["tag"]
+            temporary_name = name
+        else:
+            name = jail.humanreadable_name
+            temporary_name = "import-" + str(hash(name) % (1 << 32))
+
         try:
             new_jail = iocage.lib.Jail.JailGenerator(
-                dict(name=jail.config["tag"]),
+                dict(name=temporary_name),
+                root_datasets_name=jail.root_datasets_name,
                 new=True,
                 logger=logger,
                 zfs=zfs,
@@ -131,8 +140,14 @@ def _migrate_jails(
             yield from new_jail.clone_from_jail(jail, event_scope=event.scope)
             new_jail.save()
             new_jail.promote()
-            yield from jail.destroy()
-            yield event.end()
+            yield from jail.destroy(event_scope=event.scope)
+
         except iocage.lib.errors.IocageException as e:
             yield event.fail(e)
             print(e)
+
+        if name != temporary_name:
+            # the jail takes the old jails name
+            yield from new_jail.rename(name, event_scope=event.scope)
+
+        yield event.end()
