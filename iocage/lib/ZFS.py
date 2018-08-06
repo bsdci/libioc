@@ -211,8 +211,9 @@ class ZFS(libzfs.ZFS):
         logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
         """Recursively promote a dataset."""
+        datasets: typing.List[libzfs.ZFSDataset]
         datasets = list(reversed(list(dataset.children_recursive))) + [dataset]
-        promoted_source_datasets: typing.List[libzfs.ZFSDataset] = []
+        promoted_source_datasets: typing.List[str] = []
         error: typing.Optional[Exception] = None
         for child in datasets:
             source_dataset = child.properties["origin"].value
