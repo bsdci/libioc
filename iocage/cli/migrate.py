@@ -91,7 +91,7 @@ def _migrate_jails(
         event = JailMigrationEvent(jail=jail)
         yield event.begin()
 
-        if jail.legacy is False:
+        if jail.config.legacy is False:
             yield event.skip()
             continue
 
