@@ -149,7 +149,7 @@ class Resource(metaclass=abc.ABCMeta):
             name = f"{self.dataset.name}{self.DEFAULT_ZFS_DATASET_SUFFIX}"
             dataset = self.zfs.get_or_create_dataset(name)
         else:
-            dataset = None
+            dataset = self.dataset
 
         self._config_zfs = iocage.lib.Config.Type.ZFS.DatasetConfigZFS(
             dataset=dataset,
