@@ -254,13 +254,13 @@ class Resource(metaclass=abc.ABCMeta):
 
     def _detect_config_type(self) -> int:
 
-        if self.config_json.exists:
+        if self.config_json.exists is True:
             return self.CONFIG_TYPES.index("json")
 
-        if self.config_ucl.exists:
+        if self.config_ucl.exists is True:
             return self.CONFIG_TYPES.index("ucl")
 
-        if self.config_zfs.exists:
+        if self.config_zfs.exists is True:
             return self.CONFIG_TYPES.index("zfs")
 
         return 0
