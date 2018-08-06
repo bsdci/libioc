@@ -1147,7 +1147,7 @@ class JailGenerator(JailResource):
 
     def promote(self) -> None:
         """Promote all datasets of the jail."""
-        self.zfs.promote_dataset(self.dataset)
+        self.zfs.promote_dataset(self.dataset, logger=self.logger)
 
     def clone_from_jail(
         self,
