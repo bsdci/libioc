@@ -151,10 +151,11 @@ class ResolverProp(collections.MutableSequence):
             elif isinstance(value, list):
                 self._entries += list(value)  # noqa: T484
             else:
+                jail = self.config.jail if "jail" in dir(self.config) else None
                 raise iocage.lib.errors.InvalidJailConfigValue(
                     reason="value can be list or string",
                     property_name=self.property_name,
-                    jail=self.config.jail,
+                    jail=jail,
                     logger=self.logger,
                     level=error_log_level
                 )
