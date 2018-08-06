@@ -107,7 +107,7 @@ class ZFS(libzfs.ZFS):
                     self.logger.verbose(
                         f"Deleting snapshot {snapshot.name}"
                     )
-                snapshot.delete()
+                snapshot.delete(recursive=True)
 
         origin = None
         if delete_origin_snapshot is True:
@@ -117,6 +117,11 @@ class ZFS(libzfs.ZFS):
 
         if self._has_logger:
             self.logger.verbose(f"Deleting dataset {dataset.name}")
+        try:
+            dataset.umount()
+            self.logger.spam("Dataset unmounted")
+        except libzfs.ZFSException:
+            pass
         dataset.delete()
 
         if origin is not None:
