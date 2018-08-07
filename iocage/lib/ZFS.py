@@ -230,8 +230,8 @@ class ZFS(libzfs.ZFS):
         if error is not None:
             if logger is not None:
                 self.logger.verbose("Promotion failed: Reverting changes.")
-            for dataset in promoted_source_datasets:
-                self.get_dataset(dataset).promote()
+            for dataset_name in promoted_source_datasets:
+                self.get_dataset(dataset_name).promote()
             raise error
 
     def _promote(
