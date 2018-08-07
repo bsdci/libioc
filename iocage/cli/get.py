@@ -41,7 +41,7 @@ from .shared.click import IocageClickContext
 )
 @click.pass_context
 @click.argument("prop", nargs=-1, required=False, default=None)
-@click.argument("jail", nargs=1, required=True, default="")
+@click.argument("jail", nargs=1, required=True)
 @click.option(
     "--all", "-a", "_all",
     help="Get all properties for the specified jail.",
@@ -54,7 +54,7 @@ from .shared.click import IocageClickContext
 )
 def cli(
     ctx: IocageClickContext,
-    prop: typing.Optional[str],
+    prop: typing.Tuple[str],
     _all: bool,
     _pool: bool,
     jail: str
@@ -62,6 +62,8 @@ def cli(
     """Get a list of jails and print the property."""
     logger = ctx.parent.logger
     host = iocage.lib.Host.Host(logger=logger)
+
+    _prop = None if len(prop) == 0 else prop[0]
 
     if _pool is True:
         try:
@@ -71,8 +73,13 @@ def cli(
             exit(1)
         exit(0)
 
-    if jail == "":
-        prop = ("")
+    if _all is True:
+        if jail == None:
+            jail = _prop
+        _prop = None
+
+    if _prop == "all":
+        _prop = None
 
     if jail == "defaults":
         source_resource = host.defaults
@@ -89,31 +96,25 @@ def cli(
         except iocage.lib.errors.JailNotFound as e:
             exit(1)
 
-    if (_all is True):
-        prop = None
-
-    if prop == "all":
-        prop = None
-
-    if (prop is None) and (jail == "") and not _all:
+    if (_prop is None) and (jail == "") and not _all:
         logger.error("Missing arguments property and jail")
         exit(1)
-    elif (prop is not None) and (jail == ""):
+    elif (_prop is not None) and (jail == ""):
         logger.error("Missing argument property name or -a/--all argument")
         exit(1)
 
-    if prop:
-        value = lookup_method(source_resource, prop)
+    if _prop:
+        value = lookup_method(source_resource, _prop)
 
         if value:
             print(value)
             return
         else:
-            logger.error(f"Unknown property '{prop}'")
+            logger.error(f"Unknown property '{_prop}'")
             exit(1)
 
     for key in source_resource.config.all_properties:
-        if (prop is None) or (key == prop):
+        if (_prop is None) or (key == _prop):
             value = source_resource.config.get_string(key)
             _print_property(key, value)
 
