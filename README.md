@@ -13,15 +13,13 @@ Ongoing preparations at this repository and iocage ensure that the transition to
 
 ## Install
 
-### from Master branch
-
 ```sh
 git clone https://github.com/iocage/libiocage
 cd libiocage
 make install
 ```
 
-Please note: this will build `py-libzfs` from source, which will require `/usr/src` to be populated.
+At the current time libiocage is not packaged or available in FreeBSD ports.
 
 ## Configuration
 
