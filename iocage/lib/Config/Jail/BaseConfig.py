@@ -623,6 +623,7 @@ class BaseConfig(dict):
                 return
 
             self._set_data(key, parsed_value)
+            error = None
         except ValueError as err:
             error = iocage.lib.errors.InvalidJailConfigValue(
                 reason=str(err),
@@ -630,8 +631,9 @@ class BaseConfig(dict):
                 logger=self.logger,
                 level=("warn" if (skip_on_error is True) else "error")
             )
-            if skip_on_error is False:
-                raise error
+
+        if (error is not None) and (skip_on_error is False):
+            raise error
 
     def _set_data(
         self,
