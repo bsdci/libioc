@@ -40,8 +40,8 @@ from .shared.click import IocageClickContext
     help="Gets the specified property."
 )
 @click.pass_context
-@click.argument("prop", required=True, default="")
-@click.argument("jail", required=True, default="")
+@click.argument("prop", nargs=-1, required=False, default=None)
+@click.argument("jail", nargs=1, required=True, default="")
 @click.option(
     "--all", "-a", "_all",
     help="Get all properties for the specified jail.",
@@ -72,7 +72,7 @@ def cli(
         exit(0)
 
     if jail == "":
-        prop = ""
+        prop = ("")
 
     if jail == "defaults":
         source_resource = host.defaults
@@ -89,7 +89,7 @@ def cli(
         except iocage.lib.errors.JailNotFound as e:
             exit(1)
 
-    if _all is True:
+    if (_all is True):
         prop = None
 
     if prop == "all":
