@@ -63,6 +63,46 @@ jail.create("11.1-RELEASE")
 Libiocage comes bundles with a CLI tool called `ioc`.
 It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
 
+```
+Usage: ioc [OPTIONS] COMMAND [ARGS]...
+
+  A jail manager.
+
+Options:
+  --version             Show the version and exit.
+  --source TEXT         Globally override the activated iocage dataset(s)
+  -d, --log-level TEXT  Set the CLI log level ('critical', 'error', 'warn',
+                        'info', 'notice', 'verbose', 'debug', 'spam',
+                        'screen')
+  --help                Show this message and exit.
+
+Commands:
+  activate    Set a zpool active for iocage usage.
+  clone       Clone and promote jails.
+  console     Login to a jail.
+  create      Create a jail.
+  deactivate  Disable a ZFS pool for iocage.
+  destroy     Destroy specified resource
+  exec        Run a command inside a specified jail.
+  export      Export a jail to a backup archive
+  fetch       Fetch and update a Release to create Jails...
+  fstab       View and manipulate a jails fstab file.
+  get         Gets the specified property.
+  import      Import a jail from a backup archive
+  list        List a specified dataset type, by default...
+  migrate     Migrate jails to the latest format.
+  pkg         Manage packages in a jail.
+  promote     Clone and promote jails.
+  provision   Trigger provisioning of jails.
+  rename      Rename a stopped jail.
+  restart     Restarts the specified jails.
+  set         Sets the specified property.
+  snapshot    Take and manage resource snapshots.
+  start       Starts the specified jails or ALL.
+  stop        Stops the specified jails or ALL.
+  update      Starts the specified jails or ALL.
+```
+
 ### Custom Release (e.g. running -CURRENT)
 
 #### Initially create the release dataset
