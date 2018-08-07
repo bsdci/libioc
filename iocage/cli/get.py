@@ -57,7 +57,7 @@ def cli(
     prop: typing.Tuple[str],
     _all: bool,
     _pool: bool,
-    jail: str
+    jail: typing.Optional[str]
 ) -> None:
     """Get a list of jails and print the property."""
     logger = ctx.parent.logger
@@ -74,7 +74,7 @@ def cli(
         exit(0)
 
     if _all is True:
-        if jail == None:
+        if jail is None:
             jail = _prop
         _prop = None
 
