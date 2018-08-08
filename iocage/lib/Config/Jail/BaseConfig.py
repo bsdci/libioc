@@ -24,7 +24,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The common base of jail configurations."""
 import typing
-import inspect
 import re
 
 import iocage.lib.Config.Jail.Properties
@@ -598,17 +597,7 @@ class BaseConfig(dict):
             setter_method_name = f"_set_{key}"
             if setter_method_name in object.__dir__(self):
                 setter_method = self.__getattribute__(setter_method_name)
-                setter_kwargs = dict()
-                _spec = inspect.getfullargspec(setter_method)
-                if ("skip_on_error" in _spec) or (_spec.varkw is not None):
-                    # only pass skip_on_error when method reads it
-                    setter_kwargs["skip_on_error"] = skip_on_error
-                    # do not skip in this method when the setter takes care
-                    skip_on_error = False
-                setter_method(
-                    parsed_value,
-                    **setter_kwargs
-                )
+                setter_method(parsed_value)
                 return
 
             self._set_data(key, parsed_value)
