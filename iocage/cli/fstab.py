@@ -116,7 +116,7 @@ def cli_add(
         fstab.new_line(
             source=source,
             destination=desination_path,
-            fs_type="nullfs",
+            type="nullfs",
             options=mount_opts,
             dump="0",
             passnum="0",
