@@ -675,22 +675,30 @@ def get_basedir_list(distribution_name: str="FreeBSD") -> typing.List[str]:
     return basedirs
 
 
+def require_no_symlink(
+    path: str,
+    logger: typing.Optional['iocage.lib.Logger.Logger']=None
+) -> None:
+    """Raise when the path contains a symlink."""
+    directories = path.split("/")
+    while len(directories) > 0:
+        current_directory = "/".join(directories)
+        if os.path.exists(current_directory):
+            if os.path.islink(current_directory):
+                raise iocage.lib.errors.SecurityViolation(
+                    reason="Path contains a symbolic link.",
+                    logger=logger
+                )
+        directories.pop()
+
+
 def makedirs_safe(
     target: str,
     mode: int=0o700,
     logger: typing.Optional['iocage.lib.Logger.Logger']=None
 ) -> None:
     """Create a directory without following symlinks."""
-    directories = target.split("/")
-    while len(directories) > 0:
-        current_directory = "/".join(directories)
-        if os.path.exists(current_directory):
-            if os.path.islink(current_directory):
-                raise iocage.lib.errors.SecurityViolation(
-                    reason="Refusing to create a directory below a symlink",
-                    logger=logger
-                )
-        directories.pop()
+    require_no_symlink(target)
     if logger is not None:
         logger.verbose(f"Safely creating {target} directory")
     os.makedirs(target, mode=mode, exist_ok=True)
