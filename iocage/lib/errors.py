@@ -581,11 +581,14 @@ class UnmountFailed(IocageException):
     def __init__(  # noqa: T484
         self,
         mountpoint: typing.Any,
+        reason: typing.Optional[str]=None,
         *args,
         **kwargs
     ) -> None:
 
-        msg = f"Failed to unmount {mountpoint}"
+        msg = f"Unmount of {mountpoint} failed"
+        if reason is not None:
+            msg += f": {reason}"
         super().__init__(msg, *args, **kwargs)
 
 

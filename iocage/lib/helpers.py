@@ -631,13 +631,14 @@ def umount(
             logger.debug(
                 f"Jail mountpoint {mountpoint} umounted"
             )
-    except iocage.lib.errors.CommandFailure:
+    except iocage.lib.errors.CommandFailure as e:
         if logger is not None:
             logger.spam(
                 f"Jail mountpoint {mountpoint} not unmounted"
             )
         if ignore_error is False:
             raise iocage.lib.errors.UnmountFailed(
+                reason=str(e),
                 mountpoint=mountpoint,
                 logger=logger
             )
