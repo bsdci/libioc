@@ -1355,7 +1355,7 @@ class JailGenerator(JailResource):
 
     def _destroy_jail(self) -> None:
 
-        self._exec_host_command(
+        stdout, stderr, returncode = self._exec_host_command(
             [
                 "/usr/sbin/jail",
                 "-v",
@@ -1366,6 +1366,12 @@ class JailGenerator(JailResource):
             ],
             passthru=False
         )
+
+        if returncode > 0:
+            raise iocage.lib.errors.JailDestructionFailed(
+                jail=self,
+                logger=self.logger
+            )
 
     @property
     def _dhcp_enabled(self) -> bool:

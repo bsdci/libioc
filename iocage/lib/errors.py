@@ -188,7 +188,7 @@ class JailNotTemplate(IocageException):
 
 
 class JailLaunchFailed(IocageException):
-    """Raised when the jail state could not be obtained."""
+    """Raised when the jail could not be launched."""
 
     def __init__(  # noqa: T484
         self,
@@ -197,6 +197,19 @@ class JailLaunchFailed(IocageException):
         **kwargs
     ) -> None:
         msg = f"Launching jail {jail.full_name} failed"
+        IocageException.__init__(self, msg, *args, **kwargs)
+
+
+class JailDestructionFailed(IocageException):
+    """Raised when the jail could not be destroyed."""
+
+    def __init__(  # noqa: T484
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        *args,
+        **kwargs
+    ) -> None:
+        msg = f"Destroying jail {jail.full_name} failed"
         IocageException.__init__(self, msg, *args, **kwargs)
 
 
