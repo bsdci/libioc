@@ -1571,9 +1571,11 @@ class JailGenerator(JailResource):
             "command=/usr/bin/true"
         ]
 
+        _identifier = str(shlex.quote(self.identifier))
+        _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
         self._write_hook_script("host_command", "\n".join(
             [
-                f"IOCAGE_JID=$(jls -j {self.identifier} jid)",
+                f"IOCAGE_JID=$({_jls_command} 2&>1 || echo -1)",
                 "set -e",
                 f"/bin/sh {self.get_hook_script_path('started')}",
                 (
@@ -1657,9 +1659,11 @@ class JailGenerator(JailResource):
         file = self.get_hook_script_path(hook_name)
         existed = os.path.isfile(file)
         if hook_name in ["started", "poststart", "prestop"]:
+            _identifier = str(shlex.quote(self.identifier))
+            _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
             command_string = (
                 "IOCAGE_JID="
-                f"$(/usr/sbin/jls -j {shlex.quote(self.identifier)} jid)"
+                f"$({_jls_command} 2&>1 || echo -1)"
                 "\n" + command_string
             )
         if hook_name == "poststop":
