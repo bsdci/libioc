@@ -30,6 +30,7 @@ import random
 import re
 
 import iocage.lib.helpers
+import iocage.lib.Types
 import iocage.lib.Config.Jail.File
 
 
@@ -248,8 +249,8 @@ class Fstab(
                 continue
 
             new_line = FstabLine({
-                "source": fragments[0],
-                "destination": destination,
+                "source": iocage.lib.Types.AbsolutePath(fragments[0]),
+                "destination": iocage.lib.Types.AbsolutePath(destination),
                 "type": fragments[2],
                 "options": fragments[3],
                 "dump": fragments[4],
@@ -481,6 +482,23 @@ class Fstab(
 
     def __delitem__(self, index: int) -> None:  # noqa: T484
         """Delete an FstabLine at the given index."""
+        deletion_target_line = self.__getitem__(index)
+        jail_name = self.jail.humanreadable_name
+        source = deletion_target_line["source"]
+        destination = deletion_target_line["destination"]
+        if self.jail.running is True:
+            self.logger.verbose(
+                f"Unmounting {destination} from running jail {jail_name}"
+            )
+            iocage.lib.helpers.umount(
+                destination,
+                force=True,
+                logger=self.logger
+            )
+        self.logger.verbose(
+            f"Deleting fstab entry from jail {jail_name}: "
+            f"{source} -> {destination}"
+        )
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
