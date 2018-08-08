@@ -624,9 +624,8 @@ def umount(
         options=options,
         force=force
     )
-
     try:
-        iocage.lib.helpers.exec(cmd)
+        iocage.lib.helpers.exec(cmd, logger=logger)
         if logger is not None:
             logger.debug(
                 f"Jail mountpoint {mountpoint} umounted"
