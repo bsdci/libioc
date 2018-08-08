@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The common base of jail configurations."""
 import typing
+import inspect
 import re
 
 import iocage.lib.Config.Jail.Properties
@@ -152,10 +153,9 @@ class BaseConfig(dict):
 
         self.clone(data, skip_on_error=skip_on_error)
 
-    def _set_legacy(  # noqa: T484
+    def _set_legacy(
         self,
-        value: typing.Union[bool, str],
-        **kwargs
+        value: typing.Union[bool, str]
     ) -> None:
         try:
             self.legacy = iocage.lib.helpers.parse_bool(value)
@@ -200,8 +200,8 @@ class BaseConfig(dict):
     def _get_name(self) -> str:
         return self._get_id()
 
-    def _set_name(self, name: str, **kwargs) -> None:  # noqa: T484
-        return self._set_id(name=name, **kwargs)
+    def _set_name(self, name: str) -> None:
+        return self._set_id(name=name)
 
     def _get_uuid(self) -> str:
         return self._get_id()
@@ -215,11 +215,7 @@ class BaseConfig(dict):
         else:
             return "jail"
 
-    def _set_type(  # noqa: T484
-        self,
-        value: typing.Optional[str],
-        **kwargs
-    ) -> None:
+    def _set_type(self, value: typing.Optional[str]) -> None:
 
         if value == "basejail":
             self["basejail"] = True
@@ -237,11 +233,7 @@ class BaseConfig(dict):
     def _get_priority(self) -> int:
         return int(self.data["priority"])
 
-    def _set_priority(  # noqa: T484
-        self,
-        value: typing.Union[int, str],
-        **kwargs
-    ) -> None:
+    def _set_priority(self, value: typing.Union[int, str]) -> None:
         self.data["priority"] = str(value)
 
     # legacy support
@@ -255,7 +247,7 @@ class BaseConfig(dict):
         except (KeyError, IndexError):
             return None
 
-    def _set_tag(self, value: str, **kwargs) -> None:  # noqa: T484
+    def _set_tag(self, value: str) -> None:
 
         if (self._has_legacy_tag is True) or ("tags" not in self.data.keys()):
             # store as deprecated `tag` for downwards compatibility
@@ -280,10 +272,9 @@ class BaseConfig(dict):
             iocage.lib.helpers.parse_list(self.data["vnet_interfaces"])
         )
 
-    def _set_vnet_interfaces(  # noqa: T484
+    def _set_vnet_interfaces(
         self,
-        value: typing.Optional[typing.Union[str, typing.List[str]]],
-        **kwargs
+        value: typing.Optional[typing.Union[str, typing.List[str]]]
     ) -> None:
         try:
             iocage.lib.helpers.parse_none(value)
@@ -300,11 +291,7 @@ class BaseConfig(dict):
     def _get_exec_clean(self) -> bool:
         return (self.data["exec_clean"] == 1) is True
 
-    def _set_exec_clean(  # noqa: T484
-        self,
-        value: typing.Union[str, int, bool],
-        **kwargs
-    ) -> None:
+    def _set_exec_clean(self, value: typing.Union[str, int, bool]) -> None:
         if isinstance(value, str):
             value = int(value)
         self.data["exec_clean"] = 1 if ((value is True) or (value == 1)) else 0
@@ -323,15 +310,14 @@ class BaseConfig(dict):
 
         return list(tags)
 
-    def _set_tags(  # noqa: T484
+    def _set_tags(
         self,
         value: typing.Union[
             str,
             bool,
             int,
             typing.List[typing.Union[str, bool, int]]
-        ],
-        **kwargs
+        ]
     ) -> None:
 
         data = iocage.lib.helpers.to_string(value)
@@ -343,27 +329,34 @@ class BaseConfig(dict):
     def _get_basejail(self) -> bool:
         return iocage.lib.helpers.parse_bool(self.data["basejail"]) is True
 
-    def _set_basejail(self, value: typing.Any, **kwargs) -> None:  # noqa: T484
+    def _set_basejail(self, value: typing.Any) -> None:
         self.data["basejail"] = self.stringify(value)
 
     def _get_clonejail(self) -> bool:
         return iocage.lib.helpers.parse_bool(self.data["clonejail"]) is True
 
-    def _set_clonejail(  # noqa: T484
+    def _set_clonejail(
         self,
-        value: typing.Optional[typing.Union[str, bool]],
-        **kwargs
+        value: typing.Optional[typing.Union[str, bool]]
     ) -> None:
         self.data["clonejail"] = self.stringify(value)
+
+    def _get_template(self) -> bool:
+        return self.data.get("template", False) is True
+
+    def _set_template(
+        self,
+        value: typing.Union[str, bool]
+    ) -> None:
+        try:
+            self.data["template"] = iocage.lib.helpers.parse_bool(value)
+        except (ValueError, TypeError) as e:
+            raise ValueError(str(e))
 
     def _get_vnet(self) -> bool:
         return iocage.lib.helpers.parse_user_input(self.data["vnet"]) is True
 
-    def _set_vnet(  # noqa: T484
-        self,
-        value: typing.Union[str, bool],
-        **kwargs
-    ) -> None:
+    def _set_vnet(self, value: typing.Union[str, bool]) -> None:
         self.data["vnet"] = iocage.lib.helpers.to_string(
             value,
             true="on",
@@ -377,10 +370,9 @@ class BaseConfig(dict):
         except KeyError:
             return []
 
-    def _set_jail_zfs_dataset(  # noqa: T484
+    def _set_jail_zfs_dataset(
         self,
-        value: typing.Optional[typing.Union[typing.List[str], str]],
-        **kwargs
+        value: typing.Optional[typing.Union[typing.List[str], str]]
     ) -> None:
         value = [value] if isinstance(value, str) else value
         if value is None:
@@ -393,10 +385,9 @@ class BaseConfig(dict):
             self.data["jail_zfs"]
         ) is True
 
-    def _set_jail_zfs(  # noqa: T484
+    def _set_jail_zfs(
         self,
         value: typing.Optional[typing.Union[bool, str]],
-        **kwargs
     ) -> None:
         parsed_value = iocage.lib.helpers.parse_user_input(value)
         if parsed_value is None:
@@ -408,10 +399,9 @@ class BaseConfig(dict):
             false="off"
         )
 
-    def _set_cloned_release(  # noqa: T484
+    def _set_cloned_release(
         self,
-        value: typing.Optional[str],
-        **kwargs
+        value: typing.Optional[str]
     ) -> None:
         if (value is None) and "cloned_release" in self.data.keys():
             del self.data["cloned_release"]
@@ -449,10 +439,9 @@ class BaseConfig(dict):
         except KeyError:
             return JailConfigList(["-f", "root"])
 
-    def _set_login_flags(  # noqa: T484
+    def _set_login_flags(
         self,
-        value: typing.Optional[typing.Union[str, typing.List[str]]],
-        **kwargs
+        value: typing.Optional[typing.Union[str, typing.List[str]]]
     ) -> None:
         if value is None:
             try:
@@ -497,13 +486,6 @@ class BaseConfig(dict):
     def get_string(self, key: str) -> str:
         """Get the stringified value of a configuration property."""
         return self.stringify(self.__getitem__(key))
-
-    def _skip_on_error(self, **kwargs) -> bool:  # noqa: T484
-        """Resolve the skip_on_error attribute with this helper function."""
-        try:
-            return kwargs["skip_on_error"] is True
-        except AttributeError:
-            return False
 
     def _getitem_user(self, key: str) -> typing.Any:
 
@@ -616,9 +598,16 @@ class BaseConfig(dict):
             setter_method_name = f"_set_{key}"
             if setter_method_name in object.__dir__(self):
                 setter_method = self.__getattribute__(setter_method_name)
+                setter_kwargs = dict()
+                _spec = inspect.getfullargspec(setter_method)
+                if ("skip_on_error" in _spec) or (_spec.varkw is not None):
+                    # only pass skip_on_error when method reads it
+                    setter_kwargs["skip_on_error"] = skip_on_error
+                    # do not skip in this method when the setter takes care
+                    skip_on_error = False
                 setter_method(
                     parsed_value,
-                    skip_on_error=skip_on_error
+                    **setter_kwargs
                 )
                 return
 
