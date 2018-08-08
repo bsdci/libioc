@@ -203,7 +203,6 @@ class Fstab(
         )
 
         for line in input_text.rstrip("\n").splitlines():
-
             if _is_comment_line(line) or _is_empty_line(line):
                 self.add_line(FstabCommentLine({
                     "line": line
@@ -258,7 +257,7 @@ class Fstab(
                 "comment": comment
             })
 
-            self.add_line(new_line, skip_existing=True)
+            self.add_line(new_line, skip_existing=True, auto_mount_jail=False)
 
     def read_file(self) -> None:
         """Read the fstab file."""
@@ -306,7 +305,7 @@ class Fstab(
         self,
         source: str,
         destination: str,
-        fs_type: str="nullfs",
+        type: str="nullfs",
         options: str="ro",
         dump: str="0",
         passnum: str="0",
@@ -322,7 +321,7 @@ class Fstab(
         line = FstabLine({
             "source": source,
             "destination": destination,
-            "type": fs_type,
+            "type": type,
             "options": options,
             "dump": dump,
             "passnum": passnum,
@@ -344,7 +343,8 @@ class Fstab(
         ],
         skip_existing: bool=False,
         replace: bool=False,
-        auto_create_destination: bool=False
+        auto_create_destination: bool=False,
+        auto_mount_jail: bool=True
     ) -> None:
         """
         Directly append a FstabLine type.
@@ -377,10 +377,12 @@ class Fstab(
         if type(line) == FstabLine:
             # destination is always relative to the jail resource
             if line["destination"].startswith(self.jail.root_path) is False:
-                line["destination"] = "/".join([
+                line["destination"] = iocage.lib.Types.AbsolutePath("/".join([
                     self.jail.root_path,
                     line["destination"].strip("/")
-                ])
+                ]))
+
+            iocage.lib.helpers.require_no_symlink(str(line["destination"]))
 
             if auto_create_destination is True:
                 _destination = line["destination"]
@@ -389,6 +391,21 @@ class Fstab(
                         f"Auto-creating fstab destination {_destination}"
                     )
                     os.makedirs(line["destination"], 0o700)
+
+            if (auto_mount_jail and self.jail.running) is True:
+                mount_command = [
+                    "/sbin/mount",
+                    "-o", line["options"],
+                    "-t", line["type"],
+                    line["source"],
+                    line["destination"]
+                ]
+                iocage.lib.helpers.exec(mount_command, logger=self.logger)
+                _source = line["source"]
+                _jail_name = self.jail.humanreadable_name
+                self.logger.verbose(
+                    f"{_source} mounted to running jail {_jail_name}"
+                )
 
         self._lines.append(line)
 
