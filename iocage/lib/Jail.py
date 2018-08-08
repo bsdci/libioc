@@ -1776,49 +1776,44 @@ class JailGenerator(JailResource):
         if self.storage_backend is None:
             raise Exception("")
 
-    def require_jail_not_template(self, **kwargs) -> None:  # noqa: T484
+    def require_jail_not_template(self) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is True:
             raise iocage.lib.errors.JailIsTemplate(
                 jail=self,
-                logger=self.logger,
-                **kwargs  # noqa: T484
+                logger=self.logger
             )
 
-    def require_jail_not_existing(self, **kwargs) -> None:  # noqa: T484
+    def require_jail_not_existing(self) -> None:
         """Raise JailAlreadyExists exception if the jail already exists."""
         if self.exists:
             raise iocage.lib.errors.JailAlreadyExists(
                 jail=self,
-                logger=self.logger,
-                **kwargs  # noqa: T484
+                logger=self.logger
             )
 
-    def require_jail_existing(self, **kwargs) -> None:  # noqa: T484
+    def require_jail_existing(self) -> None:
         """Raise JailDoesNotExist exception if the jail does not exist."""
         if not self.exists:
             raise iocage.lib.errors.JailDoesNotExist(
                 jail=self,
-                logger=self.logger,
-                **kwargs  # noqa: T484
+                logger=self.logger
             )
 
-    def require_jail_stopped(self, **kwargs) -> None:  # noqa: T484
+    def require_jail_stopped(self) -> None:
         """Raise JailAlreadyRunning exception if the jail is running."""
         if self.running is not False:
             raise iocage.lib.errors.JailAlreadyRunning(
                 jail=self,
-                logger=self.logger,
-                **kwargs  # noqa: T484
+                logger=self.logger
             )
 
-    def require_jail_running(self, **kwargs) -> None:  # noqa: T484
+    def require_jail_running(self) -> None:
         """Raise JailNotRunning exception if the jail is stopped."""
         if not self.running:
             raise iocage.lib.errors.JailNotRunning(
                 jail=self,
-                logger=self.logger,
-                **kwargs  # noqa: T484
+                logger=self.logger
             )
 
     def _teardown_mounts(self) -> typing.List[str]:
