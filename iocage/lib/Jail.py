@@ -694,18 +694,13 @@ class JailGenerator(JailResource):
         raise NotImplemented("_run_hook only supports start/stop")
 
     def _ensure_script_dir(self) -> None:
-        jail_mountpoint_absolute_dir = "/".join([
-            self.root_dataset.mountpoint,
-            self._relative_hook_script_dir
-        ])
-        for _dir in [self.launch_script_dir, jail_mountpoint_absolute_dir]:
-            realpath = os.path.realpath(_dir)
-            if realpath.startswith(self.dataset.mountpoint) is False:
-                raise iocage.lib.errors.SecurityViolationConfigJailEscape(
-                    file=realpath
-                )
-            if os.path.isdir(realpath) is False:
-                os.makedirs(realpath, 0o755)
+        realpath = os.path.realpath(self.launch_script_dir)
+        if realpath.startswith(self.dataset.mountpoint) is False:
+            raise iocage.lib.errors.SecurityViolationConfigJailEscape(
+                file=realpath
+            )
+        if os.path.isdir(realpath) is False:
+            os.makedirs(realpath, 0o755)
 
     def _prepare_stop(self) -> None:
         exec_prestop = []
@@ -1275,20 +1270,7 @@ class JailGenerator(JailResource):
         else:
             self.fstab.release = None
 
-        # launch command mountpoint
-        jail_start_script_dir = "".join([
-            self.root_dataset.mountpoint,
-            self._relative_hook_script_dir
-        ])
-        iocage_helper_line = iocage.lib.Config.Jail.File.Fstab.FstabLine(dict(
-            source=self.launch_script_dir,
-            destination=jail_start_script_dir,
-            type="nullfs",
-            options="ro",
-            comment=self.fstab.AUTO_COMMENT_IDENTIFIER
-        ))
         self.fstab.read_file()
-        self.fstab.add_line(iocage_helper_line, replace=True)
         self.fstab.save()
 
     def exec(  # noqa: T484

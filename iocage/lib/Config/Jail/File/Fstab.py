@@ -76,6 +76,12 @@ class FstabBasejailLine(FstabLine):
     pass
 
 
+class FstabMaintenanceLine(FstabLine):
+    """Model a fstab line automatically created for jail launch scripts."""
+
+    pass
+
+
 class FstabCommentLine(dict):
     """Model a fstab comment line (beginning with #)."""
 
@@ -448,6 +454,21 @@ class Fstab(
             return False
 
     @property
+    def maintenance_lines(self) -> typing.List[FstabMaintenanceLine]:
+        """Auto-generate lines that are required for jail start and stop."""
+        return [FstabMaintenanceLine(dict(
+            source=iocage.lib.Types.AbsolutePath(self.jail.launch_script_dir),
+            destination=iocage.lib.Types.AbsolutePath(
+                f"{self.jail.root_dataset.mountpoint}/.iocage"
+            ),
+            options="ro",
+            fstype="nullfs",
+            dump="0",
+            passnum="0",
+            comment=self.AUTO_COMMENT_IDENTIFIER
+        ))]
+
+    @property
     def basejail_lines(self) -> typing.List[FstabBasejailLine]:
         """
         Auto-generate lines of NullFS basejails.
@@ -608,12 +629,15 @@ class Fstab(
             if isinstance(line, FstabAutoPlaceholderLine):
                 if basejail_lines_added is False:
                     output += self.basejail_lines
+                    output += self.maintenance_lines
                     basejail_lines_added = True
             else:
                 output.append(line)
 
         if basejail_lines_added is False:
-            output = self.basejail_lines + self._lines  # noqa: T484
+            _basejail = self.basejail_lines
+            _maintenance = self.maintenance_lines
+            output = _basejail + _maintenance + self._lines  # noqa: T484
 
         return iter(output)
 
