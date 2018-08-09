@@ -33,21 +33,17 @@ import iocage.lib.errors
 class LogEntry:
     """A single log entry."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         message: str,
         level: str,
         indent: int=0,
-        logger: 'iocage.lib.Logger.Logger'=None,
-        **kwargs
+        logger: 'iocage.lib.Logger.Logger'=None
     ) -> None:
         self.message = message
         self.level = level
         self.indent = indent
         self.logger = logger
-
-        for key in kwargs.keys():
-            object.__setattr__(self, key, kwargs[key])
 
     def edit(
         self,
@@ -161,18 +157,18 @@ class Logger:
             self._create_log_directory()
         self.log(f"Log directory set to '{log_directory}'", level="spam")
 
-    def log(  # noqa: T484
+    def log(
         self,
         message: str,
         level: str="info",
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Add a log entry."""
         log_entry = LogEntry(
             message=message,
             level=level,
-            logger=self,
-            **kwargs
+            indent=indent,
+            logger=self
         )
 
         if self._should_print_log_entry(log_entry):
@@ -181,59 +177,53 @@ class Logger:
 
         return log_entry
 
-    def verbose(  # noqa: T484
+    def verbose(
         self,
         message: str,
         indent: int=0,
-        **kwargs
     ) -> LogEntry:
         """Add a verbose log entry."""
-        return self.log(message, level="verbose", indent=indent, **kwargs)
+        return self.log(message, level="verbose", indent=indent)
 
-    def error(  # noqa: T484
+    def error(
         self,
         message: str,
-        indent: int=0,
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Add an error log entry."""
-        return self.log(message, level="error", indent=indent, **kwargs)
+        return self.log(message, level="error", indent=indent)
 
-    def warn(  # noqa: T484
+    def warn(
         self,
         message: str,
-        indent: int=0,
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Add a warning log entry."""
-        return self.log(message, level="warn", indent=indent, **kwargs)
+        return self.log(message, level="warn", indent=indent)
 
-    def debug(  # noqa: T484
+    def debug(
         self,
         message: str,
-        indent: int=0,
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Add a debug log entry."""
-        return self.log(message, level="debug", indent=indent, **kwargs)
+        return self.log(message, level="debug", indent=indent)
 
-    def spam(  # noqa: T484
+    def spam(
         self,
         message: str,
-        indent: int=0,
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Add a spam log entry."""
-        return self.log(message, level="spam", indent=indent, **kwargs)
+        return self.log(message, level="spam", indent=indent)
 
-    def screen(  # noqa: T484
+    def screen(
         self,
         message: str,
-        indent: int=0,
-        **kwargs
+        indent: int=0
     ) -> LogEntry:
         """Screen never gets printed to log files."""
-        return self.log(message, level="screen", indent=indent, **kwargs)
+        return self.log(message, level="screen", indent=indent)
 
     def redraw(self, log_entry: LogEntry) -> None:
         """Redraw and update a log entry that was already printed."""
