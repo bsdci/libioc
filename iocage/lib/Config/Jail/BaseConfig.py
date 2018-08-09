@@ -756,14 +756,13 @@ class BaseConfig(dict):
 class JailConfigList(list):
     """Jail configuration property in form of a list."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
-        *args,
+        data: typing.List[str]=[],
         delimiter: str=" ",
-        **kwargs
     ) -> None:
         self.delimiter = delimiter
-        list.__init__(self, *args, **kwargs)
+        list.__init__(self, data)
 
     def __str__(self) -> str:
         """Return the string representation in iocage format."""
