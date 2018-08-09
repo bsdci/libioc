@@ -132,9 +132,7 @@ class ListableResource(list):
     @abc.abstractmethod
     def _create_resource_instance(  # noqa: T484
         self,
-        dataset: libzfs.ZFSDataset,
-        *args,
-        **kwargs
+        dataset: libzfs.ZFSDataset
     ) -> 'iocage.lib.Resource.Resource':
         pass
 
