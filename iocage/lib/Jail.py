@@ -1557,7 +1557,7 @@ class JailGenerator(JailResource):
         _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
         self._write_hook_script("host_command", "\n".join(
             [
-                f"IOCAGE_JID=$({_jls_command} 2&>1 || echo -1)",
+                f"IOCAGE_JID=$({_jls_command} 2>&1 || echo -1)",
                 "set -e",
                 f"/bin/sh {self.get_hook_script_path('started')}",
                 (
@@ -1645,7 +1645,7 @@ class JailGenerator(JailResource):
             _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
             command_string = (
                 "IOCAGE_JID="
-                f"$({_jls_command} 2&>1 || echo -1)"
+                f"$({_jls_command} 2>&1 || echo -1)"
                 "\n" + command_string
             )
         if hook_name == "poststop":
