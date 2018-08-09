@@ -179,31 +179,30 @@ def _print_list(
         print(separator.join(_lookup_resource_values(resource, columns)))
 
 
-def _print_json(  # noqa: T484
+def _print_json(
     resources: typing.Generator[
         iocage.lib.Jails.JailsGenerator,
         None,
         None
     ],
     columns: list,
-    **json_dumps_args
+    # json.dumps arguments
+    indent: int=2,
+    sort_keys: bool=True
 ) -> None:
 
-    if "indent" not in json_dumps_args.keys():
-        json_dumps_args["indent"] = 2
-
-    if "sort_keys" not in json_dumps_args.keys():
-        json_dumps_args["sort_keys"] = True
-
     output = []
-
     for resource in resources:
         output.append(dict(zip(
             columns,
             _lookup_resource_values(resource, columns)
         )))
 
-    print(json.dumps(output, **json_dumps_args))
+    print(json.dumps(
+        output,
+        indent=indent,
+        sort_keys=sort_keys
+    ))
 
 
 def _lookup_resource_values(
