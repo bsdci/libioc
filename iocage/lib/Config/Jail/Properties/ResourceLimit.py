@@ -71,7 +71,7 @@ class ResourceLimitValue:
     def __init__(
         self,
         *args: typing.List[str],
-        **kwargs: typing.Dict[str, typing.Union[int, str]]
+        **kwargs: typing.Union[int, str]
     ) -> None:
         _values: ResourceLimitValueTuple = (None, None, None,)
         if len(args) > 0:
