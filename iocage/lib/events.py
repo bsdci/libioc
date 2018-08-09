@@ -39,6 +39,8 @@ EVENT_STATUS = (
     "failed"
 )
 
+EventUpdateData = typing.Dict[str, typing.Any]
+
 
 class Scope(list):
     """An independent event history scope."""
@@ -68,11 +70,10 @@ class IocageEvent:
     ]]]
     _child_events: typing.List['IocageEvent']
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         message: typing.Optional[str]=None,
-        scope: typing.Optional[Scope]=None,
-        **kwargs
+        scope: typing.Optional[Scope]=None
     ) -> None:
         """Initialize an IocageEvent."""
         self.scope = scope
@@ -88,7 +89,6 @@ class IocageEvent:
         self._rollback_steps = []
         self._child_events = []
 
-        self.data = kwargs
         self._rollback_steps = []
         self.number = len(self.scope) + 1
         self.parent_count = self.scope.PENDING_COUNT
@@ -208,59 +208,58 @@ class IocageEvent:
         except AttributeError:
             return None
 
-    def _update_message(self, **kwargs) -> None:  # noqa: T484
-        for key in kwargs.keys():
-            if key == "message":
-                self.message = kwargs["message"]
-            else:
-                self.data[key] = kwargs[key]
+    def _update_message(
+        self,
+        message: typing.Optional[str]=None,
+    ) -> None:
+        self.message = message
 
-    def begin(self, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def begin(self, message: typing.Optional[str]=None) -> 'IocageEvent':
         """Begin an event."""
-        self._update_message(**kwargs)
+        self._update_message(message)
         self.pending = True
         self.done = False
         self.parent_count = self.scope.PENDING_COUNT - 1
         return self
 
-    def end(self, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def end(self, message: typing.Optional[str]=None) -> 'IocageEvent':
         """Successfully finish an event."""
-        self._update_message(**kwargs)
+        self._update_message(message)
         self.done = True
         self.pending = False
         self.parent_count = self.scope.PENDING_COUNT
         return self
 
-    def step(self, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def step(self, message: typing.Optional[str]=None) -> 'IocageEvent':
         """Reflect partial event progress."""
-        self._update_message(**kwargs)
+        self._update_message(message)
         self.parent_count = self.scope.PENDING_COUNT
         return self
 
-    def skip(self, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def skip(self, message: typing.Optional[str]=None) -> 'IocageEvent':
         """Mark an event as skipped."""
-        self._update_message(**kwargs)
+        self._update_message(message)
         self.skipped = True
         self.pending = False
         self.parent_count = self.scope.PENDING_COUNT
         return self
 
-    def fail(  # noqa: T484
+    def fail(
         self,
         exception: bool=True,
-        **kwargs
+        message: typing.Optional[str]=None
     ) -> 'IocageEvent':
         """End an event with a failure."""
-        list(self.fail_generator(exception=exception, **kwargs))
+        list(self.fail_generator(exception=exception, message=message))
         return self
 
-    def fail_generator(  # noqa: T484
+    def fail_generator(
         self,
         exception: bool=True,
-        **kwargs
+        message: typing.Optional[str]=None
     ) -> typing.Generator['IocageEvent', None, None]:
         """End an event with a failure via a generator of rollback steps."""
-        self._update_message(**kwargs)
+        self._update_message(message)
         self.error = exception
 
         actions = self.rollback()
@@ -286,18 +285,22 @@ class IocageEvent:
 class JailEvent(IocageEvent):
     """Any event related to a jail."""
 
-    def __init__(  # noqa: T484
+    jail: 'iocage.lib.Jail.JailGenerator'
+    identifier: typing.Optional[str]
+
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         try:
             self.identifier = jail.full_name
         except AttributeError:
             self.identifier = None
-
-        IocageEvent.__init__(self, jail=jail, **kwargs)
+        self.jail = jail
+        IocageEvent.__init__(self, message=message, scope=scope)
 
 
 class JailLaunch(JailEvent):
@@ -305,82 +308,95 @@ class JailLaunch(JailEvent):
 
     stdout: typing.Optional[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
         self.stdout = None
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
-    def end(self, stdout, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def end(
+        self,
+        message: typing.Optional[str]=None,
+        stdout: str=""
+    ) -> 'IocageEvent':
         """Successfully finish an event."""
         self.stdout = stdout
-        return IocageEvent.end(self, **kwargs)
+        return IocageEvent.end(self, message)
 
 
 class JailRename(JailEvent):
     """Change the name of a jail."""
 
-    def __init__(  # noqa: T484
+    current_name: str
+    new_name: str
+
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
         current_name: str,
         new_name: str,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        kwargs["current_name"] = current_name
-        kwargs["new_name"] = new_name
-        JailEvent.__init__(self, jail, **kwargs)
+        self.current_name = current_name
+        self.new_name = new_name
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
 class JailDestroy(JailEvent):
     """Destroy the jail."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
 class JailFstabUpdate(JailEvent):
     """Update a jails fstab file."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
 class JailResolverConfig(JailEvent):
     """Update a jails /etc/resolv.conf file."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
 class JailClone(JailEvent):
     """Clone a jail."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 # Release
 
@@ -388,122 +404,72 @@ class JailClone(JailEvent):
 class ReleaseEvent(IocageEvent):
     """Event related to a release."""
 
-    def __init__(  # noqa: T484
+    release: 'iocage.lib.Release.ReleaseGenerator'
+
+    def __init__(
         self,
         release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.identifier = release.full_name
-        IocageEvent.__init__(self, release=release, **kwargs)
+        self.release = release
+        IocageEvent.__init__(self, message=message, scope=scope)
 
 
 class ReleaseUpdate(ReleaseEvent):
     """Update a release."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        ReleaseEvent.__init__(self, release, **kwargs)
+    pass
 
 
 class FetchRelease(ReleaseEvent):
     """Fetch release assets."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        ReleaseEvent.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleasePrepareStorage(FetchRelease):
     """Prepare the storage of a release before fetching it."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        FetchRelease.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseDownload(FetchRelease):
     """Download release assets."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        FetchRelease.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseExtraction(FetchRelease):
     """Extract a release asset."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        FetchRelease.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseCopyBase(FetchRelease):
     """Copy the basejail folders of a release into individual ZFS datasets."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        FetchRelease.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseConfiguration(FetchRelease):
     """Pre-configure a release with reasonable defaults."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        FetchRelease.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseUpdatePull(ReleaseUpdate):
     """Pull resource updater and patches from the remote."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        ReleaseUpdate.__init__(self, release, **kwargs)
+    pass
 
 
 class ReleaseUpdateDownload(ReleaseUpdate):
     """Download resource updates/patches."""
 
-    def __init__(  # noqa: T484
-        self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
-        **kwargs
-    ) -> None:
-
-        ReleaseUpdate.__init__(self, release, **kwargs)
+    pass
 
 
 # Resource
@@ -512,50 +478,33 @@ class ReleaseUpdateDownload(ReleaseUpdate):
 class ResourceEvent(IocageEvent):
     """Event with a resource."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         resource: 'iocage.lib.Resource.ResourceGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.identifier = resource.full_name
-        IocageEvent.__init__(self, **kwargs)
+        IocageEvent.__init__(self, message)
 
 
 class ResourceUpdate(ResourceEvent):
     """Update a resource."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.ResourceGenerator',
-        **kwargs
-    ) -> None:
-
-        ResourceEvent.__init__(self, resource, **kwargs)
+    pass
 
 
 class RunResourceUpdate(ResourceUpdate):
     """Run the update of a resource."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.ResourceGenerator',
-        **kwargs
-    ) -> None:
-
-        ResourceUpdate.__init__(self, resource, **kwargs)
+    pass
 
 
 class ExecuteResourceUpdate(ResourceUpdate):
     """Execute the updater script in a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.ResourceGenerator',
-        **kwargs
-    ) -> None:
-
-        ResourceUpdate.__init__(self, resource, **kwargs)
+    pass
 
 
 # ZFS
@@ -564,78 +513,108 @@ class ExecuteResourceUpdate(ResourceUpdate):
 class ZFSEvent(IocageEvent):
     """Event related to ZFS storage."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         zfs_object: libzfs.ZFSObject,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.identifier = zfs_object.name
-        IocageEvent.__init__(self, zfs_object=zfs_object, **kwargs)
+        self.zfs_object = zfs_object
+        IocageEvent.__init__(self, message=message, scope=scope)
 
 
 class ZFSDatasetRename(ZFSEvent):
     """Rename a ZFS dataset."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         dataset: libzfs.ZFSDataset,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
+        ZFSEvent.__init__(
+            self,
+            zfs_object=dataset,
+            message=message,
+            scope=scope
+        )
 
 
 class ZFSDatasetDestroy(ZFSEvent):
     """Rename a ZFS dataset."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         dataset: libzfs.ZFSDataset,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        ZFSEvent.__init__(self, zfs_object=dataset, **kwargs)
+        ZFSEvent.__init__(
+            self,
+            zfs_object=dataset,
+            message=message,
+            scope=scope
+        )
 
 
 class ZFSSnapshotRename(ZFSEvent):
     """Rename a ZFS snapshot."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         snapshot: libzfs.ZFSDataset,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        ZFSEvent.__init__(self, zfs_object=snapshot, **kwargs)
+        ZFSEvent.__init__(
+            self,
+            zfs_object=snapshot,
+            message=message,
+            scope=scope
+        )
 
 
 class ZFSSnapshotClone(ZFSEvent):
     """Clone a ZFS snapshot to a target."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         snapshot: libzfs.ZFSDataset,
         target: str,
-        **kwargs
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        msg = f"Could not clone to {target}"
-        ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
+        message = f"Could not clone to {target}"
+        ZFSEvent.__init__(
+            self,
+            zfs_object=snapshot,
+            message=message,
+            scope=scope
+        )
 
 
 class ZFSSnapshotRollback(ZFSEvent):
     """Rollback a ZFS dataset to a snapshot."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         snapshot: libzfs.ZFSSnapshot,
         target: str,
-        **kwargs
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
-        msg = f"Rolling back {target} to snapshot {snapshot.snapshot_name}"
-        ZFSEvent.__init__(self, msg=msg, zfs_object=snapshot, **kwargs)
+        message = f"Rolling back {target} to snapshot {snapshot.snapshot_name}"
+        ZFSEvent.__init__(
+            self,
+            zfs_object=snapshot,
+            message=message,
+            scope=scope
+        )
 
 
 # Backup
@@ -644,83 +623,71 @@ class ZFSSnapshotRollback(ZFSEvent):
 class ResourceBackup(IocageEvent):
     """Events that occur when backing up a resource."""
 
-    def __init__(  # noqa: T484
+    resource: 'iocage.lib.Resource.Resource'
+
+    def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         if "name" in resource.__dir__():
             self.identifier = resource.name
         else:
             self.identifier = resource.dataset_name
-        IocageEvent.__init__(self, resource=resource, **kwargs)
+        self.resource = resource
+        IocageEvent.__init__(
+            self,
+            message=message,
+            scope=scope
+        )
 
 
 class ExportConfig(ResourceBackup):
     """Event that occurs when the config of a resource is exported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ExportFstab(ResourceBackup):
     """Event that occurs when the fstab file of a jail is exported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ExportRootDataset(ResourceBackup):
     """Export a resources root dataset."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ExportOtherDatasets(ResourceBackup):
     """Event that occurs when other resource datasets get exported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ExportOtherDataset(ResourceBackup):
     """Export one of a resources datasets."""
 
-    def __init__(  # noqa: T484
+    dataset: libzfs.ZFSDataset
+
+    def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
         dataset: libzfs.ZFSDataset,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
+        self.dataset = dataset
         ResourceBackup.__init__(
             self,
             resource=resource,
-            dataset=dataset,
-            **kwargs
+            message=message
         )
+
         # The identifier is the dataset name relative to the resource
         relative_dataset_name = dataset.name[len(resource.dataset_name):]
         self.identifier = str(self.identifier) + str(relative_dataset_name)
@@ -729,18 +696,21 @@ class ExportOtherDataset(ResourceBackup):
 class BundleBackup(ResourceBackup):
     """Bundle exported data into a backup archive."""
 
-    def __init__(  # noqa: T484
+    destination: str
+
+    def __init__(
         self,
         destination: str,
         resource: 'iocage.lib.Resource.Resource',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
+        self.destination = destination
         ResourceBackup.__init__(
             self,
             resource=resource,
-            destination=destination,
-            **kwargs
+            message=message
         )
 
 
@@ -750,87 +720,73 @@ class BundleBackup(ResourceBackup):
 class ExtractBundle(ResourceBackup):
     """Extract a bundled backup archive."""
 
-    def __init__(  # noqa: T484
+    destination: str
+    resource: 'iocage.lib.Resource.Resource'
+
+    def __init__(
         self,
         source: str,
         destination: str,
         resource: 'iocage.lib.Resource.Resource',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
+        self.destination = destination
+        self.resource = resource
         ResourceBackup.__init__(
             self,
             resource=resource,
-            destination=destination,
-            **kwargs
+            message=message
         )
 
 
 class ImportConfig(ResourceBackup):
     """Event that occurs when the config of a resource is imported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ImportFstab(ResourceBackup):
     """Event that occurs when the fstab file of a jail is imported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ImportRootDataset(ResourceBackup):
     """Import data from an an archived root dataset."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ImportOtherDatasets(ResourceBackup):
     """Event that occurs when other resource datasets get exported."""
 
-    def __init__(  # noqa: T484
-        self,
-        resource: 'iocage.lib.Resource.Resource',
-        **kwargs
-    ) -> None:
-
-        ResourceBackup.__init__(self, resource=resource, **kwargs)
+    pass
 
 
 class ImportOtherDataset(ResourceBackup):
     """Export one of a resources datasets."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         resource: 'iocage.lib.Resource.Resource',
         dataset_name: str,
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.identifier = dataset_name
         ResourceBackup.__init__(
             self,
-            resource=resource,
-            dataset_name=dataset_name,
-            **kwargs
+            resource=resource
         )
+
+    @property
+    def dataset_name(self) -> str:
+        """Map the event identifier to dataset_name."""
+        return str(self.identifier)
+
 
 # CLI
 
@@ -838,73 +794,37 @@ class ImportOtherDataset(ResourceBackup):
 class JailRestart(JailEvent):
     """Restart a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailShutdown(JailEvent):
     """Shutdown a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailSoftShutdown(JailEvent):
     """Soft-restart a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailStart(JailEvent):
     """Start a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailProvisioning(JailEvent):
     """Provision a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailProvisioningAssetDownload(JailEvent):
     """Provision a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail, **kwargs)
+    pass
 
 
 class JailCommandExecution(JailEvent):
@@ -912,18 +832,23 @@ class JailCommandExecution(JailEvent):
 
     stdout: typing.Optional[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
         self.stdout = None
-        JailEvent.__init__(self, jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
-    def end(self, stdout, **kwargs) -> 'IocageEvent':  # noqa: T484
+    def end(
+        self,
+        message: typing.Optional[str]=None,
+        stdout: str=""
+    ) -> 'IocageEvent':
         """Successfully finish an event."""
         self.stdout = stdout
-        return IocageEvent.end(self, **kwargs)
+        return IocageEvent.end(self, message)
 
 # PKG
 
@@ -933,38 +858,34 @@ class PackageFetch(IocageEvent):
 
     packages: typing.List[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         packages: typing.List[str],
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.identifier = "global"
         self.packages = packages
-        IocageEvent.__init__(self, **kwargs)
+        IocageEvent.__init__(self, message=message, scope=scope)
 
 
 class PackageInstall(JailEvent):
     """Install packages in a jail."""
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         packages: typing.List[str],
         jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.packages = packages
-        JailEvent.__init__(self, jail=jail, **kwargs)
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
 class PackageConfiguration(JailEvent):
     """Install packages in a jail."""
 
-    def __init__(  # noqa: T484
-        self,
-        jail: 'iocage.lib.Jail.JailGenerator',
-        **kwargs
-    ) -> None:
-
-        JailEvent.__init__(self, jail=jail, **kwargs)
+    pass
