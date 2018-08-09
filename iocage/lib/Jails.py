@@ -68,24 +68,20 @@ class JailsGenerator(iocage.lib.ListableResource.ListableResource):
             logger=logger
         )
 
-    def _create_resource_instance(  # noqa: T484
+    def _create_resource_instance(
         self,
-        dataset: libzfs.ZFSDataset,
-        *class_args,
-        **class_kwargs
+        dataset: libzfs.ZFSDataset
     ) -> iocage.lib.Jail.JailGenerator:
 
-        sources = self.sources
-        class_kwargs["data"] = {
-            "id": dataset.name.split("/").pop()
-        }
-        class_kwargs["root_datasets_name"] = sources.find_root_datasets_name(
-            dataset.name
+        jail = self._class_jail(
+            data=dict(id=dataset.name.split("/").pop()),
+            root_datasets_name=self.sources.find_root_datasets_name(
+                dataset.name
+            ),
+            logger=self.logger,
+            host=self.host,
+            zfs=self.zfs
         )
-        class_kwargs["logger"] = self.logger
-        class_kwargs["host"] = self.host
-        class_kwargs["zfs"] = self.zfs
-        jail = self._class_jail(*class_args, **class_kwargs)
 
         if jail.identifier in self.states:
             self.logger.spam(

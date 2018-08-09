@@ -88,22 +88,19 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
         releases = distribution.releases  # type: ReleaseListType
         return releases
 
-    def _create_resource_instance(  # noqa T484
+    def _create_resource_instance(
         self,
-        dataset: libzfs.ZFSDataset,
-        *class_args,
-        **class_kwargs
+        dataset: libzfs.ZFSDataset
     ) -> iocage.lib.Release.ReleaseGenerator:
-
-        sources = self.sources
-        class_kwargs["name"] = self._get_asset_name_from_dataset(dataset)
-        class_kwargs["root_datasets_name"] = sources.find_root_datasets_name(
-            dataset.name
+        return self._class_release(
+            name=self._get_asset_name_from_dataset(dataset),
+            root_datasets_name=self.sources.find_root_datasets_name(
+                dataset.name
+            ),
+            logger=self.logger,
+            host=self.host,
+            zfs=self.zfs
         )
-        class_kwargs["logger"] = self.logger
-        class_kwargs["host"] = self.host
-        class_kwargs["zfs"] = self.zfs
-        return self._class_release(*class_args, **class_kwargs)
 
     def _create_instance(  # noqa: T484
         self,
