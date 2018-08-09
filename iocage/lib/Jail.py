@@ -67,11 +67,16 @@ class JailResource(
 
     def __init__(  # noqa: T484
         self,
-        host: 'iocage.lib.Host.HostGenerator',
-        jail: typing.Optional['JailGenerator']=None,
+        jail: 'JailGenerator',
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: str="auto",
+        config_file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
+        fstab: typing.Optional['iocage.lib.Config.Jail.File.Fstab.Fstab']=None,
         root_datasets_name: typing.Optional[str]=None,
-        fstab: typing.Optional['iocage.lib.Config.Jail.File.Fstab']=None,
-        **kwargs
     ) -> None:
 
         self.host = iocage.lib.helpers.init_host(self, host)
@@ -85,7 +90,12 @@ class JailResource(
 
         iocage.lib.LaunchableResource.LaunchableResource.__init__(
             self,
-            **kwargs  # noqa: T484
+            dataset=dataset,
+            dataset_name=dataset_name,
+            config_type=config_type,
+            config_file=config_file,
+            logger=logger,
+            zfs=zfs
         )
 
     @property
@@ -268,10 +278,14 @@ class JailGenerator(JailResource):
     def __init__(  # noqa: T484
         self,
         data: typing.Union[str, typing.Dict[str, typing.Any]]={},
-        root_datasets_name: typing.Optional[str]=None,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: str="auto",
+        config_file: typing.Optional[str]=None,
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         host: typing.Optional['iocage.lib.Host.Host']=None,
-        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
+        root_datasets_name: typing.Optional[str]=None,
         new: bool=False,
         **resource_args
     ) -> None:
@@ -308,11 +322,14 @@ class JailGenerator(JailResource):
         JailResource.__init__(
             self,
             jail=self,
-            root_datasets_name=root_datasets_name,
-            host=self.host,
+            dataset=dataset,
+            dataset_name=dataset_name,
+            config_type=config_type,
+            config_file=config_file,
             logger=self.logger,
             zfs=self.zfs,
-            **resource_args
+            host=self.host,
+            root_datasets_name=root_datasets_name
         )
 
         if not new and (("id" not in data) or (data["id"] is None)):
