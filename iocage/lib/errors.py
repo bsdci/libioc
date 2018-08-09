@@ -75,7 +75,21 @@ class MissingFeature(IocageException, NotImplementedError):
 # Jails
 
 
-class JailDoesNotExist(IocageException):
+class JailException(IocageException):
+    """Raised when an exception related to a jail occurs."""
+
+    jail: 'iocage.lib.Jail.JailGenerator'
+
+    def __init__(
+        self,
+        jail: 'iocage.lib.Jail.JailGenerator',
+        message: typing.Optional[str]=None,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
+        self.jail = jail
+        IocageException.__init__(self, message=message, logger=logger)
+
+class JailDoesNotExist(JailException):
     """Raised when the jail does not exist."""
 
     def __init__(
@@ -84,7 +98,7 @@ class JailDoesNotExist(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Jail '{jail.humanreadable_name}' does not exist"
-        IocageException.__init__(self, msg, logger=logger)
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
 class JailAlreadyExists(IocageException):
@@ -107,7 +121,6 @@ class JailNotRunning(IocageException):
         jail: 'iocage.lib.Jail.JailGenerator',
         logger: typing.Optional[Logger]=None
     ) -> None:
-
         msg = f"Jail '{jail.humanreadable_name}' is not running"
         IocageException.__init__(self, msg, logger=logger)
 
@@ -162,8 +175,10 @@ class JailBackendMissing(IocageException):
         IocageException.__init__(self, msg, logger=logger)
 
 
-class JailIsTemplate(IocageException):
+class JailIsTemplate(JailException):
     """Raised when the jail is a template but should not be."""
+
+    jail: 'iocage.lib.Jail.JailGenerator'
 
     def __init__(
         self,
@@ -171,11 +186,13 @@ class JailIsTemplate(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The jail '{jail.name}' is a template"
-        IocageException.__init__(self, msg, logger=logger)
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
-class JailNotTemplate(IocageException):
+class JailNotTemplate(JailException):
     """Raised when the jail is no template but should be one."""
+
+    jail: 'iocage.lib.Jail.JailGenerator'
 
     def __init__(
         self,
@@ -183,10 +200,10 @@ class JailNotTemplate(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The jail '{jail.full_name}' is not a template"
-        IocageException.__init__(self, msg, logger=logger)
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
-class JailLaunchFailed(IocageException):
+class JailLaunchFailed(JailException):
     """Raised when the jail could not be launched."""
 
     def __init__(
@@ -195,11 +212,13 @@ class JailLaunchFailed(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Launching jail {jail.full_name} failed"
-        IocageException.__init__(self, msg, logger=logger)
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
-class JailDestructionFailed(IocageException):
+class JailDestructionFailed(JailException):
     """Raised when the jail could not be destroyed."""
+
+    jail: 'iocage.lib.Jail.JailGenerator'
 
     def __init__(
         self,
@@ -207,22 +226,25 @@ class JailDestructionFailed(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Destroying jail {jail.full_name} failed"
-        IocageException.__init__(self, msg, logger=logger)
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
 class JailCommandFailed(IocageException):
     """Raised when a jail command fails with an exit code > 0."""
+
+    returncode: int
 
     def __init__(
         self,
         returncode: int,
         logger: typing.Optional[Logger]=None
     ) -> None:
+        self.returncode = returncode
         msg = f"Jail command exited with {returncode}"
         IocageException.__init__(self, msg, logger=logger)
 
 
-class JailExecutionAborted(IocageException):
+class JailExecutionAborted(JailException):
     """Raised when a jail command fails with an exit code > 0."""
 
     def __init__(
@@ -230,9 +252,8 @@ class JailExecutionAborted(IocageException):
         jail: 'iocage.lib.Jail.JailGenerator',
         logger: typing.Optional[Logger]=None
     ) -> None:
-        self.jail = jail
-        message = f"Jail execution of {jail.humanreadable_name} aborted."
-        IocageException.__init__(self, message=message, logger=logger)
+        msg = f"Jail execution of {jail.humanreadable_name} aborted."
+        JailException.__init__(self, msg, jail=jail, logger=logger)
 
 
 # Jail Fstab
