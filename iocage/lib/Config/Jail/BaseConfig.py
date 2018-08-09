@@ -164,7 +164,7 @@ class BaseConfig(dict):
     def _get_id(self) -> str:
         return str(self.data["id"])
 
-    def _set_id(self, name: str, **kwargs) -> None:  # noqa: T484
+    def _set_id(self, name: str) -> None:
 
         if ("id" in self.data.keys()) and (self.data["id"] == name):
             # We do not want to set the same name twice.
