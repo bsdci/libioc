@@ -299,13 +299,6 @@ class Logger:
         indent = Logger.INDENT_PREFIX * level
         return "\n".join(map(lambda x: f"{indent}{x}", message.splitlines()))
 
-    def _get_log_file_path(
-        self,
-        level: str,
-        jail: 'iocage.lib.Jail.JailGenerator'=None
-    ) -> str:
-        return self.log_directory
-
     def _create_log_directory(self) -> None:
         if os.geteuid() != 0:
             raise iocage.lib.errors.MustBeRoot(
