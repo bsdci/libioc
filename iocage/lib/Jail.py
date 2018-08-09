@@ -275,7 +275,7 @@ class JailGenerator(JailResource):
     _relative_hook_script_dir: str
     _provisioner: 'iocage.lib.Provisioning.Prototype'
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         data: typing.Union[str, typing.Dict[str, typing.Any]]={},
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
@@ -286,8 +286,7 @@ class JailGenerator(JailResource):
         zfs: typing.Optional['iocage.lib.ZFS.ZFS']=None,
         host: typing.Optional['iocage.lib.Host.Host']=None,
         root_datasets_name: typing.Optional[str]=None,
-        new: bool=False,
-        **resource_args
+        new: bool=False
     ) -> None:
         """
         Initialize a Jail.
