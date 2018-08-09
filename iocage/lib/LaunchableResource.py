@@ -55,12 +55,17 @@ class LaunchableResource(iocage.lib.Resource.Resource):
     ]
     config: iocage.lib.Config.Jail.JailConfig.JailConfig
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: str="auto",
+        config_file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         host: typing.Optional[
             'iocage.lib.Host.HostGenerator'
         ]=None,
-        **kwargs
     ) -> None:
         self.host = iocage.lib.helpers.init_host(self, host)
         self._updater = None
@@ -69,7 +74,15 @@ class LaunchableResource(iocage.lib.Resource.Resource):
         self._sysctl_conf = None
         self._updater = None
         self._backup = None
-        iocage.lib.Resource.Resource.__init__(self, **kwargs)
+        iocage.lib.Resource.Resource.__init__(
+            self,
+            dataset=dataset,
+            dataset_name=dataset_name,
+            config_type=config_type,
+            config_file=config_file,
+            logger=logger,
+            zfs=zfs
+        )
 
     @property
     def updater(
