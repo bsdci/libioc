@@ -1694,7 +1694,7 @@ class JailGenerator(JailResource):
         'iocage.lib.Network.StartedCommandList',
         'iocage.lib.Network.JailCommandList'
     ]:
-        self.logger.debug("Starting VNET/VIMAGE", jail=self)
+        self.logger.debug("Starting VNET/VIMAGE")
 
         started: typing.List[str] = []
         start: typing.List[str] = []
