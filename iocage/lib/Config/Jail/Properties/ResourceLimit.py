@@ -143,6 +143,9 @@ _ResourceLimitInputType = typing.Optional[
 class ResourceLimitProp(ResourceLimitValue):
     """Special jail config property for resource limits."""
 
+    property_name: str
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
+
     def __init__(
         self,
         property_name: str,
@@ -150,7 +153,6 @@ class ResourceLimitProp(ResourceLimitValue):
             'iocage.lib.Config.Jail.BaseConfig.BaseConfig'
         ]=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
-        skip_on_error: bool=False
     ) -> None:
 
         self.logger = logger

@@ -34,6 +34,7 @@ class InterfaceProp(dict):
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str
+    logger: typing.Optional['iocage.lib.Logger.Logger']
     delimiter: str = ","
 
     def __init__(
@@ -41,8 +42,8 @@ class InterfaceProp(dict):
         config: typing.Optional[
             'iocage.lib.Config.Jail.JailConfig.JailConfig'
         ]=None,
-        logger: typing.Optional['iocage.lib.Logger.Logger']=None,
-        property_name: str="interfaces"
+        property_name: str="interfaces",
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
         self.property_name = property_name
         dict.__init__(self, {})

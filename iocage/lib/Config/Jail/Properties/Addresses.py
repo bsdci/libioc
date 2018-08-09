@@ -62,15 +62,19 @@ IPInterfaceList = typing.Union[
 class AddressSet(set):
     """Set of IP addresses."""
 
+    property_name: str
     config: typing.Optional['iocage.lib.Config.Jail.JailConfig.JailConfig']
+    logger: typing.Optional['iocage.lib.Logger.Logger']
 
     def __init__(
         self,
         config: typing.Optional[
             'iocage.lib.Config.Jail.JailConfig.JailConfig'
         ]=None,
-        property_name: str="ip4_address"
+        property_name: str="ip4_address",
+        logger: typing.Optional['iocage.lib.Logger.Logger']=None
     ) -> None:
+        self.logger = logger
         self.config = config
         set.__init__(self)
         self.property_name = property_name

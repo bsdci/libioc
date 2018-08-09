@@ -68,7 +68,13 @@ def _get_class(property_name: str) -> Property:
     raise ValueError("A special property class with this name was not found")
 
 
-def init_property(property_name: str, **kwargs) -> Property:  # noqa: T484
+def init_property(
+    property_name: str,
+    config: typing.Optional[
+        'iocage.lib.Config.Jail.JailConfig.JailConfig'
+    ]=None,
+    logger: typing.Optional[iocage.lib.Logger.Logger]=None
+) -> Property:  # noqa: T484
     """
     Instantiate a special jail config property.
 
@@ -83,13 +89,17 @@ def init_property(property_name: str, **kwargs) -> Property:  # noqa: T484
                 - defaultrouter
                 - defaultrouter6
 
-        **kwargs:
-            Arguments passed to the special property class
+        config (iocage.lib.Config.Jail.JailConfig.JailConfig):
+            The special property keeps reference to this JailConfig instance
+
+        logger (iocage.lib.Logger.Logger): (optional):
+            Logger instance that the class is initialized with
     """
     target_class = _get_class(property_name)
     out = target_class(
         property_name=property_name,
-        **kwargs
+        config=config,
+        logger=logger
     )
     return out
 
