@@ -102,22 +102,8 @@ class ReleasesGenerator(iocage.lib.ListableResource.ListableResource):
             zfs=self.zfs
         )
 
-    def _create_instance(  # noqa: T484
-        self,
-        *args,
-        **kwargs
-    ) -> iocage.lib.Release.ReleaseGenerator:
-        return self._class_release(*args, **kwargs)
-
 
 class Releases(ReleasesGenerator):
     """Model of multiple iocage Releases."""
 
     _class_release = iocage.lib.Release.Release
-
-    def _create_instance(  # noqa: T484
-        self,
-        *args,
-        **kwargs
-    ) -> iocage.lib.Release.Release:
-        return iocage.lib.Release.Release(*args, **kwargs)
