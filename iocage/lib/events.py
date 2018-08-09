@@ -39,8 +39,6 @@ EVENT_STATUS = (
     "failed"
 )
 
-EventUpdateData = typing.Dict[str, typing.Any]
-
 
 class Scope(list):
     """An independent event history scope."""
