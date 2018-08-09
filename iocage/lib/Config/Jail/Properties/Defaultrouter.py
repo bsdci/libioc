@@ -39,10 +39,9 @@ IPAddressInput = typing.Optional[typing.Union[
 class DefaultrouterMixin:
     """Special jail config property mixin defaultrouter and defaultrouter6."""
 
-    logger: iocage.lib.Logger.Logger
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str = "defaultrouter"
-    skip_on_error: bool
+    logger: typing.Optional['iocage.lib.Logger.Logger']
     interface_delimiter: str = "@"
 
     _ip: typing.Optional[int]  # from ipaddress.IPv*Address class
@@ -54,14 +53,12 @@ class DefaultrouterMixin:
             'iocage.lib.Config.Jail.BaseConfig.BaseConfig'
         ]=None,
         property_name: str="defaultrouter",
-        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-        skip_on_error: bool=False
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None
     ) -> None:
 
         self.logger = logger
         self.config = config
         self.property_name = property_name
-        self.skip_on_error = skip_on_error
         self.static_interface = None
 
     def set(
@@ -134,13 +131,6 @@ class DefaultrouterMixin:
 class DefaultrouterProp(DefaultrouterMixin, ipaddress.IPv4Address):
     """Special jail config property defaultrouter."""
 
-    def __init__(
-        self,
-        *args: typing.Any,
-        **kwargs: typing.Any,
-    ) -> None:
-        DefaultrouterMixin.__init__(self, *args, **kwargs)
-
     def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> typing.List[str]:
         """Return a list of commands that configure the default IPv4 route."""
         commands: typing.List[str] = []
@@ -153,15 +143,17 @@ class DefaultrouterProp(DefaultrouterMixin, ipaddress.IPv4Address):
 
         if self.static_interface is not None:
             nic = self.static_interface
-            self.logger.verbose(
-                f"setting pointopoint route to {gateway} via {nic}"
-            )
+            if self.logger is not None:
+                self.logger.verbose(
+                    f"setting pointopoint route to {gateway} via {nic}"
+                )
             commands.append(f"/sbin/route -q add {gateway} -iface {nic}")
 
-        self.logger.verbose(
-            f"setting default IPv4 gateway to {gateway}",
-            jail=self
-        )
+        if self.logger is not None:
+            self.logger.verbose(
+                f"setting default IPv4 gateway to {gateway}",
+                jail=self
+            )
         commands.append(f"/sbin/route -q add default {gateway}")
 
         return commands
@@ -169,13 +161,6 @@ class DefaultrouterProp(DefaultrouterMixin, ipaddress.IPv4Address):
 
 class Defaultrouter6Prop(DefaultrouterMixin, ipaddress.IPv6Address):
     """Special jail config property defaultrouter6."""
-
-    def __init__(
-        self,
-        *args: typing.Any,
-        **kwargs: typing.Any,
-    ) -> None:
-        DefaultrouterMixin.__init__(self, *args, **kwargs)
 
     def apply(self, jail: 'iocage.lib.Jail.JailGenerator') -> typing.List[str]:
         """Return a list of commands that configure the default IPv6 route."""
@@ -190,17 +175,19 @@ class Defaultrouter6Prop(DefaultrouterMixin, ipaddress.IPv6Address):
             gateway = str(gateway_address)
             if self.static_interface is not None:
                 nic = self.static_interface
-                self.logger.verbose(
-                    f"setting pointopoint route to {gateway} via {nic}"
-                )
+                if self.logger is not None:
+                    self.logger.verbose(
+                        f"setting pointopoint route to {gateway} via {nic}"
+                    )
                 commands.append(
                     f"/sbin/route -q add -6 -host {gateway} -iface {nic}"
                 )
 
-        self.logger.verbose(
-            f"setting default IPv4 gateway to {gateway}",
-            jail=self
-        )
+        if self.logger is not None:
+            self.logger.verbose(
+                f"setting default IPv4 gateway to {gateway}",
+                jail=self
+            )
         commands.append(f"/sbin/route -q add -6 default {gateway}")
         return commands
 

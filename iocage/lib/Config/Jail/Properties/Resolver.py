@@ -38,16 +38,16 @@ import iocage.lib.Logger
 class ResolverProp(collections.MutableSequence):
     """Handle the special jail property (DNS) Resolver."""
 
-    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     property_name: str
+    config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
     none_matches: typing.List[str] = ["/dev/null", "-", ""]
     _entries: typing.List[str] = []
 
     def __init__(
         self,
         config: 'iocage.lib.Config.Jail.JailConfig.JailConfig',
+        property_name: str="resolver",
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
-        property_name: str="resolver"
     ) -> None:
         self.property_name = property_name
         self.logger = iocage.lib.helpers.init_logger(self, logger)
