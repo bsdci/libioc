@@ -59,12 +59,17 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
     host: 'iocage.lib.Host.HostGenerator'
     root_datasets_name: typing.Optional[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
-        host: iocage.lib.Host.HostGenerator,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: str="auto",
+        config_file: typing.Optional[str]=None,
+        logger: typing.Optional[iocage.lib.Logger.Logger]=None,
+        zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
+        host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
         release: typing.Optional['ReleaseGenerator']=None,
         root_datasets_name: typing.Optional[str]=None,
-        **kwargs
     ) -> None:
 
         self.host = iocage.lib.helpers.init_host(self, host)
@@ -72,7 +77,12 @@ class ReleaseResource(iocage.lib.LaunchableResource.LaunchableResource):
 
         iocage.lib.LaunchableResource.LaunchableResource.__init__(
             self,
-            **kwargs
+            dataset=dataset,
+            dataset_name=dataset_name,
+            config_type=config_type,
+            config_file=config_file,
+            logger=logger,
+            zfs=zfs
         )
 
         self._release = release
@@ -223,13 +233,16 @@ class ReleaseGenerator(ReleaseResource):
     def __init__(  # noqa: T484
         self,
         name: str,
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        dataset_name: typing.Optional[str]=None,
+        config_type: str="auto",
+        config_file: typing.Optional[str]=None,
         root_datasets_name: typing.Optional[str]=None,
         host: typing.Optional[iocage.lib.Host.HostGenerator]=None,
         zfs: typing.Optional[iocage.lib.ZFS.ZFS]=None,
         logger: typing.Optional[iocage.lib.Logger.Logger]=None,
         check_hashes: bool=True,
         check_eol: bool=True,
-        **release_resource_args
     ) -> None:
         self.logger = iocage.lib.helpers.init_logger(self, logger)
         self.zfs = iocage.lib.helpers.init_zfs(self, zfs)
@@ -265,7 +278,10 @@ class ReleaseGenerator(ReleaseResource):
             logger=self.logger,
             zfs=self.zfs,
             root_datasets_name=root_datasets_name,
-            **release_resource_args
+            dataset_name=dataset_name,
+            config_type=config_type,
+            config_file=config_file,
+            release=self
         )
 
         self._assets = ["base"]

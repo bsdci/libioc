@@ -1205,13 +1205,12 @@ class JailGenerator(JailResource):
         self.require_jail_not_existing()
 
         self.logger.verbose(
-            f"Creating jail '{self.config['id']}'",
-            jail=self
+            f"Creating jail '{self.config['id']}'"
         )
 
         for key, value in self.config.data.items():
             msg = f"{key} = {value}"
-            self.logger.spam(msg, jail=self, indent=1)
+            self.logger.spam(msg, indent=1)
 
         self.create_resource()
 

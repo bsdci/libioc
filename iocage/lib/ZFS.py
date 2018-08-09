@@ -63,7 +63,7 @@ class ZFS(libzfs.ZFS):
         dataset.mount()
         return dataset
 
-    def get_or_create_dataset(  # noqa: T484
+    def get_or_create_dataset(
         self,
         dataset_name: str
     ) -> libzfs.ZFSDataset:
