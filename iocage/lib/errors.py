@@ -69,7 +69,7 @@ class MissingFeature(IocageException, NotImplementedError):
             f"Missing Feature: '{feature_name}' "
             f"{'are' if plural is True else 'is'} not implemented yet"
         )
-        IocageException.__init__(self, message)
+        IocageException.__init__(self, message=message)
 
 
 # Jails
@@ -83,11 +83,12 @@ class JailException(IocageException):
     def __init__(
         self,
         jail: 'iocage.lib.Jail.JailGenerator',
-        message: typing.Optional[str]=None,
+        message: str,
         logger: typing.Optional[Logger]=None
     ) -> None:
         self.jail = jail
         IocageException.__init__(self, message=message, logger=logger)
+
 
 class JailDoesNotExist(JailException):
     """Raised when the jail does not exist."""
@@ -98,7 +99,7 @@ class JailDoesNotExist(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Jail '{jail.humanreadable_name}' does not exist"
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 class JailAlreadyExists(IocageException):
@@ -110,7 +111,7 @@ class JailAlreadyExists(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Jail '{jail.humanreadable_name}' already exists"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailNotRunning(IocageException):
@@ -122,7 +123,7 @@ class JailNotRunning(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Jail '{jail.humanreadable_name}' is not running"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailAlreadyRunning(IocageException):
@@ -135,7 +136,7 @@ class JailAlreadyRunning(IocageException):
     ) -> None:
 
         msg = f"Jail '{jail.humanreadable_name}' is already running"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailNotFound(IocageException):
@@ -148,7 +149,7 @@ class JailNotFound(IocageException):
     ) -> None:
 
         msg = f"No jail matching '{text}' was found"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailNotSupplied(IocageException):
@@ -156,7 +157,7 @@ class JailNotSupplied(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = f"Please supply a jail"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailUnknownIdentifier(IocageException):
@@ -164,7 +165,7 @@ class JailUnknownIdentifier(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = "The jail has no identifier yet"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailBackendMissing(IocageException):
@@ -172,7 +173,7 @@ class JailBackendMissing(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = "The jail backend is unknown"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailIsTemplate(JailException):
@@ -186,7 +187,7 @@ class JailIsTemplate(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The jail '{jail.name}' is a template"
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 class JailNotTemplate(JailException):
@@ -200,7 +201,7 @@ class JailNotTemplate(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The jail '{jail.full_name}' is not a template"
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 class JailLaunchFailed(JailException):
@@ -212,7 +213,7 @@ class JailLaunchFailed(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Launching jail {jail.full_name} failed"
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 class JailDestructionFailed(JailException):
@@ -226,7 +227,7 @@ class JailDestructionFailed(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Destroying jail {jail.full_name} failed"
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 class JailCommandFailed(IocageException):
@@ -241,7 +242,7 @@ class JailCommandFailed(IocageException):
     ) -> None:
         self.returncode = returncode
         msg = f"Jail command exited with {returncode}"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailExecutionAborted(JailException):
@@ -253,7 +254,7 @@ class JailExecutionAborted(JailException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Jail execution of {jail.humanreadable_name} aborted."
-        JailException.__init__(self, msg, jail=jail, logger=logger)
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
 # Jail Fstab
@@ -264,7 +265,7 @@ class VirtualFstabLineHasNoRealIndex(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = f"The virtual fstab line does not have a real list index"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class FstabDestinationExists(IocageException):
@@ -276,7 +277,7 @@ class FstabDestinationExists(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The mountpoint {mountpoint} already exists in the fstab file"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 # Security
@@ -291,7 +292,7 @@ class SecurityViolation(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Security violation: {reason}"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class InsecureJailPath(SecurityViolation):
@@ -303,7 +304,7 @@ class InsecureJailPath(SecurityViolation):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Insecure path {path} jail escape attempt"
-        SecurityViolation.__init__(self, msg)
+        SecurityViolation.__init__(self, reason=msg)
 
 
 class SecurityViolationConfigJailEscape(SecurityViolation):
@@ -315,7 +316,7 @@ class SecurityViolationConfigJailEscape(SecurityViolation):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The file {file} references a file outsite of the jail resource"
-        SecurityViolation.__init__(self, msg)
+        SecurityViolation.__init__(self, reason=msg)
 
 
 class IllegalArchiveContent(IocageException):
@@ -328,7 +329,7 @@ class IllegalArchiveContent(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Asset {asset_name} contains illegal files - {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # JailConfig
@@ -348,7 +349,7 @@ class InvalidJailName(JailConfigError):
             "Invalid jail name: "
             "Names have to begin and end with an alphanumeric character"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class JailConigZFSIsNotAllowed(JailConfigError):
@@ -359,7 +360,7 @@ class JailConigZFSIsNotAllowed(JailConfigError):
             "jail_zfs is disabled "
             "despite jail_zfs_dataset is configured"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidJailConfigValue(JailConfigError, ValueError):
@@ -379,7 +380,7 @@ class InvalidJailConfigValue(JailConfigError, ValueError):
             msg += f" of jail {jail.humanreadable_name}"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger, level=level)
+        super().__init__(message=msg, logger=logger, level=level)
 
 
 class InvalidJailConfigAddress(InvalidJailConfigValue):
@@ -420,7 +421,7 @@ class ResourceLimitUnknown(IocageException, KeyError):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = f"The specified resource limit is unknown"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class JailConfigNotFound(IocageException):
@@ -433,7 +434,7 @@ class JailConfigNotFound(IocageException):
     ) -> None:
         msg = f"Could not read {config_type} config"
         # This is a silent error internally used
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class DefaultConfigNotFound(IocageException, FileNotFoundError):
@@ -445,7 +446,7 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Default configuration not found at {config_file_path}"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class UnknownJailConfigProperty(IocageException, KeyError):
@@ -462,7 +463,7 @@ class UnknownJailConfigProperty(IocageException, KeyError):
             f"The config property '{key}' "
             f"of jail '{jail.humanreadable_name}' is unknown."
         )
-        IocageException.__init__(self, msg, logger=logger, level=level)
+        IocageException.__init__(self, message=msg, logger=logger, level=level)
 
 
 # Backup
@@ -474,7 +475,7 @@ class BackupInProgress(IocageException):
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
 
         msg = "A backup operation is already in progress"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class ExportDestinationExists(IocageException):
@@ -487,7 +488,7 @@ class ExportDestinationExists(IocageException):
     ) -> None:
 
         msg = "The backup destination {destination} already exists"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 # ListableResource
@@ -501,7 +502,7 @@ class ListableResourceNamespaceUndefined(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The ListableResource needs a namespace for this operation"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 # General
@@ -515,7 +516,7 @@ class IocageNotActivated(IocageException):
             "iocage is not activated yet - "
             "please run `ioc activate <POOL>` first and select a pool"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidLogLevel(IocageException):
@@ -532,17 +533,21 @@ class InvalidLogLevel(IocageException):
             f"Invalid log-level {log_level}. Choose one of "
             f"{available_log_levels_string} or {available_log_levels[-1]}"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class MustBeRoot(IocageException):
     """Raised when iocage is executed without root permission."""
 
-    def __init__(self, msg: str, logger: typing.Optional[Logger]=None) -> None:
+    def __init__(
+        self,
+        message: str,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
         _msg = (
-            f"Must be root to {msg}"
+            f"Must be root to {message}"
         )
-        super().__init__(_msg, logger=logger)
+        super().__init__(message=_msg, logger=logger)
 
 
 class CommandFailure(IocageException):
@@ -554,7 +559,7 @@ class CommandFailure(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Command exited with {returncode}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class NotAnIocageZFSProperty(IocageException):
@@ -566,7 +571,7 @@ class NotAnIocageZFSProperty(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"The ZFS property '{property_name}' is not managed by iocage"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Host, Distribution
@@ -581,7 +586,7 @@ class DistributionUnknown(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Unknown Distribution: {distribution_name}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class HostReleaseUnknown(IocageException):
@@ -589,7 +594,7 @@ class HostReleaseUnknown(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = f"The host release is unknown"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class HostUserlandVersionUnknown(IocageException):
@@ -597,7 +602,7 @@ class HostUserlandVersionUnknown(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = f"Could not determine the hosts userland version"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class DistributionEOLWarningDownloadFailed(IocageException):
@@ -609,7 +614,7 @@ class DistributionEOLWarningDownloadFailed(IocageException):
         level: str="error"
     ) -> None:
         msg = f"Failed to download the EOL warnings"
-        super().__init__(msg, logger=logger, level=level)
+        super().__init__(message=msg, logger=logger, level=level)
 
 
 # Storage
@@ -625,7 +630,7 @@ class DatasetExists(IocageException):
     ) -> None:
 
         msg = f"Dataset already exists: {dataset_name}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class UnmountFailed(IocageException):
@@ -641,7 +646,7 @@ class UnmountFailed(IocageException):
         msg = f"Unmount of {mountpoint} failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class MountFailed(IocageException):
@@ -654,7 +659,7 @@ class MountFailed(IocageException):
     ) -> None:
 
         msg = f"Failed to mount {mountpoint}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class DatasetNotMounted(IocageException):
@@ -667,7 +672,7 @@ class DatasetNotMounted(IocageException):
     ) -> None:
 
         msg = f"Dataset '{dataset.name}' is not mounted"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class DatasetNotAvailable(IocageException):
@@ -680,7 +685,7 @@ class DatasetNotAvailable(IocageException):
     ) -> None:
 
         msg = f"Dataset '{dataset_name}' is not available"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class DatasetNotJailed(IocageException):
@@ -707,11 +712,11 @@ class ZFSException(IocageException):
 
     def __init__(
         self,
-        msg: str,
+        message: str,
         logger: typing.Optional[Logger]=None
     ) -> None:
 
-        super().__init__(msg, logger=logger)
+        super().__init__(message=message, logger=logger)
 
 
 class ZFSPoolInvalid(IocageException, TypeError):
@@ -728,7 +733,7 @@ class ZFSPoolInvalid(IocageException, TypeError):
         if consequence is not None:
             msg += f": {consequence}"
 
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 class ZFSPoolUnavailable(IocageException):
@@ -741,7 +746,7 @@ class ZFSPoolUnavailable(IocageException):
     ) -> None:
 
         msg = f"ZFS pool '{pool_name}' is UNAVAIL"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class ResourceUnmanaged(IocageException):
@@ -754,7 +759,7 @@ class ResourceUnmanaged(IocageException):
     ) -> None:
 
         msg = f"The resource dataset {dataset_name} is not managed by iocage"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class ConflictingResourceSelection(IocageException):
@@ -771,7 +776,7 @@ class ConflictingResourceSelection(IocageException):
             "The resource was configured with conflicting root sources: "
             f"{source_a} != {source_b}"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Snapshots
@@ -780,8 +785,12 @@ class ConflictingResourceSelection(IocageException):
 class SnapshotError(IocageException):
     """Raised on snapshot related errors."""
 
-    def __init__(self, msg: str, logger: typing.Optional[Logger]=None) -> None:
-        super().__init__(msg, logger=logger)
+    def __init__(
+        self,
+        message: str,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
+        super().__init__(message=message, logger=logger)
 
 
 class SnapshotCreation(SnapshotError):
@@ -796,7 +805,7 @@ class SnapshotCreation(SnapshotError):
         msg = "Snapshot creation failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class SnapshotDeletion(SnapshotError):
@@ -811,7 +820,7 @@ class SnapshotDeletion(SnapshotError):
         msg = "Snapshot deletion failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class SnapshotRollback(SnapshotError):
@@ -826,7 +835,7 @@ class SnapshotRollback(SnapshotError):
         msg = "Snapshot rollback failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class SnapshotNotFound(SnapshotError):
@@ -840,7 +849,7 @@ class SnapshotNotFound(SnapshotError):
     ) -> None:
 
         msg = f"Snapshot not found: {dataset_name}@{snapshot_name}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidSnapshotIdentifier(SnapshotError):
@@ -856,7 +865,7 @@ class InvalidSnapshotIdentifier(SnapshotError):
             f"Invalid snapshot identifier syntax: {identifier}"
             "(should be <jail>@<snapshot>)"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Network
@@ -867,7 +876,7 @@ class InvalidInterfaceName(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = "Invalid NIC name"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class VnetBridgeMissing(IocageException):
@@ -875,7 +884,7 @@ class VnetBridgeMissing(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = "VNET is enabled and requires setting a bridge"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidNetworkBridge(IocageException, ValueError):
@@ -890,7 +899,7 @@ class InvalidNetworkBridge(IocageException, ValueError):
         msg = "Invalid network bridge argument"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class FirewallDisabled(IocageException):
@@ -904,7 +913,7 @@ class FirewallDisabled(IocageException):
         msg = "IPFW is disabled"
         if hint is not None:
             msg += f": {hint}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class FirewallCommandFailure(IocageException):
@@ -912,7 +921,7 @@ class FirewallCommandFailure(IocageException):
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
         msg = "Firewall Command failed. Is IPFW enabled?"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidIPAddress(IocageException):
@@ -926,7 +935,7 @@ class InvalidIPAddress(IocageException):
     ) -> None:
         ip_version = 4 + 2 * (ipv6 is True)
         msg = f"Invalid IPv{ip_version} address: {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Release
@@ -938,7 +947,7 @@ class ReleaseListUnavailable(IocageException):
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
 
         msg = f"The releases list is unavailable"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class ReleaseAssetHashesUnavailable(IocageException):
@@ -947,7 +956,7 @@ class ReleaseAssetHashesUnavailable(IocageException):
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
 
         msg = f"The releases asset hashes are unavailable"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class UpdateFailure(IocageException):
@@ -963,7 +972,7 @@ class UpdateFailure(IocageException):
         msg = f"Release update of '{name}' failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class InvalidReleaseAssetSignature(UpdateFailure):
@@ -1010,7 +1019,7 @@ class ReleaseNotFetched(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Release '{name}' does not exist or is not fetched locally"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class ReleaseUpdateBranchLookup(IocageException):
@@ -1025,7 +1034,7 @@ class ReleaseUpdateBranchLookup(IocageException):
         msg = f"Update source of release '{release_name}' not found"
         if reason is not None:
             msg += ": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class UnsupportedRelease(MissingFeature):
@@ -1052,7 +1061,7 @@ class InvalidReleaseName(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Invalid release name: {name}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Prompts
@@ -1070,7 +1079,7 @@ class DefaultReleaseNotFound(IocageException):
             f"Release '{host_release_name}' not found: "
             "Could not determine a default source"
         )
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # DevfsRules
@@ -1079,8 +1088,12 @@ class DefaultReleaseNotFound(IocageException):
 class DevfsRuleException(IocageException):
     """Raised on errors in devfs rules."""
 
-    def __init__(self, msg: str, logger: typing.Optional[Logger]=None) -> None:
-        super().__init__(msg, logger=logger)
+    def __init__(
+        self,
+        message: str,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
+        super().__init__(message=message, logger=logger)
 
 
 class InvalidDevfsRulesSyntax(DevfsRuleException):
@@ -1095,7 +1108,7 @@ class InvalidDevfsRulesSyntax(DevfsRuleException):
         msg = f"Invalid devfs rules in {devfs_rules_file}"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class DuplicateDevfsRuleset(DevfsRuleException):
@@ -1110,7 +1123,7 @@ class DuplicateDevfsRuleset(DevfsRuleException):
         msg = "Cannot add duplicate ruleset"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 class MissingDevfsRulesetName(DevfsRuleException):
@@ -1122,7 +1135,7 @@ class MissingDevfsRulesetName(DevfsRuleException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = "The devfs ruleset is missing a name"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 # Logger
 
@@ -1130,8 +1143,12 @@ class MissingDevfsRulesetName(DevfsRuleException):
 class LogException(IocageException):
     """Raised when logging fails."""
 
-    def __init__(self, msg: str, logger: typing.Optional[Logger]=None) -> None:
-        super().__init__(msg, logger=logger)
+    def __init__(
+        self,
+        message: str,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
+        super().__init__(message=message, logger=logger)
 
 
 class CannotRedrawLine(LogException):
@@ -1145,7 +1162,7 @@ class CannotRedrawLine(LogException):
         msg = "Logger can't redraw line"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(msg, logger=logger)
+        super().__init__(message=msg, logger=logger)
 
 
 # Events
@@ -1160,7 +1177,7 @@ class EventAlreadyFinished(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = "This {event.type} event is already finished"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 # Jail Filter
@@ -1169,19 +1186,23 @@ class EventAlreadyFinished(IocageException):
 class JailFilterException(IocageException):
     """Raised when a jail filter is invalid."""
 
-    def __init__(self, msg: str, logger: typing.Optional[Logger]=None) -> None:
-        IocageException.__init__(self, msg, logger=logger)
+    def __init__(
+        self,
+        message: str,
+        logger: typing.Optional[Logger]=None
+    ) -> None:
+        IocageException.__init__(self, message=message, logger=logger)
 
 
 class JailFilterInvalidName(JailFilterException):
     """Raised when the name of a jail filter is invalid."""
 
     def __init__(self, logger: typing.Optional[Logger]=None) -> None:
-        msg = (
+        message = (
             "Invalid jail selector: "
             "Cannot select jail with illegal name"
         )
-        JailFilterException.__init__(self, msg, logger=logger)
+        JailFilterException.__init__(self, message=message, logger=logger)
 
 
 # pkg
@@ -1195,7 +1216,7 @@ class PkgNotFound(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = "The pkg package was not found in the local mirror."
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
 
 
 # Provisioning
@@ -1210,4 +1231,4 @@ class UnknownProvisioner(IocageException):
         logger: typing.Optional[Logger]=None
     ) -> None:
         msg = f"Unknown provisioner: {name}"
-        IocageException.__init__(self, msg, logger=logger)
+        IocageException.__init__(self, message=msg, logger=logger)
