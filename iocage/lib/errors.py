@@ -931,11 +931,12 @@ class InvalidIPAddress(IocageException):
         self,
         reason: str,
         ipv6: bool,
-        logger: typing.Optional[Logger]=None
+        logger: typing.Optional[Logger]=None,
+        level: str="error"
     ) -> None:
         ip_version = 4 + 2 * (ipv6 is True)
         msg = f"Invalid IPv{ip_version} address: {reason}"
-        super().__init__(message=msg, logger=logger)
+        super().__init__(message=msg, logger=logger, level=level)
 
 
 # Release
