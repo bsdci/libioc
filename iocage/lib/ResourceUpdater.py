@@ -629,7 +629,7 @@ class FreeBSD(Updater):
 
 def get_launchable_update_resource(  # noqa: T484
     host: 'iocage.lib.Host.HostGenerator',
-    **kwargs
+    resource: 'iocage.lib.Resource.Resource'
 ) -> Updater:
     """Return an updater instance for the host distribution."""
     _class: typing.Type[Updater]
@@ -641,5 +641,5 @@ def get_launchable_update_resource(  # noqa: T484
 
     return _class(
         host=host,
-        **kwargs
+        resource=resource
     )
