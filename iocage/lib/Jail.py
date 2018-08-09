@@ -1496,15 +1496,13 @@ class JailGenerator(JailResource):
         )
         if returncode > 0:
             self.logger.verbose(
-                f"Jail '{self.humanreadable_name}' was not started",
-                jail=self
+                f"Jail '{self.humanreadable_name}' was not started"
             )
             return stdout, stderr, returncode
 
         self.state.query()
         self.logger.verbose(
-            f"Jail '{self.humanreadable_name}' started with JID {self.jid}",
-            jail=self
+            f"Jail '{self.humanreadable_name}' started with JID {self.jid}"
         )
 
         return stdout, stderr, returncode
