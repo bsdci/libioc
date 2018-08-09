@@ -33,17 +33,18 @@ class InterfaceProp(dict):
     """Special jail config property Interfaces."""
 
     config: 'iocage.lib.Config.Jail.JailConfig.JailConfig'
-    property_name: str = "interfaces"
+    property_name: str
     delimiter: str = ","
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         config: typing.Optional[
             'iocage.lib.Config.Jail.JailConfig.JailConfig'
         ]=None,
         logger: typing.Optional['iocage.lib.Logger.Logger']=None,
-        **kwargs
+        property_name: str="interfaces"
     ) -> None:
+        self.property_name = property_name
         dict.__init__(self, {})
         self.logger = logger
         if config is not None:
