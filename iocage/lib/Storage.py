@@ -72,8 +72,7 @@ class Storage:
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
-            f"Cloned release '{release.name}' to {jail_name}",
-            jail=self.jail
+            f"Cloned release '{release.name}' to {jail_name}"
         )
 
     def _clone_jail(
@@ -87,8 +86,7 @@ class Storage:
         )
         jail_name = self.jail.humanreadable_name
         self.logger.verbose(
-            f"Cloned jail '{jail.name}' to {jail_name}",
-            jail=self.jail
+            f"Cloned jail '{jail.name}' to {jail_name}"
         )
 
     def rename(
