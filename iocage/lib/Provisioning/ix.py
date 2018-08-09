@@ -115,12 +115,9 @@ def provision(
     )
     yield jailProvisioningEvent.begin()
     _scope = jailProvisioningEvent.scope
-    event_kargs = dict(
+    jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
         jail=self.jail,
         event_scope=_scope
-    )
-    jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
-        **event_kargs
     )
 
     # download provisioning assets
