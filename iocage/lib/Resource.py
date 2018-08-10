@@ -298,10 +298,9 @@ class Resource(metaclass=abc.ABCMeta):
         dataset: libzfs.ZFSDataset = self.zfs.get_dataset(dataset_name)
         return dataset
 
-    def get_or_create_dataset(  # noqa: T484
+    def get_or_create_dataset(
         self,
-        name: str,
-        **kwargs
+        name: str
     ) -> libzfs.ZFSDataset:
         """
         Get or create a child dataset.
@@ -313,8 +312,7 @@ class Resource(metaclass=abc.ABCMeta):
         """
         dataset_name = f"{self.dataset_name}/{name}"
         dataset: libzfs.ZFSDataset = self.zfs.get_or_create_dataset(
-            dataset_name,
-            **kwargs
+            dataset_name
         )
         return dataset
 
