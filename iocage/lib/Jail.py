@@ -660,23 +660,6 @@ class JailGenerator(JailResource):
         finally:
             self.config = original_config
 
-    @property
-    def basejail_backend(self) -> typing.Optional[typing.Union[
-        iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage,
-        iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
-    ]]:
-        """Return the basejail backend or None."""
-        if self.config["basejail"] is False:
-            return None
-
-        if self.config["basejail_type"] == "nullfs":
-            return iocage.lib.NullFSBasejailStorage.NullFSBasejailStorage
-
-        if self.config["basejail_type"] == "zfs":
-            return iocage.lib.ZFSBasejailStorage.ZFSBasejailStorage
-
-        return None
-
     def _run_hook(self, hook_name: str) -> typing.Optional[
         iocage.lib.helpers.CommandOutput
     ]:
