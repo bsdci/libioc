@@ -686,7 +686,7 @@ class JailGenerator(JailResource):
         Hooks are executed during the start and stop process of the jail.
         """
         key = f"exec_{hook_name}"
-        value = self.config[key]
+        value = str(self.config.get(key, "/usr/bin/true"))
 
         if value == "/usr/bin/true":
             return None
@@ -695,7 +695,7 @@ class JailGenerator(JailResource):
             f"Running {hook_name} hook for {self.humanreadable_name}"
         )
 
-        lex = shlex.shlex(value)  # noqa: T484
+        lex = shlex.shlex(value)
         lex.whitespace_split = True
         command = list(lex)
 
