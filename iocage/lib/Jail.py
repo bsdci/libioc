@@ -1697,7 +1697,7 @@ class JailGenerator(JailResource):
         return commands
 
     def _configure_localhost_commands(self) -> typing.List[str]:
-        return ["ifconfig lo0 localhost"]
+        return ["/sbin/ifconfig lo0 localhost"]
 
     def _get_resource_limits_commands(self) -> typing.List[str]:
 
