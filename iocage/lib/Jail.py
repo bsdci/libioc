@@ -65,7 +65,7 @@ class JailResource(
     host: 'iocage.lib.Host.HostGenerator'
     root_datasets_name: typing.Optional[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         jail: 'JailGenerator',
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
