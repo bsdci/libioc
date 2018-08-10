@@ -1025,7 +1025,7 @@ class JailGenerator(JailResource):
             raise e
 
         # Update fstab to the new dataset
-        fstab_path_events = self.update_fstab_paths(
+        fstab_path_events = self._update_fstab_paths(
             current_mountpoint,
             event_scope=jailRenameEvent.scope
         )
@@ -1034,7 +1034,7 @@ class JailGenerator(JailResource):
 
         yield jailRenameEvent.end()
 
-    def update_fstab_paths(
+    def _update_fstab_paths(
         self,
         old_path_prefix: str,
         new_path_prefix: typing.Optional[str]=None,
@@ -1160,7 +1160,7 @@ class JailGenerator(JailResource):
         self.config.clone(source_jail.config.data, skip_on_error=True)
         self.save()
 
-        fstab_update_generator = self.update_fstab_paths(
+        fstab_update_generator = self._update_fstab_paths(
             source_jail.root_dataset.mountpoint,
             event_scope=event_scope
         )
@@ -2039,13 +2039,13 @@ class Jail(JailGenerator):
         """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))
 
-    def update_fstab_paths(  # noqa: T484
+    def _update_fstab_paths(  # noqa: T484
         self,
         *args,
         **kwargs
     ) -> typing.List['iocage.lib.events.IocageEvent']:
         """Update a path in the whole fstab file."""
-        return list(JailGenerator.update_fstab_paths(self, *args, **kwargs))
+        return list(JailGenerator._update_fstab_paths(self, *args, **kwargs))
 
     def destroy(  # noqa: T484
         self,
