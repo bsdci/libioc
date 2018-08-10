@@ -1722,10 +1722,8 @@ class JailGenerator(JailResource):
         return commands
 
     def _clear_resource_limits(self) -> typing.List[str]:
-
         if self.config['rlimits'] is False:
             return []
-
         self.logger.verbose("Clearing resource limits")
         return [f"/usr/bin/rctl -r jail:{self.identifier} 2>/dev/null || true"]
 
