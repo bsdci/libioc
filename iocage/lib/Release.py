@@ -230,7 +230,7 @@ class ReleaseGenerator(ReleaseResource):
     _assets: typing.List[str]
     _mirror_url: typing.Optional[str]
 
-    def __init__(  # noqa: T484
+    def __init__(
         self,
         name: str,
         dataset: typing.Optional[libzfs.ZFSDataset]=None,
