@@ -478,7 +478,7 @@ class ResourceEvent(IocageEvent):
 
     def __init__(
         self,
-        resource: 'iocage.lib.Resource.ResourceGenerator',
+        resource: 'iocage.lib.Resource.Resource',
         message: typing.Optional[str]=None,
         scope: typing.Optional[Scope]=None
     ) -> None:
