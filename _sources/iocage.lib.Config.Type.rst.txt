@@ -1,0 +1,19 @@
+iocage.lib.Config.Type package
+==============================
+
+Submodules
+----------
+
+.. toctree::
+
+   iocage.lib.Config.Type.JSON
+   iocage.lib.Config.Type.UCL
+   iocage.lib.Config.Type.ZFS
+
+Module contents
+---------------
+
+.. automodule:: iocage.lib.Config.Type
+    :members:
+    :undoc-members:
+    :show-inheritance:

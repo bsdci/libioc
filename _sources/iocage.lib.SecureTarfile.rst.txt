@@ -1,0 +1,7 @@
+iocage.lib.SecureTarfile module
+===============================
+
+.. automodule:: iocage.lib.SecureTarfile
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+iocage.lib.DevfsRules module
+============================
+
+.. automodule:: iocage.lib.DevfsRules
+    :members:
+    :undoc-members:
+    :show-inheritance:

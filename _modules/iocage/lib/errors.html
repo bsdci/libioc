@@ -1,0 +1,1437 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.lib.errors &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.lib.errors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.lib.errors</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;Collection of iocage errors.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="c1"># MyPy</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.events</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.Jail</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.Types</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">iocage.lib.Logger</span> <span class="k">import</span> <span class="n">Logger</span>
+
+
+<div class="viewcode-block" id="IocageException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.IocageException">[docs]</a><span class="k">class</span> <span class="nc">IocageException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A well-known exception raised by libiocage.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+        <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">append_warning</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">warning</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">silent</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">level</span><span class="p">)(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">append_warning</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">warning</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<span class="c1"># Missing Features</span>
+
+
+<div class="viewcode-block" id="MissingFeature"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.MissingFeature">[docs]</a><span class="k">class</span> <span class="nc">MissingFeature</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an iocage feature is not fully implemented yet.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">feature_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">plural</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Missing Feature: &#39;</span><span class="si">{feature_name}</span><span class="s2">&#39; &quot;</span>
+            <span class="n">f</span><span class="s2">&quot;{&#39;are&#39; if plural is True else &#39;is&#39;} not implemented yet&quot;</span>
+        <span class="p">)</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<span class="c1"># Jails</span>
+
+
+<div class="viewcode-block" id="JailException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailException">[docs]</a><span class="k">class</span> <span class="nc">JailException</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an exception related to a jail occurs.&quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jail</span> <span class="o">=</span> <span class="n">jail</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailDoesNotExist"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailDoesNotExist">[docs]</a><span class="k">class</span> <span class="nc">JailDoesNotExist</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail does not exist.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39; does not exist&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailAlreadyExists"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailAlreadyExists">[docs]</a><span class="k">class</span> <span class="nc">JailAlreadyExists</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail already exists.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39; already exists&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailNotRunning"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailNotRunning">[docs]</a><span class="k">class</span> <span class="nc">JailNotRunning</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail is not running.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39; is not running&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailAlreadyRunning"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailAlreadyRunning">[docs]</a><span class="k">class</span> <span class="nc">JailAlreadyRunning</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail is already running.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39; is already running&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailNotFound">[docs]</a><span class="k">class</span> <span class="nc">JailNotFound</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail was not found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;No jail matching &#39;</span><span class="si">{text}</span><span class="s2">&#39; was found&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailNotSupplied"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailNotSupplied">[docs]</a><span class="k">class</span> <span class="nc">JailNotSupplied</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when no jail was supplied.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Please supply a jail&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailUnknownIdentifier"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailUnknownIdentifier">[docs]</a><span class="k">class</span> <span class="nc">JailUnknownIdentifier</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail has an unknown identifier.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The jail has no identifier yet&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailBackendMissing"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailBackendMissing">[docs]</a><span class="k">class</span> <span class="nc">JailBackendMissing</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jails backend was not found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The jail backend is unknown&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailIsTemplate"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailIsTemplate">[docs]</a><span class="k">class</span> <span class="nc">JailIsTemplate</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail is a template but should not be.&quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The jail &#39;</span><span class="si">{jail.name}</span><span class="s2">&#39; is a template&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailNotTemplate"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailNotTemplate">[docs]</a><span class="k">class</span> <span class="nc">JailNotTemplate</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail is no template but should be one.&quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The jail &#39;</span><span class="si">{jail.full_name}</span><span class="s2">&#39; is not a template&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailLaunchFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailLaunchFailed">[docs]</a><span class="k">class</span> <span class="nc">JailLaunchFailed</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail could not be launched.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Launching jail </span><span class="si">{jail.full_name}</span><span class="s2"> failed&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailDestructionFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailDestructionFailed">[docs]</a><span class="k">class</span> <span class="nc">JailDestructionFailed</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail could not be destroyed.&quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Destroying jail </span><span class="si">{jail.full_name}</span><span class="s2"> failed&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailCommandFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailCommandFailed">[docs]</a><span class="k">class</span> <span class="nc">JailCommandFailed</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail command fails with an exit code &gt; 0.&quot;&quot;&quot;</span>
+
+    <span class="n">returncode</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">returncode</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returncode</span> <span class="o">=</span> <span class="n">returncode</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail command exited with </span><span class="si">{returncode}</span><span class="s2">&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailExecutionAborted"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailExecutionAborted">[docs]</a><span class="k">class</span> <span class="nc">JailExecutionAborted</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail command fails with an exit code &gt; 0.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail execution of </span><span class="si">{jail.humanreadable_name}</span><span class="s2"> aborted.&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Jail Fstab</span>
+
+
+<div class="viewcode-block" id="VirtualFstabLineHasNoRealIndex"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.VirtualFstabLineHasNoRealIndex">[docs]</a><span class="k">class</span> <span class="nc">VirtualFstabLineHasNoRealIndex</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when attempting to access the index of a virtual fstab line.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The virtual fstab line does not have a real list index&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FstabDestinationExists"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.FstabDestinationExists">[docs]</a><span class="k">class</span> <span class="nc">FstabDestinationExists</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the destination directory does not exist.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The mountpoint </span><span class="si">{mountpoint}</span><span class="s2"> already exists in the fstab file&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Security</span>
+
+
+<div class="viewcode-block" id="SecurityViolation"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SecurityViolation">[docs]</a><span class="k">class</span> <span class="nc">SecurityViolation</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when iocage has security concerns.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Security violation: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InsecureJailPath"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InsecureJailPath">[docs]</a><span class="k">class</span> <span class="nc">InsecureJailPath</span><span class="p">(</span><span class="n">SecurityViolation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a a path points outside of a resource.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Insecure path </span><span class="si">{path}</span><span class="s2"> jail escape attempt&quot;</span>
+        <span class="n">SecurityViolation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecurityViolationConfigJailEscape"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SecurityViolationConfigJailEscape">[docs]</a><span class="k">class</span> <span class="nc">SecurityViolationConfigJailEscape</span><span class="p">(</span><span class="n">SecurityViolation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a file symlinks to a location outside of the jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The file </span><span class="si">{file}</span><span class="s2"> references a file outsite of the jail resource&quot;</span>
+        <span class="n">SecurityViolation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IllegalArchiveContent"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.IllegalArchiveContent">[docs]</a><span class="k">class</span> <span class="nc">IllegalArchiveContent</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a release asset archive contains malicious content.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">asset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Asset </span><span class="si">{asset_name}</span><span class="s2"> contains illegal files - </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># JailConfig</span>
+
+
+<div class="viewcode-block" id="JailConfigError"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailConfigError">[docs]</a><span class="k">class</span> <span class="nc">JailConfigError</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a general configuration error occurs.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="InvalidJailName"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidJailName">[docs]</a><span class="k">class</span> <span class="nc">InvalidJailName</span><span class="p">(</span><span class="n">JailConfigError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail has an invalid name.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Invalid jail name: &quot;</span>
+            <span class="s2">&quot;Names have to begin and end with an alphanumeric character&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailConigZFSIsNotAllowed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailConigZFSIsNotAllowed">[docs]</a><span class="k">class</span> <span class="nc">JailConigZFSIsNotAllowed</span><span class="p">(</span><span class="n">JailConfigError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail is not allowed to use ZFS shares.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;jail_zfs is disabled &quot;</span>
+            <span class="s2">&quot;despite jail_zfs_dataset is configured&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidJailConfigValue"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidJailConfigValue">[docs]</a><span class="k">class</span> <span class="nc">InvalidJailConfigValue</span><span class="p">(</span><span class="n">JailConfigError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail configuration value is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;error&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Invalid value for property &#39;</span><span class="si">{property_name}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">if</span> <span class="n">jail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot; of jail </span><span class="si">{jail.humanreadable_name}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidJailConfigAddress"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidJailConfigAddress">[docs]</a><span class="k">class</span> <span class="nc">InvalidJailConfigAddress</span><span class="p">(</span><span class="n">InvalidJailConfigValue</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail address is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;expected </span><span class="se">\&quot;</span><span class="s2">&lt;nic&gt;|&lt;address&gt;</span><span class="se">\&quot;</span><span class="s2"> but got </span><span class="se">\&quot;</span><span class="si">{value}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">property_name</span><span class="o">=</span><span class="n">property_name</span><span class="p">,</span>
+            <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="n">reason</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidMacAddress"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidMacAddress">[docs]</a><span class="k">class</span> <span class="nc">InvalidMacAddress</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail MAC address is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mac_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;invalid mac address: </span><span class="se">\&quot;</span><span class="si">{mac_address}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">reason</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceLimitUnknown"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ResourceLimitUnknown">[docs]</a><span class="k">class</span> <span class="nc">ResourceLimitUnknown</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a resource limit has is unknown.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The specified resource limit is unknown&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailConfigNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailConfigNotFound">[docs]</a><span class="k">class</span> <span class="nc">JailConfigNotFound</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail is not configured.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Could not read </span><span class="si">{config_type}</span><span class="s2"> config&quot;</span>
+        <span class="c1"># This is a silent error internally used</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DefaultConfigNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DefaultConfigNotFound">[docs]</a><span class="k">class</span> <span class="nc">DefaultConfigNotFound</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when no default config was found on the host.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Default configuration not found at </span><span class="si">{config_file_path}</span><span class="s2">&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UnknownJailConfigProperty"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.UnknownJailConfigProperty">[docs]</a><span class="k">class</span> <span class="nc">UnknownJailConfigProperty</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a unknown jail config property was used.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;error&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;The config property &#39;</span><span class="si">{key}</span><span class="s2">&#39; &quot;</span>
+            <span class="n">f</span><span class="s2">&quot;of jail &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39; is unknown.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span></div>
+
+
+<span class="c1"># Backup</span>
+
+
+<div class="viewcode-block" id="BackupInProgress"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.BackupInProgress">[docs]</a><span class="k">class</span> <span class="nc">BackupInProgress</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a backup operation is already in progress.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;A backup operation is already in progress&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExportDestinationExists"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ExportDestinationExists">[docs]</a><span class="k">class</span> <span class="nc">ExportDestinationExists</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a backup operation is already in progress.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The backup destination </span><span class="si">{destination}</span><span class="s2"> already exists&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># ListableResource</span>
+
+
+<div class="viewcode-block" id="ListableResourceNamespaceUndefined"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ListableResourceNamespaceUndefined">[docs]</a><span class="k">class</span> <span class="nc">ListableResourceNamespaceUndefined</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a ListableResource was not defined with a namespace.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The ListableResource needs a namespace for this operation&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># General</span>
+
+
+<div class="viewcode-block" id="IocageNotActivated"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.IocageNotActivated">[docs]</a><span class="k">class</span> <span class="nc">IocageNotActivated</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when iocage is not active on any ZFS pool.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;iocage is not activated yet - &quot;</span>
+            <span class="s2">&quot;please run `ioc activate &lt;POOL&gt;` first and select a pool&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidLogLevel"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidLogLevel">[docs]</a><span class="k">class</span> <span class="nc">InvalidLogLevel</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the logger was initialized with an invalid log level.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">log_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">available_log_levels</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">LOG_LEVELS</span>
+        <span class="n">available_log_levels_string</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_log_levels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Invalid log-level </span><span class="si">{log_level}</span><span class="s2">. Choose one of &quot;</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{available_log_levels_string}</span><span class="s2"> or </span><span class="si">{available_log_levels[-1]}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MustBeRoot"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.MustBeRoot">[docs]</a><span class="k">class</span> <span class="nc">MustBeRoot</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when iocage is executed without root permission.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Must be root to </span><span class="si">{message}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">_msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CommandFailure"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.CommandFailure">[docs]</a><span class="k">class</span> <span class="nc">CommandFailure</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when iocage fails to execute a command.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">returncode</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Command exited with </span><span class="si">{returncode}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotAnIocageZFSProperty"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.NotAnIocageZFSProperty">[docs]</a><span class="k">class</span> <span class="nc">NotAnIocageZFSProperty</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when iocage attempts to touch a non-iocage ZFS property.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The ZFS property &#39;</span><span class="si">{property_name}</span><span class="s2">&#39; is not managed by iocage&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Host, Distribution</span>
+
+
+<div class="viewcode-block" id="DistributionUnknown"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DistributionUnknown">[docs]</a><span class="k">class</span> <span class="nc">DistributionUnknown</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the host distribution is unknown or not supported.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">distribution_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Unknown Distribution: </span><span class="si">{distribution_name}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HostReleaseUnknown"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.HostReleaseUnknown">[docs]</a><span class="k">class</span> <span class="nc">HostReleaseUnknown</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the host release could not be determined.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The host release is unknown&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HostUserlandVersionUnknown"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.HostUserlandVersionUnknown">[docs]</a><span class="k">class</span> <span class="nc">HostUserlandVersionUnknown</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the hosts userland version could not be detected.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Could not determine the hosts userland version&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DistributionEOLWarningDownloadFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DistributionEOLWarningDownloadFailed">[docs]</a><span class="k">class</span> <span class="nc">DistributionEOLWarningDownloadFailed</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when downloading EOL warnings failed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;error&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Failed to download the EOL warnings&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span></div>
+
+
+<span class="c1"># Storage</span>
+
+
+<div class="viewcode-block" id="DatasetExists"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DatasetExists">[docs]</a><span class="k">class</span> <span class="nc">DatasetExists</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a dataset already exists.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Dataset already exists: </span><span class="si">{dataset_name}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UnmountFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.UnmountFailed">[docs]</a><span class="k">class</span> <span class="nc">UnmountFailed</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an unmount operation fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Unmount of </span><span class="si">{mountpoint}</span><span class="s2"> failed&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MountFailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.MountFailed">[docs]</a><span class="k">class</span> <span class="nc">MountFailed</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a mount operation fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Failed to mount </span><span class="si">{mountpoint}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasetNotMounted"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DatasetNotMounted">[docs]</a><span class="k">class</span> <span class="nc">DatasetNotMounted</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a dataset is not mounted but should be.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="s1">&#39;libzfs.ZFSDataset&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39; is not mounted&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasetNotAvailable"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DatasetNotAvailable">[docs]</a><span class="k">class</span> <span class="nc">DatasetNotAvailable</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a dataset is not available.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Dataset &#39;</span><span class="si">{dataset_name}</span><span class="s2">&#39; is not available&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DatasetNotJailed"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DatasetNotJailed">[docs]</a><span class="k">class</span> <span class="nc">DatasetNotJailed</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a ZFS share was not flagged as such.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="s1">&#39;libzfs.ZFSDataset&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Dataset </span><span class="si">{name}</span><span class="s2"> is not jailed.&quot;</span>
+        <span class="n">warning</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Run &#39;zfs set jailed=on </span><span class="si">{name}</span><span class="s2">&#39; to allow mounting&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">msg</span><span class="p">,</span>
+            <span class="n">warning</span><span class="o">=</span><span class="n">warning</span><span class="p">,</span>
+            <span class="n">append_warning</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ZFSException">[docs]</a><span class="k">class</span> <span class="nc">ZFSException</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a ZFS pool not available.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSPoolInvalid"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ZFSPoolInvalid">[docs]</a><span class="k">class</span> <span class="nc">ZFSPoolInvalid</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a ZFS pool is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">consequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid ZFS pool&quot;</span>
+
+        <span class="k">if</span> <span class="n">consequence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{consequence}</span><span class="s2">&quot;</span>
+
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSPoolUnavailable"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ZFSPoolUnavailable">[docs]</a><span class="k">class</span> <span class="nc">ZFSPoolUnavailable</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a ZFS pool not available.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;ZFS pool &#39;</span><span class="si">{pool_name}</span><span class="s2">&#39; is UNAVAIL&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceUnmanaged"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ResourceUnmanaged">[docs]</a><span class="k">class</span> <span class="nc">ResourceUnmanaged</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when locating a resources dataset on a root dataset fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The resource dataset </span><span class="si">{dataset_name}</span><span class="s2"> is not managed by iocage&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConflictingResourceSelection"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ConflictingResourceSelection">[docs]</a><span class="k">class</span> <span class="nc">ConflictingResourceSelection</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a resource was configured with conflicting sources.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source_b</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;The resource was configured with conflicting root sources: &quot;</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{source_a}</span><span class="s2"> != </span><span class="si">{source_b}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Snapshots</span>
+
+
+<div class="viewcode-block" id="SnapshotError"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SnapshotError">[docs]</a><span class="k">class</span> <span class="nc">SnapshotError</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised on snapshot related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SnapshotCreation"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SnapshotCreation">[docs]</a><span class="k">class</span> <span class="nc">SnapshotCreation</span><span class="p">(</span><span class="n">SnapshotError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when creating a snapshot failed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Snapshot creation failed&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SnapshotDeletion"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SnapshotDeletion">[docs]</a><span class="k">class</span> <span class="nc">SnapshotDeletion</span><span class="p">(</span><span class="n">SnapshotError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when deleting a snapshot failed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Snapshot deletion failed&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SnapshotRollback"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SnapshotRollback">[docs]</a><span class="k">class</span> <span class="nc">SnapshotRollback</span><span class="p">(</span><span class="n">SnapshotError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when rolling back a snapshot failed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Snapshot rollback failed&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SnapshotNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.SnapshotNotFound">[docs]</a><span class="k">class</span> <span class="nc">SnapshotNotFound</span><span class="p">(</span><span class="n">SnapshotError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a snapshot was not found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Snapshot not found: </span><span class="si">{dataset_name}</span><span class="s2">@</span><span class="si">{snapshot_name}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidSnapshotIdentifier"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidSnapshotIdentifier">[docs]</a><span class="k">class</span> <span class="nc">InvalidSnapshotIdentifier</span><span class="p">(</span><span class="n">SnapshotError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a snapshot identifier is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Invalid snapshot identifier syntax: </span><span class="si">{identifier}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;(should be &lt;jail&gt;@&lt;snapshot&gt;)&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Network</span>
+
+
+<div class="viewcode-block" id="InvalidInterfaceName"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidInterfaceName">[docs]</a><span class="k">class</span> <span class="nc">InvalidInterfaceName</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a NIC name is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid NIC name&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="VnetBridgeMissing"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.VnetBridgeMissing">[docs]</a><span class="k">class</span> <span class="nc">VnetBridgeMissing</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a vnet bridge is missing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;VNET is enabled and requires setting a bridge&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidNetworkBridge"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidNetworkBridge">[docs]</a><span class="k">class</span> <span class="nc">InvalidNetworkBridge</span><span class="p">(</span><span class="n">IocageException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a network bridge is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid network bridge argument&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FirewallDisabled"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.FirewallDisabled">[docs]</a><span class="k">class</span> <span class="nc">FirewallDisabled</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the firewall is required but disabled (Secure VNET).&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;IPFW is disabled&quot;</span>
+        <span class="k">if</span> <span class="n">hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{hint}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FirewallCommandFailure"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.FirewallCommandFailure">[docs]</a><span class="k">class</span> <span class="nc">FirewallCommandFailure</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a firewall command fails (Secure VNET).&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Firewall Command failed. Is IPFW enabled?&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidIPAddress"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidIPAddress">[docs]</a><span class="k">class</span> <span class="nc">InvalidIPAddress</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an invalid IP address was assigned to a network.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ipv6</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;error&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ip_version</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">ipv6</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Invalid IPv</span><span class="si">{ip_version}</span><span class="s2"> address: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span></div>
+
+
+<span class="c1"># Release</span>
+
+
+<div class="viewcode-block" id="ReleaseListUnavailable"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ReleaseListUnavailable">[docs]</a><span class="k">class</span> <span class="nc">ReleaseListUnavailable</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the list could not be downloaded from the remote.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The releases list is unavailable&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReleaseAssetHashesUnavailable"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ReleaseAssetHashesUnavailable">[docs]</a><span class="k">class</span> <span class="nc">ReleaseAssetHashesUnavailable</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the list could not be downloaded from the remote.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The releases asset hashes are unavailable&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UpdateFailure"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.UpdateFailure">[docs]</a><span class="k">class</span> <span class="nc">UpdateFailure</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an update fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Release update of &#39;</span><span class="si">{name}</span><span class="s2">&#39; failed&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidReleaseAssetSignature"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidReleaseAssetSignature">[docs]</a><span class="k">class</span> <span class="nc">InvalidReleaseAssetSignature</span><span class="p">(</span><span class="n">UpdateFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a release signature is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">asset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Asset </span><span class="si">{asset_name}</span><span class="s2"> has an invalid signature&quot;</span>
+        <span class="n">UpdateFailure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="n">msg</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NonReleaseUpdateFetch"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.NonReleaseUpdateFetch">[docs]</a><span class="k">class</span> <span class="nc">NonReleaseUpdateFetch</span><span class="p">(</span><span class="n">UpdateFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when attempting to fetch updates for a custom release.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Updates can only be fetched for releases&quot;</span>
+        <span class="n">UpdateFailure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="n">msg</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReleaseNotFetched"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ReleaseNotFetched">[docs]</a><span class="k">class</span> <span class="nc">ReleaseNotFetched</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a release was not yet fetched.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Release &#39;</span><span class="si">{name}</span><span class="s2">&#39; does not exist or is not fetched locally&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReleaseUpdateBranchLookup"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.ReleaseUpdateBranchLookup">[docs]</a><span class="k">class</span> <span class="nc">ReleaseUpdateBranchLookup</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when failing to lookup the remote update branch.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Update source of release &#39;</span><span class="si">{release_name}</span><span class="s2">&#39; not found&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UnsupportedRelease"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.UnsupportedRelease">[docs]</a><span class="k">class</span> <span class="nc">UnsupportedRelease</span><span class="p">(</span><span class="n">MissingFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when interacting with an unsupported release.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">feature_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Support for release version </span><span class="si">{version}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">feature_name</span><span class="o">=</span><span class="n">feature_name</span><span class="p">,</span>
+            <span class="n">plural</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidReleaseName"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidReleaseName">[docs]</a><span class="k">class</span> <span class="nc">InvalidReleaseName</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when interacting with an unsupported release.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Invalid release name: </span><span class="si">{name}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Prompts</span>
+
+
+<div class="viewcode-block" id="DefaultReleaseNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DefaultReleaseNotFound">[docs]</a><span class="k">class</span> <span class="nc">DefaultReleaseNotFound</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the default (host) release does not match a remote.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">host_release_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Release &#39;</span><span class="si">{host_release_name}</span><span class="s2">&#39; not found: &quot;</span>
+            <span class="s2">&quot;Could not determine a default source&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># DevfsRules</span>
+
+
+<div class="viewcode-block" id="DevfsRuleException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DevfsRuleException">[docs]</a><span class="k">class</span> <span class="nc">DevfsRuleException</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised on errors in devfs rules.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidDevfsRulesSyntax"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.InvalidDevfsRulesSyntax">[docs]</a><span class="k">class</span> <span class="nc">InvalidDevfsRulesSyntax</span><span class="p">(</span><span class="n">DevfsRuleException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a devfs rule has invalid syntax.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">devfs_rules_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Invalid devfs rules in </span><span class="si">{devfs_rules_file}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DuplicateDevfsRuleset"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.DuplicateDevfsRuleset">[docs]</a><span class="k">class</span> <span class="nc">DuplicateDevfsRuleset</span><span class="p">(</span><span class="n">DevfsRuleException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a duplicate devfs rule was found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">devfs_rules_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Cannot add duplicate ruleset&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MissingDevfsRulesetName"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.MissingDevfsRulesetName">[docs]</a><span class="k">class</span> <span class="nc">MissingDevfsRulesetName</span><span class="p">(</span><span class="n">DevfsRuleException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a duplicate devfs rule was found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">devfs_rules_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The devfs ruleset is missing a name&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+<span class="c1"># Logger</span>
+
+
+<div class="viewcode-block" id="LogException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.LogException">[docs]</a><span class="k">class</span> <span class="nc">LogException</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when logging fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CannotRedrawLine"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.CannotRedrawLine">[docs]</a><span class="k">class</span> <span class="nc">CannotRedrawLine</span><span class="p">(</span><span class="n">LogException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when manipulating previous log entries fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Logger can&#39;t redraw line&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Events</span>
+
+
+<div class="viewcode-block" id="EventAlreadyFinished"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.EventAlreadyFinished">[docs]</a><span class="k">class</span> <span class="nc">EventAlreadyFinished</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a event is touched that was already finished.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.events.IocageEvent&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;This </span><span class="si">{event.type}</span><span class="s2"> event is already finished&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Jail Filter</span>
+
+
+<div class="viewcode-block" id="JailFilterException"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailFilterException">[docs]</a><span class="k">class</span> <span class="nc">JailFilterException</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a jail filter is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailFilterInvalidName"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.JailFilterInvalidName">[docs]</a><span class="k">class</span> <span class="nc">JailFilterInvalidName</span><span class="p">(</span><span class="n">JailFilterException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the name of a jail filter is invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Invalid jail selector: &quot;</span>
+            <span class="s2">&quot;Cannot select jail with illegal name&quot;</span>
+        <span class="p">)</span>
+        <span class="n">JailFilterException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># pkg</span>
+
+
+<div class="viewcode-block" id="PkgNotFound"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.PkgNotFound">[docs]</a><span class="k">class</span> <span class="nc">PkgNotFound</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the pkg package was not found in the local mirror.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The pkg package was not found in the local mirror.&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<span class="c1"># Provisioning</span>
+
+
+<div class="viewcode-block" id="UnknownProvisioner"><a class="viewcode-back" href="../../../iocage.lib.errors.html#iocage.lib.errors.UnknownProvisioner">[docs]</a><span class="k">class</span> <span class="nc">UnknownProvisioner</span><span class="p">(</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an unsupported provisioner method is used.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Logger</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Unknown provisioner: </span><span class="si">{name}</span><span class="s2">&quot;</span>
+        <span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

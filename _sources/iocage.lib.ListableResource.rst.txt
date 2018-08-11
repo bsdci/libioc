@@ -1,0 +1,7 @@
+iocage.lib.ListableResource module
+==================================
+
+.. automodule:: iocage.lib.ListableResource
+    :members:
+    :undoc-members:
+    :show-inheritance:

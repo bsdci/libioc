@@ -1,0 +1,7 @@
+iocage.lib.Filter module
+========================
+
+.. automodule:: iocage.lib.Filter
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,17 @@
+iocage package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+
+    iocage.lib
+
+Module contents
+---------------
+
+.. automodule:: iocage
+    :members:
+    :undoc-members:
+    :show-inheritance:

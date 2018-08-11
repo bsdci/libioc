@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.lib.errors module &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iocage.lib.events module" href="iocage.lib.events.html" />
+    <link rel="prev" title="iocage.lib.ZFSShareStorage module" href="iocage.lib.ZFSShareStorage.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="iocage.html">iocage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iocage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="iocage.lib.html">iocage.lib package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="iocage.lib.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="iocage.lib.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iocage.lib.html#module-iocage.lib">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#module-iocage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="iocage.html">iocage package</a> &raquo;</li>
+        
+          <li><a href="iocage.lib.html">iocage.lib package</a> &raquo;</li>
+        
+      <li>iocage.lib.errors module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/iocage.lib.errors.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iocage.lib.errors">
+<span id="iocage-lib-errors-module"></span><h1>iocage.lib.errors module<a class="headerlink" href="#module-iocage.lib.errors" title="Permalink to this headline">¶</a></h1>
+<p>Collection of iocage errors.</p>
+<dl class="exception">
+<dt id="iocage.lib.errors.BackupInProgress">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">BackupInProgress</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#BackupInProgress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.BackupInProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a backup operation is already in progress.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.CannotRedrawLine">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">CannotRedrawLine</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#CannotRedrawLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.CannotRedrawLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.LogException" title="iocage.lib.errors.LogException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.LogException</span></code></a></p>
+<p>Raised when manipulating previous log entries fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.CommandFailure">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">CommandFailure</code><span class="sig-paren">(</span><em>returncode</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#CommandFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.CommandFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when iocage fails to execute a command.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ConflictingResourceSelection">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ConflictingResourceSelection</code><span class="sig-paren">(</span><em>source_a</em>, <em>source_b</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ConflictingResourceSelection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ConflictingResourceSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a resource was configured with conflicting sources.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DatasetExists">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DatasetExists</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DatasetExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DatasetExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset already exists.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DatasetNotAvailable">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DatasetNotAvailable</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DatasetNotAvailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DatasetNotAvailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset is not available.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DatasetNotJailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DatasetNotJailed</code><span class="sig-paren">(</span><em>dataset</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DatasetNotJailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DatasetNotJailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS share was not flagged as such.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DatasetNotMounted">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DatasetNotMounted</code><span class="sig-paren">(</span><em>dataset</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DatasetNotMounted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DatasetNotMounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset is not mounted but should be.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DefaultConfigNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DefaultConfigNotFound</code><span class="sig-paren">(</span><em>config_file_path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DefaultConfigNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DefaultConfigNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></p>
+<p>Raised when no default config was found on the host.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DefaultReleaseNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DefaultReleaseNotFound</code><span class="sig-paren">(</span><em>host_release_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DefaultReleaseNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DefaultReleaseNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the default (host) release does not match a remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DevfsRuleException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DevfsRuleException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DevfsRuleException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DevfsRuleException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised on errors in devfs rules.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DistributionEOLWarningDownloadFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DistributionEOLWarningDownloadFailed</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DistributionEOLWarningDownloadFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DistributionEOLWarningDownloadFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when downloading EOL warnings failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DistributionUnknown">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DistributionUnknown</code><span class="sig-paren">(</span><em>distribution_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DistributionUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DistributionUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the host distribution is unknown or not supported.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.DuplicateDevfsRuleset">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">DuplicateDevfsRuleset</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#DuplicateDevfsRuleset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.DuplicateDevfsRuleset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.DevfsRuleException" title="iocage.lib.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a duplicate devfs rule was found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.EventAlreadyFinished">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">EventAlreadyFinished</code><span class="sig-paren">(</span><em>event</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#EventAlreadyFinished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.EventAlreadyFinished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a event is touched that was already finished.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ExportDestinationExists">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ExportDestinationExists</code><span class="sig-paren">(</span><em>destination</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ExportDestinationExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ExportDestinationExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a backup operation is already in progress.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.FirewallCommandFailure">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">FirewallCommandFailure</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#FirewallCommandFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.FirewallCommandFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a firewall command fails (Secure VNET).</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.FirewallDisabled">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">FirewallDisabled</code><span class="sig-paren">(</span><em>hint=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#FirewallDisabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.FirewallDisabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the firewall is required but disabled (Secure VNET).</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.FstabDestinationExists">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">FstabDestinationExists</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#FstabDestinationExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.FstabDestinationExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the destination directory does not exist.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.HostReleaseUnknown">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">HostReleaseUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#HostReleaseUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.HostReleaseUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the host release could not be determined.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.HostUserlandVersionUnknown">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">HostUserlandVersionUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#HostUserlandVersionUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.HostUserlandVersionUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the hosts userland version could not be detected.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.IllegalArchiveContent">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">IllegalArchiveContent</code><span class="sig-paren">(</span><em>asset_name</em>, <em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#IllegalArchiveContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.IllegalArchiveContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a release asset archive contains malicious content.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InsecureJailPath">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InsecureJailPath</code><span class="sig-paren">(</span><em>path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InsecureJailPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InsecureJailPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SecurityViolation" title="iocage.lib.errors.SecurityViolation"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SecurityViolation</span></code></a></p>
+<p>Raised when a a path points outside of a resource.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidDevfsRulesSyntax">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidDevfsRulesSyntax</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidDevfsRulesSyntax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidDevfsRulesSyntax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.DevfsRuleException" title="iocage.lib.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a devfs rule has invalid syntax.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidIPAddress">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidIPAddress</code><span class="sig-paren">(</span><em>reason</em>, <em>ipv6</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidIPAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidIPAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when an invalid IP address was assigned to a network.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidInterfaceName">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidInterfaceName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidInterfaceName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidInterfaceName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a NIC name is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidJailConfigAddress">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidJailConfigAddress</code><span class="sig-paren">(</span><em>value</em>, <em>property_name</em>, <em>jail=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidJailConfigAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidJailConfigAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.InvalidJailConfigValue" title="iocage.lib.errors.InvalidJailConfigValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.InvalidJailConfigValue</span></code></a></p>
+<p>Raised when a jail address is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidJailConfigValue">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidJailConfigValue</code><span class="sig-paren">(</span><em>property_name</em>, <em>jail=None</em>, <em>reason=None</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidJailConfigValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidJailConfigValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailConfigError" title="iocage.lib.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailConfigError</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a jail configuration value is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidJailName">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidJailName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidJailName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidJailName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailConfigError" title="iocage.lib.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailConfigError</span></code></a></p>
+<p>Raised when a jail has an invalid name.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidLogLevel">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidLogLevel</code><span class="sig-paren">(</span><em>log_level</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidLogLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidLogLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the logger was initialized with an invalid log level.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidMacAddress">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidMacAddress</code><span class="sig-paren">(</span><em>mac_address</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidMacAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidMacAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a jail MAC address is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidNetworkBridge">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidNetworkBridge</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidNetworkBridge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidNetworkBridge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a network bridge is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidReleaseAssetSignature">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidReleaseAssetSignature</code><span class="sig-paren">(</span><em>name</em>, <em>asset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidReleaseAssetSignature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidReleaseAssetSignature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.UpdateFailure" title="iocage.lib.errors.UpdateFailure"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.UpdateFailure</span></code></a></p>
+<p>Raised when a release signature is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidReleaseName">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidReleaseName</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidReleaseName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidReleaseName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when interacting with an unsupported release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.InvalidSnapshotIdentifier">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">InvalidSnapshotIdentifier</code><span class="sig-paren">(</span><em>identifier</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#InvalidSnapshotIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.InvalidSnapshotIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SnapshotError" title="iocage.lib.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SnapshotError</span></code></a></p>
+<p>Raised when a snapshot identifier is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.IocageException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">IocageException</code><span class="sig-paren">(</span><em>message</em>, <em>level='error'</em>, <em>silent=False</em>, <em>append_warning=False</em>, <em>warning=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#IocageException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.IocageException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>A well-known exception raised by libiocage.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.IocageNotActivated">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">IocageNotActivated</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#IocageNotActivated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.IocageNotActivated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when iocage is not active on any ZFS pool.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailAlreadyExists">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailAlreadyExists</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailAlreadyExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailAlreadyExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jail already exists.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailAlreadyRunning">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailAlreadyRunning</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailAlreadyRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailAlreadyRunning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jail is already running.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailBackendMissing">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailBackendMissing</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailBackendMissing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailBackendMissing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jails backend was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailCommandFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailCommandFailed</code><span class="sig-paren">(</span><em>returncode</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailCommandFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailCommandFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a jail command fails with an exit code &gt; 0.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailConfigError">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailConfigError</code><span class="sig-paren">(</span><em>message</em>, <em>level='error'</em>, <em>silent=False</em>, <em>append_warning=False</em>, <em>warning=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailConfigError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailConfigError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a general configuration error occurs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailConfigNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailConfigNotFound</code><span class="sig-paren">(</span><em>config_type</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailConfigNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailConfigNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a jail is not configured.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailConigZFSIsNotAllowed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailConigZFSIsNotAllowed</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailConigZFSIsNotAllowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailConigZFSIsNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailConfigError" title="iocage.lib.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailConfigError</span></code></a></p>
+<p>Raised when a jail is not allowed to use ZFS shares.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailDestructionFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailDestructionFailed</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailDestructionFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailDestructionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when the jail could not be destroyed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailDoesNotExist">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailDoesNotExist</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailDoesNotExist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailDoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when the jail does not exist.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailException</code><span class="sig-paren">(</span><em>jail</em>, <em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when an exception related to a jail occurs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailExecutionAborted">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailExecutionAborted</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailExecutionAborted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailExecutionAborted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when a jail command fails with an exit code &gt; 0.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailFilterException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailFilterException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailFilterException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailFilterException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a jail filter is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailFilterInvalidName">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailFilterInvalidName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailFilterInvalidName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailFilterInvalidName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailFilterException" title="iocage.lib.errors.JailFilterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailFilterException</span></code></a></p>
+<p>Raised when the name of a jail filter is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailIsTemplate">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailIsTemplate</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailIsTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailIsTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when the jail is a template but should not be.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailLaunchFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailLaunchFailed</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailLaunchFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailLaunchFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when the jail could not be launched.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailNotFound</code><span class="sig-paren">(</span><em>text</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jail was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailNotRunning">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailNotRunning</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailNotRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailNotRunning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jail is not running.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailNotSupplied">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailNotSupplied</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailNotSupplied"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailNotSupplied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when no jail was supplied.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailNotTemplate">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailNotTemplate</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailNotTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailNotTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.JailException" title="iocage.lib.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.JailException</span></code></a></p>
+<p>Raised when the jail is no template but should be one.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.JailUnknownIdentifier">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">JailUnknownIdentifier</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#JailUnknownIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.JailUnknownIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the jail has an unknown identifier.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ListableResourceNamespaceUndefined">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ListableResourceNamespaceUndefined</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ListableResourceNamespaceUndefined"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ListableResourceNamespaceUndefined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a ListableResource was not defined with a namespace.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.LogException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">LogException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#LogException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.LogException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when logging fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.MissingDevfsRulesetName">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">MissingDevfsRulesetName</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#MissingDevfsRulesetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.MissingDevfsRulesetName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.DevfsRuleException" title="iocage.lib.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a duplicate devfs rule was found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.MissingFeature">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">MissingFeature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>plural=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#MissingFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.MissingFeature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code></p>
+<p>Raised when an iocage feature is not fully implemented yet.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.MountFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">MountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#MountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.MountFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a mount operation fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.MustBeRoot">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">MustBeRoot</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#MustBeRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.MustBeRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when iocage is executed without root permission.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.NonReleaseUpdateFetch">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">NonReleaseUpdateFetch</code><span class="sig-paren">(</span><em>resource</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#NonReleaseUpdateFetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.NonReleaseUpdateFetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.UpdateFailure" title="iocage.lib.errors.UpdateFailure"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.UpdateFailure</span></code></a></p>
+<p>Raised when attempting to fetch updates for a custom release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.NotAnIocageZFSProperty">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">NotAnIocageZFSProperty</code><span class="sig-paren">(</span><em>property_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#NotAnIocageZFSProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.NotAnIocageZFSProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when iocage attempts to touch a non-iocage ZFS property.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.PkgNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">PkgNotFound</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#PkgNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.PkgNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the pkg package was not found in the local mirror.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ReleaseAssetHashesUnavailable">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ReleaseAssetHashesUnavailable</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ReleaseAssetHashesUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ReleaseAssetHashesUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the list could not be downloaded from the remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ReleaseListUnavailable">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ReleaseListUnavailable</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ReleaseListUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ReleaseListUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when the list could not be downloaded from the remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ReleaseNotFetched">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ReleaseNotFetched</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ReleaseNotFetched"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ReleaseNotFetched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a release was not yet fetched.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ReleaseUpdateBranchLookup">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ReleaseUpdateBranchLookup</code><span class="sig-paren">(</span><em>release_name</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ReleaseUpdateBranchLookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ReleaseUpdateBranchLookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when failing to lookup the remote update branch.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ResourceLimitUnknown">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ResourceLimitUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ResourceLimitUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ResourceLimitUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
+<p>Raised when a resource limit has is unknown.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ResourceUnmanaged">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ResourceUnmanaged</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ResourceUnmanaged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ResourceUnmanaged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when locating a resources dataset on a root dataset fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SecurityViolation">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SecurityViolation</code><span class="sig-paren">(</span><em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SecurityViolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SecurityViolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when iocage has security concerns.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SecurityViolationConfigJailEscape">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SecurityViolationConfigJailEscape</code><span class="sig-paren">(</span><em>file</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SecurityViolationConfigJailEscape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SecurityViolationConfigJailEscape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SecurityViolation" title="iocage.lib.errors.SecurityViolation"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SecurityViolation</span></code></a></p>
+<p>Raised when a file symlinks to a location outside of the jail.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SnapshotCreation">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SnapshotCreation</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SnapshotCreation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SnapshotCreation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SnapshotError" title="iocage.lib.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SnapshotError</span></code></a></p>
+<p>Raised when creating a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SnapshotDeletion">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SnapshotDeletion</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SnapshotDeletion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SnapshotDeletion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SnapshotError" title="iocage.lib.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SnapshotError</span></code></a></p>
+<p>Raised when deleting a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SnapshotError">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SnapshotError</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SnapshotError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SnapshotError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised on snapshot related errors.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SnapshotNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SnapshotNotFound</code><span class="sig-paren">(</span><em>snapshot_name</em>, <em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SnapshotNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SnapshotNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SnapshotError" title="iocage.lib.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SnapshotError</span></code></a></p>
+<p>Raised when a snapshot was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.SnapshotRollback">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">SnapshotRollback</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#SnapshotRollback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.SnapshotRollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.SnapshotError" title="iocage.lib.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.SnapshotError</span></code></a></p>
+<p>Raised when rolling back a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.UnknownJailConfigProperty">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">UnknownJailConfigProperty</code><span class="sig-paren">(</span><em>key</em>, <em>jail</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#UnknownJailConfigProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.UnknownJailConfigProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
+<p>Raised when a unknown jail config property was used.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.UnknownProvisioner">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">UnknownProvisioner</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#UnknownProvisioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.UnknownProvisioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when an unsupported provisioner method is used.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.UnmountFailed">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">UnmountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#UnmountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.UnmountFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when an unmount operation fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.UnsupportedRelease">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">UnsupportedRelease</code><span class="sig-paren">(</span><em>version</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#UnsupportedRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.UnsupportedRelease" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.MissingFeature" title="iocage.lib.errors.MissingFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.MissingFeature</span></code></a></p>
+<p>Raised when interacting with an unsupported release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.UpdateFailure">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">UpdateFailure</code><span class="sig-paren">(</span><em>name</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#UpdateFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.UpdateFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when an update fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.VirtualFstabLineHasNoRealIndex">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">VirtualFstabLineHasNoRealIndex</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#VirtualFstabLineHasNoRealIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.VirtualFstabLineHasNoRealIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when attempting to access the index of a virtual fstab line.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.VnetBridgeMissing">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">VnetBridgeMissing</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#VnetBridgeMissing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.VnetBridgeMissing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a vnet bridge is missing.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ZFSException">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ZFSException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ZFSException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ZFSException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS pool not available.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ZFSPoolInvalid">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ZFSPoolInvalid</code><span class="sig-paren">(</span><em>consequence</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ZFSPoolInvalid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ZFSPoolInvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></p>
+<p>Raised when a ZFS pool is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.lib.errors.ZFSPoolUnavailable">
+<em class="property">exception </em><code class="descclassname">iocage.lib.errors.</code><code class="descname">ZFSPoolUnavailable</code><span class="sig-paren">(</span><em>pool_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/errors.html#ZFSPoolUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.errors.ZFSPoolUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.lib.errors.IocageException" title="iocage.lib.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.lib.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS pool not available.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iocage.lib.events.html" class="btn btn-neutral float-right" title="iocage.lib.events module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iocage.lib.ZFSShareStorage.html" class="btn btn-neutral" title="iocage.lib.ZFSShareStorage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

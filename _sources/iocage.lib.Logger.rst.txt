@@ -1,0 +1,7 @@
+iocage.lib.Logger module
+========================
+
+.. automodule:: iocage.lib.Logger
+    :members:
+    :undoc-members:
+    :show-inheritance:

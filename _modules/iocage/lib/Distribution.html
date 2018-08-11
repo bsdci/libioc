@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.lib.Distribution &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.lib.Distribution</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.lib.Distribution</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage Distribution module.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">html.parser</span>
+
+<span class="kn">import</span> <span class="nn">iocage.lib.errors</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.helpers</span>
+
+
+<div class="viewcode-block" id="EOLParser"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.EOLParser">[docs]</a><span class="k">class</span> <span class="nc">EOLParser</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">HTMLParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for EOL releases.&quot;&quot;&quot;</span>
+
+    <span class="n">eol_releases</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">in_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">td_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">current_branch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="EOLParser.handle_starttag"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.EOLParser.handle_starttag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Handle opening HTML tags.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;td&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_id</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">td_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;tr&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">td_counter</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="EOLParser.handle_endtag"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.EOLParser.handle_endtag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_endtag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Handle closing HTML tags.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;td&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_id</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="EOLParser.handle_data"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.EOLParser.handle_data">[docs]</a>    <span class="k">def</span> <span class="nf">handle_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Handle data in HTML tags.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_id</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>  <span class="c1"># skip non-td content</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">td_counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;stable/&quot;</span><span class="p">):</span>
+            <span class="n">stable_version</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eol_releases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{stable_version}</span><span class="s2">-STABLE&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">td_counter</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data</span> <span class="o">!=</span> <span class="s2">&quot;n/a&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eol_releases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DistributionGenerator"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.DistributionGenerator">[docs]</a><span class="k">class</span> <span class="nc">DistributionGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Asynchronous representation of the host distribution.&quot;&quot;&quot;</span>
+
+    <span class="n">release_name_blacklist</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;..&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ISO-IMAGES&quot;</span>
+    <span class="p">]</span>
+
+    <span class="n">eol_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.freebsd.org/security/unsupported.html&quot;</span>
+    <span class="n">_eol_list</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+
+    <span class="n">mirror_link_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;a href=</span><span class="se">\&quot;</span><span class="s2">([A-z0-9\-_\.]+)/</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="n">_available_releases</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;iocage.lib.Release.ReleaseGenerator&#39;</span><span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Host.HostGenerator&#39;</span>
+    <span class="n">zfs</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.ZFS.ZFS&#39;</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Logger.Logger&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.lib.Host.Host&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.lib.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.lib.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">init_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eol_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_releases</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_class_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="s1">&#39;iocage.lib.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;iocage.lib.Release.Release&#39;</span>
+    <span class="p">]:</span>
+        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the name of the host distribution.</span>
+
+<span class="sd">        Often used to differentiate between operations for HardenedBSD or</span>
+<span class="sd">        standard FreeBSD.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;/usr/sbin/hbsd-update&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;HardenedBSD&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mirror_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the mirror URL of the distribution.</span>
+
+<span class="sd">        URL that points to the top level directory of a distributions release</span>
+<span class="sd">        asset HTTP server.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">processor</span>
+
+        <span class="k">if</span> <span class="n">distribution</span> <span class="o">==</span> <span class="s2">&quot;FreeBSD&quot;</span><span class="p">:</span>
+            <span class="n">release_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;/ftp/releases/</span><span class="si">{processor}</span><span class="s2">/</span><span class="si">{processor}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;https://download.freebsd.org</span><span class="si">{release_path}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">distribution</span> <span class="o">==</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;https://jenkins.hardenedbsd.org/builds&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DistributionUnknown</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hash_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the name of the checksum file found on the mirror.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;FreeBSD&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;MANIFEST&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;CHECKSUMS.SHA256&quot;</span>
+        <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DistributionUnknown</span><span class="p">(</span>
+            <span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="DistributionGenerator.fetch_releases"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.DistributionGenerator.fetch_releases">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_releases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch and cache the available releases.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Fetching release list from &#39;</span><span class="si">{self.mirror_url}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># the mirror_url @property is validated (enforced) @property, so:</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_url</span><span class="p">)</span>  <span class="c1"># nosec</span>
+        <span class="n">charset</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get_content_charset</span><span class="p">()</span>  <span class="c1"># noqa: T484</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">charset</span> <span class="k">if</span> <span class="n">charset</span> <span class="k">else</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+
+        <span class="n">found_releases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_links</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="n">available_releases</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">map</span><span class="p">(</span>  <span class="c1"># map long HardenedBSD release names</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_map_available_release</span><span class="p">,</span>
+                <span class="nb">filter</span><span class="p">(</span>  <span class="c1"># filter out other CPU architectures on HardenedBSD</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_filter_available_releases</span><span class="p">,</span>
+                    <span class="n">found_releases</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_releases</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_release</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">),</span>
+            <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">available_releases</span>
+            <span class="p">)</span>
+        <span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_map_available_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+            <span class="c1"># e.g. HardenedBSD-11-STABLE-libressl-amd64-LATEST</span>
+            <span class="k">return</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">release_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">release_name</span>
+
+    <span class="k">def</span> <span class="nf">_filter_available_releases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">arch</span> <span class="o">=</span> <span class="n">release_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">processor</span> <span class="o">==</span> <span class="n">arch</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eol_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the (memoized) list of release names listed as EOL.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eol_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eol_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_eol_list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eol_list</span> <span class="o">=</span> <span class="n">eol_list</span>
+            <span class="k">return</span> <span class="n">eol_list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eol_list</span>
+
+    <span class="k">def</span> <span class="nf">_query_eol_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Scrape the FreeBSD website and return a list of EOL RELEASES.&quot;&quot;&quot;</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eol_url</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Accept-Charset&quot;</span><span class="p">:</span> <span class="s2">&quot;utf-8&quot;</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Downloading EOL info from </span><span class="si">{self.eol_url}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>  <span class="c1"># nosec: B310</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">getcode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># noqa: T484</span>
+                <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DistributionEOLWarningDownloadFailed</span><span class="p">(</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="n">level</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="p">[]</span>
+
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">EOLParser</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">eol_releases</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">releases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;iocage.lib.Release.ReleaseGenerator&#39;</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of available releases.</span>
+
+<span class="sd">        Raises an error when the releases cannot be fetched at the current time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_releases</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetch_releases</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_releases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_releases</span>
+        <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ReleaseListUnavailable</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_parse_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">blacklisted_releases</span> <span class="o">=</span> <span class="n">Distribution</span><span class="o">.</span><span class="n">release_name_blacklist</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">blacklisted_releases</span><span class="p">,</span>
+            <span class="nb">map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">/&quot;</span><span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                    <span class="n">Distribution</span><span class="o">.</span><span class="n">mirror_link_pattern</span><span class="p">,</span>
+                    <span class="n">text</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Distribution"><a class="viewcode-back" href="../../../iocage.lib.Distribution.html#iocage.lib.Distribution.Distribution">[docs]</a><span class="k">class</span> <span class="nc">Distribution</span><span class="p">(</span><span class="n">DistributionGenerator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Synchronous wrapper of the host distribution.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_class_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="s1">&#39;iocage.lib.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;iocage.lib.Release.Release&#39;</span>
+    <span class="p">]:</span>
+        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">Release</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

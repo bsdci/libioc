@@ -1,0 +1,21 @@
+iocage.lib.Config.Jail.Properties package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   iocage.lib.Config.Jail.Properties.Addresses
+   iocage.lib.Config.Jail.Properties.Defaultrouter
+   iocage.lib.Config.Jail.Properties.Interfaces
+   iocage.lib.Config.Jail.Properties.Resolver
+   iocage.lib.Config.Jail.Properties.ResourceLimit
+
+Module contents
+---------------
+
+.. automodule:: iocage.lib.Config.Jail.Properties
+    :members:
+    :undoc-members:
+    :show-inheritance:

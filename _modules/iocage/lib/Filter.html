@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.lib.Filter &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.lib.Filter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.lib.Filter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage filters for ListableResource.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">iocage.lib.errors</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.helpers</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.Resource</span>
+<span class="kn">import</span> <span class="nn">iocage.lib.ResourceSelector</span>
+
+<span class="n">_ResourceSelector</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span>
+<span class="n">_TermValuesType</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="match_filter"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.match_filter">[docs]</a><span class="k">def</span> <span class="nf">match_filter</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return True when the value matches the filter string.&quot;&quot;&quot;</span>
+    <span class="n">escaped_characters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;$&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">character</span> <span class="ow">in</span> <span class="n">escaped_characters</span><span class="p">:</span>
+        <span class="n">filter_string</span> <span class="o">=</span> <span class="n">filter_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="se">\\</span><span class="si">{character}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">filter_string</span> <span class="o">=</span> <span class="n">filter_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;.*&quot;</span><span class="p">)</span>
+    <span class="n">filter_string</span> <span class="o">=</span> <span class="n">filter_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;.+&quot;</span><span class="p">)</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;^</span><span class="si">{filter_string}</span><span class="s2">$&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Term"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Term">[docs]</a><span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A single filter term.&quot;&quot;&quot;</span>
+
+    <span class="n">glob_characters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">_TermValuesType</span><span class="o">=</span><span class="p">[]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_filter_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">values</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">_ResourceSelector</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">short</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the short name of a UUID be used.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Term.matches_resource"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Term.matches_resource">[docs]</a>    <span class="k">def</span> <span class="nf">matches_resource</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Resource.Resource&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the term matches the resource.&quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">short</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Term.matches"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Term.matches">[docs]</a>    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">short</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if the value matches the term.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            value:</span>
+<span class="sd">                The value that is matched against the filter term</span>
+
+<span class="sd">            short:</span>
+<span class="sd">                When value has a length of 8 characters, this argument allows</span>
+<span class="sd">                to match a jail&#39;s shortname as well. This is required for</span>
+<span class="sd">                selecting jails with UUIDs by the first part of the name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># match any item of a list</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># `short` not required here</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+        <span class="n">input_value</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_filter</span><span class="p">(</span><span class="n">input_value</span><span class="p">,</span> <span class="n">filter_value</span><span class="p">,</span> <span class="n">short</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_value</span><span class="p">,</span> <span class="n">_ResourceSelector</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_filter</span><span class="p">(</span><span class="n">input_value</span><span class="p">,</span> <span class="n">filter_value</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">short</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_filter</span><span class="p">(</span><span class="n">input_value</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">short</span><span class="p">),</span>
+                    <span class="n">filter_value</span>
+                <span class="p">))</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">_match_filter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">short</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">match_filter</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">has_no_globs</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_string_has_globs</span><span class="p">(</span><span class="n">filter_string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_no_globs</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># match against humanreadable names as well</span>
+            <span class="n">has_humanreadble_length</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_string</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">has_humanreadble_length</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">short</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">shortname</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">to_humanreadable_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">shortname</span> <span class="o">==</span> <span class="n">filter_string</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">_parse_user_input</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_user_input</span>
+            <span class="n">parsed_value</span> <span class="o">=</span> <span class="n">_parse_user_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">parsed_filter</span> <span class="o">=</span> <span class="n">_parse_user_input</span><span class="p">(</span><span class="n">filter_string</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">parsed_value</span> <span class="o">==</span> <span class="n">parsed_filter</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_filter_string_has_globs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">glob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_characters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">glob</span> <span class="ow">in</span> <span class="n">filter_string</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_split_filter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">escaped_comma_blocks</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">block</span><span class="p">:</span> <span class="n">block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
+            <span class="n">user_input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">,&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">escaped_comma_blocks</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;,</span><span class="si">{block[0]}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">+=</span> <span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="nf">_validate_name_filter_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+
+        <span class="n">globs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glob_characters</span>
+
+        <span class="c1"># Allow glob only filters</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_string</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">filter_string</span> <span class="ow">in</span> <span class="n">globs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># replace all glob charaters in user input</span>
+        <span class="n">filter_string_without_globs</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filter_string</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">globs</span><span class="p">:</span>
+                <span class="n">filter_string_without_globs</span> <span class="o">+=</span> <span class="n">char</span>
+
+        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">validate_name</span><span class="p">(</span>
+            <span class="n">filter_string_without_globs</span>
+        <span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Terms"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Terms">[docs]</a><span class="k">class</span> <span class="nc">Terms</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A group of filter terms.</span>
+
+<span class="sd">    Each item in this group must match for a resource to pass the filter.</span>
+<span class="sd">    This can be interpreted as logical AND</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">terms</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+            <span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_term</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Terms.match_resource"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Terms.match_resource">[docs]</a>    <span class="k">def</span> <span class="nf">match_resource</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;iocage.lib.Resource.Resource&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if all Terms match the resource.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">matches_resource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Terms.match_key"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Terms.match_key">[docs]</a>    <span class="k">def</span> <span class="nf">match_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a value matches for a given key.</span>
+
+<span class="sd">        Returns True if the given value matches all terms for the specified key</span>
+<span class="sd">        Returns Fals if one of the terms does not match</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">key</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;name&quot;</span><span class="p">):</span>
+                <span class="n">short</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">short</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Terms.match_source"><a class="viewcode-back" href="../../../iocage.lib.Filter.html#iocage.lib.Filter.Terms.match_source">[docs]</a>    <span class="k">def</span> <span class="nf">match_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if the source name matches the filter terms.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">key</span> <span class="o">!=</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># All name terms have been transformed to ResourceSelector</span>
+            <span class="n">resource_selector</span> <span class="o">=</span> <span class="n">term</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">resource_selector</span><span class="o">.</span><span class="n">source_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">resource_selector</span><span class="o">.</span><span class="n">source_name</span> <span class="o">==</span> <span class="n">source_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+        <span class="c1"># no name term or none at all</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Term</span><span class="p">]:</span>
+
+        <span class="n">terms</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prop</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="s2">&quot;name&quot;</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">user_input</span>
+
+        <span class="k">if</span> <span class="n">prop</span> <span class="o">==</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Term</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">terms</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

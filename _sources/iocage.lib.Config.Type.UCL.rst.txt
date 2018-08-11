@@ -1,0 +1,7 @@
+iocage.lib.Config.Type.UCL module
+=================================
+
+.. automodule:: iocage.lib.Config.Type.UCL
+    :members:
+    :undoc-members:
+    :show-inheritance:

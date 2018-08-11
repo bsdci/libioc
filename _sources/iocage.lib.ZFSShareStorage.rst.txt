@@ -1,0 +1,7 @@
+iocage.lib.ZFSShareStorage module
+=================================
+
+.. automodule:: iocage.lib.ZFSShareStorage
+    :members:
+    :undoc-members:
+    :show-inheritance:

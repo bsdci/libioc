@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.lib.Config.Jail.Properties.Interfaces module &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iocage.lib.Config.Jail.Properties.Resolver module" href="iocage.lib.Config.Jail.Properties.Resolver.html" />
+    <link rel="prev" title="iocage.lib.Config.Jail.Properties.Defaultrouter module" href="iocage.lib.Config.Jail.Properties.Defaultrouter.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="iocage.html">iocage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iocage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="iocage.lib.html">iocage.lib package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="iocage.lib.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iocage.lib.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iocage.lib.html#module-iocage.lib">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#module-iocage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="iocage.html">iocage package</a> &raquo;</li>
+        
+          <li><a href="iocage.lib.html">iocage.lib package</a> &raquo;</li>
+        
+          <li><a href="iocage.lib.Config.html">iocage.lib.Config package</a> &raquo;</li>
+        
+          <li><a href="iocage.lib.Config.Jail.html">iocage.lib.Config.Jail package</a> &raquo;</li>
+        
+          <li><a href="iocage.lib.Config.Jail.Properties.html">iocage.lib.Config.Jail.Properties package</a> &raquo;</li>
+        
+      <li>iocage.lib.Config.Jail.Properties.Interfaces module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/iocage.lib.Config.Jail.Properties.Interfaces.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iocage.lib.Config.Jail.Properties.Interfaces">
+<span id="iocage-lib-config-jail-properties-interfaces-module"></span><h1>iocage.lib.Config.Jail.Properties.Interfaces module<a class="headerlink" href="#module-iocage.lib.Config.Jail.Properties.Interfaces" title="Permalink to this headline">¶</a></h1>
+<p>Jail config interfaces property.</p>
+<dl class="class">
+<dt id="iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp">
+<em class="property">class </em><code class="descclassname">iocage.lib.Config.Jail.Properties.Interfaces.</code><code class="descname">InterfaceProp</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='interfaces'</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/Config/Jail/Properties/Interfaces.html#InterfaceProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Special jail config property Interfaces.</p>
+<dl class="method">
+<dt id="iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>jail_if</em>, <em>bridge_if=None</em>, <em>notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/Config/Jail/Properties/Interfaces.html#InterfaceProp.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an interface/bridge configuration entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>jail_if</strong> (<em>string</em>) – Interface name inside the jail</li>
+<li><strong>bridge_if</strong> (<em>string</em>) – <p>(optional)
+Interface name of the host bridge device (VNET only)</p>
+<p>A name beginning with : (colon) enables the secure
+mode, that adds a second bridge between the jail and the
+target bridge, so that source IP and mac address cannot be
+spoofed from within the jail.</p>
+<blockquote>
+<div>ioc set interfaces=”vnet0::bridge0” my-jail</div></blockquote>
+</li>
+<li><strong>notify</strong> (<em>bool</em>) – (default=True)
+Sends an update notification to the jail config instance</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.delimiter">
+<code class="descname">delimiter</code><em class="property"> = ','</em><a class="headerlink" href="#iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.delimiter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>data</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/Config/Jail/Properties/Interfaces.html#InterfaceProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear and set all interfaces from data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/lib/Config/Jail/Properties/Interfaces.html#InterfaceProp.to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.lib.Config.Jail.Properties.Interfaces.InterfaceProp.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the iocage formatted string of interfaces.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iocage.lib.Config.Jail.Properties.Resolver.html" class="btn btn-neutral float-right" title="iocage.lib.Config.Jail.Properties.Resolver module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iocage.lib.Config.Jail.Properties.Defaultrouter.html" class="btn btn-neutral" title="iocage.lib.Config.Jail.Properties.Defaultrouter module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

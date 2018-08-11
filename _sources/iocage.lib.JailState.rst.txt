@@ -1,0 +1,7 @@
+iocage.lib.JailState module
+===========================
+
+.. automodule:: iocage.lib.JailState
+    :members:
+    :undoc-members:
+    :show-inheritance:

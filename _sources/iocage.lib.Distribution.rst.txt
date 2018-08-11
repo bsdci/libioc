@@ -1,0 +1,7 @@
+iocage.lib.Distribution module
+==============================
+
+.. automodule:: iocage.lib.Distribution
+    :members:
+    :undoc-members:
+    :show-inheritance:
