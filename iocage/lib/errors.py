@@ -999,7 +999,7 @@ class NonReleaseUpdateFetch(UpdateFailure):
 
     def __init__(
         self,
-        resource: 'iocage.lib.Resource.ResourceGenerator',
+        resource: 'iocage.lib.Resource.Resource',
         logger: typing.Optional[Logger]=None
     ) -> None:
 
