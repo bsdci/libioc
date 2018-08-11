@@ -16,6 +16,7 @@ install: deps
 		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
 	fi
 install-dev: deps
+	pkg install -y gmake
 	python3.6 -m pip install -Ur requirements-dev.txt
 	python3.6 -m pip install -e .
 	@if [ -f /usr/local/etc/init.d ]; then \
@@ -35,6 +36,10 @@ test:
 	pytest iocage/tests --zpool $(ZPOOL)
 regression-test:
 	iocage/tests/run-integration.sh
+.PHONY: docs
+docs:
+	sphinx-apidoc -o docs --separate -H libiocage -A "iocage Authors" --full iocage iocage/cli iocage/tests
+	gmake -C docs html
 
 help:
 	@echo "    install"
