@@ -247,7 +247,10 @@ class JailGenerator(JailResource):
             the release's root dataset.
 
         zpool/iocage/jails/<NAME>/config.json:
-            Jails configured with the latest configuration style store their information in a JSON file. When this file is found in the jail's dataset, libiocage assumes the jail to be a JSON-style jail and ignores other configuration mechanisms.
+            Jails configured with the latest configuration style store their
+            information in a JSON file. When this file is found in the jail's
+            dataset, libiocage assumes the jail to be a JSON-style jail and
+            ignores other configuration mechanisms.
 
         zpool/iocage/jails/<NAME>/config:
             Another compatible configuration mechanism is a UCL file. It's
