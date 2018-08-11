@@ -1,6 +1,5 @@
 deploy:
-	if [ -d api/ ]; then rm -r api/; fi
-	mkdir api/
-	cp -r docs/_build/html/* api/
-	git add api
+	rm -r *.html *.js _modules/ _sources/ _static/
+	cp -r docs/_build/html/* .
+	git add .
 	git commit -m "auto-generate docs"
