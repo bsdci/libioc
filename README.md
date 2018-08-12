@@ -128,12 +128,6 @@ The [API Reference (html)](https://iocage.github.io/libiocage) documenting all p
 
 ## Development
 
-### Install Development Dependencies
-
-```sh
-make install-dev
-```
-
 ### Unit Tests
 
 Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage pool.
@@ -142,18 +136,14 @@ Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage poo
 ZPOOL=zroot make test
 ```
 
-### Type Checking
+### Static Code Analysis
 
-At this time differential type checking is enabled, which allows us to incrementally cover the library with strong typings until we can switch to strict type checking.
-
+The project enforces PEP-8 code style and MyPy strong typing via flake8, that is required to pass before merging any changes. Together with Bandit checks for common security issues the static code analysis can be ran on Linux and BSD as both do not require py-libzfs or code execution.
 
 ```
+make install-dev
 make check
 ```
-
-### Code Style
-
-The code style is automatically checked with flake8.
 
 ---
 
