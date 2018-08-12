@@ -122,6 +122,10 @@ make installworld DESTDIR=/iocage/releases/custom/root
 ioc fetch -r custom -b
 ```
 
+## Documentation
+
+The [API Reference (html)](https://iocage.github.io/libiocage) documenting all public interfaces of libiocage is updated with every release. The information found in the reference is compiled from Python docstrings and MyPy typings using Sphinx.
+
 ## Development
 
 ### Install Development Dependencies
