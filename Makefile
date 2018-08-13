@@ -28,6 +28,9 @@ install-travis:
 	python3.6 -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 uninstall:
 	python3.6 -m pip uninstall -y iocage
+	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
+		rm /usr/local/etc/rc.d/ioc; \
+	fi
 check:
 	flake8 --version
 	flake8 --exclude=".travis,.eggs,__init__.py,docs" --ignore=E203,W391,D107,A001,A002,A003,A004
