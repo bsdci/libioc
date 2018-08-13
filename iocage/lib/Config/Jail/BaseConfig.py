@@ -600,7 +600,7 @@ class BaseConfig(dict):
                 setter_method(parsed_value)
                 return
 
-            self._set_data(key, parsed_value)
+            self.__set_data(key, parsed_value)
             error = None
         except ValueError as err:
             error = iocage.lib.errors.InvalidJailConfigValue(
@@ -613,7 +613,7 @@ class BaseConfig(dict):
         if (error is not None) and (skip_on_error is False):
             raise error
 
-    def _set_data(
+    def __set_data(
         self,
         key: str,
         value: typing.Any,
@@ -627,7 +627,7 @@ class BaseConfig(dict):
             current_key, rest_key = key.split(".", maxsplit=1)
             if current_key not in data.keys():
                 data[current_key] = dict()
-            self._set_data(rest_key, value, data[current_key])
+            self.__set_data(rest_key, value, data[current_key])
 
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
