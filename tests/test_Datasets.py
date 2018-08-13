@@ -30,7 +30,7 @@ import libzfs
 import iocage.lib
 
 
-class DatasetsMock(iocage.lib.Datasets.Datasets):
+class DatasetsMock(iocage.Datasets.Datasets):
     """Mock the database."""
 
     ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
@@ -42,7 +42,7 @@ class TestDatasets(object):
     @pytest.fixture
     def MockedDatasets(
         self,
-        logger: 'iocage.lib.Logger.Logger',
+        logger: 'iocage.Logger.Logger',
         pool: libzfs.ZFSPool
     ) -> typing.Generator[DatasetsMock, None, None]:
         """Mock a dataset in a disabled pool."""
@@ -55,7 +55,7 @@ class TestDatasets(object):
         self,
         MockedDatasets: typing.Generator[DatasetsMock, None, None],
         pool: libzfs.ZFSPool,
-        logger: 'iocage.lib.Logger.Logger'
+        logger: 'iocage.Logger.Logger'
     ) -> None:
         """Test if a pool can be activated."""
         datasets = DatasetsMock(pool=pool, logger=logger)

@@ -25,9 +25,9 @@
 """Get a specific jails with this CLI helper function."""
 import typing
 
-import iocage.lib.errors
-import iocage.lib.Jail
-import iocage.lib.Logger
+import iocage.errors
+import iocage.Jail
+import iocage.Logger
 
 from .click import IocageClickContext
 
@@ -35,21 +35,21 @@ from .click import IocageClickContext
 def get_jail(
     jail_name: str,
     ctx: IocageClickContext
-) -> iocage.lib.Jail.JailGenerator:
+) -> iocage.Jail.JailGenerator:
     """Return the jail matching the given name."""
     try:
-        return iocage.lib.Jail.JailGenerator(
+        return iocage.Jail.JailGenerator(
             jail_name,
             logger=ctx.logger,
             host=ctx.host
         )
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 
 
 def set_properties(
     properties: typing.Iterable[str],
-    target: 'iocage.lib.LaunchableResource.LaunchableResource'
+    target: 'iocage.LaunchableResource.LaunchableResource'
 ) -> set:
     """Set a bunch of jail properties from a Click option tuple."""
     updated_properties = set()
@@ -66,7 +66,7 @@ def set_properties(
             try:
                 del target.config[key]
                 updated_properties.add(key)
-            except (iocage.lib.errors.IocageException, KeyError):
+            except (iocage.errors.IocageException, KeyError):
                 pass
 
     if len(updated_properties) > 0:

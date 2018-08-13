@@ -26,9 +26,9 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.Jails
-import iocage.lib.Logger
+import iocage.errors
+import iocage.Jails
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 from .shared.jail import set_properties
@@ -70,16 +70,16 @@ def cli(
 def _provision(
     filters: typing.Tuple[str, ...],
     temporary_config_override: typing.Tuple[str, ...],
-    zfs: iocage.lib.ZFS.ZFS,
-    host: iocage.lib.Host.HostGenerator,
-    logger: iocage.lib.Logger.Logger,
+    zfs: iocage.ZFS.ZFS,
+    host: iocage.Host.HostGenerator,
+    logger: iocage.Logger.Logger,
     print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ]
 ) -> bool:
 
-    jails = iocage.lib.Jails.JailsGenerator(
+    jails = iocage.Jails.JailsGenerator(
         logger=logger,
         zfs=zfs,
         host=host,
@@ -94,12 +94,12 @@ def _provision(
                 properties=temporary_config_override,
                 target=jail
             )
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
 
         try:
             print_function(_execute_provisioner(jail))
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_jails.append(jail)
             continue
 
@@ -117,10 +117,10 @@ def _provision(
 
 
 def _execute_provisioner(
-    jail: 'iocage.lib.Jail.JailsGenerator'
-) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
+    jail: 'iocage.Jail.JailsGenerator'
+) -> typing.Generator['iocage.events.IocageEvent', None, None]:
     for event in jail.provisioner.provision():
         yield event
-        if isinstance(event, iocage.lib.events.JailCommandExecution):
+        if isinstance(event, iocage.events.JailCommandExecution):
             if event.done is True:
                 print(event.stdout)

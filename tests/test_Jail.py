@@ -30,7 +30,7 @@ import helper_functions
 import pytest
 import libzfs
 
-import iocage.lib.Jail
+import iocage.Jail
 
 
 def read_jail_config_json(config_file: str) -> dict:
@@ -45,11 +45,11 @@ class TestJail(object):
     @pytest.fixture
     def local_release(
         self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
+        release: 'iocage.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
         zfs: libzfs.ZFS
-    ) -> 'iocage.lib.Release.ReleaseGenerator':
+    ) -> 'iocage.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
             release.fetch()
@@ -64,14 +64,14 @@ class TestJail(object):
 
     def test_can_be_created(
         self,
-        host: 'iocage.lib.Host.Host',
-        local_release: 'iocage.lib.Release.ReleaseGenerator',
-        logger: 'iocage.lib.Logger.Logger',
+        host: 'iocage.Host.Host',
+        local_release: 'iocage.Release.ReleaseGenerator',
+        logger: 'iocage.Logger.Logger',
         zfs: libzfs.ZFS,
         root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if jails can be created."""
-        jail = iocage.lib.Jail.Jail(
+        jail = iocage.Jail.Jail(
             dict(id="foobar"),
             new=True,
             host=host,
@@ -118,11 +118,11 @@ class TestNullFSBasejail(object):
     @pytest.fixture
     def local_release(
         self,
-        release: 'iocage.lib.Release.ReleaseGenerator',
+        release: 'iocage.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
         zfs: libzfs.ZFS
-    ) -> 'iocage.lib.Release.ReleaseGenerator':
+    ) -> 'iocage.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
             release.fetch()
@@ -137,14 +137,14 @@ class TestNullFSBasejail(object):
 
     def test_can_be_created(
         self,
-        host: 'iocage.lib.Host.Host',
-        local_release: 'iocage.lib.Release.ReleaseGenerator',
-        logger: 'iocage.lib.Logger.Logger',
+        host: 'iocage.Host.Host',
+        local_release: 'iocage.Release.ReleaseGenerator',
+        logger: 'iocage.Logger.Logger',
         zfs: libzfs.ZFS,
         root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if NullFS basejails can be created."""
-        jail = iocage.lib.Jail.Jail(
+        jail = iocage.Jail.Jail(
             {
                 "basejail": True
             },

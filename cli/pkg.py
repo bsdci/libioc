@@ -25,10 +25,10 @@
 """Jail package management subcommand for the CLI."""
 import click
 
-import iocage.lib.Jail
-import iocage.lib.Pkg
-import iocage.lib.Logger
-import iocage.lib.errors
+import iocage.Jail
+import iocage.Pkg
+import iocage.Logger
+import iocage.errors
 
 __rootcmd__ = True
 
@@ -42,17 +42,17 @@ def cli(ctx, jail, packages):
     logger = ctx.parent.logger
 
     try:
-        ioc_jail = iocage.lib.Jail.JailGenerator(
+        ioc_jail = iocage.Jail.JailGenerator(
             jail,
             logger=logger,
             zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
-    except iocage.lib.errors.JailNotFound:
+    except iocage.errors.JailNotFound:
         exit(1)
 
     try:
-        pkg = iocage.lib.Pkg.Pkg(
+        pkg = iocage.Pkg.Pkg(
             logger=logger,
             zfs=ctx.parent.zfs,
             host=ctx.parent.host
@@ -62,6 +62,6 @@ def cli(ctx, jail, packages):
             packages=list(packages)
         )
         ctx.parent.print_events(events)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 

@@ -26,18 +26,18 @@
 import typing
 import click.core
 
-import iocage.lib.events
-import iocage.lib.Logger
-import iocage.lib.Host
+import iocage.events
+import iocage.Logger
+import iocage.Host
 
 
 class IocageClickContext(click.core.Context):
     """ioc ctx for Click CLI."""
 
-    logger: iocage.lib.Logger.Logger
-    host: iocage.lib.Host.Host
+    logger: iocage.Logger.Logger
+    host: iocage.Host.Host
     parent: 'IocageClickContext'
     print_events: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ]

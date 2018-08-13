@@ -26,11 +26,11 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.Logger
-import iocage.lib.helpers
-import iocage.lib.Resource
-import iocage.lib.Jails
+import iocage.errors
+import iocage.Logger
+import iocage.helpers
+import iocage.Resource
+import iocage.Jails
 
 from .shared.jail import set_properties
 
@@ -52,8 +52,8 @@ def cli(
 ) -> None:
     """Set one or many configuration properties of one jail."""
     parent: typing.Any = ctx.parent
-    logger: iocage.lib.Logger.Logger = parent.logger
-    host: iocage.lib.Host.HostGenerator = parent.host
+    logger: iocage.Logger.Logger = parent.logger
+    host: iocage.Host.HostGenerator = parent.host
 
     # Defaults
     if jail == "defaults":
@@ -69,7 +69,7 @@ def cli(
 
     # Jail Properties
     filters = (f"name={jail}",)
-    ioc_jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.Jails.JailsGenerator(
         filters,
         host=host,
         logger=logger
@@ -77,14 +77,14 @@ def cli(
 
     updated_jail_count = 0
 
-    for ioc_jail in ioc_jails:  # type: iocage.lib.Jail.JailGenerator
+    for ioc_jail in ioc_jails:  # type: iocage.Jail.JailGenerator
 
         try:
             updated_properties = set_properties(
                 properties=props,
                 target=ioc_jail
             )
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
 
         if len(updated_properties) == 0:

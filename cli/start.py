@@ -26,9 +26,9 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.Jails
-import iocage.lib.Logger
+import iocage.errors
+import iocage.Jails
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 from .shared.jail import set_properties
@@ -89,18 +89,18 @@ def cli(
 
 
 def _autostart(
-    zfs: iocage.lib.ZFS.ZFS,
-    host: iocage.lib.Host.HostGenerator,
-    logger: iocage.lib.Logger.Logger,
+    zfs: iocage.ZFS.ZFS,
+    host: iocage.Host.HostGenerator,
+    logger: iocage.Logger.Logger,
     print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ]
 ) -> None:
 
     filters = ("boot=yes", "running=no", "template=no,-",)
 
-    ioc_jails = iocage.lib.Jails.Jails(
+    ioc_jails = iocage.Jails.Jails(
         zfs=zfs,
         host=host,
         logger=logger,
@@ -117,7 +117,7 @@ def _autostart(
     for jail in jails:
         try:
             jail.start()
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_jails.append(jail)
             continue
 
@@ -132,18 +132,18 @@ def _autostart(
 def _normal(
     filters: typing.Tuple[str, ...],
     temporary_config_override: typing.Tuple[str, ...],
-    zfs: iocage.lib.ZFS.ZFS,
-    host: iocage.lib.Host.HostGenerator,
-    logger: iocage.lib.Logger.Logger,
+    zfs: iocage.ZFS.ZFS,
+    host: iocage.Host.HostGenerator,
+    logger: iocage.Logger.Logger,
     print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ]
 ) -> bool:
 
     filters += ("template=no,-",)
 
-    jails = iocage.lib.Jails.JailsGenerator(
+    jails = iocage.Jails.JailsGenerator(
         logger=logger,
         zfs=zfs,
         host=host,
@@ -158,12 +158,12 @@ def _normal(
                 properties=temporary_config_override,
                 target=jail
             )
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
         try:
             jail.require_jail_not_template()
             print_function(jail.start())
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_jails.append(jail)
             continue
 

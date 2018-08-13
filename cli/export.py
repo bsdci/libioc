@@ -26,13 +26,13 @@
 import click
 import os.path
 
-import iocage.lib.errors
-import iocage.lib.Filter
-import iocage.lib.Jail
-import iocage.lib.Jails
-import iocage.lib.Logger
-import iocage.lib.Releases
-import iocage.lib.Resource
+import iocage.errors
+import iocage.Filter
+import iocage.Jail
+import iocage.Jails
+import iocage.Logger
+import iocage.Releases
+import iocage.Resource
 
 from .shared.click import IocageClickContext
 
@@ -68,14 +68,14 @@ def cli(
     as the destination path.
     """
     logger = ctx.parent.logger
-    zfs: iocage.lib.ZFS.ZFS = ctx.parent.zfs
-    host: iocage.lib.Host.HostGenerator = ctx.parent.host
+    zfs: iocage.ZFS.ZFS = ctx.parent.zfs
+    host: iocage.Host.HostGenerator = ctx.parent.host
     print_events = ctx.parent.print_events
 
     # Recursive exports cannot be imported at the current time
     recursive = False
 
-    ioc_jail = iocage.lib.Jail.JailGenerator(
+    ioc_jail = iocage.Jail.JailGenerator(
         jail,
         logger=logger,
         zfs=zfs,
@@ -92,5 +92,5 @@ def cli(
             standalone=standalone,
             recursive=recursive
         ))
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)

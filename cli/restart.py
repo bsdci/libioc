@@ -26,10 +26,10 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.events
-import iocage.lib.Jails
-import iocage.lib.Logger
+import iocage.errors
+import iocage.events
+import iocage.Jails
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 
@@ -71,7 +71,7 @@ def cli(
         logger.error("No jail selector provided")
         exit(1)
 
-    ioc_jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.Jails.JailsGenerator(
         host=ctx.parent.host,
         zfs=ctx.parent.zfs,
         logger=logger,

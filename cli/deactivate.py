@@ -25,10 +25,10 @@
 """Deactivate ZFS pools for iocage with the CLI."""
 import click
 
-import iocage.lib.errors
-import iocage.lib.Datasets
-import iocage.lib.Logger
-import iocage.lib.ZFS
+import iocage.errors
+import iocage.Datasets
+import iocage.Logger
+import iocage.ZFS
 
 __rootcmd__ = True
 
@@ -52,7 +52,7 @@ def cli(ctx, zpool):
         exit(1)
 
     try:
-        datasets = iocage.lib.Datasets.Datasets(
+        datasets = iocage.Datasets.Datasets(
             zfs=zfs,
             logger=logger
         )
@@ -62,5 +62,5 @@ def cli(ctx, zpool):
             logger.log(f"ZFS pool '{zpool}' deactivated")
         else:
             logger.warn(f"ZFS pool '{zpool}' is not active")
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)

@@ -26,9 +26,9 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.Jails
-import iocage.lib.Logger
+import iocage.errors
+import iocage.Jails
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 
@@ -87,11 +87,11 @@ def cli(
 
 def _normal(
     filters: typing.Tuple[str, ...],
-    zfs: iocage.lib.Host.HostGenerator,
-    host: iocage.lib.Host.HostGenerator,
-    logger: iocage.lib.Logger.Logger,
+    zfs: iocage.Host.HostGenerator,
+    host: iocage.Host.HostGenerator,
+    logger: iocage.Logger.Logger,
     print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ],
     force: bool
@@ -99,7 +99,7 @@ def _normal(
 
     filters += ("template=no,-",)
 
-    jails = iocage.lib.Jails.JailsGenerator(
+    jails = iocage.Jails.JailsGenerator(
         zfs=zfs,
         host=host,
         logger=logger,
@@ -111,7 +111,7 @@ def _normal(
     for jail in jails:
         try:
             print_function(jail.stop(force=force))
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_jails.append(jail)
             continue
 
@@ -130,11 +130,11 @@ def _normal(
 
 
 def _autostop(
-    zfs: iocage.lib.ZFS.ZFS,
-    host: iocage.lib.Host.HostGenerator,
-    logger: iocage.lib.Logger.Logger,
+    zfs: iocage.ZFS.ZFS,
+    host: iocage.Host.HostGenerator,
+    logger: iocage.Logger.Logger,
     print_function: typing.Callable[
-        [typing.Generator[iocage.lib.events.IocageEvent, None, None]],
+        [typing.Generator[iocage.events.IocageEvent, None, None]],
         None
     ],
     force: bool=True
@@ -142,7 +142,7 @@ def _autostop(
 
     filters = ("running=yes", "template=no,-",)
 
-    ioc_jails = iocage.lib.Jails.Jails(
+    ioc_jails = iocage.Jails.Jails(
         host=host,
         zfs=zfs,
         logger=logger,
@@ -159,7 +159,7 @@ def _autostop(
     for jail in jails:
         try:
             jail.stop(force=force)
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_jails.append(jail)
             continue
 

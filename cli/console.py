@@ -25,9 +25,9 @@
 """Console subcommand for the CLI."""
 import click
 
-import iocage.lib.Jail
-import iocage.lib.Logger
-import iocage.lib.errors
+import iocage.Jail
+import iocage.Logger
+import iocage.errors
 
 __rootcmd__ = True
 
@@ -41,14 +41,14 @@ def cli(ctx, jail, start):
     logger = ctx.parent.logger
 
     try:
-        ioc_jail = iocage.lib.Jail.JailGenerator(
+        ioc_jail = iocage.Jail.JailGenerator(
             jail,
             logger=logger,
             zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
         ioc_jail.state.query()
-    except iocage.lib.errors.JailNotFound:
+    except iocage.errors.JailNotFound:
         exit(1)
 
     try:
@@ -57,6 +57,6 @@ def cli(ctx, jail, start):
                 ctx.parent.print_events(ioc_jail.start())
 
         ioc_jail.exec_console()
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 

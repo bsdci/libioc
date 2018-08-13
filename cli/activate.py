@@ -25,10 +25,10 @@
 """Activate zfs pools for iocage with the CLI."""
 import click
 
-import iocage.lib.errors
-import iocage.lib.Datasets
-import iocage.lib.Logger
-import iocage.lib.ZFS
+import iocage.errors
+import iocage.Datasets
+import iocage.Logger
+import iocage.ZFS
 
 __rootcmd__ = True
 
@@ -57,12 +57,12 @@ def cli(ctx, zpool, mountpoint):
         exit(1)
 
     try:
-        datasets = iocage.lib.Datasets.Datasets(
+        datasets = iocage.Datasets.Datasets(
             zfs=zfs,
             logger=logger
         )
         datasets.attach_source("iocage", f"{iocage_pool.name}/iocage")
         datasets.activate(mountpoint=mountpoint)
         logger.log(f"ZFS pool '{zpool}' activated")
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)

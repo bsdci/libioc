@@ -26,8 +26,8 @@
 import typing
 import click
 
-import iocage.lib.Jail
-import iocage.lib.Logger
+import iocage.Jail
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 from .shared.jail import get_jail
@@ -74,7 +74,7 @@ def _cli_create(ctx: IocageClickContext, identifier: str) -> None:
             require_full_identifier=True
         )
         ioc_jail.snapshots.create(snapshot_name)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         pass
 
 
@@ -98,7 +98,7 @@ def cli_rollback(
             require_full_identifier=True
         )
         ioc_jail.snapshots.rollback(snapshot_name, force=force)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         pass
 
 
@@ -123,7 +123,7 @@ def _cli_list(ctx: IocageClickContext, jail: str) -> None:
         columns = ["NAME"]
         data = [[x.name.split("@", maxsplit=1)[1]] for x in ioc_jail.snapshots]
         print_table(data, columns)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         pass
 
 
@@ -142,7 +142,7 @@ def cli_remove(ctx: IocageClickContext, identifier: str) -> None:
             require_full_identifier=True
         )
         ioc_jail.snapshots.delete(snapshot_name)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         pass
 
 
@@ -200,14 +200,14 @@ def _parse_identifier(
     ctx: IocageClickContext,
     identifier: str,
     require_full_identifier: bool=False
-) -> typing.Tuple[iocage.lib.Jail.JailGenerator, typing.Optional[str]]:
+) -> typing.Tuple[iocage.Jail.JailGenerator, typing.Optional[str]]:
 
     snapshot_name: typing.Optional[str] = None
     try:
         jail, snapshot_name = identifier.split("@")
     except ValueError:
         if require_full_identifier is True:
-            raise iocage.lib.errors.InvalidSnapshotIdentifier(
+            raise iocage.errors.InvalidSnapshotIdentifier(
                 identifier=identifier,
                 logger=ctx.parent.logger
             )

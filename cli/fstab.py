@@ -28,28 +28,28 @@ import errno
 import click
 import os
 
-import iocage.lib.errors
-import iocage.lib.Logger
-import iocage.lib.Host
-import iocage.lib.helpers
-import iocage.lib.Jail
-import iocage.lib.Config.Jail.File.Fstab
+import iocage.errors
+import iocage.Logger
+import iocage.Host
+import iocage.helpers
+import iocage.Jail
+import iocage.Config.Jail.File.Fstab
 
 from .shared.jail import get_jail
 from .shared.click import IocageClickContext
 
 __rootcmd__ = True
-FstabLine = iocage.lib.Config.Jail.File.Fstab.FstabLine
+FstabLine = iocage.Config.Jail.File.Fstab.FstabLine
 
 
-def _get_relpath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
+def _get_relpath(path: str, jail: iocage.Jail.JailGenerator) -> str:
     if path.startswith(jail.root_path) is True:
         return path[len(jail.root_path.rstrip("/")):]
     else:
         return path
 
 
-def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
+def _get_abspath(path: str, jail: iocage.Jail.JailGenerator) -> str:
     result = str(os.path.realpath(os.path.join(
         jail.root_path,
         _get_relpath(path, jail).lstrip("/")
@@ -58,7 +58,7 @@ def _get_abspath(path: str, jail: iocage.lib.Jail.JailGenerator) -> str:
     if result.startswith(jail.root_path):
         return result
 
-    raise iocage.lib.errors.InsecureJailPath(
+    raise iocage.errors.InsecureJailPath(
         path=result,
         logger=jail.logger
     )
@@ -137,7 +137,7 @@ def cli_add(
             f"fstab mount added: {source} -> {desination_path} ({mount_opts})"
         )
         exit(0)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 
 
@@ -182,7 +182,7 @@ def cli_rm(ctx: IocageClickContext, source: str, jail: str) -> None:
                 del fstab[i - 1]
                 fstab.save()
                 break
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 
     if destination is None:

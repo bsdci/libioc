@@ -25,9 +25,9 @@
 """Clone and promote jails."""
 import click
 
-import iocage.lib.errors
-import iocage.lib.ZFS
-import iocage.lib.Jail
+import iocage.errors
+import iocage.ZFS
+import iocage.Jail
 
 from .shared.click import IocageClickContext
 
@@ -59,14 +59,14 @@ def cli(
     print_function = ctx.parent.print_events
     logger = ctx.parent.logger
 
-    ioc_source_jail = iocage.lib.Jail.JailGenerator(
+    ioc_source_jail = iocage.Jail.JailGenerator(
         dict(id=source),
         logger=logger,
         zfs=ctx.parent.zfs,
         host=ctx.parent.host
     )
 
-    ioc_destination_jail = iocage.lib.Jail.JailGenerator(
+    ioc_destination_jail = iocage.Jail.JailGenerator(
         dict(id=destination),
         new=True,
         logger=logger,
@@ -76,5 +76,5 @@ def cli(
 
     try:
         print_function(ioc_destination_jail.clone_from_jail(ioc_source_jail))
-    except iocage.lib.errors.IocageException as e:
+    except iocage.errors.IocageException as e:
         exit(1)
