@@ -27,7 +27,7 @@ import os
 import sys
 
 
-from iocage.cli import cli
+from cli import cli
 
 
 def main_safe():

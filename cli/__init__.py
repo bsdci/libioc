@@ -32,12 +32,12 @@ import sys
 
 import click
 
-from ..lib.Logger import Logger
-from ..lib.events import IocageEvent
-from ..lib.errors import InvalidLogLevel, IocageNotActivated
-from ..lib.ZFS import get_zfs
-from ..lib.Datasets import Datasets
-from ..lib.Host import HostGenerator
+from iocage.lib.Logger import Logger
+from iocage.lib.events import IocageEvent
+from iocage.lib.errors import InvalidLogLevel, IocageNotActivated
+from iocage.lib.ZFS import get_zfs
+from iocage.lib.Datasets import Datasets
+from iocage.lib.Host import HostGenerator
 
 logger = Logger()
 
@@ -148,7 +148,7 @@ class IOCageCLI(click.MultiCommand):
     def get_command(self, ctx, name):
         ctx.print_events = print_events
         try:
-            mod = __import__(f"iocage.cli.{name}", None, None, ["cli"])
+            mod = __import__(f"cli.{name}", None, None, ["cli"])
 
             try:
                 if mod.__rootcmd__ and "--help" not in sys.argv[1:]:
