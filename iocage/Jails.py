@@ -35,7 +35,6 @@ import iocage.helpers
 class JailsGenerator(iocage.ListableResource.ListableResource):
     """Asynchronous representation of a collection of jails."""
 
-    _class_jail = iocage.Jail.JailGenerator
     states = iocage.JailState.JailStates()
 
     # Keys that are stored on the Jail object, not the configuration
@@ -68,10 +67,14 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
             logger=logger
         )
 
+    @property
+    def _class_jail(self) -> iocage.Jail.JailGenerator:
+        return iocage.Jail.JailGenerator
+
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> iocage.Jail.JailGenerator:
+    ) -> 'iocage.Jail.JailGenerator':
 
         jail = self._class_jail(
             data=dict(id=dataset.name.split("/").pop()),
@@ -114,4 +117,6 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
 class Jails(JailsGenerator):
     """Synchronous wrapper ofs JailsGenerator."""
 
-    _class_jail = iocage.Jail.Jail
+    @property
+    def _class_jail(self) -> iocage.Jail.Jail:
+        return iocage.Jail.Jail
