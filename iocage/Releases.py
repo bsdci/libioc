@@ -32,13 +32,12 @@ import typing
 
 # MyPy
 import libzfs
-ReleaseListType = typing.List[iocage.Release.ReleaseGenerator]
+ReleaseListType = typing.List['iocage.Release.ReleaseGenerator']
 
 
 class ReleasesGenerator(iocage.ListableResource.ListableResource):
     """Generator Model of multiple iocage Releases."""
 
-    _class_release = iocage.Release.ReleaseGenerator
     host: 'iocage.Host.HostGenerator'
     zfs: 'iocage.ZFS.ZFS'
     logger: 'iocage.Logger.Logger'
@@ -63,6 +62,10 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
             zfs=zfs,
             logger=logger
         )
+
+    @property
+    def _class_release(self) -> 'iocage.Release.ReleaseGenerator':
+        return iocage.Release.ReleaseGenerator
 
     @property
     def local(self) -> ReleaseListType:
@@ -91,7 +94,7 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> iocage.Release.ReleaseGenerator:
+    ) -> 'iocage.Release.ReleaseGenerator':
         return self._class_release(
             name=self._get_asset_name_from_dataset(dataset),
             root_datasets_name=self.sources.find_root_datasets_name(
@@ -106,4 +109,6 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
 class Releases(ReleasesGenerator):
     """Model of multiple iocage Releases."""
 
-    _class_release = iocage.Release.Release
+    @property
+    def _class_release(self) -> 'iocage.Release.Release':
+        return iocage.Release.Release
