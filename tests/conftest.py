@@ -28,9 +28,9 @@ import helper_functions
 import libzfs
 import pytest
 
-import iocage.lib.Host
-import iocage.lib.Logger
-import iocage.lib.Release
+import iocage.Host
+import iocage.Logger
+import iocage.Release
 
 # Inject lib directory to path
 # iocage_lib_dir = os.path.abspath(os.path.join(
@@ -78,7 +78,7 @@ def zfs() -> libzfs.ZFS:
 def pool(
     request: typing.Any,
     zfs: libzfs.ZFS,
-    logger: 'iocage.lib.Logger.Logger'
+    logger: 'iocage.Logger.Logger'
 ) -> libzfs.ZFSPool:
     """Find the active iocage pool."""
     requested_pool = request.config.getoption("--zpool")
@@ -95,7 +95,7 @@ def pool(
         lambda pool: (pool.name == requested_pool),
         zfs.pools
     ))[0]
-    datasets = iocage.lib.Datasets.Datasets(
+    datasets = iocage.Datasets.Datasets(
         pool=target_pool,
         zfs=zfs,
         logger=logger
@@ -107,9 +107,9 @@ def pool(
 
 
 @pytest.fixture
-def logger() -> 'iocage.lib.Logger.Logger':
+def logger() -> 'iocage.Logger.Logger':
     """Make the iocage Logger available to the tests."""
-    return iocage.lib.Logger.Logger()
+    return iocage.Logger.Logger()
 
 
 @pytest.fixture
@@ -147,11 +147,11 @@ def root_dataset(
 @pytest.fixture
 def host(
     root_dataset: libzfs.ZFSDataset,
-    logger: 'iocage.lib.Logger.Logger',
+    logger: 'iocage.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'iocage.lib.Host.HostGenerator':
+) -> 'iocage.Host.HostGenerator':
     """Make the iocage.Host available to the tests."""
-    host = iocage.lib.Host.Host(
+    host = iocage.Host.Host(
         root_dataset=root_dataset, logger=logger, zfs=zfs
     )
     return host
@@ -160,11 +160,11 @@ def host(
 
 @pytest.fixture
 def release(
-    host: 'iocage.lib.Host.HostGenerator',
-    logger: 'iocage.lib.Logger.Logger',
+    host: 'iocage.Host.HostGenerator',
+    logger: 'iocage.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'iocage.lib.Release.ReleaseGenerator':
+) -> 'iocage.Release.ReleaseGenerator':
     """Return the test release matching the host release version."""
-    return iocage.lib.Release.Release(
+    return iocage.Release.Release(
         name=host.release_version, host=host, logger=logger, zfs=zfs
     )

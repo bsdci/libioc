@@ -26,10 +26,10 @@
 import click
 import typing
 
-import iocage.lib.Host
-import iocage.lib.Prompts
-import iocage.lib.Release
-import iocage.lib.errors
+import iocage.Host
+import iocage.Prompts
+import iocage.Release
+import iocage.errors
 
 from .shared.click import IocageClickContext
 
@@ -94,30 +94,30 @@ def cli(  # noqa: T484
     logger = ctx.parent.logger
     host = ctx.parent.host
     zfs = ctx.parent.zfs
-    prompts = iocage.lib.Prompts.Prompts(host=host, logger=logger)
+    prompts = iocage.Prompts.Prompts(host=host, logger=logger)
 
     release_input = kwargs["release"]
     if release_input is None:
         try:
             release = prompts.release()
-        except iocage.lib.errors.DefaultReleaseNotFound:
+        except iocage.errors.DefaultReleaseNotFound:
             exit(1)
     else:
         try:
-            release = iocage.lib.Release.ReleaseGenerator(
+            release = iocage.Release.ReleaseGenerator(
                 name=release_input,
                 host=host,
                 zfs=zfs,
                 logger=logger
             )
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
 
     if kwargs["copy_basejail_only"] is True:
         try:
             release.update_base_release()
             exit(0)
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
 
     url_or_files_selected = False
@@ -140,7 +140,7 @@ def cli(  # noqa: T484
             update=kwargs["update"],
             fetch_updates=fetch_updates
         ))
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 
     exit(0)

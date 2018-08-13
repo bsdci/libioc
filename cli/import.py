@@ -25,10 +25,10 @@
 """Export a jail from the CLI."""
 import click
 
-import iocage.lib.errors
-import iocage.lib.Jail
-import iocage.lib.Host
-import iocage.lib.ZFS
+import iocage.errors
+import iocage.Jail
+import iocage.Host
+import iocage.ZFS
 
 from .shared.click import IocageClickContext
 
@@ -46,11 +46,11 @@ def cli(
 ) -> None:
     """Restore a jail from a backup archive."""
     logger = ctx.parent.logger
-    zfs: iocage.lib.ZFS.ZFS = ctx.parent.zfs
-    host: iocage.lib.Host.HostGenerator = ctx.parent.host
+    zfs: iocage.ZFS.ZFS = ctx.parent.zfs
+    host: iocage.Host.HostGenerator = ctx.parent.host
     print_events = ctx.parent.print_events
 
-    ioc_jail = iocage.lib.Jail.JailGenerator(
+    ioc_jail = iocage.Jail.JailGenerator(
         dict(name=jail),
         logger=logger,
         zfs=zfs,
@@ -64,5 +64,5 @@ def cli(
 
     try:
         print_events(ioc_jail.backup.restore(source))
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)

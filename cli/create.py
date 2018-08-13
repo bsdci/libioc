@@ -26,12 +26,12 @@
 import click
 import typing
 
-import iocage.lib.errors
-import iocage.lib.Host
-import iocage.lib.Jail
-import iocage.lib.Logger
-import iocage.lib.Release
-import iocage.lib.ZFS
+import iocage.errors
+import iocage.Host
+import iocage.Jail
+import iocage.Logger
+import iocage.Release
+import iocage.ZFS
 
 from .shared.click import IocageClickContext
 
@@ -54,7 +54,7 @@ def validate_count(
 
             return int(value)
         except ValueError:
-            logger = iocage.lib.Logger.Logger()
+            logger = iocage.Logger.Logger()
             logger.error(f"{value} is not a valid integer.")
             exit(1)
     else:
@@ -121,8 +121,8 @@ def cli(
 ) -> None:
     """Create iocage jails."""
     logger = ctx.parent.logger
-    zfs: iocage.lib.ZFS.ZFS = ctx.parent.zfs
-    host: iocage.lib.Host.Host = ctx.parent.host
+    zfs: iocage.ZFS.ZFS = ctx.parent.zfs
+    host: iocage.Host.Host = ctx.parent.host
 
     jail_data: typing.Dict[str, typing.Any] = {}
 
@@ -133,20 +133,20 @@ def cli(
         )
         release = host.release_version
 
-    resource_selector = iocage.lib.ResourceSelector.ResourceSelector(name)
+    resource_selector = iocage.ResourceSelector.ResourceSelector(name)
     jail_data["name"] = resource_selector.name
     root_datasets_name = resource_selector.source_name
 
     if release is not None:
         try:
-            resource = iocage.lib.Release.ReleaseGenerator(
+            resource = iocage.Release.ReleaseGenerator(
                 name=release,
                 root_datasets_name=root_datasets_name,
                 logger=logger,
                 host=host,
                 zfs=zfs
             )
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             exit(1)
         if not resource.fetched:
             if not resource.available:
@@ -167,7 +167,7 @@ def cli(
                 logger.log(f"Automatically fetching release '{resource.name}'")
                 resource.fetch()
     elif template is not None:
-        resource = iocage.lib.Jail.JailGenerator(
+        resource = iocage.Jail.JailGenerator(
             template,
             root_datasets_name=root_datasets_name,
             logger=logger,
@@ -193,7 +193,7 @@ def cli(
     errors = False
     for i in range(count):
 
-        jail = iocage.lib.Jail.JailGenerator(
+        jail = iocage.Jail.JailGenerator(
             jail_data,
             root_datasets_name=root_datasets_name,
             logger=logger,
@@ -211,7 +211,7 @@ def cli(
                 f"{msg_source}!{suffix}"
             )
             logger.log(msg)
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             msg = f"{jail.humanreadable_name} could not be created!{suffix}"
             logger.warn(msg)
 

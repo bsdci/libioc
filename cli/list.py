@@ -27,13 +27,13 @@ import click
 import json
 import typing
 
-import iocage.lib.errors
-import iocage.lib.Logger
-import iocage.lib.Host
-import iocage.lib.Resource
-import iocage.lib.ListableResource
-import iocage.lib.Jails
-import iocage.lib.Releases
+import iocage.errors
+import iocage.Logger
+import iocage.Host
+import iocage.Resource
+import iocage.ListableResource
+import iocage.Jails
+import iocage.Releases
 
 from .shared.output import print_table
 from .shared.click import IocageClickContext
@@ -77,7 +77,7 @@ def cli(
 ) -> None:
     """List jails in various formats."""
     logger = ctx.parent.logger
-    host: iocage.lib.Host.HostGenerator = ctx.parent.host
+    host: iocage.Host.HostGenerator = ctx.parent.host
 
     if output is not None and _long is True:
         logger.error("--output and --long can't be used together")
@@ -103,7 +103,7 @@ def cli(
         else:
 
             if (dataset_type == "base"):
-                resources_class = iocage.lib.Releases.ReleasesGenerator
+                resources_class = iocage.Releases.ReleasesGenerator
                 columns = ["full_name"]
             elif (dataset_type == "datasets"):
                 resources_class = None
@@ -114,7 +114,7 @@ def cli(
                     in host.datasets.items()
                 ]
             else:
-                resources_class = iocage.lib.Jails.JailsGenerator
+                resources_class = iocage.Jails.JailsGenerator
                 columns = _list_output_comumns(output, _long)
                 if dataset_type == "template":
                     filters += ("template=yes",)
@@ -130,7 +130,7 @@ def cli(
                     filters=filters
                 )
 
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 
     if output_format == "list":
@@ -145,7 +145,7 @@ def cli(
 
 def _print_table(
     resources: typing.Generator[
-        iocage.lib.ListableResource.ListableResource,
+        iocage.ListableResource.ListableResource,
         None,
         None
     ],
@@ -163,7 +163,7 @@ def _print_table(
 
 def _print_list(
     resources: typing.Generator[
-        iocage.lib.Jails.JailsGenerator,
+        iocage.Jails.JailsGenerator,
         None,
         None
     ],
@@ -181,7 +181,7 @@ def _print_list(
 
 def _print_json(
     resources: typing.Generator[
-        iocage.lib.Jails.JailsGenerator,
+        iocage.Jails.JailsGenerator,
         None,
         None
     ],
@@ -206,7 +206,7 @@ def _print_json(
 
 
 def _lookup_resource_values(
-    resource: 'iocage.lib.Resource.Resource',
+    resource: 'iocage.Resource.Resource',
     columns: typing.List[str]
 ) -> typing.List[str]:
     if "getstring" in resource.__dir__():

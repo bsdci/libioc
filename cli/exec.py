@@ -27,8 +27,8 @@ import click
 import typing
 import shlex
 
-import iocage.lib.Jail
-import iocage.lib.Logger
+import iocage.Jail
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 
@@ -81,7 +81,7 @@ def cli(
             shlex.quote(user_command)
         ]
 
-    ioc_jail = iocage.lib.Jail.JailGenerator(
+    ioc_jail = iocage.Jail.JailGenerator(
         jail,
         logger=logger,
         zfs=ctx.parent.zfs,
@@ -108,5 +108,5 @@ def cli(
                 continue
         else:
             ioc_jail.passthru(command_list)
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)

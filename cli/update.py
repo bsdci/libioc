@@ -33,10 +33,10 @@ are temporarily mounted and applied with securelevel=0.
 import click
 import typing
 
-import iocage.lib.errors
-import iocage.lib.Jails
-import iocage.lib.Logger
-import iocage.lib.Config.Jail.File.Fstab
+import iocage.errors
+import iocage.Jails
+import iocage.Logger
+import iocage.Config.Jail.File.Fstab
 
 from .shared.click import IocageClickContext
 
@@ -59,7 +59,7 @@ def cli(
         exit(1)
 
     filters = jails + ("template=no,-", "basejail=no",)
-    ioc_jails = iocage.lib.Jails.JailsGenerator(
+    ioc_jails = iocage.Jails.JailsGenerator(
         logger=logger,
         host=ctx.parent.host,
         zfs=ctx.parent.zfs,
@@ -73,7 +73,7 @@ def cli(
             changed = print_function(jail.updater.apply())
             if changed is True:
                 changed_jails.append(jail)
-        except iocage.lib.errors.UpdateFailure:
+        except iocage.errors.UpdateFailure:
             failed_jails.append(jail)
 
     if len(failed_jails) > 0:

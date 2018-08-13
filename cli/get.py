@@ -26,10 +26,10 @@
 import typing
 import click
 
-import iocage.lib.errors
-import iocage.lib.Host
-import iocage.lib.Jail
-import iocage.lib.Logger
+import iocage.errors
+import iocage.Host
+import iocage.Jail
+import iocage.Logger
 
 from .shared.click import IocageClickContext
 
@@ -61,7 +61,7 @@ def cli(
 ) -> None:
     """Get a list of jails and print the property."""
     logger = ctx.parent.logger
-    host = iocage.lib.Host.Host(logger=logger)
+    host = iocage.Host.Host(logger=logger)
 
     _prop = None if len(prop) == 0 else prop[0]
 
@@ -88,12 +88,12 @@ def cli(
     else:
         lookup_method = _lookup_jail_value
         try:
-            source_resource = iocage.lib.Jail.Jail(
+            source_resource = iocage.Jail.Jail(
                 jail,
                 host=host,
                 logger=logger
             )
-        except iocage.lib.errors.JailNotFound as e:
+        except iocage.errors.JailNotFound as e:
             exit(1)
 
     if (_prop is None) and (jail == "") and not _all:
@@ -124,14 +124,14 @@ def _print_property(key: str, value: str) -> None:
 
 
 def _lookup_config_value(
-    resource: 'iocage.lib.Resource.Resource',
+    resource: 'iocage.Resource.Resource',
     key: str
 ) -> str:
-    return str(iocage.lib.helpers.to_string(resource.config[key]))
+    return str(iocage.helpers.to_string(resource.config[key]))
 
 
 def _lookup_jail_value(
-    resource: 'iocage.lib.LaunchableResource.LaunchableResource',
+    resource: 'iocage.LaunchableResource.LaunchableResource',
     key: str
 ) -> str:
 
@@ -140,4 +140,4 @@ def _lookup_jail_value(
     else:
         value = resource.getstring(key)
 
-    return str(iocage.lib.helpers.to_string(value))
+    return str(iocage.helpers.to_string(value))

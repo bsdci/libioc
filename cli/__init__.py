@@ -32,12 +32,12 @@ import sys
 
 import click
 
-from iocage.lib.Logger import Logger
-from iocage.lib.events import IocageEvent
-from iocage.lib.errors import InvalidLogLevel, IocageNotActivated
-from iocage.lib.ZFS import get_zfs
-from iocage.lib.Datasets import Datasets
-from iocage.lib.Host import HostGenerator
+from iocage.Logger import Logger
+from iocage.events import IocageEvent
+from iocage.errors import InvalidLogLevel, IocageNotActivated
+from iocage.ZFS import get_zfs
+from iocage.Datasets import Datasets
+from iocage.Host import HostGenerator
 
 logger = Logger()
 
@@ -165,6 +165,7 @@ class IOCageCLI(click.MultiCommand):
                 pass
             return mod.cli
         except (ImportError, AttributeError):
+            raise
             return
 
 

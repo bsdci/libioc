@@ -25,7 +25,7 @@
 """Rename a jail."""
 import click
 
-import iocage.lib.Jail
+import iocage.Jail
 
 from .shared.click import IocageClickContext
 
@@ -46,13 +46,13 @@ def cli(
     print_function = ctx.parent.print_events
 
     try:
-        ioc_jail = iocage.lib.Jail.Jail(
+        ioc_jail = iocage.Jail.Jail(
             jail,
             logger=logger,
             zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
         print_function(ioc_jail.rename(name))
-    except iocage.lib.errors.IocageException:
+    except iocage.errors.IocageException:
         exit(1)
 

@@ -26,13 +26,13 @@
 import click
 import typing
 
-import iocage.lib.errors
-import iocage.lib.Filter
-import iocage.lib.Jail
-import iocage.lib.Jails
-import iocage.lib.Logger
-import iocage.lib.Releases
-import iocage.lib.Resource
+import iocage.errors
+import iocage.Filter
+import iocage.Jail
+import iocage.Jails
+import iocage.Logger
+import iocage.Releases
+import iocage.Resource
 
 from .shared.click import IocageClickContext
 
@@ -86,13 +86,13 @@ def cli(
     release = (dataset_type == "release") is True
 
     resources_class: typing.Union[
-        typing.Type[iocage.lib.Releases.ReleasesGenerator],
-        typing.Type[iocage.lib.Jails.JailsGenerator]
+        typing.Type[iocage.Releases.ReleasesGenerator],
+        typing.Type[iocage.Jails.JailsGenerator]
     ]
     if release is True:
-        resources_class = iocage.lib.Releases.ReleasesGenerator
+        resources_class = iocage.Releases.ReleasesGenerator
     else:
-        resources_class = iocage.lib.Jails.JailsGenerator
+        resources_class = iocage.Jails.JailsGenerator
 
     resources = list(resources_class(
         filters=filters,
@@ -125,7 +125,7 @@ def cli(
         try:
             ctx.parent.print_events(item.destroy())
             logger.screen(f"{old_mountpoint} destroyed")
-        except iocage.lib.errors.IocageException:
+        except iocage.errors.IocageException:
             failed_items.append(item)
 
     if len(failed_items) > 0:
