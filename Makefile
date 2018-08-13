@@ -31,14 +31,14 @@ uninstall:
 check:
 	flake8 --version
 	flake8 --exclude=".travis,.eggs,__init__.py,docs" --ignore=E203,W391,D107,A001,A002,A003,A004
-	bandit --skip B404 --exclude iocage/tests/ -r .
+	bandit --skip B404 --exclude tests/ -r .
 test:
-	pytest iocage/tests --zpool $(ZPOOL)
+	pytest tests --zpool $(ZPOOL)
 regression-test:
-	iocage/tests/run-integration.sh
+	tests/run-integration.sh
 .PHONY: docs
 docs:
-	sphinx-apidoc -o docs --separate -H libiocage -A "iocage Authors" --full iocage iocage/cli iocage/tests
+	sphinx-apidoc -o docs --separate -H libiocage -A "iocage Authors" --full iocage cli tests
 	if [ "`uname`" = "FreeBSD" ]; then gmake -C docs html; else make -C docs html; fi
 
 help:
