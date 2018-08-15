@@ -30,6 +30,8 @@ status_cmd="ioc_status"
 extra_commands="status"
 export LANG=$ioc_lang
 
+[ $# -ne 1 ] && rc_usage $_keywords
+
 ioc_start()
 {
     if checkyesno ${rcvar}; then
