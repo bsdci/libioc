@@ -469,15 +469,15 @@ class JailGenerator(JailResource):
         exec_start: typing.List[str] = [
             f". {self._relative_hook_script_dir}/.env"
         ]
-        exec_started: typing.List[str] = [
+        exec_created: typing.List[str] = [
             f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
             "set -eu",
         ]
         exec_poststart: typing.List[str] = []
 
         if self.config["vnet"]:
-            _started, _start = self._start_vimage_network()
-            exec_started += _started
+            _created, _start = self._start_vimage_network()
+            exec_created += _created
             exec_start += [f". {self._relative_hook_script_dir}/.env"] + _start
             exec_start += self._configure_localhost_commands()
             exec_start += self._configure_routes_commands()
@@ -491,12 +491,12 @@ class JailGenerator(JailResource):
             )
             share_storage.mount_zfs_shares()
             exec_start += share_storage.read_commands("jail")
-            exec_started += share_storage.read_commands()
+            exec_created += share_storage.read_commands()
 
         if self.config["exec_prestart"] is not None:
             exec_prestart += [self.config["exec_prestart"]]
-        if self.config["exec_started"] is not None:
-            exec_started += [self.config["exec_started"]]
+        if self.config["exec_created"] is not None:
+            exec_created += [self.config["exec_created"]]
         if self.config["exec_start"] is not None and (single_command is None):
             exec_start += [self.config["exec_start"]]
         if self.config["exec_poststart"] is not None:
@@ -510,9 +510,9 @@ class JailGenerator(JailResource):
             )
         )
         self._write_hook_script(
-            "started",
+            "created",
             self._wrap_hook_script_command_string(
-                exec_started,
+                exec_created,
             )
         )
         self._write_hook_script(
@@ -527,8 +527,8 @@ class JailGenerator(JailResource):
             "poststart",
             self._wrap_hook_script_command_string([
                 "set -eu",
-                "/bin/echo running exec.started hook on the host",
-                f"/bin/sh {self.get_hook_script_path('started')} 2>&1",
+                "/bin/echo running exec.created hook on the host",
+                f"/bin/sh {self.get_hook_script_path('created')} 2>&1",
                 "/bin/echo running exec.start hook in the jail",
                 (
                     f"/usr/sbin/jexec {self.identifier} "
@@ -1561,7 +1561,7 @@ class JailGenerator(JailResource):
             [
                 f"IOCAGE_JID=$({_jls_command} 2>&1 || echo -1)",
                 "set -e",
-                f"/bin/sh {self.get_hook_script_path('started')}",
+                f"/bin/sh {self.get_hook_script_path('created')}",
                 (
                     f"/usr/sbin/jexec {self.identifier} "
                     f"{self._relative_hook_script_dir}/command.sh"
@@ -1642,7 +1642,7 @@ class JailGenerator(JailResource):
     def _write_hook_script(self, hook_name: str, command_string: str) -> None:
         file = self.get_hook_script_path(hook_name)
         existed = os.path.isfile(file)
-        if hook_name in ["started", "poststart", "prestop"]:
+        if hook_name in ["created", "poststart", "prestop"]:
             _identifier = str(shlex.quote(self.identifier))
             _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
             command_string = (
@@ -1685,16 +1685,16 @@ class JailGenerator(JailResource):
     ]:
         self.logger.debug("Starting VNET/VIMAGE")
 
-        started: typing.List[str] = []
+        created: typing.List[str] = []
         start: typing.List[str] = []
 
         for network in self.networks:
-            _started, _start = network.setup()
+            _created, _start = network.setup()
 
-            started += _started
+            created += _created
             start += _start
 
-        return started, start
+        return created, start
 
     def _stop_vimage_network(self) -> typing.List[str]:
         commands: typing.List[str] = []
