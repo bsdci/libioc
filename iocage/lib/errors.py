@@ -391,13 +391,15 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
         value: str,
         property_name: str,
         jail: typing.Optional[iocage.lib.Jail.JailGenerator]=None,
-        logger: typing.Optional[Logger]=None
+        logger: typing.Optional[Logger]=None,
+        level: str="error"
     ) -> None:
         reason = f"expected \"<nic>|<address>\" but got \"{value}\""
         super().__init__(
             property_name=property_name,
             jail=jail,
-            reason=reason
+            reason=reason,
+            level=level
         )
 
 
