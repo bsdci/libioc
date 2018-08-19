@@ -399,7 +399,8 @@ class InvalidJailConfigAddress(InvalidJailConfigValue):
             property_name=property_name,
             jail=jail,
             reason=reason,
-            level=level
+            level=level,
+            logger=logger
         )
 
 
