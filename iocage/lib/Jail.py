@@ -1680,7 +1680,7 @@ class JailGenerator(JailResource):
         return f"{self.jail.launch_script_dir}/{hook_name}.sh"
 
     def _start_vimage_network(self) -> typing.Tuple[
-        'iocage.lib.Network.StartedCommandList',
+        'iocage.lib.Network.CreatedCommandList',
         'iocage.lib.Network.JailCommandList'
     ]:
         self.logger.debug("Starting VNET/VIMAGE")
