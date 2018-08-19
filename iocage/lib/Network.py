@@ -35,7 +35,7 @@ import iocage.lib.Firewall
 import iocage.lib.errors
 import iocage.lib.helpers
 
-StartedCommandList = typing.List[str]
+CreatedCommandList = typing.List[str]
 PoststopCommandList = typing.List[str]
 StartCommandList = typing.List[str]
 
@@ -86,7 +86,7 @@ class Network:
         self._nic_hash_cache = {}
 
     def setup(self) -> typing.Tuple[
-        StartedCommandList,
+        CreatedCommandList,
         StartCommandList
     ]:
         """
@@ -186,9 +186,9 @@ class Network:
         nic_suffix_a: str=":a",
         nic_suffix_b: str=":b",
         **nic_args: typing.Any
-    ) -> StartedCommandList:
+    ) -> CreatedCommandList:
 
-        commands: StartedCommandList = []
+        commands: CreatedCommandList = []
 
         commands += iocage.lib.NetworkInterface.QueuingNetworkInterface(
             name="epair",
@@ -227,11 +227,11 @@ class Network:
         return commands
 
     def __create_vnet_iface(self) -> typing.Tuple[
-        StartedCommandList,
+        CreatedCommandList,
         StartCommandList
     ]:
 
-        commands_started: typing.List[str] = []
+        commands_created: typing.List[str] = []
         commands_start: typing.List[str] = []
 
         if self.bridge is None:
@@ -240,7 +240,7 @@ class Network:
         if self._is_secure_vnet_bridge is True:
             self.firewall.ensure_firewall_enabled()
 
-        commands_started += self.__create_new_epair_interface(
+        commands_created += self.__create_new_epair_interface(
             variable_name_a=f"IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
             variable_name_b=f"IOCAGE_NIC_EPAIR_B_{self._nic_hash}",
             nic_suffix_a="",
@@ -267,7 +267,7 @@ class Network:
             description=self.nic_local_description,
             logger=self.logger
         )
-        commands_started += host_if.read_commands()
+        commands_created += host_if.read_commands()
 
         if self._is_secure_vnet_bridge is False:
             jail_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -276,9 +276,9 @@ class Network:
                 logger=self.logger,
                 insecure=True
             )
-            commands_started += jail_bridge.read_commands()
+            commands_created += jail_bridge.read_commands()
         else:
-            commands_started += self.__create_new_epair_interface(
+            commands_created += self.__create_new_epair_interface(
                 variable_name_a=f"IOCAGE_NIC_EPAIR_C_{self._nic_hash}",
                 variable_name_b=f"IOCAGE_NIC_EPAIR_D_{self._nic_hash}",
                 nic_suffix_a=":a",
@@ -286,7 +286,7 @@ class Network:
                 mtu=self.mtu
             )
 
-            commands_started += self.__configure_firewall(
+            commands_created += self.__configure_firewall(
                 mac_address=str(mac_address_pair.b)
             )
 
@@ -299,7 +299,7 @@ class Network:
                 insecure=True,
                 shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._nic_hash}",
             )
-            commands_started += sec_bridge.read_commands()
+            commands_created += sec_bridge.read_commands()
 
             # add nic to secure bridge
             sec_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -312,7 +312,7 @@ class Network:
                 logger=self.logger,
                 insecure=True
             )
-            commands_started += sec_bridge.read_commands()
+            commands_created += sec_bridge.read_commands()
 
             # add nic to jail bridge
             jail_bridge = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -321,9 +321,9 @@ class Network:
                 logger=self.logger,
                 insecure=True
             )
-            commands_started += jail_bridge.read_commands()
+            commands_created += jail_bridge.read_commands()
 
-        commands_started += self.__up_host_if()
+        commands_created += self.__up_host_if()
 
         # assign epair_b to jail
         assigned_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -332,7 +332,7 @@ class Network:
             extra_settings=[],
             logger=self.logger
         )
-        commands_started += assigned_if.read_commands()
+        commands_created += assigned_if.read_commands()
 
         # configure network inside the jail
         jail_if = iocage.lib.NetworkInterface.QueuingNetworkInterface(
@@ -348,7 +348,7 @@ class Network:
         )
         commands_start += jail_if.read_commands()
 
-        return commands_started, commands_start
+        return commands_created, commands_start
 
     def __configure_firewall(self, mac_address: str) -> typing.List[str]:
 
