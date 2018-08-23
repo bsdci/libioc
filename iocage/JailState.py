@@ -165,6 +165,13 @@ class JailState(dict):
         """Iterate over the jail state entries."""
         return self.data.__iter__()
 
+    def __repr__(self) -> str:
+        """Return the state in humand and robot friendly format."""
+        if self._data is None:
+            return "None"
+        else:
+            return str(iocage.helpers.to_json(self._data))
+
     def keys(self) -> typing.List[str]:  # noqa: T484
         """Return all available jail state keys."""
         return list(self.data.keys())
