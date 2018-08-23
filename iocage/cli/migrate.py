@@ -44,7 +44,7 @@ class JailMigrationEvent(iocage.lib.events.IocageEvent):
         jail: 'iocage.lib.Jail.JailGenerator'
     ) -> None:
         self.identifier = jail.full_name
-        iocage.lib.events.IocageEvent.__init__(self, jail=jail)
+        iocage.lib.events.IocageEvent.__init__(self)
 
 
 @click.command(name="migrate", help="Migrate jails to the latest format.")
