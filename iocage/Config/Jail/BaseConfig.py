@@ -694,6 +694,10 @@ class BaseConfig(dict):
         """Return the JSON object with all user configured settings."""
         return str(iocage.helpers.to_json(self.data))
 
+    def __repr__(self) -> str:
+        """Return the confgured settings in human and robot friendly format."""
+        return self.__str__()
+
     def __dir__(self) -> typing.List[str]:
         """Return a list of config object attributes."""
         properties = set()
