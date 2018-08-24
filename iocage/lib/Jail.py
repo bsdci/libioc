@@ -763,7 +763,8 @@ class JailGenerator(JailResource):
     def stop(
         self,
         force: bool=False,
-        event_scope: typing.Optional['iocage.lib.events.Scope']=None
+        event_scope: typing.Optional['iocage.lib.events.Scope']=None,
+        log_errors: bool=True
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
         Stop a jail.
@@ -771,11 +772,20 @@ class JailGenerator(JailResource):
         Args:
 
             force (bool): (default=False)
-                Ignores failures and enforces teardown if True
+                Ignores failures and enforces teardown if True.
+
+            event_scope (iocage.lib.events.Scope): (default=None)
+                Provide an existing libiocage event scope or automatically
+                create a new one instead.
+
+            log_errors (bool): (default=True)
+                When disabled errors are not passed to the logger. This is
+                useful in scripted contexts when then stop operation was
+                executed to enforce a defined jail state.
         """
         if force is False:
-            self.require_jail_existing()
-            self.require_jail_running()
+            self.require_jail_existing(log_errors=log_errors)
+            self.require_jail_running(log_errors=log_errors)
 
         events: typing.Any = iocage.lib.events
         jailDestroyEvent = events.JailDestroy(self, scope=event_scope)
@@ -785,7 +795,7 @@ class JailGenerator(JailResource):
         yield jailDestroyEvent.begin()
         try:
             self._write_jail_conf(force=force)
-            self._destroy_jail()
+            self._destroy_jail(log_errors=log_errors)
         except Exception as e:
             if force is True:
                 yield jailDestroyEvent.skip()
@@ -1341,7 +1351,7 @@ class JailGenerator(JailResource):
             ["/usr/bin/login"] + self.config["login_flags"]
         )
 
-    def _destroy_jail(self) -> None:
+    def _destroy_jail(self, log_errors: bool=True) -> None:
 
         stdout, stderr, returncode = self._exec_host_command(
             [
@@ -1358,7 +1368,7 @@ class JailGenerator(JailResource):
         if returncode > 0:
             raise iocage.lib.errors.JailDestructionFailed(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
     @property
@@ -1765,57 +1775,57 @@ class JailGenerator(JailResource):
 
         return commands
 
-    def require_jail_is_template(self) -> None:
+    def require_jail_is_template(self, log_errors: bool=True) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is False:
             raise iocage.lib.errors.JailNotTemplate(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
-    def require_storage_backend(self) -> None:
+    def require_storage_backend(self, log_errors: bool=True) -> None:
         """Raise if the jail was not initialized with a storage backend."""
         if self.storage_backend is None:
-            raise Exception("")
+            raise Exception("The jail has no storage backend.")
 
-    def require_jail_not_template(self) -> None:
+    def require_jail_not_template(self, log_errors: bool=True) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.config['template'] is True:
             raise iocage.lib.errors.JailIsTemplate(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
-    def require_jail_not_existing(self) -> None:
+    def require_jail_not_existing(self, log_errors: bool=True) -> None:
         """Raise JailAlreadyExists exception if the jail already exists."""
         if self.exists:
             raise iocage.lib.errors.JailAlreadyExists(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
-    def require_jail_existing(self) -> None:
+    def require_jail_existing(self, log_errors: bool=True) -> None:
         """Raise JailDoesNotExist exception if the jail does not exist."""
         if not self.exists:
             raise iocage.lib.errors.JailDoesNotExist(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
-    def require_jail_stopped(self) -> None:
+    def require_jail_stopped(self, log_errors: bool=True) -> None:
         """Raise JailAlreadyRunning exception if the jail is running."""
         if self.running is not False:
             raise iocage.lib.errors.JailAlreadyRunning(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
-    def require_jail_running(self) -> None:
+    def require_jail_running(self, log_errors: bool=True) -> None:
         """Raise JailNotRunning exception if the jail is stopped."""
         if not self.running:
             raise iocage.lib.errors.JailNotRunning(
                 jail=self,
-                logger=self.logger
+                logger=(self.logger if log_errors else None)
             )
 
     def _teardown_mounts(self) -> typing.List[str]:
