@@ -71,6 +71,9 @@ class JailConfig(iocage.lib.Config.Jail.BaseConfig.BaseConfig):
                 return str(jail.humanreadable_name)
             raise e
 
+    def _get_legacy(self) -> bool:
+        return self.legacy
+
     def _is_known_property(self, key: str) -> bool:
         key_is_default = key in self.host.defaults.config.keys()
         key_is_setter = f"_set_{key}" in dict.__dir__(self)
