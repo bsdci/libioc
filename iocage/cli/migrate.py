@@ -97,7 +97,10 @@ def _migrate_jails(
             continue
 
         if jail.running is True:
-            yield event.fail(iocage.lib.errors.JailAlreadyRunning(jail=jail))
+            yield event.fail(iocage.lib.errors.JailAlreadyRunning(
+                jail=jail,
+                logger=logger
+            ))
             continue
 
         if iocage.lib.helpers.validate_name(jail.config["tag"]):
