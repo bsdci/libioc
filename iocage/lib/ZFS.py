@@ -119,7 +119,7 @@ class ZFS(libzfs.ZFS):
             self.logger.verbose(f"Deleting dataset {dataset.name}")
         try:
             dataset.umount()
-            self.logger.spam("Dataset unmounted")
+            self.logger.spam(f"Dataset {dataset.name} unmounted")
         except libzfs.ZFSException:
             pass
         dataset.delete()
