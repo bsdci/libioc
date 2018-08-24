@@ -946,6 +946,7 @@ class JailGenerator(JailResource):
     def destroy(
         self,
         force: bool=False,
+        force_stop: bool=False,
         event_scope: typing.Optional['iocage.lib.events.Scope']=None
     ) -> typing.Generator['iocage.lib.events.IocageEvent', None, None]:
         """
@@ -957,26 +958,36 @@ class JailGenerator(JailResource):
                 This flag enables whether an existing jail should be shut down
                 before destroying the dataset. By default destroying a jail
                 requires it to be stopped.
+
+            force_stop (bool): (default=False)
+                A jail is force stopped when either the force_stop argument was
+                set or the force option was enabled and the jail is running.
+                When being enabled the argument invokes a full stop before
+                destroying the jail.
         """
         self.state.query()
 
         if event_scope is None:
             event_scope = iocage.lib.events.Scope()
 
+        _stop_jail = force_stop
         if force is False:
             self.require_jail_stopped()
+        else:
+            _stop_jail = (self.running is True)
 
-        try:
-            stop_events = JailGenerator.stop(
-                self,
-                force=True,
-                event_scope=event_scope,
-                log_errors=False
-            )
-            for event in stop_events:
-                yield event
-        except iocage.lib.errors.JailDestructionFailed:
-            pass
+        if _stop_jail is True:
+            try:
+                stop_events = JailGenerator.stop(
+                    self,
+                    force=True,
+                    event_scope=event_scope,
+                    log_errors=(force_stop is False)
+                )
+                for event in stop_events:
+                    yield event
+            except iocage.lib.errors.JailDestructionFailed:
+                pass
 
         zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
             dataset=self.dataset,
