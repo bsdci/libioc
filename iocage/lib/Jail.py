@@ -708,6 +708,8 @@ class JailGenerator(JailResource):
             os.makedirs(realpath, 0o755)
 
     def _prepare_stop(self) -> None:
+        self._ensure_script_dir()
+
         exec_prestop = []
         exec_stop = []
         exec_poststop = self._teardown_mounts() + self._clear_resource_limits()
