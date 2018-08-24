@@ -140,7 +140,11 @@ def _migrate_jails(
             yield from new_jail.clone_from_jail(jail, event_scope=event.scope)
             new_jail.save()
             new_jail.promote()
-            yield from jail.destroy(force=True, event_scope=event.scope)
+            yield from jail.destroy(
+                force=True,
+                force_stop=True,
+                event_scope=event.scope
+            )
 
         except iocage.lib.errors.IocageException as e:
             yield event.fail(e)
