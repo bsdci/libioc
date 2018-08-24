@@ -966,13 +966,17 @@ class JailGenerator(JailResource):
         if force is False:
             self.require_jail_stopped()
 
-        stop_events = JailGenerator.stop(
-            self,
-            force=True,
-            event_scope=event_scope
-        )
-        for event in stop_events:
-            yield event
+        try:
+            stop_events = JailGenerator.stop(
+                self,
+                force=True,
+                event_scope=event_scope,
+                log_errors=False
+            )
+            for event in stop_events:
+                yield event
+        except iocage.lib.errors.JailDestructionFailed:
+            pass
 
         zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
             dataset=self.dataset,
