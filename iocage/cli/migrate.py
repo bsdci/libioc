@@ -144,7 +144,7 @@ def _migrate_jails(
 
         except iocage.lib.errors.IocageException as e:
             yield event.fail(e)
-            print(e)
+            continue
 
         if name != temporary_name:
             # the jail takes the old jails name
