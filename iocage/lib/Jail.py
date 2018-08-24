@@ -951,16 +951,16 @@ class JailGenerator(JailResource):
         if event_scope is None:
             event_scope = iocage.lib.events.Scope()
 
-        if self.running is True and force is True:
-            stop_events = JailGenerator.stop(
-                self,
-                force=True,
-                event_scope=event_scope
-            )
-            for event in stop_events:
-                yield event
-        else:
+        if force is False:
             self.require_jail_stopped()
+
+        stop_events = JailGenerator.stop(
+            self,
+            force=True,
+            event_scope=event_scope
+        )
+        for event in stop_events:
+            yield event
 
         zfsDatasetDestroyEvent = iocage.lib.events.ZFSDatasetDestroy(
             dataset=self.dataset,
