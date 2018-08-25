@@ -3,7 +3,7 @@ import importlib
 import typing
 
 
-class HookedModule:
+class _HookedModule:
 
 	def __call__(self, *args, **kwargs) -> None:
 		return self.main_module(*args, **kwargs)
@@ -14,7 +14,7 @@ class HookedModule:
 		return sys.modules[name].__getattribute__(name.split(".").pop())
 
 
-class IocageModule(sys.modules["iocage"].__class__):
+class _IocageModule(sys.modules["iocage"].__class__):
 
 	hooked_modules = [
 		"Host",
@@ -46,13 +46,13 @@ class IocageModule(sys.modules["iocage"].__class__):
 
 	def __hook_module(self, module: typing.Any) -> None:
 
-		class _HookedModule(module.__class__, HookedModule):
+		class _Module(module.__class__, _HookedModule):
 
 			pass
 
 
-		module.__class__ = _HookedModule
+		module.__class__ = _Module
 		return module
 
 
-sys.modules["iocage"].__class__ = IocageModule
+sys.modules["iocage"].__class__ = _IocageModule
