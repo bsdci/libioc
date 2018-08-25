@@ -491,6 +491,7 @@ def exec_generator(
     universal_newlines: bool=True,
     stdin: typing.Optional[typing.Union[typing.TextIO, int]]=None,
     stdout: typing.Optional[typing.TextIO]=None,
+    env: typing.Optional[typing.Dict[str, typing.Any]]=None,
     logger: typing.Optional[iocage.lib.Logger.Logger]=None
 ) -> typing.Generator[
     bytes,
@@ -521,7 +522,8 @@ def exec_generator(
             stdout=delegate_pts,
             stderr=subprocess.STDOUT,
             close_fds=False,
-            universal_newlines=universal_newlines
+            universal_newlines=universal_newlines,
+            env=env
         )
         while child.poll() is None:
             read, _, _ = select.select([controller_pts], [], [], 0)
