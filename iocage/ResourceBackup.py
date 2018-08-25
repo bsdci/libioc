@@ -262,10 +262,6 @@ class LaunchableResourceBackup:
             _old_fstab_file = fstab.file
             fstab.file = fstab_file_path
             fstab.read_file()
-            fstab.replace_path(
-                "backup:///",
-                self.resource.dataset.mountpoint
-            )
             fstab.file = _old_fstab_file
             fstab.save()
             self.logger.verbose(f"Fstab restored from {fstab.file}")
