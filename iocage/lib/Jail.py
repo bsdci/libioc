@@ -1553,7 +1553,8 @@ class JailGenerator(JailResource):
             else:
                 exec_events = iocage.lib.helpers.exec_generator(
                     command,
-                    logger=self.logger
+                    logger=self.logger,
+                    env=self.env
                 )
                 try:
                     while True:
