@@ -148,7 +148,7 @@ class IOCageCLI(click.MultiCommand):
     def get_command(self, ctx, name):
         ctx.print_events = print_events
         try:
-            mod = __import__(f"cli.{name}", None, None, ["cli"])
+            mod = __import__(f"ioc.{name}", None, None, ["ioc"])
 
             try:
                 if mod.__rootcmd__ and "--help" not in sys.argv[1:]:

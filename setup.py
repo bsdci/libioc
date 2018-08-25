@@ -31,12 +31,18 @@ try:
 except ModuleNotFoundError:
     from pip.req import parse_requirements
 
-reqs = list(parse_requirements("requirements.txt", session="iocage"))
-install_requires = list(map(lambda x: f"{x.name}{x.specifier}", reqs))
-dependency_links = list(map(
-    lambda x: str(x.link),
-    filter(lambda x: x.link, reqs)
-))
+def _read_requirements(filename: str="requirements.txt") -> None:
+    reqs = list(parse_requirements(filename, session="iocage"))
+    return dict(
+        install_requires=list(map(lambda x: f"{x.name}{x.specifier}", reqs)),
+        dependency_links=list(map(
+            lambda x: str(x.link),
+            filter(lambda x: x.link, reqs)
+        ))
+    )
+
+iocage_requirements = _read_requirements("requirements.txt")
+ioc_requirements = _read_requirements("requirements-ioc.txt")
 
 TEMPLATE = '''\
 # -*- coding: utf-8 -*-
@@ -44,7 +50,7 @@ TEMPLATE = '''\
 __requires__ = '{0}'
 import sys
 
-from iocage.cli import cli
+from ioc import cli
 
 if __name__ == '__main__':
     sys.dd:exit(cli())'''
@@ -72,22 +78,38 @@ if sys.version_info < (3, 6):
 setup(
     name='iocage',
     license='BSD',
-    version='0.2.12',
+    version='0.3.0',
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='iocage Contributors',
     author_email='authors@iocage.io',
     url='https://github.com/iocage/libiocage',
     python_requires='>=3.6',
-    packages=find_packages(),
+    packages=find_packages(include=["iocage", "iocage.*"]),
     include_package_data=True,
-    install_requires=install_requires,
-    dependency_links=dependency_links,
+    install_requires=iocage_requirements["install_requires"],
+    dependency_links=iocage_requirements["dependency_links"],
     setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
+)
+
+setup(
+    name='ioc',
+    license='BSD',
+    version='0.3.0',
+    description='A Python library to manage jails with iocage',
+    keywords='FreeBSD jail iocage',
+    author='iocage Contributors',
+    author_email='authors@iocage.io',
+    url='https://github.com/iocage/libiocage',
+    python_requires='>=3.6',
+    packages=find_packages(include=["ioc", "ioc.*"]),
+    include_package_data=True,
+    install_requires=iocage_requirements["install_requires"],
+    dependency_links=iocage_requirements["dependency_links"],
     entry_points={
         'console_scripts': [
-            'ioc=iocage.cli:cli'
+            'ioc=ioc:cli'
         ]
-    },
-    tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
+    }
 )

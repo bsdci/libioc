@@ -8,6 +8,7 @@ deps:
 	if [ "`uname`" = "FreeBSD" ]; then pkg install -q -y libucl py36-cython rsync python36 py36-libzfs py36-sysctl; fi
 	python3.6 -m ensurepip
 	python3.6 -m pip install -Ur requirements.txt
+	python3.6 -m pip install -Ur requirements-ioc.txt
 install: deps
 	python3.6 -m pip install -U .
 	@if [ -f /usr/local/etc/init.d ]; then \

@@ -27,7 +27,7 @@ import os
 import sys
 
 
-from cli import cli
+from ioc import cli
 
 
 def main_safe():
