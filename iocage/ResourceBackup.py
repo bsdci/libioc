@@ -152,8 +152,19 @@ class LaunchableResourceBackup:
 
         resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
 
-        for event in self._extract_bundle(source, event_scope=_scope):
-            yield event
+        try:
+            yield from self._extract_bundle(source, event_scope=_scope)
+        except Exception as e:
+            yield resourceBackupEvent.fail(e)
+            raise e
+
+        def _destroy_failed_import() -> None:
+            try:
+                self.zfs.delete_dataset_recursive(self.resource.dataset)
+            except libzfs.ZFSException:
+                pass
+
+        resourceBackupEvent.add_rollback_step(_destroy_failed_import)
 
         # ToDo: Allow importing of releases or empty jails
         config_data = iocage.Config.Type.JSON.ConfigJSON(
@@ -164,29 +175,33 @@ class LaunchableResourceBackup:
         is_standalone = os.path.isfile(f"{self.temp_dir}/root.zfs") is True
         has_release = ("release" in config_data.keys()) is True
 
-        if has_release and not is_standalone:
-            release = iocage.Release.ReleaseGenerator(
-                name=config_data["release"],
-                logger=self.logger,
-                zfs=self.zfs,
-                host=self.resource.host
-            )
-            self.resource.create_from_release(release)
-        else:
-            self.resource.create_from_scratch()
+        try:
+            if has_release and not is_standalone:
+                release = iocage.Release.ReleaseGenerator(
+                    name=config_data["release"],
+                    logger=self.logger,
+                    zfs=self.zfs,
+                    host=self.resource.host
+                )
+                self.resource.create_from_release(release)
+            else:
+                self.resource.create_from_scratch()
 
-        if is_standalone is False:
-            for event in self._import_root_dataset(event_scope=_scope):
+            if is_standalone is False:
+                for event in self._import_root_dataset(event_scope=_scope):
+                    yield event
+
+            for event in self._import_other_datasets_recursive(event_scope=_scope):
                 yield event
 
-        for event in self._import_other_datasets_recursive(event_scope=_scope):
-            yield event
+            for event in self._import_config(config_data, event_scope=_scope):
+                yield event
 
-        for event in self._import_config(config_data, event_scope=_scope):
-            yield event
-
-        for event in self._import_fstab(event_scope=_scope):
-            yield event
+            for event in self._import_fstab(event_scope=_scope):
+                yield event
+        except Exception as e:
+            yield resourceBackupEvent.fail(e)
+            raise e
 
         _unlock_resource_backup()
         yield resourceBackupEvent.end()
@@ -211,7 +226,7 @@ class LaunchableResourceBackup:
                 destination=self.temp_dir,
                 logger=self.logger
             )
-        except iocage.errors.IocageException as e:
+        except Exception as e:
             yield extractBundleEvent.fail(e)
             raise e
 
