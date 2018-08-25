@@ -681,7 +681,8 @@ class ExportOtherDataset(ResourceBackup):
         ResourceBackup.__init__(
             self,
             resource=resource,
-            message=message
+            message=message,
+            scope=scope
         )
 
         # The identifier is the dataset name relative to the resource
@@ -706,7 +707,8 @@ class BundleBackup(ResourceBackup):
         ResourceBackup.__init__(
             self,
             resource=resource,
-            message=message
+            message=message,
+            scope=scope
         )
 
 
@@ -733,7 +735,8 @@ class ExtractBundle(ResourceBackup):
         ResourceBackup.__init__(
             self,
             resource=resource,
-            message=message
+            message=message,
+            scope=scope
         )
 
 
@@ -775,7 +778,8 @@ class ImportOtherDataset(ResourceBackup):
         self.identifier = dataset_name
         ResourceBackup.__init__(
             self,
-            resource=resource
+            resource=resource,
+            scope=scope
         )
 
     @property

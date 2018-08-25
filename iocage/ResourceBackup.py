@@ -209,7 +209,7 @@ class LaunchableResourceBackup:
     def _extract_bundle(
         self,
         source: str,
-        event_scope: typing.Optional['iocage.events.Scope']
+        event_scope: typing.Optional['iocage.events.Scope']=None
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
 
         extractBundleEvent = iocage.events.ExtractBundle(
