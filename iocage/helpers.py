@@ -67,8 +67,8 @@ def init_zfs(
 
 def init_host(
     self: typing.Any,
-    host: typing.Optional[iocage.Host.HostGenerator]=None
-) -> iocage.Host.HostGenerator:
+    host: typing.Optional['iocage.Host.HostGenerator']=None
+) -> 'iocage.Host.HostGenerator':
     """Attach or initialize a Host object."""
     try:
         return self.host
@@ -86,8 +86,8 @@ def init_host(
 
 def init_distribution(
     self: typing.Any,
-    distribution: typing.Optional[iocage.Distribution.Distribution]=None
-) -> iocage.Host.HostGenerator:
+    distribution: typing.Optional['iocage.Distribution.Distribution']=None
+) -> 'iocage.Host.HostGenerator':
     """Attach or initialize a Distribution object."""
     try:
         return self.distribution
