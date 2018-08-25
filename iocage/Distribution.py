@@ -31,7 +31,7 @@ import urllib.request
 import html.parser
 
 import iocage.errors
-import iocage.helpers
+import iocage.helpers_object
 
 
 class EOLParser(html.parser.HTMLParser):
@@ -99,9 +99,9 @@ class DistributionGenerator:
         zfs: typing.Optional['iocage.ZFS.ZFS']=None,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
         self._eol_list = None
         self._available_releases = None
 

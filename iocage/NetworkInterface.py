@@ -28,6 +28,7 @@ import ipaddress
 import shlex
 
 import iocage.helpers
+import iocage.helpers_object
 import iocage.CommandQueue
 
 
@@ -83,7 +84,7 @@ class NetworkInterface:
     ) -> None:
 
         self.jail = jail
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
 
         # disable shlex quoting on purpose (use with caution)
         self.insecure = (insecure is True)

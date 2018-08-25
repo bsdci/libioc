@@ -25,7 +25,7 @@
 """iocage MacAddress module."""
 import typing
 
-import iocage.helpers
+import iocage.helpers_object
 import iocage.errors
 
 
@@ -39,7 +39,7 @@ class MacAddress:
         mac_address: str,
         logger: 'iocage.Logger.Logger'
     ) -> None:
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
         self.address = mac_address
 
     @property
@@ -83,7 +83,7 @@ class MacAddressPair:
         logger: 'iocage.Logger.Logger'
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
         a: MacAddress
         b: MacAddress
 

@@ -29,6 +29,7 @@ import shlex
 import sysctl
 
 import iocage.helpers
+import iocage.helpers_object
 import iocage.CommandQueue
 
 
@@ -44,7 +45,7 @@ class Firewall:
     ) -> None:
 
         self.IPFW_RULE_OFFSET = 10000
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
 
     @property
     def _required_sysctl_properties(self) -> typing.Dict[str, int]:

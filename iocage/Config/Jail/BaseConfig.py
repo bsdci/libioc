@@ -29,6 +29,7 @@ import re
 import iocage.Config.Jail.Properties
 import iocage.errors
 import iocage.helpers
+import iocage.helpers_object
 
 # mypy
 import iocage.Logger
@@ -79,7 +80,7 @@ class BaseConfig(dict):
         self.data = {}
         dict.__init__(self)
 
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
 
         Properties = iocage.Config.Jail.Properties.JailConfigProperties
         self.special_properties = Properties(

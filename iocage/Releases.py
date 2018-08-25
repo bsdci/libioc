@@ -26,7 +26,7 @@
 import iocage.Release
 import iocage.ListableResource
 import iocage.Filter
-import iocage.helpers
+import iocage.helpers_object
 
 import typing
 
@@ -50,9 +50,9 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
 
         iocage.ListableResource.ListableResource.__init__(
             self,

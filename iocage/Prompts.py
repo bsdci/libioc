@@ -24,15 +24,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage commandline prompt module."""
 import iocage.errors
-import iocage.helpers
+import iocage.helpers_object
 
 
 class Prompts:
     """iocage commandline prompt module."""
 
     def __init__(self, host=None, logger=None):
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.host = iocage.helpers_object.init_host(self, host)
 
     def release(self):
         """Prompt for a release."""

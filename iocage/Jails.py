@@ -29,7 +29,7 @@ import typing
 import iocage.Jail
 import iocage.Filter
 import iocage.ListableResource
-import iocage.helpers
+import iocage.helpers_object
 
 
 class JailsGenerator(iocage.ListableResource.ListableResource):
@@ -54,9 +54,9 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
         zfs: typing.Optional['iocage.ZFS.ZFS']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
 
         iocage.ListableResource.ListableResource.__init__(
             self,

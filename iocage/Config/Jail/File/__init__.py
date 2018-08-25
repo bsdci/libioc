@@ -28,6 +28,8 @@ import os.path
 
 import ucl
 
+import iocage.helpers
+import iocage.helpers_object
 import iocage.LaunchableResource
 
 
@@ -73,7 +75,7 @@ class ConfigFile(dict):
     ) -> None:
 
         dict.__init__(self, {})
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
 
         # No file was loaded yet, so we can't know the delta yet
         self._file_content_changed = True

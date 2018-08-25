@@ -30,6 +30,7 @@ import random
 import re
 
 import iocage.helpers
+import iocage.helpers_object
 import iocage.Types
 import iocage.Config.Jail.File
 
@@ -152,8 +153,8 @@ class Fstab(
         file: str="fstab"
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.host = iocage.helpers_object.init_host(self, host)
         self.jail = jail
         self.release = release
         self.file = file

@@ -28,6 +28,7 @@ import libzfs
 
 import iocage.errors
 import iocage.helpers
+import iocage.helpers_object
 
 
 class ZFSShareStorage:
@@ -40,8 +41,8 @@ class ZFSShareStorage:
         zfs: typing.Optional['iocage.ZFS.ZFS']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.jail = jail
 
     def mount_zfs_shares(self, auto_create: bool=False) -> None:

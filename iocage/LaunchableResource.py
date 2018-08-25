@@ -26,25 +26,19 @@
 import libzfs
 import typing
 
-import iocage.Config.Jail.File.RCConf
-import iocage.Config.Jail.File.SysctlConf
+import iocage.helpers_object
 import iocage.Resource
-import iocage.ResourceUpdater
 import iocage.ResourceBackup
-
-# MyPy
-import iocage.Config.Jail.JailConfig
-import iocage.Config.Jail.File
 
 
 class LaunchableResource(iocage.Resource.Resource):
     """Representation of launchable resources like jails."""
 
     _rc_conf: typing.Optional[
-        iocage.Config.Jail.File.RCConf.ResourceRCConf
+        'iocage.Config.Jail.File.RCConf.ResourceRCConf'
     ]
     _sysctl_conf: typing.Optional[
-        iocage.Config.Jail.File.SysctlConf.SysctlConf
+        'iocage.Config.Jail.File.SysctlConf.SysctlConf'
     ]
     host: 'iocage.Host.HostGenerator'
     _updater: typing.Optional[
@@ -53,7 +47,7 @@ class LaunchableResource(iocage.Resource.Resource):
     _backup: typing.Optional[
         'iocage.ResourceBackup.LaunchableResourceBackup'
     ]
-    config: iocage.Config.Jail.JailConfig.JailConfig
+    config: 'iocage.Config.Jail.JailConfig.JailConfig'
 
     def __init__(
         self,
@@ -67,7 +61,7 @@ class LaunchableResource(iocage.Resource.Resource):
             'iocage.Host.HostGenerator'
         ]=None,
     ) -> None:
-        self.host = iocage.helpers.init_host(self, host)
+        self.host = iocage.helpers_object.init_host(self, host)
         self._updater = None
         self._backup = None
         self._rc_conf = None
@@ -87,7 +81,7 @@ class LaunchableResource(iocage.Resource.Resource):
     @property
     def updater(
         self
-    ) -> iocage.ResourceUpdater.Updater:
+    ) -> 'iocage.ResourceUpdater.Updater':
         """Return the lazy-loaded resource updater."""
         if self._updater is not None:
             return self._updater
@@ -102,7 +96,7 @@ class LaunchableResource(iocage.Resource.Resource):
     @property
     def backup(
         self
-    ) -> iocage.ResourceUpdater.Updater:
+    ) -> 'iocage.ResourceUpdater.Updater':
         """Return the lazy-loaded resource backup tool."""
         if self._backup is not None:
             return self._backup
@@ -161,6 +155,7 @@ class LaunchableResource(iocage.Resource.Resource):
     def rc_conf(self) -> 'iocage.Config.Jail.File.RCConf.ResourceRCConf':
         """Return a lazy-loaded instance of the resources RCConf."""
         if self._rc_conf is None:
+            import iocage.Config.Jail.File.RCConf
             self._rc_conf = iocage.Config.Jail.File.RCConf.ResourceRCConf(
                 resource=self,
                 logger=self.logger
@@ -173,6 +168,7 @@ class LaunchableResource(iocage.Resource.Resource):
     ) -> 'iocage.Config.Jail.File.SysctlConf.SysctlConf':
         """Return a lazy-loaded instance of the resources SysctlConf."""
         if self._sysctl_conf is None:
+            import iocage.Config.Jail.File.SysctlConf
             sysctl_conf = iocage.Config.Jail.File.SysctlConf.SysctlConf(
                 resource=self,
                 logger=self.logger

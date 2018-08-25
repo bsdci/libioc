@@ -28,7 +28,7 @@ import libzfs
 import datetime
 
 import iocage.Logger
-import iocage.helpers
+import iocage.helpers_object
 import iocage.errors
 
 
@@ -281,7 +281,7 @@ def get_zfs(
 ) -> ZFS:
     """Get an instance of iocages enhanced ZFS class."""
     zfs = ZFS(history=history, history_prefix=history_prefix)
-    zfs.logger = iocage.helpers.init_logger(zfs, logger)
+    zfs.logger = iocage.helpers_object.init_logger(zfs, logger)
     return zfs
 
 

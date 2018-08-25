@@ -36,6 +36,7 @@ import iocage.DevfsRules
 import iocage.Distribution
 import iocage.Resource
 import iocage.helpers
+import iocage.helpers_object
 
 # MyPy
 import iocage.Config.Jail.BaseConfig  # noqa: F401
@@ -80,8 +81,8 @@ class HostGenerator:
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
 
         if datasets is not None:
             self.datasets = datasets

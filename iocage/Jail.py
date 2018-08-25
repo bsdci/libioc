@@ -36,6 +36,7 @@ import iocage.Types
 import iocage.errors
 import iocage.events
 import iocage.helpers
+import iocage.helpers_object
 import iocage.JailState
 import iocage.DevfsRules
 import iocage.Host
@@ -79,7 +80,7 @@ class JailResource(
         root_datasets_name: typing.Optional[str]=None,
     ) -> None:
 
-        self.host = iocage.helpers.init_host(self, host)
+        self.host = iocage.helpers_object.init_host(self, host)
         self.root_datasets_name = root_datasets_name
 
         if fstab is not None:
@@ -311,9 +312,9 @@ class JailGenerator(JailResource):
             logger (iocage.Logger): (optional)
                 Inherit an existing Logger instance from ancestor classes
         """
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
         self._relative_hook_script_dir = "/.iocage"
 
         if isinstance(data, str):
@@ -684,7 +685,7 @@ class JailGenerator(JailResource):
             f"Running {hook_name} hook for {self.humanreadable_name}"
         )
 
-        lex = shlex.shlex(value)
+        lex = shlex.shlex(value)  # noqa: T484
         lex.whitespace_split = True
         command = list(lex)
 

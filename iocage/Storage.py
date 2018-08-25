@@ -30,6 +30,7 @@ import typing
 
 import iocage.events
 import iocage.helpers
+import iocage.helpers_object
 
 
 class Storage:
@@ -43,8 +44,8 @@ class Storage:
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.jail = jail
 
         # safe-mody only attaches zfs datasets to jails that were tagged with

@@ -25,7 +25,7 @@
 """Configuration of a Jail or other LaunchableResource."""
 import typing
 
-import iocage.helpers
+import iocage.helpers_object
 import iocage.Config.Jail.BaseConfig
 
 BaseConfig = iocage.Config.Jail.BaseConfig.BaseConfig
@@ -51,7 +51,7 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
             logger=logger
         )
 
-        self.host = iocage.helpers.init_host(self, host)
+        self.host = iocage.helpers_object.init_host(self, host)
         self.jail = jail
 
     def update_special_property(self, name: str) -> None:
