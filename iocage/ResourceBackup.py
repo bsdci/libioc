@@ -142,7 +142,7 @@ class LaunchableResourceBackup:
             self.resource,
             scope=event_scope
         )
-        _scope = resourceBackupEvent.scope
+        scope = resourceBackupEvent.scope
         yield resourceBackupEvent.begin()
 
         self._lock()
@@ -153,7 +153,7 @@ class LaunchableResourceBackup:
         resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
 
         try:
-            yield from self._extract_bundle(source, event_scope=_scope)
+            yield from self._extract_bundle(source, event_scope=scope)
         except Exception as e:
             yield resourceBackupEvent.fail(e)
             raise e
@@ -188,17 +188,11 @@ class LaunchableResourceBackup:
                 self.resource.create_from_scratch()
 
             if is_standalone is False:
-                for event in self._import_root_dataset(event_scope=_scope):
-                    yield event
+                yield from self._import_root_dataset(event_scope=scope)
 
-            for event in self._import_other_datasets_recursive(event_scope=_scope):
-                yield event
-
-            for event in self._import_config(config_data, event_scope=_scope):
-                yield event
-
-            for event in self._import_fstab(event_scope=_scope):
-                yield event
+            yield from self._import_other_datasets_recursive(event_scope=scope)
+            yield from self._import_config(config_data, event_scope=scope)
+            yield from self._import_fstab(event_scope=scope)
         except Exception as e:
             yield resourceBackupEvent.fail(e)
             raise e
@@ -439,35 +433,27 @@ class LaunchableResourceBackup:
 
         if "config" in self.resource.__dir__():
             # only export config when the resource has one
-            for event in self._export_config(event_scope=_scope):
-                yield event
-            for event in self._export_fstab(event_scope=_scope):
-                yield event
+            yield from self._export_config(event_scope=_scope)
+            yield from self._export_fstab(event_scope=_scope)
 
         if is_standalone is False:
-            export_root_dataset_events = self._export_root_dataset(
+            yield from self._export_root_dataset(
                 flags=zfs_send_flags,
                 event_scope=_scope
             )
-            for event in export_root_dataset_events:
-                yield event
 
         # other datasets include `root` when the resource is no basejail
-        recursive_export_events = self._export_other_datasets_recursive(
+        yield from self._export_other_datasets_recursive(
             flags=zfs_send_flags,
             standalone=is_standalone,
             limit_depth=(recursive is True),
             event_scope=_scope
         )
-        for event in recursive_export_events:
-            yield event
 
-        bundle_backup_events = self._bundle_backup(
+        yield from self._bundle_backup(
             destination=destination,
             event_scope=_scope
         )
-        for event in bundle_backup_events:
-            yield event
 
         _unlock_resource_backup()
         yield resourceBackupEvent.end()
