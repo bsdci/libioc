@@ -248,14 +248,27 @@ class Fstab(
                 )
                 continue
 
+            source = fragments[0].strip()
             destination = fragments[1].strip()
 
             # skip lines with destinations overlapping self.basejail_lines
             if destination in basejail_destinations:
                 continue
 
+            _backup_prefix = "backup:///"
+            if destination.startswith(_backup_prefix) is True:
+                destination = "".join([
+                    self.jail.dataset.mountpoint,
+                    destination[len(_backup_prefix):]
+                ])
+            if source.startswith(_backup_prefix) is True:
+                source = "".join([
+                    self.jail.dataset.mountpoint,
+                    source[len(_backup_prefix):]
+                ])
+
             new_line = FstabLine({
-                "source": iocage.Types.AbsolutePath(fragments[0]),
+                "source": iocage.Types.AbsolutePath(source),
                 "destination": iocage.Types.AbsolutePath(destination),
                 "type": fragments[2],
                 "options": fragments[3],
