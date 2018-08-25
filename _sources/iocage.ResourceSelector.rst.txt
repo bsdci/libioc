@@ -1,0 +1,7 @@
+iocage.ResourceSelector module
+==============================
+
+.. automodule:: iocage.ResourceSelector
+    :members:
+    :undoc-members:
+    :show-inheritance:

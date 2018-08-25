@@ -1,7 +1,0 @@
-iocage.lib.Prompts module
-=========================
-
-.. automodule:: iocage.lib.Prompts
-    :members:
-    :undoc-members:
-    :show-inheritance:

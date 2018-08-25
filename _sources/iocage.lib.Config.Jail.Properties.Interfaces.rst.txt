@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.Properties.Interfaces module
-===================================================
-
-.. automodule:: iocage.lib.Config.Jail.Properties.Interfaces
-    :members:
-    :undoc-members:
-    :show-inheritance:

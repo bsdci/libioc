@@ -1,7 +1,0 @@
-iocage.lib.BridgeInterface module
-=================================
-
-.. automodule:: iocage.lib.BridgeInterface
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-iocage.lib.MacAddress module
-============================
-
-.. automodule:: iocage.lib.MacAddress
-    :members:
-    :undoc-members:
-    :show-inheritance:

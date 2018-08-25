@@ -1,0 +1,817 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.Release module &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iocage.Releases module" href="iocage.Releases.html" />
+    <link rel="prev" title="iocage.Prompts module" href="iocage.Prompts.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="iocage.html">iocage package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iocage.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iocage.BridgeInterface.html">iocage.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.CommandQueue.html">iocage.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Datasets.html">iocage.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.DevfsRules.html">iocage.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Distribution.html">iocage.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Filter.html">iocage.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Firewall.html">iocage.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Host.html">iocage.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.IPAddress.html">iocage.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Jail.html">iocage.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.JailState.html">iocage.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Jails.html">iocage.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.LaunchableResource.html">iocage.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ListableResource.html">iocage.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Logger.html">iocage.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Releases.html">iocage.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Resource.html">iocage.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceBackup.html">iocage.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers_object.html">iocage.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#module-iocage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="iocage.html">iocage package</a> &raquo;</li>
+        
+      <li>iocage.Release module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/iocage.Release.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iocage.Release">
+<span id="iocage-release-module"></span><h1>iocage.Release module<a class="headerlink" href="#module-iocage.Release" title="Permalink to this headline">¶</a></h1>
+<p>iocage release module.</p>
+<dl class="class">
+<dt id="iocage.Release.Release">
+<em class="property">class </em><code class="descclassname">iocage.Release.</code><code class="descname">Release</code><span class="sig-paren">(</span><em>name</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>root_datasets_name=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em>, <em>check_hashes=True</em>, <em>check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#Release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.Release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.Release.ReleaseGenerator" title="iocage.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Release.ReleaseGenerator</span></code></a></p>
+<p>Release with synchronous interfaces.</p>
+<dl class="method">
+<dt id="iocage.Release.Release.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#Release.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.Release.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.Release.fetch">
+<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=None</em>, <em>fetch_updates=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#Release.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.Release.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the release from the remote synchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.Release.ReleaseGenerator">
+<em class="property">class </em><code class="descclassname">iocage.Release.</code><code class="descname">ReleaseGenerator</code><span class="sig-paren">(</span><em>name</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>root_datasets_name=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em>, <em>check_hashes=True</em>, <em>check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.Release.ReleaseResource" title="iocage.Release.ReleaseResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Release.ReleaseResource</span></code></a></p>
+<p>Release with generator interfaces.</p>
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.DEFAULT_RC_CONF">
+<code class="descname">DEFAULT_RC_CONF</code><em class="property"> = {'netif_enable': False, 'sendmail_enable': False, 'sendmail_msp_queue_enable': False, 'sendmail_outbound_enable': False, 'sendmail_submit_enable': False, 'syslogd_flags': '-ss'}</em><a class="headerlink" href="#iocage.Release.ReleaseGenerator.DEFAULT_RC_CONF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.DEFAULT_SYSCTL_CONF">
+<code class="descname">DEFAULT_SYSCTL_CONF</code><em class="property"> = {'net.inet.ip.fw.enable': 0}</em><a class="headerlink" href="#iocage.Release.ReleaseGenerator.DEFAULT_SYSCTL_CONF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.annotated_name">
+<code class="descname">annotated_name</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.annotated_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the release name with annotations.</p>
+<p>Annotations inform whether a release is newer then the host or EOL.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.assets">
+<code class="descname">assets</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of release assets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.available">
+<code class="descname">available</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the release is available on the remote mirror.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.current_snapshot">
+<code class="descname">current_snapshot</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.current_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the manually configured or the latest release snapshot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.ReleaseGenerator.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.download_directory">
+<code class="descname">download_directory</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.download_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the download directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.eol">
+<code class="descname">eol</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.eol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the release is EOL or checks are disabled.</p>
+<p>When check_eol is disabled, None is returned, True when the release
+name was found in the distributions eol_list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.ReleaseGenerator.fetch">
+<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=None</em>, <em>fetch_updates=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the release from the remote.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.fetched">
+<code class="descname">fetched</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.fetched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the release is fetched locally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.hashes">
+<code class="descname">hashes</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.hashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases asset hashes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.hbds_release_branch">
+<code class="descname">hbds_release_branch</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.hbds_release_branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate the release into a HardenedBSD release git branch name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.latest_snapshot">
+<code class="descname">latest_snapshot</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.latest_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return or create the latest version snapshot.</p>
+<p>When no snapshot was taken before <cite>p0</cite> is automatically created.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.mirror_url">
+<code class="descname">mirror_url</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.mirror_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the distributions release mirror URL.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.name">
+<code class="descname">name</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases identifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.newer_than_host">
+<code class="descname">newer_than_host</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.newer_than_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the release is newer than the host.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.ReleaseGenerator.read_hashes">
+<code class="descname">read_hashes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator.read_hashes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator.read_hashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the release asset hashes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.real_name">
+<code class="descname">real_name</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.real_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the release name on HardenedBSD.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.releases_folder">
+<code class="descname">releases_folder</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.releases_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mountpoint of the iocage/releases dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.remote_url">
+<code class="descname">remote_url</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.remote_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases full mirror URL.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.resource">
+<code class="descname">resource</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.Resource.html#iocage.Resource.Resource" title="iocage.Resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.root_dir">
+<code class="descname">root_dir</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.root_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the main directory of the release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.ReleaseGenerator.snapshot">
+<code class="descname">snapshot</code><span class="sig-paren">(</span><em>identifier</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator.snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator.snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ZFS snapshot of the release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>identifier</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – This string specifies the snapshots name</li>
+<li><strong>force</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – (default=False)
+Enabling this option forces re-creation of a snapshot in case
+it already exists for the given identifier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The ZFS snapshot object found or created</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">libzfs.ZFSSnapshot</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Release.ReleaseGenerator.update_base_release">
+<code class="descname">update_base_release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseGenerator.update_base_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseGenerator.update_base_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the ZFS basejail release dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.version_number">
+<code class="descname">version_number</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.version_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the numeric release version number or 0 for CURRENT.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.version_snapshots">
+<code class="descname">version_snapshots</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.version_snapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sorted list of taken version snapshots (e.g. p3).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseGenerator.zfs_pool">
+<code class="descname">zfs_pool</code><a class="headerlink" href="#iocage.Release.ReleaseGenerator.zfs_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases ZFS pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.Release.ReleaseResource">
+<em class="property">class </em><code class="descclassname">iocage.Release.</code><code class="descname">ReleaseResource</code><span class="sig-paren">(</span><em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>release=None</em>, <em>root_datasets_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Release.html#ReleaseResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Release.ReleaseResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iocage.LaunchableResource.html#iocage.LaunchableResource.LaunchableResource" title="iocage.LaunchableResource.LaunchableResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.LaunchableResource.LaunchableResource</span></code></a></p>
+<p>Resource that represents an iocage release.</p>
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.base_dataset">
+<code class="descname">base_dataset</code><a class="headerlink" href="#iocage.Release.ReleaseResource.base_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ZFS basejail dataset belonging to the release.</p>
+<p>base datasets are created from releases. They are required to start
+zfs-basejails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.base_dataset_name">
+<code class="descname">base_dataset_name</code><a class="headerlink" href="#iocage.Release.ReleaseResource.base_dataset_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ZFS basejail datasets name belonging to the release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.dataset_name">
+<code class="descname">dataset_name</code><a class="headerlink" href="#iocage.Release.ReleaseResource.dataset_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the releases ZFS dataset.</p>
+<p>If the resource has no dataset or dataset_name assigned yet,
+the release id is used to find name the dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.full_name">
+<code class="descname">full_name</code><a class="headerlink" href="#iocage.Release.ReleaseResource.full_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the full identifier of a jail.</p>
+<p>When more than one root dataset is managed by iocage, the full source
+and name are returned. Otherwise just the name.</p>
+<p>For example <cite>mydataset/jailname</cite> or just <cite>jailname</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.release">
+<code class="descname">release</code><a class="headerlink" href="#iocage.Release.ReleaseResource.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the release instance that belongs to the resource.</p>
+<p>Usually the resource becomes inherited from the Release itself.
+It can still be used linked to a foreign ReleaseGenerator by passing
+release as named attribute to the __init__ function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Release.ReleaseGenerator" title="iocage.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.source">
+<code class="descname">source</code><a class="headerlink" href="#iocage.Release.ReleaseResource.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the releases source root datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Release.ReleaseResource.source_dataset">
+<code class="descname">source_dataset</code><a class="headerlink" href="#iocage.Release.ReleaseResource.source_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the releases source root dataset.</p>
+<p>iocage can manage multiple source datasets (on different ZFS pools
+for instance). This property returns the RootDatasets instance that
+belongs to the release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.Datasets.html#iocage.Datasets.RootDatasets" title="iocage.Datasets.RootDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDatasets</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iocage.Releases.html" class="btn btn-neutral float-right" title="iocage.Releases module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iocage.Prompts.html" class="btn btn-neutral" title="iocage.Prompts module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

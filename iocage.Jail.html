@@ -1,0 +1,1174 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.Jail module &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iocage.JailState module" href="iocage.JailState.html" />
+    <link rel="prev" title="iocage.IPAddress module" href="iocage.IPAddress.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="iocage.html">iocage package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iocage.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iocage.BridgeInterface.html">iocage.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.CommandQueue.html">iocage.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Datasets.html">iocage.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.DevfsRules.html">iocage.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Distribution.html">iocage.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Filter.html">iocage.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Firewall.html">iocage.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Host.html">iocage.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.IPAddress.html">iocage.IPAddress module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.JailState.html">iocage.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Jails.html">iocage.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.LaunchableResource.html">iocage.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ListableResource.html">iocage.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Logger.html">iocage.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Releases.html">iocage.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Resource.html">iocage.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceBackup.html">iocage.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers_object.html">iocage.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#module-iocage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="iocage.html">iocage package</a> &raquo;</li>
+        
+      <li>iocage.Jail module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/iocage.Jail.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iocage.Jail">
+<span id="iocage-jail-module"></span><h1>iocage.Jail module<a class="headerlink" href="#module-iocage.Jail" title="Permalink to this headline">¶</a></h1>
+<p>iocage Jail module.</p>
+<dl class="class">
+<dt id="iocage.Jail.Jail">
+<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">Jail</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.Jail.JailGenerator" title="iocage.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Jail.JailGenerator</span></code></a></p>
+<p>Synchronous wrapper of JailGenerator.</p>
+<dl class="method">
+<dt id="iocage.Jail.Jail.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy a Jail and it’s datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>force</strong> (<em>bool</em>) – (default=False)
+This flag enables whether an existing jail should be shut down
+before destroying the dataset. By default destroying a jail
+requires it to be stopped.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.Jail.fork_exec">
+<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.fork_exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a one-shot jail and return its stdout.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.Jail.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.rename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.Jail.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.Jail.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.Jail.JailGenerator">
+<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">JailGenerator</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.Jail.JailResource" title="iocage.Jail.JailResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Jail.JailResource</span></code></a></p>
+<p>iocage unit orchestrates a jail’s configuration and manages state.</p>
+<p>Jails are represented as a zfs dataset <code class="docutils literal notranslate"><span class="pre">zpool/iocage/jails/&lt;NAME&gt;</span></code></p>
+<p>Directory Structure:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>zpool/iocage/jails/&lt;NAME&gt;:</dt>
+<dd>The jail’s dataset containing it’s configuration and root dataset.
+iocage-legacy used to store a jails configuration as ZFS
+properties on this dataset. Even though the modern JSON config
+mechanism is preferred.</dd>
+<dt>zpool/iocage/jails/&lt;NAME&gt;/root:</dt>
+<dd>This directory is the dataset used as jail’s root when starting a
+jail. Usually the clone source of a root dataset is a snapshot of
+the release’s root dataset.</dd>
+<dt>zpool/iocage/jails/&lt;NAME&gt;/config.json:</dt>
+<dd>Jails configured with the latest configuration style store their
+information in a JSON file. When this file is found in the jail’s
+dataset, libiocage assumes the jail to be a JSON-style jail and
+ignores other configuration mechanisms.</dd>
+<dt>zpool/iocage/jails/&lt;NAME&gt;/config:</dt>
+<dd>Another compatible configuration mechanism is a UCL file. It’s
+content is only taken into account if no JSON or ZFS configuration
+was found.</dd>
+</dl>
+</div></blockquote>
+<p>Jail Types:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Standalone:</dt>
+<dd>The /root dataset gets cloned from a release at creation time. It
+it not affected by changes to the Release and persists all data
+within the jail.</dd>
+<dt>NullFS Basejail:</dt>
+<dd>The fastest method to spawn a basejail by mounting read-only
+directories from the release’s root dataset by creating a snapshot
+of the release on each boot of the jail. When a release is
+updated, the jail is updated as well on the next reboot. This type
+is the one used by the Python implementation of iocage.</dd>
+<dt>ZFS Basejail: Legacy basejails used to clone individual datasets from a</dt>
+<dd>release (stored in <code class="docutils literal notranslate"><span class="pre">zpool/iocage/base/&lt;RELEASE&gt;</span></code>).</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.clone_from_jail">
+<code class="descname">clone_from_jail</code><span class="sig-paren">(</span><em>source_jail</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.clone_from_jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.clone_from_jail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Jail from another Jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.clone_to_dataset">
+<code class="descname">clone_to_dataset</code><span class="sig-paren">(</span><em>destination_dataset_name</em>, <em>delete_existing=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.clone_to_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.clone_to_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones the jails dataset to another dataset with the given name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>resource=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Jail from a given Resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<a class="reference internal" href="#iocage.Jail.Jail" title="iocage.Jail.Jail"><em>Jail</em></a><em> or </em><a class="reference internal" href="iocage.Release.html#iocage.Release.Release" title="iocage.Release.Release"><em>Release</em></a>) – The (new) jail is created from this resource.
+If no resource is specified, an empty dataset will be created</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.create_from_release">
+<code class="descname">create_from_release</code><span class="sig-paren">(</span><em>release</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.create_from_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.create_from_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Jail from a Release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<a class="reference internal" href="iocage.Release.html#iocage.Release.Release" title="iocage.Release.Release"><em>Release</em></a>) – The jail is created from the provided resource.
+This can be either another Jail or a Release.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.create_from_scratch">
+<code class="descname">create_from_scratch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.create_from_scratch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.create_from_scratch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new jail without any root dataset content.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.create_from_template">
+<code class="descname">create_from_template</code><span class="sig-paren">(</span><em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.create_from_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.create_from_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Jail from a template Jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em>, <em>force_stop=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy a Jail and it’s datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>force</strong> (<em>bool</em>) – (default=False)
+This flag enables whether an existing jail should be shut down
+before destroying the dataset. By default destroying a jail
+requires it to be stopped.</li>
+<li><strong>force_stop</strong> (<em>bool</em>) – (default=False)
+A jail is force stopped when either the force_stop argument was
+set or the force option was enabled and the jail is running.
+When being enabled the argument invokes a full stop before
+destroying the jail.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.devfs_ruleset">
+<code class="descname">devfs_ruleset</code><a class="headerlink" href="#iocage.Jail.JailGenerator.devfs_ruleset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of the jail’s devfs ruleset.</p>
+<p>When a new combination of the base ruleset specified in
+jail.config[“devfs_ruleset”] and rules automatically added by iocage
+appears, the according rule is automatically created and added to the
+/etc/devfs.rules file on the host</p>
+<p>Users may reference a rule by numeric identifier or name. This numbers
+are automatically selected, so it’s advisable to use names.1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.DevfsRules.html#iocage.DevfsRules.DevfsRuleset" title="iocage.DevfsRules.DevfsRuleset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRuleset</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.env">
+<code class="descname">env</code><a class="headerlink" href="#iocage.Jail.JailGenerator.env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the environment variables for hook scripts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.exec">
+<code class="descname">exec</code><span class="sig-paren">(</span><em>command</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a command in a running jail.</p>
+<dl class="docutils">
+<dt>command (list):</dt>
+<dd><p class="first">A list of command and it’s arguments</p>
+<p class="last">Example: [“/usr/bin/whoami”]</p>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.exec_console">
+<code class="descname">exec_console</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.exec_console"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.exec_console" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to drop into a shell of a started jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.fork_exec">
+<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>passthru=False</em>, <em>event_scope=None</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.fork_exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a jail, run a command and shut it down immediately.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.full_name">
+<code class="descname">full_name</code><a class="headerlink" href="#iocage.Jail.JailGenerator.full_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the full identifier of a jail.</p>
+<p>When more than one root dataset is managed by iocage, the full source
+and name are returned. Otherwise just the name.</p>
+<p>For example <cite>mydataset/jailname</cite> or just <cite>jailname</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.get_hook_script_path">
+<code class="descname">get_hook_script_path</code><span class="sig-paren">(</span><em>hook_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.get_hook_script_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.get_hook_script_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute path to the hook script file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.humanreadable_name">
+<code class="descname">humanreadable_name</code><a class="headerlink" href="#iocage.Jail.JailGenerator.humanreadable_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the human-readable identifier to print in logs and CLI output.</p>
+<p>Whenever a Jail is found to have a UUID as identifier,
+a shortened string of the first 8 characters is returned</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.identifier">
+<code class="descname">identifier</code><a class="headerlink" href="#iocage.Jail.JailGenerator.identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the jail id used in snapshots, jls, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.is_basejail">
+<code class="descname">is_basejail</code><a class="headerlink" href="#iocage.Jail.JailGenerator.is_basejail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if a Jail is a basejail.</p>
+<p>If this is the case, parts of the jails dataset will be mounted
+from its release or upstream Jail (for example a Template)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.jid">
+<code class="descname">jid</code><a class="headerlink" href="#iocage.Jail.JailGenerator.jid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a jails JID if it is running or None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.launch_script_dir">
+<code class="descname">launch_script_dir</code><a class="headerlink" href="#iocage.Jail.JailGenerator.launch_script_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the launch-scripts directory path of the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.name">
+<code class="descname">name</code><a class="headerlink" href="#iocage.Jail.JailGenerator.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the configured jail id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.networks">
+<code class="descname">networks</code><a class="headerlink" href="#iocage.Jail.JailGenerator.networks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of a jails configured networks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="iocage.Network.html#iocage.Network.Network" title="iocage.Network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.passthru">
+<code class="descname">passthru</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.passthru" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a command in a started jail and passthrough STDIN and STDOUT.</p>
+<dl class="docutils">
+<dt>command (list):</dt>
+<dd><p class="first">A list of command and it’s arguments</p>
+<p class="last">Example: [“/bin/sh”]</p>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.promote">
+<code class="descname">promote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.promote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.promote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Promote all datasets of the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.provisioner">
+<code class="descname">provisioner</code><a class="headerlink" href="#iocage.Jail.JailGenerator.provisioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the jails Provisioner instance.</p>
+<p>The provisioner itself is going to interpret the jails configuration
+dynamically, so that the Provisioner instance can be memoized.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.release">
+<code class="descname">release</code><a class="headerlink" href="#iocage.Jail.JailGenerator.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the iocage.Release instance linked with the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.Release.html#iocage.Release.ReleaseGenerator" title="iocage.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.release_snapshot">
+<code class="descname">release_snapshot</code><a class="headerlink" href="#iocage.Jail.JailGenerator.release_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the matching release verion snaphsot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><em>new_name</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.rename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the name of a jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_name</strong> (<em>str</em>) – The new name of a jail. It might not be used by another Jail
+and must differ from the current name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_existing">
+<code class="descname">require_jail_existing</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_existing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_existing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailDoesNotExist exception if the jail does not exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_is_template">
+<code class="descname">require_jail_is_template</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_is_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_is_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailIsTemplate exception if the jail is a template.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_not_existing">
+<code class="descname">require_jail_not_existing</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_not_existing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_not_existing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailAlreadyExists exception if the jail already exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_not_template">
+<code class="descname">require_jail_not_template</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_not_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_not_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailIsTemplate exception if the jail is a template.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_running">
+<code class="descname">require_jail_running</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailNotRunning exception if the jail is stopped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_jail_stopped">
+<code class="descname">require_jail_stopped</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_jail_stopped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_jail_stopped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise JailAlreadyRunning exception if the jail is running.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.require_storage_backend">
+<code class="descname">require_storage_backend</code><span class="sig-paren">(</span><em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.require_storage_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.require_storage_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise if the jail was not initialized with a storage backend.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.restart">
+<code class="descname">restart</code><span class="sig-paren">(</span><em>shutdown=False</em>, <em>force=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restart the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.running">
+<code class="descname">running</code><a class="headerlink" href="#iocage.Jail.JailGenerator.running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if a jail is running.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permanently save a jail’s configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.script_env_path">
+<code class="descname">script_env_path</code><a class="headerlink" href="#iocage.Jail.JailGenerator.script_env_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute path to the jail script env file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>quick=False</em>, <em>passthru=False</em>, <em>single_command=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>quick</strong> (<em>bool</em>) – Skip several operations that are not required when a jail
+was unchanged since its last start (for example when restarting
+it).</li>
+<li><strong>passthru</strong> (<em>bool</em>) – Execute commands in an interactive shell.</li>
+<li><strong>single_command</strong> (<em>str</em>) – When set the jail is launched non-persistent. The startup cycle
+reduces to the <cite>prestart</cite>, <cite>command</cite> and <cite>poststop</cite> hooks with
+the singe_command being executed in a /bin/sh context.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.state">
+<code class="descname">state</code><a class="headerlink" href="#iocage.Jail.JailGenerator.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Memoized JailState.</p>
+<p>This object holds information about the jail state. The information
+is memoized on first access because the lookup is expensive. Please
+keep in mind to update the object when executing operations that
+potentially change a jails state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.JailState.html#iocage.JailState.JailState" title="iocage.JailState.JailState"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailState</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailGenerator.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em>, <em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop a jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>force</strong> (<em>bool</em>) – (default=False)
+Ignores failures and enforces teardown if True.</li>
+<li><strong>event_scope</strong> (<em>iocage.lib.events.Scope</em>) – (default=None)
+Provide an existing libiocage event scope or automatically
+create a new one instead.</li>
+<li><strong>log_errors</strong> (<em>bool</em>) – (default=True)
+When disabled errors are not passed to the logger. This is
+useful in scripted contexts when then stop operation was
+executed to enforce a defined jail state.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.stopped">
+<code class="descname">stopped</code><a class="headerlink" href="#iocage.Jail.JailGenerator.stopped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if a jail is stopped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailGenerator.storage_backend">
+<code class="descname">storage_backend</code><a class="headerlink" href="#iocage.Jail.JailGenerator.storage_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the jail storage abstraction class.</p>
+<p>Returns the class that represents the jails storage backend according
+to its configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.Storage.html#iocage.Storage.Storage" title="iocage.Storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.Jail.JailResource">
+<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">JailResource</code><span class="sig-paren">(</span><em>jail</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iocage.LaunchableResource.html#iocage.LaunchableResource.LaunchableResource" title="iocage.LaunchableResource.LaunchableResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.LaunchableResource.LaunchableResource</span></code></a>, <a class="reference internal" href="iocage.VersionedResource.html#iocage.VersionedResource.VersionedResource" title="iocage.VersionedResource.VersionedResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.VersionedResource.VersionedResource</span></code></a></p>
+<p>Resource that represents a jail.</p>
+<dl class="method">
+<dt id="iocage.Jail.JailResource.autoset_dataset_name">
+<code class="descname">autoset_dataset_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailResource.autoset_dataset_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailResource.autoset_dataset_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically determine and set the dataset_name.</p>
+<p>When a jail was created with the new attribute enabled, the dataset
+might not exist, so that a dataset_name lookup would fail. Calling this
+method sets the jails dataset_name to a child dataset of the hosts
+jails dataset with the jails name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailResource.dataset_name">
+<code class="descname">dataset_name</code><a class="headerlink" href="#iocage.Jail.JailResource.dataset_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the jail base ZFS dataset.</p>
+<p>If the resource has no dataset or dataset_name assigned yet,
+the jail id is used to find name the dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailResource.fstab">
+<code class="descname">fstab</code><a class="headerlink" href="#iocage.Jail.JailResource.fstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Memoized fstab wrapper of a Jail.</p>
+<p>The fstab file is stored in the top level of a Jails dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iocage.Config.Jail.File.Fstab.html#iocage.Config.Jail.File.Fstab.Fstab" title="iocage.Config.Jail.File.Fstab.Fstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fstab</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Jail.JailResource.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailResource.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailResource.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a config value from the jail or defer to its resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailResource.jail">
+<code class="descname">jail</code><a class="headerlink" href="#iocage.Jail.JailResource.jail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Jail instance that belongs to the resource.</p>
+<p>Usually the resource becomes inherited from the jail itself.
+It can still be used linked to a foreign jail by passing jail as
+named attribute to the __init__ function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Jail.JailGenerator" title="iocage.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailGenerator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Jail.JailResource.source">
+<code class="descname">source</code><a class="headerlink" href="#iocage.Jail.JailResource.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the jails source root datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iocage.JailState.html" class="btn btn-neutral float-right" title="iocage.JailState module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iocage.IPAddress.html" class="btn btn-neutral" title="iocage.IPAddress module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

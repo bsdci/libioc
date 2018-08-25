@@ -1,0 +1,7 @@
+iocage.Config.Jail.Properties.Resolver module
+=============================================
+
+.. automodule:: iocage.Config.Jail.Properties.Resolver
+    :members:
+    :undoc-members:
+    :show-inheritance:

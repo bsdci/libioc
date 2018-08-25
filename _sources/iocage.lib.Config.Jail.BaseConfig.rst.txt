@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.BaseConfig module
-========================================
-
-.. automodule:: iocage.lib.Config.Jail.BaseConfig
-    :members:
-    :undoc-members:
-    :show-inheritance:

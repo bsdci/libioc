@@ -1,0 +1,12 @@
+Metadata-Version: 1.2
+Name: iocage
+Version: 0.3.0
+Summary: A Python library to manage jails with iocage
+Home-page: https://github.com/iocage/libiocage
+Author: iocage Contributors
+Author-email: authors@iocage.io
+License: BSD
+Description: UNKNOWN
+Keywords: FreeBSD jail iocage
+Platform: UNKNOWN
+Requires-Python: >=3.6

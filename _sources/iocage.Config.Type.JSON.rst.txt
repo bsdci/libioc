@@ -1,0 +1,7 @@
+iocage.Config.Type.JSON module
+==============================
+
+.. automodule:: iocage.Config.Type.JSON
+    :members:
+    :undoc-members:
+    :show-inheritance:

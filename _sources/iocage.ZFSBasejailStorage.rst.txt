@@ -1,0 +1,7 @@
+iocage.ZFSBasejailStorage module
+================================
+
+.. automodule:: iocage.ZFSBasejailStorage
+    :members:
+    :undoc-members:
+    :show-inheritance:

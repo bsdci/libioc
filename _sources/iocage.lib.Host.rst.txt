@@ -1,7 +1,0 @@
-iocage.lib.Host module
-======================
-
-.. automodule:: iocage.lib.Host
-    :members:
-    :undoc-members:
-    :show-inheritance:

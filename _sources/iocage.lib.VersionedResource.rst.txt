@@ -1,7 +1,0 @@
-iocage.lib.VersionedResource module
-===================================
-
-.. automodule:: iocage.lib.VersionedResource
-    :members:
-    :undoc-members:
-    :show-inheritance:

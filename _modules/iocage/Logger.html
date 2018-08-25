@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.Logger &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.Logger</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.Logger</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage logging module.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">iocage.errors</span>
+
+
+<div class="viewcode-block" id="LogEntry"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.LogEntry">[docs]</a><span class="k">class</span> <span class="nc">LogEntry</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A single log entry.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="LogEntry.edit"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.LogEntry.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Change the log entry.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">CannotRedrawLine</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;No logger available&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+
+        <span class="k">if</span> <span class="n">indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">redraw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the number of lines of the log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;iocage Logger module.&quot;&quot;&quot;</span>
+
+    <span class="n">COLORS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;margenta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cyan&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">RESET_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+    <span class="n">BOLD_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+    <span class="n">LINE_UP_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[F&quot;</span>
+
+    <span class="n">LOG_LEVEL_SETTINGS</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span>
+        <span class="p">]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;screen&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+        <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+        <span class="s2">&quot;notice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;magenta&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;spam&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;critical&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">LOG_LEVELS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;critical&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;info&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;notice&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;verbose&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;screen&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">INDENT_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span>
+
+    <span class="n">PRINT_HISTORY</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">print_level</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">log_directory</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;/var/log/iocage&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_level</span> <span class="o">=</span> <span class="n">print_level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_log_directory</span><span class="p">(</span><span class="n">log_directory</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_print_level</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the static default print level.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;info&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">print_level</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the configured or default print level.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print_level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_print_level</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print_level</span>
+
+    <span class="nd">@print_level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">print_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set a custom print level to override the default.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Logger</span><span class="o">.</span><span class="n">LOG_LEVELS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidLogLevel</span><span class="p">(</span>
+                <span class="n">log_level</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_level</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_set_log_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">log_directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">log_directory</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_log_directory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Log directory set to &#39;</span><span class="si">{log_directory}</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;spam&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Logger.log"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a log entry.&quot;&quot;&quot;</span>
+        <span class="n">log_entry</span> <span class="o">=</span> <span class="n">LogEntry</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span>
+            <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_print_log_entry</span><span class="p">(</span><span class="n">log_entry</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_log_entry</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PRINT_HISTORY</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">log_entry</span></div>
+
+<div class="viewcode-block" id="Logger.verbose"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.verbose">[docs]</a>    <span class="k">def</span> <span class="nf">verbose</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a verbose log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.error"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add an error log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.warn"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.warn">[docs]</a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a warning log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.debug"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a debug log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.spam"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.spam">[docs]</a>    <span class="k">def</span> <span class="nf">spam</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a spam log entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;spam&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.screen"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.screen">[docs]</a>    <span class="k">def</span> <span class="nf">screen</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogEntry</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Screen never gets printed to log files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;screen&quot;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logger.redraw"><a class="viewcode-back" href="../../iocage.Logger.html#iocage.Logger.Logger.redraw">[docs]</a>    <span class="k">def</span> <span class="nf">redraw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_entry</span><span class="p">:</span> <span class="n">LogEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Redraw and update a log entry that was already printed.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">log_entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRINT_HISTORY</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">CannotRedrawLine</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Log entry not found in history&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">log_entry</span><span class="o">.</span><span class="n">level</span> <span class="o">!=</span> <span class="s2">&quot;screen&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">CannotRedrawLine</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;Log level &#39;screen&#39; is required to redraw, &quot;</span>
+                    <span class="n">f</span><span class="s2">&quot;but got &#39;</span><span class="si">{log_entry.level}</span><span class="s2">&#39;&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># calculate the delta of messages printed since</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRINT_HISTORY</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PRINT_HISTORY</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRINT_HISTORY</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(),</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[</span><span class="si">{delta}</span><span class="s2">F&quot;</span><span class="p">,</span>  <span class="c1"># CPL - Cursor Previous Line</span>
+            <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span>               <span class="c1"># CR - Carriage Return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{log_entry.message}</span><span class="s2">: </span><span class="si">{delta}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">log_entry</span><span class="o">.</span><span class="n">indent</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[K&quot;</span><span class="p">,</span>           <span class="c1"># EL - Erase in Line</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta</span><span class="p">),</span>
+            <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span>
+        <span class="p">])</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_should_print_log_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_entry</span><span class="p">:</span> <span class="n">LogEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">log_entry</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="s2">&quot;screen&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_level</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">print_level</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="n">LOG_LEVELS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">print_level</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Logger</span><span class="o">.</span><span class="n">LOG_LEVELS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">log_entry</span><span class="o">.</span><span class="n">level</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">print_level</span>
+
+    <span class="k">def</span> <span class="nf">_beautify_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_level_color</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">indent</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorize</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">message</span>
+
+    <span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beautify_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">indent</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_print_log_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_entry</span><span class="p">:</span> <span class="n">LogEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span>
+            <span class="n">log_entry</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">log_entry</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+            <span class="n">log_entry</span><span class="o">.</span><span class="n">indent</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="n">INDENT_PREFIX</span> <span class="o">*</span> <span class="n">level</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{indent}{x}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">_create_log_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">geteuid</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">MustBeRoot</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;create </span><span class="si">{self.log_directory}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_directory</span><span class="p">,</span> <span class="mh">0x600</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Log directory &#39;</span><span class="si">{self.log_directory}</span><span class="s2">&#39; created&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_color_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Logger</span><span class="o">.</span><span class="n">COLORS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">color_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">30</span>
+
+    <span class="k">def</span> <span class="nf">_get_level_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log_level_setting</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="n">LOG_LEVEL_SETTINGS</span><span class="p">[</span><span class="n">log_level</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">log_level_setting</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;none&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_colorize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">color_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_color_code</span><span class="p">(</span><span class="n">color_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">message</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1;</span><span class="si">{color_code}</span><span class="s2">m</span><span class="si">{message}</span><span class="se">\033</span><span class="s2">[0m&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

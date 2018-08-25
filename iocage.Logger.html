@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.Logger module &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iocage.MacAddress module" href="iocage.MacAddress.html" />
+    <link rel="prev" title="iocage.ListableResource module" href="iocage.ListableResource.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="iocage.html">iocage package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iocage.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iocage.BridgeInterface.html">iocage.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.CommandQueue.html">iocage.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Datasets.html">iocage.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.DevfsRules.html">iocage.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Distribution.html">iocage.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Filter.html">iocage.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Firewall.html">iocage.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Host.html">iocage.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.IPAddress.html">iocage.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Jail.html">iocage.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.JailState.html">iocage.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Jails.html">iocage.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.LaunchableResource.html">iocage.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ListableResource.html">iocage.ListableResource module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Releases.html">iocage.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Resource.html">iocage.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceBackup.html">iocage.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.helpers_object.html">iocage.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.html#module-iocage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="iocage.html">iocage package</a> &raquo;</li>
+        
+      <li>iocage.Logger module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/iocage.Logger.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iocage.Logger">
+<span id="iocage-logger-module"></span><h1>iocage.Logger module<a class="headerlink" href="#module-iocage.Logger" title="Permalink to this headline">¶</a></h1>
+<p>iocage logging module.</p>
+<dl class="class">
+<dt id="iocage.Logger.LogEntry">
+<em class="property">class </em><code class="descclassname">iocage.Logger.</code><code class="descname">LogEntry</code><span class="sig-paren">(</span><em>message</em>, <em>level</em>, <em>indent=0</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#LogEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.LogEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A single log entry.</p>
+<dl class="method">
+<dt id="iocage.Logger.LogEntry.edit">
+<code class="descname">edit</code><span class="sig-paren">(</span><em>message=None</em>, <em>indent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#LogEntry.edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.LogEntry.edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.Logger.Logger">
+<em class="property">class </em><code class="descclassname">iocage.Logger.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>print_level=None</em>, <em>log_directory='/var/log/iocage'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>iocage Logger module.</p>
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.BOLD_SEQ">
+<code class="descname">BOLD_SEQ</code><em class="property"> = '\x1b[1m'</em><a class="headerlink" href="#iocage.Logger.Logger.BOLD_SEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.COLORS">
+<code class="descname">COLORS</code><em class="property"> = ('black', 'red', 'green', 'yellow', 'blue', 'margenta', 'cyan', 'white')</em><a class="headerlink" href="#iocage.Logger.Logger.COLORS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.INDENT_PREFIX">
+<code class="descname">INDENT_PREFIX</code><em class="property"> = '  '</em><a class="headerlink" href="#iocage.Logger.Logger.INDENT_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.LINE_UP_SEQ">
+<code class="descname">LINE_UP_SEQ</code><em class="property"> = '\x1b[F'</em><a class="headerlink" href="#iocage.Logger.Logger.LINE_UP_SEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.LOG_LEVELS">
+<code class="descname">LOG_LEVELS</code><em class="property"> = ('critical', 'error', 'warn', 'info', 'notice', 'verbose', 'debug', 'spam', 'screen')</em><a class="headerlink" href="#iocage.Logger.Logger.LOG_LEVELS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.LOG_LEVEL_SETTINGS">
+<code class="descname">LOG_LEVEL_SETTINGS</code><em class="property"> = {'critical': {'bold': True, 'color': 'red'}, 'debug': {'color': 'green'}, 'error': {'color': 'red'}, 'info': {'color': None}, 'notice': {'color': 'magenta'}, 'screen': {'color': None}, 'spam': {'color': 'green'}, 'verbose': {'color': 'blue'}, 'warn': {'color': 'yellow'}}</em><a class="headerlink" href="#iocage.Logger.Logger.LOG_LEVEL_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.PRINT_HISTORY">
+<code class="descname">PRINT_HISTORY</code><em class="property"> = []</em><a class="headerlink" href="#iocage.Logger.Logger.PRINT_HISTORY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.RESET_SEQ">
+<code class="descname">RESET_SEQ</code><em class="property"> = '\x1b[0m'</em><a class="headerlink" href="#iocage.Logger.Logger.RESET_SEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a debug log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.default_print_level">
+<code class="descname">default_print_level</code><a class="headerlink" href="#iocage.Logger.Logger.default_print_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the static default print level.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an error log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>message</em>, <em>level='info'</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iocage.Logger.Logger.print_level">
+<code class="descname">print_level</code><a class="headerlink" href="#iocage.Logger.Logger.print_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the configured or default print level.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.redraw">
+<code class="descname">redraw</code><span class="sig-paren">(</span><em>log_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.redraw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.redraw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redraw and update a log entry that was already printed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.screen">
+<code class="descname">screen</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Screen never gets printed to log files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.spam">
+<code class="descname">spam</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.spam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.spam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a spam log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.verbose">
+<code class="descname">verbose</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.verbose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a verbose log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iocage.Logger.Logger.warn">
+<code class="descname">warn</code><span class="sig-paren">(</span><em>message</em>, <em>indent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Logger.html#Logger.warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Logger.Logger.warn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a warning log entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.Logger.LogEntry" title="iocage.Logger.LogEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iocage.MacAddress.html" class="btn btn-neutral float-right" title="iocage.MacAddress module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iocage.ListableResource.html" class="btn btn-neutral" title="iocage.ListableResource module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

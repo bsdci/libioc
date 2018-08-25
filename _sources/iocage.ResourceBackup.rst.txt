@@ -1,0 +1,7 @@
+iocage.ResourceBackup module
+============================
+
+.. automodule:: iocage.ResourceBackup
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.File.Fstab module
-========================================
-
-.. automodule:: iocage.lib.Config.Jail.File.Fstab
-    :members:
-    :undoc-members:
-    :show-inheritance:

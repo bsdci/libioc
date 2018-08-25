@@ -1,0 +1,7 @@
+iocage.CommandQueue module
+==========================
+
+.. automodule:: iocage.CommandQueue
+    :members:
+    :undoc-members:
+    :show-inheritance:

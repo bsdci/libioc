@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.ZFS &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.ZFS</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.ZFS</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage libzfs enhancement module.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">import</span> <span class="nn">iocage.Logger</span>
+<span class="kn">import</span> <span class="nn">iocage.helpers_object</span>
+<span class="kn">import</span> <span class="nn">iocage.errors</span>
+
+
+<div class="viewcode-block" id="ZFS"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS">[docs]</a><span class="k">class</span> <span class="nc">ZFS</span><span class="p">(</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFS</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;libzfs enhancement module.&quot;&quot;&quot;</span>
+
+    <span class="n">_logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return logger or raise an exception when it is unavailable.&quot;&quot;&quot;</span>
+        <span class="n">Logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">Logger</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The logger is unavailable&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span>
+
+    <span class="nd">@logger</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set the ZFS objects logger.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="ZFS.create_dataset"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Automatically get the pool and create a dataset from its name.&quot;&quot;&quot;</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pool</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="p">{},</span> <span class="n">create_ancestors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">mount</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="ZFS.get_or_create_dataset"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.get_or_create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">get_or_create_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Find or create the dataset, then return it.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ZFS.get_pool"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.get_pool">[docs]</a>    <span class="k">def</span> <span class="nf">get_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the pool with a given name.&quot;&quot;&quot;</span>
+        <span class="n">pool_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pools</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pool</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">pool_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pool</span>
+        <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ZFSPoolUnavailable</span><span class="p">(</span>
+            <span class="n">pool_name</span><span class="o">=</span><span class="n">pool_name</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ZFS.delete_dataset_recursive"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.delete_dataset_recursive">[docs]</a>    <span class="k">def</span> <span class="nf">delete_dataset_recursive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">delete_snapshots</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">delete_origin_snapshot</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Recursively delete a dataset.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_dataset_recursive</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Unmounting </span><span class="si">{dataset.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">umount</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">delete_snapshots</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">snapshots</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s2">&quot;Deleting snapshot </span><span class="si">{snapshot.name}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">snapshot</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">origin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">delete_origin_snapshot</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">origin_property</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">origin_property</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">origin</span> <span class="o">=</span> <span class="n">origin_property</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting dataset </span><span class="si">{dataset.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">umount</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Dataset </span><span class="si">{dataset.name}</span><span class="s2"> unmounted&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting snapshot </span><span class="si">{origin}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">origin_snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">origin_snapshot</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ZFS.clone_dataset"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.clone_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">clone_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">delete_existing</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Clone a ZFSDataset from a source to a target dataset name.&quot;&quot;&quot;</span>
+        <span class="c1"># delete target dataset if it already exists</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">existing_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">delete_existing</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DatasetExists</span><span class="p">(</span>
+                    <span class="n">dataset_name</span><span class="o">=</span><span class="n">target</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Deleting existing dataset </span><span class="si">{target}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">existing_dataset</span><span class="o">.</span><span class="n">mountpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">existing_dataset</span><span class="o">.</span><span class="n">umount</span><span class="p">()</span>
+            <span class="n">existing_dataset</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">existing_dataset</span>
+
+        <span class="n">snapshot_name</span> <span class="o">=</span> <span class="n">append_snapshot_datetime</span><span class="p">(</span><span class="s2">&quot;clone&quot;</span><span class="p">)</span>
+        <span class="n">snapshot_identifier</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{source.name}</span><span class="s2">@</span><span class="si">{snapshot_name}</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">snapshot_identifier</span><span class="p">)</span>
+            <span class="n">delete_snapshot</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+            <span class="n">source</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">snapshot_identifier</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">snapshot_identifier</span><span class="p">)</span>
+            <span class="n">delete_snapshot</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">snapshot_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clone_snapshot</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">snapshot_error</span> <span class="o">=</span> <span class="n">e</span>
+
+        <span class="k">if</span> <span class="n">delete_snapshot</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">snapshot_error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SnapshotCreation</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">snapshot_error</span><span class="p">),</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Successfully cloned </span><span class="si">{source}</span><span class="s2"> to </span><span class="si">{target}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ZFS.clone_snapshot"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.clone_snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">clone_snapshot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSSnapshot</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Clone a ZFSSnapshot to the target dataset name.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Cloning snapshot </span><span class="si">{snapshot.name}</span><span class="s2"> to </span><span class="si">{target}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">source_prefix</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">source_prefix_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_prefix</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">current_snapshot</span> <span class="ow">in</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">snapshots_recursive</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_snapshot</span><span class="o">.</span><span class="n">snapshot_name</span> <span class="o">!=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot_name</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">_ds</span> <span class="o">=</span> <span class="n">current_snapshot</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="n">source_prefix_len</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">current_target</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{target}</span><span class="s2">/</span><span class="si">{_ds}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clone_and_mount</span><span class="p">(</span><span class="n">current_snapshot</span><span class="p">,</span> <span class="n">current_target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ZFS.promote_dataset"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.promote_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">promote_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Recursively promote a dataset.&quot;&quot;&quot;</span>
+        <span class="n">datasets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">]</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">children_recursive</span><span class="p">)))</span> <span class="o">+</span> <span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
+        <span class="n">promoted_source_datasets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">error</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+            <span class="n">source_dataset</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">source_dataset</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="c1"># already promoted</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_promote</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+                <span class="n">promoted_source_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source_dataset</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">e</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Promotion failed: Reverting changes.&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dataset_name</span> <span class="ow">in</span> <span class="n">promoted_source_datasets</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span><span class="o">.</span><span class="n">promote</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">error</span></div>
+
+    <span class="k">def</span> <span class="nf">_promote</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Promoting ZFS dataset </span><span class="si">{dataset.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">promote</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_clone_and_mount</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSSnapshot</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parent_name</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">parent_name</span><span class="p">)</span>
+
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">mount</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ZFS.rename_snapshot_recursive"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.ZFS.rename_snapshot_recursive">[docs]</a>    <span class="k">def</span> <span class="nf">rename_snapshot_recursive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSSnapshot</span><span class="p">,</span>
+        <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Rename a snapshot recursively.&quot;&quot;&quot;</span>
+        <span class="c1"># ToDo: replace after https://github.com/freenas/py-libzfs/pull/10</span>
+        <span class="n">snapshots_recursive</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">snapshot_name</span> <span class="o">==</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot_name</span><span class="p">,</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">snapshots_recursive</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">_snapshot</span> <span class="ow">in</span> <span class="n">snapshots_recursive</span><span class="p">:</span>
+            <span class="n">_snapshot</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_has_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;_logger&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="get_zfs"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.get_zfs">[docs]</a><span class="k">def</span> <span class="nf">get_zfs</span><span class="p">(</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">history</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">history_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&lt;iocage&gt;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZFS</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Get an instance of iocages enhanced ZFS class.&quot;&quot;&quot;</span>
+    <span class="n">zfs</span> <span class="o">=</span> <span class="n">ZFS</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">,</span> <span class="n">history_prefix</span><span class="o">=</span><span class="n">history_prefix</span><span class="p">)</span>
+    <span class="n">zfs</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="n">zfs</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zfs</span></div>
+
+
+<div class="viewcode-block" id="append_snapshot_datetime"><a class="viewcode-back" href="../../iocage.ZFS.html#iocage.ZFS.append_snapshot_datetime">[docs]</a><span class="k">def</span> <span class="nf">append_snapshot_datetime</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Append the current datetime string to a snapshot name.&quot;&quot;&quot;</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">+=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%I%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

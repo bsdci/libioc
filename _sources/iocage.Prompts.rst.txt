@@ -1,0 +1,7 @@
+iocage.Prompts module
+=====================
+
+.. automodule:: iocage.Prompts
+    :members:
+    :undoc-members:
+    :show-inheritance:

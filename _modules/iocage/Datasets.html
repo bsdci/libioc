@@ -1,0 +1,653 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iocage.Datasets &mdash; libiocage  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libiocage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../iocage.html">iocage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libiocage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>iocage.Datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iocage.Datasets</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage datasets module.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>
+
+<span class="kn">import</span> <span class="nn">iocage.errors</span>
+<span class="kn">import</span> <span class="nn">iocage.helpers</span>
+<span class="kn">import</span> <span class="nn">iocage.helpers_object</span>
+
+<span class="c1"># MyPy</span>
+<span class="kn">import</span> <span class="nn">iocage.Types</span>
+<span class="kn">import</span> <span class="nn">iocage.ZFS</span>
+<span class="kn">import</span> <span class="nn">iocage.Logger</span>
+
+<span class="c1"># MyPy</span>
+<span class="n">DatasetIdentifier</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">]</span>
+<span class="n">OptionalSourceFilterType</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="RCConfEmptyException"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.RCConfEmptyException">[docs]</a><span class="k">class</span> <span class="nc">RCConfEmptyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception for internal use.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="RootDatasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.RootDatasets">[docs]</a><span class="k">class</span> <span class="nc">RootDatasets</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;iocage core dataset abstraction.&quot;&quot;&quot;</span>
+
+    <span class="n">zfs</span><span class="p">:</span> <span class="s1">&#39;iocage.ZFS.ZFS&#39;</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span>
+    <span class="n">root</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span>
+    <span class="n">_datasets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root_dataset</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root_dataset</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">releases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get or create the iocage releases dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_dataset</span><span class="p">(</span><span class="s2">&quot;releases&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get or create the iocage ZFS basejail releases dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_dataset</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">jails</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get or create the iocage jails dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_dataset</span><span class="p">(</span><span class="s2">&quot;jails&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pkg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get or create the pkg cache.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_dataset</span><span class="p">(</span><span class="s2">&quot;pkg&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_or_create_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">asset_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">asset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">asset_name</span><span class="p">]</span>
+
+        <span class="n">asset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.root.name}</span><span class="s2">/</span><span class="si">{asset_name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">_asset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span> <span class="o">=</span> <span class="n">asset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">asset_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_asset</span>
+        <span class="k">return</span> <span class="n">_asset</span></div>
+
+
+<div class="viewcode-block" id="Datasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets">[docs]</a><span class="k">class</span> <span class="nc">Datasets</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;All source datasets managed by iocage.&quot;&quot;&quot;</span>
+
+    <span class="n">zfs</span><span class="p">:</span> <span class="s1">&#39;iocage.ZFS.ZFS&#39;</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span>
+
+    <span class="n">main_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="n">ZFS_POOL_ACTIVE_PROPERTY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;org.freebsd.ioc:active&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sources</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">]]</span>
+        <span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attach_sources</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_configure_from_rc_conf</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="n">RCConfEmptyException</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_configure_from_pool_property</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageNotActivated</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="s2">&quot;No iocage root dataset configuration found&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_configure_from_rc_conf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">enabled_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_root_datasets_from_rc_conf</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">enabled_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RCConfEmptyException</span><span class="p">()</span>
+
+        <span class="n">_e</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">enabled_datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">_e</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attach_sources</span><span class="p">(</span><span class="n">_e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_configure_from_pool_property</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">active_pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_pool_or_none</span>
+        <span class="k">if</span> <span class="n">active_pool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># raise internally without logging</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageNotActivated</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attach_sources</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">ioc</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.active_pool.name}</span><span class="s2">/iocage&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Found active ZFS pool </span><span class="si">{self.active_pool.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;iocage.Datasets.Datasets&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the source that was attached first.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageNotActivated</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Datasets.find_root_datasets_name"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.find_root_datasets_name">[docs]</a>    <span class="k">def</span> <span class="nf">find_root_datasets_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the name of the source containing the matching dataset.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">source_name</span><span class="p">,</span> <span class="n">source_datasets</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">dataset_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">source_datasets</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">source_name</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ResourceUnmanaged</span><span class="p">(</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Datasets.find_root_datasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.find_root_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">find_root_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RootDatasets</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the RootDatasets instance containing the dataset.&quot;&quot;&quot;</span>
+        <span class="n">root_datasets_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_root_datasets_name</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="n">root_datasets</span><span class="p">:</span> <span class="n">RootDatasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">root_datasets_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">root_datasets</span></div>
+
+<div class="viewcode-block" id="Datasets.get_root_source"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.get_root_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_root_source</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;iocage.Datasets.Datasets&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the root source with a certain name.</span>
+
+<span class="sd">        When the source name is empty, the main source is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">source_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">source_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Datasets.attach_sources"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.attach_sources">[docs]</a>    <span class="k">def</span> <span class="nf">attach_sources</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sources</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DatasetIdentifier</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Attach a sources dictionary at once.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset_identifier</span> <span class="ow">in</span> <span class="n">sources</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attach_source</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">dataset_identifier</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Datasets.attach_source"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.attach_source">[docs]</a>    <span class="k">def</span> <span class="nf">attach_source</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dataset_identifier</span><span class="p">:</span> <span class="n">DatasetIdentifier</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Attach a source by its DatasetIdentifier to the iocage scope.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attach_root_datasets</span><span class="p">(</span>
+            <span class="n">source_name</span><span class="o">=</span><span class="n">source_name</span><span class="p">,</span>
+            <span class="n">root_datasets</span><span class="o">=</span><span class="n">RootDatasets</span><span class="p">(</span>
+                <span class="n">root_dataset</span><span class="o">=</span><span class="n">dataset_identifier</span><span class="p">,</span>
+                <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Datasets.attach_root_datasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.attach_root_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">attach_root_datasets</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">root_datasets</span><span class="p">:</span> <span class="n">RootDatasets</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Attach another RootDatasets object to the iocage scope.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="p">[</span><span class="n">source_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">root_datasets</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="o">=</span> <span class="n">source_name</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_root_datasets_from_rc_conf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;ioc_dataset_&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">iocage.Config.Jail.File.RCConf</span>
+        <span class="n">rc_conf</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">RCConf</span><span class="o">.</span><span class="n">RCConf</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
+        <span class="n">rc_conf_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">rc_conf</span><span class="p">))</span>
+
+        <span class="n">output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">rc_conf_key</span> <span class="ow">in</span> <span class="n">rc_conf_keys</span><span class="p">:</span>
+            <span class="n">datasets_name</span> <span class="o">=</span> <span class="n">rc_conf_key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">datasets_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">rc_conf</span><span class="p">[</span><span class="n">rc_conf_key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_active_pool_or_none</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">]:</span>
+        <span class="n">zpools</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">pools</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pool</span> <span class="ow">in</span> <span class="n">zpools</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pool_active</span><span class="p">(</span><span class="n">pool</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">pool</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the currently active iocage pool.&quot;&quot;&quot;</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_pool_or_none</span>
+        <span class="k">if</span> <span class="n">pool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageNotActivated</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pool</span>
+
+<div class="viewcode-block" id="Datasets.activate"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Activate the root pool and set the given mountpoint.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activate_pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="n">mountpoint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Datasets.activate_pool"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.activate_pool">[docs]</a>    <span class="k">def</span> <span class="nf">activate_pool</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Activate the given pool and set its mountpoint.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pool_active</span><span class="p">(</span><span class="n">pool</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;ZFS pool &#39;</span><span class="si">{pool.name}</span><span class="s2">&#39; is already active&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ZFSPoolInvalid</span><span class="p">(</span><span class="s2">&quot;cannot activate&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pool</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;UNAVAIL&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ZFSPoolUnavailable</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">other_pools</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">pool</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">pools</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">other_pool</span> <span class="ow">in</span> <span class="n">other_pools</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pool_activation</span><span class="p">(</span><span class="n">other_pool</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_pool_activation</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">mountpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="s1">&#39;/iocage&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+                <span class="s2">&quot;Claiming /iocage as mountpoint of the activated zpool&quot;</span>
+            <span class="p">)</span>
+            <span class="n">mountpoint</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span><span class="s1">&#39;/iocage&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mountpoint</span> <span class="o">!=</span> <span class="n">mountpoint</span><span class="p">:</span>
+            <span class="n">zfs_property</span> <span class="o">=</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSUserProperty</span><span class="p">(</span><span class="n">mountpoint</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;mountpoint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zfs_property</span></div>
+
+<div class="viewcode-block" id="Datasets.is_pool_active"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.is_pool_active">[docs]</a>    <span class="k">def</span> <span class="nf">is_pool_active</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pool</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the pool is activated for iocage.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">):</span>
+            <span class="n">_pool</span> <span class="o">=</span> <span class="n">pool</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span>
+
+        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_user_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_pool_property</span><span class="p">(</span>
+            <span class="n">_pool</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ZFS_POOL_ACTIVE_PROPERTY</span>
+        <span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_pool_property</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">,</span>
+        <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+            <span class="n">zfs_prop</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">prop</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">zfs_prop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_dataset_property</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">zfs_prop</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">prop</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">zfs_prop</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Datasets.deactivate"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Deactivate a ZFS pool for iocage use.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_pool_activation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_pool_activation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;no&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_zfs_property</span><span class="p">(</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">root_dataset</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ZFS_POOL_ACTIVE_PROPERTY</span><span class="p">,</span>
+            <span class="n">value</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_zfs_property</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">current_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_property</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_value</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Set ZFS property </span><span class="si">{name}</span><span class="s2">=&#39;</span><span class="si">{value}</span><span class="s2">&#39;&quot;</span>
+                <span class="n">f</span><span class="s2">&quot; on dataset &#39;</span><span class="si">{dataset.name}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSUserProperty</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FilteredDatasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.FilteredDatasets">[docs]</a><span class="k">class</span> <span class="nc">FilteredDatasets</span><span class="p">(</span><span class="n">Datasets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A wrapper around Datasets that limits access to certain root datasets.</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        datasets:</span>
+<span class="sd">            The Datasets hosts instance</span>
+
+<span class="sd">        source_filters:</span>
+<span class="sd">            No filters were applied when unset. The names contained in the</span>
+<span class="sd">            Tuple are matched against the dataset names specified in rc.conf.</span>
+
+<span class="sd">            For example:</span>
+<span class="sd">                echo &#39;ioc_dataset_main=&quot;zroot/iocage&quot;&#39; &gt;&gt; /etc/rc.conf</span>
+<span class="sd">                ioc list --source main</span>
+
+<span class="sd">        zfs:</span>
+<span class="sd">            The shared ZFS object.</span>
+
+<span class="sd">        logger:</span>
+<span class="sd">            The shared logger instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_source_filters</span><span class="p">:</span> <span class="n">OptionalSourceFilterType</span>
+    <span class="n">datasets</span><span class="p">:</span> <span class="n">Datasets</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">datasets</span><span class="p">:</span> <span class="n">Datasets</span><span class="p">,</span>
+        <span class="n">source_filters</span><span class="p">:</span> <span class="n">OptionalSourceFilterType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">datasets</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_filters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_filters</span> <span class="o">=</span> <span class="n">source_filters</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptionalSourceFilterType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the active source filters or None.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_filters</span>  <span class="c1"># noqa: T484</span>
+
+    <span class="nd">@source_filters</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">source_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">OptionalSourceFilterType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set or disable source filters.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_filters</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clone_from_datasets</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_clone_from_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">main_datasets_name</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">root_datasets</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_matches_filters</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">attach_root_datasets</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">root_datasets</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_name_matches_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_filters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_filters</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filter_datasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.filter_datasets">[docs]</a><span class="k">def</span> <span class="nf">filter_datasets</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="p">:</span> <span class="n">Datasets</span><span class="p">,</span>
+    <span class="n">sources</span><span class="p">:</span> <span class="n">OptionalSourceFilterType</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FilteredDatasets</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return FilteredDatasets by a tuple of sources.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">FilteredDatasets</span><span class="p">(</span>
+        <span class="n">datasets</span><span class="o">=</span><span class="n">datasets</span><span class="p">,</span>
+        <span class="n">source_filters</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+        <span class="n">zfs</span><span class="o">=</span><span class="n">datasets</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">datasets</span><span class="o">.</span><span class="n">logger</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, iocage Authors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+iocage.Config.Type.ZFS module
+=============================
+
+.. automodule:: iocage.Config.Type.ZFS
+    :members:
+    :undoc-members:
+    :show-inheritance:

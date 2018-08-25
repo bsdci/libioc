@@ -1,7 +1,0 @@
-iocage.lib.Firewall module
-==========================
-
-.. automodule:: iocage.lib.Firewall
-    :members:
-    :undoc-members:
-    :show-inheritance:

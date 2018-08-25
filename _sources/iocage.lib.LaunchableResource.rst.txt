@@ -1,7 +1,0 @@
-iocage.lib.LaunchableResource module
-====================================
-
-.. automodule:: iocage.lib.LaunchableResource
-    :members:
-    :undoc-members:
-    :show-inheritance:

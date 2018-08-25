@@ -1,7 +1,0 @@
-iocage.lib.Release module
-=========================
-
-.. automodule:: iocage.lib.Release
-    :members:
-    :undoc-members:
-    :show-inheritance:

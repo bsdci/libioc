@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.Properties.ResourceLimit module
-======================================================
-
-.. automodule:: iocage.lib.Config.Jail.Properties.ResourceLimit
-    :members:
-    :undoc-members:
-    :show-inheritance:

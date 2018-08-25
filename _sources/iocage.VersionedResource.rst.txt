@@ -1,0 +1,7 @@
+iocage.VersionedResource module
+===============================
+
+.. automodule:: iocage.VersionedResource
+    :members:
+    :undoc-members:
+    :show-inheritance:

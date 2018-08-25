@@ -1,0 +1,7 @@
+iocage.Storage module
+=====================
+
+.. automodule:: iocage.Storage
+    :members:
+    :undoc-members:
+    :show-inheritance:

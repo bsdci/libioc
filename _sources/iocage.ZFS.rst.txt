@@ -1,0 +1,7 @@
+iocage.ZFS module
+=================
+
+.. automodule:: iocage.ZFS
+    :members:
+    :undoc-members:
+    :show-inheritance:

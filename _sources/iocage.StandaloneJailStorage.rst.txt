@@ -1,0 +1,7 @@
+iocage.StandaloneJailStorage module
+===================================
+
+.. automodule:: iocage.StandaloneJailStorage
+    :members:
+    :undoc-members:
+    :show-inheritance:

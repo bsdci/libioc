@@ -1,0 +1,7 @@
+iocage.Resource module
+======================
+
+.. automodule:: iocage.Resource
+    :members:
+    :undoc-members:
+    :show-inheritance:

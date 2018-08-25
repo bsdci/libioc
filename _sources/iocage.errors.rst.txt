@@ -1,0 +1,7 @@
+iocage.errors module
+====================
+
+.. automodule:: iocage.errors
+    :members:
+    :undoc-members:
+    :show-inheritance:

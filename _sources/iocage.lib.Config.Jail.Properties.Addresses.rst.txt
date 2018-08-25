@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.Properties.Addresses module
-==================================================
-
-.. automodule:: iocage.lib.Config.Jail.Properties.Addresses
-    :members:
-    :undoc-members:
-    :show-inheritance:

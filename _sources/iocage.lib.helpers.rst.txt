@@ -1,7 +1,0 @@
-iocage.lib.helpers module
-=========================
-
-.. automodule:: iocage.lib.helpers
-    :members:
-    :undoc-members:
-    :show-inheritance:

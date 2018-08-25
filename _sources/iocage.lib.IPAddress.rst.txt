@@ -1,7 +1,0 @@
-iocage.lib.IPAddress module
-===========================
-
-.. automodule:: iocage.lib.IPAddress
-    :members:
-    :undoc-members:
-    :show-inheritance:

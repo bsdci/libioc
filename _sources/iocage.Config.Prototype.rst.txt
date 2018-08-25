@@ -1,0 +1,7 @@
+iocage.Config.Prototype module
+==============================
+
+.. automodule:: iocage.Config.Prototype
+    :members:
+    :undoc-members:
+    :show-inheritance:

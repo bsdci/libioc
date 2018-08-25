@@ -1,0 +1,26 @@
+iocage.Config package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    iocage.Config.Jail
+    iocage.Config.Type
+
+Submodules
+----------
+
+.. toctree::
+
+   iocage.Config.Dataset
+   iocage.Config.Prototype
+
+Module contents
+---------------
+
+.. automodule:: iocage.Config
+    :members:
+    :undoc-members:
+    :show-inheritance:

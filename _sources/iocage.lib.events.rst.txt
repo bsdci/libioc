@@ -1,7 +1,0 @@
-iocage.lib.events module
-========================
-
-.. automodule:: iocage.lib.events
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-iocage.lib.Network module
-=========================
-
-.. automodule:: iocage.lib.Network
-    :members:
-    :undoc-members:
-    :show-inheritance:

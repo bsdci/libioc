@@ -1,7 +1,0 @@
-iocage.lib.Jails module
-=======================
-
-.. automodule:: iocage.lib.Jails
-    :members:
-    :undoc-members:
-    :show-inheritance:

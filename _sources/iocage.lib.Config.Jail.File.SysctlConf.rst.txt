@@ -1,7 +1,0 @@
-iocage.lib.Config.Jail.File.SysctlConf module
-=============================================
-
-.. automodule:: iocage.lib.Config.Jail.File.SysctlConf
-    :members:
-    :undoc-members:
-    :show-inheritance:
