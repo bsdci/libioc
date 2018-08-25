@@ -37,6 +37,7 @@ import ucl
 import iocage.ZFS
 import iocage.errors
 import iocage.helpers
+import iocage.helpers_object
 import iocage.events
 import iocage.LaunchableResource
 import iocage.ResourceSelector
@@ -72,7 +73,7 @@ class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
         root_datasets_name: typing.Optional[str]=None,
     ) -> None:
 
-        self.host = iocage.helpers.init_host(self, host)
+        self.host = iocage.helpers_object.init_host(self, host)
         self.root_datasets_name = root_datasets_name
 
         iocage.LaunchableResource.LaunchableResource.__init__(
@@ -244,9 +245,9 @@ class ReleaseGenerator(ReleaseResource):
         check_hashes: bool=True,
         check_eol: bool=True,
     ) -> None:
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.host = iocage.helpers.init_host(self, host)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
 
         resource_selector = iocage.ResourceSelector.ResourceSelector(name)
         if resource_selector.source_name is not None:

@@ -38,6 +38,7 @@ import iocage.Logger
 import iocage.Types
 import iocage.ZFS
 import iocage.helpers
+import iocage.helpers_object
 
 
 class Resource(metaclass=abc.ABCMeta):
@@ -101,8 +102,8 @@ class Resource(metaclass=abc.ABCMeta):
         zfs: typing.Optional['iocage.ZFS.ZFS']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
 
         self._config_file = config_file
         self.config_type = config_type

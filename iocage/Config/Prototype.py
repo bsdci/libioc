@@ -25,9 +25,10 @@
 """Prototype of a Jail configuration."""
 import typing
 import os.path
-import iocage.helpers
 
-# mypy
+import iocage.helpers_object
+
+# MyPy
 import iocage.Logger
 
 
@@ -52,7 +53,7 @@ class Prototype:
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
 
         if file is not None:
             self._file = file

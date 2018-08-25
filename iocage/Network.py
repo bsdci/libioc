@@ -33,7 +33,7 @@ import iocage.MacAddress
 import iocage.NetworkInterface
 import iocage.Firewall
 import iocage.errors
-import iocage.helpers
+import iocage.helpers_object
 
 CreatedCommandList = typing.List[str]
 PoststopCommandList = typing.List[str]
@@ -68,7 +68,7 @@ class Network:
         logger: 'iocage.Logger.Logger'=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
         self.firewall = iocage.Firewall.QueuingFirewall(
             logger=self.logger,
             insecure=True

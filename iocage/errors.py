@@ -27,8 +27,6 @@ import typing
 
 # MyPy
 import libzfs  # noqa: F401
-import iocage.events  # noqa: F401
-import iocage.Jail  # noqa: F401
 import iocage.Types  # noqa: F401
 import iocage.Logger
 

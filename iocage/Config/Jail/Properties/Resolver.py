@@ -29,6 +29,7 @@ import os.path
 import shutil
 
 import iocage.helpers
+import iocage.helpers_object
 import iocage.Config.Jail
 
 # mypy
@@ -50,7 +51,7 @@ class ResolverProp(collections.MutableSequence):
         logger: typing.Optional['iocage.Logger.Logger']=None,
     ) -> None:
         self.property_name = property_name
-        self.logger = iocage.helpers.init_logger(self, logger)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
         self.config = config
         self.config.attach_special_property(
             name="resolver",

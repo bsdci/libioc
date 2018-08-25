@@ -35,94 +35,11 @@ import pty
 import select
 
 import iocage.errors
-import iocage.Datasets
-import iocage.Distribution
-import iocage.Host
 import iocage.Logger
-import iocage.ZFS
 
 # MyPy
 import iocage.Types
 CommandOutput = typing.Tuple[typing.Optional[str], typing.Optional[str], int]
-
-
-def init_zfs(
-    self: typing.Any,
-    zfs: typing.Optional['iocage.ZFS.ZFS']=None
-) -> 'iocage.ZFS.ZFS':
-    """Attach or initialize a ZFS object."""
-    try:
-        return self.zfs
-    except AttributeError:
-        pass
-
-    if (zfs is not None) and isinstance(zfs, iocage.ZFS.ZFS):
-        object.__setattr__(self, 'zfs', zfs)
-    else:
-        new_zfs = iocage.ZFS.get_zfs(logger=self.logger)
-        object.__setattr__(self, 'zfs', new_zfs)
-
-    return object.__getattribute__(self, 'zfs')
-
-
-def init_host(
-    self: typing.Any,
-    host: typing.Optional['iocage.Host.HostGenerator']=None
-) -> 'iocage.Host.HostGenerator':
-    """Attach or initialize a Host object."""
-    try:
-        return self.host
-    except AttributeError:
-        pass
-
-    if host:
-        return host
-
-    return iocage.Host.HostGenerator(
-        logger=self.logger,
-        zfs=self.zfs
-    )
-
-
-def init_distribution(
-    self: typing.Any,
-    distribution: typing.Optional['iocage.Distribution.Distribution']=None
-) -> 'iocage.Host.HostGenerator':
-    """Attach or initialize a Distribution object."""
-    try:
-        return self.distribution
-    except AttributeError:
-        pass
-
-    if distribution:
-        return distribution
-
-    return iocage.Distribution.Distribution(
-        logger=self.logger,
-        zfs=self.zfs
-    )
-
-
-def init_logger(
-    self: typing.Any,
-    logger: typing.Optional['iocage.Logger.Logger']=None
-) -> 'iocage.Logger.Logger':
-    """Attach or initialize a Logger object."""
-    try:
-        return self.logger
-    except AttributeError:
-        pass
-
-    if logger is not None:
-        object.__setattr__(self, 'logger', logger)
-        return logger
-    else:
-        try:
-            return self.logger
-        except AttributeError:
-            new_logger = iocage.Logger.Logger()
-            object.__setattr__(self, 'logger', new_logger)
-            return new_logger
 
 
 def get_os_version(

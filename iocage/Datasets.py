@@ -29,6 +29,7 @@ import libzfs
 
 import iocage.errors
 import iocage.helpers
+import iocage.helpers_object
 
 # MyPy
 import iocage.Types
@@ -61,8 +62,8 @@ class RootDatasets:
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
 
         self._datasets = {}
 
@@ -126,8 +127,8 @@ class Datasets(dict):
     ) -> None:
 
         dict.__init__(self)
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.main_datasets_name = None
 
         if sources is not None:
@@ -407,8 +408,8 @@ class FilteredDatasets(Datasets):
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.datasets = datasets
 
         self._source_filters = None

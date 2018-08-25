@@ -29,6 +29,7 @@ import abc
 
 import iocage.Filter
 import iocage.Resource
+import iocage.helpers_object
 
 
 class ListableResource(list):
@@ -49,8 +50,8 @@ class ListableResource(list):
 
         list.__init__(self, [])
 
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
 
         self.namespace = namespace
         self.sources = sources

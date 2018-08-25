@@ -32,6 +32,8 @@ import libzfs
 import ucl
 
 import iocage.events
+import iocage.helpers
+import iocage.helpers_object
 import iocage.LaunchableResource
 
 
@@ -47,9 +49,9 @@ class Pkg:
         host: typing.Optional['iocage.Host.Host']=None,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
-        self.zfs = iocage.helpers.init_zfs(self, zfs)
-        self.logger = iocage.helpers.init_logger(self, logger)
-        self.host = iocage.helpers.init_host(self, host)
+        self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.logger = iocage.helpers_object.init_logger(self, logger)
+        self.host = iocage.helpers_object.init_host(self, host)
 
     def fetch(
         self,

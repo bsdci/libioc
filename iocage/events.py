@@ -29,8 +29,6 @@ from timeit import default_timer as timer
 import iocage.errors
 
 # MyPy
-import iocage.Jail  # noqa: F401
-import iocage.Release  # noqa: F401
 import libzfs
 
 EVENT_STATUS = (
