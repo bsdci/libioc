@@ -67,7 +67,7 @@ class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
         config_file: typing.Optional[str]=None,
         logger: typing.Optional['iocage.Logger.Logger']=None,
         zfs: typing.Optional[iocage.ZFS.ZFS]=None,
-        host: typing.Optional[iocage.Host.HostGenerator]=None,
+        host: typing.Optional['iocage.Host.HostGenerator']=None,
         release: typing.Optional['ReleaseGenerator']=None,
         root_datasets_name: typing.Optional[str]=None,
     ) -> None:
@@ -225,7 +225,7 @@ class ReleaseGenerator(ReleaseResource):
 
     logger: 'iocage.Logger.Logger'
     zfs: iocage.ZFS.ZFS
-    host: iocage.Host.HostGenerator
+    host: 'iocage.Host.HostGenerator'
     _resource: iocage.Resource.Resource
     _assets: typing.List[str]
     _mirror_url: typing.Optional[str]
@@ -238,7 +238,7 @@ class ReleaseGenerator(ReleaseResource):
         config_type: str="auto",
         config_file: typing.Optional[str]=None,
         root_datasets_name: typing.Optional[str]=None,
-        host: typing.Optional[iocage.Host.HostGenerator]=None,
+        host: typing.Optional['iocage.Host.HostGenerator']=None,
         zfs: typing.Optional[iocage.ZFS.ZFS]=None,
         logger: typing.Optional['iocage.Logger.Logger']=None,
         check_hashes: bool=True,

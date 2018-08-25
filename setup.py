@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Installs libiocage using easy_install."""
 import sys
+import typing
 from setuptools import find_packages, setup
 from setuptools.command import easy_install
 try:
@@ -31,7 +32,10 @@ try:
 except ModuleNotFoundError:
     from pip.req import parse_requirements
 
-def _read_requirements(filename: str="requirements.txt") -> None:
+
+def _read_requirements(
+    filename: str="requirements.txt"
+) -> typing.Dict[str, typing.List[str]]:
     reqs = list(parse_requirements(filename, session="iocage"))
     return dict(
         install_requires=list(map(lambda x: f"{x.name}{x.specifier}", reqs)),
@@ -40,6 +44,7 @@ def _read_requirements(filename: str="requirements.txt") -> None:
             filter(lambda x: x.link, reqs)
         ))
     )
+
 
 iocage_requirements = _read_requirements("requirements.txt")
 ioc_requirements = _read_requirements("requirements-ioc.txt")
@@ -56,8 +61,8 @@ if __name__ == '__main__':
     sys.dd:exit(cli())'''
 
 
-@classmethod
-def get_args(cls, dist, header=None):
+@classmethod  # noqa: T484
+def get_args(cls, dist, header=None):  # noqa: T484
     """Handle arguments for easy_install."""
     if header is None:
         header = cls.get_header()

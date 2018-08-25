@@ -64,8 +64,8 @@ class ResourceSelector:
 
     def filter_datasets(
         self,
-        datasets: iocage.Datasets.Datasets
-    ) -> iocage.Datasets.FilteredDatasets:
+        datasets: 'iocage.Datasets.Datasets'
+    ) -> 'iocage.Datasets.FilteredDatasets':
         """Filter given Datasets according to the resource selector source."""
         if self.source_name is None:
             return datasets

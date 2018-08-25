@@ -74,7 +74,7 @@ class JailResource(
         config_file: typing.Optional[str]=None,
         logger: typing.Optional['iocage.Logger.Logger']=None,
         zfs: typing.Optional[iocage.ZFS.ZFS]=None,
-        host: typing.Optional[iocage.Host.HostGenerator]=None,
+        host: typing.Optional['iocage.Host.HostGenerator']=None,
         fstab: typing.Optional['iocage.Config.Jail.File.Fstab.Fstab']=None,
         root_datasets_name: typing.Optional[str]=None,
     ) -> None:
