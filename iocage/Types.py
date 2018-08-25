@@ -37,7 +37,7 @@ class AbsolutePath(str):
             sequence: str
     ) -> None:
         if self.unix_path.fullmatch(sequence) is None:
-            raise TypeError("Invalid value for AbsolutePath")
+            raise TypeError(f"Invalid value for AbsolutePath: {sequence}")
         self = sequence  # type: ignore
 
 
