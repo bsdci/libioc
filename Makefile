@@ -28,7 +28,7 @@ install-dev: deps
 install-travis:
 	python3.6 -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 uninstall:
-	python3.6 -m pip uninstall -y iocage
+	python3.6 -m pip uninstall -y iocage ioc
 	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
 		rm /usr/local/etc/rc.d/ioc; \
 	fi
