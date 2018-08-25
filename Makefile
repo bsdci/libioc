@@ -42,7 +42,7 @@ regression-test:
 	tests/run-integration.sh
 .PHONY: docs
 docs:
-	sphinx-apidoc -o docs --separate -H libiocage -A "iocage Authors" --full iocage cli tests
+	sphinx-apidoc -o docs --separate -H libiocage -A "iocage Authors" --full iocage ioc tests
 	if [ "`uname`" = "FreeBSD" ]; then gmake -C docs html; else make -C docs html; fi
 
 help:
