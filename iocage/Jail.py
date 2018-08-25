@@ -1138,7 +1138,7 @@ class JailGenerator(JailResource):
 
     def create_from_release(
         self,
-        release: iocage.Release.ReleaseGenerator
+        release: 'iocage.Release.ReleaseGenerator'
     ) -> None:
         """
         Create a Jail from a Release.
@@ -2005,7 +2005,7 @@ class JailGenerator(JailResource):
         return f"{self.source}-{config['id']}"
 
     @property
-    def release(self) -> iocage.Release.ReleaseGenerator:
+    def release(self) -> 'iocage.Release.ReleaseGenerator':
         """Return the iocage.Release instance linked with the jail."""
         return iocage.Release.ReleaseGenerator(
             name=self.config["release"],
