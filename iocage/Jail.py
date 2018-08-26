@@ -26,7 +26,6 @@
 import typing
 import os
 import random
-import subprocess  # nosec: B404
 import shlex
 import shutil
 
@@ -1305,10 +1304,11 @@ class JailGenerator(JailResource):
         self.fstab.read_file()
         self.fstab.save()
 
-    def exec(  # noqa: T484
+    def exec(
         self,
         command: typing.List[str],
-        **kwargs
+        env: typing.Dict[str, str]={},
+        passthru: bool=False
     ) -> iocage.helpers.CommandOutput:
         """
         Execute a command in a running jail.
@@ -1317,20 +1317,21 @@ class JailGenerator(JailResource):
             A list of command and it's arguments
 
             Example: ["/usr/bin/whoami"]
+
+        env (dict):
+            The dictionary may contain env variables that will be forwarded to
+            the executed jail command.
         """
         command = ["/usr/sbin/jexec", str(self.jid)] + command
 
         command_env = self.env
-        if "env" in kwargs:
-            for env_key, env_value in kwargs["env"].items():
-                command_env[env_key] = env_value
-            del kwargs["env"]
+        for env_key, env_value in env.items():
+            command_env[env_key] = env_value
 
-        stdout, stderr, returncode = iocage.helpers.exec(
+        stdout, stderr, returncode = self._exec_host_command(
             command,
-            logger=self.logger,
             env=command_env,
-            **kwargs  # noqa: T484
+            passthru=passthru
         )
 
         return stdout, stderr, returncode
@@ -1611,7 +1612,7 @@ class JailGenerator(JailResource):
         ))
 
         stdout, stderr, returncode = self._exec_host_command(
-            command,
+            command=command,
             passthru=passthru
         )
 

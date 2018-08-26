@@ -483,7 +483,7 @@ def exec_passthru(
     command: typing.List[str],
     logger: typing.Optional['iocage.Logger.Logger']=None,
     **subprocess_args: typing.Any
-) -> None:
+) -> CommandOutput:
     """Execute a command in an interactive shell."""
     child = subprocess.Popen(  # nosec: B603
         command,
@@ -494,6 +494,7 @@ def exec_passthru(
         **subprocess_args
     )
     child.wait()
+    return None, None, child.returncode
 
 
 # ToDo: replace with (u)mount library
