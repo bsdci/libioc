@@ -36,6 +36,12 @@ import iocage.helpers
 import iocage.helpers_object
 import iocage.LaunchableResource
 
+_PkgConfDataType = typing.Union[
+    str, int, bool,
+    typing.List[typing.Union[str, int, bool]],
+    typing.Dict[str, typing.Union[str, int, bool]]
+]
+
 
 class Pkg:
     """iocage pkg management utility."""
@@ -63,7 +69,7 @@ class Pkg:
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
         release_major_version = math.floor(release.version_number)
-        dataset = self._get_release_mirror_dataset(release_major_version)
+        pkg_ds = self._get_release_pkg_dataset(release_major_version)
 
         packageFetchEvent = iocage.events.PackageFetch(
             packages=_packages,
@@ -77,18 +83,29 @@ class Pkg:
             self.logger.spam("Update from release pkg remote")
             self._update_host_repo(release_major_version)
             self.logger.spam("Mirroring packages")
-            self._mirror_packages(_packages, dataset, release_major_version)
+            self._mirror_packages(_packages, pkg_ds, release_major_version)
             self.logger.spam("Build mirror index")
-            self._build_mirror_index(dataset)
+            self._build_mirror_index(release_major_version)
         except iocage.errors.IocageException as e:
             yield packageFetchEvent.fail(e)
             raise e
         yield packageFetchEvent.end()
 
+    def _get_pkg_command(self, release_major_version: int) -> typing.List[str]:
+        pkg_ds = self._get_release_pkg_dataset(release_major_version)
+        conf_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/conf")
+        repos_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/repos")
+        return [
+            "/usr/sbin/pkg",
+            "--config",
+            f"{conf_ds.mountpoint}/pkg.conf",
+            "--repo-conf-dir",
+            repos_ds.mountpoint
+        ]
+
     def _update_host_repo(self, release_major_version: int) -> None:
         iocage.helpers.exec(
-            [
-                "/usr/sbin/pkg",
+            self._get_pkg_command(release_major_version) + [
                 "update",
                 "--repository", self._get_repo_name(release_major_version)
             ],
@@ -105,13 +122,11 @@ class Pkg:
         release_major_version: int
     ) -> None:
         iocage.helpers.exec(
-            [
-                "/usr/sbin/pkg",
+            self._get_pkg_command(release_major_version) + [
                 "fetch",
                 "--yes",
                 "--dependencies",
-                "--repository", self._get_repo_name(release_major_version),
-                "--output", dataset.mountpoint,
+                "--repository", self._get_repo_name(release_major_version)
             ] + packages,
             logger=self.logger,
             env=dict(
@@ -119,12 +134,14 @@ class Pkg:
             )
         )
 
-    def _build_mirror_index(self, dataset: libzfs.ZFSDataset) -> None:
+    def _build_mirror_index(self, release_major_version: int) -> None:
+        pkg_ds = self._get_release_pkg_dataset(release_major_version)
+        cache_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/cache")
+
         iocage.helpers.exec(
-            [
-                "/usr/sbin/pkg",
+            self._get_pkg_command(release_major_version) + [
                 "repo",
-                dataset.mountpoint
+                cache_ds.mountpoint
             ],
             env=dict(
                 SIGNATURE_TYPE="fingerprints",
@@ -157,7 +174,7 @@ class Pkg:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
         release_major_version = math.floor(jail.release.version_number)
-        dataset = self._get_release_mirror_dataset(release_major_version)
+        dataset = self._get_release_pkg_dataset(release_major_version)
 
         packageInstallEvent = iocage.events.PackageInstall(
             packages=_packages,
@@ -183,10 +200,11 @@ class Pkg:
             pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
             command = "\n".join([
                 "export ASSUME_ALWAYS_YES=yes",
+                "ls -alR /.iocage-pkg",
                 " ".join([
                     "/usr/sbin/pkg",
                     "add",
-                    f"{self.package_source_directory}/All/{pkg_archive_name}"
+                    f"{self.package_source_directory}/cache/{pkg_archive_name}"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
@@ -224,7 +242,7 @@ class Pkg:
             raise e
 
     def _get_latest_pkg_archive(self, package_source_directory: str) -> str:
-        packages_directory = f"{package_source_directory}/All"
+        packages_directory = f"{package_source_directory}/cache"
         for package_archive in os.listdir(packages_directory):
             if package_archive.endswith(".txz") is False:
                 continue
@@ -274,7 +292,7 @@ class Pkg:
         host_directory = f"{jail.root_path}/{jail_directory}"
         self._update_repo_conf(
             repo_name="libiocage",
-            url=f"file://{self.package_source_directory}",
+            url=f"file://{self.package_source_directory}/cache",
             directory=host_directory,
             signature_type="none"
         )
@@ -285,10 +303,27 @@ class Pkg:
     ) -> None:
         repo_name = self._get_repo_name(release_major_version)
         base_url = self._get_base_url(release_major_version)
+
+        pkg_ds = self._get_release_pkg_dataset(release_major_version)
+        db_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/db")
+        conf_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/conf")
+        cache_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/cache")
+        repos_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/repos")
+
+        self._update_pkg_conf(
+            filename=f"{conf_ds.mountpoint}/pkg.conf",
+            data=dict(
+                PKG_DBDIR=db_ds.mountpoint,
+                PKG_CACHEDIR=cache_ds.mountpoint,
+                REPOS_DIR=[str(repos_ds.mountpoint)],
+                SYSLOG=False
+            )
+        )
+
         self._update_repo_conf(
             repo_name=repo_name,
-            directory="/usr/local/etc/pkg/repos",
-            enabled=False,
+            directory=repos_ds.mountpoint,
+            enabled=True,
             url=f"pkg+{base_url}",
             mirror_type="srv",
             fingerprints="/usr/share/keys/pkg"
@@ -308,7 +343,7 @@ class Pkg:
             logger=self.logger
         )
 
-        repo_config_data = {
+        repo_config_data: typing.Dict[str, _PkgConfDataType] = {
             repo_name: dict(
                 enabled=enabled,
                 url=url,
@@ -318,15 +353,25 @@ class Pkg:
         }
 
         config_path = f"{directory}/{repo_name}.conf"
-        if os.path.exists(config_path) and os.path.islink(config_path):
+        self._update_pkg_conf(
+            filename=config_path,
+            data=repo_config_data
+        )
+
+    def _update_pkg_conf(
+        self,
+        filename: str,
+        data: typing.Dict[str, _PkgConfDataType]
+    ) -> None:
+        if os.path.exists(filename) and os.path.islink(filename):
             raise iocage.errors.SecurityViolation(
                 reason="Refusing to write to a symlink",
                 logger=self.logger
             )
-        with open(config_path, "w") as f:
-            f.write(ucl.dump(repo_config_data, ucl.UCL_EMIT_JSON))
+        with open(filename, "w") as f:
+            f.write(ucl.dump(data, ucl.UCL_EMIT_JSON))
 
-    def _get_release_mirror_dataset(
+    def _get_release_pkg_dataset(
         self,
         release_major_version: int
     ) -> libzfs.ZFSDataset:
@@ -366,11 +411,19 @@ class Pkg:
         destination_dir = f"{root_path}{self.package_source_directory}"
 
         release_major_version = math.floor(source_jail.release.version_number)
-        dataset = self._get_release_mirror_dataset(release_major_version)
+        dataset = self._get_release_pkg_dataset(release_major_version)
         try:
             temporary_jail.fstab.new_line(
                 source=dataset.mountpoint,
                 destination=destination_dir,
+                options="ro",
+                auto_create_destination=True,
+                replace=True
+            )
+            cache_ds = self.zfs.get_or_create_dataset(f"{dataset.name}/cache")
+            temporary_jail.fstab.new_line(
+                source=cache_ds.mountpoint,
+                destination=f"{destination_dir}/cache",
                 options="ro",
                 auto_create_destination=True,
                 replace=True
