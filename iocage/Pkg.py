@@ -206,7 +206,7 @@ class Pkg:
                 " ".join([
                     "/usr/sbin/pkg",
                     "add",
-                    f"{self.package_source_directory}/cache/{pkg_archive_name}"
+                    f"{self.package_source_directory}/{pkg_archive_name}"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
@@ -244,8 +244,7 @@ class Pkg:
             raise e
 
     def _get_latest_pkg_archive(self, package_source_directory: str) -> str:
-        packages_directory = f"{package_source_directory}/cache"
-        for package_archive in os.listdir(packages_directory):
+        for package_archive in os.listdir(f"{package_source_directory}/cache"):
             if package_archive.endswith(".txz") is False:
                 continue
             if package_archive.startswith("pkg"):
@@ -294,7 +293,7 @@ class Pkg:
         host_directory = f"{jail.root_path}/{jail_directory}"
         self._update_repo_conf(
             repo_name="libiocage",
-            url=f"file://{self.package_source_directory}/cache",
+            url=f"file://{self.package_source_directory}",
             directory=host_directory,
             signature_type="none"
         )
@@ -413,19 +412,13 @@ class Pkg:
         destination_dir = f"{root_path}{self.package_source_directory}"
 
         release_major_version = math.floor(source_jail.release.version_number)
-        dataset = self._get_release_pkg_dataset(release_major_version)
+        repo_ds = self._get_release_pkg_dataset(release_major_version)
+        cache_ds = self.zfs.get_or_create_dataset(f"{repo_ds.name}/cache")
         try:
-            temporary_jail.fstab.new_line(
-                source=dataset.mountpoint,
-                destination=destination_dir,
-                options="ro",
-                auto_create_destination=True,
-                replace=True
-            )
-            cache_ds = self.zfs.get_or_create_dataset(f"{dataset.name}/cache")
+            print("FSTAB THING")
             temporary_jail.fstab.new_line(
                 source=cache_ds.mountpoint,
-                destination=f"{destination_dir}/cache",
+                destination=f"{destination_dir}",
                 options="ro",
                 auto_create_destination=True,
                 replace=True
