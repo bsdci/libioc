@@ -121,7 +121,7 @@ class Pkg:
         dataset: libzfs.ZFSDataset,
         release_major_version: int
     ) -> None:
-        iocage.helpers.exec(
+        stdout, stderr, returncode = iocage.helpers.exec(
             self._get_pkg_command(release_major_version) + [
                 "fetch",
                 "--yes",
@@ -133,6 +133,9 @@ class Pkg:
                 SIGNATURE_TYPE="fingerprints"
             )
         )
+
+        if (stderr is not None) and (len(stderr) > 0):
+            raise iocage.errors.PkgNotFound(stderr, logger=self.logger)
 
     def _build_mirror_index(self, release_major_version: int) -> None:
         pkg_ds = self._get_release_pkg_dataset(release_major_version)
