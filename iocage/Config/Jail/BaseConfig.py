@@ -90,7 +90,13 @@ class BaseConfig(dict):
 
     def clone(
         self,
-        data: typing.Dict[str, typing.Any],
+        data: typing.Dict[str, typing.Union[
+            iocage.Config.Jail.Properties.Property,
+            str,
+            int,
+            bool,
+            typing.Dict[str, typing.Union[str, int, bool]]
+        ]],
         skip_on_error: bool=False
     ) -> None:
         """
