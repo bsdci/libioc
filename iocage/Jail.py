@@ -691,8 +691,7 @@ class JailGenerator(JailResource):
         if (hook_name == "start") or (hook_name == "stop"):
             return self.exec(
                 command,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                passthru=False
             )
 
         # ToDo: Deprecate and remove this method
@@ -805,8 +804,7 @@ class JailGenerator(JailResource):
                 try:
                     for hook_name in ["prestop", "poststop"]:
                         iocage.helpers.exec(
-                            [self.get_hook_script_path(hook_name)],
-                            logger=self.logger
+                            command=[self.get_hook_script_path(hook_name)]
                         )
                 except Exception as e:
                     self.logger.warn(str(e))
@@ -1308,7 +1306,8 @@ class JailGenerator(JailResource):
         self,
         command: typing.List[str],
         env: typing.Dict[str, str]={},
-        passthru: bool=False
+        passthru: bool=False,
+        **kwargs: typing.Any
     ) -> iocage.helpers.CommandOutput:
         """
         Execute a command in a running jail.
@@ -1338,7 +1337,8 @@ class JailGenerator(JailResource):
 
     def passthru(
         self,
-        command: typing.List[str]
+        command: typing.List[str],
+        env: typing.Optional[typing.Dict[str, str]]=None
     ) -> iocage.helpers.CommandOutput:
         """
         Execute a command in a started jail and passthrough STDIN and STDOUT.
@@ -1351,12 +1351,13 @@ class JailGenerator(JailResource):
         if isinstance(command, str):
             command = [command]
 
-        return iocage.helpers.exec_passthru(
-            [
+        return self._exec_host_command(
+            command=[
                 "/usr/sbin/jexec",
                 str(self.jid)
             ] + command,
-            logger=self.logger
+            passthru=True,
+            env=env
         )
 
     def exec_console(
@@ -1379,7 +1380,8 @@ class JailGenerator(JailResource):
                 self._jail_conf_file,
                 self.identifier
             ],
-            passthru=False
+            passthru=False,
+            env=self.env
         )
 
         if returncode > 0:
@@ -1525,7 +1527,8 @@ class JailGenerator(JailResource):
 
         stdout, stderr, returncode = self._exec_host_command(
             command=command,
-            passthru=passthru
+            passthru=passthru,
+            env=self.env
         )
         if returncode > 0:
             self.logger.verbose(
@@ -1543,20 +1546,21 @@ class JailGenerator(JailResource):
     def _exec_host_command(
         self,
         command: typing.List[str],
-        passthru: bool
+        passthru: bool,
+        env: typing.Optional[typing.Dict[str, str]]=None
     ) -> iocage.helpers.CommandOutput:
         try:
             if passthru is True:
                 return iocage.helpers.exec_passthru(
                     command,
                     logger=self.logger,
-                    env=self.env
+                    env=env
                 )
             else:
                 exec_events = iocage.helpers.exec_generator(
                     command,
                     logger=self.logger,
-                    env=self.env
+                    env=env
                 )
                 try:
                     while True:
@@ -1613,7 +1617,8 @@ class JailGenerator(JailResource):
 
         stdout, stderr, returncode = self._exec_host_command(
             command=command,
-            passthru=passthru
+            passthru=passthru,
+            env=self.env
         )
 
         if returncode > 0:
