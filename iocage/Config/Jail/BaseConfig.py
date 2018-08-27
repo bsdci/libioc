@@ -128,7 +128,8 @@ class BaseConfig(dict):
             key, value = items.pop()
 
             if type(value) == dict:
-                items += [(f"{key}.{k}", v) for k, v in value.items()]
+                _subitems = value.items()  # noqa: T484
+                items += [(f"{key}.{k}", v) for k, v in _subitems]
                 continue
 
             if (key in ["id", "name", "uuid"]) and (current_id is not None):
