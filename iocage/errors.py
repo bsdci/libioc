@@ -1280,10 +1280,12 @@ class PkgNotFound(IocageException):
 
     def __init__(
         self,
+        message: typing.Optional[str]=None,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
-        msg = "The pkg package was not found in the local mirror."
-        IocageException.__init__(self, message=msg, logger=logger)
+        if message is None:
+            message = "The pkg package was not found in the local mirror."
+        IocageException.__init__(self, message=message, logger=logger)
 
 
 # Provisioning
