@@ -67,7 +67,6 @@ class Pkg:
 
         packageFetchEvent = iocage.events.PackageFetch(
             packages=_packages,
-            logger=self.logger,
             scope=event_scope
         )
 
@@ -163,13 +162,11 @@ class Pkg:
         packageInstallEvent = iocage.events.PackageInstall(
             packages=_packages,
             jail=jail,
-            logger=self.logger,
             scope=event_scope
         )
 
         packageConfigurationEvent = iocage.events.PackageConfiguration(
             jail=jail,
-            logger=self.logger,
             scope=event_scope
         )
 
