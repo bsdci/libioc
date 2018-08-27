@@ -203,7 +203,6 @@ class Pkg:
             pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
             command = "\n".join([
                 "export ASSUME_ALWAYS_YES=yes",
-                "ls -alR /.iocage-pkg",
                 " ".join([
                     "/usr/sbin/pkg",
                     "add",
