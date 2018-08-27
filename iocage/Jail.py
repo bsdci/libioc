@@ -291,6 +291,7 @@ class JailGenerator(JailResource):
         logger: typing.Optional['iocage.Logger.Logger']=None,
         zfs: typing.Optional['iocage.ZFS.ZFS']=None,
         host: typing.Optional['iocage.Host.Host']=None,
+        fstab: typing.Optional['iocage.Config.Jail.File.Fstab.Fstab']=None,
         root_datasets_name: typing.Optional[str]=None,
         new: bool=False
     ) -> None:
@@ -334,6 +335,7 @@ class JailGenerator(JailResource):
             logger=self.logger,
             zfs=self.zfs,
             host=self.host,
+            fstab=fstab,
             root_datasets_name=root_datasets_name
         )
 
