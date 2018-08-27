@@ -1320,6 +1320,11 @@ class JailGenerator(JailResource):
         env (dict):
             The dictionary may contain env variables that will be forwarded to
             the executed jail command.
+
+        passthru (bool): (default=False)
+            When enabled the commands stdout and stderr are directory forwarded
+            to the attached terminal. The results will not be included in the
+            CommandOutput, so that (None, None, <returncode>) is returned.
         """
         command = ["/usr/sbin/jexec", str(self.jid)] + command
 
