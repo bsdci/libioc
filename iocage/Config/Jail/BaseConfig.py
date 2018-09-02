@@ -185,8 +185,8 @@ class BaseConfig(dict):
             self.data["id"] = None
             return
 
-        allowed_characters_pattern = "([^A-z0-9\\._\\-]|\\^)"
-        invalid_characters = re.findall(allowed_characters_pattern, name)
+        disallowed_characters_pattern = "([^A-Za-z0-9\\._\\-]|\\^)"
+        invalid_characters = re.findall(disallowed_characters_pattern, name)
         if len(invalid_characters) > 0:
             msg = (
                 f"Invalid character in name: "
