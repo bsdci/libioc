@@ -198,7 +198,7 @@
 <p>iocage Jail module.</p>
 <dl class="class">
 <dt id="iocage.Jail.Jail">
-<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">Jail</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">Jail</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.Jail.JailGenerator" title="iocage.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Jail.JailGenerator</span></code></a></p>
 <p>Synchronous wrapper of JailGenerator.</p>
 <dl class="method">
@@ -280,7 +280,7 @@ requires it to be stopped.</td>
 
 <dl class="class">
 <dt id="iocage.Jail.JailGenerator">
-<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">JailGenerator</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">iocage.Jail.</code><code class="descname">JailGenerator</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.Jail.JailResource" title="iocage.Jail.JailResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.Jail.JailResource</span></code></a></p>
 <p>iocage unit orchestrates a jail’s configuration and manages state.</p>
 <p>Jails are represented as a zfs dataset <code class="docutils literal notranslate"><span class="pre">zpool/iocage/jails/&lt;NAME&gt;</span></code></p>
@@ -478,13 +478,20 @@ are automatically selected, so it’s advisable to use names.1</p>
 
 <dl class="method">
 <dt id="iocage.Jail.JailGenerator.exec">
-<code class="descname">exec</code><span class="sig-paren">(</span><em>command</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.exec" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exec</code><span class="sig-paren">(</span><em>command</em>, <em>env={}</em>, <em>passthru=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.exec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a command in a running jail.</p>
 <dl class="docutils">
 <dt>command (list):</dt>
 <dd><p class="first">A list of command and it’s arguments</p>
 <p class="last">Example: [“/usr/bin/whoami”]</p>
 </dd>
+<dt>env (dict):</dt>
+<dd>The dictionary may contain env variables that will be forwarded to
+the executed jail command.</dd>
+<dt>passthru (bool): (default=False)</dt>
+<dd>When enabled the commands stdout and stderr are directory forwarded
+to the attached terminal. The results will not be included in the
+CommandOutput, so that (None, None, &lt;returncode&gt;) is returned.</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -659,7 +666,7 @@ from its release or upstream Jail (for example a Template)</p>
 
 <dl class="method">
 <dt id="iocage.Jail.JailGenerator.passthru">
-<code class="descname">passthru</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.passthru" title="Permalink to this definition">¶</a></dt>
+<code class="descname">passthru</code><span class="sig-paren">(</span><em>command</em>, <em>env=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.passthru" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a command in a started jail and passthrough STDIN and STDOUT.</p>
 <dl class="docutils">
 <dt>command (list):</dt>
@@ -1158,7 +1165,6 @@ named attribute to the __init__ function</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

@@ -180,6 +180,12 @@
 <span class="kn">import</span> <span class="nn">iocage.helpers_object</span>
 <span class="kn">import</span> <span class="nn">iocage.LaunchableResource</span>
 
+<span class="n">_PkgConfDataType</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]],</span>
+    <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span>
+<span class="p">]</span>
+
 
 <div class="viewcode-block" id="Pkg"><a class="viewcode-back" href="../../iocage.Pkg.html#iocage.Pkg.Pkg">[docs]</a><span class="k">class</span> <span class="nc">Pkg</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;iocage pkg management utility.&quot;&quot;&quot;</span>
@@ -207,11 +213,10 @@
         <span class="n">_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_packages</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
         <span class="n">_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;pkg&quot;</span><span class="p">)</span>
         <span class="n">release_major_version</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">release</span><span class="o">.</span><span class="n">version_number</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_mirror_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">pkg_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
 
         <span class="n">packageFetchEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">PackageFetch</span><span class="p">(</span>
             <span class="n">packages</span><span class="o">=</span><span class="n">_packages</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
 
@@ -222,18 +227,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="s2">&quot;Update from release pkg remote&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_host_repo</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="s2">&quot;Mirroring packages&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_mirror_packages</span><span class="p">(</span><span class="n">_packages</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mirror_packages</span><span class="p">(</span><span class="n">_packages</span><span class="p">,</span> <span class="n">pkg_ds</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="s2">&quot;Build mirror index&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_build_mirror_index</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_mirror_index</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">packageFetchEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="k">yield</span> <span class="n">packageFetchEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
+    <span class="k">def</span> <span class="nf">_get_pkg_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">pkg_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">conf_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/conf&quot;</span><span class="p">)</span>
+        <span class="n">repos_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/repos&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--config&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{conf_ds.mountpoint}</span><span class="s2">/pkg.conf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--repo-conf-dir&quot;</span><span class="p">,</span>
+            <span class="n">repos_ds</span><span class="o">.</span><span class="n">mountpoint</span>
+        <span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">_update_host_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_command</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="s2">&quot;update&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_repo_name</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
             <span class="p">],</span>
@@ -250,13 +266,11 @@
         <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_command</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="s2">&quot;fetch&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--yes&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--dependencies&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_repo_name</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">),</span>
-                <span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_repo_name</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">packages</span><span class="p">,</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -264,12 +278,14 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_build_mirror_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_build_mirror_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pkg_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">cache_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/cache&quot;</span><span class="p">)</span>
+
         <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_command</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="s2">&quot;repo&quot;</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span>
+                <span class="n">cache_ds</span><span class="o">.</span><span class="n">mountpoint</span>
             <span class="p">],</span>
             <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">SIGNATURE_TYPE</span><span class="o">=</span><span class="s2">&quot;fingerprints&quot;</span><span class="p">,</span>
@@ -302,18 +318,16 @@
         <span class="sd">&quot;&quot;&quot;Install locally mirrored packages to a jail.&quot;&quot;&quot;</span>
         <span class="n">_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_packages</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
         <span class="n">release_major_version</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">jail</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">version_number</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_mirror_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
 
         <span class="n">packageInstallEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">PackageInstall</span><span class="p">(</span>
             <span class="n">packages</span><span class="o">=</span><span class="n">_packages</span><span class="p">,</span>
             <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
 
         <span class="n">packageConfigurationEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">PackageConfiguration</span><span class="p">(</span>
             <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
 
@@ -330,10 +344,11 @@
             <span class="n">pkg_archive_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_latest_pkg_archive</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">)</span>
             <span class="n">command</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                 <span class="s2">&quot;export ASSUME_ALWAYS_YES=yes&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ls -alR /.iocage-pkg&quot;</span><span class="p">,</span>
                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;add&quot;</span><span class="p">,</span>
-                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.package_source_directory}</span><span class="s2">/All/</span><span class="si">{pkg_archive_name}</span><span class="s2">&quot;</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.package_source_directory}</span><span class="s2">/cache/</span><span class="si">{pkg_archive_name}</span><span class="s2">&quot;</span>
                 <span class="p">]),</span>
                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
@@ -371,7 +386,7 @@
             <span class="k">raise</span> <span class="n">e</span></div>
 
     <span class="k">def</span> <span class="nf">_get_latest_pkg_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_source_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">packages_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{package_source_directory}</span><span class="s2">/All&quot;</span>
+        <span class="n">packages_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{package_source_directory}</span><span class="s2">/cache&quot;</span>
         <span class="k">for</span> <span class="n">package_archive</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">packages_directory</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">package_archive</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.txz&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -421,7 +436,7 @@
         <span class="n">host_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{jail.root_path}</span><span class="s2">/</span><span class="si">{jail_directory}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_repo_conf</span><span class="p">(</span>
             <span class="n">repo_name</span><span class="o">=</span><span class="s2">&quot;libiocage&quot;</span><span class="p">,</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;file://</span><span class="si">{self.package_source_directory}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;file://</span><span class="si">{self.package_source_directory}</span><span class="s2">/cache&quot;</span><span class="p">,</span>
             <span class="n">directory</span><span class="o">=</span><span class="n">host_directory</span><span class="p">,</span>
             <span class="n">signature_type</span><span class="o">=</span><span class="s2">&quot;none&quot;</span>
         <span class="p">)</span>
@@ -432,10 +447,27 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">repo_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_repo_name</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
         <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_base_url</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+
+        <span class="n">pkg_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">db_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/db&quot;</span><span class="p">)</span>
+        <span class="n">conf_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/conf&quot;</span><span class="p">)</span>
+        <span class="n">cache_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/cache&quot;</span><span class="p">)</span>
+        <span class="n">repos_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{pkg_ds.name}</span><span class="s2">/repos&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_pkg_conf</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{conf_ds.mountpoint}</span><span class="s2">/pkg.conf&quot;</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">PKG_DBDIR</span><span class="o">=</span><span class="n">db_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="n">PKG_CACHEDIR</span><span class="o">=</span><span class="n">cache_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="n">REPOS_DIR</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">repos_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">)],</span>
+                <span class="n">SYSLOG</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_repo_conf</span><span class="p">(</span>
             <span class="n">repo_name</span><span class="o">=</span><span class="n">repo_name</span><span class="p">,</span>
-            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;/usr/local/etc/pkg/repos&quot;</span><span class="p">,</span>
-            <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">directory</span><span class="o">=</span><span class="n">repos_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;pkg+</span><span class="si">{base_url}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">mirror_type</span><span class="o">=</span><span class="s2">&quot;srv&quot;</span><span class="p">,</span>
             <span class="n">fingerprints</span><span class="o">=</span><span class="s2">&quot;/usr/share/keys/pkg&quot;</span>
@@ -455,7 +487,7 @@
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
 
-        <span class="n">repo_config_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">repo_config_data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_PkgConfDataType</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">repo_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">enabled</span><span class="o">=</span><span class="n">enabled</span><span class="p">,</span>
                 <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
@@ -465,15 +497,25 @@
         <span class="p">}</span>
 
         <span class="n">config_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{directory}</span><span class="s2">/</span><span class="si">{repo_name}</span><span class="s2">.conf&quot;</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_pkg_conf</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">config_path</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">repo_config_data</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_pkg_conf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_PkgConfDataType</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SecurityViolation</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Refusing to write to a symlink&quot;</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ucl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">repo_config_data</span><span class="p">,</span> <span class="n">ucl</span><span class="o">.</span><span class="n">UCL_EMIT_JSON</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ucl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ucl</span><span class="o">.</span><span class="n">UCL_EMIT_JSON</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_get_release_mirror_dataset</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_get_release_pkg_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
@@ -513,11 +555,19 @@
         <span class="n">destination_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{root_path}{self.package_source_directory}</span><span class="s2">&quot;</span>
 
         <span class="n">release_major_version</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">source_jail</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">version_number</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_mirror_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
                 <span class="n">source</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
                 <span class="n">destination</span><span class="o">=</span><span class="n">destination_dir</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span>
+                <span class="n">auto_create_destination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">cache_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{dataset.name}</span><span class="s2">/cache&quot;</span><span class="p">)</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">cache_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="n">destination</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{destination_dir}</span><span class="s2">/cache&quot;</span><span class="p">,</span>
                 <span class="n">options</span><span class="o">=</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span>
                 <span class="n">auto_create_destination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
@@ -572,7 +622,6 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

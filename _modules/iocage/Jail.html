@@ -170,7 +170,6 @@
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec: B404</span>
 <span class="kn">import</span> <span class="nn">shlex</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 
@@ -436,6 +435,7 @@
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Host.Host&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fstab</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Config.Jail.File.Fstab.Fstab&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">root_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">new</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -479,6 +479,7 @@
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
             <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">fstab</span><span class="o">=</span><span class="n">fstab</span><span class="p">,</span>
             <span class="n">root_datasets_name</span><span class="o">=</span><span class="n">root_datasets_name</span>
         <span class="p">)</span>
 
@@ -836,8 +837,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">hook_name</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">hook_name</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
                 <span class="n">command</span><span class="p">,</span>
-                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
-                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span>
+                <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
 
         <span class="c1"># ToDo: Deprecate and remove this method</span>
@@ -950,8 +950,7 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">hook_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;prestop&quot;</span><span class="p">,</span> <span class="s2">&quot;poststop&quot;</span><span class="p">]:</span>
                         <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
-                            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_hook_script_path</span><span class="p">(</span><span class="n">hook_name</span><span class="p">)],</span>
-                            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                            <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_hook_script_path</span><span class="p">(</span><span class="n">hook_name</span><span class="p">)]</span>
                         <span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
@@ -1282,7 +1281,7 @@
 
 <div class="viewcode-block" id="JailGenerator.create_from_release"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.create_from_release">[docs]</a>    <span class="k">def</span> <span class="nf">create_from_release</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">release</span><span class="p">:</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;iocage.Release.ReleaseGenerator&#39;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a Jail from a Release.</span>
@@ -1449,10 +1448,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
-<div class="viewcode-block" id="JailGenerator.exec"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.exec">[docs]</a>    <span class="k">def</span> <span class="nf">exec</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+<div class="viewcode-block" id="JailGenerator.exec"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.exec">[docs]</a>    <span class="k">def</span> <span class="nf">exec</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="o">**</span><span class="n">kwargs</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">CommandOutput</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute a command in a running jail.</span>
@@ -1461,27 +1462,34 @@
 <span class="sd">            A list of command and it&#39;s arguments</span>
 
 <span class="sd">            Example: [&quot;/usr/bin/whoami&quot;]</span>
+
+<span class="sd">        env (dict):</span>
+<span class="sd">            The dictionary may contain env variables that will be forwarded to</span>
+<span class="sd">            the executed jail command.</span>
+
+<span class="sd">        passthru (bool): (default=False)</span>
+<span class="sd">            When enabled the commands stdout and stderr are directory forwarded</span>
+<span class="sd">            to the attached terminal. The results will not be included in the</span>
+<span class="sd">            CommandOutput, so that (None, None, &lt;returncode&gt;) is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/usr/sbin/jexec&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jid</span><span class="p">)]</span> <span class="o">+</span> <span class="n">command</span>
 
         <span class="n">command_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span>
-        <span class="k">if</span> <span class="s2">&quot;env&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">env_key</span><span class="p">,</span> <span class="n">env_value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">command_env</span><span class="p">[</span><span class="n">env_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_value</span>
-            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">env_key</span><span class="p">,</span> <span class="n">env_value</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">command_env</span><span class="p">[</span><span class="n">env_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_value</span>
 
-        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_host_command</span><span class="p">(</span>
             <span class="n">command</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="n">command_env</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>  <span class="c1"># noqa: T484</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span></div>
 
 <div class="viewcode-block" id="JailGenerator.passthru"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.passthru">[docs]</a>    <span class="k">def</span> <span class="nf">passthru</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">CommandOutput</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute a command in a started jail and passthrough STDIN and STDOUT.</span>
@@ -1494,12 +1502,13 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">command</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec_passthru</span><span class="p">(</span>
-            <span class="p">[</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_host_command</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="p">[</span>
                 <span class="s2">&quot;/usr/sbin/jexec&quot;</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jid</span><span class="p">)</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">command</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="JailGenerator.exec_console"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.exec_console">[docs]</a>    <span class="k">def</span> <span class="nf">exec_console</span><span class="p">(</span>
@@ -1522,7 +1531,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_jail_conf_file</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
             <span class="p">],</span>
-            <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1668,7 +1678,8 @@
 
         <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_host_command</span><span class="p">(</span>
             <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
-            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
@@ -1686,20 +1697,21 @@
     <span class="k">def</span> <span class="nf">_exec_host_command</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span>
+        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">CommandOutput</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">passthru</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec_passthru</span><span class="p">(</span>
                     <span class="n">command</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                    <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">exec_events</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec_generator</span><span class="p">(</span>
                     <span class="n">command</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                    <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -1755,8 +1767,9 @@
         <span class="p">))</span>
 
         <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_host_command</span><span class="p">(</span>
-            <span class="n">command</span><span class="p">,</span>
-            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -2149,7 +2162,7 @@
         <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.source}</span><span class="s2">-</span><span class="si">{config[&#39;id&#39;]}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;iocage.Release.ReleaseGenerator&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the iocage.Release instance linked with the jail.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">],</span>
@@ -2299,7 +2312,6 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

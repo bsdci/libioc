@@ -286,7 +286,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
-        <span class="n">_scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
@@ -296,8 +296,19 @@
 
         <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_unlock_resource_backup</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_bundle</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">event</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_bundle</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">def</span> <span class="nf">_destroy_failed_import</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">delete_dataset_recursive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_destroy_failed_import</span><span class="p">)</span>
 
         <span class="c1"># ToDo: Allow importing of releases or empty jails</span>
         <span class="n">config_data</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">JSON</span><span class="o">.</span><span class="n">ConfigJSON</span><span class="p">(</span>
@@ -308,29 +319,27 @@
         <span class="n">is_standalone</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/root.zfs&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
         <span class="n">has_release</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;release&quot;</span> <span class="ow">in</span> <span class="n">config_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">True</span>
 
-        <span class="k">if</span> <span class="n">has_release</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_standalone</span><span class="p">:</span>
-            <span class="n">release</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">config_data</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">],</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
-                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_release</span><span class="p">(</span><span class="n">release</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_scratch</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">has_release</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_standalone</span><span class="p">:</span>
+                <span class="n">release</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">config_data</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">],</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+                    <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_release</span><span class="p">(</span><span class="n">release</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_scratch</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">is_standalone</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_root_dataset</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="n">event</span>
+            <span class="k">if</span> <span class="n">is_standalone</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_root_dataset</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_other_datasets_recursive</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">event</span>
-
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_config</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">event</span>
-
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">event</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_other_datasets_recursive</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_config</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
         <span class="n">_unlock_resource_backup</span><span class="p">()</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
@@ -338,7 +347,7 @@
     <span class="k">def</span> <span class="nf">_extract_bundle</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 
         <span class="n">extractBundleEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExtractBundle</span><span class="p">(</span>
@@ -355,7 +364,7 @@
                 <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-        <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">extractBundleEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">e</span>
 
@@ -406,10 +415,6 @@
             <span class="n">_old_fstab_file</span> <span class="o">=</span> <span class="n">fstab</span><span class="o">.</span><span class="n">file</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">fstab_file_path</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
-            <span class="n">fstab</span><span class="o">.</span><span class="n">replace_path</span><span class="p">(</span>
-                <span class="s2">&quot;backup:///&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span>
-            <span class="p">)</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">_old_fstab_file</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Fstab restored from </span><span class="si">{fstab.file}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -572,35 +577,27 @@
 
         <span class="k">if</span> <span class="s2">&quot;config&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">():</span>
             <span class="c1"># only export config when the resource has one</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_config</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="n">event</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="n">event</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_config</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">is_standalone</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">export_root_dataset_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_root_dataset</span><span class="p">(</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_root_dataset</span><span class="p">(</span>
                 <span class="n">flags</span><span class="o">=</span><span class="n">zfs_send_flags</span><span class="p">,</span>
                 <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
             <span class="p">)</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">export_root_dataset_events</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">event</span>
 
         <span class="c1"># other datasets include `root` when the resource is no basejail</span>
-        <span class="n">recursive_export_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_other_datasets_recursive</span><span class="p">(</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_other_datasets_recursive</span><span class="p">(</span>
             <span class="n">flags</span><span class="o">=</span><span class="n">zfs_send_flags</span><span class="p">,</span>
             <span class="n">standalone</span><span class="o">=</span><span class="n">is_standalone</span><span class="p">,</span>
             <span class="n">limit_depth</span><span class="o">=</span><span class="p">(</span><span class="n">recursive</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">),</span>
             <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">recursive_export_events</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span>
 
-        <span class="n">bundle_backup_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_backup</span><span class="p">(</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_backup</span><span class="p">(</span>
             <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
             <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">bundle_backup_events</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span>
 
         <span class="n">_unlock_resource_backup</span><span class="p">()</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
@@ -847,7 +844,6 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
