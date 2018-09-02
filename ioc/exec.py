@@ -37,8 +37,7 @@ __rootcmd__ = True
 
 @click.command(
     context_settings=dict(ignore_unknown_options=True),
-    name="exec",
-    help="Run a command inside a specified jail."
+    name="exec"
 )
 @click.pass_context
 @click.option(
@@ -62,7 +61,16 @@ def cli(
     user: typing.Optional[str],
     fork: bool,
 ) -> None:
-    """Run the given command inside the specified jail."""
+    """
+    Run the given command inside the specified jail.
+
+    When executing commands with own options or flags the end of ioc options
+    can be marked with a double-dash or the full command can be quoted:
+
+        ioc exec myjail -- ps -aux
+
+        ioc exec myjail "ps -aux"
+    """
     logger = ctx.parent.logger
 
     if jail.startswith("-"):
