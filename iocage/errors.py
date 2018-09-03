@@ -1301,3 +1301,20 @@ class UnknownProvisioner(IocageException):
     ) -> None:
         msg = f"Unknown provisioner: {name}"
         IocageException.__init__(self, message=msg, logger=logger)
+
+
+# Sources
+
+
+class InvalidSourceName(JailConfigError):
+    """Raised when a source name is invalid."""
+
+    def __init__(
+        self,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
+        msg = (
+            "Invalid source name: "
+            "A source name may contain letters A-z, dash and lowdash"
+        )
+        super().__init__(message=msg, logger=logger)

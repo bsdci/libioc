@@ -133,7 +133,14 @@ def cli(
         )
         release = host.release_version
 
-    resource_selector = iocage.ResourceSelector.ResourceSelector(name)
+    try:
+        resource_selector = iocage.ResourceSelector.ResourceSelector(
+            name,
+            logger=logger
+        )
+    except iocage.errors.IocageException:
+        exit(1)
+
     jail_data["name"] = resource_selector.name
     root_datasets_name = resource_selector.source_name
 
@@ -167,13 +174,16 @@ def cli(
                 logger.log(f"Automatically fetching release '{resource.name}'")
                 resource.fetch()
     elif template is not None:
-        resource = iocage.Jail.JailGenerator(
-            template,
-            root_datasets_name=root_datasets_name,
-            logger=logger,
-            host=host,
-            zfs=zfs
-        )
+        try:
+            resource = iocage.Jail.JailGenerator(
+                template,
+                root_datasets_name=root_datasets_name,
+                logger=logger,
+                host=host,
+                zfs=zfs
+            )
+        except iocage.errors.IocageException:
+            exit(1)
     else:
         logger.error("No release or jail selected")
         exit(1)

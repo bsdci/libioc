@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage resource selector type."""
 import typing
+import re
 
 import iocage.Datasets
 
@@ -34,10 +35,14 @@ class ResourceSelector:
     source_name: typing.Optional[str]
     _name: str
 
+    SOURCE_NAME_PATTERN = re.compile("^[A-Za-z0-9]+((\-|_)?[A-Za-z0-9]+)*$")
+
     def __init__(
         self,
-        name: str
+        name: str,
+        logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
+        self.logger = logger
         self.name = name
 
     @property
@@ -48,12 +53,24 @@ class ResourceSelector:
     @name.setter
     def name(self, value: str) -> None:
         name_components = value.split("/", maxsplit=1)
+        _source_name: typing.Optional[str]
         if len(name_components) == 2:
-            self._name = name_components[1]
-            self.source_name = name_components[0]
+            _name = name_components[1]
+            _source_name = name_components[0]
+            if self._validate_source_name(_source_name) is False:
+                raise iocage.errors.InvalidSourceName(logger=self.logger)
         else:
-            self._name = value
-            self.source_name = None
+            _name = value
+            _source_name = None
+
+        if iocage.helpers.validate_name(_name) is False:
+            raise iocage.errors.InvalidJailName(logger=self.logger)
+
+        self.source_name = _source_name
+        self._name = _name
+
+    def _validate_source_name(self, name: str) -> bool:
+        return self.SOURCE_NAME_PATTERN.match(name) is not None
 
     def __str__(self) -> str:
         """Return the full resource selector string."""
