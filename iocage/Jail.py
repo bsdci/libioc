@@ -204,9 +204,12 @@ class JailResource(
         if self.root_datasets_name is None:
             base_name = self.host.datasets.main.jails.name
         else:
-            base_name = self.host.datasets.__getitem__(
-                self.root_datasets_name
-            ).jails.name
+            try:
+                base_name = self.host.datasets.__getitem__(
+                    self.root_datasets_name
+                ).jails.name
+            except KeyError:
+                raise iocage.errors.SourceNotFound(logger=self.logger)
         return f"{base_name}/{jail_id}"
 
     @property
