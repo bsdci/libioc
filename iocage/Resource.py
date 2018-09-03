@@ -219,10 +219,12 @@ class Resource(metaclass=abc.ABCMeta):
         try:
             return self._dataset
         except AttributeError:
-            name = self.dataset_name
-            dataset: libzfs.ZFSDataset = self.zfs.get_dataset(name)
-            self._dataset = dataset
-            return dataset
+            pass
+
+        name = self.dataset_name
+        dataset: libzfs.ZFSDataset = self.zfs.get_dataset(name)
+        self._dataset = dataset
+        return dataset
 
     @dataset.setter
     def dataset(self, value: libzfs.ZFSDataset) -> None:
