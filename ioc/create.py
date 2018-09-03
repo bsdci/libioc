@@ -153,24 +153,26 @@ def cli(
                 host=host,
                 zfs=zfs
             )
-        if not resource.fetched:
-            if not resource.available:
-                logger.error(
-                    f"The release '{resource.name}' does not exist"
-                )
-                exit(1)
+            if resource.fetched is False:
+                if not resource.available:
+                    logger.error(
+                        f"The release '{resource.name}' does not exist"
+                    )
+                    exit(1)
 
-            msg = (
-                f"The release '{resource.name}' is available,"
-                " but not downloaded yet"
-            )
-            if no_fetch:
-                logger.error(msg)
-                exit(1)
-            else:
-                logger.spam(msg)
-                logger.log(f"Automatically fetching release '{resource.name}'")
-                resource.fetch()
+                msg = (
+                    f"The release '{resource.name}' is available,"
+                    " but not downloaded yet"
+                )
+                if no_fetch:
+                    logger.error(msg)
+                    exit(1)
+                else:
+                    logger.spam(msg)
+                    logger.log(
+                        f"Automatically fetching release '{resource.name}'"
+                    )
+                    resource.fetch()
         elif template is not None:
             resource = iocage.Jail.JailGenerator(
                 template,
