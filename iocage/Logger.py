@@ -252,7 +252,7 @@ class Logger:
             f"\033[{delta}F",  # CPL - Cursor Previous Line
             "\r",               # CR - Carriage Return
             self._indent(
-                f"{log_entry.message}: {delta}",
+                log_entry.message,
                 log_entry.indent
             ),
             "\033[K",           # EL - Erase in Line
