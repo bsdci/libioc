@@ -200,11 +200,14 @@ class Terms(list):
     """
 
     def __init__(
-            self,
-            terms: typing.Optional[
-                typing.Iterable[typing.Union[Term, str]]
-            ]=None) -> None:
+        self,
+        terms: typing.Optional[
+            typing.Iterable[typing.Union[Term, str]]
+        ]=None,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
 
+        self.logger = logger
         data: typing.List[typing.Union[Term, str]] = []
 
         if terms is not None:
@@ -273,7 +276,10 @@ class Terms(list):
             value = user_input
 
         if prop == "name":
-            value = iocage.ResourceSelector.ResourceSelector(value)
+            value = iocage.ResourceSelector.ResourceSelector(
+                value,
+                logger=self.logger
+            )
 
         terms.append(Term(prop, value))
 
