@@ -221,7 +221,6 @@ def cli(
             )
             logger.log(msg)
         except iocage.errors.IocageException:
-            msg = f"{jail.humanreadable_name} could not be created!{suffix}"
-            logger.warn(msg)
+            exit(1)
 
     exit(int(errors))
