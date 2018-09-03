@@ -1921,7 +1921,8 @@ class JailGenerator(JailResource):
             raise iocage.errors.JailNotSupplied(logger=self.logger)
 
         resource_selector = iocage.ResourceSelector.ResourceSelector(
-            name=text
+            name=text,
+            logger=self.logger
         )
 
         root_datasets = resource_selector.filter_datasets(self.host.datasets)

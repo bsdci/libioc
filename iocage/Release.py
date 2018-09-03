@@ -249,7 +249,10 @@ class ReleaseGenerator(ReleaseResource):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.host = iocage.helpers_object.init_host(self, host)
 
-        resource_selector = iocage.ResourceSelector.ResourceSelector(name)
+        resource_selector = iocage.ResourceSelector.ResourceSelector(
+            name,
+            logger=self.logger
+        )
         if resource_selector.source_name is not None:
             is_different = resource_selector.source_name != root_datasets_name
             if (root_datasets_name is not None) and (is_different is True):

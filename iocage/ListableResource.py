@@ -71,7 +71,7 @@ class ListableResource(list):
         if isinstance(value, iocage.Filter.Terms):
             self._filters = value
         else:
-            self._filters = iocage.Filter.Terms(value)
+            self._filters = iocage.Filter.Terms(value, logger=self.logger)
 
     def destroy(self, force: bool=False) -> None:
         """Listable resources by itself cannot be destroyed."""
