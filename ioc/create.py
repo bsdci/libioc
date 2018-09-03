@@ -144,8 +144,8 @@ def cli(
     jail_data["name"] = resource_selector.name
     root_datasets_name = resource_selector.source_name
 
-    if release is not None:
-        try:
+    try:
+        if release is not None:
             resource = iocage.Release.ReleaseGenerator(
                 name=release,
                 root_datasets_name=root_datasets_name,
@@ -153,8 +153,6 @@ def cli(
                 host=host,
                 zfs=zfs
             )
-        except iocage.errors.IocageException:
-            exit(1)
         if not resource.fetched:
             if not resource.available:
                 logger.error(
@@ -173,8 +171,7 @@ def cli(
                 logger.spam(msg)
                 logger.log(f"Automatically fetching release '{resource.name}'")
                 resource.fetch()
-    elif template is not None:
-        try:
+        elif template is not None:
             resource = iocage.Jail.JailGenerator(
                 template,
                 root_datasets_name=root_datasets_name,
@@ -182,23 +179,23 @@ def cli(
                 host=host,
                 zfs=zfs
             )
-        except iocage.errors.IocageException:
+        else:
+            logger.error("No release or jail selected")
             exit(1)
-    else:
-        logger.error("No release or jail selected")
+
+        if basejail:
+            jail_data["basejail"] = True
+
+        if props:
+            for prop in props:
+                try:
+                    key, value = prop.split("=", maxsplit=1)
+                    jail_data[key] = value
+                except (ValueError, KeyError):
+                    logger.error(f"Invalid property {prop}")
+                    exit(1)
+    except iocage.errors.IocageException:
         exit(1)
-
-    if basejail:
-        jail_data["basejail"] = True
-
-    if props:
-        for prop in props:
-            try:
-                key, value = prop.split("=", maxsplit=1)
-                jail_data[key] = value
-            except (ValueError, KeyError):
-                logger.error(f"Invalid property {prop}")
-                exit(1)
 
     errors = False
     for i in range(count):
