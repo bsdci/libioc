@@ -185,7 +185,10 @@ class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
         if self.root_datasets_name is None:
             return self.host.datasets.main
         else:
-            return self.host.datasets.__getitem__(self.root_datasets_name)
+            try:
+                return self.host.datasets.__getitem__(self.root_datasets_name)
+            except KeyError:
+                raise iocage.errors.SourceNotFound(logger=self.logger)
 
     @property
     def source(self) -> str:
