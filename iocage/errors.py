@@ -1306,7 +1306,7 @@ class UnknownProvisioner(IocageException):
 # Sources
 
 
-class InvalidSourceName(JailConfigError):
+class InvalidSourceName(IocageException):
     """Raised when a source name is invalid."""
 
     def __init__(
@@ -1317,4 +1317,15 @@ class InvalidSourceName(JailConfigError):
             "Invalid source name: "
             "A source name may contain letters A-z, dash and lowdash"
         )
+        super().__init__(message=msg, logger=logger)
+
+
+class SourceNotFound(IocageException):
+    """Raised when a source was not found."""
+
+    def __init__(
+        self,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
+        msg = f"Jail source not found"
         super().__init__(message=msg, logger=logger)
