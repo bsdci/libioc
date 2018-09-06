@@ -68,8 +68,6 @@ def cli(
     can be marked with a double-dash or the full command can be quoted:
 
         ioc exec myjail -- ps -aux
-
-        ioc exec myjail "ps -aux"
     """
     logger = ctx.parent.logger
 
