@@ -575,17 +575,18 @@ class ActivationFailed(IocageException):
         super().__init__(message=msg, logger=logger)
 
 
-class ZFSSourceCreation(IocageException):
-    """Raised when iocage could not determine its mountpoint on creation."""
+class ZFSSourceMountpoint(IocageException):
+    """Raised when iocage could not determine its mountpoint."""
 
     def __init__(
         self,
-        reason: typing.Optional[str]=None,
+        dataset_name: str,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
-        msg = "iocage ZFS source could not be created"
-        if reason is not None:
-            msg += f": {reason}"
+        msg = (
+            f"The mountpoint of the iocage ZFS source dataset '{dataset_name}'"
+            " is not set and could not be determined automatically"
+        )
         super().__init__(message=msg, logger=logger)
 
 

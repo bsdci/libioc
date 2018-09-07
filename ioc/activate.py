@@ -61,7 +61,10 @@ def cli(ctx, zpool, mountpoint):
             zfs=zfs,
             logger=logger
         )
-        datasets.activate(mountpoint=mountpoint)
+        datasets.activate_pool(
+            pool=iocage_pool,
+            mountpoint=mountpoint
+        )
         logger.log(f"ZFS pool '{zpool}' activated")
     except iocage.errors.IocageException:
         exit(1)
