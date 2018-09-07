@@ -34,7 +34,11 @@ import click
 
 from iocage.Logger import Logger
 from iocage.events import IocageEvent
-from iocage.errors import InvalidLogLevel, IocageNotActivated
+from iocage.errors import (
+    InvalidLogLevel,
+    IocageNotActivated,
+    ZFSSourceMountpoint
+)
 from iocage.ZFS import get_zfs
 from iocage.Datasets import Datasets
 from iocage.Host import HostGenerator
@@ -213,6 +217,6 @@ def cli(ctx, log_level: str, source: set) -> None:
             logger=ctx.logger,
             zfs=ctx.zfs
         )
-    except IocageNotActivated:
+    except (IocageNotActivated, ZFSSourceMountpoint):
         exit(1)
 
