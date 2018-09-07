@@ -584,8 +584,8 @@ class ZFSSourceMountpoint(IocageException):
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
         msg = (
-            f"The mountpoint of the iocage ZFS source dataset '{dataset_name}'"
-            " is not set and could not be determined automatically"
+            f"Mountpoint of iocage ZFS source dataset '{dataset_name}'"
+            " is unset and cannot be determined automatically"
         )
         super().__init__(message=msg, logger=logger)
 

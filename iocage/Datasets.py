@@ -67,31 +67,42 @@ class RootDatasets:
 
         self._datasets = {}
 
-        _create = False
         if isinstance(root_dataset, libzfs.ZFSDataset):
             self.root = root_dataset
         elif isinstance(root_dataset, str):
             try:
                 self.root = self.zfs.get_dataset(root_dataset)
+                _create = False
             except libzfs.ZFSException:
                 _create = True
 
-        if _create is True:
-            self.root = self.zfs.get_or_create_dataset(root_dataset)
+            if _create is True:
+                pool_mountpoint = self.zfs.get_dataset(
+                    self.zfs.get_pool(root_dataset).name
+                ).mountpoint
+                if pool_mountpoint is None:
+                    preferred_mountpoint = "/iocage"
+                    if (os.path.ismount(preferred_mountpoint) is True):
+                        raise iocage.errors.ZFSSourceMountpoint(
+                            dataset_name=root_dataset,
+                            logger=self.logger
+                        )
+                    else:
+                        self.root = self.zfs.create_dataset(root_dataset)
+                        self.logger.spam(
+                            "Claiming mountpoint /iocage"
+                        )
+                        mountpoint = iocage.Types.AbsolutePath(
+                            preferred_mountpoint
+                        )
+                        zfs_property = libzfs.ZFSUserProperty(mountpoint)
+                        self.root.properties["mountpoint"] = zfs_property
 
         if self.root.mountpoint is None:
-            if _create and (os.path.ismount('/iocage') is False):
-                self.logger.spam(
-                    "Claiming /iocage as mountpoint of the activated zpool"
-                )
-                mountpoint = iocage.Types.AbsolutePath('/iocage')
-                zfs_property = libzfs.ZFSUserProperty(mountpoint)
-                self.root.properties["mountpoint"] = zfs_property
-            else:
-                raise iocage.errors.ZFSSourceMountpoint(
-                    dataset_name=self.root.name,
-                    logger=self.logger
-                )
+            raise iocage.errors.ZFSSourceMountpoint(
+                dataset_name=self.root.name,
+                logger=self.logger
+            )
 
     @property
     def releases(self) -> libzfs.ZFSDataset:
