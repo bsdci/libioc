@@ -72,6 +72,21 @@ class RootDatasets:
         elif isinstance(root_dataset, str):
             self.root = self.zfs.get_or_create_dataset(root_dataset)
 
+        mountpoint = self.root.mountpoint
+        if self.root.mountpoint is None:
+            if os.path.ismount('/iocage') is False:
+                self.logger.spam(
+                    "Claiming /iocage as mountpoint of the activated zpool"
+                )
+                mountpoint = iocage.Types.AbsolutePath('/iocage')
+                zfs_property = libzfs.ZFSUserProperty(mountpoint)
+                self.root.properties["mountpoint"] = zfs_property
+            else:
+                raise iocage.errors.ZFSSourceCreation(
+                    reason="Cannot determine the iocage source mountpoint",
+                    logger=self.logger
+                )
+
     @property
     def releases(self) -> libzfs.ZFSDataset:
         """Get or create the iocage releases dataset."""
@@ -295,12 +310,6 @@ class Datasets(dict):
             self._set_pool_activation(other_pool, False)
 
         self._set_pool_activation(pool, True)
-
-        if (mountpoint is None) and (os.path.ismount('/iocage') is False):
-            self.logger.spam(
-                "Claiming /iocage as mountpoint of the activated zpool"
-            )
-            mountpoint = iocage.Types.AbsolutePath('/iocage')
 
         if self.main.root.mountpoint != mountpoint:
             zfs_property = libzfs.ZFSUserProperty(mountpoint)
