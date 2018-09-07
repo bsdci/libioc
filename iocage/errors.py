@@ -561,6 +561,20 @@ class IocageNotActivated(IocageException):
         super().__init__(message=msg, logger=logger)
 
 
+class ZFSSourceCreation(IocageException):
+    """Raised when iocage could not determine its mountpoint on creation."""
+
+    def __init__(
+        self,
+        reason: typing.Optional[str]=None,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
+        msg = "iocage ZFS source could not be created"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(message=msg, logger=logger)
+
+
 class InvalidLogLevel(IocageException):
     """Raised when the logger was initialized with an invalid log level."""
 
