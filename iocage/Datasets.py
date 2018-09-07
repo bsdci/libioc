@@ -67,14 +67,20 @@ class RootDatasets:
 
         self._datasets = {}
 
+        _create = False
         if isinstance(root_dataset, libzfs.ZFSDataset):
             self.root = root_dataset
         elif isinstance(root_dataset, str):
+            try:
+                self.root = self.zfs.get_dataset(root_dataset)
+            except libzfs.ZFSException:
+                _create = True
+
+        if _create is True:
             self.root = self.zfs.get_or_create_dataset(root_dataset)
 
-        mountpoint = self.root.mountpoint
         if self.root.mountpoint is None:
-            if os.path.ismount('/iocage') is False:
+            if _create and (os.path.ismount('/iocage') is False):
                 self.logger.spam(
                     "Claiming /iocage as mountpoint of the activated zpool"
                 )
@@ -82,8 +88,8 @@ class RootDatasets:
                 zfs_property = libzfs.ZFSUserProperty(mountpoint)
                 self.root.properties["mountpoint"] = zfs_property
             else:
-                raise iocage.errors.ZFSSourceCreation(
-                    reason="Cannot determine the iocage source mountpoint",
+                raise iocage.errors.ZFSSourceMountpoint(
+                    dataset_name=self.root.name,
                     logger=self.logger
                 )
 
