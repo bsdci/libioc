@@ -310,14 +310,25 @@ class Datasets(dict):
         self,
         pool: typing.Optional[libzfs.ZFSPool]=None
     ) -> bool:
-        """Return True if the pool is activated for iocage."""
-        if isinstance(pool, libzfs.ZFSPool):
-            _pool = pool
-        else:
-            _pool = self.main.root.pool
+        """
+        Return True if the pool is activated for iocage.
 
+        Args:
+
+            pool (libzfs.ZFSPool): (optional)
+
+                The specified pool is checked for being activated for iocage.
+                When the pool is unset, the main pool is tested against.
+
+        """
+        if isinstance(pool, libzfs.ZFSPool):
+            return self._is_pool_active(pool)
+        else:
+            return self._is_pool_active(self.main.root.pool)
+
+    def _is_pool_active(self, pool: libzfs.ZFSPool) -> bool:
         return iocage.helpers.parse_user_input(self._get_pool_property(
-            _pool,
+            pool,
             self.ZFS_POOL_ACTIVE_PROPERTY
         )) is True
 
