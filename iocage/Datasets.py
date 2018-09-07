@@ -342,6 +342,7 @@ class Datasets(dict):
             self._set_pool_activation(other_pool, False)
 
         self._set_pool_activation(pool, True)
+        self.attach_source("iocage", f"{pool.name}/iocage")
 
         if self.main.root.mountpoint != mountpoint:
             zfs_property = libzfs.ZFSUserProperty(mountpoint)
