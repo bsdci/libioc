@@ -299,7 +299,28 @@ class Datasets(dict):
         pool: libzfs.ZFSPool,
         mountpoint: typing.Optional[iocage.Types.AbsolutePath]=None
     ) -> None:
-        """Activate the given pool and set its mountpoint."""
+        """
+        Activate the given pool and set its mountpoint.
+
+        Pool activation follows the traditional way of setting a ZFS property
+        on the pool that other iocage variants will detect.
+
+        The mechanism cannot be combined with iocage datasets defined in
+        /etc/rc.conf, so that using the Multi-Pool feature is not possible.
+        When attemptig to activate a pool on a system with such configuration
+        an ActivationFailed error is raised.
+
+        Args:
+
+            pool (libzfs.ZFSPool):
+
+                Target of the iocage activation on which an iocage dataset
+                is created on the top level (e.g. zfs create <pool>/iocage)
+
+            mountpoint (iocage.Types.AbsolutePath): (optional)
+
+                The desired mountpoint for the iocage dataset.
+        """
         if self._rc_conf_enabled is True:
             raise iocage.errors.ActivationFailed(
                 "iocage ZFS source datasets are managed in /etc/rc.conf",
