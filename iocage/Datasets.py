@@ -129,6 +129,7 @@ class Datasets(dict):
     logger: 'iocage.Logger.Logger'
 
     main_datasets_name: typing.Optional[str]
+    _rc_conf_enabled: bool
 
     ZFS_POOL_ACTIVE_PROPERTY: str = "org.freebsd.ioc:active"
 
@@ -146,6 +147,9 @@ class Datasets(dict):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.main_datasets_name = None
 
+        # assume being managed by rc_conf unless later detection fails
+        self._rc_conf_enabled = True
+
         if sources is not None:
             self.attach_sources(sources)
             return
@@ -154,6 +158,7 @@ class Datasets(dict):
             self._configure_from_rc_conf()
             return
         except RCConfEmptyException:
+            self._rc_conf_enabled = False
             pass
 
         try:
@@ -295,6 +300,12 @@ class Datasets(dict):
         mountpoint: typing.Optional[iocage.Types.AbsolutePath]=None
     ) -> None:
         """Activate the given pool and set its mountpoint."""
+        if self._rc_conf_enabled is True:
+            raise iocage.errors.ActivationFailed(
+                "iocage ZFS source datasets are managed in /etc/rc.conf",
+                logger=self.logger
+            )
+
         if self.is_pool_active(pool):
             msg = f"ZFS pool '{pool.name}' is already active"
             self.logger.warn(msg)
