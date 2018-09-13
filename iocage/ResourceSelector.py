@@ -65,7 +65,8 @@ class ResourceSelector:
 
         _name_without_globs = _name.replace("*", "").replace("+", "")
         has_valid_name = iocage.helpers.validate_name(_name_without_globs)
-        if (_name not in ["*", "+"]) and (has_valid_name is False):
+        is_valid_uuid = iocage.helpers.is_uuid(_name_without_globs)
+        if (_name not in ["*", "+"]) and not (has_valid_name or is_valid_uuid):
             raise iocage.errors.InvalidJailName(logger=self.logger)
 
         self.source_name = _source_name
