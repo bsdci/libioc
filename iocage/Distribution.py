@@ -173,7 +173,8 @@ class DistributionGenerator:
                     self._filter_available_releases,
                     found_releases
                 )
-            )
+            ),
+            key=lambda x: float(x.split("-")[0])  # sort numerically
         )
 
         self._available_releases = list(map(
