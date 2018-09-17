@@ -166,6 +166,14 @@ class DistributionGenerator:
 
         found_releases = self._parse_links(response)
 
+        def parse_release_version(release_name: str) -> float:
+            release_fragments = release_name.split("-", maxsplit=1)
+            try:
+                return float(release_fragments[0])
+            except ValueError:
+                # non-float values indicate a high index
+                return float(1024)
+
         available_releases = sorted(
             map(  # map long HardenedBSD release names
                 self._map_available_release,
@@ -174,7 +182,7 @@ class DistributionGenerator:
                     found_releases
                 )
             ),
-            key=lambda x: float(x.split("-")[0])  # sort numerically
+            key=parse_release_version  # sort numerically
         )
 
         self._available_releases = list(map(
