@@ -81,11 +81,11 @@ class RootDatasets:
                     self.zfs.get_pool(root_dataset).name
                 ).mountpoint
                 preferred_mountpoint = "/iocage"
-                preferred_mountpoint_exists = os.path.ismount(
+                preferred_mountpoint_inuse = os.path.ismount(
                     preferred_mountpoint
                 ) is True
                 if pool_mountpoint is None:
-                    if preferred_mountpoint_exists:
+                    if preferred_mountpoint_inuse:
                         raise iocage.errors.ZFSSourceMountpoint(
                             dataset_name=root_dataset,
                             logger=self.logger
@@ -93,7 +93,7 @@ class RootDatasets:
 
                 self.root = self.zfs.create_dataset(root_dataset)
 
-                if preferred_mountpoint_exists is False:
+                if preferred_mountpoint_inuse is False:
                     self.logger.spam(
                         "Claiming mountpoint /iocage"
                     )
