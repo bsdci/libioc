@@ -54,15 +54,26 @@ class ZFSShareStorage:
         """Unmount a running jails shared ZFS datasets."""
         for dataset in self.get_zfs_datasets():
             self.logger.verbose(f"Unmounting ZFS Dataset {dataset.name}")
-            self._exec_jail([
+            self._exec([
+                "/sbin/zfs",
+                "set",
+                "jailed=off",
+                dataset.name
+            ])
+            self._exec([
                 "/sbin/zfs",
                 "umount",
                 dataset.name
             ])
             self._exec([
                 "/sbin/zfs",
-                "unjail",
-                self.jail.identifier,
+                "mount",
+                dataset.name
+            ])
+            self._exec([
+                "/sbin/zfs",
+                "set",
+                "jailed=on",
                 dataset.name
             ])
 
