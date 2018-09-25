@@ -12,7 +12,7 @@ Progress towards the transition of [python-iocage](https://github.com/iocage/ioc
 Recent changes to both projects ensure compatibility running on the same host, so that it is now possible to partially utilize libiocage in iocage until a full migration is performed.
 Because some changes to the command line arguments and the script output will occur, @skarekrow will continue to maintain the current implementation until users had time to follow the deprecation warnings and suggestions.
 
-In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://iocage.github.com/handbook) was published.
+In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://iocage.io/handbook) was published.
 
 ## Install
 
@@ -26,8 +26,8 @@ At the current time libiocage is not packaged or available in FreeBSD ports.
 
 ## Documentation
 
-- Iocage Handbook: https://iocage.github.com/handbook
-- Reference Documentation: https://iocage.github.io/libiocage
+- Iocage Handbook: https://iocage.io/handbook
+- Reference Documentation: https://iocage.io/libiocage
 
 ## Configuration
 
@@ -134,7 +134,7 @@ ioc fetch -r custom -b
 
 ## Documentation
 
-The [API Reference (html)](https://iocage.github.io/libiocage) documenting all public interfaces of libiocage is updated with every release.
+The [API Reference (html)](https://iocage.io/libiocage) documenting all public interfaces of libiocage is updated with every release.
 The information found in the reference is compiled from Python docstrings and MyPy typings using Sphinx.
 
 ## Development
