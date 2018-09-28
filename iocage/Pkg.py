@@ -29,7 +29,6 @@ import os.path
 import re
 
 import libzfs
-import ucl
 
 import iocage.events
 import iocage.helpers
@@ -369,6 +368,7 @@ class Pkg:
                 reason="Refusing to write to a symlink",
                 logger=self.logger
             )
+        import ucl
         with open(filename, "w") as f:
             f.write(ucl.dump(data, ucl.UCL_EMIT_JSON))
 

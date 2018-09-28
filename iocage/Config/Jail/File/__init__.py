@@ -26,8 +26,6 @@
 import typing
 import os.path
 
-import ucl
-
 import iocage.helpers
 import iocage.helpers_object
 import iocage.LaunchableResource
@@ -161,6 +159,7 @@ class ConfigFile(dict):
             self._file_content_changed = False
 
     def _read(self, silent: bool=False) -> dict:
+        import ucl
         data = dict(ucl.load(open(self.path).read()))
         self.logger.spam(f"{self._file} was read from {self.path}")
         return data
@@ -174,7 +173,7 @@ class ConfigFile(dict):
             return False
 
         with open(self.path, "w") as rcconf:
-
+            import ucl
             output = ucl.dump(self, ucl.UCL_EMIT_CONFIG)
             output = output.replace(" = \"", "=\"")
             output = output.replace("\";\n", "\"\n")

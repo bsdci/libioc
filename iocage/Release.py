@@ -32,7 +32,6 @@ import urllib.parse
 import re
 
 import libzfs
-import ucl
 
 import iocage.ZFS
 import iocage.errors
@@ -621,6 +620,7 @@ class ReleaseGenerator(ReleaseResource):
             )
 
         with open(source_file, "r") as f:
+            import ucl
             hbsd_update_conf = ucl.load(f.read())
             self._hbsd_release_branch = hbsd_update_conf["branch"]
             return str(self._hbsd_release_branch)
