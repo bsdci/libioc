@@ -85,6 +85,9 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
             return True
         return (fragments[0] in self["interfaces"].keys()) is True
 
+    def _is_user_property(self, key: str) -> bool:
+        return key.startswith("user.") is True
+
     def _is_known_property(self, key: str) -> bool:
         key_is_default = key in self.host.defaults.config.keys()
         key_is_setter = f"_set_{key}" in dict.__dir__(self)
@@ -93,7 +96,8 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
             key_is_default,
             key_is_setter,
             key_is_special,
-            self._key_is_mac_config(key)
+            self._key_is_mac_config(key),
+            self._is_user_property(key)
         ]) is True
 
     def __setitem__(
