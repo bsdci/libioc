@@ -74,11 +74,27 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
     def _get_legacy(self) -> bool:
         return self.legacy
 
+    def _key_is_mac_config(self, key: str, explicit: bool=False) -> bool:
+        fragments = key.rsplit("_", maxsplit=1)
+        if len(fragments) < 2:
+            return False
+        elif fragments[1].lower() != "mac":
+            return False
+        elif explicit is False:
+            # do not explicitly check if the interface exists
+            return True
+        return (fragments[0] in self["interfaces"].keys()) is True
+
     def _is_known_property(self, key: str) -> bool:
         key_is_default = key in self.host.defaults.config.keys()
         key_is_setter = f"_set_{key}" in dict.__dir__(self)
         key_is_special = key in iocage.Config.Jail.Properties.properties
-        return (key_is_default or key_is_setter or key_is_special) is True
+        return any([
+            key_is_default,
+            key_is_setter,
+            key_is_special,
+            self._key_is_mac_config(key)
+        ]) is True
 
     def __setitem__(
         self,
