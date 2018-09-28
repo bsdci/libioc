@@ -402,6 +402,12 @@ class Datasets(dict):
         prop: str
     ) -> typing.Optional[str]:
 
+        if pool.status != "ONLINE":
+            self.logger.verbose(
+                f"The pool {pool.name} is {pool.status} and will be ignored"
+            )
+            return None
+
         if prop in pool.root_dataset.properties:
             zfs_prop = pool.root_dataset.properties[prop]
             return str(zfs_prop.value)
