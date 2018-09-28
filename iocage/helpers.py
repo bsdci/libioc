@@ -30,7 +30,6 @@ import random
 import re
 import subprocess  # nosec: B404
 import sys
-import ucl
 import pty
 import select
 
@@ -326,6 +325,7 @@ def to_ucl(data: typing.Dict[str, typing.Any]) -> str:
             false="off",
             none="none"
         )
+    import ucl
     return str(ucl.dump(output_data))
 
 

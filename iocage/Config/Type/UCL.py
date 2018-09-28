@@ -25,8 +25,6 @@
 """iocage configuration stored in an UCL file."""
 import typing
 
-import ucl
-
 import iocage.Config
 import iocage.Config.Prototype
 import iocage.Config.Dataset
@@ -40,6 +38,7 @@ class ConfigUCL(iocage.Config.Prototype.Prototype):
 
     def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
         """Normalize data read from the UCL file."""
+        import ucl
         result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
         result["legacy"] = True
         return result
