@@ -218,7 +218,7 @@ class Pkg:
                     "install",
                     "--yes",
                     "--repository", "libiocage",
-                    " ".join(packages)
+                    " ".join(_packages)
                 ])
             ] + postinstall)
             temporary_jail = self._get_temporary_jail(jail)
@@ -241,6 +241,46 @@ class Pkg:
         except Exception as e:
             yield packageInstallEvent.fail(e)
             raise e
+
+    def remove(
+        self,
+        packages: typing.Union[str, typing.List[str]],
+        jail: 'iocage.Jail.JailGenerator',
+        event_scope: typing.Optional['iocage.events.Scope']=None
+    ) -> typing.Generator[iocage.events.IocageEvent, None, None]:
+        """Remove installed packages from a jail."""
+        _packages = self._normalize_packages(packages)
+
+        packageRemoveEvent = iocage.events.PackageRemove(
+            packages=_packages,
+            jail=jail,
+            scope=event_scope
+        )
+        command = [
+            "/usr/sbin/pkg",
+            "remove",
+            "--yes",
+            " ".join(_packages)
+        ]
+        yield packageRemoveEvent.begin()
+        try:
+            if jail.running is False:
+                temporary_jail = self._get_temporary_jail(jail)
+                _command = "\n".join([
+                    "export ASSUME_ALWAYS_YES=yes",
+                    " ".join(command)
+                ])
+                yield from temporary_jail.fork_exec(
+                    _command,
+                    passthru=False,
+                    event_scope=packageRemoveEvent.scope
+                )
+            else:
+                jail.exec(command)
+        except Exception as err:
+            yield packageRemoveEvent.fail(err)
+            raise err
+        yield packageRemoveEvent.end()
 
     def _get_latest_pkg_archive(self, package_source_directory: str) -> str:
         for package_archive in os.listdir(f"{package_source_directory}/cache"):

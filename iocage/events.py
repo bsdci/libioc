@@ -885,6 +885,21 @@ class PackageInstall(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
+class PackageRemove(JailEvent):
+    """Remove packages from a jail."""
+
+    def __init__(
+        self,
+        packages: typing.List[str],
+        jail: 'iocage.Jail.JailGenerator',
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
+    ) -> None:
+
+        self.packages = packages
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
+
+
 class PackageConfiguration(JailEvent):
     """Install packages in a jail."""
 

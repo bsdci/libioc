@@ -23,6 +23,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail package management subcommand for the CLI."""
+import typing
 import click
 
 import iocage.Jail
@@ -30,14 +31,26 @@ import iocage.Pkg
 import iocage.Logger
 import iocage.errors
 
-__rootcmd__ = True
+from .shared.click import IocageClickContext
 
 
 @click.command(name="pkg", help="Manage packages in a jail.")
 @click.pass_context
+@click.option(
+    "--remove", "-r",
+    "remove",
+    is_flag=True,
+    default=False,
+    help="Remove the packages instead of installing/updating them."
+)
 @click.argument("jail")
 @click.argument("packages", nargs=-1)
-def cli(ctx, jail, packages):
+def cli(
+    ctx: IocageClickContext,
+    remove: bool,
+    jail: str,
+    packages: typing.Tuple[str, ...]
+) -> None:
     """Manage packages within jails using an offline mirror."""
     logger = ctx.parent.logger
 
@@ -57,10 +70,16 @@ def cli(ctx, jail, packages):
             zfs=ctx.parent.zfs,
             host=ctx.parent.host
         )
-        events = pkg.fetch_and_install(
-            jail=ioc_jail,
-            packages=list(packages)
-        )
+        if remove is False:
+            events = pkg.fetch_and_install(
+                jail=ioc_jail,
+                packages=list(packages)
+            )
+        else:
+            events = pkg.remove(
+                jail=ioc_jail,
+                packages=list(packages)
+            )
         ctx.parent.print_events(events)
     except iocage.errors.IocageException:
         exit(1)
