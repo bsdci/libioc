@@ -415,7 +415,6 @@ class Pkg:
         repo_ds = self._get_release_pkg_dataset(release_major_version)
         cache_ds = self.zfs.get_or_create_dataset(f"{repo_ds.name}/cache")
         try:
-            print("FSTAB THING")
             temporary_jail.fstab.new_line(
                 source=cache_ds.mountpoint,
                 destination=f"{destination_dir}",
