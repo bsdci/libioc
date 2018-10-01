@@ -402,7 +402,7 @@ class Datasets(dict):
         prop: str
     ) -> typing.Optional[str]:
 
-        if (pool.status != "ONLINE") and (pool.status != "DEGRADED"):
+        if pool.status not in ["ONLINE", "DEGRADED"]:
             self.logger.verbose(
                 f"The pool {pool.name} is {pool.status} and will be ignored"
             )
