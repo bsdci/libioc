@@ -83,7 +83,7 @@ if sys.version_info < (3, 6):
 setup(
     name='iocage',
     license='BSD',
-    version='0.3.0',
+    version='0.3.1',
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='iocage Contributors',
@@ -101,7 +101,7 @@ setup(
 setup(
     name='ioc',
     license='BSD',
-    version='0.3.0',
+    version='0.3.1',
     description='A Python library to manage jails with iocage',
     keywords='FreeBSD jail iocage',
     author='iocage Contributors',
