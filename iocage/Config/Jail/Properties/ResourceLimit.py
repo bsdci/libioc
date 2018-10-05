@@ -92,6 +92,7 @@ class ResourceLimitValue:
         return (None in [self.amount, self.action, self.per]) is True
 
     def _parse_resource_limit(self, value: str) -> ResourceLimitValueTuple:
+        _default_per = "jail"
 
         if (value is False) or (value is None) or (value == "None=None/None"):
             amount = None
@@ -101,15 +102,19 @@ class ResourceLimitValue:
             # simplified syntax vmemoryuse=128M
             amount = value
             action = "deny"
-            per = "jail"
+            per = _default_per
         elif "=" in value:
             # rctl syntax
             action, _rest = value.split("=", maxsplit=1)
-            amount, per = _rest.split("/", maxsplit=1)
+            try:
+                amount, per = _rest.split("/", maxsplit=1)
+            except ValueError:
+                amount = _rest
+                per = _default_per
         elif ":" in value:
             # iocage legacy syntax
             amount, action = value.split(":", maxsplit=1)
-            per = "jail"
+            per = _default_per
         else:
             raise ValueError("invalid syntax")
 
