@@ -814,6 +814,17 @@ class JailStart(JailEvent):
 
     pass
 
+class JailDependantsStart(JailStart):
+    """Start dependant jails."""
+
+    pass
+
+
+class JailDependantStart(JailStart):
+    """Start one dependant jail."""
+
+    pass
+
 
 class JailProvisioning(JailEvent):
     """Provision a jail."""

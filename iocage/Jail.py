@@ -462,6 +462,11 @@ class JailGenerator(JailResource):
         events: typing.Any = iocage.events
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
+        yield from self._start_dependant_jails(
+            self.config["depends"],
+            event_scope=event_scope
+        )
+
         self._ensure_script_dir()
         jail_start_script_dir = "".join([
             self.root_dataset.mountpoint,
@@ -547,12 +552,10 @@ class JailGenerator(JailResource):
 
         def _stop_failed_jail(
         ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
-            stop_events = self.stop(
+            yield from self.stop(
                 force=True,
                 event_scope=jailLaunchEvent.scope
             )
-            for event in stop_events:
-                yield event
         jailLaunchEvent.add_rollback_step(_stop_failed_jail)
 
         if self.is_basejail is True:
@@ -582,6 +585,59 @@ class JailGenerator(JailResource):
             raise e
 
         yield jailLaunchEvent.end(stdout=stdout)
+
+    def _start_dependant_jails(
+        self,
+        terms: iocage.Filter.Terms,
+        event_scope: typing.Optional['iocage.events.Scope']=None
+    ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
+
+        jailDependantsStartEvent = iocage.events.JailDependantsStart(
+            jail=self,
+            scope=event_scope
+        )
+
+        yield jailDependantsStartEvent.begin()
+        _depends = self.config["depends"]
+        if len(_depends) == 0:
+            yield jailDependantsStartEvent.skip("No dependant jails")
+        else:
+            dependant_jails = iocage.Jails.JailsGenerator(
+                filters=_depends,
+                host=self.host,
+                logger=self.logger,
+                zfs=self.zfs
+            )
+
+            for dependant_jail in dependant_jails:
+                if dependant_jail == self:
+                    self.logger.warn(f"The jail {self.name} depends on itself")
+                    continue
+                jailDependantStartEvent = iocage.events.JailDependantStart(
+                    jail=dependant_jail,
+                    scope=jailDependantsStartEvent.scope
+                )
+                yield jailDependantStartEvent.begin()
+                if dependant_jail.running is True:
+                    yield jailDependantStartEvent.skip("already running")
+                    continue
+
+                def _revert_start(
+                ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
+                    yield from dependant_jail.stop(force=True)
+                jailDependantsStartEvent.add_rollback_step(_revert_start)
+
+                try:
+                    yield from dependant_jail.start(
+                        event_scope=jailDependantStartEvent.scope
+                    )
+                except iocage.errors.IocageException as err:
+                    yield jailDependantStartEvent.fail(err)
+                    yield jailDependantsStartEvent.fail(err)
+                    raise err
+                yield jailDependantStartEvent.end()
+
+        yield jailDependantsStartEvent.end()
 
     def _run_poststop_hook_manually(self) -> None:
         self.logger.debug("Running poststop hook manually")
