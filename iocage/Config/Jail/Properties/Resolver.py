@@ -97,7 +97,7 @@ class ResolverProp(collections.MutableSequence):
         )
 
         jailResolverConfigEvent = iocage.events.JailResolverConfig(
-            jail=self,
+            jail=jail,
             scope=event_scope
         )
         yield jailResolverConfigEvent.begin()
