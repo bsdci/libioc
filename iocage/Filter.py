@@ -158,21 +158,7 @@ class Term(list):
         return False
 
     def _split_filter_values(self, user_input: str) -> typing.List[str]:
-        values: typing.List[str] = []
-        escaped_comma_blocks = map(
-            lambda block: block.split(","),
-            user_input.split("\\,")
-        )
-        for block in escaped_comma_blocks:
-            n = len(values)
-            if n > 0:
-                index = n - 1
-                values[index] += f",{block[0]}"
-            else:
-                values.append(block[0])
-            if len(block) > 1:
-                values += block[1:]
-        return values
+        return re.split(r'(?<!\\),', user_input)
 
     def _validate_name_filter_string(self, filter_string: str) -> bool:
 
