@@ -815,13 +815,36 @@ class JailStart(JailEvent):
     pass
 
 
-class JailDependantsStart(JailStart):
+class JailDependantsStart(JailEvent):
     """Start dependant jails."""
 
-    pass
+    started_jails: typing.List['iocage.Jail.JailGenerator']
+
+    def __init__(
+        self,
+        jail: 'iocage.Jail.JailGenerator',
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
+    ) -> None:
+
+        try:
+            self.identifier = jail.full_name
+        except AttributeError:
+            self.identifier = None
+        self.started_jails = []
+        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
+
+    def end(
+        self,
+        message: typing.Optional[str]=None,
+        started_jails: typing.List['iocage.Jail.JailGenerator']=[],
+    ) -> 'IocageEvent':
+        """Successfully finish starting dependant Jails."""
+        self.started_jails = started_jails
+        return JailEvent.end(self, message)
 
 
-class JailDependantStart(JailStart):
+class JailDependantStart(JailEvent):
     """Start one dependant jail."""
 
     pass
