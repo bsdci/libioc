@@ -316,10 +316,10 @@ class Terms(list):
             value = user_input
 
         if prop == "name":
-            value = iocage.ResourceSelector.ResourceSelector(
-                value,
+            value = [iocage.ResourceSelector.ResourceSelector(
+                partial_value,
                 logger=self.logger
-            )
+            ) for partial_value in re.split(r'(?<!\\),', value)]
         else:
             value = iocage.helpers.to_string(
                 iocage.helpers.parse_user_input(value)
