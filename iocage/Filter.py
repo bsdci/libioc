@@ -59,7 +59,7 @@ class Term(list):
     def __init__(
         self,
         key: str,
-        values: _TermValuesType=[]
+        values: typing.Optional[_TermValuesType]=[]
     ) -> None:
         self.key = key
 
@@ -69,6 +69,8 @@ class Term(list):
             data = values
         elif isinstance(values, _ResourceSelector):
             data = [values]
+        elif values is None:
+            data = []
 
         list.__init__(self, data)
 
@@ -190,6 +192,20 @@ class Term(list):
             filter_string_without_globs
         ) is True
 
+    def __str__(self) -> str:
+        """Return the Filter Term as string."""
+        output: str = ""
+
+        if self.key != "name":
+            output += f"{self.key}="
+
+        output += ",".join([str(x) for x in self])
+        return f"{output}"
+
+    def __repr__(self) -> str:
+        """Return the Term in human and robot friendly format."""
+        return self.__str__()
+
 
 class Terms(list):
     """
@@ -210,15 +226,56 @@ class Terms(list):
         self.logger = logger
         data: typing.List[typing.Union[Term, str]] = []
 
-        if terms is not None:
+        list.__init__(self, [])
+        Terms.set(self, terms)
 
-            for term in terms:
+    def set(
+        self,
+        terms: typing.Optional[typing.Union[
+            str,
+            typing.Iterable[typing.Union[Term, str]]
+        ]]
+    ) -> None:
+        """Clear and set all terms from input data."""
+        self.clear()
+
+        try:
+            iocage.helpers.parse_none(terms)
+            return
+        except TypeError:
+            pass
+
+        data: typing.List[typing.Union[Term, str]] = []
+
+        if terms is not None:
+            _terms = [terms] if isinstance(terms, str) else terms
+            for term in _terms:
                 if isinstance(term, str):
-                    data += self._parse_term(term)
+                    data += self._parse_terms(term)
                 elif isinstance(term, Term):
                     data.append(term)
 
-        list.__init__(self, data)
+        self.extend(data)
+
+    def add(
+        self,
+        term: typing.Union[Term, str]
+    ) -> None:
+        """
+        Add a Term to the list of Terms.
+
+        Args:
+
+            term (iocage.Filter.Term, str):
+                Interface name inside the jail
+        """
+        _term: Term
+        if isinstance(term, Term) is True:
+            _term = term
+        else:
+            _term = self._parse_term(term)
+
+        list.add(self, _term)
 
     def match_resource(
         self,
@@ -265,10 +322,7 @@ class Terms(list):
         # no name term or none at all
         return True
 
-    def _parse_term(self, user_input: str) -> typing.List[Term]:
-
-        terms = []
-
+    def _parse_term(self, user_input: str) -> Term:
         try:
             prop, value = user_input.split("=", maxsplit=1)
         except ValueError:
@@ -280,7 +334,22 @@ class Terms(list):
                 value,
                 logger=self.logger
             )
+        else:
+            value = iocage.helpers.to_string(
+                iocage.helpers.parse_user_input(value)
+            )
 
-        terms.append(Term(prop, value))
+        return Term(prop, value)
+
+    def _parse_terms(self, user_input: str) -> typing.List[Term]:
+        terms = []
+        user_input_terms = re.split(r'(?<!\\)\s+', user_input)
+
+        for user_input_term in user_input_terms:
+            terms.append(self._parse_term(user_input_term))
 
         return terms
+
+    def __str__(self) -> str:
+        """Return the Filter.Terms as string."""
+        return " ".join([str(x) for x in self])

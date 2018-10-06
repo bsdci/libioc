@@ -71,6 +71,7 @@ class JailConfigDefaults(iocage.Config.Jail.BaseConfig.BaseConfig):
         "priority": 0,
         "legacy": False,
         "priority": 0,
+        "depends": None,
         "basejail": False,
         "basejail_type": "nullfs",
         "clonejail": False,

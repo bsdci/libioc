@@ -29,11 +29,13 @@ import iocage.Config.Jail.Properties.Interfaces
 import iocage.Config.Jail.Properties.Resolver
 import iocage.Config.Jail.Properties.ResourceLimit
 import iocage.Config.Jail.Properties.Defaultrouter
+import iocage.Config.Jail.Properties.Depends
 
 Property = typing.Union[
     'iocage.Config.Jail.Properties.Addresses.AddressesProp',
     'iocage.Config.Jail.Properties.Interfaces.InterfaceProp',
-    'iocage.Config.Jail.Properties.Resolver.ResolverProp'
+    'iocage.Config.Jail.Properties.Resolver.ResolverProp',
+    'iocage.Config.Jail.Properties.Depends.DependsProp'
 ]
 
 properties: typing.List[str] = [
@@ -42,7 +44,8 @@ properties: typing.List[str] = [
     "interfaces",
     "defaultrouter",
     "defaultrouter6",
-    "resolver"
+    "resolver",
+    "depends"
 ] + ResourceLimit.properties
 
 def _get_class(property_name: str) -> Property:
@@ -62,6 +65,8 @@ def _get_class(property_name: str) -> Property:
         return DefaultrouterModule.DefaultrouterProp
     elif property_name == "defaultrouter6":
         return DefaultrouterModule.Defaultrouter6Prop
+    elif property_name == "depends":
+        return iocage.Config.Jail.Properties.Depends.DependsProp
     elif property_name in ResourceLimit.properties:
         return ResourceLimit.ResourceLimitProp
 
@@ -88,6 +93,7 @@ def init_property(
                 - resolver
                 - defaultrouter
                 - defaultrouter6
+                - depends
 
         config (iocage.Config.Jail.JailConfig.JailConfig):
             The special property keeps reference to this JailConfig instance
@@ -137,5 +143,4 @@ class JailConfigProperties(dict):
                 config=self.config,
                 logger=self.logger
             )
-
         return self[property_name]
