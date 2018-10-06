@@ -462,10 +462,15 @@ class JailGenerator(JailResource):
         events: typing.Any = iocage.events
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
-        yield from self._start_dependant_jails(
+        dependant_jails_started: typing.List[JailGenerator] = []
+        for event in self._start_dependant_jails(
             self.config["depends"],
             event_scope=event_scope
-        )
+        ):
+            if isinstance(event, iocage.events.JailDependantsStart) is True:
+                if event.done and (event.error is None):
+                    dependant_jails_started.extend(event.started_jails)
+            yield event
 
         self._ensure_script_dir()
         jail_start_script_dir = "".join([
@@ -552,10 +557,12 @@ class JailGenerator(JailResource):
 
         def _stop_failed_jail(
         ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
-            yield from self.stop(
-                force=True,
-                event_scope=jailLaunchEvent.scope
-            )
+            jails_to_stop = [self] + list(reversed(dependant_jails_started))
+            for jail_to_stop in jails_to_stop:
+                yield from jail_to_stop.stop(
+                    force=True,
+                    event_scope=jailLaunchEvent.scope
+                )
         jailLaunchEvent.add_rollback_step(_stop_failed_jail)
 
         if self.is_basejail is True:
@@ -581,7 +588,7 @@ class JailGenerator(JailResource):
                     logger=self.logger
                 )
         except iocage.errors.IocageException as e:
-            yield jailLaunchEvent.fail(e)
+            yield from jailLaunchEvent.fail_generator(e)
             raise e
 
         yield jailLaunchEvent.end(stdout=stdout)
@@ -596,17 +603,21 @@ class JailGenerator(JailResource):
             jail=self,
             scope=event_scope
         )
+        started_jails: typing.List[JailGenerator] = []
 
         yield jailDependantsStartEvent.begin()
         _depends = self.config["depends"]
         if len(_depends) == 0:
             yield jailDependantsStartEvent.skip("No dependant jails")
         else:
-            dependant_jails = iocage.Jails.JailsGenerator(
-                filters=_depends,
-                host=self.host,
-                logger=self.logger,
-                zfs=self.zfs
+            dependant_jails = sorted(
+                iocage.Jails.JailsGenerator(
+                    filters=_depends,
+                    host=self.host,
+                    logger=self.logger,
+                    zfs=self.zfs
+                ),
+                key=lambda x: x.config["priority"]
             )
 
             for dependant_jail in dependant_jails:
@@ -628,9 +639,11 @@ class JailGenerator(JailResource):
                     )
                 except iocage.errors.IocageException as err:
                     yield jailDependantStartEvent.fail(err)
-                    yield jailDependantsStartEvent.fail(err)
+                    yield from jailDependantsStartEvent.fail_generator(err)
                     raise err
                 yield jailDependantStartEvent.end()
+
+                started_jails.append(dependant_jail)
 
                 # revert start of previously started dependants after failure
                 def _revert_start(
@@ -650,7 +663,9 @@ class JailGenerator(JailResource):
                     _revert_start(dependant_jail)
                 )
 
-        yield jailDependantsStartEvent.end()
+        yield jailDependantsStartEvent.end(
+            started_jails=started_jails
+        )
 
     def _run_poststop_hook_manually(self) -> None:
         self.logger.debug("Running poststop hook manually")
