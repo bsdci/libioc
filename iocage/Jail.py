@@ -622,11 +622,6 @@ class JailGenerator(JailResource):
                     yield jailDependantStartEvent.skip("already running")
                     continue
 
-                def _revert_start(
-                ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
-                    yield from dependant_jail.stop(force=True)
-                jailDependantsStartEvent.add_rollback_step(_revert_start)
-
                 try:
                     yield from dependant_jail.start(
                         event_scope=jailDependantStartEvent.scope
@@ -636,6 +631,24 @@ class JailGenerator(JailResource):
                     yield jailDependantsStartEvent.fail(err)
                     raise err
                 yield jailDependantStartEvent.end()
+
+                # revert start of previously started dependants after failure
+                def _revert_start(
+                    jail: JailGenerator
+                ) -> typing.Callable[
+                    [],
+                    typing.Generator['iocage.events.IocageEvent', None, None]
+                ]:
+                    def revert_method() -> typing.Generator[
+                        'iocage.events.IocageEvent',
+                        None,
+                        None
+                    ]:
+                        yield from jail.stop(force=True)
+                    return revert_method
+                jailDependantsStartEvent.add_rollback_step(
+                    _revert_start(dependant_jail)
+                )
 
         yield jailDependantsStartEvent.end()
 
