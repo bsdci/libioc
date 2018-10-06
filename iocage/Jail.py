@@ -629,6 +629,7 @@ class JailGenerator(JailResource):
                     scope=jailDependantsStartEvent.scope
                 )
                 yield jailDependantStartEvent.begin()
+                dependant_jail.state.query()
                 if dependant_jail.running is True:
                     yield jailDependantStartEvent.skip("already running")
                     continue
