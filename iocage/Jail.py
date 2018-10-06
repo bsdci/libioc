@@ -1024,7 +1024,10 @@ class JailGenerator(JailResource):
         self.require_storage_backend()
 
         if iocage.helpers.validate_name(new_name) is False:
-            raise iocage.errors.InvalidJailName(logger=self.logger)
+            raise iocage.errors.InvalidJailName(
+                name=new_name,
+                logger=self.logger
+            )
 
         current_id = self.config["id"]
         current_mountpoint = self.dataset.mountpoint

@@ -193,7 +193,10 @@ class BaseConfig(dict):
                 " ".join(invalid_characters)
             )
             self.logger.error(msg)
-            raise iocage.errors.InvalidJailName(logger=self.logger)
+            raise iocage.errors.InvalidJailName(
+                name="INVALID",
+                logger=self.logger
+            )
 
         is_valid_name = iocage.helpers.validate_name(name)
         if is_valid_name is True:
@@ -202,7 +205,10 @@ class BaseConfig(dict):
             if iocage.helpers.is_uuid(name) is True:
                 self.data["id"] = name
             else:
-                raise iocage.errors.InvalidJailName(logger=self.logger)
+                raise iocage.errors.InvalidJailName(
+                    name=name,
+                    logger=self.logger
+                )
 
     def _get_name(self) -> str:
         return self._get_id()
