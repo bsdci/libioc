@@ -339,3 +339,7 @@ class Terms(list):
     def __str__(self) -> str:
         """Return the Filter.Terms as string."""
         return " ".join([str(x) for x in self])
+
+    def __repr__(self) -> str:
+        """Return the Terms in human and robot friendly format."""
+        return self.__str__()
