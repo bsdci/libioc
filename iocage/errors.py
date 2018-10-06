@@ -370,10 +370,11 @@ class InvalidJailName(JailConfigError):
 
     def __init__(
         self,
+        name: str,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
         msg = (
-            "Invalid jail name: "
+            f"Invalid jail name '{name}': "
             "Names have to begin and end with an alphanumeric character"
         )
         super().__init__(message=msg, logger=logger)
