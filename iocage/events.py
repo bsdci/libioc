@@ -814,6 +814,7 @@ class JailStart(JailEvent):
 
     pass
 
+
 class JailDependantsStart(JailStart):
     """Start dependant jails."""
 

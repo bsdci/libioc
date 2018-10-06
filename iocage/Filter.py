@@ -210,8 +210,6 @@ class Terms(list):
     ) -> None:
 
         self.logger = logger
-        data: typing.List[typing.Union[Term, str]] = []
-
         list.__init__(self, [])
         Terms.set(self, terms)
 
@@ -255,13 +253,8 @@ class Terms(list):
             term (iocage.Filter.Term, str):
                 Interface name inside the jail
         """
-        _term: Term
-        if isinstance(term, Term) is True:
-            _term = term
-        else:
-            _term = self._parse_term(term)
-
-        list.add(self, _term)
+        _term = term if isinstance(term, Term) else self._parse_term(term)
+        list.append(self, _term)
 
     def match_resource(
         self,
@@ -309,6 +302,7 @@ class Terms(list):
         return True
 
     def _parse_term(self, user_input: str) -> Term:
+        value: typing.Any
         try:
             prop, value = user_input.split("=", maxsplit=1)
         except ValueError:
