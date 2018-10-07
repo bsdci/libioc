@@ -38,6 +38,8 @@ _TermValuesType = typing.Union[
     iocage.ResourceSelector.ResourceSelector
 ]
 
+_REGEX_PATTERN_SPLIT_COMMA = re.compile(r'(?<!\\),')
+
 
 def match_filter(value: str, filter_string: str) -> bool:
     """Return True when the value matches the filter string."""
@@ -158,7 +160,7 @@ class Term(list):
         return False
 
     def _split_filter_values(self, user_input: str) -> typing.List[str]:
-        return re.split(r'(?<!\\),', user_input)
+        return re.split(_REGEX_PATTERN_SPLIT_COMMA, user_input)
 
     def _validate_name_filter_string(self, filter_string: str) -> bool:
 
@@ -313,7 +315,10 @@ class Terms(list):
             value = [iocage.ResourceSelector.ResourceSelector(
                 partial_value,
                 logger=self.logger
-            ) for partial_value in re.split(r'(?<!\\),', value)]
+            ) for partial_value in re.split(
+                _REGEX_PATTERN_SPLIT_COMMA,
+                value
+            )]
         else:
             value = iocage.helpers.to_string(
                 iocage.helpers.parse_user_input(value)
