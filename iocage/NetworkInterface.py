@@ -218,7 +218,7 @@ class NetworkInterface:
             is_ipv4 = isinstance(address, ipaddress.IPv4Interface) is True
             is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
             family = "inet6" if is_ipv6 else "inet"
-            if is_ipv4 and (str(address).lower() == "dhcp"):
+            if str(address).lower() == "dhcp":
                 command = [self.dhclient_command, name]
             else:
                 command = [self.ifconfig_command, name, family, str(address)]
