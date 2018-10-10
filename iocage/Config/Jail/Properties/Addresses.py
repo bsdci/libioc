@@ -116,10 +116,8 @@ class AddressSet(set):
         iocage.IPAddress.IPv6Interface
     ]:
         _address = str(address).lower()
-        if _address == "accept_rtadv":
-            return iocage.IPAddress.IPv6Interface(_address)
-        elif _address == "dhcp":
-            return iocage.IPAddress.IPv4Interface(_address)
+        if (_address == "accept_rtadv") or (_address == "dhcp"):
+            return str(_address)
         return address
 
 
