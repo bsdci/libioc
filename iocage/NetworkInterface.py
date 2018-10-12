@@ -223,10 +223,12 @@ class NetworkInterface:
             else:
                 is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
                 family = "inet6" if is_ipv6 else "inet"
-                command = [self.ifconfig_command, name, family, str(address)]
+                command = [self.ifconfig_command, name, family]
 
-            if i > 0:
-                command.append("alias")
+                if i > 0:
+                    command.append("alias")
+
+                command.append(str(address))
 
             self._exec(command)
 
