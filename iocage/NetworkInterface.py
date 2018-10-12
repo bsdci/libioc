@@ -215,24 +215,23 @@ class NetworkInterface:
 
         for i, address in enumerate(list(addresses)):  # noqa: T484
             name = self.current_nic_name
-            is_ipv4 = isinstance(address, ipaddress.IPv4Interface) is True
-            is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
-            family = "inet6" if is_ipv6 else "inet"
+
             if str(address).lower() == "dhcp":
                 command = [self.dhclient_command, name]
+            elif str(address).lower() == "accept_rtadv":
+                self._exec([
+                    self.rtsold_command,
+                    name
+                ])
             else:
+                is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
+                family = "inet6" if is_ipv6 else "inet"
                 command = [self.ifconfig_command, name, family, str(address)]
 
             if i > 0:
                 command.append("alias")
 
             self._exec(command)
-
-            if is_ipv6 and (str(address).lower() == "accept_rtadv"):
-                self._exec([
-                    self.rtsold_command,
-                    name
-                ])
 
     def _exec(
         self,
