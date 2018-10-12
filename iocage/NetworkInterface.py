@@ -219,10 +219,7 @@ class NetworkInterface:
             if str(address).lower() == "dhcp":
                 command = [self.dhclient_command, name]
             elif str(address).lower() == "accept_rtadv":
-                self._exec([
-                    self.rtsold_command,
-                    name
-                ])
+                command = [self.rtsold_command, name]
             else:
                 is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
                 family = "inet6" if is_ipv6 else "inet"
