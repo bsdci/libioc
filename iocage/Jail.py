@@ -483,7 +483,7 @@ class JailGenerator(JailResource):
         if self.config["vnet"]:
             _created, _start = self._start_vimage_network()
             exec_created += _created
-            exec_start += [f". {self._relative_hook_script_dir}/.env"] + _start
+            exec_start += _start
             exec_start += self._configure_localhost_commands()
             exec_start += self._configure_routes_commands()
             if self.host.ipfw_enabled is True:
