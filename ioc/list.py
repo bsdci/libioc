@@ -237,7 +237,8 @@ def _lookup_resource_values(
     ],
     columns: typing.List[str]
 ) -> typing.List[str]:
-    if "getstring" in resource.__dir__():
+    is_resorce = isinstance(resource, iocage.Resource.Resource)
+    if is_resorce and ("getstring" in resource.__dir__()):
         return list(map(
             lambda column: str(resource.getstring(column)),
             columns
