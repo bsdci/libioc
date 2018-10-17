@@ -2008,7 +2008,7 @@ class JailGenerator(JailResource):
             jail_env = {}
 
         for prop in self.config.all_properties:
-            prop_name = f"IOCAGE_{prop.upper()}"
+            prop_name = f"IOCAGE_{prop.replace('.', '_').upper()}"
             jail_env[prop_name] = self.getstring(prop)
 
         jail_env["IOCAGE_JAIL_PATH"] = self.root_dataset.mountpoint
