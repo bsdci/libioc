@@ -72,7 +72,7 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
         """Return the locally available releases."""
         datasets = iocage.ListableResource.ListableResource.__iter__(self)
         return list(map(
-            lambda x: self._class_release(
+            lambda x: self._class_release(  # noqa: T484
                 name=x.name.split("/").pop(),
                 root_datasets_name=self.host.datasets.find_root_datasets_name(
                     x.name
