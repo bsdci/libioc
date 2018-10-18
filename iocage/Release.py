@@ -522,8 +522,8 @@ class ReleaseGenerator(ReleaseResource):
         """Return True if the release is available on the remote mirror."""
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
-            resource = urllib.request.urlopen(request)  # nosec: see above
-            return resource.getcode() == 200  # type: ignore
+            resource = urllib.request.urlopen(request)  # nosec: trusted URL
+            return (resource.getcode() == 200) is True  # noqa: T484
         except urllib.error.URLError:
             pass
         return False
