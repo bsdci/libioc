@@ -116,6 +116,9 @@ def _autostart(
     failed_jails = []
     for jail in jails:
         try:
+            if jail.running is True:
+                logger.log(f"{jail.name} is already running - skipping start")
+                continue
             jail.start()
         except iocage.errors.IocageException:
             failed_jails.append(jail)
@@ -162,6 +165,9 @@ def _normal(
             exit(1)
         try:
             jail.require_jail_not_template()
+            if jail.running is True:
+                logger.log(f"{jail.name} is already running - skipping start")
+                continue
             print_function(jail.start())
         except iocage.errors.IocageException:
             failed_jails.append(jail)
