@@ -186,7 +186,7 @@ class DistributionGenerator:
         )
 
         self._available_releases = list(map(
-            lambda x: self._class_release(
+            lambda x: self._class_release(  # noqa: T484
                 name=x,
                 host=self.host,
                 zfs=self.zfs,
@@ -263,7 +263,7 @@ class DistributionGenerator:
         matches = filter(
             lambda y: y not in blacklisted_releases,
             map(
-                lambda z: z.strip("\"/"),
+                lambda z: z.strip("\"/"),  # noqa: T484
                 re.findall(
                     Distribution.mirror_link_pattern,
                     text,
