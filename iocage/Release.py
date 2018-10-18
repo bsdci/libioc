@@ -56,7 +56,7 @@ class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
 
     _release: typing.Optional['ReleaseGenerator']
     _hashes: typing.Optional[typing.Dict[str, str]]
-    host: 'iocage.Host.HostGenerator'
+    host: iocage.Host.HostGenerator
     root_datasets_name: typing.Optional[str]
 
     def __init__(
