@@ -41,7 +41,7 @@ class DependsProp(iocage.Filter.Terms):
         config: typing.Optional[
             'iocage.Config.Jail.JailConfig.JailConfig'
         ]=None,
-        property_name: str="interfaces",
+        property_name: str="depends",
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
         self.property_name = property_name
