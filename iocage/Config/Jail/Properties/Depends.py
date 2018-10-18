@@ -91,7 +91,7 @@ class DependsProp(iocage.Filter.Terms):
             self.__notify()
 
     def __delitem__(self, key: typing.Any) -> None:
-        """Remove a jail NIC."""
+        """Remove a jail dependency."""
         dict.__delitem__(self, key)
         self.__notify()
 
