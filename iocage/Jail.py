@@ -425,7 +425,8 @@ class JailGenerator(JailResource):
         quick: bool=False,
         passthru: bool=False,
         single_command: typing.Optional[str]=None,
-        event_scope: typing.Optional['iocage.events.Scope']=None
+        event_scope: typing.Optional['iocage.events.Scope']=None,
+        dependant_jails_seen: typing.List['JailGenerator']=[],
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
         """
         Start the jail.
@@ -463,9 +464,11 @@ class JailGenerator(JailResource):
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
         dependant_jails_started: typing.List[JailGenerator] = []
+        dependant_jails_seen.append(self)
         for event in self._start_dependant_jails(
             self.config["depends"],
-            event_scope=event_scope
+            event_scope=event_scope,
+            dependant_jails_seen=dependant_jails_seen
         ):
             if isinstance(event, iocage.events.JailDependantsStart) is True:
                 if event.done and (event.error is None):
@@ -596,6 +599,7 @@ class JailGenerator(JailResource):
     def _start_dependant_jails(
         self,
         terms: iocage.Filter.Terms,
+        dependant_jails_seen: typing.List['JailGenerator'],
         event_scope: typing.Optional['iocage.events.Scope']=None
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
 
@@ -624,6 +628,12 @@ class JailGenerator(JailResource):
                 if dependant_jail == self:
                     self.logger.warn(f"The jail {self.name} depends on itself")
                     continue
+                if dependant_jail in dependant_jails_seen:
+                    self.logger.spam(
+                        f"Circular dependency {dependant_jail.name} - skipping"
+                    )
+                    continue
+                dependant_jails_seen.append(dependant_jail)
                 jailDependantStartEvent = iocage.events.JailDependantStart(
                     jail=dependant_jail,
                     scope=jailDependantsStartEvent.scope
@@ -636,7 +646,8 @@ class JailGenerator(JailResource):
 
                 try:
                     yield from dependant_jail.start(
-                        event_scope=jailDependantStartEvent.scope
+                        event_scope=jailDependantStartEvent.scope,
+                        dependant_jails_seen=dependant_jails_seen
                     )
                 except iocage.errors.IocageException as err:
                     yield jailDependantStartEvent.fail(err)
