@@ -2150,6 +2150,12 @@ class JailGenerator(JailResource):
                 properties.add(prop)
         return list(properties)
 
+    def __eq__(self, other: typing.Any) -> bool:
+        """Compare two Jails by their name."""
+        if isinstance(other, JailGenerator):
+            return False
+        return (self.name == other.name) is True
+
 
 class Jail(JailGenerator):
     """Synchronous wrapper of JailGenerator."""
