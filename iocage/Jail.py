@@ -613,67 +613,68 @@ class JailGenerator(JailResource):
         _depends = self.config["depends"]
         if len(_depends) == 0:
             yield jailDependantsStartEvent.skip("No dependant jails")
-        else:
-            dependant_jails = sorted(
-                iocage.Jails.JailsGenerator(
-                    filters=_depends,
-                    host=self.host,
-                    logger=self.logger,
-                    zfs=self.zfs
-                ),
-                key=lambda x: x.config["priority"]
+            return
+
+        dependant_jails = sorted(
+            iocage.Jails.JailsGenerator(
+                filters=_depends,
+                host=self.host,
+                logger=self.logger,
+                zfs=self.zfs
+            ),
+            key=lambda x: x.config["priority"]
+        )
+
+        for dependant_jail in dependant_jails:
+            if dependant_jail == self:
+                self.logger.warn(f"The jail {self.name} depends on itself")
+                continue
+            if dependant_jail in dependant_jails_seen:
+                self.logger.spam(
+                    f"Circular dependency {dependant_jail.name} - skipping"
+                )
+                continue
+            dependant_jails_seen.append(dependant_jail)
+            jailDependantStartEvent = iocage.events.JailDependantStart(
+                jail=dependant_jail,
+                scope=jailDependantsStartEvent.scope
             )
+            yield jailDependantStartEvent.begin()
+            dependant_jail.state.query()
+            if dependant_jail.running is True:
+                yield jailDependantStartEvent.skip("already running")
+                continue
 
-            for dependant_jail in dependant_jails:
-                if dependant_jail == self:
-                    self.logger.warn(f"The jail {self.name} depends on itself")
-                    continue
-                if dependant_jail in dependant_jails_seen:
-                    self.logger.spam(
-                        f"Circular dependency {dependant_jail.name} - skipping"
-                    )
-                    continue
-                dependant_jails_seen.append(dependant_jail)
-                jailDependantStartEvent = iocage.events.JailDependantStart(
-                    jail=dependant_jail,
-                    scope=jailDependantsStartEvent.scope
+            try:
+                yield from dependant_jail.start(
+                    event_scope=jailDependantStartEvent.scope,
+                    dependant_jails_seen=dependant_jails_seen
                 )
-                yield jailDependantStartEvent.begin()
-                dependant_jail.state.query()
-                if dependant_jail.running is True:
-                    yield jailDependantStartEvent.skip("already running")
-                    continue
+            except iocage.errors.IocageException as err:
+                yield jailDependantStartEvent.fail(err)
+                yield from jailDependantsStartEvent.fail_generator(err)
+                raise err
+            yield jailDependantStartEvent.end()
 
-                try:
-                    yield from dependant_jail.start(
-                        event_scope=jailDependantStartEvent.scope,
-                        dependant_jails_seen=dependant_jails_seen
-                    )
-                except iocage.errors.IocageException as err:
-                    yield jailDependantStartEvent.fail(err)
-                    yield from jailDependantsStartEvent.fail_generator(err)
-                    raise err
-                yield jailDependantStartEvent.end()
+            started_jails.append(dependant_jail)
 
-                started_jails.append(dependant_jail)
-
-                # revert start of previously started dependants after failure
-                def _revert_start(
-                    jail: JailGenerator
-                ) -> typing.Callable[
-                    [],
-                    typing.Generator['iocage.events.IocageEvent', None, None]
+            # revert start of previously started dependants after failure
+            def _revert_start(
+                jail: JailGenerator
+            ) -> typing.Callable[
+                [],
+                typing.Generator['iocage.events.IocageEvent', None, None]
+            ]:
+                def revert_method() -> typing.Generator[
+                    'iocage.events.IocageEvent',
+                    None,
+                    None
                 ]:
-                    def revert_method() -> typing.Generator[
-                        'iocage.events.IocageEvent',
-                        None,
-                        None
-                    ]:
-                        yield from jail.stop(force=True)
-                    return revert_method
-                jailDependantsStartEvent.add_rollback_step(
-                    _revert_start(dependant_jail)
-                )
+                    yield from jail.stop(force=True)
+                return revert_method
+            jailDependantsStartEvent.add_rollback_step(
+                _revert_start(dependant_jail)
+            )
 
         yield jailDependantsStartEvent.end(
             started_jails=started_jails
