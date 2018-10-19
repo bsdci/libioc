@@ -2163,10 +2163,15 @@ class JailGenerator(JailResource):
         return list(properties)
 
     def __eq__(self, other: typing.Any) -> bool:
-        """Compare two Jails by their name."""
+        """
+        Compare two Jails by their name.
+
+        The jail is identified by its full name, including the iocage root
+        dataset name in case there is more than one enabled on the host.
+        """
         if isinstance(other, JailGenerator):
             return False
-        return (self.name == other.name) is True
+        return (self.full_name == other.full_name) is True
 
 
 class Jail(JailGenerator):
