@@ -120,7 +120,7 @@ class JailConfigDefaults(iocage.Config.Jail.BaseConfig.BaseConfig):
         "exec_stop": "/bin/sh /etc/rc.shutdown",
         "exec_poststop": None,
         "exec_jail_user": "root",
-        "exec_timeout": "60",
+        "exec_timeout": "600",
         "stop_timeout": "30",
         "mount_procfs": "0",
         "mount_devfs": "1",
