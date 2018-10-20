@@ -43,7 +43,10 @@ from .shared.click import IocageClickContext
 __rootcmd__ = True
 
 
-@click.command(name="start", help="Starts the specified jails or ALL.")
+@click.command(
+    name="update",
+    help="Update a jail to a new release or patchlevel."
+)
 @click.pass_context
 @click.argument("jails", nargs=-1)
 def cli(
