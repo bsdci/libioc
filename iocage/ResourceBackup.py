@@ -542,6 +542,14 @@ class LaunchableResourceBackup:
             ])
             os.mkdir(temp_root_dir)
 
+            excludes: typing.List[str] = []
+            basedirs = iocage.helpers.get_basedir_list(
+                distribution_name=self.resource.host.distribution.name
+            )
+            for basedir in basedirs:
+                excludes.append("--exclude")
+                excludes.append(basedir)
+
             self.logger.verbose(
                 f"Writing root dataset delta to {temp_root_dir}"
             )
@@ -551,7 +559,8 @@ class LaunchableResourceBackup:
                 "--checksum",
                 "--links",
                 "--hard-links",
-                "--safe-links",
+                "--safe-links"
+            ] + excludes + [
                 f"--compare-dest={compare_dest}/",
                 f"{self.resource.root_dataset.mountpoint}/",
                 temp_root_dir,
