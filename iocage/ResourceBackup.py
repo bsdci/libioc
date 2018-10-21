@@ -538,7 +538,7 @@ class LaunchableResourceBackup:
             temp_root_dir = f"{self.temp_dir}/root"
             compare_dest = "/".join([
                 self.resource.release.root_dataset.mountpoint,
-                f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
+                f".zfs/snapshot/{self.resource.release_snapshot.snapshot_name}"
             ])
             os.mkdir(temp_root_dir)
 
