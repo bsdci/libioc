@@ -324,6 +324,14 @@ class ReleaseGenerator(ReleaseResource):
             self.root_datasets_name = match.group("source_dataset_name")
 
     @property
+    def full_name(self) -> str:
+        """Return the release name including the patchlevel."""
+        if self.patchlevel is None:
+            return self._name
+
+        return f"{self._name}-p{self.current_snapshot_patchlevel}"
+
+    @property
     def resource(self) -> 'iocage.Resource.Resource':
         """Return the releases resource."""
         return self._resource
@@ -425,6 +433,12 @@ class ReleaseGenerator(ReleaseResource):
                 self.host.distribution.eol_list
             )) is True
         return False
+
+    @property
+    def current_snapshot_patchlevel(self) -> int:
+        """Return the currently chosen patchlevel number or the latest."""
+        current_snapshot_name = self.current_snapshot.snapshot_name
+        return int(current_snapshot_name.lstrip('p'))
 
     @property
     def current_snapshot(self) -> libzfs.ZFSSnapshot:
