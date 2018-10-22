@@ -1257,7 +1257,7 @@ class JailGenerator(JailResource):
                 logger=self.logger
             )
 
-        self.config["release"] = release.name
+        self.config["release"] = release.full_name
         self._create_from_resource(release)
 
     def create_from_template(
@@ -1271,7 +1271,7 @@ class JailGenerator(JailResource):
             if key in (["id", "name", "template"] + existing_config_keys):
                 continue
             self.config[key] = template.config[key]
-        self.config['release'] = template.config['release']
+        self.config['release'] = template.release.full_name
         self.config['basejail'] = template.config['basejail']
         self.config['basejail_type'] = template.config['basejail_type']
         self._create_from_resource(template)
