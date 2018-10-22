@@ -417,12 +417,11 @@ class Updater:
                     "The update jail is still running. "
                     "Force-stopping it now."
                 )
-                for event in iocage.Jail.JailGenerator.stop(
+                yield from iocage.Jail.JailGenerator.stop(
                     jail,
                     force=True,
                     event_scope=executeResourceUpdateEvent.scope
-                ):
-                    yield event
+                )
 
         if skipped is True:
             yield executeResourceUpdateEvent.skip()
