@@ -314,14 +314,19 @@ class BaseConfig(dict):
         data_keys = self.data.keys()
 
         if "tags" in data_keys:
-            tags = set(list(iocage.helpers.parse_list(self.data["tags"])))
+            tags = list(iocage.helpers.parse_list(self.data["tags"]))
         else:
-            tags = set()
+            tags = list()
 
         if (self._has_legacy_tag is True):
-            tags.add(self.data["tag"])
+            tags.append(self.data["tag"])
 
-        return list(tags)
+        return self.__unique_list(tags)
+
+    def __unique_list(self, seq: typing.List[str]) -> typing.List[str]:
+        seen: typing.Set[str] = set()
+        seen_add = seen.add
+        return [x for x in seq if not (x in seen or seen_add(x))]  # noqa
 
     def _set_tags(
         self,
