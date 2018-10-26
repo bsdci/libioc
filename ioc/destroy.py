@@ -106,9 +106,9 @@ def cli(
         exit(1)
 
     if not force:
+        _msg = f"These {dataset_type}s will be deleted"
         message = "\n- ".join(
-            [f"These {dataset_type}s will be deleted"] +
-            [r.getstring('full_name') for r in resources]
+            [_msg] + [r.getstring('full_name') for r in resources]
         ) + "\nAre you sure?"
         click.confirm(message, default=False, abort=True)
 
