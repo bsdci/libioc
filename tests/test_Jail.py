@@ -174,7 +174,7 @@ class TestNullFSBasejail(object):
 
             try:
                 assert data["basejail_type"] == "nullfs"
-            except KeyError as e:
+            except KeyError:
                 pass
 
         except Exception as e:
