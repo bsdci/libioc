@@ -797,7 +797,7 @@ class JailGenerator(JailResource):
             )
 
         # ToDo: Deprecate and remove this method
-        raise NotImplemented("_run_hook only supports start/stop")
+        raise NotImplementedError("_run_hook only supports start/stop")
 
     def _ensure_script_dir(self) -> None:
         realpath = os.path.realpath(self.launch_script_dir)
