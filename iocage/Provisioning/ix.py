@@ -200,7 +200,7 @@ def __get_empty_dataset(
 ) -> libzfs.ZFSDataset:
     try:
         dataset = zfs.get_dataset(dataset_name)
-    except libzfs.ZFSException as e:
+    except libzfs.ZFSException:
         dataset = None
         pass
     if dataset is not None:
