@@ -83,7 +83,7 @@ def cli(
                 host=host,
                 logger=logger
             )
-        except iocage.errors.JailNotFound as e:
+        except iocage.errors.JailNotFound:
             exit(1)
 
     if (_prop is None) and (jail == "") and not _all:
