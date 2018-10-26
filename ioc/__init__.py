@@ -144,7 +144,7 @@ class IOCageCLI(click.MultiCommand):
         for filename in os.listdir(IOCAGE_CMD_FOLDER):
             if filename.endswith('.py') and \
                     not filename.startswith('__init__'):
-                rv.append(re.sub(".py$", "", filename))
+                rv.append(re.sub(r".py$", "", filename))
         rv.sort()
 
         return rv
