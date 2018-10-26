@@ -219,7 +219,9 @@ class Datasets(dict):
     def find_root_datasets_name(self, dataset_name: str) -> str:
         """Return the name of the source containing the matching dataset."""
         for source_name, source_datasets in self.items():
-            if dataset_name.startswith(source_datasets.root.name):
+            if dataset_name == source_datasets.root.name:
+                return str(source_name)
+            elif dataset_name.startswith(f"{source_datasets.root.name}/"):
                 return str(source_name)
         raise iocage.errors.ResourceUnmanaged(
             dataset_name=dataset_name,
