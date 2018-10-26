@@ -309,7 +309,7 @@ class ReleaseGenerator(ReleaseResource):
         """Set the releases identifier (optionally including patchlevel)."""
         match = re.match((
             r"^(?:(?P<source_dataset_name>.*)/)?"
-            r"(?P<release_name>.*)"
+            r"(?P<release_name>.*?)"
             r"(?:-p(?P<patchlevel>[0-9]+))?$"
         ), value)
         if match is None:
