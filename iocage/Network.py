@@ -362,7 +362,7 @@ class Network:
             for address in addresses:
                 try:
                     _address = str(address.ip)
-                except ipaddress.AddressValueError as e:
+                except ipaddress.AddressValueError:
                     self.logger.warn(
                         f"Firewall permit not possible for address '{address}'"
                     )
