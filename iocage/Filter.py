@@ -38,7 +38,7 @@ _TermValuesType = typing.Union[
     iocage.ResourceSelector.ResourceSelector
 ]
 
-_REGEX_PATTERN_SPLIT_COMMA = re.compile(r'(?<!\\),')
+_REGEX_PATTERN_SPLIT_COMMA = re.compile(r"(?<!\\),")
 
 
 def match_filter(value: str, filter_string: str) -> bool:

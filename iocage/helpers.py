@@ -48,13 +48,13 @@ def get_os_version(
     f = open(version_file, "r", re.MULTILINE, encoding="utf-8")
     # ToDo: move out of the function
     pattern = re.compile(
-        "USERLAND_VERSION=\""
-        "(?P<userland>\d{1,2}(?:\.\d)?)"
-        "\-"
-        "(?P<name>[A-z0-9\-]+?)"
-        "(?:-"
-        "p(?P<patch>\d+)"
-        ")?\""
+        r"USERLAND_VERSION=\""
+        r"(?P<userland>\d{1,2}(?:\.\d)?)"
+        r"\-"
+        r"(?P<name>[A-z0-9\-]+?)"
+        r"(?:-"
+        r"p(?P<patch>\d+)"
+        r")?\""
     )
     content = f.read()
     match = pattern.search(content)  # type: typing.Optional[typing.Match[str]]
@@ -140,7 +140,7 @@ def to_humanreadable_name(name: str) -> str:
 
 
 _UUID_REGEX = re.compile(
-    "^[A-z0-9]{8}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{12}$"
+    r"^[A-z0-9]{8}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{4}-[A-z0-9]{12}$"
 )
 
 
@@ -150,7 +150,7 @@ def is_uuid(text: str) -> bool:
 
 
 # helper function to validate names
-_validate_name = re.compile(r'[a-z0-9][a-z0-9\.\-_]{1,31}', re.I)
+_validate_name = re.compile(r"[a-z0-9][a-z0-9\.\-_]{1,31}", re.I)
 
 
 def validate_name(name: str) -> bool:

@@ -579,7 +579,7 @@ class FreeBSD(Updater):
     def _modify_updater_config(self, path: str) -> None:
         with open(path, "r+") as f:
             content = f.read()
-            pattern = re.compile("^Components .+$", re.MULTILINE)
+            pattern = re.compile(r"^Components .+$", re.MULTILINE)
             f.seek(0)
             f.write(pattern.sub(
                 "Components world",

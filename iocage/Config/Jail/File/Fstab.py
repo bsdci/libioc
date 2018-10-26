@@ -47,7 +47,7 @@ class FstabLine(dict):
             self[key] = data[key]
 
     def _escape(self, key: str) -> str:
-        return str(self[key].replace(" ", "\ "))
+        return str(self[key].replace(" ", r"\ "))
 
     def __str__(self) -> str:
         """Serialize the data into an fstab line string."""
@@ -236,8 +236,8 @@ class Fstab(
             if line == "":
                 continue
 
-            line = re.sub("\s\s*", " ", line)
-            line = re.sub("([^\\\\])\s", "\g<1>\n", line)
+            line = re.sub(r"\s\s*", " ", line)
+            line = re.sub(r"([^\\\\])\s", r"\g<1>\n", line)
             line = line.replace("\\ ", " ")
 
             fragments = line.splitlines()
