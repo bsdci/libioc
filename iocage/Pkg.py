@@ -315,7 +315,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]]
     ) -> typing.List[str]:
         _packages = [packages] if isinstance(packages, str) else packages
-        pattern = re.compile("^(?:[A-z0-9](?:[A-z0-9\-\/]?[A-z0-9])*)+$")
+        pattern = re.compile(r"^(?:[A-z0-9](?:[A-z0-9\-\/]?[A-z0-9])*)+$")
         for package in _packages:
             if pattern.match(package) is None:
                 raise iocage.errors.SecurityViolation(

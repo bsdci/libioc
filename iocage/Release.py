@@ -455,7 +455,7 @@ class ReleaseGenerator(ReleaseResource):
         """Return the sorted list of taken version snapshots (e.g. p3)."""
         versions: typing.List[int] = []
         snapshots: typing.Dict[int, 'libzfs.ZFSSnapshot'] = {}
-        pattern = re.compile("^p(\d+)$")
+        pattern = re.compile(r"^p(\d+)$")
         for snapshot in self.root_dataset.snapshots:
             match = pattern.match(snapshot.snapshot_name)
             if match is None:

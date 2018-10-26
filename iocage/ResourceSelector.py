@@ -35,7 +35,7 @@ class ResourceSelector:
     source_name: typing.Optional[str]
     _name: str
 
-    SOURCE_NAME_PATTERN = re.compile("^[A-Za-z0-9]+((\-|_)?[A-Za-z0-9]+)*$")
+    SOURCE_NAME_PATTERN = re.compile(r"^[A-Za-z0-9]+((\-|_)?[A-Za-z0-9]+)*$")
 
     def __init__(
         self,
