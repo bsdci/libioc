@@ -57,5 +57,5 @@ def cli(
 
     try:
         ioc_jail.promote()
-    except iocage.errors.IocageException as e:
+    except iocage.errors.IocageException:
         exit(1)
