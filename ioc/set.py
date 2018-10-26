@@ -90,9 +90,9 @@ def cli(
         if len(updated_properties) == 0:
             logger.screen(f"Jail '{ioc_jail.humanreadable_name}' unchanged")
         else:
+            _properties = ", ".join(updated_properties)
             logger.screen(
-                f"Jail '{ioc_jail.humanreadable_name}' updated: " +
-                ", ".join(updated_properties)
+                f"Jail '{ioc_jail.humanreadable_name}' updated: {_properties}"
             )
 
         updated_jail_count += 1
