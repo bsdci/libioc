@@ -38,6 +38,23 @@ import iocage.Pkg
 import iocage.Provisioning
 
 
+class PluginUnavailableError(iocage.errors.IocageException):
+    """Raised when an iX iocage plugin is not available."""
+
+    def __init__(
+        self,
+        name: str,
+        reason: str,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
+        msg = f"iX iocage plugin '{name}' is not available: {reason}"
+        iocage.errors.IocageException.__init__(
+            self,
+            message=msg,
+            logger=logger
+        )
+
+
 class PluginDefinition(dict):
     """ix-iocage-plugin definition."""
 
@@ -85,8 +102,9 @@ class PluginDefinition(dict):
         try:
             resource = urllib.request.urlopen(self.__get_url(name))  # nosec
         except urllib.error.HTTPError as e:
-            raise iocage.errors.ProvisioningSourceUnavailable(
+            raise PluginUnavailableError(
                 name=name,
+                reason=str(e),
                 logger=self.logger
             )
         charset = resource.headers.get_content_charset()  # noqa: T484
