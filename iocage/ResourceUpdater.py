@@ -140,6 +140,7 @@ class Updater:
                 dataset=self.resource.dataset
             )
             temporary_jail.config.file = "config_update.json"
+            temporary_jail.config.ignore_host_defaults = True
 
             root_path = temporary_jail.root_path
             destination_dir = f"{root_path}{self.local_release_updates_dir}"

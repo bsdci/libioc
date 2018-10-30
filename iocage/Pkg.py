@@ -433,11 +433,6 @@ class Pkg:
                 "basejail": source_jail.config["basejail"],
                 "release": source_jail.release.name,
                 "exec_start": None,
-                "exec_prestart": None,
-                "exec_poststart": None,
-                "exec_prestop": None,
-                "exec_poststop": None,
-                "exec_timeout": 600,
                 "vnet": False,
                 "ip4_addr": None,
                 "ip6_addr": None,
@@ -452,6 +447,7 @@ class Pkg:
             host=source_jail.host,
             dataset=source_jail.dataset
         )
+        temporary_jail.config.ignore_host_defaults = True
 
         root_path = temporary_jail.root_path
         destination_dir = f"{root_path}{self.package_source_directory}"
