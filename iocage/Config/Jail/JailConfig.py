@@ -37,6 +37,7 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
     legacy: bool = False
     jail: typing.Optional['iocage.Jail.JailGenerator']
     data: dict = {}
+    ignore_host_defaults: bool = False
 
     def __init__(
         self,
@@ -136,6 +137,8 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
         try:
             return super().__getitem__(key)
         except KeyError:
+            if self.ignore_host_defaults is True:
+                raise
             pass
 
         # fall back to default
