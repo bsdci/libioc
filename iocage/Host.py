@@ -176,6 +176,20 @@ class HostGenerator:
         _sysctl = sysctl.filter("net.inet.ip.fw.enable")
         return ((len(_sysctl) == 1) and (_sysctl[0].value == 1))
 
+    @property
+    def rc_conf(self):
+        """Return the hosts rc.conf wrapper object."""
+        try:
+            return self._rc_conf
+        except AttributeError:
+            pass
+
+        import iocage.Config.Jail.File.RCConf
+        self._rc_conf = iocage.Config.Jail.File.RCConf.RCConf(
+            logger=self.logger
+        )
+        return self._rc_conf
+
 
 class Host(HostGenerator):
     """Synchronous wrapper of HostGenerator."""
