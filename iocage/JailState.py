@@ -98,7 +98,6 @@ class JailState(dict):
             return self._query_list()
 
     def _query_libxo(self) -> typing.Dict[str, str]:
-        data: typing.Dict[str, str] = {}
         stdout, _, returncode = iocage.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -116,12 +115,11 @@ class JailState(dict):
             self.clear()
             return {}
 
-        new_state = _parse_json(stdout)[self.name]
-        self._data = new_state.data
-        return data
+        data = _parse_json(stdout)[self.name]._data
+        self._data = data
+        return data if (data is not None) else {}
 
     def _query_list(self) -> typing.Dict[str, str]:
-        data: typing.Dict[str, str] = {}
         stdout, _, returncode = iocage.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -140,9 +138,9 @@ class JailState(dict):
             self.clear()
             return {}
 
-        new_state = _parse(stdout)[self.name]
-        self._data = new_state.data
-        return data
+        data = _parse(stdout)[self.name]._data
+        self._data = data
+        return data if (data is not None) else {}
 
     @property
     def data(self) -> typing.Dict[str, str]:
