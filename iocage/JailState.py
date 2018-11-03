@@ -178,7 +178,6 @@ class JailState(dict):
 class JailStates(dict):
     """A dictionary of JailStates."""
 
-    logger: typing.Optional['iocage.Logger.Logger']
     queried: bool
 
     def __init__(
@@ -195,21 +194,24 @@ class JailStates(dict):
 
     def query(
         self,
-        logger: 'iocage.Logger.Logger'=None
+        logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:
         """Invoke update of the jail state from jls output."""
         if logger is not None:
             logger.verbose("Querying all running jails status")
         try:
             if _get_userland_version() >= 11:
-                self._query_libxo()
+                self._query_libxo(logger=logger)
             else:
-                self._query_list()
+                self._query_list(logger=logger)
         except BaseException:
             raise iocage.errors.JailStateUpdateFailed()
         self.queried = True
 
-    def _query_libxo(self) -> None:
+    def _query_libxo(
+        self,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
         stdout, _, returncode = iocage.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -218,7 +220,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=self.logger
+            logger=logger
         )
 
         if returncode > 0:
@@ -229,7 +231,10 @@ class JailStates(dict):
         for name in output_data:
             dict.__setitem__(self, name, output_data[name])
 
-    def _query_list(self) -> None:
+    def _query_list(
+        self,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
         stdout, _, returncode = iocage.helpers.exec(
             [
                 "/usr/sbin/jls",
@@ -239,7 +244,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=self.logger
+            logger=logger
         )
 
         if returncode > 0:
