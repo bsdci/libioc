@@ -147,9 +147,9 @@ class JailState(dict):
     @property
     def data(self) -> typing.Dict[str, str]:
         """Return the jail state data that was previously queried."""
-        if self._data is None:
-            self._data = self.query()
-        return self._data
+        if self._data is not None:
+            return self._data
+        return self.query()
 
     def clear(self) -> None:
         """Clear the jail state."""
