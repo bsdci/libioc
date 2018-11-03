@@ -109,7 +109,7 @@ class JailState(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=None
+            logger=self.logger
         )
 
         if returncode > 0:
@@ -133,7 +133,7 @@ class JailState(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=None
+            logger=self.logger
         )
 
         if returncode > 0:
@@ -220,7 +220,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=None
+            logger=self.logger
         )
 
         if returncode > 0:
@@ -241,7 +241,7 @@ class JailStates(dict):
             ],
             stderr=subprocess.DEVNULL,
             ignore_error=True,
-            logger=None
+            logger=self.logger
         )
 
         if returncode > 0:
