@@ -116,8 +116,8 @@ class JailState(dict):
             self.clear()
             return {}
 
-        data = _parse_json(stdout)[self.name]
-        self._data = data
+        new_state = _parse_json(stdout)[self.name]
+        self._data = new_state.data
         return data
 
     def _query_list(self) -> typing.Dict[str, str]:
@@ -140,8 +140,8 @@ class JailState(dict):
             self.clear()
             return {}
 
-        data = _parse(stdout)[self.name]
-        self._data = data
+        new_state = _parse(stdout)[self.name]
+        self._data = new_state.data
         return data
 
     @property
