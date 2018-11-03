@@ -170,7 +170,7 @@ class JailState(dict):
         if self._data is None:
             return "None"
         else:
-            return str(iocage.helpers.to_json(self._data))
+            return str(iocage.helpers.to_json(self.data))
 
     def keys(self) -> typing.List[str]:  # noqa: T484
         """Return all available jail state keys."""
