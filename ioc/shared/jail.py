@@ -49,7 +49,7 @@ def get_jail(
 
 def set_properties(
     properties: typing.Iterable[str],
-    target: 'iocage.LaunchableResource.LaunchableResource'
+    target: 'iocage.Resource.Launchable.LaunchableResource'
 ) -> set:
     """Set a bunch of jail properties from a Click option tuple."""
     updated_properties = set()

@@ -121,7 +121,7 @@ def _lookup_config_value(
 
 
 def _lookup_jail_value(
-    resource: 'iocage.LaunchableResource.LaunchableResource',
+    resource: 'iocage.Resource.Launchable.LaunchableResource',
     key: str
 ) -> str:
 

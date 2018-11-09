@@ -33,7 +33,7 @@ import libzfs
 import iocage.events
 import iocage.helpers
 import iocage.helpers_object
-import iocage.LaunchableResource
+import iocage.Resource.Launchable
 
 _PkgConfDataType = typing.Union[
     str, int, bool,

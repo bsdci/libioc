@@ -28,7 +28,7 @@ import os.path
 
 import iocage.helpers
 import iocage.helpers_object
-import iocage.LaunchableResource
+import iocage.Resource.Launchable
 
 
 class ResourceConfig:
@@ -37,7 +37,7 @@ class ResourceConfig:
     def _require_path_relative_to_resource(
         self,
         filepath: str,
-        resource: 'iocage.LaunchableResource.LaunchableResource'
+        resource: 'iocage.Resource.Launchable.LaunchableResource'
     ) -> None:
 
         if self._is_path_relative_to_resource(filepath, resource) is False:
@@ -48,7 +48,7 @@ class ResourceConfig:
     def _is_path_relative_to_resource(
         self,
         filepath: str,
-        resource: 'iocage.LaunchableResource.LaunchableResource'
+        resource: 'iocage.Resource.Launchable.LaunchableResource'
     ) -> bool:
 
         real_resource_path = self._resolve_path(resource.dataset.mountpoint)
@@ -226,7 +226,7 @@ class ResourceConfigFile(ConfigFile, ResourceConfig):
 
     def __init__(
         self,
-        resource: 'iocage.LaunchableResource.LaunchableResource',
+        resource: 'iocage.Resource.Launchable.LaunchableResource',
         file: typing.Optional[str]=None,
         logger: typing.Optional['iocage.Logger.Logger']=None
     ) -> None:

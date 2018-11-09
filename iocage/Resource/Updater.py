@@ -48,7 +48,7 @@ class Updater:
 
     def __init__(
         self,
-        resource: 'iocage.LaunchableResource.LaunchableResource',
+        resource: 'iocage.Resource.Launchable.LaunchableResource',
         host: 'iocage.Host.HostGenerator'
     ) -> None:
         self.resource = resource

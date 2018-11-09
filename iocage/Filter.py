@@ -29,13 +29,12 @@ import typing
 import iocage.errors
 import iocage.helpers
 import iocage.Resource
-import iocage.ResourceSelector
+import iocage.Resource.Selector
 
-_ResourceSelector = iocage.ResourceSelector.ResourceSelector
 _TermValuesType = typing.Union[
     str,
     typing.List[str],
-    iocage.ResourceSelector.ResourceSelector
+    'iocage.Resource.Selector.ResourceSelector'
 ]
 
 _REGEX_PATTERN_SPLIT_COMMA = re.compile(r"(?<!\\),")
@@ -69,7 +68,7 @@ class Term(list):
             data = self._split_filter_values(values)
         elif isinstance(values, list):
             data = values
-        elif isinstance(values, _ResourceSelector):
+        elif isinstance(values, iocage.Resource.Selector.ResourceSelector):
             data = [values]
         elif values is None:
             data = []
@@ -109,6 +108,7 @@ class Term(list):
             return any(map(self.matches, value))
 
         input_value = iocage.helpers.to_string(value)
+        _ResourceSelector = iocage.Resource.Selector.ResourceSelector
 
         for filter_value in self:
 
@@ -312,7 +312,7 @@ class Terms(list):
             value = user_input
 
         if prop == "name":
-            value = [iocage.ResourceSelector.ResourceSelector(
+            value = [iocage.Resource.Selector.ResourceSelector(
                 partial_value,
                 logger=self.logger
             ) for partial_value in re.split(

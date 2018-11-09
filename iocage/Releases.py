@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Model of multiple iocage Releases."""
 import iocage.Release
-import iocage.ListableResource
+import iocage.Resource.Listable
 import iocage.Filter
 import iocage.helpers_object
 
@@ -35,7 +35,7 @@ import libzfs
 ReleaseListType = typing.List['iocage.Release.ReleaseGenerator']
 
 
-class ReleasesGenerator(iocage.ListableResource.ListableResource):
+class ReleasesGenerator(iocage.Resource.Listable.ListableResource):
     """Generator Model of multiple iocage Releases."""
 
     host: 'iocage.Host.HostGenerator'
@@ -54,7 +54,7 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.host = iocage.helpers_object.init_host(self, host)
 
-        iocage.ListableResource.ListableResource.__init__(
+        iocage.Resource.Listable.ListableResource.__init__(
             self,
             sources=self.host.datasets,
             namespace="releases",
@@ -70,7 +70,7 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
     @property
     def local(self) -> ReleaseListType:
         """Return the locally available releases."""
-        datasets = iocage.ListableResource.ListableResource.__iter__(self)
+        datasets = iocage.Resource.Listable.ListableResource.__iter__(self)
         return list(map(
             lambda x: self._class_release(  # noqa: T484
                 name=x.name.split("/").pop(),

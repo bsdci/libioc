@@ -32,7 +32,7 @@ import iocage.Logger
 import iocage.Host
 import iocage.Datasets
 import iocage.Resource
-import iocage.ListableResource
+import iocage.Resource.Listable
 import iocage.Jails
 import iocage.Releases
 
@@ -162,7 +162,7 @@ def cli(
 def _print_table(
     resources: typing.Generator[
         typing.Union[
-            iocage.ListableResource.ListableResource,
+            iocage.Resource.Listable.ListableResource,
             typing.List[typing.Dict[str, str]]
         ],
         None,
@@ -183,7 +183,7 @@ def _print_table(
 def _print_list(
     resources: typing.Generator[
         typing.Union[
-            iocage.ListableResource.ListableResource,
+            iocage.Resource.Listable.ListableResource,
             typing.List[typing.Dict[str, str]]
         ],
         None,
@@ -204,7 +204,7 @@ def _print_list(
 def _print_json(
     resources: typing.Generator[
         typing.Union[
-            iocage.ListableResource.ListableResource,
+            iocage.Resource.Listable.ListableResource,
             typing.List[typing.Dict[str, str]]
         ],
         None,

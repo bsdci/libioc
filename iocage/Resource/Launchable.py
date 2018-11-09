@@ -28,7 +28,7 @@ import typing
 
 import iocage.helpers_object
 import iocage.Resource
-import iocage.ResourceBackup
+import iocage.Resource.Backup
 
 
 class LaunchableResource(iocage.Resource.Resource):
@@ -45,7 +45,7 @@ class LaunchableResource(iocage.Resource.Resource):
         'iocage.ResourceUpdater.LaunchableResourceUpdate'
     ]
     _backup: typing.Optional[
-        'iocage.ResourceBackup.LaunchableResourceBackup'
+        'iocage.Resource.Backup.LaunchableResourceBackup'
     ]
     config: 'iocage.Config.Jail.JailConfig.JailConfig'
 
@@ -101,7 +101,7 @@ class LaunchableResource(iocage.Resource.Resource):
         if self._backup is not None:
             return self._backup
 
-        backup = iocage.ResourceBackup.LaunchableResourceBackup(
+        backup = iocage.Resource.Backup.LaunchableResourceBackup(
             resource=self
         )
         self._backup = backup

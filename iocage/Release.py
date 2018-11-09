@@ -38,8 +38,8 @@ import iocage.errors
 import iocage.helpers
 import iocage.helpers_object
 import iocage.events
-import iocage.LaunchableResource
-import iocage.ResourceSelector
+import iocage.Resource.Launchable
+import iocage.Resource.Selector
 import iocage.Jail
 import iocage.SecureTarfile
 
@@ -51,7 +51,7 @@ import iocage.Config.Jail.File.RCConf
 import iocage.Config.Jail.File.SysctlConf
 
 
-class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
+class ReleaseResource(iocage.Resource.Launchable.LaunchableResource):
     """Resource that represents an iocage release."""
 
     _release: typing.Optional['ReleaseGenerator']
@@ -75,7 +75,7 @@ class ReleaseResource(iocage.LaunchableResource.LaunchableResource):
         self.host = iocage.helpers_object.init_host(self, host)
         self.root_datasets_name = root_datasets_name
 
-        iocage.LaunchableResource.LaunchableResource.__init__(
+        iocage.Resource.Launchable.LaunchableResource.__init__(
             self,
             dataset=dataset,
             dataset_name=dataset_name,
@@ -256,7 +256,7 @@ class ReleaseGenerator(ReleaseResource):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.host = iocage.helpers_object.init_host(self, host)
 
-        resource_selector = iocage.ResourceSelector.ResourceSelector(
+        resource_selector = iocage.Resource.Selector.ResourceSelector(
             name,
             logger=self.logger
         )

@@ -42,13 +42,13 @@ class LaunchableResourceBackup:
     state.
     """
 
-    resource: 'iocage.LaunchableResource.LaunchableResource'
+    resource: 'iocage.Resource.Launchable.LaunchableResource'
     _temp_dir: typing.Optional[tempfile.TemporaryDirectory]
     _snapshot_name: typing.Optional[str]
 
     def __init__(
         self,
-        resource: 'iocage.LaunchableResource.LaunchableResource'
+        resource: 'iocage.Resource.Launchable.LaunchableResource'
     ) -> None:
         self.resource = resource
         self._temp_dir = None
