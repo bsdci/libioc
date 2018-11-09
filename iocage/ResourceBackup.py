@@ -43,7 +43,7 @@ class LaunchableResourceBackup:
     """
 
     resource: 'iocage.LaunchableResource.LaunchableResource'
-    _temp_dir: typing.Optional[tempfile.TemporaryDirectory]
+    _work_dir: typing.Optional[tempfile.TemporaryDirectory]
     _snapshot_name: typing.Optional[str]
 
     def __init__(
@@ -51,7 +51,7 @@ class LaunchableResourceBackup:
         resource: 'iocage.LaunchableResource.LaunchableResource'
     ) -> None:
         self.resource = resource
-        self._temp_dir = None
+        self._work_dir = None
         self._snapshot_name = None
 
     @property
@@ -65,10 +65,10 @@ class LaunchableResourceBackup:
         return self.resource.zfs
 
     @property
-    def temp_dir(self) -> str:
+    def work_dir(self) -> str:
         """Return the absolute path to the current temporary directory."""
-        if self._temp_dir is not None:
-            return self._temp_dir.name
+        if self._work_dir is not None:
+            return self._work_dir.name
         raise self.__unlocked_error
 
     @property
@@ -98,22 +98,22 @@ class LaunchableResourceBackup:
     @property
     def locked(self) -> bool:
         """Return True when a temporary directory exists."""
-        return (self._temp_dir is not None)
+        return (self._work_dir is not None)
 
     def _lock(self) -> None:
         self._require_unlocked()
-        temp_dir = tempfile.TemporaryDirectory()
+        work_dir = tempfile.TemporaryDirectory()
         self.logger.spam(
-            f"Resource backup temp directory created: {temp_dir.name}"
+            f"Resource backup temp directory created: {work_dir.name}"
         )
-        self._temp_dir = temp_dir
+        self._work_dir = work_dir
         self._snapshot_name = iocage.ZFS.append_snapshot_datetime("backup")
 
     def _unlock(self) -> None:
-        temp_dir = self.temp_dir
-        self.logger.spam(f"Deleting Resource backup temp directory {temp_dir}")
-        if self._temp_dir is not None:
-            self._temp_dir.cleanup()
+        work_dir = self.work_dir
+        self.logger.spam(f"Deleting Resource backup temp directory {work_dir}")
+        if self._work_dir is not None:
+            self._work_dir.cleanup()
 
     def _require_unlocked(self) -> None:
         if self.locked is False:
@@ -168,11 +168,11 @@ class LaunchableResourceBackup:
 
         # ToDo: Allow importing of releases or empty jails
         config_data = iocage.Config.Type.JSON.ConfigJSON(
-            file=f"{self.temp_dir}/config.json",
+            file=f"{self.work_dir}/config.json",
             logger=self.logger
         ).read()
 
-        is_standalone = os.path.isfile(f"{self.temp_dir}/root.zfs") is True
+        is_standalone = os.path.isfile(f"{self.work_dir}/root.zfs") is True
         has_release = ("release" in config_data.keys()) is True
 
         try:
@@ -208,7 +208,7 @@ class LaunchableResourceBackup:
 
         extractBundleEvent = iocage.events.ExtractBundle(
             source=source,
-            destination=self.temp_dir,
+            destination=self.work_dir,
             resource=self.resource,
             scope=event_scope
         )
@@ -217,7 +217,7 @@ class LaunchableResourceBackup:
             iocage.SecureTarfile.extract(
                 file=source,
                 compression_format="gz",
-                destination=self.temp_dir,
+                destination=self.work_dir,
                 logger=self.logger
             )
         except Exception as e:
@@ -261,7 +261,7 @@ class LaunchableResourceBackup:
         )
         yield importFstabEvent.begin()
 
-        fstab_file_path = f"{self.temp_dir}/fstab"
+        fstab_file_path = f"{self.work_dir}/fstab"
         if os.path.isfile(fstab_file_path) is False:
             yield importFstabEvent.skip()
             return
@@ -296,7 +296,7 @@ class LaunchableResourceBackup:
         yield importRootDatasetEvent.begin()
 
         try:
-            temp_root_dir = f"{self.temp_dir}/root"
+            temp_root_dir = f"{self.work_dir}/root"
             self.logger.verbose(
                 f"Importing root dataset data from {temp_root_dir}"
             )
@@ -327,7 +327,7 @@ class LaunchableResourceBackup:
         hasImportedOtherDatasets = False
 
         for dataset_name in self._list_importable_datasets():
-            absolute_asset_name = f"{self.temp_dir}/{dataset_name}.zfs"
+            absolute_asset_name = f"{self.work_dir}/{dataset_name}.zfs"
             importOtherDatasetEvent = iocage.events.ImportOtherDataset(
                 dataset_name=dataset_name,
                 resource=self.resource,
@@ -357,16 +357,16 @@ class LaunchableResourceBackup:
     ) -> typing.List[str]:
 
         if current_directory is None:
-            current_directory = self.temp_dir
+            current_directory = self.work_dir
 
         suffix = ".zfs"
 
         files: typing.List[str] = []
         current_files = os.listdir(current_directory)
         for current_file in current_files:
-            if current_file == f"{self.temp_dir}/root":
+            if current_file == f"{self.work_dir}/root":
                 continue
-            if current_file == f"{self.temp_dir}/fstab":
+            if current_file == f"{self.work_dir}/fstab":
                 continue
             if os.path.isdir(current_file):
                 nested_files = self._list_importable_datasets(current_file)
@@ -480,7 +480,7 @@ class LaunchableResourceBackup:
 
         try:
             temp_config = iocage.Config.Type.JSON.ConfigJSON(
-                file=f"{self.temp_dir}/config.json",
+                file=f"{self.work_dir}/config.json",
                 logger=self.logger
             )
             temp_config.data = self.resource.config.data
@@ -510,7 +510,7 @@ class LaunchableResourceBackup:
                 host=self.resource.host
             )
             fstab.read_file()
-            fstab.file = f"{self.temp_dir}/fstab"
+            fstab.file = f"{self.work_dir}/fstab"
             fstab.replace_path(
                 self.resource.dataset.mountpoint,
                 "backup:///"
@@ -535,7 +535,7 @@ class LaunchableResourceBackup:
         yield exportRootDatasetEvent.begin()
 
         try:
-            temp_root_dir = f"{self.temp_dir}/root"
+            temp_root_dir = f"{self.work_dir}/root"
             compare_dest = "/".join([
                 self.resource.release.root_dataset.mountpoint,
                 f".zfs/snapshot/{self.resource.release_snapshot.snapshot_name}"
@@ -624,7 +624,7 @@ class LaunchableResourceBackup:
         name_fragments = relative_name.split("/")
         minor_dataset_name = name_fragments.pop()
         relative_dir_name = "/".join(name_fragments)
-        absolute_dir_name = f"{self.temp_dir}/{relative_dir_name}".rstrip("/")
+        absolute_dir_name = f"{self.work_dir}/{relative_dir_name}".rstrip("/")
         absolute_asset_name = f"{absolute_dir_name}/{minor_dataset_name}.zfs"
 
         if os.path.isdir(absolute_dir_name) is False:
@@ -657,7 +657,7 @@ class LaunchableResourceBackup:
         try:
             self.logger.verbose(f"Bundling backup to {destination}")
             tar = tarfile.open(destination, "w:gz")
-            tar.add(self.temp_dir, arcname=".")
+            tar.add(self.work_dir, arcname=".")
             tar.close()
         except iocage.errors.IocageException as e:
             yield bundleBackupEvent.fail(e)
