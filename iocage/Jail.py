@@ -41,11 +41,11 @@ import iocage.DevfsRules
 import iocage.Host
 import iocage.Config.Jail.JailConfig
 import iocage.Network
-import iocage.NullFSBasejailStorage
 import iocage.Release
-import iocage.StandaloneJailStorage
 import iocage.Storage
-import iocage.ZFSBasejailStorage
+import iocage.Storage.NullFSBasejail
+import iocage.Storage.Standalone
+import iocage.Storage.ZFSBasejail
 import iocage.ZFSShareStorage
 import iocage.LaunchableResource
 import iocage.VersionedResource
@@ -1383,11 +1383,11 @@ class JailGenerator(JailResource):
         to its configuration.
         """
         if not self.is_basejail:
-            return iocage.StandaloneJailStorage.StandaloneJailStorage
+            return iocage.Storage.Standalone.StandaloneJailStorage
         if self.config["basejail_type"] == "nullfs":
-            return iocage.NullFSBasejailStorage.NullFSBasejailStorage
+            return iocage.Storage.NullFSBasejail.NullFSBasejailStorage
         if self.config["basejail_type"] == "zfs":
-            return iocage.ZFSBasejailStorage.ZFSBasejailStorage
+            return iocage.Storage.ZFSBasejail.ZFSBasejailStorage
 
     def save(self) -> None:
         """Permanently save a jail's configuration."""
