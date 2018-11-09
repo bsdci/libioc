@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage NullFS basejail storage backend."""
 import iocage.Storage
-import iocage.StandaloneJailStorage
+import iocage.Storage.Standalone
 import iocage.helpers
 
 
@@ -37,7 +37,7 @@ class NullFSBasejailStorage(iocage.Storage.Storage):
 
     def setup(self, release):
         """Prepare the jail storage."""
-        iocage.StandaloneJailStorage.StandaloneJailStorage.setup(
+        iocage.Storage.Standalone.StandaloneJailStorage.setup(
             self,
             release
         )
