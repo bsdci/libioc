@@ -2019,7 +2019,7 @@ class JailGenerator(JailResource):
         if (text is None) or (len(text) == 0):
             raise iocage.errors.JailNotSupplied(logger=self.logger)
 
-        resource_selector = iocage.Resource.Selector.ResourceSelector(
+        resource_selector = iocage.Resource.Selector(
             name=text,
             logger=self.logger
         )

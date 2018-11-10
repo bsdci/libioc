@@ -29,7 +29,7 @@ import re
 import iocage.Datasets
 
 
-class ResourceSelector:
+class Selector:
     """Parse and wrap resource selectors."""
 
     source_name: typing.Optional[str]

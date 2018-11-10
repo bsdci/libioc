@@ -34,7 +34,7 @@ import iocage.Resource.Selector
 _TermValuesType = typing.Union[
     str,
     typing.List[str],
-    'iocage.Resource.Selector.ResourceSelector'
+    'iocage.Resource.Selector'
 ]
 
 _REGEX_PATTERN_SPLIT_COMMA = re.compile(r"(?<!\\),")
@@ -68,7 +68,7 @@ class Term(list):
             data = self._split_filter_values(values)
         elif isinstance(values, list):
             data = values
-        elif isinstance(values, iocage.Resource.Selector.ResourceSelector):
+        elif isinstance(values, iocage.Resource.Selector):
             data = [values]
         elif values is None:
             data = []
@@ -108,14 +108,15 @@ class Term(list):
             return any(map(self.matches, value))
 
         input_value = iocage.helpers.to_string(value)
-        _ResourceSelector = iocage.Resource.Selector.ResourceSelector
+        _ResourceSelector = iocage.Resource.Selector
+        print(_ResourceSelector, type(_ResourceSelector))
 
         for filter_value in self:
 
             if isinstance(filter_value, str):
                 if self._match_filter(input_value, filter_value, short):
                     return True
-            elif isinstance(filter_value, _ResourceSelector):
+            elif isinstance(filter_value, iocage.Resource.Selector):
                 if self._match_filter(input_value, filter_value.name, short):
                     return True
             elif isinstance(filter_value, list):
@@ -312,7 +313,7 @@ class Terms(list):
             value = user_input
 
         if prop == "name":
-            value = [iocage.Resource.Selector.ResourceSelector(
+            value = [iocage.Resource.Selector(
                 partial_value,
                 logger=self.logger
             ) for partial_value in re.split(

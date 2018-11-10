@@ -256,7 +256,7 @@ class ReleaseGenerator(ReleaseResource):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.host = iocage.helpers_object.init_host(self, host)
 
-        resource_selector = iocage.Resource.Selector.ResourceSelector(
+        resource_selector = iocage.Resource.Selector(
             name,
             logger=self.logger
         )
