@@ -47,16 +47,16 @@ import iocage.StandaloneJailStorage
 import iocage.Storage
 import iocage.ZFSBasejailStorage
 import iocage.ZFSShareStorage
-import iocage.LaunchableResource
-import iocage.VersionedResource
+import iocage.Resource.Launchable
+import iocage.Resource.Versioned
 import iocage.Config.Jail.Properties.ResourceLimit
-import iocage.ResourceSelector
+import iocage.Resource.Selector
 import iocage.Config.Jail.File.Fstab
 
 
 class JailResource(
-    iocage.LaunchableResource.LaunchableResource,
-    iocage.VersionedResource.VersionedResource
+    iocage.Resource.Launchable.LaunchableResource,
+    iocage.Resource.Versioned.VersionedResource
 ):
     """Resource that represents a jail."""
 
@@ -88,7 +88,7 @@ class JailResource(
         if jail is not None:
             self._jail = jail
 
-        iocage.LaunchableResource.LaunchableResource.__init__(
+        iocage.Resource.Launchable.LaunchableResource.__init__(
             self,
             dataset=dataset,
             dataset_name=dataset_name,
@@ -2019,7 +2019,7 @@ class JailGenerator(JailResource):
         if (text is None) or (len(text) == 0):
             raise iocage.errors.JailNotSupplied(logger=self.logger)
 
-        resource_selector = iocage.ResourceSelector.ResourceSelector(
+        resource_selector = iocage.Resource.Selector(
             name=text,
             logger=self.logger
         )

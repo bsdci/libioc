@@ -28,11 +28,11 @@ import typing
 
 import iocage.Jail
 import iocage.Filter
-import iocage.ListableResource
+import iocage.Resource.Listable
 import iocage.helpers_object
 
 
-class JailsGenerator(iocage.ListableResource.ListableResource):
+class JailsGenerator(iocage.Resource.Listable.ListableResource):
     """Asynchronous representation of a collection of jails."""
 
     states = iocage.JailState.JailStates()
@@ -58,7 +58,7 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.host = iocage.helpers_object.init_host(self, host)
 
-        iocage.ListableResource.ListableResource.__init__(
+        iocage.Resource.Listable.ListableResource.__init__(
             self,
             sources=self.host.datasets,
             namespace="jails",
@@ -101,7 +101,7 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
         if self.states.queried is False:
             self.states.query(logger=self.logger)
 
-        iterator = iocage.ListableResource.ListableResource.__iter__(self)
+        iterator = iocage.Resource.Listable.ListableResource.__iter__(self)
         for jail in iterator:
 
             if jail.identifier in self.states:
