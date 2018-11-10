@@ -89,6 +89,7 @@ class HostGenerator:
         else:
             self.datasets = iocage.Datasets.Datasets(
                 logger=self.logger,
+                host=self,
                 zfs=self.zfs
             )
 

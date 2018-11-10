@@ -2024,7 +2024,7 @@ class JailGenerator(JailResource):
             logger=self.logger
         )
 
-        root_datasets = resource_selector.filter_datasets(self.host.datasets)
+        root_datasets = resource_selector.filter_datasets(self.host)
 
         for datasets_key, datasets in root_datasets.items():
             for dataset in list(datasets.jails.children):

@@ -493,6 +493,7 @@ class FilteredDatasets(Datasets):
 
         self.logger = iocage.helpers_object.init_logger(self, logger)
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
+        self.host = iocage.helpers_object.init_host(self, host)
         self.datasets = datasets
 
         self._source_filters = None
@@ -521,13 +522,14 @@ class FilteredDatasets(Datasets):
 
 
 def filter_datasets(
-    datasets: Datasets,
+    host: iocage.Host.HostGenerator,
     sources: OptionalSourceFilterType
 ) -> FilteredDatasets:
     """Return FilteredDatasets by a tuple of sources."""
     return FilteredDatasets(
-        datasets=datasets,
+        datasets=host.datasets,
         source_filters=sources,
+        host=host,
         zfs=datasets.zfs,
         logger=datasets.logger
     )
