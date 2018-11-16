@@ -78,6 +78,9 @@ class DefaultrouterMixin:
         if isinstance(data, str) is True:
             data = iocage.helpers.parse_user_input(data)
 
+        if isinstance(data, (ipaddress.IPv4Address, ipaddress.IPv6Address)):
+            data = data._ip
+
         if data is None:
             gateway = None
             self._ip = None

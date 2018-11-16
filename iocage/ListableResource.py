@@ -25,6 +25,7 @@
 """iocage Resource module."""
 import typing
 import libzfs
+import itertools
 import abc
 
 import iocage.Filter
@@ -42,7 +43,7 @@ class ListableResource(list):
     def __init__(
         self,
         sources: 'iocage.Datasets.Datasets',
-        namespace: typing.Optional[str]=None,
+        namespace: typing.Optional[typing.Union[list, str]]=None,
         filters: typing.Optional['iocage.Filter.Terms']=None,
         logger: typing.Optional['iocage.Logger.Logger']=None,
         zfs: typing.Optional['iocage.ZFS.ZFS']=None,
@@ -53,6 +54,8 @@ class ListableResource(list):
         self.logger = iocage.helpers_object.init_logger(self, logger)
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
 
+        if isinstance(namespace, str):
+            namespace = [namespace]
         self.namespace = namespace
         self.sources = sources
         self.filters = filters
@@ -81,7 +84,7 @@ class ListableResource(list):
         self
     ) -> typing.Generator['iocage.Resource.Resource', None, None]:
         """Return an iterator over the child datasets."""
-        if self.namespace is None:
+        if not self.namespace:
             raise iocage.errors.ListableResourceNamespaceUndefined(
                 logger=self.logger
             )
@@ -94,8 +97,12 @@ class ListableResource(list):
                 if (filters.match_source(root_name) is False):
                     # skip when the resources defined source does not match
                     continue
-            children = root_datasets.__getattribute__(self.namespace).children
-            for child_dataset in children:
+
+            children = [
+                root_datasets.__getattribute__(n).children
+                for n in self.namespace
+            ]
+            for child_dataset in itertools.chain(*children):
                 name = self._get_asset_name_from_dataset(child_dataset)
                 if has_filters and (filters.match_key("name", name) is False):
                         # Skip all jails that do not even match the name

@@ -61,7 +61,7 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
         iocage.ListableResource.ListableResource.__init__(
             self,
             sources=self.host.datasets,
-            namespace="jails",
+            namespace=["jails", "templates"],
             filters=filters,
             zfs=zfs,
             logger=logger
