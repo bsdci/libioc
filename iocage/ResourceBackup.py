@@ -547,8 +547,9 @@ class LaunchableResourceBackup:
                 distribution_name=self.resource.host.distribution.name
             )
             for basedir in basedirs:
+                _exclude = f"{self.resource.root_dataset.mountpoint}/{basedir}"
                 excludes.append("--exclude")
-                excludes.append(basedir)
+                excludes.append(_exclude)
 
             self.logger.verbose(
                 f"Writing root dataset delta to {temp_root_dir}"
