@@ -427,6 +427,7 @@ class JailGenerator(JailResource):
         single_command: typing.Optional[str]=None,
         event_scope: typing.Optional['iocage.events.Scope']=None,
         dependant_jails_seen: typing.List['JailGenerator']=[],
+        start_dependant_jails: bool=True
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
         """
         Start the jail.
@@ -448,6 +449,10 @@ class JailGenerator(JailResource):
                 When set the jail is launched non-persistent. The startup cycle
                 reduces to the `prestart`, `command` and `poststop` hooks with
                 the singe_command being executed in a /bin/sh context.
+
+            start_dependant_jails (bool):
+
+                When disabled, no dependant jails will be started.
         """
         self.require_jail_existing()
         self.require_jail_stopped()
@@ -464,16 +469,18 @@ class JailGenerator(JailResource):
         jailLaunchEvent = events.JailLaunch(jail=self, scope=event_scope)
 
         dependant_jails_started: typing.List[JailGenerator] = []
-        dependant_jails_seen.append(self)
-        for event in self._start_dependant_jails(
-            self.config["depends"],
-            event_scope=event_scope,
-            dependant_jails_seen=dependant_jails_seen
-        ):
-            if isinstance(event, iocage.events.JailDependantsStart) is True:
-                if event.done and (event.error is None):
-                    dependant_jails_started.extend(event.started_jails)
-            yield event
+        if start_dependant_jails is True:
+            dependant_jails_seen.append(self)
+            DependantsStartEvent = iocage.events.JailDependantsStart
+            for event in self._start_dependant_jails(
+                self.config["depends"],
+                event_scope=event_scope,
+                dependant_jails_seen=dependant_jails_seen
+            ):
+                if isinstance(event, DependantsStartEvent) is True:
+                    if event.done and (event.error is None):
+                        dependant_jails_started.extend(event.started_jails)
+                yield event
 
         self._ensure_script_dir()
         jail_start_script_dir = "".join([
@@ -560,7 +567,9 @@ class JailGenerator(JailResource):
 
         def _stop_failed_jail(
         ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
-            jails_to_stop = [self] + list(reversed(dependant_jails_started))
+            jails_to_stop = [self]
+            if start_dependant_jails is True:
+                jails_to_stop.extend(list(reversed(dependant_jails_started)))
             for jail_to_stop in jails_to_stop:
                 yield from jail_to_stop.stop(
                     force=True,
