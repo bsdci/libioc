@@ -218,8 +218,8 @@ class Updater:
 
         _request = urllib.request  # type: ignore
         try:
+            self.logger.verbose(f"Downloading update assets from {url}")
             _request.urlretrieve(url, local)  # nosec: url validated
-            self.logger.verbose(f"Update assets downloaded from {url}")
         except urllib.error.HTTPError as http_error:
             raise iocage.errors.DownloadFailed(
                 url="EOL Warnings",
