@@ -403,6 +403,7 @@ class Updater:
                 jail,
                 self._wrap_command(" ".join(self._update_command), "update"),
                 passthru=False,
+                start_dependant_jails=False,
                 event_scope=_scope
             ):
                 if isinstance(event, iocage.events.JailLaunch) is True:
