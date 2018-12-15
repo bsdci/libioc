@@ -246,9 +246,14 @@ class Updater:
             local=f"{self.host_updates_dir}/{self.update_script_name}"
         )
 
+        if self.release.version_number >= 12:
+            conf_path = f"usr.sbin/{self.update_name}/{self.update_conf_name}"
+        else:
+            conf_path = f"etc/{self.update_conf_name}"
+
         self._download_updater_asset(
             mode=0o644,
-            remote=f"etc/{self.update_conf_name}",
+            remote=conf_path,
             local=f"{self.host_updates_dir}/{self.update_conf_name}"
         )
 
