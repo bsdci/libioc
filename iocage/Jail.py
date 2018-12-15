@@ -450,6 +450,19 @@ class JailGenerator(JailResource):
                 reduces to the `prestart`, `command` and `poststop` hooks with
                 the singe_command being executed in a /bin/sh context.
 
+            event_scope (iocage.lib.events.Scope): (default=None)
+
+                Provide an existing libiocage event scope or automatically
+                create a new one instead.
+
+            dependant_jails_seen (list[iocage.JailGenerator]):
+
+                Jail depends can have circular dependencies. By passing a list
+                of already started jails to the start command, iocage does not
+                need to query their state, because they are known to be running
+                already. This argument is internally used when starting a jails
+                dependants recursively.
+
             start_dependant_jails (bool):
 
                 When disabled, no dependant jails will be started.
@@ -747,6 +760,7 @@ class JailGenerator(JailResource):
         passthru: bool=False,
         event_scope: typing.Optional['iocage.events.Scope']=None,
         start_dependant_jails: bool=True,
+        dependant_jails_seen: typing.List['JailGenerator']=[],
         **temporary_config_override: typing.Any
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
         """
@@ -755,13 +769,39 @@ class JailGenerator(JailResource):
         Args:
 
             command (string):
-                The command to execute in the jail
 
-            passthru (string):
-                Attach the command to the TTY of the executing process.
+                The command to execute in the jail.
+
+            passthru (bool):
+
+                Execute commands in an interactive shell.
+
+            event_scope (iocage.lib.events.Scope): (default=None)
+
+                Provide an existing libiocage event scope or automatically
+                create a new one instead.
+
+            dependant_jails_seen (list[iocage.JailGenerator]):
+
+                Jail depends can have circular dependencies. By passing a list
+                of already started jails to the start command, iocage does not
+                need to query their state, because they are known to be running
+                already. This argument is internally used when starting a jails
+                dependants recursively.
 
             start_dependant_jails (bool):
-                When disabled, no dependant jails are started.
+
+                When disabled, no dependant jails will be started.
+
+            **temporary_config_override (dict(str, any)):
+
+                Other named arguments temporary override JailConfig properties.
+
+                For example:
+
+                    jail = iocage.JailGenerator("myjail")
+                    events = jail.fork_exec("ifconfig", vnet=False)
+                    print(list(events))
         """
         self.require_jail_existing()
         self.require_jail_stopped()
@@ -785,6 +825,7 @@ class JailGenerator(JailResource):
                 single_command=command,
                 passthru=passthru,
                 event_scope=event_scope,
+                dependant_jails_seen=dependant_jails_seen,
                 start_dependant_jails=start_dependant_jails
             )
             for event in fork_exec_events:
@@ -2253,6 +2294,7 @@ class Jail(JailGenerator):
         command: str,
         passthru: bool=False,
         event_scope: typing.Optional['iocage.events.Scope']=None,
+        dependant_jails_seen: typing.List['JailGenerator']=[],
         start_dependant_jails: bool=True,
         **temporary_config_override
     ) -> str:
@@ -2262,20 +2304,48 @@ class Jail(JailGenerator):
         Args:
 
             command (string):
-                The command to execute in the jail
 
-            passthru (string):
-                Attach the command to the TTY of the executing process.
+                The command to execute in the jail.
+
+            passthru (bool):
+
+                Execute commands in an interactive shell.
+
+            event_scope (iocage.lib.events.Scope): (default=None)
+
+                Provide an existing libiocage event scope or automatically
+                create a new one instead.
+
+            dependant_jails_seen (list[iocage.JailGenerator]):
+
+                Jail depends can have circular dependencies. By passing a list
+                of already started jails to the start command, iocage does not
+                need to query their state, because they are known to be running
+                already. This argument is internally used when starting a jails
+                dependants recursively.
 
             start_dependant_jails (bool):
-                When disabled, not dependant jails are started.
+
+                When disabled, no dependant jails will be started.
+
+            **temporary_config_override (dict(str, any)):
+
+                Other named arguments temporary override JailConfig properties.
+
+                For example:
+
+                    jail = iocage.JailGenerator("myjail")
+                    events = jail.fork_exec("ifconfig", vnet=False)
+                    print(list(events))
         """
         events = JailGenerator.fork_exec(
             self,
             command=command,
             passthru=passthru,
             event_scope=event_scope,
-            start_dependant_jails=start_dependant_jails
+            dependant_jails_seen=dependant_jails_seen,
+            start_dependant_jails=start_dependant_jails,
+            **temporary_config_override
         )
         for event in events:
             if isinstance(event, iocage.events.JailLaunch) and event.done:
