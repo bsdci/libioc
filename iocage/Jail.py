@@ -749,7 +749,20 @@ class JailGenerator(JailResource):
         start_dependant_jails: bool=True,
         **temporary_config_override: typing.Any
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
-        """Start a jail, run a command and shut it down immediately."""
+        """
+        Start a jail, run a command and shut it down immediately.
+
+        Args:
+
+            command (string):
+                The command to execute in the jail
+
+            passthru (string):
+                Attach the command to the TTY of the executing process.
+
+            start_dependant_jails (bool):
+                When disabled, no dependant jails are started.
+        """
         self.require_jail_existing()
         self.require_jail_stopped()
 
