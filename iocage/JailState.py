@@ -151,7 +151,7 @@ class JailState(dict):
 
     def clear(self) -> None:
         """Clear the jail state."""
-        self._data = None
+        self._data = {}
 
     def __getitem__(self, name: str) -> str:
         """Get a value from the jail state."""
