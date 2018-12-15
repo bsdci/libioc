@@ -28,6 +28,7 @@ import os.path
 import re
 import shutil
 import urllib
+import urllib.error
 
 import iocage.events
 import iocage.errors
@@ -215,9 +216,16 @@ class Updater:
         if os.path.isfile(local):
             os.remove(local)
 
-        self.logger.verbose(f"Downloading {url}")
         _request = urllib.request  # type: ignore
-        _request.urlretrieve(url, local)  # nosec: url validated
+        try:
+            _request.urlretrieve(url, local)  # nosec: url validated
+            self.logger.verbose(f"Update assets downloaded from {url}")
+        except urllib.error.HTTPError as http_error:
+            raise iocage.errors.DownloadFailed(
+                url="EOL Warnings",
+                code=http_error.code,
+                logger=self.logger
+            )
         os.chmod(local, mode)
 
         self.logger.debug(
@@ -289,7 +297,6 @@ class Updater:
                     yield releaseUpdatePullEvent.end()
             else:
                 yield releaseUpdatePullEvent.end()
-
         except Exception as e:
             yield releaseUpdatePullEvent.fail(e)
             raise
