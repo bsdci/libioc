@@ -720,8 +720,10 @@ class ReleaseGenerator(ReleaseResource):
             yield releaseConfigurationEvent.skip()
 
         if fetch_updates is True:
-            for event in self.updater.fetch(event_scope=_scope):
-                yield event
+            try:
+                yield from self.updater.fetch(event_scope=_scope)
+            except iocage.errors.IocageException:
+                update = False
 
         if update is True:
             for event in self.updater.apply():

@@ -1062,13 +1062,14 @@ class UpdateFailure(IocageException):
         self,
         name: str,
         reason: typing.Optional[str]=None,
-        logger: typing.Optional['iocage.Logger.Logger']=None
+        logger: typing.Optional['iocage.Logger.Logger']=None,
+        level: str="error"
     ) -> None:
 
         msg = f"Release update of '{name}' failed"
         if reason is not None:
             msg += f": {reason}"
-        super().__init__(message=msg, logger=logger)
+        super().__init__(message=msg, logger=logger, level=level)
 
 
 class InvalidReleaseAssetSignature(UpdateFailure):
