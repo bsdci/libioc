@@ -624,6 +624,8 @@ class ReleaseGenerator(ReleaseResource):
                 logger=self.logger
             )
 
+        iocage.helpers.require_no_symlink(source_file, logger=self.logger)
+
         with open(source_file, "r") as f:
             import ucl
             hbsd_update_conf = ucl.load(f.read())
