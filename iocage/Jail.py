@@ -746,6 +746,7 @@ class JailGenerator(JailResource):
         command: str,
         passthru: bool=False,
         event_scope: typing.Optional['iocage.events.Scope']=None,
+        start_dependant_jails: bool=False,
         **temporary_config_override: typing.Any
     ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
         """Start a jail, run a command and shut it down immediately."""
@@ -770,7 +771,8 @@ class JailGenerator(JailResource):
                 self,
                 single_command=command,
                 passthru=passthru,
-                event_scope=event_scope
+                event_scope=event_scope,
+                start_dependant_jails=start_dependant_jails
             )
             for event in fork_exec_events:
                 yield event
