@@ -2251,13 +2251,31 @@ class Jail(JailGenerator):
     def fork_exec(  # noqa: T484
         self,
         command: str,
+        passthru: bool=False,
+        event_scope: typing.Optional['iocage.events.Scope']=None,
+        start_dependant_jails: bool=True,
         **temporary_config_override
     ) -> str:
-        """Execute a one-shot jail and return its stdout."""
+        """
+        Start a jail, run a command and shut it down immediately.
+
+        Args:
+
+            command (string):
+                The command to execute in the jail
+
+            passthru (string):
+                Attach the command to the TTY of the executing process.
+
+            start_dependant_jails (bool):
+                When disabled, not dependant jails are started.
+        """
         events = JailGenerator.fork_exec(
             self,
             command=command,
-            passthru=False
+            passthru=passthru,
+            event_scope=event_scope,
+            start_dependant_jails=start_dependant_jails
         )
         for event in events:
             if isinstance(event, iocage.events.JailLaunch) and event.done:
