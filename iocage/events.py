@@ -438,6 +438,12 @@ class ReleaseDownload(FetchRelease):
     pass
 
 
+class ReleaseAssetDownload(FetchRelease):
+    """Download release assets."""
+
+    pass
+
+
 class ReleaseExtraction(FetchRelease):
     """Extract a release asset."""
 
