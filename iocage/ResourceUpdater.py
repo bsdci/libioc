@@ -438,7 +438,7 @@ class Updater:
                     yield event
 
         if skipped is True:
-            yield executeResourceUpdateEvent.skip()
+            yield executeResourceUpdateEvent.skip("already up to date")
         else:
             yield executeResourceUpdateEvent.end()
 
