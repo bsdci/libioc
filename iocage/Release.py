@@ -723,7 +723,11 @@ class ReleaseGenerator(ReleaseResource):
 
         if fetch_updates is True:
             try:
-                yield from self.updater.fetch(event_scope=_scope)
+                for event in self.updater.fetch(event_scope=_scope):
+                    if isinstance(event, iocage.events.ReleaseUpdateDownload):
+                        if (event.done and event.skipped) is True:
+                            update = False
+                    yield event
             except iocage.errors.IocageException:
                 update = False
 
