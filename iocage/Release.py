@@ -679,10 +679,13 @@ class ReleaseGenerator(ReleaseResource):
 
             yield releasePrepareStorageEvent.end()
             yield releaseDownloadEvent.begin()
-
-            self._fetch_assets()
-
+            try:
+                yield from self._fetch_assets()
+            except Exception:
+                yield releaseDownloadEvent.fail()
+                raise
             yield releaseDownloadEvent.end()
+
             yield releaseExtractionEvent.begin()
 
             try:
@@ -814,18 +817,34 @@ class ReleaseGenerator(ReleaseResource):
         urllib.request.urlretrieve(url, path)  # nosec: validated in @setter
         self.logger.debug(f"Hashes downloaded to {path}")
 
-    def _fetch_assets(self) -> None:
+    def _fetch_assets(
+        self
+    ) -> typing.Generator['iocage.events.IocageEvent', None, None]:
         for asset in self.assets:
+
+            releaseAssetDownloadEvent = iocage.events.ReleaseAssetDownload(
+                release=self
+            )
+            yield releaseAssetDownloadEvent.begin()
             url = f"{self.remote_url}/{asset}.txz"
             path = self._get_asset_location(asset)
 
             if os.path.isfile(path):
-                self.logger.verbose(f"{path} already exists - skipping.")
-                return
+                yield releaseAssetDownloadEvent.skip("{path} already exists")
             else:
-                self.logger.debug(f"Starting download of {url}")
-                urllib.request.urlretrieve(url, path)  # nosec: validated
-                self.logger.verbose(f"{url} was saved to {path}")
+                try:
+                    self.logger.debug(f"Starting download of {url}")
+                    urllib.request.urlretrieve(url, path)  # nosec: validated
+                    self.logger.verbose(f"{url} was saved to {path}")
+                    yield releaseAssetDownloadEvent.end()
+                    return
+                except urllib.error.HTTPError as http_error:
+                    yield releaseAssetDownloadEvent.fail()
+                    raise iocage.errors.DownloadFailed(
+                        url=url,
+                        code=http_error.code,
+                        logger=self.logger
+                    )
 
     def read_hashes(self) -> typing.Dict[str, str]:
         """Read the release asset hashes."""
