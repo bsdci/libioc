@@ -231,8 +231,11 @@ class DistributionGenerator:
         self.logger.verbose(f"Downloading EOL info from {self.eol_url}")
         with urllib.request.urlopen(request) as response:  # nosec: B310
 
-            if response.getcode() != 200:  # noqa: T484
-                iocage.errors.DistributionEOLWarningDownloadFailed(
+            response_code = response.getcode()
+            if response_code != 200:  # noqa: T484
+                iocage.errors.DownloadFailed(
+                    topic="EOL Warnings",
+                    code=response_code,
                     logger=self.logger,
                     level="warning"
                 )

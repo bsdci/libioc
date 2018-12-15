@@ -683,15 +683,17 @@ class HostUserlandVersionUnknown(IocageException):
         super().__init__(message=msg, logger=logger)
 
 
-class DistributionEOLWarningDownloadFailed(IocageException):
+class DownloadFailed(IocageException):
     """Raised when downloading EOL warnings failed."""
 
     def __init__(
         self,
+        url: str,
+        code: int,
         logger: typing.Optional['iocage.Logger.Logger']=None,
         level: str="error"
     ) -> None:
-        msg = f"Failed to download the EOL warnings"
+        msg = f"Failed downloading {url}: {code}"
         super().__init__(message=msg, logger=logger, level=level)
 
 
