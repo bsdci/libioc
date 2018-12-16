@@ -28,7 +28,6 @@ import typing
 
 import iocage.errors
 import iocage.helpers
-import iocage.Resource
 import iocage.ResourceSelector
 
 _ResourceSelector = iocage.ResourceSelector.ResourceSelector
