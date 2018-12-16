@@ -466,12 +466,14 @@ class FilteredDatasets(Datasets):
             The Datasets hosts instance
 
         source_filters:
-            No filters were applied when unset. The names contained in the
-            Tuple are matched against the dataset names specified in rc.conf.
+            No filters were applied when unset.
+            The names contained in the Tuple are matched against the
+            dataset names specified in rc.conf.
 
-            For example:
-                echo 'ioc_dataset_main="zroot/iocage"' >> /etc/rc.conf
-                ioc list --source main
+            .. code-block:: console
+
+                $ sysrc ioc_dataset_main="zroot/iocage"
+                $ ioc list --source main
 
         zfs:
             The shared ZFS object.
