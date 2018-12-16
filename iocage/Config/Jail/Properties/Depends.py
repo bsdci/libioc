@@ -26,6 +26,7 @@
 import typing
 
 import iocage.helpers
+import iocage.Filter
 
 
 class DependsProp(iocage.Filter.Terms):
