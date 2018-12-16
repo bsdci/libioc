@@ -101,7 +101,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -111,13 +110,11 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -261,11 +258,27 @@ selecting jails with UUIDs by the first part of the name</li>
 
 <dl class="class">
 <dt id="iocage.Filter.Terms">
-<em class="property">class </em><code class="descclassname">iocage.Filter.</code><code class="descname">Terms</code><span class="sig-paren">(</span><em>terms=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Filter.html#Terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Filter.Terms" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">iocage.Filter.</code><code class="descname">Terms</code><span class="sig-paren">(</span><em>terms=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Filter.html#Terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Filter.Terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>A group of filter terms.</p>
 <p>Each item in this group must match for a resource to pass the filter.
 This can be interpreted as logical AND</p>
+<dl class="method">
+<dt id="iocage.Filter.Terms.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Filter.html#Terms.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Filter.Terms.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a Term to the list of Terms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference internal" href="#iocage.Filter.Term" title="iocage.Filter.Term"><em>iocage.Filter.Term</em></a><em>, </em><em>str</em>) – Interface name inside the jail</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="iocage.Filter.Terms.match_key">
 <code class="descname">match_key</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Filter.html#Terms.match_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Filter.Terms.match_key" title="Permalink to this definition">¶</a></dt>
@@ -310,6 +323,20 @@ Returns Fals if one of the terms does not match</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="iocage.Filter.Terms.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>terms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Filter.html#Terms.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Filter.Terms.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear and set all terms from input data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
@@ -348,7 +375,7 @@ Returns Fals if one of the terms does not match</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -367,20 +394,13 @@ Returns Fals if one of the terms does not match</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

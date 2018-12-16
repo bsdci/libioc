@@ -187,7 +187,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;iocage.LaunchableResource.LaunchableResource&#39;</span>
-    <span class="n">_temp_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span>
+    <span class="n">_work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span>
     <span class="n">_snapshot_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -195,7 +195,7 @@
         <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;iocage.LaunchableResource.LaunchableResource&#39;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
@@ -209,10 +209,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">temp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">work_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the absolute path to the current temporary directory.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">name</span>
         <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unlocked_error</span>
 
     <span class="nd">@property</span>
@@ -242,22 +242,22 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return True when a temporary directory exists.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_unlocked</span><span class="p">()</span>
-        <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
-            <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{temp_dir.name}</span><span class="s2">&quot;</span>
+            <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{work_dir.name}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span> <span class="o">=</span> <span class="n">temp_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="n">work_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ZFS</span><span class="o">.</span><span class="n">append_snapshot_datetime</span><span class="p">(</span><span class="s2">&quot;backup&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting Resource backup temp directory </span><span class="si">{temp_dir}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_temp_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting Resource backup temp directory </span><span class="si">{work_dir}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_require_unlocked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -312,11 +312,11 @@
 
         <span class="c1"># ToDo: Allow importing of releases or empty jails</span>
         <span class="n">config_data</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">JSON</span><span class="o">.</span><span class="n">ConfigJSON</span><span class="p">(</span>
-            <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        <span class="n">is_standalone</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/root.zfs&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="n">is_standalone</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root.zfs&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
         <span class="n">has_release</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;release&quot;</span> <span class="ow">in</span> <span class="n">config_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">True</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -352,7 +352,7 @@
 
         <span class="n">extractBundleEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExtractBundle</span><span class="p">(</span>
             <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-            <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span>
+            <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
             <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
@@ -361,7 +361,7 @@
             <span class="n">iocage</span><span class="o">.</span><span class="n">SecureTarfile</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span>
                 <span class="n">file</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
                 <span class="n">compression_format</span><span class="o">=</span><span class="s2">&quot;gz&quot;</span><span class="p">,</span>
-                <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span>
+                <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -405,7 +405,7 @@
         <span class="p">)</span>
         <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-        <span class="n">fstab_file_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/fstab&quot;</span>
+        <span class="n">fstab_file_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fstab_file_path</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
             <span class="k">return</span>
@@ -440,7 +440,7 @@
         <span class="k">yield</span> <span class="n">importRootDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/root&quot;</span>
+            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
                 <span class="n">f</span><span class="s2">&quot;Importing root dataset data from </span><span class="si">{temp_root_dir}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -471,7 +471,7 @@
         <span class="n">hasImportedOtherDatasets</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">for</span> <span class="n">dataset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_importable_datasets</span><span class="p">():</span>
-            <span class="n">absolute_asset_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/</span><span class="si">{dataset_name}</span><span class="s2">.zfs&quot;</span>
+            <span class="n">absolute_asset_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/</span><span class="si">{dataset_name}</span><span class="s2">.zfs&quot;</span>
             <span class="n">importOtherDatasetEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportOtherDataset</span><span class="p">(</span>
                 <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
                 <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
@@ -501,16 +501,16 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 
         <span class="k">if</span> <span class="n">current_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">current_directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span>
+            <span class="n">current_directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span>
 
         <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;.zfs&quot;</span>
 
         <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">current_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">current_directory</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">current_file</span> <span class="ow">in</span> <span class="n">current_files</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/root&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/fstab&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">current_file</span><span class="p">):</span>
                 <span class="n">nested_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_importable_datasets</span><span class="p">(</span><span class="n">current_file</span><span class="p">)</span>
@@ -624,7 +624,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">temp_config</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">JSON</span><span class="o">.</span><span class="n">ConfigJSON</span><span class="p">(</span>
-                <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
             <span class="n">temp_config</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span>
@@ -654,7 +654,7 @@
                 <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span>
             <span class="p">)</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
-            <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/fstab&quot;</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span>
             <span class="n">fstab</span><span class="o">.</span><span class="n">replace_path</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
                 <span class="s2">&quot;backup:///&quot;</span>
@@ -679,9 +679,21 @@
         <span class="k">yield</span> <span class="n">exportRootDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/root&quot;</span>
-            <span class="n">compare_dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">mountpoint</span>
+            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span>
+            <span class="n">compare_dest</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="n">f</span><span class="s2">&quot;.zfs/snapshot/</span><span class="si">{self.resource.release_snapshot.snapshot_name}</span><span class="s2">&quot;</span>
+            <span class="p">])</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">temp_root_dir</span><span class="p">)</span>
+
+            <span class="n">excludes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">basedirs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_basedir_list</span><span class="p">(</span>
+                <span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">basedir</span> <span class="ow">in</span> <span class="n">basedirs</span><span class="p">:</span>
+                <span class="n">_exclude</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_dataset.mountpoint}</span><span class="s2">/</span><span class="si">{basedir}</span><span class="s2">&quot;</span>
+                <span class="n">excludes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--exclude&quot;</span><span class="p">)</span>
+                <span class="n">excludes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_exclude</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
                 <span class="n">f</span><span class="s2">&quot;Writing root dataset delta to </span><span class="si">{temp_root_dir}</span><span class="s2">&quot;</span>
@@ -692,7 +704,8 @@
                 <span class="s2">&quot;--checksum&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--links&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--hard-links&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;--safe-links&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--safe-links&quot;</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="n">excludes</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="n">f</span><span class="s2">&quot;--compare-dest=</span><span class="si">{compare_dest}</span><span class="s2">/&quot;</span><span class="p">,</span>
                 <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_dataset.mountpoint}</span><span class="s2">/&quot;</span><span class="p">,</span>
                 <span class="n">temp_root_dir</span><span class="p">,</span>
@@ -756,7 +769,7 @@
         <span class="n">name_fragments</span> <span class="o">=</span> <span class="n">relative_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
         <span class="n">minor_dataset_name</span> <span class="o">=</span> <span class="n">name_fragments</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
         <span class="n">relative_dir_name</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name_fragments</span><span class="p">)</span>
-        <span class="n">absolute_dir_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.temp_dir}</span><span class="s2">/</span><span class="si">{relative_dir_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">absolute_dir_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/</span><span class="si">{relative_dir_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
         <span class="n">absolute_asset_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{absolute_dir_name}</span><span class="s2">/</span><span class="si">{minor_dataset_name}</span><span class="s2">.zfs&quot;</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">absolute_dir_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -789,7 +802,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Bundling backup to </span><span class="si">{destination}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;w:gz&quot;</span><span class="p">)</span>
-            <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
             <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">bundleBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -811,7 +824,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -830,20 +843,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

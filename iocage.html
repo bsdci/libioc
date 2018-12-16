@@ -84,6 +84,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Config.html">iocage.Config package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Provisioning.html">iocage.Provisioning package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a><ul>
@@ -105,7 +106,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -115,13 +115,11 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -219,6 +217,7 @@
 <li class="toctree-l6"><a class="reference internal" href="iocage.Config.Jail.Properties.html#submodules">Submodules</a><ul>
 <li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.Addresses.html">iocage.Config.Jail.Properties.Addresses module</a></li>
 <li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.Defaultrouter.html">iocage.Config.Jail.Properties.Defaultrouter module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.Depends.html">iocage.Config.Jail.Properties.Depends module</a></li>
 <li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.Interfaces.html">iocage.Config.Jail.Properties.Interfaces module</a></li>
 <li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.Resolver.html">iocage.Config.Jail.Properties.Resolver module</a></li>
 <li class="toctree-l7"><a class="reference internal" href="iocage.Config.Jail.Properties.ResourceLimit.html">iocage.Config.Jail.Properties.ResourceLimit module</a></li>
@@ -266,6 +265,16 @@
 <li class="toctree-l2"><a class="reference internal" href="iocage.Provisioning.html#module-iocage.Provisioning">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="iocage.Storage.html">iocage.Storage package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="iocage.Storage.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.NullFSBasejail.html">iocage.Storage.NullFSBasejail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.Standalone.html">iocage.Storage.Standalone module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.ZFSBasejail.html">iocage.Storage.ZFSBasejail module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iocage.Storage.html#module-iocage.Storage">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -291,7 +300,6 @@
 <li class="toctree-l1"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -301,13 +309,11 @@
 <li class="toctree-l1"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -340,7 +346,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -359,20 +365,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

@@ -172,7 +172,6 @@
 
 <span class="kn">import</span> <span class="nn">iocage.errors</span>
 <span class="kn">import</span> <span class="nn">iocage.helpers</span>
-<span class="kn">import</span> <span class="nn">iocage.Resource</span>
 <span class="kn">import</span> <span class="nn">iocage.ResourceSelector</span>
 
 <span class="n">_ResourceSelector</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span>
@@ -181,6 +180,8 @@
     <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span>
 <span class="p">]</span>
+
+<span class="n">_REGEX_PATTERN_SPLIT_COMMA</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?&lt;!</span><span class="se">\\</span><span class="s2">),&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="match_filter"><a class="viewcode-back" href="../../iocage.Filter.html#iocage.Filter.match_filter">[docs]</a><span class="k">def</span> <span class="nf">match_filter</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -203,7 +204,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">values</span><span class="p">:</span> <span class="n">_TermValuesType</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">_TermValuesType</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
 
@@ -213,6 +214,8 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">values</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">_ResourceSelector</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
@@ -300,21 +303,7 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_split_filter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">escaped_comma_blocks</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">block</span><span class="p">:</span> <span class="n">block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
-            <span class="n">user_input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">,&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">escaped_comma_blocks</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">index</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
-                <span class="n">values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;,</span><span class="si">{block[0]}</span><span class="s2">&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">values</span> <span class="o">+=</span> <span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">return</span> <span class="n">values</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_REGEX_PATTERN_SPLIT_COMMA</span><span class="p">,</span> <span class="n">user_input</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate_name_filter_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 
@@ -332,7 +321,21 @@
 
         <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">validate_name</span><span class="p">(</span>
             <span class="n">filter_string_without_globs</span>
-        <span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span></div>
+        <span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the Filter Term as string.&quot;&quot;&quot;</span>
+        <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">!=</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.key}</span><span class="s2">=&quot;</span>
+
+        <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{output}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the Term in human and robot friendly format.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Terms"><a class="viewcode-back" href="../../iocage.Filter.html#iocage.Filter.Terms">[docs]</a><span class="k">class</span> <span class="nc">Terms</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
@@ -344,22 +347,59 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">terms</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
-                <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
-            <span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">terms</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+        <span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">Terms</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terms</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Terms.set"><a class="viewcode-back" href="../../iocage.Filter.html#iocage.Filter.Terms.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">terms</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+        <span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Clear and set all terms from input data.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_none</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
-            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">:</span>
+            <span class="n">_terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">terms</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">terms</span>
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">_terms</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_term</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_terms</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
                     <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
 
-        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Terms.add"><a class="viewcode-back" href="../../iocage.Filter.html#iocage.Filter.Terms.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">term</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Term</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a Term to the list of Terms.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            term (iocage.Filter.Term, str):</span>
+<span class="sd">                Interface name inside the jail</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_term</span> <span class="o">=</span> <span class="n">term</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_term</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_term</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Terms.match_resource"><a class="viewcode-back" href="../../iocage.Filter.html#iocage.Filter.Terms.match_resource">[docs]</a>    <span class="k">def</span> <span class="nf">match_resource</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -406,10 +446,8 @@
         <span class="c1"># no name term or none at all</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="k">def</span> <span class="nf">_parse_term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Term</span><span class="p">]:</span>
-
-        <span class="n">terms</span> <span class="o">=</span> <span class="p">[]</span>
-
+    <span class="k">def</span> <span class="nf">_parse_term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Term</span><span class="p">:</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">prop</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -417,11 +455,36 @@
             <span class="n">value</span> <span class="o">=</span> <span class="n">user_input</span>
 
         <span class="k">if</span> <span class="n">prop</span> <span class="o">==</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span>
+                <span class="n">partial_value</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span> <span class="k">for</span> <span class="n">partial_value</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="n">_REGEX_PATTERN_SPLIT_COMMA</span><span class="p">,</span>
+                <span class="n">value</span>
+            <span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span>
+                <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_user_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">)</span>
 
-        <span class="n">terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Term</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Term</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">terms</span></div>
+    <span class="k">def</span> <span class="nf">_parse_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Term</span><span class="p">]:</span>
+        <span class="n">terms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">user_input_terms</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)\s+&#39;</span><span class="p">,</span> <span class="n">user_input</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">user_input_term</span> <span class="ow">in</span> <span class="n">user_input_terms</span><span class="p">:</span>
+            <span class="n">terms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_term</span><span class="p">(</span><span class="n">user_input_term</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">terms</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the Filter.Terms as string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the Terms in human and robot friendly format.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 </pre></div>
 
            </div>
@@ -434,7 +497,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -453,20 +516,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

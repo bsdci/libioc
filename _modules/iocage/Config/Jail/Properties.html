@@ -173,11 +173,13 @@
 <span class="kn">import</span> <span class="nn">iocage.Config.Jail.Properties.Resolver</span>
 <span class="kn">import</span> <span class="nn">iocage.Config.Jail.Properties.ResourceLimit</span>
 <span class="kn">import</span> <span class="nn">iocage.Config.Jail.Properties.Defaultrouter</span>
+<span class="kn">import</span> <span class="nn">iocage.Config.Jail.Properties.Depends</span>
 
 <span class="n">Property</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
     <span class="s1">&#39;iocage.Config.Jail.Properties.Addresses.AddressesProp&#39;</span><span class="p">,</span>
     <span class="s1">&#39;iocage.Config.Jail.Properties.Interfaces.InterfaceProp&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iocage.Config.Jail.Properties.Resolver.ResolverProp&#39;</span>
+    <span class="s1">&#39;iocage.Config.Jail.Properties.Resolver.ResolverProp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iocage.Config.Jail.Properties.Depends.DependsProp&#39;</span>
 <span class="p">]</span>
 
 <span class="n">properties</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -186,7 +188,8 @@
     <span class="s2">&quot;interfaces&quot;</span><span class="p">,</span>
     <span class="s2">&quot;defaultrouter&quot;</span><span class="p">,</span>
     <span class="s2">&quot;defaultrouter6&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;resolver&quot;</span>
+    <span class="s2">&quot;resolver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;depends&quot;</span>
 <span class="p">]</span> <span class="o">+</span> <span class="n">ResourceLimit</span><span class="o">.</span><span class="n">properties</span>
 
 <span class="k">def</span> <span class="nf">_get_class</span><span class="p">(</span><span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Property</span><span class="p">:</span>
@@ -206,6 +209,8 @@
         <span class="k">return</span> <span class="n">DefaultrouterModule</span><span class="o">.</span><span class="n">DefaultrouterProp</span>
     <span class="k">elif</span> <span class="n">property_name</span> <span class="o">==</span> <span class="s2">&quot;defaultrouter6&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">DefaultrouterModule</span><span class="o">.</span><span class="n">Defaultrouter6Prop</span>
+    <span class="k">elif</span> <span class="n">property_name</span> <span class="o">==</span> <span class="s2">&quot;depends&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">Properties</span><span class="o">.</span><span class="n">Depends</span><span class="o">.</span><span class="n">DependsProp</span>
     <span class="k">elif</span> <span class="n">property_name</span> <span class="ow">in</span> <span class="n">ResourceLimit</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ResourceLimit</span><span class="o">.</span><span class="n">ResourceLimitProp</span>
 
@@ -232,6 +237,7 @@
 <span class="sd">                - resolver</span>
 <span class="sd">                - defaultrouter</span>
 <span class="sd">                - defaultrouter6</span>
+<span class="sd">                - depends</span>
 
 <span class="sd">        config (iocage.Config.Jail.JailConfig.JailConfig):</span>
 <span class="sd">            The special property keeps reference to this JailConfig instance</span>
@@ -281,7 +287,6 @@
                 <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span></div></div>
 </pre></div>
 
@@ -295,7 +300,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -314,20 +319,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
 
   
 

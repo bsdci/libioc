@@ -101,7 +101,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -111,13 +110,11 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -222,13 +219,37 @@ requires it to be stopped.</td>
 
 <dl class="method">
 <dt id="iocage.Jail.Jail.fork_exec">
-<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.fork_exec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute a one-shot jail and return its stdout.</p>
+<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>passthru=False</em>, <em>event_scope=None</em>, <em>dependant_jails_seen=[]</em>, <em>start_dependant_jails=True</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#Jail.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.Jail.fork_exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a jail, run a command and shut it down immediately.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>command</strong> (<em>string</em>) – The command to execute in the jail.</li>
+<li><strong>passthru</strong> (<em>bool</em>) – Execute commands in an interactive shell.</li>
+<li><strong>event_scope</strong> (<em>iocage.lib.events.Scope</em>) – <p>(default=None)</p>
+<p>Provide an existing libiocage event scope or automatically
+create a new one instead.</p>
+</li>
+<li><strong>dependant_jails_seen</strong> (<em>list</em><em>[</em><em>iocage.JailGenerator</em><em>]</em>) – Jail depends can have circular dependencies. By passing a list
+of already started jails to the start command, iocage does not
+need to query their state, because they are known to be running
+already. This argument is internally used when starting a jails
+dependants recursively.</li>
+<li><strong>start_dependant_jails</strong> (<em>bool</em>) – When disabled, no dependant jails will be started.</li>
+<li><strong>**temporary_config_override</strong> (<em>dict</em><em>(</em><em>str</em><em>, </em><em>any</em><em>)</em>) – <p>Other named arguments temporary override JailConfig properties.</p>
+<p>For example:</p>
+<blockquote>
+<div>jail = iocage.JailGenerator(“myjail”)
+events = jail.fork_exec(“ifconfig”, vnet=False)
+print(list(events))</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -519,13 +540,37 @@ CommandOutput, so that (None, None, &lt;returncode&gt;) is returned.</dd>
 
 <dl class="method">
 <dt id="iocage.Jail.JailGenerator.fork_exec">
-<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>passthru=False</em>, <em>event_scope=None</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.fork_exec" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fork_exec</code><span class="sig-paren">(</span><em>command</em>, <em>passthru=False</em>, <em>event_scope=None</em>, <em>start_dependant_jails=True</em>, <em>dependant_jails_seen=[]</em>, <em>**temporary_config_override</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.fork_exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.fork_exec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start a jail, run a command and shut it down immediately.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>command</strong> (<em>string</em>) – The command to execute in the jail.</li>
+<li><strong>passthru</strong> (<em>bool</em>) – Execute commands in an interactive shell.</li>
+<li><strong>event_scope</strong> (<em>iocage.lib.events.Scope</em>) – <p>(default=None)</p>
+<p>Provide an existing libiocage event scope or automatically
+create a new one instead.</p>
+</li>
+<li><strong>dependant_jails_seen</strong> (<em>list</em><em>[</em><em>iocage.JailGenerator</em><em>]</em>) – Jail depends can have circular dependencies. By passing a list
+of already started jails to the start command, iocage does not
+need to query their state, because they are known to be running
+already. This argument is internally used when starting a jails
+dependants recursively.</li>
+<li><strong>start_dependant_jails</strong> (<em>bool</em>) – When disabled, no dependant jails will be started.</li>
+<li><strong>**temporary_config_override</strong> (<em>dict</em><em>(</em><em>str</em><em>, </em><em>any</em><em>)</em>) – <p>Other named arguments temporary override JailConfig properties.</p>
+<p>For example:</p>
+<blockquote>
+<div>jail = iocage.JailGenerator(“myjail”)
+events = jail.fork_exec(“ifconfig”, vnet=False)
+print(list(events))</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="iocage.events.html#iocage.events.IocageEvent" title="iocage.events.IocageEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocageEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -907,7 +952,7 @@ and must differ from the current name.</td>
 
 <dl class="method">
 <dt id="iocage.Jail.JailGenerator.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>quick=False</em>, <em>passthru=False</em>, <em>single_command=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.start" title="Permalink to this definition">¶</a></dt>
+<code class="descname">start</code><span class="sig-paren">(</span><em>quick=False</em>, <em>passthru=False</em>, <em>single_command=None</em>, <em>event_scope=None</em>, <em>dependant_jails_seen=[]</em>, <em>start_dependant_jails=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Jail.html#JailGenerator.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Jail.JailGenerator.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start the jail.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -921,6 +966,16 @@ it).</li>
 <li><strong>single_command</strong> (<em>str</em>) – When set the jail is launched non-persistent. The startup cycle
 reduces to the <cite>prestart</cite>, <cite>command</cite> and <cite>poststop</cite> hooks with
 the singe_command being executed in a /bin/sh context.</li>
+<li><strong>event_scope</strong> (<em>iocage.lib.events.Scope</em>) – <p>(default=None)</p>
+<p>Provide an existing libiocage event scope or automatically
+create a new one instead.</p>
+</li>
+<li><strong>dependant_jails_seen</strong> (<em>list</em><em>[</em><em>iocage.JailGenerator</em><em>]</em>) – Jail depends can have circular dependencies. By passing a list
+of already started jails to the start command, iocage does not
+need to query their state, because they are known to be running
+already. This argument is internally used when starting a jails
+dependants recursively.</li>
+<li><strong>start_dependant_jails</strong> (<em>bool</em>) – When disabled, no dependant jails will be started.</li>
 </ul>
 </td>
 </tr>
@@ -1132,7 +1187,7 @@ named attribute to the __init__ function</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -1151,20 +1206,13 @@ named attribute to the __init__ function</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

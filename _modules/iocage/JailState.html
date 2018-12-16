@@ -242,7 +242,6 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_list</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_query_libxo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;/usr/sbin/jls&quot;</span><span class="p">,</span>
@@ -253,19 +252,18 @@
             <span class="p">],</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
             <span class="n">ignore_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">{}</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="n">_parse_json</span><span class="p">(</span><span class="n">stdout</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_parse_json</span><span class="p">(</span><span class="n">stdout</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">data</span> <span class="k">if</span> <span class="p">(</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">_query_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;/usr/sbin/jls&quot;</span><span class="p">,</span>
@@ -277,27 +275,27 @@
             <span class="p">],</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
             <span class="n">ignore_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">{}</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="n">_parse</span><span class="p">(</span><span class="n">stdout</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_parse</span><span class="p">(</span><span class="n">stdout</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">data</span> <span class="k">if</span> <span class="p">(</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Return the jail state data that was previously queried.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
 
 <div class="viewcode-block" id="JailState.clear"><a class="viewcode-back" href="../../iocage.JailState.html#iocage.JailState.JailState.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Clear the jail state.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span></div>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a value from the jail state.&quot;&quot;&quot;</span>
@@ -314,7 +312,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;None&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
 
 <div class="viewcode-block" id="JailState.keys"><a class="viewcode-back" href="../../iocage.JailState.html#iocage.JailState.JailState.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># noqa: T484</span>
         <span class="sd">&quot;&quot;&quot;Return all available jail state keys.&quot;&quot;&quot;</span>
@@ -324,7 +322,6 @@
 <div class="viewcode-block" id="JailStates"><a class="viewcode-back" href="../../iocage.JailState.html#iocage.JailState.JailStates">[docs]</a><span class="k">class</span> <span class="nc">JailStates</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A dictionary of JailStates.&quot;&quot;&quot;</span>
 
-    <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span>
     <span class="n">queried</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -341,21 +338,24 @@
 
 <div class="viewcode-block" id="JailStates.query"><a class="viewcode-back" href="../../iocage.JailState.html#iocage.JailState.JailStates.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Invoke update of the jail state from jls output.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Querying all running jails status&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">_get_userland_version</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_query_libxo</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_query_libxo</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_query_list</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_query_list</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">JailStateUpdateFailed</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queried</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-    <span class="k">def</span> <span class="nf">_query_libxo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_query_libxo</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;/usr/sbin/jls&quot;</span><span class="p">,</span>
@@ -364,7 +364,7 @@
             <span class="p">],</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
             <span class="n">ignore_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -375,7 +375,10 @@
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">output_data</span><span class="p">:</span>
             <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">output_data</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_query_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_query_list</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;/usr/sbin/jls&quot;</span><span class="p">,</span>
@@ -385,7 +388,7 @@
             <span class="p">],</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
             <span class="n">ignore_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">returncode</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -407,7 +410,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -426,20 +429,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

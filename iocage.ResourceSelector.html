@@ -101,7 +101,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -111,13 +110,11 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -198,9 +195,14 @@
 <p>iocage resource selector type.</p>
 <dl class="class">
 <dt id="iocage.ResourceSelector.ResourceSelector">
-<em class="property">class </em><code class="descclassname">iocage.ResourceSelector.</code><code class="descname">ResourceSelector</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/ResourceSelector.html#ResourceSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.ResourceSelector.ResourceSelector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">iocage.ResourceSelector.</code><code class="descname">ResourceSelector</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/ResourceSelector.html#ResourceSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.ResourceSelector.ResourceSelector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Parse and wrap resource selectors.</p>
+<dl class="attribute">
+<dt id="iocage.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN">
+<code class="descname">SOURCE_NAME_PATTERN</code><em class="property"> = re.compile('^[A-Za-z0-9]+((\\-|_)?[A-Za-z0-9]+)*$')</em><a class="headerlink" href="#iocage.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="iocage.ResourceSelector.ResourceSelector.filter_datasets">
 <code class="descname">filter_datasets</code><span class="sig-paren">(</span><em>datasets</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/ResourceSelector.html#ResourceSelector.filter_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.ResourceSelector.ResourceSelector.filter_datasets" title="Permalink to this definition">¶</a></dt>
@@ -253,7 +255,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -272,20 +274,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

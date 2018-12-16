@@ -262,10 +262,8 @@
         <span class="n">iocage</span><span class="o">.</span><span class="n">IPAddress</span><span class="o">.</span><span class="n">IPv6Interface</span>
     <span class="p">]:</span>
         <span class="n">_address</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">_address</span> <span class="o">==</span> <span class="s2">&quot;accept_rtadv&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">IPAddress</span><span class="o">.</span><span class="n">IPv6Interface</span><span class="p">(</span><span class="n">_address</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">_address</span> <span class="o">==</span> <span class="s2">&quot;dhcp&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">IPAddress</span><span class="o">.</span><span class="n">IPv4Interface</span><span class="p">(</span><span class="n">_address</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">_address</span> <span class="o">==</span> <span class="s2">&quot;accept_rtadv&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">_address</span> <span class="o">==</span> <span class="s2">&quot;dhcp&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">_address</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">address</span></div>
 
 
@@ -490,7 +488,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -509,20 +507,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    
 
   
 

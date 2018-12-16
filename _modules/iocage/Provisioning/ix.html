@@ -184,6 +184,23 @@
 <span class="kn">import</span> <span class="nn">iocage.Provisioning</span>
 
 
+<div class="viewcode-block" id="PluginUnavailableError"><a class="viewcode-back" href="../../../iocage.Provisioning.ix.html#iocage.Provisioning.ix.PluginUnavailableError">[docs]</a><span class="k">class</span> <span class="nc">PluginUnavailableError</span><span class="p">(</span><span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an iX iocage plugin is not available.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;iX iocage plugin &#39;</span><span class="si">{name}</span><span class="s2">&#39; is not available: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
+        <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="PluginDefinition"><a class="viewcode-back" href="../../../iocage.Provisioning.ix.html#iocage.Provisioning.ix.PluginDefinition">[docs]</a><span class="k">class</span> <span class="nc">PluginDefinition</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;ix-iocage-plugin definition.&quot;&quot;&quot;</span>
 
@@ -231,8 +248,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">resource</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_url</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>  <span class="c1"># nosec</span>
         <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ProvisioningSourceUnavailable</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">PluginUnavailableError</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
         <span class="n">charset</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get_content_charset</span><span class="p">()</span>  <span class="c1"># noqa: T484</span>
@@ -328,7 +346,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">zfs</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">pass</span>
     <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -349,7 +367,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -368,20 +386,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
 
   
 

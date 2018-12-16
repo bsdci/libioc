@@ -1,0 +1,7 @@
+iocage.Config.Jail.Properties.Depends module
+============================================
+
+.. automodule:: iocage.Config.Jail.Properties.Depends
+    :members:
+    :undoc-members:
+    :show-inheritance:

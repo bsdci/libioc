@@ -176,7 +176,6 @@
 <span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">import</span> <span class="nn">libzfs</span>
-<span class="kn">import</span> <span class="nn">ucl</span>
 
 <span class="kn">import</span> <span class="nn">iocage.ZFS</span>
 <span class="kn">import</span> <span class="nn">iocage.errors</span>
@@ -201,7 +200,7 @@
 
     <span class="n">_release</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ReleaseGenerator&#39;</span><span class="p">]</span>
     <span class="n">_hashes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
-    <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;iocage.Host.HostGenerator&#39;</span>
+    <span class="n">host</span><span class="p">:</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Host</span><span class="o">.</span><span class="n">HostGenerator</span>
     <span class="n">root_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -329,7 +328,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">main</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SourceNotFound</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -357,6 +359,11 @@
         <span class="s2">&quot;sendmail_submit_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;sendmail_msp_queue_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;sendmail_outbound_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;daily_clean_hoststat_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;daily_status_mail_rejects_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;daily_status_include_submit_mailq&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;daily_submit_queuerun&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;cron_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-m &#39;&#39;&quot;</span><span class="p">,</span>
         <span class="s2">&quot;syslogd_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-ss&quot;</span>
     <span class="p">}</span>
 
@@ -393,7 +400,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
 
-        <span class="n">resource_selector</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">resource_selector</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">resource_selector</span><span class="o">.</span><span class="n">source_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">is_different</span> <span class="o">=</span> <span class="n">resource_selector</span><span class="o">.</span><span class="n">source_name</span> <span class="o">!=</span> <span class="n">root_datasets_name</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">root_datasets_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">is_different</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
@@ -443,7 +453,7 @@
         <span class="sd">&quot;&quot;&quot;Set the releases identifier (optionally including patchlevel).&quot;&quot;&quot;</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">((</span>
             <span class="sa">r</span><span class="s2">&quot;^(?:(?P&lt;source_dataset_name&gt;.*)/)?&quot;</span>
-            <span class="sa">r</span><span class="s2">&quot;(?P&lt;release_name&gt;.*)&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;(?P&lt;release_name&gt;.*?)&quot;</span>
             <span class="sa">r</span><span class="s2">&quot;(?:-p(?P&lt;patchlevel&gt;[0-9]+))?$&quot;</span>
         <span class="p">),</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -456,6 +466,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">patchlevel</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="p">(</span><span class="n">patchlevel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">patchlevel</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;source_dataset_name&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;source_dataset_name&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the release name including the patchlevel.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">patchlevel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._name}</span><span class="s2">-p</span><span class="si">{self.current_snapshot_patchlevel}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">resource</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;iocage.Resource.Resource&#39;</span><span class="p">:</span>
@@ -561,6 +579,12 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_snapshot_patchlevel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the currently chosen patchlevel number or the latest.&quot;&quot;&quot;</span>
+        <span class="n">current_snapshot_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_snapshot</span><span class="o">.</span><span class="n">snapshot_name</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_snapshot_name</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">current_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSSnapshot</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the manually configured or the latest release snapshot.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">patchlevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -589,7 +613,7 @@
         <span class="sd">&quot;&quot;&quot;Return the sorted list of taken version snapshots (e.g. p3).&quot;&quot;&quot;</span>
         <span class="n">versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">snapshots</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;libzfs.ZFSSnapshot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;^p(\d+)$&quot;</span><span class="p">)</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^p(\d+)$&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">snapshots</span><span class="p">:</span>
             <span class="n">match</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">snapshot</span><span class="o">.</span><span class="n">snapshot_name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -656,8 +680,8 @@
         <span class="sd">&quot;&quot;&quot;Return True if the release is available on the remote mirror.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;HEAD&quot;</span><span class="p">)</span>
-            <span class="n">resource</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>  <span class="c1"># nosec: see above</span>
-            <span class="k">return</span> <span class="n">resource</span><span class="o">.</span><span class="n">getcode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">200</span>  <span class="c1"># type: ignore</span>
+            <span class="n">resource</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>  <span class="c1"># nosec: trusted URL</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">getcode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>  <span class="c1"># noqa: T484</span>
         <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">URLError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -758,7 +782,10 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
 
+        <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">require_no_symlink</span><span class="p">(</span><span class="n">source_file</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">source_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">ucl</span>
             <span class="n">hbsd_update_conf</span> <span class="o">=</span> <span class="n">ucl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hbsd_release_branch</span> <span class="o">=</span> <span class="n">hbsd_update_conf</span><span class="p">[</span><span class="s2">&quot;branch&quot;</span><span class="p">]</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hbsd_release_branch</span><span class="p">)</span>
@@ -812,10 +839,13 @@
 
             <span class="k">yield</span> <span class="n">releasePrepareStorageEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
             <span class="k">yield</span> <span class="n">releaseDownloadEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_assets</span><span class="p">()</span>
-
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_assets</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">releaseDownloadEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">()</span>
+                <span class="k">raise</span>
             <span class="k">yield</span> <span class="n">releaseDownloadEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
             <span class="k">yield</span> <span class="n">releaseExtractionEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
             <span class="k">try</span><span class="p">:</span>
@@ -850,8 +880,14 @@
             <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">fetch_updates</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">updater</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="n">event</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">updater</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ReleaseUpdateDownload</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">skipped</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">yield</span> <span class="n">event</span>
+            <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span><span class="p">:</span>
+                <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">update</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">updater</span><span class="o">.</span><span class="n">apply</span><span class="p">():</span>
@@ -947,18 +983,34 @@
         <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>  <span class="c1"># nosec: validated in @setter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Hashes downloaded to </span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fetch_assets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_fetch_assets</span><span class="p">(</span>
+        <span class="bp">self</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assets</span><span class="p">:</span>
+
+            <span class="n">releaseAssetDownloadEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ReleaseAssetDownload</span><span class="p">(</span>
+                <span class="n">release</span><span class="o">=</span><span class="bp">self</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">releaseAssetDownloadEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
             <span class="n">url</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.remote_url}</span><span class="s2">/</span><span class="si">{asset}</span><span class="s2">.txz&quot;</span>
             <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_asset_location</span><span class="p">(</span><span class="n">asset</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{path}</span><span class="s2"> already exists - skipping.&quot;</span><span class="p">)</span>
-                <span class="k">return</span>
+                <span class="k">yield</span> <span class="n">releaseAssetDownloadEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{path}</span><span class="s2"> already exists&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Starting download of </span><span class="si">{url}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>  <span class="c1"># nosec: validated</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{url}</span><span class="s2"> was saved to </span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Starting download of </span><span class="si">{url}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>  <span class="c1"># nosec: validated</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{url}</span><span class="s2"> was saved to </span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">releaseAssetDownloadEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+                    <span class="k">return</span>
+                <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">http_error</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">releaseAssetDownloadEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DownloadFailed</span><span class="p">(</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                        <span class="n">code</span><span class="o">=</span><span class="n">http_error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                        <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                    <span class="p">)</span>
 
 <div class="viewcode-block" id="ReleaseGenerator.read_hashes"><a class="viewcode-back" href="../../iocage.Release.html#iocage.Release.ReleaseGenerator.read_hashes">[docs]</a>    <span class="k">def</span> <span class="nf">read_hashes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Read the release asset hashes.&quot;&quot;&quot;</span>
@@ -1137,7 +1189,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -1156,20 +1208,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

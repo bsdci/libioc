@@ -1,7 +1,0 @@
-iocage.NullFSBasejailStorage module
-===================================
-
-.. automodule:: iocage.NullFSBasejailStorage
-    :members:
-    :undoc-members:
-    :show-inheritance:

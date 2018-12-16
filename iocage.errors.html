@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="iocage.events module" href="iocage.events.html" />
-    <link rel="prev" title="iocage.ZFSShareStorage module" href="iocage.ZFSShareStorage.html" /> 
+    <link rel="prev" title="iocage.decorators module" href="iocage.decorators.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -101,7 +101,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -111,13 +110,11 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.events.html">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -197,6 +194,13 @@
 <span id="iocage-errors-module"></span><h1>iocage.errors module<a class="headerlink" href="#module-iocage.errors" title="Permalink to this headline">¶</a></h1>
 <p>Collection of iocage errors.</p>
 <dl class="exception">
+<dt id="iocage.errors.ActivationFailed">
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">ActivationFailed</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#ActivationFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.ActivationFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when ZFS pool activation failed.</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="iocage.errors.BackupInProgress">
 <em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">BackupInProgress</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#BackupInProgress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.BackupInProgress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
@@ -274,17 +278,17 @@
 </dd></dl>
 
 <dl class="exception">
-<dt id="iocage.errors.DistributionEOLWarningDownloadFailed">
-<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">DistributionEOLWarningDownloadFailed</code><span class="sig-paren">(</span><em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#DistributionEOLWarningDownloadFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.DistributionEOLWarningDownloadFailed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
-<p>Raised when downloading EOL warnings failed.</p>
-</dd></dl>
-
-<dl class="exception">
 <dt id="iocage.errors.DistributionUnknown">
 <em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">DistributionUnknown</code><span class="sig-paren">(</span><em>distribution_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#DistributionUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.DistributionUnknown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
 <p>Raised when the host distribution is unknown or not supported.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.errors.DownloadFailed">
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">DownloadFailed</code><span class="sig-paren">(</span><em>url</em>, <em>code</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#DownloadFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.DownloadFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when downloading EOL warnings failed.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -394,7 +398,7 @@
 
 <dl class="exception">
 <dt id="iocage.errors.InvalidJailName">
-<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">InvalidJailName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#InvalidJailName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.InvalidJailName" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">InvalidJailName</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#InvalidJailName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.InvalidJailName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.JailConfigError" title="iocage.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.JailConfigError</span></code></a></p>
 <p>Raised when a jail has an invalid name.</p>
 </dd></dl>
@@ -439,6 +443,13 @@
 <em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">InvalidSnapshotIdentifier</code><span class="sig-paren">(</span><em>identifier</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#InvalidSnapshotIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.InvalidSnapshotIdentifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.SnapshotError" title="iocage.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.SnapshotError</span></code></a></p>
 <p>Raised when a snapshot identifier is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="iocage.errors.InvalidSourceName">
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">InvalidSourceName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#InvalidSourceName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.InvalidSourceName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when a source name is invalid.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -660,7 +671,7 @@
 
 <dl class="exception">
 <dt id="iocage.errors.PkgNotFound">
-<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">PkgNotFound</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#PkgNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.PkgNotFound" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">PkgNotFound</code><span class="sig-paren">(</span><em>message=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#PkgNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.PkgNotFound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
 <p>Raised when the pkg package was not found in the local mirror.</p>
 </dd></dl>
@@ -757,6 +768,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="iocage.errors.SourceNotFound">
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">SourceNotFound</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#SourceNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.SourceNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when a source was not found.</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="iocage.errors.UnknownJailConfigProperty">
 <em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">UnknownJailConfigProperty</code><span class="sig-paren">(</span><em>key</em>, <em>jail</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#UnknownJailConfigProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.UnknownJailConfigProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
@@ -786,7 +804,7 @@
 
 <dl class="exception">
 <dt id="iocage.errors.UpdateFailure">
-<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">UpdateFailure</code><span class="sig-paren">(</span><em>name</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#UpdateFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.UpdateFailure" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">UpdateFailure</code><span class="sig-paren">(</span><em>name</em>, <em>reason=None</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#UpdateFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.UpdateFailure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
 <p>Raised when an update fails.</p>
 </dd></dl>
@@ -826,6 +844,13 @@
 <p>Raised when a ZFS pool not available.</p>
 </dd></dl>
 
+<dl class="exception">
+<dt id="iocage.errors.ZFSSourceMountpoint">
+<em class="property">exception </em><code class="descclassname">iocage.errors.</code><code class="descname">ZFSSourceMountpoint</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/errors.html#ZFSSourceMountpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.errors.ZFSSourceMountpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when iocage could not determine its mountpoint.</p>
+</dd></dl>
+
 </div>
 
 
@@ -839,7 +864,7 @@
         <a href="iocage.events.html" class="btn btn-neutral float-right" title="iocage.events module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="iocage.ZFSShareStorage.html" class="btn btn-neutral" title="iocage.ZFSShareStorage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="iocage.decorators.html" class="btn btn-neutral" title="iocage.decorators module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -848,7 +873,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -867,20 +892,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

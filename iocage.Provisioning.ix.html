@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="iocage.BridgeInterface module" href="iocage.BridgeInterface.html" />
+    <link rel="next" title="iocage.Storage package" href="iocage.Storage.html" />
     <link rel="prev" title="iocage.Provisioning package" href="iocage.Provisioning.html" /> 
 
   
@@ -88,6 +88,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iocage.Provisioning.html#module-iocage.Provisioning">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iocage.html#submodules">Submodules</a></li>
@@ -200,6 +201,13 @@
 
 </dd></dl>
 
+<dl class="exception">
+<dt id="iocage.Provisioning.ix.PluginUnavailableError">
+<em class="property">exception </em><code class="descclassname">iocage.Provisioning.ix.</code><code class="descname">PluginUnavailableError</code><span class="sig-paren">(</span><em>name</em>, <em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Provisioning/ix.html#PluginUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Provisioning.ix.PluginUnavailableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iocage.errors.html#iocage.errors.IocageException" title="iocage.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.errors.IocageException</span></code></a></p>
+<p>Raised when an iX iocage plugin is not available.</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="iocage.Provisioning.ix.provision">
 <code class="descclassname">iocage.Provisioning.ix.</code><code class="descname">provision</code><span class="sig-paren">(</span><em>self</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Provisioning/ix.html#provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Provisioning.ix.provision" title="Permalink to this definition">¶</a></dt>
@@ -229,7 +237,7 @@ as a jails provisioning.source property, e.g.:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iocage.BridgeInterface.html" class="btn btn-neutral float-right" title="iocage.BridgeInterface module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="iocage.Storage.html" class="btn btn-neutral float-right" title="iocage.Storage package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="iocage.Provisioning.html" class="btn btn-neutral" title="iocage.Provisioning package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -241,7 +249,7 @@ as a jails provisioning.source property, e.g.:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -260,20 +268,13 @@ as a jails provisioning.source property, e.g.:</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

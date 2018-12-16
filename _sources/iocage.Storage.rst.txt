@@ -1,5 +1,17 @@
-iocage.Storage module
-=====================
+iocage.Storage package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   iocage.Storage.NullFSBasejail
+   iocage.Storage.Standalone
+   iocage.Storage.ZFSBasejail
+
+Module contents
+---------------
 
 .. automodule:: iocage.Storage
     :members:

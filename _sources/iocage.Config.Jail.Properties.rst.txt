@@ -8,6 +8,7 @@ Submodules
 
    iocage.Config.Jail.Properties.Addresses
    iocage.Config.Jail.Properties.Defaultrouter
+   iocage.Config.Jail.Properties.Depends
    iocage.Config.Jail.Properties.Interfaces
    iocage.Config.Jail.Properties.Resolver
    iocage.Config.Jail.Properties.ResourceLimit

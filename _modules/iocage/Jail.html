@@ -185,11 +185,11 @@
 <span class="kn">import</span> <span class="nn">iocage.Host</span>
 <span class="kn">import</span> <span class="nn">iocage.Config.Jail.JailConfig</span>
 <span class="kn">import</span> <span class="nn">iocage.Network</span>
-<span class="kn">import</span> <span class="nn">iocage.NullFSBasejailStorage</span>
 <span class="kn">import</span> <span class="nn">iocage.Release</span>
-<span class="kn">import</span> <span class="nn">iocage.StandaloneJailStorage</span>
 <span class="kn">import</span> <span class="nn">iocage.Storage</span>
-<span class="kn">import</span> <span class="nn">iocage.ZFSBasejailStorage</span>
+<span class="kn">import</span> <span class="nn">iocage.Storage.NullFSBasejail</span>
+<span class="kn">import</span> <span class="nn">iocage.Storage.Standalone</span>
+<span class="kn">import</span> <span class="nn">iocage.Storage.ZFSBasejail</span>
 <span class="kn">import</span> <span class="nn">iocage.ZFSShareStorage</span>
 <span class="kn">import</span> <span class="nn">iocage.LaunchableResource</span>
 <span class="kn">import</span> <span class="nn">iocage.VersionedResource</span>
@@ -348,9 +348,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">base_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">jails</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">base_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">jails</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">base_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root_datasets_name</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">jails</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SourceNotFound</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{base_name}</span><span class="s2">/</span><span class="si">{jail_id}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
@@ -566,7 +569,9 @@
         <span class="n">quick</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">single_command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Start the jail.</span>
@@ -588,6 +593,23 @@
 <span class="sd">                When set the jail is launched non-persistent. The startup cycle</span>
 <span class="sd">                reduces to the `prestart`, `command` and `poststop` hooks with</span>
 <span class="sd">                the singe_command being executed in a /bin/sh context.</span>
+
+<span class="sd">            event_scope (iocage.lib.events.Scope): (default=None)</span>
+
+<span class="sd">                Provide an existing libiocage event scope or automatically</span>
+<span class="sd">                create a new one instead.</span>
+
+<span class="sd">            dependant_jails_seen (list[iocage.JailGenerator]):</span>
+
+<span class="sd">                Jail depends can have circular dependencies. By passing a list</span>
+<span class="sd">                of already started jails to the start command, iocage does not</span>
+<span class="sd">                need to query their state, because they are known to be running</span>
+<span class="sd">                already. This argument is internally used when starting a jails</span>
+<span class="sd">                dependants recursively.</span>
+
+<span class="sd">            start_dependant_jails (bool):</span>
+
+<span class="sd">                When disabled, no dependant jails will be started.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_existing</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_stopped</span><span class="p">()</span>
@@ -602,6 +624,20 @@
 
         <span class="n">events</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span>
         <span class="n">jailLaunchEvent</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">JailLaunch</span><span class="p">(</span><span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">)</span>
+
+        <span class="n">dependant_jails_started</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">JailGenerator</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">start_dependant_jails</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">dependant_jails_seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">DependantsStartEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailDependantsStart</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_dependant_jails</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;depends&quot;</span><span class="p">],</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+                <span class="n">dependant_jails_seen</span><span class="o">=</span><span class="n">dependant_jails_seen</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">DependantsStartEvent</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">dependant_jails_started</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">started_jails</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">event</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_script_dir</span><span class="p">()</span>
         <span class="n">jail_start_script_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
@@ -624,7 +660,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]:</span>
             <span class="n">_created</span><span class="p">,</span> <span class="n">_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_vimage_network</span><span class="p">()</span>
             <span class="n">exec_created</span> <span class="o">+=</span> <span class="n">_created</span>
-            <span class="n">exec_start</span> <span class="o">+=</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;. </span><span class="si">{self._relative_hook_script_dir}</span><span class="s2">/.env&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">_start</span>
+            <span class="n">exec_start</span> <span class="o">+=</span> <span class="n">_start</span>
             <span class="n">exec_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configure_localhost_commands</span><span class="p">()</span>
             <span class="n">exec_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configure_routes_commands</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">ipfw_enabled</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -688,12 +724,14 @@
 
         <span class="k">def</span> <span class="nf">_stop_failed_jail</span><span class="p">(</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-            <span class="n">stop_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
-                <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">scope</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">stop_events</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">event</span>
+            <span class="n">jails_to_stop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">start_dependant_jails</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">jails_to_stop</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">dependant_jails_started</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">jail_to_stop</span> <span class="ow">in</span> <span class="n">jails_to_stop</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="n">jail_to_stop</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
         <span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_stop_failed_jail</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_basejail</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -719,10 +757,94 @@
                     <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
                 <span class="p">)</span>
         <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">fail_generator</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">e</span>
 
         <span class="k">yield</span> <span class="n">jailLaunchEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="n">stdout</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_start_dependant_jails</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">terms</span><span class="p">:</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">Terms</span><span class="p">,</span>
+        <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">],</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">jailDependantsStartEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailDependantsStart</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">started_jails</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">JailGenerator</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">yield</span> <span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="n">_depends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;depends&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_depends</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;No dependant jails&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">dependant_jails</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">iocage</span><span class="o">.</span><span class="n">Jails</span><span class="o">.</span><span class="n">JailsGenerator</span><span class="p">(</span>
+                <span class="n">filters</span><span class="o">=</span><span class="n">_depends</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span>
+            <span class="p">),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;priority&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">dependant_jail</span> <span class="ow">in</span> <span class="n">dependant_jails</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dependant_jail</span> <span class="o">==</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;The jail </span><span class="si">{self.name}</span><span class="s2"> depends on itself&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">dependant_jail</span> <span class="ow">in</span> <span class="n">dependant_jails_seen</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;Circular dependency </span><span class="si">{dependant_jail.name}</span><span class="s2"> - skipping&quot;</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">dependant_jails_seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dependant_jail</span><span class="p">)</span>
+            <span class="n">jailDependantStartEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailDependantStart</span><span class="p">(</span>
+                <span class="n">jail</span><span class="o">=</span><span class="n">dependant_jail</span><span class="p">,</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">scope</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">jailDependantStartEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+            <span class="n">dependant_jail</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">dependant_jail</span><span class="o">.</span><span class="n">running</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">jailDependantStartEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;already running&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="n">dependant_jail</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailDependantStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">dependant_jails_seen</span><span class="o">=</span><span class="n">dependant_jails_seen</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocageException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">jailDependantStartEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">yield from</span> <span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">fail_generator</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">err</span>
+            <span class="k">yield</span> <span class="n">jailDependantStartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+            <span class="n">started_jails</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dependant_jail</span><span class="p">)</span>
+
+            <span class="c1"># revert start of previously started dependants after failure</span>
+            <span class="k">def</span> <span class="nf">_revert_start</span><span class="p">(</span>
+                <span class="n">jail</span><span class="p">:</span> <span class="n">JailGenerator</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span>
+                <span class="p">[],</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="p">]:</span>
+                <span class="k">def</span> <span class="nf">revert_method</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span>
+                    <span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="kc">None</span>
+                <span class="p">]:</span>
+                    <span class="k">yield from</span> <span class="n">jail</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">revert_method</span>
+            <span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span>
+                <span class="n">_revert_start</span><span class="p">(</span><span class="n">dependant_jail</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">jailDependantsStartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span>
+            <span class="n">started_jails</span><span class="o">=</span><span class="n">started_jails</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_run_poststop_hook_manually</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running poststop hook manually&quot;</span><span class="p">)</span>
@@ -781,9 +903,50 @@
         <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
         <span class="o">**</span><span class="n">temporary_config_override</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;iocage.events.IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Start a jail, run a command and shut it down immediately.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start a jail, run a command and shut it down immediately.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            command (string):</span>
+
+<span class="sd">                The command to execute in the jail.</span>
+
+<span class="sd">            passthru (bool):</span>
+
+<span class="sd">                Execute commands in an interactive shell.</span>
+
+<span class="sd">            event_scope (iocage.lib.events.Scope): (default=None)</span>
+
+<span class="sd">                Provide an existing libiocage event scope or automatically</span>
+<span class="sd">                create a new one instead.</span>
+
+<span class="sd">            dependant_jails_seen (list[iocage.JailGenerator]):</span>
+
+<span class="sd">                Jail depends can have circular dependencies. By passing a list</span>
+<span class="sd">                of already started jails to the start command, iocage does not</span>
+<span class="sd">                need to query their state, because they are known to be running</span>
+<span class="sd">                already. This argument is internally used when starting a jails</span>
+<span class="sd">                dependants recursively.</span>
+
+<span class="sd">            start_dependant_jails (bool):</span>
+
+<span class="sd">                When disabled, no dependant jails will be started.</span>
+
+<span class="sd">            **temporary_config_override (dict(str, any)):</span>
+
+<span class="sd">                Other named arguments temporary override JailConfig properties.</span>
+
+<span class="sd">                For example:</span>
+
+<span class="sd">                    jail = iocage.JailGenerator(&quot;myjail&quot;)</span>
+<span class="sd">                    events = jail.fork_exec(&quot;ifconfig&quot;, vnet=False)</span>
+<span class="sd">                    print(list(events))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_existing</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_stopped</span><span class="p">()</span>
 
@@ -805,7 +968,9 @@
                 <span class="bp">self</span><span class="p">,</span>
                 <span class="n">single_command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
                 <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+                <span class="n">dependant_jails_seen</span><span class="o">=</span><span class="n">dependant_jails_seen</span><span class="p">,</span>
+                <span class="n">start_dependant_jails</span><span class="o">=</span><span class="n">start_dependant_jails</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">fork_exec_events</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">event</span>
@@ -841,7 +1006,7 @@
             <span class="p">)</span>
 
         <span class="c1"># ToDo: Deprecate and remove this method</span>
-        <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;_run_hook only supports start/stop&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;_run_hook only supports start/stop&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_ensure_script_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">realpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">launch_script_dir</span><span class="p">)</span>
@@ -1165,7 +1330,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">require_storage_backend</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">validate_name</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailName</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailName</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">new_name</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
 
         <span class="n">current_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
         <span class="n">current_mountpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span>
@@ -1298,7 +1466,7 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">release</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">release</span><span class="o">.</span><span class="n">full_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_from_resource</span><span class="p">(</span><span class="n">release</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="JailGenerator.create_from_template"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.create_from_template">[docs]</a>    <span class="k">def</span> <span class="nf">create_from_template</span><span class="p">(</span>
@@ -1307,11 +1475,12 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create a Jail from a template Jail.&quot;&quot;&quot;</span>
         <span class="n">template</span><span class="o">.</span><span class="n">require_jail_is_template</span><span class="p">()</span>
+        <span class="n">existing_config_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;template&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">([</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;template&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">existing_config_keys</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">full_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;basejail&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;basejail&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;basejail_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;basejail_type&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_from_resource</span><span class="p">(</span><span class="n">template</span><span class="p">)</span></div>
@@ -1423,11 +1592,11 @@
 <span class="sd">        to its configuration.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_basejail</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">StandaloneJailStorage</span>
+            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Standalone</span><span class="o">.</span><span class="n">StandaloneJailStorage</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;basejail_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nullfs&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">NullFSBasejailStorage</span><span class="o">.</span><span class="n">NullFSBasejailStorage</span>
+            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">NullFSBasejail</span><span class="o">.</span><span class="n">NullFSBasejailStorage</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;basejail_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;zfs&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ZFSBasejailStorage</span><span class="o">.</span><span class="n">ZFSBasejailStorage</span>
+            <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">ZFSBasejail</span><span class="o">.</span><span class="n">ZFSBasejailStorage</span>
 
 <div class="viewcode-block" id="JailGenerator.save"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.JailGenerator.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Permanently save a jail&#39;s configuration.&quot;&quot;&quot;</span>
@@ -1758,8 +1927,7 @@
 
         <span class="n">_ipfw_enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">ipfw_enabled</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_hook_script</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="p">([</span><span class="s2">&quot;set +e&quot;</span><span class="p">,</span> <span class="s2">&quot;service ipfw onestop&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">_ipfw_enabled</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span>
-            <span class="p">[</span>
+            <span class="p">([</span><span class="s2">&quot;set +e&quot;</span><span class="p">,</span> <span class="s2">&quot;service ipfw onestop&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">_ipfw_enabled</span> <span class="k">else</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="s2">&quot;set -e&quot;</span><span class="p">,</span>
                 <span class="n">f</span><span class="s2">&quot;. </span><span class="si">{self._relative_hook_script_dir}</span><span class="s2">/start.sh&quot;</span><span class="p">,</span>
                 <span class="n">jail_command</span><span class="p">,</span>
@@ -2061,7 +2229,8 @@
             <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">JailNotSupplied</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
         <span class="n">resource_selector</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="o">.</span><span class="n">ResourceSelector</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">text</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="n">root_datasets</span> <span class="o">=</span> <span class="n">resource_selector</span><span class="o">.</span><span class="n">filter_datasets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
@@ -2147,7 +2316,7 @@
             <span class="n">jail_env</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">all_properties</span><span class="p">:</span>
-            <span class="n">prop_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;IOCAGE_{prop.upper()}&quot;</span>
+            <span class="n">prop_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;IOCAGE_{prop.replace(&#39;.&#39;, &#39;_&#39;).upper()}&quot;</span>
             <span class="n">jail_env</span><span class="p">[</span><span class="n">prop_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getstring</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
 
         <span class="n">jail_env</span><span class="p">[</span><span class="s2">&quot;IOCAGE_JAIL_PATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">mountpoint</span>
@@ -2199,7 +2368,18 @@
         <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">prop</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
                 <span class="n">properties</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare two Jails by their name.</span>
+
+<span class="sd">        The jail is identified by its full name, including the iocage root</span>
+<span class="sd">        dataset name in case there is more than one enabled on the host.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">JailGenerator</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">full_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="Jail"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.Jail">[docs]</a><span class="k">class</span> <span class="nc">Jail</span><span class="p">(</span><span class="n">JailGenerator</span><span class="p">):</span>
@@ -2256,13 +2436,60 @@
 <div class="viewcode-block" id="Jail.fork_exec"><a class="viewcode-back" href="../../iocage.Jail.html#iocage.Jail.Jail.fork_exec">[docs]</a>    <span class="k">def</span> <span class="nf">fork_exec</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">temporary_config_override</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Execute a one-shot jail and return its stdout.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start a jail, run a command and shut it down immediately.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            command (string):</span>
+
+<span class="sd">                The command to execute in the jail.</span>
+
+<span class="sd">            passthru (bool):</span>
+
+<span class="sd">                Execute commands in an interactive shell.</span>
+
+<span class="sd">            event_scope (iocage.lib.events.Scope): (default=None)</span>
+
+<span class="sd">                Provide an existing libiocage event scope or automatically</span>
+<span class="sd">                create a new one instead.</span>
+
+<span class="sd">            dependant_jails_seen (list[iocage.JailGenerator]):</span>
+
+<span class="sd">                Jail depends can have circular dependencies. By passing a list</span>
+<span class="sd">                of already started jails to the start command, iocage does not</span>
+<span class="sd">                need to query their state, because they are known to be running</span>
+<span class="sd">                already. This argument is internally used when starting a jails</span>
+<span class="sd">                dependants recursively.</span>
+
+<span class="sd">            start_dependant_jails (bool):</span>
+
+<span class="sd">                When disabled, no dependant jails will be started.</span>
+
+<span class="sd">            **temporary_config_override (dict(str, any)):</span>
+
+<span class="sd">                Other named arguments temporary override JailConfig properties.</span>
+
+<span class="sd">                For example:</span>
+
+<span class="sd">                    jail = iocage.JailGenerator(&quot;myjail&quot;)</span>
+<span class="sd">                    events = jail.fork_exec(&quot;ifconfig&quot;, vnet=False)</span>
+<span class="sd">                    print(list(events))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">events</span> <span class="o">=</span> <span class="n">JailGenerator</span><span class="o">.</span><span class="n">fork_exec</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
-            <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+            <span class="n">dependant_jails_seen</span><span class="o">=</span><span class="n">dependant_jails_seen</span><span class="p">,</span>
+            <span class="n">start_dependant_jails</span><span class="o">=</span><span class="n">start_dependant_jails</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">temporary_config_override</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailLaunch</span><span class="p">)</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
@@ -2279,7 +2506,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -2298,20 +2525,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

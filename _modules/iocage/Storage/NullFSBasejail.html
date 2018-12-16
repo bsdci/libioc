@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>iocage.NullFSBasejailStorage &mdash; libiocage  documentation</title>
+  <title>iocage.Storage.NullFSBasejail &mdash; libiocage  documentation</title>
   
 
   
@@ -24,13 +24,13 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> libiocage
+            <a href="../../../index.html" class="icon icon-home"> libiocage
           
 
           
@@ -59,7 +59,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -78,7 +78,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../iocage.html">iocage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../iocage.html">iocage package</a></li>
 </ul>
 
             
@@ -93,7 +93,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">libiocage</a>
+          <a href="../../../index.html">libiocage</a>
         
       </nav>
 
@@ -122,11 +122,13 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>iocage.NullFSBasejailStorage</li>
+          <li><a href="../Storage.html">iocage.Storage</a> &raquo;</li>
+        
+      <li>iocage.Storage.NullFSBasejail</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -141,7 +143,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for iocage.NullFSBasejailStorage</h1><div class="highlight"><pre>
+  <h1>Source code for iocage.Storage.NullFSBasejail</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2014-2018, iocage</span>
 <span class="c1"># Copyright (c) 2017-2018, Stefan Grönke</span>
 <span class="c1"># All rights reserved.</span>
@@ -168,25 +170,25 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage NullFS basejail storage backend.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">iocage.Storage</span>
-<span class="kn">import</span> <span class="nn">iocage.StandaloneJailStorage</span>
+<span class="kn">import</span> <span class="nn">iocage.Storage.Standalone</span>
 <span class="kn">import</span> <span class="nn">iocage.helpers</span>
 
 
-<div class="viewcode-block" id="NullFSBasejailStorage"><a class="viewcode-back" href="../../iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">NullFSBasejailStorage</span><span class="p">(</span><span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Storage</span><span class="p">):</span>
+<div class="viewcode-block" id="NullFSBasejailStorage"><a class="viewcode-back" href="../../../iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">NullFSBasejailStorage</span><span class="p">(</span><span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Storage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;iocage NullFS basejail storage backend.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.apply"><a class="viewcode-back" href="../../iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NullFSBasejailStorage.apply"><a class="viewcode-back" href="../../../iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Attach the jail storage.&quot;&quot;&quot;</span>
         <span class="n">NullFSBasejailStorage</span><span class="o">.</span><span class="n">_create_nullfs_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.setup"><a class="viewcode-back" href="../../iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">):</span>
+<div class="viewcode-block" id="NullFSBasejailStorage.setup"><a class="viewcode-back" href="../../../iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prepare the jail storage.&quot;&quot;&quot;</span>
-        <span class="n">iocage</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
+        <span class="n">iocage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Standalone</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">release</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.umount_nullfs"><a class="viewcode-back" href="../../iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.umount_nullfs">[docs]</a>    <span class="k">def</span> <span class="nf">umount_nullfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NullFSBasejailStorage.umount_nullfs"><a class="viewcode-back" href="../../../iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.umount_nullfs">[docs]</a>    <span class="k">def</span> <span class="nf">umount_nullfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Unmount all NullFS mounts from fstab.</span>
 
@@ -227,7 +229,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -246,24 +248,17 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

@@ -173,7 +173,6 @@
 <span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">import</span> <span class="nn">libzfs</span>
-<span class="kn">import</span> <span class="nn">ucl</span>
 
 <span class="kn">import</span> <span class="nn">iocage.events</span>
 <span class="kn">import</span> <span class="nn">iocage.helpers</span>
@@ -265,7 +264,7 @@
         <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
         <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_command</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="s2">&quot;fetch&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--yes&quot;</span><span class="p">,</span>
@@ -277,6 +276,9 @@
                 <span class="n">SIGNATURE_TYPE</span><span class="o">=</span><span class="s2">&quot;fingerprints&quot;</span>
             <span class="p">)</span>
         <span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">stderr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stderr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">PkgNotFound</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_build_mirror_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pkg_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
@@ -344,11 +346,10 @@
             <span class="n">pkg_archive_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_latest_pkg_archive</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">)</span>
             <span class="n">command</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                 <span class="s2">&quot;export ASSUME_ALWAYS_YES=yes&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;ls -alR /.iocage-pkg&quot;</span><span class="p">,</span>
                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;add&quot;</span><span class="p">,</span>
-                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.package_source_directory}</span><span class="s2">/cache/</span><span class="si">{pkg_archive_name}</span><span class="s2">&quot;</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.package_source_directory}</span><span class="s2">/</span><span class="si">{pkg_archive_name}</span><span class="s2">&quot;</span>
                 <span class="p">]),</span>
                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
@@ -361,7 +362,7 @@
                     <span class="s2">&quot;install&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;--yes&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="s2">&quot;libiocage&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
+                    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_packages</span><span class="p">)</span>
                 <span class="p">])</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">postinstall</span><span class="p">)</span>
             <span class="n">temporary_jail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_temporary_jail</span><span class="p">(</span><span class="n">jail</span><span class="p">)</span>
@@ -385,9 +386,48 @@
             <span class="k">yield</span> <span class="n">packageInstallEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">e</span></div>
 
+<div class="viewcode-block" id="Pkg.remove"><a class="viewcode-back" href="../../iocage.Pkg.html#iocage.Pkg.Pkg.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;iocage.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">IocageEvent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Remove installed packages from a jail.&quot;&quot;&quot;</span>
+        <span class="n">_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_packages</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
+
+        <span class="n">packageRemoveEvent</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">PackageRemove</span><span class="p">(</span>
+            <span class="n">packages</span><span class="o">=</span><span class="n">_packages</span><span class="p">,</span>
+            <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;remove&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--yes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_packages</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">yield</span> <span class="n">packageRemoveEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">jail</span><span class="o">.</span><span class="n">running</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">temporary_jail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_temporary_jail</span><span class="p">(</span><span class="n">jail</span><span class="p">)</span>
+                <span class="n">_command</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s2">&quot;export ASSUME_ALWAYS_YES=yes&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="p">])</span>
+                <span class="k">yield from</span> <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fork_exec</span><span class="p">(</span>
+                    <span class="n">_command</span><span class="p">,</span>
+                    <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">packageRemoveEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">packageRemoveEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">yield</span> <span class="n">packageRemoveEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">_get_latest_pkg_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_source_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">packages_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{package_source_directory}</span><span class="s2">/cache&quot;</span>
-        <span class="k">for</span> <span class="n">package_archive</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">packages_directory</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">package_archive</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{package_source_directory}</span><span class="s2">/cache&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">package_archive</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.txz&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">package_archive</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;pkg&quot;</span><span class="p">):</span>
@@ -419,7 +459,7 @@
         <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">_packages</span> <span class="o">=</span> <span class="p">[</span><span class="n">packages</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">packages</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">packages</span>
-        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;^(?:[A-z0-9](?:[A-z0-9\-\/]?[A-z0-9])*)+$&quot;</span><span class="p">)</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(?:[A-z0-9](?:[A-z0-9\-\/]?[A-z0-9])*)+$&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">_packages</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">package</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SecurityViolation</span><span class="p">(</span>
@@ -436,7 +476,7 @@
         <span class="n">host_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{jail.root_path}</span><span class="s2">/</span><span class="si">{jail_directory}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_repo_conf</span><span class="p">(</span>
             <span class="n">repo_name</span><span class="o">=</span><span class="s2">&quot;libiocage&quot;</span><span class="p">,</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;file://</span><span class="si">{self.package_source_directory}</span><span class="s2">/cache&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;file://</span><span class="si">{self.package_source_directory}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">directory</span><span class="o">=</span><span class="n">host_directory</span><span class="p">,</span>
             <span class="n">signature_type</span><span class="o">=</span><span class="s2">&quot;none&quot;</span>
         <span class="p">)</span>
@@ -512,6 +552,7 @@
                 <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Refusing to write to a symlink&quot;</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">ucl</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ucl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ucl</span><span class="o">.</span><span class="n">UCL_EMIT_JSON</span><span class="p">))</span>
 
@@ -550,24 +591,18 @@
             <span class="n">host</span><span class="o">=</span><span class="n">source_jail</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">=</span><span class="n">source_jail</span><span class="o">.</span><span class="n">dataset</span>
         <span class="p">)</span>
+        <span class="n">temporary_jail</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ignore_host_defaults</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">root_path</span> <span class="o">=</span> <span class="n">temporary_jail</span><span class="o">.</span><span class="n">root_path</span>
         <span class="n">destination_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{root_path}{self.package_source_directory}</span><span class="s2">&quot;</span>
 
         <span class="n">release_major_version</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">source_jail</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">version_number</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">repo_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_pkg_dataset</span><span class="p">(</span><span class="n">release_major_version</span><span class="p">)</span>
+        <span class="n">cache_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{repo_ds.name}</span><span class="s2">/cache&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
-                <span class="n">source</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
-                <span class="n">destination</span><span class="o">=</span><span class="n">destination_dir</span><span class="p">,</span>
-                <span class="n">options</span><span class="o">=</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span>
-                <span class="n">auto_create_destination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
-            <span class="n">cache_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{dataset.name}</span><span class="s2">/cache&quot;</span><span class="p">)</span>
-            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
                 <span class="n">source</span><span class="o">=</span><span class="n">cache_ds</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
-                <span class="n">destination</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{destination_dir}</span><span class="s2">/cache&quot;</span><span class="p">,</span>
+                <span class="n">destination</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{destination_dir}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">options</span><span class="o">=</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span>
                 <span class="n">auto_create_destination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
@@ -589,7 +624,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -608,20 +643,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

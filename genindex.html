@@ -182,6 +182,8 @@
 </li>
       <li><a href="iocage.Datasets.html#iocage.Datasets.Datasets.activate_pool">activate_pool() (iocage.Datasets.Datasets method)</a>
 </li>
+      <li><a href="iocage.errors.html#iocage.errors.ActivationFailed">ActivationFailed</a>
+</li>
       <li><a href="iocage.Datasets.html#iocage.Datasets.Datasets.active_pool">active_pool (iocage.Datasets.Datasets attribute)</a>
 </li>
       <li><a href="iocage.Config.Jail.Properties.Addresses.html#iocage.Config.Jail.Properties.Addresses.AddressesProp.add">add() (iocage.Config.Jail.Properties.Addresses.AddressesProp method)</a>
@@ -189,7 +191,11 @@
       <ul>
         <li><a href="iocage.Config.Jail.Properties.Addresses.html#iocage.Config.Jail.Properties.Addresses.AddressSet.add">(iocage.Config.Jail.Properties.Addresses.AddressSet method)</a>
 </li>
+        <li><a href="iocage.Config.Jail.Properties.Depends.html#iocage.Config.Jail.Properties.Depends.DependsProp.add">(iocage.Config.Jail.Properties.Depends.DependsProp method)</a>
+</li>
         <li><a href="iocage.Config.Jail.Properties.Interfaces.html#iocage.Config.Jail.Properties.Interfaces.InterfaceProp.add">(iocage.Config.Jail.Properties.Interfaces.InterfaceProp method)</a>
+</li>
+        <li><a href="iocage.Filter.html#iocage.Filter.Terms.add">(iocage.Filter.Terms method)</a>
 </li>
       </ul></li>
       <li><a href="iocage.Config.Jail.File.Fstab.html#iocage.Config.Jail.File.Fstab.Fstab.add_line">add_line() (iocage.Config.Jail.File.Fstab.Fstab method)</a>
@@ -241,13 +247,13 @@
 </li>
         <li><a href="iocage.NetworkInterface.html#iocage.NetworkInterface.NetworkInterface.apply">(iocage.NetworkInterface.NetworkInterface method)</a>
 </li>
-        <li><a href="iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.apply">(iocage.NullFSBasejailStorage.NullFSBasejailStorage method)</a>
-</li>
         <li><a href="iocage.ResourceUpdater.html#iocage.ResourceUpdater.Updater.apply">(iocage.ResourceUpdater.Updater method)</a>
 </li>
-        <li><a href="iocage.StandaloneJailStorage.html#iocage.StandaloneJailStorage.StandaloneJailStorage.apply">(iocage.StandaloneJailStorage.StandaloneJailStorage method)</a>
+        <li><a href="iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.apply">(iocage.Storage.NullFSBasejail.NullFSBasejailStorage method)</a>
 </li>
-        <li><a href="iocage.ZFSBasejailStorage.html#iocage.ZFSBasejailStorage.ZFSBasejailStorage.apply">(iocage.ZFSBasejailStorage.ZFSBasejailStorage method)</a>
+        <li><a href="iocage.Storage.Standalone.html#iocage.Storage.Standalone.StandaloneJailStorage.apply">(iocage.Storage.Standalone.StandaloneJailStorage method)</a>
+</li>
+        <li><a href="iocage.Storage.ZFSBasejail.html#iocage.Storage.ZFSBasejail.ZFSBasejailStorage.apply">(iocage.Storage.ZFSBasejail.ZFSBasejailStorage method)</a>
 </li>
       </ul></li>
       <li><a href="iocage.NetworkInterface.html#iocage.NetworkInterface.NetworkInterface.apply_addresses">apply_addresses() (iocage.NetworkInterface.NetworkInterface method)</a>
@@ -331,7 +337,7 @@
       <ul>
         <li><a href="iocage.DevfsRules.html#iocage.DevfsRules.DevfsRuleset.clone">(iocage.DevfsRules.DevfsRuleset method)</a>
 </li>
-        <li><a href="iocage.ZFSBasejailStorage.html#iocage.ZFSBasejailStorage.ZFSBasejailStorage.clone">(iocage.ZFSBasejailStorage.ZFSBasejailStorage method)</a>
+        <li><a href="iocage.Storage.ZFSBasejail.html#iocage.Storage.ZFSBasejail.ZFSBasejailStorage.clone">(iocage.Storage.ZFSBasejail.ZFSBasejailStorage method)</a>
 </li>
       </ul></li>
       <li><a href="iocage.ZFS.html#iocage.ZFS.ZFS.clone_dataset">clone_dataset() (iocage.ZFS.ZFS method)</a>
@@ -411,6 +417,8 @@
 </li>
       </ul></li>
       <li><a href="iocage.Release.html#iocage.Release.ReleaseGenerator.current_snapshot">current_snapshot (iocage.Release.ReleaseGenerator attribute)</a>
+</li>
+      <li><a href="iocage.Release.html#iocage.Release.ReleaseGenerator.current_snapshot_patchlevel">current_snapshot_patchlevel (iocage.Release.ReleaseGenerator attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -500,10 +508,10 @@
         <li><a href="iocage.Resource.html#iocage.Resource.Resource.DEFAULT_ZFS_DATASET_SUFFIX">(iocage.Resource.Resource attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.errors.html#iocage.errors.DefaultConfigNotFound">DefaultConfigNotFound</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.errors.html#iocage.errors.DefaultReleaseNotFound">DefaultReleaseNotFound</a>
 </li>
       <li><a href="iocage.Resource.html#iocage.Resource.DefaultResource">DefaultResource (class in iocage.Resource)</a>
@@ -529,9 +537,13 @@
       <li><a href="iocage.Config.Jail.Properties.Addresses.html#iocage.Config.Jail.Properties.Addresses.AddressesProp.delimiter">delimiter (iocage.Config.Jail.Properties.Addresses.AddressesProp attribute)</a>
 
       <ul>
+        <li><a href="iocage.Config.Jail.Properties.Depends.html#iocage.Config.Jail.Properties.Depends.DependsProp.delimiter">(iocage.Config.Jail.Properties.Depends.DependsProp attribute)</a>
+</li>
         <li><a href="iocage.Config.Jail.Properties.Interfaces.html#iocage.Config.Jail.Properties.Interfaces.InterfaceProp.delimiter">(iocage.Config.Jail.Properties.Interfaces.InterfaceProp attribute)</a>
 </li>
       </ul></li>
+      <li><a href="iocage.Config.Jail.Properties.Depends.html#iocage.Config.Jail.Properties.Depends.DependsProp">DependsProp (class in iocage.Config.Jail.Properties.Depends)</a>
+</li>
       <li><a href="iocage.Jail.html#iocage.Jail.Jail.destroy">destroy() (iocage.Jail.Jail method)</a>
 
       <ul>
@@ -564,13 +576,13 @@
 </li>
       <li><a href="iocage.Distribution.html#iocage.Distribution.Distribution">Distribution (class in iocage.Distribution)</a>
 </li>
-      <li><a href="iocage.errors.html#iocage.errors.DistributionEOLWarningDownloadFailed">DistributionEOLWarningDownloadFailed</a>
-</li>
       <li><a href="iocage.Distribution.html#iocage.Distribution.DistributionGenerator">DistributionGenerator (class in iocage.Distribution)</a>
 </li>
       <li><a href="iocage.errors.html#iocage.errors.DistributionUnknown">DistributionUnknown</a>
 </li>
       <li><a href="iocage.Release.html#iocage.Release.ReleaseGenerator.download_directory">download_directory (iocage.Release.ReleaseGenerator attribute)</a>
+</li>
+      <li><a href="iocage.errors.html#iocage.errors.DownloadFailed">DownloadFailed</a>
 </li>
       <li><a href="iocage.errors.html#iocage.errors.DuplicateDevfsRuleset">DuplicateDevfsRuleset</a>
 </li>
@@ -588,6 +600,8 @@
 
       <ul>
         <li><a href="iocage.events.html#iocage.events.JailCommandExecution.end">(iocage.events.JailCommandExecution method)</a>
+</li>
+        <li><a href="iocage.events.html#iocage.events.JailDependantsStart.end">(iocage.events.JailDependantsStart method)</a>
 </li>
         <li><a href="iocage.events.html#iocage.events.JailLaunch.end">(iocage.events.JailLaunch method)</a>
 </li>
@@ -714,10 +728,10 @@
 </li>
       <li><a href="iocage.DevfsRules.html#iocage.DevfsRules.DevfsRules.find_by_name">find_by_name() (iocage.DevfsRules.DevfsRules method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.DevfsRules.html#iocage.DevfsRules.DevfsRules.find_by_number">find_by_number() (iocage.DevfsRules.DevfsRules method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.Datasets.html#iocage.Datasets.Datasets.find_root_datasets">find_root_datasets() (iocage.Datasets.Datasets method)</a>
 </li>
       <li><a href="iocage.Datasets.html#iocage.Datasets.Datasets.find_root_datasets_name">find_root_datasets_name() (iocage.Datasets.Datasets method)</a>
@@ -755,6 +769,8 @@
       <li><a href="iocage.Jail.html#iocage.Jail.JailGenerator.full_name">full_name (iocage.Jail.JailGenerator attribute)</a>
 
       <ul>
+        <li><a href="iocage.Release.html#iocage.Release.ReleaseGenerator.full_name">(iocage.Release.ReleaseGenerator attribute)</a>
+</li>
         <li><a href="iocage.Release.html#iocage.Release.ReleaseResource.full_name">(iocage.Release.ReleaseResource attribute)</a>
 </li>
       </ul></li>
@@ -866,6 +882,8 @@
 </li>
       <li><a href="iocage.NetworkInterface.html#iocage.NetworkInterface.NetworkInterface.ifconfig_command">ifconfig_command (iocage.NetworkInterface.NetworkInterface attribute)</a>
 </li>
+      <li><a href="iocage.Config.Jail.JailConfig.html#iocage.Config.Jail.JailConfig.JailConfig.ignore_host_defaults">ignore_host_defaults (iocage.Config.Jail.JailConfig.JailConfig attribute)</a>
+</li>
       <li><a href="iocage.errors.html#iocage.errors.IllegalArchiveContent">IllegalArchiveContent</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.ImportConfig">ImportConfig (class in iocage.events)</a>
@@ -932,6 +950,8 @@
 </li>
       <li><a href="iocage.errors.html#iocage.errors.InvalidSnapshotIdentifier">InvalidSnapshotIdentifier</a>
 </li>
+      <li><a href="iocage.errors.html#iocage.errors.InvalidSourceName">InvalidSourceName</a>
+</li>
       <li><a href="iocage.html#module-iocage">iocage (module)</a>
 </li>
       <li><a href="iocage.BridgeInterface.html#module-iocage.BridgeInterface">iocage.BridgeInterface (module)</a>
@@ -964,6 +984,8 @@
 </li>
       <li><a href="iocage.Config.Jail.Properties.Defaultrouter.html#module-iocage.Config.Jail.Properties.Defaultrouter">iocage.Config.Jail.Properties.Defaultrouter (module)</a>
 </li>
+      <li><a href="iocage.Config.Jail.Properties.Depends.html#module-iocage.Config.Jail.Properties.Depends">iocage.Config.Jail.Properties.Depends (module)</a>
+</li>
       <li><a href="iocage.Config.Jail.Properties.Interfaces.html#module-iocage.Config.Jail.Properties.Interfaces">iocage.Config.Jail.Properties.Interfaces (module)</a>
 </li>
       <li><a href="iocage.Config.Jail.Properties.Resolver.html#module-iocage.Config.Jail.Properties.Resolver">iocage.Config.Jail.Properties.Resolver (module)</a>
@@ -976,13 +998,15 @@
 </li>
       <li><a href="iocage.Config.Type.JSON.html#module-iocage.Config.Type.JSON">iocage.Config.Type.JSON (module)</a>
 </li>
-      <li><a href="iocage.Config.Type.UCL.html#module-iocage.Config.Type.UCL">iocage.Config.Type.UCL (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="iocage.Config.Type.UCL.html#module-iocage.Config.Type.UCL">iocage.Config.Type.UCL (module)</a>
+</li>
       <li><a href="iocage.Config.Type.ZFS.html#module-iocage.Config.Type.ZFS">iocage.Config.Type.ZFS (module)</a>
 </li>
       <li><a href="iocage.Datasets.html#module-iocage.Datasets">iocage.Datasets (module)</a>
+</li>
+      <li><a href="iocage.decorators.html#module-iocage.decorators">iocage.decorators (module)</a>
 </li>
       <li><a href="iocage.DevfsRules.html#module-iocage.DevfsRules">iocage.DevfsRules (module)</a>
 </li>
@@ -1022,8 +1046,6 @@
 </li>
       <li><a href="iocage.NetworkInterface.html#module-iocage.NetworkInterface">iocage.NetworkInterface (module)</a>
 </li>
-      <li><a href="iocage.NullFSBasejailStorage.html#module-iocage.NullFSBasejailStorage">iocage.NullFSBasejailStorage (module)</a>
-</li>
       <li><a href="iocage.Pkg.html#module-iocage.Pkg">iocage.Pkg (module)</a>
 </li>
       <li><a href="iocage.Prompts.html#module-iocage.Prompts">iocage.Prompts (module)</a>
@@ -1046,17 +1068,19 @@
 </li>
       <li><a href="iocage.SecureTarfile.html#module-iocage.SecureTarfile">iocage.SecureTarfile (module)</a>
 </li>
-      <li><a href="iocage.StandaloneJailStorage.html#module-iocage.StandaloneJailStorage">iocage.StandaloneJailStorage (module)</a>
-</li>
       <li><a href="iocage.Storage.html#module-iocage.Storage">iocage.Storage (module)</a>
+</li>
+      <li><a href="iocage.Storage.NullFSBasejail.html#module-iocage.Storage.NullFSBasejail">iocage.Storage.NullFSBasejail (module)</a>
+</li>
+      <li><a href="iocage.Storage.Standalone.html#module-iocage.Storage.Standalone">iocage.Storage.Standalone (module)</a>
+</li>
+      <li><a href="iocage.Storage.ZFSBasejail.html#module-iocage.Storage.ZFSBasejail">iocage.Storage.ZFSBasejail (module)</a>
 </li>
       <li><a href="iocage.Types.html#module-iocage.Types">iocage.Types (module)</a>
 </li>
       <li><a href="iocage.VersionedResource.html#module-iocage.VersionedResource">iocage.VersionedResource (module)</a>
 </li>
       <li><a href="iocage.ZFS.html#module-iocage.ZFS">iocage.ZFS (module)</a>
-</li>
-      <li><a href="iocage.ZFSBasejailStorage.html#module-iocage.ZFSBasejailStorage">iocage.ZFSBasejailStorage (module)</a>
 </li>
       <li><a href="iocage.ZFSShareStorage.html#module-iocage.ZFSShareStorage">iocage.ZFSShareStorage (module)</a>
 </li>
@@ -1136,6 +1160,10 @@
 </li>
       <li><a href="iocage.errors.html#iocage.errors.JailConigZFSIsNotAllowed">JailConigZFSIsNotAllowed</a>
 </li>
+      <li><a href="iocage.events.html#iocage.events.JailDependantsStart">JailDependantsStart (class in iocage.events)</a>
+</li>
+      <li><a href="iocage.events.html#iocage.events.JailDependantStart">JailDependantStart (class in iocage.events)</a>
+</li>
       <li><a href="iocage.events.html#iocage.events.JailDestroy">JailDestroy (class in iocage.events)</a>
 </li>
       <li><a href="iocage.errors.html#iocage.errors.JailDestructionFailed">JailDestructionFailed</a>
@@ -1152,10 +1180,10 @@
 </li>
       <li><a href="iocage.errors.html#iocage.errors.JailFilterInvalidName">JailFilterInvalidName</a>
 </li>
-      <li><a href="iocage.events.html#iocage.events.JailFstabUpdate">JailFstabUpdate (class in iocage.events)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="iocage.events.html#iocage.events.JailFstabUpdate">JailFstabUpdate (class in iocage.events)</a>
+</li>
       <li><a href="iocage.Jail.html#iocage.Jail.JailGenerator">JailGenerator (class in iocage.Jail)</a>
 </li>
       <li><a href="iocage.errors.html#iocage.errors.JailIsTemplate">JailIsTemplate</a>
@@ -1205,6 +1233,8 @@
       <li><a href="iocage.errors.html#iocage.errors.JailUnknownIdentifier">JailUnknownIdentifier</a>
 </li>
       <li><a href="iocage.Jail.html#iocage.Jail.JailGenerator.jid">jid (iocage.Jail.JailGenerator attribute)</a>
+</li>
+      <li><a href="iocage.decorators.html#iocage.decorators.json">json() (in module iocage.decorators)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1398,7 +1428,7 @@
 </li>
       <li><a href="iocage.errors.html#iocage.errors.NotAnIocageZFSProperty">NotAnIocageZFSProperty</a>
 </li>
-      <li><a href="iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage">NullFSBasejailStorage (class in iocage.NullFSBasejailStorage)</a>
+      <li><a href="iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage">NullFSBasejailStorage (class in iocage.Storage.NullFSBasejail)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1413,6 +1443,8 @@
       <li><a href="iocage.events.html#iocage.events.PackageFetch">PackageFetch (class in iocage.events)</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.PackageInstall">PackageInstall (class in iocage.events)</a>
+</li>
+      <li><a href="iocage.events.html#iocage.events.PackageRemove">PackageRemove (class in iocage.events)</a>
 </li>
       <li><a href="iocage.helpers.html#iocage.helpers.parse_bool">parse_bool() (in module iocage.helpers)</a>
 </li>
@@ -1455,6 +1487,8 @@
       <li><a href="iocage.errors.html#iocage.errors.PkgNotFound">PkgNotFound</a>
 </li>
       <li><a href="iocage.Provisioning.ix.html#iocage.Provisioning.ix.PluginDefinition">PluginDefinition (class in iocage.Provisioning.ix)</a>
+</li>
+      <li><a href="iocage.Provisioning.ix.html#iocage.Provisioning.ix.PluginUnavailableError">PluginUnavailableError</a>
 </li>
       <li><a href="iocage.Resource.html#iocage.Resource.Resource.pool">pool (iocage.Resource.Resource attribute)</a>
 </li>
@@ -1574,6 +1608,8 @@
 </li>
       <li><a href="iocage.Host.html#iocage.Host.HostGenerator.release_version">release_version (iocage.Host.HostGenerator attribute)</a>
 </li>
+      <li><a href="iocage.events.html#iocage.events.ReleaseAssetDownload">ReleaseAssetDownload (class in iocage.events)</a>
+</li>
       <li><a href="iocage.errors.html#iocage.errors.ReleaseAssetHashesUnavailable">ReleaseAssetHashesUnavailable</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.ReleaseConfiguration">ReleaseConfiguration (class in iocage.events)</a>
@@ -1621,7 +1657,11 @@
       <li><a href="iocage.Release.html#iocage.Release.ReleaseGenerator.remote_url">remote_url (iocage.Release.ReleaseGenerator attribute)</a>
 </li>
       <li><a href="iocage.Config.Jail.Properties.Addresses.html#iocage.Config.Jail.Properties.Addresses.AddressSet.remove">remove() (iocage.Config.Jail.Properties.Addresses.AddressSet method)</a>
+
+      <ul>
+        <li><a href="iocage.Pkg.html#iocage.Pkg.Pkg.remove">(iocage.Pkg.Pkg method)</a>
 </li>
+      </ul></li>
       <li><a href="iocage.Jail.html#iocage.Jail.Jail.rename">rename() (iocage.Jail.Jail method)</a>
 
       <ul>
@@ -1755,21 +1795,25 @@
 </li>
         <li><a href="iocage.Config.Jail.Properties.Defaultrouter.html#iocage.Config.Jail.Properties.Defaultrouter.DefaultrouterMixin.set">(iocage.Config.Jail.Properties.Defaultrouter.DefaultrouterMixin method)</a>
 </li>
+        <li><a href="iocage.Config.Jail.Properties.Depends.html#iocage.Config.Jail.Properties.Depends.DependsProp.set">(iocage.Config.Jail.Properties.Depends.DependsProp method)</a>
+</li>
         <li><a href="iocage.Config.Jail.Properties.Interfaces.html#iocage.Config.Jail.Properties.Interfaces.InterfaceProp.set">(iocage.Config.Jail.Properties.Interfaces.InterfaceProp method)</a>
 </li>
         <li><a href="iocage.Config.Jail.Properties.Resolver.html#iocage.Config.Jail.Properties.Resolver.ResolverProp.set">(iocage.Config.Jail.Properties.Resolver.ResolverProp method)</a>
 </li>
         <li><a href="iocage.Config.Jail.Properties.ResourceLimit.html#iocage.Config.Jail.Properties.ResourceLimit.ResourceLimitProp.set">(iocage.Config.Jail.Properties.ResourceLimit.ResourceLimitProp method)</a>
 </li>
+        <li><a href="iocage.Filter.html#iocage.Filter.Terms.set">(iocage.Filter.Terms method)</a>
+</li>
       </ul></li>
       <li><a href="iocage.Network.html#iocage.Network.Network.setup">setup() (iocage.Network.Network method)</a>
 
       <ul>
-        <li><a href="iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.setup">(iocage.NullFSBasejailStorage.NullFSBasejailStorage method)</a>
+        <li><a href="iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.setup">(iocage.Storage.NullFSBasejail.NullFSBasejailStorage method)</a>
 </li>
-        <li><a href="iocage.StandaloneJailStorage.html#iocage.StandaloneJailStorage.StandaloneJailStorage.setup">(iocage.StandaloneJailStorage.StandaloneJailStorage method)</a>
+        <li><a href="iocage.Storage.Standalone.html#iocage.Storage.Standalone.StandaloneJailStorage.setup">(iocage.Storage.Standalone.StandaloneJailStorage method)</a>
 </li>
-        <li><a href="iocage.ZFSBasejailStorage.html#iocage.ZFSBasejailStorage.ZFSBasejailStorage.setup">(iocage.ZFSBasejailStorage.ZFSBasejailStorage method)</a>
+        <li><a href="iocage.Storage.ZFSBasejail.html#iocage.Storage.ZFSBasejail.ZFSBasejailStorage.setup">(iocage.Storage.ZFSBasejail.ZFSBasejailStorage method)</a>
 </li>
       </ul></li>
       <li><a href="iocage.Filter.html#iocage.Filter.Term.short">short (iocage.Filter.Term attribute)</a>
@@ -1806,11 +1850,15 @@
 </li>
       <li><a href="iocage.Datasets.html#iocage.Datasets.FilteredDatasets.source_filters">source_filters (iocage.Datasets.FilteredDatasets attribute)</a>
 </li>
+      <li><a href="iocage.ResourceSelector.html#iocage.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN">SOURCE_NAME_PATTERN (iocage.ResourceSelector.ResourceSelector attribute)</a>
+</li>
+      <li><a href="iocage.errors.html#iocage.errors.SourceNotFound">SourceNotFound</a>
+</li>
       <li><a href="iocage.Logger.html#iocage.Logger.Logger.spam">spam() (iocage.Logger.Logger method)</a>
 </li>
       <li><a href="iocage.helpers.html#iocage.helpers.split_list_string">split_list_string() (in module iocage.helpers)</a>
 </li>
-      <li><a href="iocage.StandaloneJailStorage.html#iocage.StandaloneJailStorage.StandaloneJailStorage">StandaloneJailStorage (class in iocage.StandaloneJailStorage)</a>
+      <li><a href="iocage.Storage.Standalone.html#iocage.Storage.Standalone.StandaloneJailStorage">StandaloneJailStorage (class in iocage.Storage.Standalone)</a>
 </li>
       <li><a href="iocage.Jail.html#iocage.Jail.Jail.start">start() (iocage.Jail.Jail method)</a>
 
@@ -1852,13 +1900,13 @@
 </li>
       <li><a href="iocage.Network.html#iocage.Network.Network.teardown">teardown() (iocage.Network.Network method)</a>
 </li>
-      <li><a href="iocage.ResourceBackup.html#iocage.ResourceBackup.LaunchableResourceBackup.temp_dir">temp_dir (iocage.ResourceBackup.LaunchableResourceBackup attribute)</a>
-</li>
       <li><a href="iocage.ResourceUpdater.html#iocage.ResourceUpdater.Updater.temporary_jail">temporary_jail (iocage.ResourceUpdater.Updater attribute)</a>
 </li>
       <li><a href="iocage.Filter.html#iocage.Filter.Term">Term (class in iocage.Filter)</a>
 </li>
       <li><a href="iocage.Filter.html#iocage.Filter.Terms">Terms (class in iocage.Filter)</a>
+</li>
+      <li><a href="iocage.decorators.html#iocage.decorators.timeit">timeit() (in module iocage.decorators)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1886,7 +1934,7 @@
 </li>
       <li><a href="iocage.helpers.html#iocage.helpers.umount_command">umount_command() (in module iocage.helpers)</a>
 </li>
-      <li><a href="iocage.NullFSBasejailStorage.html#iocage.NullFSBasejailStorage.NullFSBasejailStorage.umount_nullfs">umount_nullfs() (iocage.NullFSBasejailStorage.NullFSBasejailStorage method)</a>
+      <li><a href="iocage.Storage.NullFSBasejail.html#iocage.Storage.NullFSBasejail.NullFSBasejailStorage.umount_nullfs">umount_nullfs() (iocage.Storage.NullFSBasejail.NullFSBasejailStorage method)</a>
 </li>
       <li><a href="iocage.ZFSShareStorage.html#iocage.ZFSShareStorage.ZFSShareStorage.umount_zfs_shares">umount_zfs_shares() (iocage.ZFSShareStorage.ZFSShareStorage method)</a>
 </li>
@@ -1984,6 +2032,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.Logger.html#iocage.Logger.Logger.warn">warn() (iocage.Logger.Logger method)</a>
 </li>
+      <li><a href="iocage.ResourceBackup.html#iocage.ResourceBackup.LaunchableResourceBackup.work_dir">work_dir (iocage.ResourceBackup.LaunchableResourceBackup attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.Config.Prototype.html#iocage.Config.Prototype.Prototype.write">write() (iocage.Config.Prototype.Prototype method)</a>
@@ -2006,16 +2056,16 @@
 </li>
       <li><a href="iocage.Datasets.html#iocage.Datasets.Datasets.ZFS_POOL_ACTIVE_PROPERTY">ZFS_POOL_ACTIVE_PROPERTY (iocage.Datasets.Datasets attribute)</a>
 </li>
-      <li><a href="iocage.ZFSBasejailStorage.html#iocage.ZFSBasejailStorage.ZFSBasejailStorage">ZFSBasejailStorage (class in iocage.ZFSBasejailStorage)</a>
+      <li><a href="iocage.Storage.ZFSBasejail.html#iocage.Storage.ZFSBasejail.ZFSBasejailStorage">ZFSBasejailStorage (class in iocage.Storage.ZFSBasejail)</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.ZFSDatasetDestroy">ZFSDatasetDestroy (class in iocage.events)</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.ZFSDatasetRename">ZFSDatasetRename (class in iocage.events)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.events.html#iocage.events.ZFSEvent">ZFSEvent (class in iocage.events)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iocage.errors.html#iocage.errors.ZFSException">ZFSException</a>
 </li>
       <li><a href="iocage.errors.html#iocage.errors.ZFSPoolInvalid">ZFSPoolInvalid</a>
@@ -2029,6 +2079,8 @@
       <li><a href="iocage.events.html#iocage.events.ZFSSnapshotRename">ZFSSnapshotRename (class in iocage.events)</a>
 </li>
       <li><a href="iocage.events.html#iocage.events.ZFSSnapshotRollback">ZFSSnapshotRollback (class in iocage.events)</a>
+</li>
+      <li><a href="iocage.errors.html#iocage.errors.ZFSSourceMountpoint">ZFSSourceMountpoint</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2045,7 +2097,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -2064,20 +2116,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

@@ -101,7 +101,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.MacAddress.html">iocage.MacAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Network.html">iocage.Network module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.NetworkInterface.html">iocage.NetworkInterface module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.NullFSBasejailStorage.html">iocage.NullFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Pkg.html">iocage.Pkg module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Prompts.html">iocage.Prompts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Release.html">iocage.Release module</a></li>
@@ -111,13 +110,11 @@
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceSelector.html">iocage.ResourceSelector module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ResourceUpdater.html">iocage.ResourceUpdater module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.SecureTarfile.html">iocage.SecureTarfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.StandaloneJailStorage.html">iocage.StandaloneJailStorage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Types.html">iocage.Types module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.VersionedResource.html">iocage.VersionedResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFS.html">iocage.ZFS module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iocage.ZFSBasejailStorage.html">iocage.ZFSBasejailStorage module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.ZFSShareStorage.html">iocage.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.decorators.html">iocage.decorators module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.errors.html">iocage.errors module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">iocage.events module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.helpers.html">iocage.helpers module</a></li>
@@ -541,6 +538,34 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="iocage.events.JailDependantStart">
+<em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">JailDependantStart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#JailDependantStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.JailDependantStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.events.JailEvent" title="iocage.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.JailEvent</span></code></a></p>
+<p>Start one dependant jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.events.JailDependantsStart">
+<em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">JailDependantsStart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#JailDependantsStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.JailDependantsStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.events.JailEvent" title="iocage.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.JailEvent</span></code></a></p>
+<p>Start dependant jails.</p>
+<dl class="method">
+<dt id="iocage.events.JailDependantsStart.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>message=None</em>, <em>started_jails=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#JailDependantsStart.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.JailDependantsStart.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully finish starting dependant Jails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#iocage.events.IocageEvent" title="iocage.events.IocageEvent">IocageEvent</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="iocage.events.JailDestroy">
 <em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">JailDestroy</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#JailDestroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.JailDestroy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.events.JailEvent" title="iocage.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.JailEvent</span></code></a></p>
@@ -657,6 +682,20 @@
 <em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">PackageInstall</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#PackageInstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.PackageInstall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iocage.events.JailEvent" title="iocage.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.JailEvent</span></code></a></p>
 <p>Install packages in a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.events.PackageRemove">
+<em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">PackageRemove</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#PackageRemove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.PackageRemove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.events.JailEvent" title="iocage.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.JailEvent</span></code></a></p>
+<p>Remove packages from a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="iocage.events.ReleaseAssetDownload">
+<em class="property">class </em><code class="descclassname">iocage.events.</code><code class="descname">ReleaseAssetDownload</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/events.html#ReleaseAssetDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.events.ReleaseAssetDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iocage.events.FetchRelease" title="iocage.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">iocage.events.FetchRelease</span></code></a></p>
+<p>Download release assets.</p>
 </dd></dl>
 
 <dl class="class">
@@ -821,7 +860,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -840,20 +879,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

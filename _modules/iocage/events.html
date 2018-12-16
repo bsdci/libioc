@@ -582,6 +582,12 @@
     <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="ReleaseAssetDownload"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.ReleaseAssetDownload">[docs]</a><span class="k">class</span> <span class="nc">ReleaseAssetDownload</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download release assets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="ReleaseExtraction"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.ReleaseExtraction">[docs]</a><span class="k">class</span> <span class="nc">ReleaseExtraction</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Extract a release asset.&quot;&quot;&quot;</span>
 
@@ -959,6 +965,41 @@
     <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="JailDependantsStart"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.JailDependantsStart">[docs]</a><span class="k">class</span> <span class="nc">JailDependantsStart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start dependant jails.&quot;&quot;&quot;</span>
+
+    <span class="n">started_jails</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;iocage.Jail.JailGenerator&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">jail</span><span class="o">.</span><span class="n">full_name</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_jails</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JailDependantsStart.end"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.JailDependantsStart.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">started_jails</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;iocage.Jail.JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish starting dependant Jails.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_jails</span> <span class="o">=</span> <span class="n">started_jails</span>
+        <span class="k">return</span> <span class="n">JailEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JailDependantStart"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.JailDependantStart">[docs]</a><span class="k">class</span> <span class="nc">JailDependantStart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start one dependant jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="JailProvisioning"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.JailProvisioning">[docs]</a><span class="k">class</span> <span class="nc">JailProvisioning</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Provision a jail.&quot;&quot;&quot;</span>
 
@@ -1029,6 +1070,21 @@
         <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="PackageRemove"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.PackageRemove">[docs]</a><span class="k">class</span> <span class="nc">PackageRemove</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove packages from a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;iocage.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">packages</span> <span class="o">=</span> <span class="n">packages</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="PackageConfiguration"><a class="viewcode-back" href="../../iocage.events.html#iocage.events.PackageConfiguration">[docs]</a><span class="k">class</span> <span class="nc">PackageConfiguration</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Install packages in a jail.&quot;&quot;&quot;</span>
 
@@ -1045,7 +1101,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -1064,20 +1120,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

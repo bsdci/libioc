@@ -214,7 +214,44 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root_dataset</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">)</span>
+                <span class="n">_create</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+                <span class="n">_create</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">_create</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">pool_mountpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_pool</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">mountpoint</span>
+                <span class="n">preferred_mountpoint</span> <span class="o">=</span> <span class="s2">&quot;/iocage&quot;</span>
+                <span class="n">preferred_mountpoint_inuse</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span>
+                    <span class="n">preferred_mountpoint</span>
+                <span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">pool_mountpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">preferred_mountpoint_inuse</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ZFSSourceMountpoint</span><span class="p">(</span>
+                            <span class="n">dataset_name</span><span class="o">=</span><span class="n">root_dataset</span><span class="p">,</span>
+                            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                        <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">root_dataset</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">preferred_mountpoint_inuse</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+                        <span class="s2">&quot;Claiming mountpoint /iocage&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">mountpoint</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span>
+                        <span class="n">preferred_mountpoint</span>
+                    <span class="p">)</span>
+                    <span class="n">zfs_property</span> <span class="o">=</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSUserProperty</span><span class="p">(</span><span class="n">mountpoint</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;mountpoint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zfs_property</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mountpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ZFSSourceMountpoint</span><span class="p">(</span>
+                <span class="n">dataset_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">releases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
@@ -258,6 +295,7 @@
     <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span>
 
     <span class="n">main_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_rc_conf_enabled</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="n">ZFS_POOL_ACTIVE_PROPERTY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;org.freebsd.ioc:active&quot;</span>
 
@@ -275,6 +313,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># assume being managed by rc_conf unless later detection fails</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rc_conf_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+
         <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">attach_sources</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
             <span class="k">return</span>
@@ -283,6 +324,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_configure_from_rc_conf</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="k">except</span> <span class="n">RCConfEmptyException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rc_conf_enabled</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">pass</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -321,7 +363,9 @@
 <div class="viewcode-block" id="Datasets.find_root_datasets_name"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.find_root_datasets_name">[docs]</a>    <span class="k">def</span> <span class="nf">find_root_datasets_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the name of the source containing the matching dataset.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">source_name</span><span class="p">,</span> <span class="n">source_datasets</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">dataset_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">source_datasets</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dataset_name</span> <span class="o">==</span> <span class="n">source_datasets</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">source_name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dataset_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{source_datasets.root.name}</span><span class="s2">/&quot;</span><span class="p">):</span>
                 <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">source_name</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ResourceUnmanaged</span><span class="p">(</span>
             <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
@@ -423,7 +467,34 @@
         <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">,</span>
         <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Activate the given pool and set its mountpoint.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activate the given pool and set its mountpoint.</span>
+
+<span class="sd">        Pool activation follows the traditional way of setting a ZFS property</span>
+<span class="sd">        on the pool that other iocage variants will detect.</span>
+
+<span class="sd">        The mechanism cannot be combined with iocage datasets defined in</span>
+<span class="sd">        /etc/rc.conf, so that using the Multi-Pool feature is not possible.</span>
+<span class="sd">        When attemptig to activate a pool on a system with such configuration</span>
+<span class="sd">        an ActivationFailed error is raised.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            pool (libzfs.ZFSPool):</span>
+
+<span class="sd">                Target of the iocage activation on which an iocage dataset</span>
+<span class="sd">                is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</span>
+
+<span class="sd">            mountpoint (iocage.Types.AbsolutePath): (optional)</span>
+
+<span class="sd">                The desired mountpoint for the iocage dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rc_conf_enabled</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">iocage</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ActivationFailed</span><span class="p">(</span>
+                <span class="s2">&quot;iocage ZFS source datasets are managed in /etc/rc.conf&quot;</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pool_active</span><span class="p">(</span><span class="n">pool</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;ZFS pool &#39;</span><span class="si">{pool.name}</span><span class="s2">&#39; is already active&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -439,12 +510,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_pool_activation</span><span class="p">(</span><span class="n">other_pool</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_pool_activation</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="n">mountpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="s1">&#39;/iocage&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
-                <span class="s2">&quot;Claiming /iocage as mountpoint of the activated zpool&quot;</span>
-            <span class="p">)</span>
-            <span class="n">mountpoint</span> <span class="o">=</span> <span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span><span class="s1">&#39;/iocage&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attach_source</span><span class="p">(</span><span class="s2">&quot;iocage&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{pool.name}</span><span class="s2">/iocage&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mountpoint</span> <span class="o">!=</span> <span class="n">mountpoint</span><span class="p">:</span>
             <span class="n">zfs_property</span> <span class="o">=</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSUserProperty</span><span class="p">(</span><span class="n">mountpoint</span><span class="p">)</span>
@@ -454,22 +520,39 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pool</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return True if the pool is activated for iocage.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">):</span>
-            <span class="n">_pool</span> <span class="o">=</span> <span class="n">pool</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">_pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if the pool is activated for iocage.</span>
 
+<span class="sd">        Args:</span>
+
+<span class="sd">            pool (libzfs.ZFSPool): (optional)</span>
+
+<span class="sd">                The specified pool is checked for being activated for iocage.</span>
+<span class="sd">                When the pool is unset, the main pool is tested against.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pool_active</span><span class="p">(</span><span class="n">pool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pool_active</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_is_pool_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">iocage</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_user_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_pool_property</span><span class="p">(</span>
-            <span class="n">_pool</span><span class="p">,</span>
+            <span class="n">pool</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ZFS_POOL_ACTIVE_PROPERTY</span>
-        <span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span></div>
+        <span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_get_pool_property</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pool</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSPool</span><span class="p">,</span>
         <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">pool</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ONLINE&quot;</span><span class="p">,</span> <span class="s2">&quot;DEGRADED&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;The pool </span><span class="si">{pool.name}</span><span class="s2"> is </span><span class="si">{pool.status}</span><span class="s2"> and will be ignored&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
             <span class="n">zfs_prop</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">prop</span><span class="p">]</span>
@@ -604,7 +687,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -623,20 +706,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 

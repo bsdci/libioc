@@ -89,6 +89,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="iocage.Provisioning.html">iocage.Provisioning package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iocage.Storage.html">iocage.Storage package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iocage.html#submodules">Submodules</a></li>
@@ -189,7 +190,7 @@
 
 <dl class="attribute">
 <dt id="iocage.Config.Jail.Defaults.DefaultsUserData.user_properties">
-<code class="descname">user_properties</code><em class="property"> = set()</em><a class="headerlink" href="#iocage.Config.Jail.Defaults.DefaultsUserData.user_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">user_properties</code><em class="property"> = {}</em><a class="headerlink" href="#iocage.Config.Jail.Defaults.DefaultsUserData.user_properties" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -201,7 +202,7 @@
 <p>BaseConfig object filled with global defaults.</p>
 <dl class="attribute">
 <dt id="iocage.Config.Jail.Defaults.JailConfigDefaults.DEFAULTS">
-<code class="descname">DEFAULTS</code><em class="property"> = {'allow_chflags': 0, 'allow_mount': 0, 'allow_mount_devfs': 0, 'allow_mount_fdescfs': 0, 'allow_mount_nullfs': 0, 'allow_mount_procfs': 0, 'allow_mount_tmpfs': 0, 'allow_mount_zfs': 0, 'allow_quotas': 0, 'allow_raw_sockets': 0, 'allow_set_hostname': 1, 'allow_socket_af': 0, 'allow_sysvipc': 0, 'basejail': False, 'basejail_type': 'nullfs', 'boot': False, 'children_max': 0, 'clonejail': False, 'defaultrouter': None, 'defaultrouter6': None, 'devfs_ruleset': 4, 'enforce_statfs': 2, 'exec_clean': 1, 'exec_created': None, 'exec_fib': 1, 'exec_jail_user': 'root', 'exec_poststart': None, 'exec_poststop': None, 'exec_prestart': None, 'exec_prestop': None, 'exec_start': '/bin/sh /etc/rc', 'exec_stop': '/bin/sh /etc/rc.shutdown', 'exec_timeout': '60', 'host_domainname': None, 'host_hostname': None, 'host_hostuuid': None, 'id': None, 'interfaces': [], 'ip4': 'new', 'ip4_addr': None, 'ip4_saddrsel': 1, 'ip6': 'new', 'ip6_addr': None, 'ip6_saddrsel': 1, 'jail_zfs': False, 'jail_zfs_dataset': None, 'legacy': False, 'mac_prefix': '02ff60', 'mount_devfs': '1', 'mount_fdescfs': '0', 'mount_procfs': '0', 'priority': 0, 'provisioning': {'method': None, 'source': None, 'rev': 'master'}, 'release': None, 'resolver': '/etc/resolv.conf', 'rlimits': None, 'securelevel': '2', 'stop_timeout': '30', 'sysvmsg': 'new', 'sysvsem': 'new', 'sysvshm': 'new', 'tags': [], 'template': False, 'vnet': False, 'vnet_interfaces': []}</em><a class="headerlink" href="#iocage.Config.Jail.Defaults.JailConfigDefaults.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DEFAULTS</code><em class="property"> = {'allow_chflags': 0, 'allow_mount': 0, 'allow_mount_devfs': 0, 'allow_mount_fdescfs': 0, 'allow_mount_nullfs': 0, 'allow_mount_procfs': 0, 'allow_mount_tmpfs': 0, 'allow_mount_zfs': 0, 'allow_quotas': 0, 'allow_raw_sockets': 0, 'allow_set_hostname': 1, 'allow_socket_af': 0, 'allow_sysvipc': 0, 'basejail': False, 'basejail_type': 'nullfs', 'boot': False, 'children_max': 0, 'clonejail': False, 'defaultrouter': None, 'defaultrouter6': None, 'depends': [], 'devfs_ruleset': 4, 'enforce_statfs': 2, 'exec_clean': 1, 'exec_created': None, 'exec_fib': 1, 'exec_jail_user': 'root', 'exec_poststart': None, 'exec_poststop': None, 'exec_prestart': None, 'exec_prestop': None, 'exec_start': '/bin/sh /etc/rc', 'exec_stop': '/bin/sh /etc/rc.shutdown', 'exec_timeout': '600', 'host_domainname': None, 'host_hostname': None, 'host_hostuuid': None, 'id': None, 'interfaces': [], 'ip4': 'new', 'ip4_addr': None, 'ip4_saddrsel': 1, 'ip6': 'new', 'ip6_addr': None, 'ip6_saddrsel': 1, 'jail_zfs': False, 'jail_zfs_dataset': None, 'legacy': False, 'mac_prefix': '02ff60', 'mount_devfs': '1', 'mount_fdescfs': '0', 'mount_procfs': '0', 'priority': 0, 'provisioning': {'method': None, 'rev': 'master', 'source': None}, 'release': None, 'resolver': '/etc/resolv.conf', 'rlimits': None, 'securelevel': '2', 'stop_timeout': '30', 'sysvmsg': 'new', 'sysvsem': 'new', 'sysvshm': 'new', 'tags': [], 'template': False, 'vnet': False, 'vnet_interfaces': []}</em><a class="headerlink" href="#iocage.Config.Jail.Defaults.JailConfigDefaults.DEFAULTS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -256,7 +257,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -275,20 +276,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 

@@ -8,6 +8,7 @@ Subpackages
 
     iocage.Config
     iocage.Provisioning
+    iocage.Storage
 
 Submodules
 ----------
@@ -32,7 +33,6 @@ Submodules
    iocage.MacAddress
    iocage.Network
    iocage.NetworkInterface
-   iocage.NullFSBasejailStorage
    iocage.Pkg
    iocage.Prompts
    iocage.Release
@@ -42,13 +42,11 @@ Submodules
    iocage.ResourceSelector
    iocage.ResourceUpdater
    iocage.SecureTarfile
-   iocage.StandaloneJailStorage
-   iocage.Storage
    iocage.Types
    iocage.VersionedResource
    iocage.ZFS
-   iocage.ZFSBasejailStorage
    iocage.ZFSShareStorage
+   iocage.decorators
    iocage.errors
    iocage.events
    iocage.helpers

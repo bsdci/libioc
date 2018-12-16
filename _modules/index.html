@@ -153,6 +153,7 @@
 <li><a href="iocage/Config/Jail/Properties.html">iocage.Config.Jail.Properties</a></li>
 <ul><li><a href="iocage/Config/Jail/Properties/Addresses.html">iocage.Config.Jail.Properties.Addresses</a></li>
 <li><a href="iocage/Config/Jail/Properties/Defaultrouter.html">iocage.Config.Jail.Properties.Defaultrouter</a></li>
+<li><a href="iocage/Config/Jail/Properties/Depends.html">iocage.Config.Jail.Properties.Depends</a></li>
 <li><a href="iocage/Config/Jail/Properties/Interfaces.html">iocage.Config.Jail.Properties.Interfaces</a></li>
 <li><a href="iocage/Config/Jail/Properties/Resolver.html">iocage.Config.Jail.Properties.Resolver</a></li>
 <li><a href="iocage/Config/Jail/Properties/ResourceLimit.html">iocage.Config.Jail.Properties.ResourceLimit</a></li>
@@ -176,7 +177,6 @@
 <li><a href="iocage/MacAddress.html">iocage.MacAddress</a></li>
 <li><a href="iocage/Network.html">iocage.Network</a></li>
 <li><a href="iocage/NetworkInterface.html">iocage.NetworkInterface</a></li>
-<li><a href="iocage/NullFSBasejailStorage.html">iocage.NullFSBasejailStorage</a></li>
 <li><a href="iocage/Pkg.html">iocage.Pkg</a></li>
 <li><a href="iocage/Prompts.html">iocage.Prompts</a></li>
 <li><a href="iocage/Provisioning.html">iocage.Provisioning</a></li>
@@ -188,13 +188,15 @@
 <li><a href="iocage/ResourceSelector.html">iocage.ResourceSelector</a></li>
 <li><a href="iocage/ResourceUpdater.html">iocage.ResourceUpdater</a></li>
 <li><a href="iocage/SecureTarfile.html">iocage.SecureTarfile</a></li>
-<li><a href="iocage/StandaloneJailStorage.html">iocage.StandaloneJailStorage</a></li>
 <li><a href="iocage/Storage.html">iocage.Storage</a></li>
-<li><a href="iocage/Types.html">iocage.Types</a></li>
+<ul><li><a href="iocage/Storage/NullFSBasejail.html">iocage.Storage.NullFSBasejail</a></li>
+<li><a href="iocage/Storage/Standalone.html">iocage.Storage.Standalone</a></li>
+<li><a href="iocage/Storage/ZFSBasejail.html">iocage.Storage.ZFSBasejail</a></li>
+</ul><li><a href="iocage/Types.html">iocage.Types</a></li>
 <li><a href="iocage/VersionedResource.html">iocage.VersionedResource</a></li>
 <li><a href="iocage/ZFS.html">iocage.ZFS</a></li>
-<li><a href="iocage/ZFSBasejailStorage.html">iocage.ZFSBasejailStorage</a></li>
 <li><a href="iocage/ZFSShareStorage.html">iocage.ZFSShareStorage</a></li>
+<li><a href="iocage/decorators.html">iocage.decorators</a></li>
 <li><a href="iocage/errors.html">iocage.errors</a></li>
 <li><a href="iocage/events.html">iocage.events</a></li>
 <li><a href="iocage/helpers.html">iocage.helpers</a></li>
@@ -211,7 +213,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, iocage Authors.
+        &copy; Copyright 2018, iocage Authors
 
     </p>
   </div>
@@ -230,20 +232,13 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
 
   
 
