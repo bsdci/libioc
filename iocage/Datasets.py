@@ -394,12 +394,12 @@ class Datasets(dict):
 
         Args:
 
-            pool (libzfs.ZFSPool):
+            pool:
 
                 Target of the iocage activation on which an iocage dataset
                 is created on the top level (e.g. zfs create <pool>/iocage)
 
-            mountpoint (iocage.Types.AbsolutePath): (optional)
+            mountpoint:
 
                 The desired mountpoint for the iocage dataset.
         """
@@ -439,7 +439,7 @@ class Datasets(dict):
 
         Args:
 
-            pool (libzfs.ZFSPool): (optional)
+            pool:
 
                 The specified pool is checked for being activated for iocage.
                 When the pool is unset, the main pool is tested against.
