@@ -198,6 +198,14 @@
 <em class="property">class </em><code class="descclassname">iocage.Datasets.</code><code class="descname">Datasets</code><span class="sig-paren">(</span><em>sources=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Datasets.html#Datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Datasets.Datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>All source datasets managed by iocage.</p>
+<p>Automatically detects activated iocage datasets from ZFS pool properties
+or sysrc lines in <code class="docutils literal notranslate"><span class="pre">/etc/rc.conf</span></code>.</p>
+<p>Operations that should be performed on selected iocage datasets, are
+typically achieved by filtering Datasets. Only the matching and activated
+datasets are then taken into account and thus result in a performance
+benefit.</p>
+<p>The iocage dataset configuration from sysrc wins over ZFS pools activated
+by the <cite>org.freebsd.ioc:active</cite> property on their pool root dataset.</p>
 <dl class="attribute">
 <dt id="iocage.Datasets.Datasets.ZFS_POOL_ACTIVE_PROPERTY">
 <code class="descname">ZFS_POOL_ACTIVE_PROPERTY</code><em class="property"> = 'org.freebsd.ioc:active'</em><a class="headerlink" href="#iocage.Datasets.Datasets.ZFS_POOL_ACTIVE_PROPERTY" title="Permalink to this definition">¶</a></dt>
@@ -211,7 +219,9 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mountpoint</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="iocage.Types.html#iocage.Types.AbsolutePath" title="iocage.Types.AbsolutePath"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsolutePath</span></code></a>]) – see <a class="reference internal" href="#iocage.Datasets.Datasets.activate_pool" title="iocage.Datasets.Datasets.activate_pool"><code class="xref py py-meth docutils literal notranslate"><span class="pre">activate_pool()</span></code></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -232,11 +242,9 @@ an ActivationFailed error is raised.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pool</strong> (<em>libzfs.ZFSPool</em>) – Target of the iocage activation on which an iocage dataset
+<li><strong>pool</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code>) – Target of the iocage activation on which an iocage dataset
 is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</li>
-<li><strong>mountpoint</strong> (<a class="reference internal" href="iocage.Types.html#iocage.Types.AbsolutePath" title="iocage.Types.AbsolutePath"><em>iocage.Types.AbsolutePath</em></a>) – <p>(optional)</p>
-<p>The desired mountpoint for the iocage dataset.</p>
-</li>
+<li><strong>mountpoint</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="iocage.Types.html#iocage.Types.AbsolutePath" title="iocage.Types.AbsolutePath"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsolutePath</span></code></a>]) – The desired mountpoint for the iocage dataset.</li>
 </ul>
 </td>
 </tr>
@@ -269,7 +277,14 @@ is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the source dataset.</li>
+<li><strong>root_datasets</strong> (<a class="reference internal" href="#iocage.Datasets.RootDatasets" title="iocage.Datasets.RootDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDatasets</span></code></a>) – Instance of <a class="reference internal" href="#iocage.Datasets.RootDatasets" title="iocage.Datasets.RootDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDatasets</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -283,7 +298,14 @@ is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the source dataset.</li>
+<li><strong>dataset_identifier</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code>]) – ZFSDataset structure or dataset name representing the source.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -368,10 +390,8 @@ is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pool</strong> (<em>libzfs.ZFSPool</em>) – <p>(optional)</p>
-<p>The specified pool is checked for being activated for iocage.
-When the pool is unset, the main pool is tested against.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pool</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code>]) – The specified pool is checked for being activated for iocage.
+When the pool is unset, the main pool is tested against.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
 </tr>
@@ -406,13 +426,13 @@ When the pool is unset, the main pool is tested against.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>datasets</strong> (<a class="reference internal" href="#iocage.Datasets.Datasets" title="iocage.Datasets.Datasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>) – The Datasets hosts instance</li>
-<li><strong>source_filters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]]) – <p>No filters were applied when unset. The names contained in the
-Tuple are matched against the dataset names specified in rc.conf.</p>
-<dl class="docutils">
-<dt>For example:</dt>
-<dd>echo ‘ioc_dataset_main=”zroot/iocage”’ &gt;&gt; /etc/rc.conf
-ioc list –source main</dd>
-</dl>
+<li><strong>source_filters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]]) – <p>No filters were applied when unset.
+The names contained in the Tuple are matched against the
+dataset names specified in rc.conf.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> sysrc <span class="nv">ioc_dataset_main</span><span class="o">=</span><span class="s2">&quot;zroot/iocage&quot;</span>
+<span class="gp">$</span> ioc list --source main
+</pre></div>
+</div>
 </li>
 <li><strong>zfs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="iocage.ZFS.html#iocage.ZFS.ZFS" title="iocage.ZFS.ZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFS</span></code></a>]) – The shared ZFS object.</li>
 <li><strong>logger</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="iocage.Logger.html#iocage.Logger.Logger" title="iocage.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a>]) – The shared logger instance.</li>
@@ -449,6 +469,23 @@ ioc list –source main</dd>
 <em class="property">class </em><code class="descclassname">iocage.Datasets.</code><code class="descname">RootDatasets</code><span class="sig-paren">(</span><em>root_dataset</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/iocage/Datasets.html#RootDatasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iocage.Datasets.RootDatasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>iocage core dataset abstraction.</p>
+<p>Defined by a ZFSDataset and a given name <a class="footnote-reference" href="#id2" id="id1">[1]</a>, the RootDataset provides
+access to the iocage source datasets. The ability to handle multiple source
+datasets, allows nested iocage usage in other jails.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> sysrc <span class="nv">ioc_dataset_ioc</span><span class="o">=</span><span class="s2">&quot;zroot/iocage&quot;</span>
+<span class="go">ioc_dataset_ioc:  -&gt; zroot/iocage</span>
+<span class="gp">$</span> ioc_dataset_nvme:  -&gt; nvme/my-dataset/iocage
+<span class="go">ioc_dataset_nvme:  -&gt; nvme/my-dataset/iocage</span>
+</pre></div>
+</div>
+<p>When more than one dataset is enabled, Resource names are displayed
+including their RootDataset prefix (e.g. <code class="docutils literal notranslate"><span class="pre">ioc/myjail</span></code>).</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The ZFS property activated default name is <code class="docutils literal notranslate"><span class="pre">ioc</span></code></td></tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="iocage.Datasets.RootDatasets.base">
 <code class="descname">base</code><a class="headerlink" href="#iocage.Datasets.RootDatasets.base" title="Permalink to this definition">¶</a></dt>

@@ -192,7 +192,25 @@
 
 
 <div class="viewcode-block" id="RootDatasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.RootDatasets">[docs]</a><span class="k">class</span> <span class="nc">RootDatasets</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;iocage core dataset abstraction.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    iocage core dataset abstraction.</span>
+
+<span class="sd">    Defined by a ZFSDataset and a given name [#]_, the RootDataset provides</span>
+<span class="sd">    access to the iocage source datasets. The ability to handle multiple source</span>
+<span class="sd">    datasets, allows nested iocage usage in other jails.</span>
+
+<span class="sd">    .. code-block:: console</span>
+
+<span class="sd">        $ sysrc ioc_dataset_ioc=&quot;zroot/iocage&quot;</span>
+<span class="sd">        ioc_dataset_ioc:  -&gt; zroot/iocage</span>
+<span class="sd">        $ ioc_dataset_nvme:  -&gt; nvme/my-dataset/iocage</span>
+<span class="sd">        ioc_dataset_nvme:  -&gt; nvme/my-dataset/iocage</span>
+
+<span class="sd">    When more than one dataset is enabled, Resource names are displayed</span>
+<span class="sd">    including their RootDataset prefix (e.g. ``ioc/myjail``).</span>
+
+<span class="sd">    .. [#] The ZFS property activated default name is ``ioc``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">zfs</span><span class="p">:</span> <span class="s1">&#39;iocage.ZFS.ZFS&#39;</span>
     <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span>
@@ -289,7 +307,20 @@
 
 
 <div class="viewcode-block" id="Datasets"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets">[docs]</a><span class="k">class</span> <span class="nc">Datasets</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;All source datasets managed by iocage.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All source datasets managed by iocage.</span>
+
+<span class="sd">    Automatically detects activated iocage datasets from ZFS pool properties</span>
+<span class="sd">    or sysrc lines in ``/etc/rc.conf``.</span>
+
+<span class="sd">    Operations that should be performed on selected iocage datasets, are</span>
+<span class="sd">    typically achieved by filtering Datasets. Only the matching and activated</span>
+<span class="sd">    datasets are then taken into account and thus result in a performance</span>
+<span class="sd">    benefit.</span>
+
+<span class="sd">    The iocage dataset configuration from sysrc wins over ZFS pools activated</span>
+<span class="sd">    by the `org.freebsd.ioc:active` property on their pool root dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">zfs</span><span class="p">:</span> <span class="s1">&#39;iocage.ZFS.ZFS&#39;</span>
     <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;iocage.Logger.Logger&#39;</span>
@@ -404,7 +435,17 @@
         <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">dataset_identifier</span><span class="p">:</span> <span class="n">DatasetIdentifier</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Attach a source by its DatasetIdentifier to the iocage scope.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attach a source by its DatasetIdentifier to the iocage scope.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            source_name:</span>
+<span class="sd">                Name of the source dataset.</span>
+
+<span class="sd">            dataset_identifier:</span>
+<span class="sd">                ZFSDataset structure or dataset name representing the source.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attach_root_datasets</span><span class="p">(</span>
             <span class="n">source_name</span><span class="o">=</span><span class="n">source_name</span><span class="p">,</span>
             <span class="n">root_datasets</span><span class="o">=</span><span class="n">RootDatasets</span><span class="p">(</span>
@@ -419,7 +460,17 @@
         <span class="n">source_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">root_datasets</span><span class="p">:</span> <span class="n">RootDatasets</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Attach another RootDatasets object to the iocage scope.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attach another RootDatasets object to the iocage scope.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            source_name:</span>
+<span class="sd">                Name of the source dataset.</span>
+
+<span class="sd">            root_datasets:</span>
+<span class="sd">                Instance of :class:`~iocage.Datasets.RootDatasets`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">source_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">root_datasets</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">main_datasets_name</span> <span class="o">=</span> <span class="n">source_name</span></div>
@@ -459,7 +510,14 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">iocage</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Activate the root pool and set the given mountpoint.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Activate the root pool and set the given mountpoint.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            mountpoint:</span>
+<span class="sd">                see :meth:`~iocage.Datasets.Datasets.activate_pool`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">activate_pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="n">mountpoint</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Datasets.activate_pool"><a class="viewcode-back" href="../../iocage.Datasets.html#iocage.Datasets.Datasets.activate_pool">[docs]</a>    <span class="k">def</span> <span class="nf">activate_pool</span><span class="p">(</span>
@@ -480,12 +538,12 @@
 
 <span class="sd">        Args:</span>
 
-<span class="sd">            pool (libzfs.ZFSPool):</span>
+<span class="sd">            pool:</span>
 
 <span class="sd">                Target of the iocage activation on which an iocage dataset</span>
 <span class="sd">                is created on the top level (e.g. zfs create &lt;pool&gt;/iocage)</span>
 
-<span class="sd">            mountpoint (iocage.Types.AbsolutePath): (optional)</span>
+<span class="sd">            mountpoint:</span>
 
 <span class="sd">                The desired mountpoint for the iocage dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -525,7 +583,7 @@
 
 <span class="sd">        Args:</span>
 
-<span class="sd">            pool (libzfs.ZFSPool): (optional)</span>
+<span class="sd">            pool:</span>
 
 <span class="sd">                The specified pool is checked for being activated for iocage.</span>
 <span class="sd">                When the pool is unset, the main pool is tested against.</span>
@@ -610,12 +668,14 @@
 <span class="sd">            The Datasets hosts instance</span>
 
 <span class="sd">        source_filters:</span>
-<span class="sd">            No filters were applied when unset. The names contained in the</span>
-<span class="sd">            Tuple are matched against the dataset names specified in rc.conf.</span>
+<span class="sd">            No filters were applied when unset.</span>
+<span class="sd">            The names contained in the Tuple are matched against the</span>
+<span class="sd">            dataset names specified in rc.conf.</span>
 
-<span class="sd">            For example:</span>
-<span class="sd">                echo &#39;ioc_dataset_main=&quot;zroot/iocage&quot;&#39; &gt;&gt; /etc/rc.conf</span>
-<span class="sd">                ioc list --source main</span>
+<span class="sd">            .. code-block:: console</span>
+
+<span class="sd">                $ sysrc ioc_dataset_main=&quot;zroot/iocage&quot;</span>
+<span class="sd">                $ ioc list --source main</span>
 
 <span class="sd">        zfs:</span>
 <span class="sd">            The shared ZFS object.</span>
