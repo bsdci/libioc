@@ -188,7 +188,7 @@ class IOCageCLI(click.MultiCommand):
     help="Globally override the activated iocage dataset(s)"
 )
 @click.command(cls=IOCageCLI)
-@click.version_option(version="0.3.1 2018/10/04", prog_name="ioc")
+@click.version_option(version="0.3.2 2018/12/16", prog_name="ioc")
 @click.pass_context
 def cli(ctx, log_level: str, source: set) -> None:
     """A jail manager."""
