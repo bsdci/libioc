@@ -48,7 +48,25 @@ class RCConfEmptyException(Exception):
 
 
 class RootDatasets:
-    """iocage core dataset abstraction."""
+    """
+    iocage core dataset abstraction.
+
+    Defined by a ZFSDataset and a given name [#]_, the RootDataset provides
+    access to the iocage source datasets. The ability to handle multiple source
+    datasets, allows nested iocage usage in other jails.
+
+    .. code-block:: console
+
+        $ sysrc ioc_dataset_ioc="zroot/iocage"
+        ioc_dataset_ioc:  -> zroot/iocage
+        $ ioc_dataset_nvme:  -> nvme/my-dataset/iocage
+        ioc_dataset_nvme:  -> nvme/my-dataset/iocage
+
+    When more than one dataset is enabled, Resource names are displayed
+    including their RootDataset prefix (e.g. ``ioc/myjail``).
+
+    .. [#] The ZFS property activated default name is ``ioc``
+    """
 
     zfs: 'iocage.ZFS.ZFS'
     logger: 'iocage.Logger.Logger'
@@ -145,7 +163,20 @@ class RootDatasets:
 
 
 class Datasets(dict):
-    """All source datasets managed by iocage."""
+    """
+    All source datasets managed by iocage.
+
+    Automatically detects activated iocage datasets from ZFS pool properties
+    or sysrc lines in ``/etc/rc.conf``.
+
+    Operations that should be performed on selected iocage datasets, are
+    typically achieved by filtering Datasets. Only the matching and activated
+    datasets are then taken into account and thus result in a performance
+    benefit.
+
+    The iocage dataset configuration from sysrc wins over ZFS pools activated
+    by the `org.freebsd.ioc:active` property on their pool root dataset.
+    """
 
     zfs: 'iocage.ZFS.ZFS'
     logger: 'iocage.Logger.Logger'
@@ -260,7 +291,17 @@ class Datasets(dict):
         source_name: str,
         dataset_identifier: DatasetIdentifier
     ) -> None:
-        """Attach a source by its DatasetIdentifier to the iocage scope."""
+        """
+        Attach a source by its DatasetIdentifier to the iocage scope.
+
+        Args:
+
+            source_name:
+                Name of the source dataset.
+
+            dataset_identifier:
+                ZFSDataset structure or dataset name representing the source.
+        """
         self.attach_root_datasets(
             source_name=source_name,
             root_datasets=RootDatasets(
@@ -275,7 +316,17 @@ class Datasets(dict):
         source_name: str,
         root_datasets: RootDatasets
     ) -> None:
-        """Attach another RootDatasets object to the iocage scope."""
+        """
+        Attach another RootDatasets object to the iocage scope.
+
+        Args:
+
+            source_name:
+                Name of the source dataset.
+
+            root_datasets:
+                Instance of :class:`~iocage.Datasets.RootDatasets`.
+        """
         self[source_name] = root_datasets
         if self.main_datasets_name is None:
             self.main_datasets_name = source_name
@@ -315,7 +366,14 @@ class Datasets(dict):
         self,
         mountpoint: typing.Optional[iocage.Types.AbsolutePath]=None
     ) -> None:
-        """Activate the root pool and set the given mountpoint."""
+        """
+        Activate the root pool and set the given mountpoint.
+
+        Args:
+
+            mountpoint:
+                see :meth:`~iocage.Datasets.Datasets.activate_pool`
+        """
         self.activate_pool(self.main.root.pool, mountpoint)
 
     def activate_pool(
