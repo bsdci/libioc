@@ -1825,7 +1825,7 @@ class JailGenerator(JailResource):
 
         for nic in nics:
 
-            bridge = self.config["interfaces"][nic]
+            bridge = nics[nic]
 
             try:
                 ipv4_addresses = self.config["ip4_addr"][nic]
