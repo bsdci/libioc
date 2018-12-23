@@ -154,6 +154,7 @@ def _normal(
     )
 
     changed_jails = []
+    skipped_jails = []
     failed_jails = []
     for jail in jails:
         try:
@@ -167,6 +168,7 @@ def _normal(
             jail.require_jail_not_template()
             if jail.running is True:
                 logger.log(f"{jail.name} is already running - skipping start")
+                skipped_jails.append(jail)
                 continue
             print_function(jail.start())
         except iocage.errors.IocageException:
@@ -179,8 +181,8 @@ def _normal(
     if len(failed_jails) > 0:
         return False
 
-    if len(changed_jails) == 0:
-        jails_input = " ".join(list(jails))
+    if (len(changed_jails) == 0) and (len(skipped_jails) == 0):
+        jails_input = " ".join(list(filters))
         logger.error(f"No jails started your input: {jails_input}")
         return False
 
