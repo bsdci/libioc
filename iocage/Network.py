@@ -54,6 +54,7 @@ class Network:
     bridge: typing.Optional['iocage.BridgeInterface.BridgeInterface']
     nic: str = "vnet0"
     _nic_hash_cache: typing.Dict[str, str]
+    _mtu: typing.Optional[int]
 
     def __init__(
         self,
@@ -61,7 +62,7 @@ class Network:
         nic: typing.Optional[str]=None,
         ipv4_addresses: typing.Optional[typing.List[str]]=None,
         ipv6_addresses: typing.Optional[typing.List[str]]=None,
-        mtu: typing.Optional[int]=1500,
+        mtu: typing.Optional[int]=None,
         bridge: typing.Optional[
             'iocage.BridgeInterface.BridgeInterface'
         ]=None,
@@ -80,7 +81,7 @@ class Network:
         self.vnet = True
         self.bridge = bridge
         self.jail = jail
-        self.mtu = mtu
+        self._mtu = mtu
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv6_addresses = ipv6_addresses or []
         self._nic_hash_cache = {}
@@ -96,8 +97,8 @@ class Network:
         and configure the interfaces on jail and host side according to the
         class attributes.
         """
-        if (self.vnet is True) and (self.bridge is None):
-            raise iocage.errors.VnetBridgeMissing(logger=self.logger)
+        if (self.vnet is True):
+            self.__require_bridge()
         return self.__create_vnet_iface()
 
     def teardown(self) -> typing.List[str]:
@@ -120,6 +121,10 @@ class Network:
             commands += self.firewall.read_commands()
 
         return commands
+
+    def __require_bridge(self) -> None:
+        if (self.bridge is None):
+            raise iocage.errors.VnetBridgeMissing(logger=self.logger)
 
     def __down_host_interface(self) -> typing.List[str]:
         nic = iocage.NetworkInterface.QueuingNetworkInterface(
@@ -145,6 +150,27 @@ class Network:
                 insecure=True
             ).read_commands()
         return commands
+
+    @property
+    def mtu(self) -> int:
+        """Return the configured MTU."""
+        if self._mtu is not None:
+            return self._mtu
+        return self.__autodetected_bridge_mtu
+
+    @mtu.setter
+    def mtu(self, mtu: int) -> None:
+        """Set the networks MTU."""
+        self._mtu = mtu
+
+    @property
+    def __autodetected_bridge_mtu(self) -> int:
+        self.__require_bridge()
+        bridge_name = str(self.bridge)
+        mtu = int(iocage.helpers_ioctl.get_interface_mtu(bridge_name))
+        self.logger.debug(f"Bridge {bridge_name} MTU detected: {mtu}")
+        self._mtu = mtu
+        return mtu
 
     @property
     def nic_local_description(self) -> str:
