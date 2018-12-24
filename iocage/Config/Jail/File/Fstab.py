@@ -70,6 +70,22 @@ class FstabLine(dict):
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
+    def __setitem__(
+        self,
+        key: str,
+        value: typing.Union[str, iocage.Types.AbsolutePath]
+    ) -> None:
+        if (key == "source") or (key == "destination"):
+            if isinstance(value, str) is True:
+                absolute_path = iocage.Types.AbsolutePath(value)
+            elif isinstance(value, iocage.Types.AbsolutePath) is True:
+                absolute_path = value
+            else:
+                raise ValueError("String or AbsolutePath expected")
+            dict.__setitem__(self, key, absolute_path)
+        else:
+            dict.__setitem__(self, key, value)
+
 
 class FstabBasejailLine(FstabLine):
     """Model a fstab line automatically created by a NullFS basejail."""
