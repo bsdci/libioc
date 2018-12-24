@@ -84,8 +84,10 @@ class FstabLine(dict):
             else:
                 raise ValueError("String or AbsolutePath expected")
             dict.__setitem__(self, key, absolute_path)
-        else:
+        elif key in ["type", "options", "dump", "passnum", "comment"]:
             dict.__setitem__(self, key, value)
+        else:
+            raise KeyError(f"Invalid FstabLine key: {key}")
 
 
 class FstabBasejailLine(FstabLine):
@@ -495,7 +497,7 @@ class Fstab(
                 f"{self.jail.root_dataset.mountpoint}/.iocage"
             ),
             options="ro",
-            fstype="nullfs",
+            type="nullfs",
             dump="0",
             passnum="0",
             comment=self.AUTO_COMMENT_IDENTIFIER
