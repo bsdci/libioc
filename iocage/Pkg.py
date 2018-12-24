@@ -34,6 +34,7 @@ import iocage.events
 import iocage.helpers
 import iocage.helpers_object
 import iocage.LaunchableResource
+import iocage.Config.Jail.File.Fstab
 
 _PkgConfDataType = typing.Union[
     str, int, bool,
@@ -47,6 +48,7 @@ class Pkg:
 
     _dataset: libzfs.ZFSDataset
     package_source_directory: str = "/.iocage-pkg"
+    __pkg_directory_mounted: bool
 
     def __init__(
         self,
@@ -57,6 +59,7 @@ class Pkg:
         self.zfs = iocage.helpers_object.init_zfs(self, zfs)
         self.logger = iocage.helpers_object.init_logger(self, logger)
         self.host = iocage.helpers_object.init_host(self, host)
+        self.__pkg_directory_mounted = False
 
     def fetch(
         self,
@@ -221,19 +224,25 @@ class Pkg:
                     " ".join(_packages)
                 ])
             ] + postinstall)
-            temporary_jail = self._get_temporary_jail(jail)
-            jail_exec_events = temporary_jail.fork_exec(
-                command,
-                passthru=False,
-                event_scope=packageInstallEvent.scope
-            )
-            skipped = False
-            for event in jail_exec_events:
-                if isinstance(event, iocage.events.JailLaunch) is True:
-                    if event.done is True:
-                        stdout = event.stdout.strip("\r\n")
-                        skipped = stdout.endswith("already installed")
-                yield event
+
+            if jail.running is True:
+                self.__mount_pkg_directory(jail)
+                stdout, stderr, code = jail.exec(["/bin/sh", "-c", command])
+                stdout = stdout.strip("\r\n")
+                self.__umount_pkg_directory(jail)
+            else:
+                temporary_jail = self._get_temporary_jail(jail)
+                jail_exec_events = temporary_jail.fork_exec(
+                    command,
+                    passthru=False,
+                    event_scope=packageInstallEvent.scope
+                )
+                for event in jail_exec_events:
+                    if isinstance(event, iocage.events.JailLaunch) is True:
+                        if event.done is True:
+                            stdout = event.stdout.strip("\r\n")
+                    yield event
+            skipped = stdout.endswith("already installed")
             if skipped is True:
                 yield packageInstallEvent.skip()
             else:
@@ -422,6 +431,22 @@ class Pkg:
         )
         return dataset
 
+    def __get_pkg_directory_fstab_line(
+        self,
+        jail: 'iocage.Jail.JailGenerator'
+    ) -> iocage.Config.Jail.File.Fstab.FstabLine:
+        destination_dir = f"{jail.root_path}{self.package_source_directory}"
+
+        release_major_version = math.floor(jail.release.version_number)
+        repo_ds = self._get_release_pkg_dataset(release_major_version)
+        cache_ds = self.zfs.get_or_create_dataset(f"{repo_ds.name}/cache")
+        return iocage.Config.Jail.File.Fstab.FstabLine(dict(
+            source=cache_ds.mountpoint,
+            destination=f"{destination_dir}",
+            options="ro",
+            type="nullfs"
+        ))
+
     def _get_temporary_jail(
         self,
         source_jail: 'iocage.Jail.JailGenerator'
@@ -448,23 +473,32 @@ class Pkg:
             dataset=source_jail.dataset
         )
         temporary_jail.config.ignore_host_defaults = True
-
-        root_path = temporary_jail.root_path
-        destination_dir = f"{root_path}{self.package_source_directory}"
-
-        release_major_version = math.floor(source_jail.release.version_number)
-        repo_ds = self._get_release_pkg_dataset(release_major_version)
-        cache_ds = self.zfs.get_or_create_dataset(f"{repo_ds.name}/cache")
-        try:
-            temporary_jail.fstab.new_line(
-                source=cache_ds.mountpoint,
-                destination=f"{destination_dir}",
-                options="ro",
-                auto_create_destination=True,
-                replace=True
-            )
-            temporary_jail.fstab.save()
-        except iocage.errors.FstabDestinationExists:
-            pass
+        self.__mount_pkg_directory(temporary_jail)
 
         return temporary_jail
+
+    def __mount_pkg_directory(self, jail: iocage.Jail.JailGenerator) -> None:
+        try:
+            jail.fstab.add_line(
+                line=self.__get_pkg_directory_fstab_line(jail),
+                auto_create_destination=True,
+                auto_mount_jail=True,
+                replace=True
+            )
+            self.__pkg_directory_mounted = True
+        except (
+            iocage.errors.FstabDestinationExists,
+            iocage.errors.UnmountFailed
+        ):
+            pass
+        finally:
+            jail.fstab.save()
+
+    def __umount_pkg_directory(self, jail: iocage.Jail.JailGenerator) -> None:
+        if self.__pkg_directory_mounted is False:
+            return
+
+        fstab_line = self.__get_pkg_directory_fstab_line(jail)
+        fstab_line_index = jail.fstab.index(fstab_line)
+        del jail.fstab[fstab_line_index]
+        jail.fstab.save()
