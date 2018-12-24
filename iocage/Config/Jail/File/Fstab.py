@@ -347,7 +347,8 @@ class Fstab(
         passnum: str="0",
         comment: typing.Optional[str]=None,
         replace: bool=False,
-        auto_create_destination: bool=False
+        auto_create_destination: bool=False,
+        auto_mount_jail: bool=True
     ) -> None:
         """
         Append a new line to the fstab file.
@@ -367,7 +368,8 @@ class Fstab(
         self.add_line(
             line=line,
             replace=replace,
-            auto_create_destination=auto_create_destination
+            auto_create_destination=auto_create_destination,
+            auto_mount_jail=auto_mount_jail
         )
 
     def add_line(
