@@ -556,6 +556,14 @@ class Fstab(
         jail_name = self.jail.humanreadable_name
         source = deletion_target_line["source"]
         destination = deletion_target_line["destination"]
+
+        self.logger.verbose(
+            f"Deleting fstab entry from jail {jail_name}: "
+            f"{source} -> {destination}"
+        )
+        real_index = self._get_real_index(index)
+        self._lines.__delitem__(real_index)
+
         if self.jail.running is True:
             self.logger.verbose(
                 f"Unmounting {destination} from running jail {jail_name}"
@@ -565,12 +573,6 @@ class Fstab(
                 force=True,
                 logger=self.logger
             )
-        self.logger.verbose(
-            f"Deleting fstab entry from jail {jail_name}: "
-            f"{source} -> {destination}"
-        )
-        real_index = self._get_real_index(index)
-        self._lines.__delitem__(real_index)
 
     def __getitem__(self, index: int) -> typing.Union[  # noqa: T484
         FstabLine,
