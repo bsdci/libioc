@@ -75,6 +75,7 @@ class FstabLine(dict):
         key: str,
         value: typing.Union[str, iocage.Types.AbsolutePath]
     ) -> None:
+        """Set an item of the FstabLine."""
         if (key == "source") or (key == "destination"):
             if isinstance(value, str) is True:
                 absolute_path = iocage.Types.AbsolutePath(value)
