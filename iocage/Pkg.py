@@ -229,7 +229,6 @@ class Pkg:
                 self.__mount_pkg_directory(jail)
                 stdout, stderr, code = jail.exec(["/bin/sh", "-c", command])
                 stdout = stdout.strip("\r\n")
-                self.__umount_pkg_directory(jail)
             else:
                 temporary_jail = self._get_temporary_jail(jail)
                 jail_exec_events = temporary_jail.fork_exec(
@@ -493,12 +492,3 @@ class Pkg:
             pass
         finally:
             jail.fstab.save()
-
-    def __umount_pkg_directory(self, jail: iocage.Jail.JailGenerator) -> None:
-        if self.__pkg_directory_mounted is False:
-            return
-
-        fstab_line = self.__get_pkg_directory_fstab_line(jail)
-        fstab_line_index = jail.fstab.index(fstab_line)
-        del jail.fstab[fstab_line_index]
-        jail.fstab.save()
