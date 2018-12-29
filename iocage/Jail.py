@@ -1617,85 +1617,77 @@ class JailGenerator(JailResource):
             return self.host.devfs[ruleset_line_position].number
 
     @property
-    def _launch_command(self) -> typing.List[str]:
+    def _launch_parameters(self) -> typing.Dict[str, typing.Union[str, int]]:
 
-        command = ["/usr/sbin/jail", "-c"]
+        import jail
+        stopped_jail = jail.StoppedJail(str(self.root_dataset.mountpoint))
+
+        p = dict()
 
         if self.config["vnet"]:
-            command.append("vnet")
+            p["vnet"] = 1
         else:
 
             if self.config["ip4_addr"] is not None:
                 ip4_addr = self.config["ip4_addr"]
-                command += [
-                    f"ip4.addr={ip4_addr}",
-                    f"ip4.saddrsel={self.config['ip4_saddrsel']}",
-                    f"ip4={self.config['ip4']}",
-                ]
+                p["ip4.addr"] = str(self.config["ip4_addr"])
+                p["ip4.saddrsel"] = str(self.config['ip4_saddrsel'])
+                p["ip4"] = str(self.config['ip4'])
 
             if self.config['ip6_addr'] is not None:
                 ip6_addr = self.config['ip6_addr']
-                command += [
-                    f"ip6.addr={ip6_addr}",
-                    f"ip6.saddrsel={self.config['ip6_saddrsel']}",
-                    f"ip6={self.config['ip6']}",
-                ]
+                p["ip6.addr"] = str(ip6_addr)
+                p["ip6.saddrsel"] = str(self.config['ip6_saddrsel'])
+                p["ip6"] = str(self.config['ip6'])
 
-        command += [
-            f"name={self.identifier}",
-            f"host.hostname={self.config['host_hostname']}",
-            f"host.domainname={self.config['host_domainname']}",
-            f"path={self.root_dataset.mountpoint}",
-            f"securelevel={self._get_value('securelevel')}",
-            f"host.hostuuid={self.name}",
-            f"devfs_ruleset={self.devfs_ruleset}",
-            f"enforce_statfs={self._get_value('enforce_statfs')}",
-            f"children.max={self._get_value('children_max')}",
-            f"allow.set_hostname={self._get_value('allow_set_hostname')}",
-            f"allow.sysvipc={self._get_value('allow_sysvipc')}",
-            f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
-            f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
-            f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
-            f"exec.jail_user={self._get_value('exec_jail_user')}"
-        ]
+        p["name"] = f"{self.identifier}",
+        p["host.hostname"] = str(self.config['host_hostname'])
+        p["host.domainname"] = str(self.config['host_domainname'])
+        p["securelevel"] = int(self._get_value('securelevel'))
+        p["host.hostuuid"] = str(self.name)
+        p["devfs_ruleset"] = int(self.devfs_ruleset)
+        p["enforce_statfs"] = int(self._get_value('enforce_statfs'))
+        p["children.max"] = int(self._get_value('children_max'))
+        p["allow.set_hostname"] = str(self._get_value('allow_set_hostname'))
+        p["allow.sysvipc"] = int(self._get_value('allow_sysvipc'))
+        p["exec.prestart"] = f"\"{self.get_hook_script_path('prestart')}\"",
+        p["exec.prestop"] = f"\"{self.get_hook_script_path('prestop')}\"",
+        p["exec.poststop"] = f"\"{self.get_hook_script_path('poststop')}\"",
+        p["exec.jail_user"] = str(self._get_value('exec_jail_user'))
 
         if self.host.userland_version > 10.3:
-            command += [
-                f"sysvmsg={self._get_value('sysvmsg')}",
-                f"sysvsem={self._get_value('sysvsem')}",
-                f"sysvshm={self._get_value('sysvshm')}"
-            ]
+            p["sysvmsg"] = 2 if self._get_value('sysvmsg') == "inherit" else 1
+            p["sysvsem"] = 2 if self._get_value('sysvsem') == "inherit" else 1
+            p["sysvshm"] = 2 if self._get_value('sysvshm') == "inherit" else 1
 
-        command += [
-            f"allow.raw_sockets={self._get_value('allow_raw_sockets')}",
-            f"allow.chflags={self._get_value('allow_chflags')}",
-            f"allow.mount={self._allow_mount}",
-            f"allow.mount.devfs={self._get_value('allow_mount_devfs')}",
-            f"allow.mount.nullfs={self._get_value('allow_mount_nullfs')}",
-            f"allow.mount.procfs={self._get_value('allow_mount_procfs')}",
-            f"allow.mount.fdescfs={self._get_value('allow_mount_fdescfs')}",
-            f"allow.mount.zfs={self._allow_mount_zfs}",
-            f"allow.quotas={self._get_value('allow_quotas')}",
-            f"allow.socket_af={self._get_value('allow_socket_af')}",
-            f"exec.timeout={self._get_value('exec_timeout')}",
-            f"stop.timeout={self._get_value('stop_timeout')}",
-            f"mount.fstab={self.fstab.path}",
-            f"mount.devfs={self._get_value('mount_devfs')}"
-        ]
+        p["allow.raw_sockets"] = str(self._get_value('allow_raw_sockets'))
+        p["allow.chflags"] = str(self._get_value('allow_chflags'))
+        p["allow.mount"] = int(self._allow_mount)
+        p["allow.mount.devfs"] = int(self._get_value('allow_mount_devfs'))
+        p["allow.mount.nullfs"] = int(self._get_value('allow_mount_nullfs'))
+        p["allow.mount.procfs"] = int(self._get_value('allow_mount_procfs'))
+        p["allow.mount.fdescfs"] = int(self._get_value('allow_mount_fdescfs'))
+        p["allow.mount.zfs"] = int(self._allow_mount_zfs)
+        p["allow.quotas"] = int(self._get_value('allow_quotas'))
+        p["allow.socket_af"] = int(self._get_value('allow_socket_af'))
+        p["exec.timeout"] = int(self._get_value('exec_timeout'))
+        p["stop.timeout"] = int(self._get_value('stop_timeout'))
+        p["mount.fstab"] = str(self.fstab.path)
+        p["mount.devfs"] = int(self._get_value('mount_devfs'))
 
         if self.host.userland_version > 9.3:
-            command += [
-                f"mount.fdescfs={self._get_value('mount_fdescfs')}",
-                f"allow.mount.tmpfs={self._get_value('allow_mount_tmpfs')}"
-            ]
+            p["mount.fdescfs"] = int(self._get_value('mount_fdescfs'))
+            p["allow.mount.tmpfs"] int(self._get_value('allow_mount_tmpfs'))
 
-        command += ["allow.dying"]
-        return command
+        p["allow.dying"] = 1
+        p["persist"] = 1
+        return p
 
     def _launch_persistent_jail(
         self,
         passthru: bool
     ) -> iocage.helpers.CommandOutput:
+
         command = self._launch_command + [
             "persist",
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
