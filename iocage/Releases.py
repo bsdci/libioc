@@ -105,6 +105,12 @@ class ReleasesGenerator(iocage.ListableResource.ListableResource):
             zfs=self.zfs
         )
 
+    def __getitem__(self, index: int) -> 'iocage.Release.ReleaseGenerator':
+        """Return the ReleaseGenerator at a certain index position."""
+        _getitem = iocage.ListableResource.ListableResource.__getitem__
+        r = _getitem(self, index)  # type: iocage.Release.ReleaseGenerator
+        return r
+
 
 class Releases(ReleasesGenerator):
     """Model of multiple iocage Releases."""
@@ -112,3 +118,9 @@ class Releases(ReleasesGenerator):
     @property
     def _class_release(self) -> 'iocage.Release.Release':
         return iocage.Release.Release
+
+    def __getitem__(self, index: int) -> 'iocage.Release.Release':
+        """Return the Jail object at a certain index position."""
+        _getitem = ReleasesGenerator.__getitem__
+        release = _getitem(self, index)  # type: iocage.Release.Release
+        return release

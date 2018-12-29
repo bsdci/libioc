@@ -113,6 +113,12 @@ class JailsGenerator(iocage.ListableResource.ListableResource):
 
             yield jail
 
+    def __getitem__(self, index: int) -> 'iocage.Jail.JailGenerator':
+        """Return the JailGenerator at a certain index position."""
+        _getitem = iocage.ListableResource.ListableResource.__getitem__
+        jail = _getitem(self, index)  # type: iocage.Jail.JailGenerator
+        return jail
+
 
 class Jails(JailsGenerator):
     """Synchronous wrapper ofs JailsGenerator."""
@@ -120,3 +126,9 @@ class Jails(JailsGenerator):
     @property
     def _class_jail(self) -> iocage.Jail.Jail:
         return iocage.Jail.Jail
+
+    def __getitem__(self, index: int) -> 'iocage.Jail.Jail':
+        """Return the Jail object at a certain index position."""
+        _getitem = JailsGenerator.__getitem__
+        jail = _getitem(self, index)  # type: iocage.Jail.Jail
+        return jail
