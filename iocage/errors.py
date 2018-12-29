@@ -973,6 +973,18 @@ class VnetBridgeMissing(IocageException):
         super().__init__(message=msg, logger=logger)
 
 
+class VnetBridgeDoesNotExist(IocageException):
+    """Raised when a vnet bridge is missing."""
+
+    def __init__(
+        self,
+        bridge_name: str,
+        logger: typing.Optional['iocage.Logger.Logger']=None
+    ) -> None:
+        msg = f"VNET bridge {bridge_name} does not exist"
+        super().__init__(message=msg, logger=logger)
+
+
 class InvalidNetworkBridge(IocageException, ValueError):
     """Raised when a network bridge is invalid."""
 

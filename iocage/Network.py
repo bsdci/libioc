@@ -167,8 +167,15 @@ class Network:
     def __autodetected_bridge_mtu(self) -> int:
         self.__require_bridge()
         bridge_name = str(self.bridge)
-        mtu = int(iocage.helpers_ioctl.get_interface_mtu(bridge_name))
-        self.logger.debug(f"Bridge {bridge_name} MTU detected: {mtu}")
+        try:
+            mtu = int(iocage.helpers_ioctl.get_interface_mtu(bridge_name))
+            self.logger.debug(f"Bridge {bridge_name} MTU detected: {mtu}")
+        except OSError:
+            self.logger.debug(f"Bridge {bridge_name} MTU detection failed")
+            raise iocage.errors.VnetBridgeDoesNotExist(
+                bridge_name=bridge_name,
+                logger=self.logger
+            )
         self._mtu = mtu
         return mtu
 
