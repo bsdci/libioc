@@ -26,6 +26,7 @@
 import typing
 import libzfs
 import abc
+import itertools
 
 import iocage.Filter
 import iocage.Resource
@@ -106,6 +107,20 @@ class ListableResource(list):
                 if self._filters is not None:
                     if self._filters.match_resource(resource):
                         yield resource
+
+    def __getitem__(  # noqa: T484
+        self,
+        index: int
+    ) -> 'iocage.Resource.Resource':
+        """Return the resource at a certain index position."""
+        items = self.__iter__()
+        try:
+            for _ in itertools.repeat(None, index):
+                next(items)
+            return next(items)
+        except StopIteration:
+            pass
+        raise IndexError("list index out of range")
 
     def __len__(self) -> int:
         """Return the number of resources matching the filters."""
