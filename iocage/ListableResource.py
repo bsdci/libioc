@@ -126,6 +126,11 @@ class ListableResource(list):
         """Return the number of resources matching the filters."""
         return len(list(self.__iter__()))
 
+    def __repr__(self) -> str:
+        """Return the resource list string representation."""
+        resource_names = ", ".join([x.name for x in self.__iter__()])
+        return f"[{resource_names}]"
+
     def _get_asset_name_from_dataset(
         self,
         dataset: libzfs.ZFSDataset
