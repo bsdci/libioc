@@ -59,7 +59,7 @@ class JailConfig(iocage.Config.Jail.BaseConfig.BaseConfig):
         """Triggered when a special property was updated."""
         BaseConfig.update_special_property(self, name)
 
-        if (name == "ip6_addr") and (self.jail is not None):
+        if (name == "ip6_addr") and (self.jail.exists is True):
             rc_conf = self.jail.rc_conf
             rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
 

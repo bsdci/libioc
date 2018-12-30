@@ -23,6 +23,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage Jail module."""
+import itertools
 import typing
 import os
 import random
@@ -326,7 +327,7 @@ class JailGenerator(JailResource):
             }
 
         if "id" in data.keys():
-            data["id"] = self._resolve_name(data["id"])
+            dataset, data["id"] = self._resolve_name(data["id"])
 
         JailResource.__init__(
             self,
@@ -2079,8 +2080,9 @@ class JailGenerator(JailResource):
 
         return iocage.Types.AbsolutePath(f"{self.root_path}{value}")
 
-    def _resolve_name(self, text: str) -> str:
-
+    def _resolve_name(self, text: str) -> typing.Tuple[
+        libzfs.ZFSDataset, str
+    ]:
         if (text is None) or (len(text) == 0):
             raise iocage.errors.JailNotSupplied(logger=self.logger)
 
@@ -2092,16 +2094,19 @@ class JailGenerator(JailResource):
         root_datasets = resource_selector.filter_datasets(self.host.datasets)
 
         for datasets_key, datasets in root_datasets.items():
-            for dataset in list(datasets.jails.children):
+            for dataset in itertools.chain(
+                    datasets.jails.children,
+                    datasets.templates.children
+            ):
                 dataset_name = str(
-                    dataset.name[(len(datasets.jails.name) + 1):]
-                )
+                    dataset.name
+                ).split('/')[-1]
                 humanreadable_name = iocage.helpers.to_humanreadable_name(
                     dataset_name
                 )
                 possible_names = [dataset_name, humanreadable_name]
                 if resource_selector.name in possible_names:
-                    return dataset_name
+                    return dataset, dataset_name
 
         raise iocage.errors.JailNotFound(text, logger=self.logger)
 

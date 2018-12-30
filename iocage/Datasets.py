@@ -147,6 +147,11 @@ class RootDatasets:
         """Get or create the pkg cache."""
         return self._get_or_create_dataset("pkg")
 
+    @property
+    def templates(self) -> libzfs.ZFSDataset:
+        """Get or create the legacy iocage templates dataset."""
+        return self._get_or_create_dataset("templates")
+
     def _get_or_create_dataset(
         self,
         asset_name: str

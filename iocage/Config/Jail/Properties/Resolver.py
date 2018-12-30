@@ -143,6 +143,8 @@ class ResolverProp(collections.MutableSequence):
         skip_on_error: bool=False
     ) -> None:
         """Clear and set all nameservers."""
+        if isinstance(value, ResolverProp):
+            value = value._entries.copy()
         error_log_level = "warn" if (skip_on_error is True) else "error"
         self._entries.clear()
         method = self._get_method(value)
