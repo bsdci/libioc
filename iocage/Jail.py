@@ -30,6 +30,7 @@ import shlex
 import shutil
 
 import libzfs
+import jail
 
 import iocage.Types
 import iocage.errors
@@ -1619,9 +1620,6 @@ class JailGenerator(JailResource):
     @property
     def _launch_parameters(self) -> typing.Dict[str, typing.Union[str, int]]:
 
-        import jail
-        stopped_jail = jail.StoppedJail(str(self.root_dataset.mountpoint))
-
         p = dict()
 
         if self.config["vnet"]:
@@ -1650,9 +1648,6 @@ class JailGenerator(JailResource):
         p["children.max"] = int(self._get_value('children_max'))
         p["allow.set_hostname"] = str(self._get_value('allow_set_hostname'))
         p["allow.sysvipc"] = int(self._get_value('allow_sysvipc'))
-        p["exec.prestart"] = f"\"{self.get_hook_script_path('prestart')}\"",
-        p["exec.prestop"] = f"\"{self.get_hook_script_path('prestop')}\"",
-        p["exec.poststop"] = f"\"{self.get_hook_script_path('poststop')}\"",
         p["exec.jail_user"] = str(self._get_value('exec_jail_user'))
 
         if self.host.userland_version > 10.3:
@@ -1683,33 +1678,29 @@ class JailGenerator(JailResource):
         p["persist"] = 1
         return p
 
-    def _launch_persistent_jail(
-        self,
-        passthru: bool
-    ) -> iocage.helpers.CommandOutput:
+    def _launch_jail(self) -> jail.RunningJail:
+        stopped_jail = jail.StoppedJail(str(self.root_dataset.mountpoint))
+        stopped_jail.parameters = self._launch_parameters
 
-        command = self._launch_command + [
-            "persist",
-            f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
-        ]
-
-        stdout, stderr, returncode = self._exec_host_command(
-            command=command,
-            passthru=passthru,
-            env=self.env
-        )
-        if returncode > 0:
+        try:
+            return jail.start()
+        except Exception as e:
             self.logger.verbose(
                 f"Jail '{self.humanreadable_name}' was not started"
             )
-            return stdout, stderr, returncode
+            raise e
+
+    def _launch_persistent_jail(
+        self,
+        passthru: bool
+    ) -> None:
+
+        running_jail = self._launch_jail()
 
         self.state.query()
         self.logger.verbose(
             f"Jail '{self.humanreadable_name}' started with JID {self.jid}"
         )
-
-        return stdout, stderr, returncode
 
     def _exec_host_command(
         self,
@@ -1751,11 +1742,8 @@ class JailGenerator(JailResource):
         jail_command: str,
         passthru: bool
     ) -> iocage.helpers.CommandOutput:
-        command = self._launch_command + [
-            "nopersist",
-            f"exec.poststart=\"{self.get_hook_script_path('host_command')}\"",
-            "command=/usr/bin/true"
-        ]
+
+        running_jail = self._launch_jail()
 
         _identifier = str(shlex.quote(self.identifier))
         _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
