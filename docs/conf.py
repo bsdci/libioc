@@ -14,14 +14,14 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, '/usr/local/src/libiocage/iocage')
+# sys.path.insert(0, '/usr/local/src/libioc/iocage')
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'libiocage'
-copyright = '2018, iocage Authors'
-author = 'iocage Authors'
+project = 'libioc'
+copyright = '2018, ioc Contributors'
+author = 'ioc Contributors'
 
 # The short X.Y version
 version = ''
@@ -106,7 +106,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'libiocagedoc'
+htmlhelp_basename = 'libiocdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -133,8 +133,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'libiocage.tex', 'libiocage Documentation',
-     'iocage Authors', 'manual'),
+    (master_doc, 'libioc.tex', 'libioc Documentation',
+     'ioc Contributors', 'manual'),
 ]
 
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'libiocage', 'libiocage Documentation',
+    (master_doc, 'libioc', 'libioc Documentation',
      [author], 1)
 ]
 
@@ -154,8 +154,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'libiocage', 'libiocage Documentation',
-     author, 'libiocage', 'One line description of project.',
+    (master_doc, 'libioc', 'libioc Documentation',
+     author, 'libioc',
+     'libioc is a Python 3 jail management library originating from iocage.',
      'Miscellaneous'),
 ]
 

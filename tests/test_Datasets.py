@@ -1,5 +1,5 @@
+# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
-# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,10 @@ import pytest
 import typing
 import libzfs
 
-import iocage.lib
+import ioc.lib
 
 
-class DatasetsMock(iocage.Datasets.Datasets):
+class DatasetsMock(ioc.Datasets.Datasets):
     """Mock the database."""
 
     ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
@@ -42,7 +42,7 @@ class TestDatasets(object):
     @pytest.fixture
     def MockedDatasets(
         self,
-        logger: 'iocage.Logger.Logger',
+        logger: 'ioc.Logger.Logger',
         pool: libzfs.ZFSPool
     ) -> typing.Generator[DatasetsMock, None, None]:
         """Mock a dataset in a disabled pool."""
@@ -55,7 +55,7 @@ class TestDatasets(object):
         self,
         MockedDatasets: typing.Generator[DatasetsMock, None, None],
         pool: libzfs.ZFSPool,
-        logger: 'iocage.Logger.Logger'
+        logger: 'ioc.Logger.Logger'
     ) -> None:
         """Test if a pool can be activated."""
         datasets = DatasetsMock(pool=pool, logger=logger)

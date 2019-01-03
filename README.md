@@ -1,18 +1,18 @@
 # libiocage
 
-**Python Library to manage FreeBSD jails with libiocage.**
+**Python Library to manage FreeBSD jails with libioc.**
 
 iocage is a jail/container manager fusioning some of the best features and technologies the FreeBSD operating system has to offer.
 It is geared for ease of use with a simple and easy to understand command syntax.
 
-This library provides programmatic access to iocage features and jails, while aiming to be compatible with iocage-legacy, and the current Python 3 version of iocage.
+This library provides programmatic access to iocage features and jails, while aiming to be compatible with iocage-legacy, and the current Python 3 version of ioc.
 
 ### Latest News (September 22nd, 2018)
 Progress towards the transition of [python-iocage](https://github.com/iocage/iocage) using libiocage has been made.
 Recent changes to both projects ensure compatibility running on the same host, so that it is now possible to partially utilize libiocage in iocage until a full migration is performed.
 Because some changes to the command line arguments and the script output will occur, @skarekrow will continue to maintain the current implementation until users had time to follow the deprecation warnings and suggestions.
 
-In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://iocage.io/handbook) was published.
+In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://ioc.io/handbook) was published.
 
 ## Install
 
@@ -26,8 +26,8 @@ At the current time libiocage is not packaged or available in FreeBSD ports.
 
 ## Documentation
 
-- Iocage Handbook: https://iocage.io/handbook
-- Reference Documentation: https://iocage.io/libiocage
+- Iocage Handbook: https://ioc.io/handbook
+- Reference Documentation: https://ioc.io/libiocage
 
 ## Configuration
 
@@ -64,7 +64,7 @@ When `othersource` is the only datasource with a jail named `myjail` the above o
 ```python
 import iocage
 
-jail = iocage.Jail()
+jail = ioc.Jail()
 jail.create("11.1-RELEASE")
 ```
 
@@ -91,7 +91,7 @@ Commands:
   clone       Clone and promote jails.
   console     Login to a jail.
   create      Create a jail.
-  deactivate  Disable a ZFS pool for iocage.
+  deactivate  Disable a ZFS pool for ioc.
   destroy     Destroy specified resource
   exec        Run a command inside a specified jail.
   export      Export a jail to a backup archive
@@ -134,7 +134,7 @@ ioc fetch -r custom -b
 
 ## Documentation
 
-The [API Reference (html)](https://iocage.io/libiocage) documenting all public interfaces of libiocage is updated with every release.
+The [API Reference (html)](https://ioc.io/libiocage) documenting all public interfaces of libiocage is updated with every release.
 The information found in the reference is compiled from Python docstrings and MyPy typings using Sphinx.
 
 ## Development

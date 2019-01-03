@@ -1,5 +1,5 @@
-# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
+# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,16 +22,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Helper utilities for tests."""
+"""Manage sysctl.conf files."""
+import ioc.helpers
+import ioc.Config.Jail.File
+
+# MyPy
+import ioc.Logger
 
 
-def _delete_dataset_recursive(dataset):
-    for child in dataset.children:
-        _delete_dataset_recursive(child)
-    dataset.delete()
+class SysctlConf(ioc.Config.Jail.File.ResourceConfigFile):
+    """Abstract the sysctl.conf file."""
 
-
-def unmount_and_destroy_dataset_recursive(dataset):
-    """Unmount and destroy a dataset recursively."""
-    dataset.umount_recursive()
-    _delete_dataset_recursive(dataset)
+    _file: str = "/etc/sysctl.conf"

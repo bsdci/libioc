@@ -1,5 +1,5 @@
+# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
-# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,9 @@ import helper_functions
 import libzfs
 import pytest
 
-import iocage.Host
-import iocage.Logger
-import iocage.Release
+import ioc.Host
+import ioc.Logger
+import ioc.Release
 
 # Inject lib directory to path
 # iocage_lib_dir = os.path.abspath(os.path.join(
@@ -78,7 +78,7 @@ def zfs() -> libzfs.ZFS:
 def pool(
     request: typing.Any,
     zfs: libzfs.ZFS,
-    logger: 'iocage.Logger.Logger'
+    logger: 'ioc.Logger.Logger'
 ) -> libzfs.ZFSPool:
     """Find the active iocage pool."""
     requested_pool = request.config.getoption("--zpool")
@@ -95,7 +95,7 @@ def pool(
         lambda pool: (pool.name == requested_pool),
         zfs.pools
     ))[0]
-    datasets = iocage.Datasets.Datasets(
+    datasets = ioc.Datasets.Datasets(
         pool=target_pool,
         zfs=zfs,
         logger=logger
@@ -107,9 +107,9 @@ def pool(
 
 
 @pytest.fixture
-def logger() -> 'iocage.Logger.Logger':
+def logger() -> 'ioc.Logger.Logger':
     """Make the iocage Logger available to the tests."""
-    return iocage.Logger.Logger()
+    return ioc.Logger.Logger()
 
 
 @pytest.fixture
@@ -147,11 +147,11 @@ def root_dataset(
 @pytest.fixture
 def host(
     root_dataset: libzfs.ZFSDataset,
-    logger: 'iocage.Logger.Logger',
+    logger: 'ioc.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'iocage.Host.HostGenerator':
-    """Make the iocage.Host available to the tests."""
-    host = iocage.Host.Host(
+) -> 'ioc.Host.HostGenerator':
+    """Make the ioc.Host available to the tests."""
+    host = ioc.Host.Host(
         root_dataset=root_dataset, logger=logger, zfs=zfs
     )
     return host
@@ -160,11 +160,11 @@ def host(
 
 @pytest.fixture
 def release(
-    host: 'iocage.Host.HostGenerator',
-    logger: 'iocage.Logger.Logger',
+    host: 'ioc.Host.HostGenerator',
+    logger: 'ioc.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'iocage.Release.ReleaseGenerator':
+) -> 'ioc.Release.ReleaseGenerator':
     """Return the test release matching the host release version."""
-    return iocage.Release.Release(
+    return ioc.Release.Release(
         name=host.release_version, host=host, logger=logger, zfs=zfs
     )

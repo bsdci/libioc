@@ -1,5 +1,5 @@
-# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
+# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,16 +22,34 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Helper utilities for tests."""
+"""Collection of iocage Python decorators."""
+import functools
+import time
+
+import ioc.helpers
 
 
-def _delete_dataset_recursive(dataset):
-    for child in dataset.children:
-        _delete_dataset_recursive(child)
-    dataset.delete()
+def json(fn):
+    """Return the functions output as JSON string."""
+    @functools.wraps(fn)
+    def wrapped(*args, **kwargs):  # noqa: T484
+        return ioc.helpers.to_json(fn(*args, **kwargs))
+    return wrapped
 
 
-def unmount_and_destroy_dataset_recursive(dataset):
-    """Unmount and destroy a dataset recursively."""
-    dataset.umount_recursive()
-    _delete_dataset_recursive(dataset)
+def timeit(fn):
+    """Measure and print the functions execution time."""
+    @functools.wraps(fn)
+    def wrapped(*args, **kwargs):  # noqa: T484
+        startTime = time.time()
+        try:
+            output = fn(*args, **kwargs)
+            error = None
+        except Exception as err:
+            error = err
+        elapsedTime = (time.time() - startTime) * 1000
+        print(f"function [{fn.__qualname__}] finished in {elapsedTime} ms")
+        if error is not None:
+            raise error
+        return output
+    return wrapped

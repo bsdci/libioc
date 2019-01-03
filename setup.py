@@ -1,5 +1,5 @@
+# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
-# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,11 +22,10 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Installs libiocage using easy_install."""
+"""Installs libioc using setuptools."""
 import sys
 import typing
 from setuptools import find_packages, setup
-from setuptools.command import easy_install
 try:
     from pip._internal.req import parse_requirements
 except ModuleNotFoundError:
@@ -36,7 +35,7 @@ except ModuleNotFoundError:
 def _read_requirements(
     filename: str="requirements.txt"
 ) -> typing.Dict[str, typing.List[str]]:
-    reqs = list(parse_requirements(filename, session="iocage"))
+    reqs = list(parse_requirements(filename, session="ioc"))
     return dict(
         install_requires=list(map(lambda x: f"{x.name}{x.specifier}", reqs)),
         dependency_links=list(map(
@@ -46,75 +45,26 @@ def _read_requirements(
     )
 
 
-iocage_requirements = _read_requirements("requirements.txt")
-ioc_requirements = _read_requirements("requirements-ioc.txt")
-
-TEMPLATE = '''\
-# -*- coding: utf-8 -*-
-# EASY-INSTALL-ENTRY-SCRIPT: '{0}'
-__requires__ = '{0}'
-import sys
-
-from ioc import cli
-
-if __name__ == '__main__':
-    sys.dd:exit(cli())'''
-
-
-@classmethod  # noqa: T484
-def get_args(cls, dist, header=None):  # noqa: T484
-    """Handle arguments for easy_install."""
-    if header is None:
-        header = cls.get_header()
-
-    script_text = TEMPLATE.format(str(dist.as_requirement()))
-    args = cls._get_script_args("console", "ioc", header, script_text)
-
-    for res in args:
-        yield res
-
-
-easy_install.ScriptWriter.get_args = get_args
-
+ioc_requirements = _read_requirements("requirements.txt")
 
 if sys.version_info < (3, 6):
     exit("Only Python 3.6 and higher is supported.")
 
 setup(
-    name='iocage',
+    name='ioc',
     license='BSD',
-    version='0.3.2',
-    description='A Python library to manage jails with iocage',
-    keywords='FreeBSD jail iocage',
-    author='iocage Contributors',
-    author_email='authors@iocage.io',
-    url='https://github.com/iocage/libiocage',
+    version='0.4.0',
+    description='A Python library to manage jails with ioc (an iocage fork)',
+    keywords='FreeBSD jail ioc',
+    author='ioc Contributors',
+    author_email='authors@ioc.io',
+    url='https://github.com/bsdci/ioc',
     python_requires='>=3.6',
-    packages=find_packages(include=["iocage", "iocage.*"]),
+    packages=find_packages(include=["ioc", "ioc.*"]),
     include_package_data=True,
-    install_requires=iocage_requirements["install_requires"],
-    dependency_links=iocage_requirements["dependency_links"],
+    install_requires=ioc_requirements["install_requires"],
+    dependency_links=ioc_requirements["dependency_links"],
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
 )
 
-setup(
-    name='ioc',
-    license='BSD',
-    version='0.3.2',
-    description='A Python library to manage jails with iocage',
-    keywords='FreeBSD jail iocage',
-    author='iocage Contributors',
-    author_email='authors@iocage.io',
-    url='https://github.com/iocage/libiocage',
-    python_requires='>=3.6',
-    packages=find_packages(include=["ioc", "ioc.*"]),
-    include_package_data=True,
-    install_requires=iocage_requirements["install_requires"],
-    dependency_links=iocage_requirements["dependency_links"],
-    entry_points={
-        'console_scripts': [
-            'ioc=ioc:cli'
-        ]
-    }
-)
