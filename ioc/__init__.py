@@ -1,5 +1,5 @@
+# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
-# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,201 +22,62 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-import typing
-import locale
-import os
-import re
-import signal
-import subprocess  # nosec: B404
+"""Libioc Python module ioc."""
 import sys
-
-import click
-
-from iocage.Logger import Logger
-from iocage.events import IocageEvent
-from iocage.errors import (
-    InvalidLogLevel,
-    IocageNotActivated,
-    ZFSSourceMountpoint
-)
-from iocage.ZFS import get_zfs
-from iocage.Datasets import Datasets
-from iocage.Host import HostGenerator
-
-logger = Logger()
-
-click.core._verify_python3_env = lambda: None  # type: ignore
-user_locale = os.environ.get("LANG", "en_US.UTF-8")
-locale.setlocale(locale.LC_ALL, user_locale)
-
-IOCAGE_CMD_FOLDER = os.path.abspath(os.path.dirname(__file__))
-
-# @formatter:off
-# Sometimes SIGINT won't be installed.
-# http://stackoverflow.com/questions/40775054/capturing-sigint-using-keyboardinterrupt-exception-works-in-terminal-not-in-scr/40785230#40785230
-signal.signal(signal.SIGINT, signal.default_int_handler)
-# If a utility decides to cut off the pipe, we don't care (IE: head)
-signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-# @formatter:on
-
-try:
-    subprocess.check_call(  # nosec
-        ["/sbin/sysctl", "vfs.zfs.version.spa"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-except subprocess.CalledProcessError:
-    logger.error(
-        "ZFS is required to use iocage.\n"
-        "Try calling 'kldload zfs' as root."
-    )
-    exit(1)
+import importlib
+import typing
 
 
-def set_to_dict(data: typing.Set[str]) -> typing.Dict[str, str]:
-    """Convert a set of values to a dictionary."""
-    keys, values = zip(*[x.split("=", maxsplit=1) for x in data])
-    return dict(zip(keys, values))
+class _HookedModule:
+
+	def __call__(self, *args, **kwargs) -> None:
+		return self.main_module(*args, **kwargs)
+
+	@property
+	def main_module(self) -> typing.Any:
+		name = self.__name__
+		return sys.modules[name].__getattribute__(name.split(".").pop())
 
 
-def print_events(
-    generator: typing.Generator[typing.Union[IocageEvent, bool], None, None]
-) -> typing.Optional[bool]:
+class _IocageModule(sys.modules["ioc"].__class__):
 
-    lines: typing.Dict[str, str] = {}
-    for event in generator:
+	hooked_modules = [
+		"Host",
+		"Distribution",
+		"Jails",
+		"Jail",
+		"Releases",
+		"Release"
+	]
 
-        if isinstance(event, bool):
-            # a boolean terminates the event stream
-            return event
+	def __getattribute__(self, key: str) -> typing.Any:
+		if key.startswith("_") is True:
+			return super().__getattribute__(key)
 
-        if event.identifier is None:
-            identifier = "generic"
-        else:
-            identifier = event.identifier
+		if key not in sys.modules.keys():
+			if key in object.__getattribute__(self, "hooked_modules"):
+				self.__load_hooked_module(key)
+			else:
+				self.__load_module(key)
+		return super().__getattribute__(key)
 
-        if event.type not in lines:
-            lines[event.type] = {}
+	def __load_module(self, name: str) -> None:
+		module = importlib.import_module(f"ioc.{name}")
+		sys.modules[name] = module
 
-        # output fragments
-        running_indicator = "+" if (event.done or event.skipped) else "-"
-        name = event.type
-        if event.identifier is not None:
-            name += f"@{event.identifier}"
+	def __load_hooked_module(self, name: str) -> None:
+		module = importlib.import_module(f"ioc.{name}")
+		sys.modules[name] = self.__hook_module(module)
 
-        output = f"[{running_indicator}] {name}: "
+	def __hook_module(self, module: typing.Any) -> None:
 
-        if event.message is not None:
-            output += event.message
-        else:
-            output += event.get_state_string(
-                done="OK",
-                error="FAILED",
-                skipped="SKIPPED",
-                pending="..."
-            )
+		class _Module(module.__class__, _HookedModule):
 
-        if event.duration is not None:
-            output += " [" + str(round(event.duration, 3)) + "s]"
-
-        # new line or update of previous
-        if identifier not in lines[event.type]:
-            # Indent if previous task is not finished
-            lines[event.type][identifier] = logger.screen(
-                output,
-                indent=event.parent_count
-            )
-        else:
-            lines[event.type][identifier].edit(
-                output,
-                indent=event.parent_count
-            )
+			pass
 
 
-class IOCageCLI(click.MultiCommand):
-    """
-    Iterates in the 'cli' directory and will load any module's cli definition.
-    """
-
-    def list_commands(self, ctx: click.core.Context):
-        rv = []
-
-        for filename in os.listdir(IOCAGE_CMD_FOLDER):
-            if filename.endswith('.py') and \
-                    not filename.startswith('__init__'):
-                rv.append(re.sub(r".py$", "", filename))
-        rv.sort()
-
-        return rv
-
-    def get_command(self, ctx, name):
-        ctx.print_events = print_events
-        try:
-            mod = __import__(f"ioc.{name}", None, None, ["ioc"])
-
-            try:
-                if mod.__rootcmd__ and "--help" not in sys.argv[1:]:
-                    if len(sys.argv) != 1:
-                        if os.geteuid() != 0:
-                            app_name = mod.__name__.rsplit(".")[-1]
-                            logger.error(
-                                "You need to have root privileges"
-                                f" to run {app_name}"
-                            )
-                            exit(1)
-            except AttributeError:
-                # It's not a root required command.
-                pass
-            return mod.cli
-        except (ImportError, AttributeError):
-            raise
-            return
+		module.__class__ = _Module
+		return module
 
 
-@click.option(
-    "--log-level",
-    "-d",
-    default=None,
-    help=(
-        f"Set the CLI log level {Logger.LOG_LEVELS}"
-    )
-)
-@click.option(
-    "--source",
-    multiple=True,
-    type=str,
-    help="Globally override the activated iocage dataset(s)"
-)
-@click.command(cls=IOCageCLI)
-@click.version_option(version="0.3.2 2018/12/16", prog_name="ioc")
-@click.pass_context
-def cli(ctx, log_level: str, source: set) -> None:
-    """A jail manager."""
-    if log_level is not None:
-        try:
-            logger.print_level = log_level
-        except InvalidLogLevel:
-            exit(1)
-    ctx.logger = logger
-
-    ctx.zfs = get_zfs(logger=ctx.logger)
-
-    ctx.user_sources = None if (len(source) == 0) else set_to_dict(source)
-
-    if ctx.invoked_subcommand in ["activate", "deactivate"]:
-        return
-
-    try:
-        datasets = Datasets(
-            sources=ctx.user_sources,
-            zfs=ctx.zfs,
-            logger=ctx.logger
-        )
-        ctx.host = HostGenerator(
-            datasets=datasets,
-            logger=ctx.logger,
-            zfs=ctx.zfs
-        )
-    except (IocageNotActivated, ZFSSourceMountpoint):
-        exit(1)
-
+sys.modules["ioc"].__class__ = _IocageModule

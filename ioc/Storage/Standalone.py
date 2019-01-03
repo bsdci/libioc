@@ -1,5 +1,5 @@
-# Copyright (c) 2017-2019, Stefan Grönke
 # Copyright (c) 2014-2018, iocage
+# Copyright (c) 2017-2018, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,16 +22,27 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Helper utilities for tests."""
+"""iocage standalone jail storage backend."""
+import ioc.Storage
 
 
-def _delete_dataset_recursive(dataset):
-    for child in dataset.children:
-        _delete_dataset_recursive(child)
-    dataset.delete()
+class StandaloneJailStorage(ioc.Storage.Storage):
+    """iocage standalone jail storage backend."""
 
+    def apply(
+        self,
+        release: 'ioc.Release.ReleaseGenerator'
+    ) -> None:
+        """Attach the jail storage."""
+        self.logger.warn(
+            "Standalone jails do not require storage operations to start",
+            jail=self.jail
+        )
 
-def unmount_and_destroy_dataset_recursive(dataset):
-    """Unmount and destroy a dataset recursively."""
-    dataset.umount_recursive()
-    _delete_dataset_recursive(dataset)
+    def setup(
+        self,
+        resource: 'ioc.Resource.Resource'
+    ) -> None:
+        """Configure the jail storage."""
+        self.logger.verbose("Cloning the release once to the root dataset")
+        self.clone_resource(resource)
