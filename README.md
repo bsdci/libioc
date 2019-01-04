@@ -1,18 +1,11 @@
-# libiocage
+# libioc
 
-**Python Library to manage FreeBSD jails with libioc.**
+**Python Library to manage FreeBSD jails with ioc{age,ell}.**
 
 iocage is a jail/container manager fusioning some of the best features and technologies the FreeBSD operating system has to offer.
 It is geared for ease of use with a simple and easy to understand command syntax.
 
-This library provides programmatic access to iocage features and jails, while aiming to be compatible with iocage-legacy, and the current Python 3 version of ioc.
-
-### Latest News (September 22nd, 2018)
-Progress towards the transition of [python-iocage](https://github.com/iocage/iocage) using libiocage has been made.
-Recent changes to both projects ensure compatibility running on the same host, so that it is now possible to partially utilize libiocage in iocage until a full migration is performed.
-Because some changes to the command line arguments and the script output will occur, @skarekrow will continue to maintain the current implementation until users had time to follow the deprecation warnings and suggestions.
-
-In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://ioc.io/handbook) was published.
+This library provides programmatic access to iocage features and jails, while aiming to be compatible with iocage_legacy, iocell and the Python 3 version of iocage (`< 1.0`).
 
 ## Install
 
@@ -26,8 +19,8 @@ At the current time libiocage is not packaged or available in FreeBSD ports.
 
 ## Documentation
 
-- Iocage Handbook: https://ioc.io/handbook
-- Reference Documentation: https://ioc.io/libiocage
+- Iocage Handbook: https://bsdci.github.io/handbook
+- Reference Documentation: https://bsdci.github.io/libioc
 
 ## Configuration
 
@@ -50,7 +43,11 @@ ioc_dataset_othersource="zroot/iocage"
 iocage commands default to the first root data source specified in the file.
 Operations can be pointed to an alternative root by prefixing the subject with the source name followed by a slash.
 
-```sh
+```python
+import ioc
+release = ioc.Release("12.0-RELEASE")
+
+jail_a = ioc.Jail(new=True, {})
 ioc create othersource/myjail
 ioc rename othersource/myjail myjail2
 ```
@@ -62,7 +59,7 @@ When `othersource` is the only datasource with a jail named `myjail` the above o
 ### Library
 
 ```python
-import iocage
+import ioc
 
 jail = ioc.Jail()
 jail.create("11.1-RELEASE")
@@ -70,78 +67,19 @@ jail.create("11.1-RELEASE")
 
 ### CLI
 
-Libiocage comes bundles with a CLI tool called `ioc`.
+libioc has a CLI tool called [ioc](https://github.com/bsdci/ioc) that is no longer bundled with the library, but can be installed individually.
 It is inspired by the command line interface of [iocage](https://github.com/iocage/iocage) but meant to be developed along with the library and to spike on new features.
-
-```
-Usage: ioc [OPTIONS] COMMAND [ARGS]...
-
-  A jail manager.
-
-Options:
-  --version             Show the version and exit.
-  --source TEXT         Globally override the activated iocage dataset(s)
-  -d, --log-level TEXT  Set the CLI log level ('critical', 'error', 'warn',
-                        'info', 'notice', 'verbose', 'debug', 'spam',
-                        'screen')
-  --help                Show this message and exit.
-
-Commands:
-  activate    Set a zpool active for iocage usage.
-  clone       Clone and promote jails.
-  console     Login to a jail.
-  create      Create a jail.
-  deactivate  Disable a ZFS pool for ioc.
-  destroy     Destroy specified resource
-  exec        Run a command inside a specified jail.
-  export      Export a jail to a backup archive
-  fetch       Fetch and update a Release to create Jails...
-  fstab       View and manipulate a jails fstab file.
-  get         Gets the specified property.
-  import      Import a jail from a backup archive
-  list        List a specified dataset type, by default...
-  migrate     Migrate jails to the latest format.
-  pkg         Manage packages in a jail.
-  promote     Clone and promote jails.
-  provision   Trigger provisioning of jails.
-  rename      Rename a stopped jail.
-  restart     Restarts the specified jails.
-  set         Sets the specified property.
-  snapshot    Take and manage resource snapshots.
-  start       Starts the specified jails or ALL.
-  stop        Stops the specified jails or ALL.
-  update      Starts the specified jails or ALL.
-```
-
-### Custom Release (e.g. running -CURRENT)
-
-#### Initially create the release dataset
-
-```sh
-zfs create zroot/iocage/releases/custom/root
-cd /usr/src
-# install your source tree
-make installworld DESTDIR=/iocage/releases/custom/root
-make distribution DESTDIR=/iocage/releases/custom/root
-ioc fetch -r custom -b
-```
-
-#### Update the installation after recompile
-```sh
-make installworld DESTDIR=/iocage/releases/custom/root
-ioc fetch -r custom -b
-```
 
 ## Documentation
 
-The [API Reference (html)](https://ioc.io/libiocage) documenting all public interfaces of libiocage is updated with every release.
+The [API Reference (html)](https://bsdci.github.io/libioc) documenting all public interfaces of libioc is updated with every release.
 The information found in the reference is compiled from Python docstrings and MyPy typings using Sphinx.
 
 ## Development
 
 ### Unit Tests
 
-Unit tests may run on FreeBSD or HardenedBSD and require an activated iocage pool.
+Unit tests may run on FreeBSD or HardenedBSD and require an activated ioc pool.
 
 ```sh
 ZPOOL=zroot make test
@@ -160,6 +98,13 @@ make check
 ---
 
 ### Project Status (Archive)
+
+#### 2018-09-22
+Progress towards the transition of [python-iocage](https://github.com/iocage/iocage) using libiocage has been made.
+Recent changes to both projects ensure compatibility running on the same host, so that it is now possible to partially utilize libiocage in iocage until a full migration is performed.
+Because some changes to the command line arguments and the script output will occur, @skarekrow will continue to maintain the current implementation until users had time to follow the deprecation warnings and suggestions.
+
+In terms of the "Advanced container management with libiocage" tutorial at EuroBSDCon 2018 the [Handbook](https://bsdci.github.io/handbook) was published.
 
 #### 2018-08-07
 libiocage is making small but continuous steps to stabilize the interfaces and become used in [iocage/iocage](https://github.com/iocage/iocage).
