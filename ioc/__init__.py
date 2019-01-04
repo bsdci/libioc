@@ -27,6 +27,8 @@ import sys
 import importlib
 import typing
 
+VERSION = "0.4.0 2019/01/04"
+
 
 class _HookedModule:
 
