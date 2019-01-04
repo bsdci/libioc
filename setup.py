@@ -64,7 +64,7 @@ setup(
     include_package_data=True,
     install_requires=ioc_requirements["install_requires"],
     dependency_links=ioc_requirements["dependency_links"],
-    setup_requires=['pytest-runner'],
+    # setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
 )
 
