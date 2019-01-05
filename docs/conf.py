@@ -32,8 +32,8 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = 'libioc'
-copyright = '2019, ioc Contributors'
 author = 'ioc Contributors'
+copyright = '2019, {0}'.format(author) 
 
 # The short X.Y version
 __dirname = os.path.dirname(__file__)
