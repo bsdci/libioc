@@ -79,6 +79,7 @@ instance/
 docs/_build/
 docs/*.rst
 docs/make.bat
+docs/Makefile
 
 # PyBuilder
 target/
