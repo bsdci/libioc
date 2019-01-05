@@ -17,20 +17,31 @@
 # sys.path.insert(0, '/usr/local/src/libioc/iocage')
 import sphinx.apidoc
 import os.path
-
-# -- Project information -----------------------------------------------------
-
-project = 'libioc'
-author = 'ioc Contributors'
-copyright = '2019, {0}'.format(author) 
+from datetime import datetime
+import re
 
 __dirname = os.path.dirname(__file__)
+
+
+# -- Project information -----------------------------------------------------
+project = 'libioc'
+
+__license_file = os.path.join(__dirname, '../LICENSE.txt')
+with open(__license_file, "r") as f:
+    __license_info = re.match(
+        r".*(?P<full>(?P<start>\d{4})-(?P<end>\d{4}),\s(?P<author>.*))$",
+        f.read().split("\n")[0].strip()
+    )
+    author = __license_info["author"]
+    copyright = __license_info["full"]
+
 __version_file = os.path.join(__dirname, '../ioc/VERSION')
 with open(__version_file, "r") as f:
     release = f.read().split("\n")[0]
 version = release.split()[0]
 
 
+# -- Sphinx Autodoc ----------------------------------------------------------
 def setup(app):
     sphinx.ext.apidoc.main([
         '--separate',
