@@ -38,54 +38,56 @@ def _get_version():
 
 class _HookedModule:
 
-	def __call__(self, *args, **kwargs) -> None:
-		return self.main_module(*args, **kwargs)
+    def __call__(self, *args, **kwargs) -> None:
+        return self.main_module(*args, **kwargs)
 
-	@property
-	def main_module(self) -> typing.Any:
-		name = self.__name__
-		return sys.modules[name].__getattribute__(name.split(".").pop())
+    @property
+    def main_module(self) -> typing.Any:
+        name = self.__name__
+        return sys.modules[name].__getattribute__(name.split(".").pop())
 
 
 class _IocageModule(sys.modules["ioc"].__class__):
 
-	hooked_modules = [
-		"Host",
-		"Distribution",
-		"Jails",
-		"Jail",
-		"Releases",
-		"Release"
-	]
+    hooked_modules = [
+        "Host",
+        "Distribution",
+        "Jails",
+        "Jail",
+        "Releases",
+        "Release"
+    ]
 
-	def __getattribute__(self, key: str) -> typing.Any:
-		if key.startswith("_") is True:
-			return super().__getattribute__(key)
+    def __getattribute__(self, key: str) -> typing.Any:
+        if key == "VERSION":
+            return _get_version()
+        if key.startswith("_") is True:
+            return super().__getattribute__(key)
 
-		if key not in sys.modules.keys():
-			if key in object.__getattribute__(self, "hooked_modules"):
-				self.__load_hooked_module(key)
-			else:
-				self.__load_module(key)
-		return super().__getattribute__(key)
+        if key not in sys.modules.keys():
+            if key in object.__getattribute__(self, "hooked_modules"):
+                self.__load_hooked_module(key)
+            else:
+                self.__load_module(key)
+        return super().__getattribute__(key)
 
-	def __load_module(self, name: str) -> None:
-		module = importlib.import_module(f"ioc.{name}")
-		sys.modules[name] = module
+    def __load_module(self, name: str) -> None:
+        module = importlib.import_module(f"ioc.{name}")
+        sys.modules[name] = module
 
-	def __load_hooked_module(self, name: str) -> None:
-		module = importlib.import_module(f"ioc.{name}")
-		sys.modules[name] = self.__hook_module(module)
+    def __load_hooked_module(self, name: str) -> None:
+        module = importlib.import_module(f"ioc.{name}")
+        sys.modules[name] = self.__hook_module(module)
 
-	def __hook_module(self, module: typing.Any) -> None:
+    def __hook_module(self, module: typing.Any) -> None:
 
-		class _Module(module.__class__, _HookedModule):
+        class _Module(module.__class__, _HookedModule):
 
-			pass
+            pass
 
 
-		module.__class__ = _Module
-		return module
+        module.__class__ = _Module
+        return module
 
 
 sys.modules["ioc"].__class__ = _IocageModule
