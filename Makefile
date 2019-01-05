@@ -28,9 +28,7 @@ regression-test:
 	tests/run-integration.sh
 .PHONY: docs
 docs:
-	sphinx-apidoc -o docs --separate -H ioc -A "ioc Contributors" --full ioc tests
-	if [ "`uname`" = "FreeBSD" ]; then gmake -C docs html; else make -C docs html; fi
-
+	python3.6 setup.py build_sphinx
 help:
 	@echo "    install"
 	@echo "        Installs libioc"
