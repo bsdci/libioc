@@ -15,7 +15,18 @@
 # import os
 # import sys
 # sys.path.insert(0, '/usr/local/src/libioc/iocage')
+import sphinx.apidoc
 
+def setup(app):
+    sphinx.ext.apidoc.main([
+        '--separate',
+        '-H', 'libioc',
+        '--no-toc',
+        '-o', 'docs',
+        '--full',
+        'ioc',
+        'tests'
+    ])
 
 # -- Project information -----------------------------------------------------
 
