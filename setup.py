@@ -50,17 +50,21 @@ ioc_requirements = _read_requirements("requirements.txt")
 if sys.version_info < (3, 6):
     exit("Only Python 3.6 and higher is supported.")
 
+with open("ioc/VERSION", "r") as f:
+    version = f.read().split()[0]
+
 setup(
     name='ioc',
     license='BSD',
-    version='0.4.0',
-    description='A Python library to manage jails with ioc (an iocage fork)',
+    version=version,
+    description='A Python library to manage jails with ioc{age,cell}',
     keywords='FreeBSD jail ioc',
     author='ioc Contributors',
     author_email='authors@ioc.io',
-    url='https://github.com/bsdci/ioc',
+    url='https://github.com/bsdci/libioc',
     python_requires='>=3.6',
     packages=find_packages(include=["ioc", "ioc.*"]),
+    package_data={'': ['VERSION']},
     include_package_data=True,
     install_requires=ioc_requirements["install_requires"],
     dependency_links=ioc_requirements["dependency_links"],
