@@ -16,6 +16,7 @@
 # import sys
 # sys.path.insert(0, '/usr/local/src/libioc/iocage')
 import sphinx.apidoc
+import os.path
 
 def setup(app):
     sphinx.ext.apidoc.main([
@@ -35,9 +36,11 @@ copyright = '2018, ioc Contributors'
 author = 'ioc Contributors'
 
 # The short X.Y version
-version = '0.4.0'
-# The full version, including alpha/beta/rc tags
-release = ''
+__dirname = os.path.dirname(__file__)
+__version_file = os.path.join(__dirname, '../ioc/VERSION')
+with open(__version_file, "r") as f:
+    release = f.read().split("\n")[0]
+version = release.split()[0]
 
 
 # -- General configuration ---------------------------------------------------

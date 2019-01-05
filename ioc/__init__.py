@@ -24,10 +24,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Libioc Python module ioc."""
 import sys
+import os.path
 import importlib
 import typing
 
-VERSION = "0.4.0 2019/01/04"
+
+def _get_version():
+    __dirname = os.path.dirname(__file__)
+    __version_file = os.path.join(__dirname, 'VERSION')
+    with open(__version_file, "r") as f:
+        return f.read().split("\n")[0]
 
 
 class _HookedModule:
