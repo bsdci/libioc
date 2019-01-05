@@ -32,7 +32,7 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = 'libioc'
-copyright = '2018, ioc Contributors'
+copyright = '2019, ioc Contributors'
 author = 'ioc Contributors'
 
 # The short X.Y version
