@@ -1,0 +1,7 @@
+ioc.Resource module
+===================
+
+.. automodule:: ioc.Resource
+    :members:
+    :undoc-members:
+    :show-inheritance:

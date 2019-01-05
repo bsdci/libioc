@@ -1,0 +1,7 @@
+ioc.Config.Jail.Properties.Addresses module
+===========================================
+
+.. automodule:: ioc.Config.Jail.Properties.Addresses
+    :members:
+    :undoc-members:
+    :show-inheritance:

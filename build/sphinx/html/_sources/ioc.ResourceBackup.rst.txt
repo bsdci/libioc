@@ -1,0 +1,7 @@
+ioc.ResourceBackup module
+=========================
+
+.. automodule:: ioc.ResourceBackup
+    :members:
+    :undoc-members:
+    :show-inheritance:

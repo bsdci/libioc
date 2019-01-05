@@ -1,0 +1,7 @@
+ioc.ZFS module
+==============
+
+.. automodule:: ioc.ZFS
+    :members:
+    :undoc-members:
+    :show-inheritance:

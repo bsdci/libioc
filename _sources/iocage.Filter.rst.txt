@@ -1,7 +1,0 @@
-iocage.Filter module
-====================
-
-.. automodule:: iocage.Filter
-    :members:
-    :undoc-members:
-    :show-inheritance:

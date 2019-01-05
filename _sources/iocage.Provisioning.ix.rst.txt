@@ -1,7 +1,0 @@
-iocage.Provisioning.ix module
-=============================
-
-.. automodule:: iocage.Provisioning.ix
-    :members:
-    :undoc-members:
-    :show-inheritance:

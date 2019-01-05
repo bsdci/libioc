@@ -1,0 +1,1154 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.events &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ioc.html">ioc package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ioc.events</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ioc.events</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
+<span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage events collection.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+
+<span class="kn">import</span> <span class="nn">ioc.errors</span>
+
+<span class="c1"># MyPy</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>
+
+<span class="n">EVENT_STATUS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;done&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;failed&quot;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="Scope"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.Scope">[docs]</a><span class="k">class</span> <span class="nc">Scope</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An independent event history scope.&quot;&quot;&quot;</span>
+
+    <span class="n">PENDING_COUNT</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PENDING_COUNT</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([])</span></div>
+
+
+<div class="viewcode-block" id="IocageEvent"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent">[docs]</a><span class="k">class</span> <span class="nc">IocageEvent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The base event class of libioc.&quot;&quot;&quot;</span>
+
+    <span class="n">_scope</span><span class="p">:</span> <span class="n">Scope</span>
+
+    <span class="n">identifier</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_started_at</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">_stopped_at</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">_pending</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">skipped</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">done</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">reverted</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">error</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">]]</span>
+    <span class="n">_rollback_steps</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="p">]]]</span>
+    <span class="n">_child_events</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;IocageEvent&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize an IocageEvent.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">event</span>  <span class="c1"># type: ignore</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rollback_steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_events</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rollback_steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scope</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the currently used event scope.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span>
+
+    <span class="nd">@scope</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="n">Scope</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="n">scope</span>
+
+<div class="viewcode-block" id="IocageEvent.get_state_string"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.get_state_string">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_string</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">error</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span>
+        <span class="n">skipped</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;skipped&quot;</span><span class="p">,</span>
+        <span class="n">done</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;done&quot;</span><span class="p">,</span>
+        <span class="n">pending</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a humanreadable string according to the jail state.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">error</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">skipped</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">done</span>
+
+        <span class="k">return</span> <span class="n">pending</span></div>
+
+<div class="viewcode-block" id="IocageEvent.child_event"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.child_event">[docs]</a>    <span class="k">def</span> <span class="nf">child_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Append the event to the child_events for later notification.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">event</span></div>
+
+<div class="viewcode-block" id="IocageEvent.add_rollback_step"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.add_rollback_step">[docs]</a>    <span class="k">def</span> <span class="nf">add_rollback_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a rollback step that is executed when the event fails.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rollback_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IocageEvent.rollback"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.rollback">[docs]</a>    <span class="k">def</span> <span class="nf">rollback</span><span class="p">(</span>
+        <span class="bp">self</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Rollback all rollback steps in reverse order.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverted</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Notify child_events in reverse order</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_child_events</span><span class="p">):</span>
+            <span class="n">rollback_actions</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">rollback_actions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">rollback_action</span> <span class="ow">in</span> <span class="n">rollback_actions</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">rollback_action</span>
+
+        <span class="c1"># Execute rollback steps in reverse order</span>
+        <span class="n">reversed_rollback_steps</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rollback_steps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rollback_steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">revert_step</span> <span class="ow">in</span> <span class="n">reversed_rollback_steps</span><span class="p">:</span>
+            <span class="n">revert_events</span> <span class="o">=</span> <span class="n">revert_step</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">revert_events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">revert_events</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">event</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the events type.</span>
+
+<span class="sd">        The event type is obtained from an IocageEvent&#39;s class name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pending</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the event is pending.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending</span>
+
+    <span class="nd">@pending</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">pending</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the pending state.</span>
+
+<span class="sd">        Changes invoke internal processing as for example the calculation of</span>
+<span class="sd">        the event duration and the global PENDING_COUNT.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending</span>
+        <span class="n">new_state</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">current</span> <span class="o">==</span> <span class="n">new_state</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">new_state</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_started_at</span>
+                <span class="k">raise</span> <span class="n">ioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EventAlreadyFinished</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_started_at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">timer</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">new_state</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stopped_at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">timer</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending</span> <span class="o">=</span> <span class="n">new_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the duration of finished events.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stopped_at</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started_at</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_update_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+
+<div class="viewcode-block" id="IocageEvent.begin"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.begin">[docs]</a>    <span class="k">def</span> <span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Begin an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="IocageEvent.end"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="IocageEvent.step"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Reflect partial event progress.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="IocageEvent.skip"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.skip">[docs]</a>    <span class="k">def</span> <span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Mark an event as skipped.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skipped</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="IocageEvent.fail"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.fail">[docs]</a>    <span class="k">def</span> <span class="nf">fail</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exception</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;End an event with a failure.&quot;&quot;&quot;</span>
+        <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fail_generator</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">exception</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="IocageEvent.fail_generator"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.IocageEvent.fail_generator">[docs]</a>    <span class="k">def</span> <span class="nf">fail_generator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exception</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;IocageEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;End an event with a failure via a generator of rollback steps.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">exception</span>
+
+        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">action</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">PENDING_COUNT</span>
+
+        <span class="k">yield</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compare an event by its type and identifier.&quot;&quot;&quot;</span>
+        <span class="n">has_identifier</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;identifier&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="n">identifier</span> <span class="o">=</span> <span class="s2">&quot;generic&quot;</span> <span class="k">if</span> <span class="n">has_identifier</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">identifier</span><span class="p">))</span></div>
+
+
+<span class="c1"># Jail</span>
+
+
+<div class="viewcode-block" id="JailEvent"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailEvent">[docs]</a><span class="k">class</span> <span class="nc">JailEvent</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Any event related to a jail.&quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span>
+    <span class="n">identifier</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">jail</span><span class="o">.</span><span class="n">full_name</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jail</span> <span class="o">=</span> <span class="n">jail</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailLaunch"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailLaunch">[docs]</a><span class="k">class</span> <span class="nc">JailLaunch</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Launch a jail.&quot;&quot;&quot;</span>
+
+    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JailLaunch.end"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailLaunch.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="k">return</span> <span class="n">IocageEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JailRename"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailRename">[docs]</a><span class="k">class</span> <span class="nc">JailRename</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Change the name of a jail.&quot;&quot;&quot;</span>
+
+    <span class="n">current_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">current_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_name</span> <span class="o">=</span> <span class="n">current_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_name</span> <span class="o">=</span> <span class="n">new_name</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailDestroy"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailDestroy">[docs]</a><span class="k">class</span> <span class="nc">JailDestroy</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Destroy the jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailFstabUpdate"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailFstabUpdate">[docs]</a><span class="k">class</span> <span class="nc">JailFstabUpdate</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update a jails fstab file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailResolverConfig"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailResolverConfig">[docs]</a><span class="k">class</span> <span class="nc">JailResolverConfig</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update a jails /etc/resolv.conf file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailClone"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailClone">[docs]</a><span class="k">class</span> <span class="nc">JailClone</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clone a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+<span class="c1"># Release</span>
+
+
+<div class="viewcode-block" id="ReleaseEvent"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseEvent">[docs]</a><span class="k">class</span> <span class="nc">ReleaseEvent</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event related to a release.&quot;&quot;&quot;</span>
+
+    <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;ioc.Release.ReleaseGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;ioc.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">release</span><span class="o">.</span><span class="n">full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">release</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReleaseUpdate"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseUpdate">[docs]</a><span class="k">class</span> <span class="nc">ReleaseUpdate</span><span class="p">(</span><span class="n">ReleaseEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update a release.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FetchRelease"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.FetchRelease">[docs]</a><span class="k">class</span> <span class="nc">FetchRelease</span><span class="p">(</span><span class="n">ReleaseEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetch release assets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleasePrepareStorage"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleasePrepareStorage">[docs]</a><span class="k">class</span> <span class="nc">ReleasePrepareStorage</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prepare the storage of a release before fetching it.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseDownload"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseDownload">[docs]</a><span class="k">class</span> <span class="nc">ReleaseDownload</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download release assets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseAssetDownload"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseAssetDownload">[docs]</a><span class="k">class</span> <span class="nc">ReleaseAssetDownload</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download release assets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseExtraction"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseExtraction">[docs]</a><span class="k">class</span> <span class="nc">ReleaseExtraction</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract a release asset.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseCopyBase"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseCopyBase">[docs]</a><span class="k">class</span> <span class="nc">ReleaseCopyBase</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy the basejail folders of a release into individual ZFS datasets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseConfiguration"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseConfiguration">[docs]</a><span class="k">class</span> <span class="nc">ReleaseConfiguration</span><span class="p">(</span><span class="n">FetchRelease</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pre-configure a release with reasonable defaults.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseUpdatePull"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseUpdatePull">[docs]</a><span class="k">class</span> <span class="nc">ReleaseUpdatePull</span><span class="p">(</span><span class="n">ReleaseUpdate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pull resource updater and patches from the remote.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReleaseUpdateDownload"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ReleaseUpdateDownload">[docs]</a><span class="k">class</span> <span class="nc">ReleaseUpdateDownload</span><span class="p">(</span><span class="n">ReleaseUpdate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download resource updates/patches.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<span class="c1"># Resource</span>
+
+
+<div class="viewcode-block" id="ResourceEvent"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ResourceEvent">[docs]</a><span class="k">class</span> <span class="nc">ResourceEvent</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event with a resource.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">full_name</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceUpdate"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ResourceUpdate">[docs]</a><span class="k">class</span> <span class="nc">ResourceUpdate</span><span class="p">(</span><span class="n">ResourceEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update a resource.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="RunResourceUpdate"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.RunResourceUpdate">[docs]</a><span class="k">class</span> <span class="nc">RunResourceUpdate</span><span class="p">(</span><span class="n">ResourceUpdate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run the update of a resource.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExecuteResourceUpdate"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExecuteResourceUpdate">[docs]</a><span class="k">class</span> <span class="nc">ExecuteResourceUpdate</span><span class="p">(</span><span class="n">ResourceUpdate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Execute the updater script in a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<span class="c1"># ZFS</span>
+
+
+<div class="viewcode-block" id="ZFSEvent"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSEvent">[docs]</a><span class="k">class</span> <span class="nc">ZFSEvent</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event related to ZFS storage.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">zfs_object</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSObject</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">zfs_object</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs_object</span> <span class="o">=</span> <span class="n">zfs_object</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSDatasetRename"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSDatasetRename">[docs]</a><span class="k">class</span> <span class="nc">ZFSDatasetRename</span><span class="p">(</span><span class="n">ZFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rename a ZFS dataset.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">ZFSEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">zfs_object</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSDatasetDestroy"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSDatasetDestroy">[docs]</a><span class="k">class</span> <span class="nc">ZFSDatasetDestroy</span><span class="p">(</span><span class="n">ZFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rename a ZFS dataset.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">ZFSEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">zfs_object</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSSnapshotRename"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSSnapshotRename">[docs]</a><span class="k">class</span> <span class="nc">ZFSSnapshotRename</span><span class="p">(</span><span class="n">ZFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rename a ZFS snapshot.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">ZFSEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">zfs_object</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSSnapshotClone"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSSnapshotClone">[docs]</a><span class="k">class</span> <span class="nc">ZFSSnapshotClone</span><span class="p">(</span><span class="n">ZFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clone a ZFS snapshot to a target.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Could not clone to </span><span class="si">{target}</span><span class="s2">&quot;</span>
+        <span class="n">ZFSEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">zfs_object</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZFSSnapshotRollback"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ZFSSnapshotRollback">[docs]</a><span class="k">class</span> <span class="nc">ZFSSnapshotRollback</span><span class="p">(</span><span class="n">ZFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rollback a ZFS dataset to a snapshot.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSSnapshot</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Rolling back </span><span class="si">{target}</span><span class="s2"> to snapshot </span><span class="si">{snapshot.snapshot_name}</span><span class="s2">&quot;</span>
+        <span class="n">ZFSEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">zfs_object</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># Backup</span>
+
+
+<div class="viewcode-block" id="ResourceBackup"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ResourceBackup">[docs]</a><span class="k">class</span> <span class="nc">ResourceBackup</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Events that occur when backing up a resource.&quot;&quot;&quot;</span>
+
+    <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">resource</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">dataset_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExportConfig"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExportConfig">[docs]</a><span class="k">class</span> <span class="nc">ExportConfig</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when the config of a resource is exported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExportFstab"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExportFstab">[docs]</a><span class="k">class</span> <span class="nc">ExportFstab</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when the fstab file of a jail is exported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExportRootDataset"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExportRootDataset">[docs]</a><span class="k">class</span> <span class="nc">ExportRootDataset</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Export a resources root dataset.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExportOtherDatasets"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExportOtherDatasets">[docs]</a><span class="k">class</span> <span class="nc">ExportOtherDatasets</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when other resource datasets get exported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExportOtherDataset"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExportOtherDataset">[docs]</a><span class="k">class</span> <span class="nc">ExportOtherDataset</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Export one of a resources datasets.&quot;&quot;&quot;</span>
+
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="n">ResourceBackup</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The identifier is the dataset name relative to the resource</span>
+        <span class="n">relative_dataset_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset_name</span><span class="p">):]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">relative_dataset_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BundleBackup"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.BundleBackup">[docs]</a><span class="k">class</span> <span class="nc">BundleBackup</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bundle exported data into a backup archive.&quot;&quot;&quot;</span>
+
+    <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="n">ResourceBackup</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># Backup import/restore</span>
+
+
+<div class="viewcode-block" id="ExtractBundle"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ExtractBundle">[docs]</a><span class="k">class</span> <span class="nc">ExtractBundle</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract a bundled backup archive.&quot;&quot;&quot;</span>
+
+    <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="n">ResourceBackup</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImportConfig"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ImportConfig">[docs]</a><span class="k">class</span> <span class="nc">ImportConfig</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when the config of a resource is imported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImportFstab"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ImportFstab">[docs]</a><span class="k">class</span> <span class="nc">ImportFstab</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when the fstab file of a jail is imported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImportRootDataset"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ImportRootDataset">[docs]</a><span class="k">class</span> <span class="nc">ImportRootDataset</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Import data from an an archived root dataset.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImportOtherDatasets"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ImportOtherDatasets">[docs]</a><span class="k">class</span> <span class="nc">ImportOtherDatasets</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event that occurs when other resource datasets get exported.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ImportOtherDataset"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.ImportOtherDataset">[docs]</a><span class="k">class</span> <span class="nc">ImportOtherDataset</span><span class="p">(</span><span class="n">ResourceBackup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Export one of a resources datasets.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;ioc.Resource.Resource&#39;</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">dataset_name</span>
+        <span class="n">ResourceBackup</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Map the event identifier to dataset_name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span></div>
+
+
+<span class="c1"># CLI</span>
+
+
+<div class="viewcode-block" id="JailRestart"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailRestart">[docs]</a><span class="k">class</span> <span class="nc">JailRestart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Restart a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailShutdown"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailShutdown">[docs]</a><span class="k">class</span> <span class="nc">JailShutdown</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shutdown a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailSoftShutdown"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailSoftShutdown">[docs]</a><span class="k">class</span> <span class="nc">JailSoftShutdown</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Soft-restart a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailStart"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailStart">[docs]</a><span class="k">class</span> <span class="nc">JailStart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailDependantsStart"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailDependantsStart">[docs]</a><span class="k">class</span> <span class="nc">JailDependantsStart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start dependant jails.&quot;&quot;&quot;</span>
+
+    <span class="n">started_jails</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">jail</span><span class="o">.</span><span class="n">full_name</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_jails</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JailDependantsStart.end"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailDependantsStart.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">started_jails</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish starting dependant Jails.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_jails</span> <span class="o">=</span> <span class="n">started_jails</span>
+        <span class="k">return</span> <span class="n">JailEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JailDependantStart"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailDependantStart">[docs]</a><span class="k">class</span> <span class="nc">JailDependantStart</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start one dependant jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailProvisioning"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailProvisioning">[docs]</a><span class="k">class</span> <span class="nc">JailProvisioning</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provision a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailProvisioningAssetDownload"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailProvisioningAssetDownload">[docs]</a><span class="k">class</span> <span class="nc">JailProvisioningAssetDownload</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provision a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailCommandExecution"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailCommandExecution">[docs]</a><span class="k">class</span> <span class="nc">JailCommandExecution</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run command in a jail.&quot;&quot;&quot;</span>
+
+    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JailCommandExecution.end"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.JailCommandExecution.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocageEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="k">return</span> <span class="n">IocageEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
+
+<span class="c1"># PKG</span>
+
+
+<div class="viewcode-block" id="PackageFetch"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.PackageFetch">[docs]</a><span class="k">class</span> <span class="nc">PackageFetch</span><span class="p">(</span><span class="n">IocageEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetch packages for offline installation.&quot;&quot;&quot;</span>
+
+    <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">packages</span> <span class="o">=</span> <span class="n">packages</span>
+        <span class="n">IocageEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PackageInstall"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.PackageInstall">[docs]</a><span class="k">class</span> <span class="nc">PackageInstall</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Install packages in a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">packages</span> <span class="o">=</span> <span class="n">packages</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PackageRemove"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.PackageRemove">[docs]</a><span class="k">class</span> <span class="nc">PackageRemove</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove packages from a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;ioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">packages</span> <span class="o">=</span> <span class="n">packages</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PackageConfiguration"><a class="viewcode-back" href="../../ioc.events.html#ioc.events.PackageConfiguration">[docs]</a><span class="k">class</span> <span class="nc">PackageConfiguration</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Install packages in a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

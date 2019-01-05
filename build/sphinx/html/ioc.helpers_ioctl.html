@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.helpers_ioctl module &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ioc.helpers_object module" href="ioc.helpers_object.html" />
+    <link rel="prev" title="ioc.helpers module" href="ioc.helpers.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ioc.html">ioc package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ioc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ioc.BridgeInterface.html">ioc.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.CommandQueue.html">ioc.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Datasets.html">ioc.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.DevfsRules.html">ioc.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Distribution.html">ioc.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Filter.html">ioc.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Firewall.html">ioc.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Host.html">ioc.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.IPAddress.html">ioc.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jail.html">ioc.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.JailState.html">ioc.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jails.html">ioc.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.LaunchableResource.html">ioc.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ListableResource.html">ioc.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Logger.html">ioc.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.MacAddress.html">ioc.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Network.html">ioc.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.NetworkInterface.html">ioc.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Pkg.html">ioc.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Prompts.html">ioc.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Release.html">ioc.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Releases.html">ioc.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Resource.html">ioc.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceBackup.html">ioc.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceSelector.html">ioc.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceUpdater.html">ioc.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.SecureTarfile.html">ioc.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Types.html">ioc.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.VersionedResource.html">ioc.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFS.html">ioc.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFSShareStorage.html">ioc.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.decorators.html">ioc.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.errors.html">ioc.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.events.html">ioc.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers.html">ioc.helpers module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ioc.helpers_ioctl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_object.html">ioc.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#module-ioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="ioc.html">ioc package</a> &raquo;</li>
+        
+      <li>ioc.helpers_ioctl module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ioc.helpers_ioctl.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ioc.helpers_ioctl">
+<span id="ioc-helpers-ioctl-module"></span><h1>ioc.helpers_ioctl module<a class="headerlink" href="#module-ioc.helpers_ioctl" title="Permalink to this headline">¶</a></h1>
+<p>Interface for ioctl abstraction.</p>
+<dl class="class">
+<dt id="ioc.helpers_ioctl.SOCKIO_IOCTLS">
+<em class="property">class </em><code class="descclassname">ioc.helpers_ioctl.</code><code class="descname">SOCKIO_IOCTLS</code><a class="reference internal" href="_modules/ioc/helpers_ioctl.html#SOCKIO_IOCTLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers_ioctl.SOCKIO_IOCTLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Hardcoded ioctl numbers.</p>
+<dl class="attribute">
+<dt id="ioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFADDR">
+<code class="descname">SIOCGIFADDR</code><em class="property"> = -1071617759</em><a class="headerlink" href="#ioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFADDR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFMTU">
+<code class="descname">SIOCGIFMTU</code><em class="property"> = -1071617741</em><a class="headerlink" href="#ioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFMTU" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers_ioctl.get_interface_ip4_address">
+<code class="descclassname">ioc.helpers_ioctl.</code><code class="descname">get_interface_ip4_address</code><span class="sig-paren">(</span><em>nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers_ioctl.html#get_interface_ip4_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers_ioctl.get_interface_ip4_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the primary IPv4Address of a given NIC.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">IPv4Address</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers_ioctl.get_interface_mtu">
+<code class="descclassname">ioc.helpers_ioctl.</code><code class="descname">get_interface_mtu</code><span class="sig-paren">(</span><em>nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers_ioctl.html#get_interface_mtu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers_ioctl.get_interface_mtu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the primary MTU of a given NIC.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers_ioctl.get_sockio_ioctl">
+<code class="descclassname">ioc.helpers_ioctl.</code><code class="descname">get_sockio_ioctl</code><span class="sig-paren">(</span><em>nic_name</em>, <em>ioctl</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers_ioctl.html#get_sockio_ioctl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers_ioctl.get_sockio_ioctl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query a sockio ioctl for a given NIC.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ioc.helpers_object.html" class="btn btn-neutral float-right" title="ioc.helpers_object module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ioc.helpers.html" class="btn btn-neutral" title="ioc.helpers module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,934 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.errors module &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ioc.events module" href="ioc.events.html" />
+    <link rel="prev" title="ioc.decorators module" href="ioc.decorators.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ioc.html">ioc package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ioc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ioc.BridgeInterface.html">ioc.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.CommandQueue.html">ioc.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Datasets.html">ioc.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.DevfsRules.html">ioc.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Distribution.html">ioc.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Filter.html">ioc.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Firewall.html">ioc.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Host.html">ioc.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.IPAddress.html">ioc.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jail.html">ioc.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.JailState.html">ioc.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jails.html">ioc.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.LaunchableResource.html">ioc.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ListableResource.html">ioc.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Logger.html">ioc.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.MacAddress.html">ioc.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Network.html">ioc.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.NetworkInterface.html">ioc.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Pkg.html">ioc.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Prompts.html">ioc.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Release.html">ioc.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Releases.html">ioc.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Resource.html">ioc.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceBackup.html">ioc.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceSelector.html">ioc.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceUpdater.html">ioc.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.SecureTarfile.html">ioc.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Types.html">ioc.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.VersionedResource.html">ioc.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFS.html">ioc.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFSShareStorage.html">ioc.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.decorators.html">ioc.decorators module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ioc.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.events.html">ioc.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers.html">ioc.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_ioctl.html">ioc.helpers_ioctl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_object.html">ioc.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#module-ioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="ioc.html">ioc package</a> &raquo;</li>
+        
+      <li>ioc.errors module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ioc.errors.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ioc.errors">
+<span id="ioc-errors-module"></span><h1>ioc.errors module<a class="headerlink" href="#module-ioc.errors" title="Permalink to this headline">¶</a></h1>
+<p>Collection of iocage errors.</p>
+<dl class="exception">
+<dt id="ioc.errors.ActivationFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ActivationFailed</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ActivationFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ActivationFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when ZFS pool activation failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.BackupInProgress">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">BackupInProgress</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#BackupInProgress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.BackupInProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a backup operation is already in progress.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.CannotRedrawLine">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">CannotRedrawLine</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#CannotRedrawLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.CannotRedrawLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.LogException" title="ioc.errors.LogException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.LogException</span></code></a></p>
+<p>Raised when manipulating previous log entries fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.CommandFailure">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">CommandFailure</code><span class="sig-paren">(</span><em>returncode</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#CommandFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.CommandFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage fails to execute a command.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ConflictingResourceSelection">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ConflictingResourceSelection</code><span class="sig-paren">(</span><em>source_a</em>, <em>source_b</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ConflictingResourceSelection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ConflictingResourceSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a resource was configured with conflicting sources.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DatasetExists">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DatasetExists</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DatasetExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DatasetExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset already exists.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DatasetNotAvailable">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DatasetNotAvailable</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DatasetNotAvailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DatasetNotAvailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset is not available.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DatasetNotJailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DatasetNotJailed</code><span class="sig-paren">(</span><em>dataset</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DatasetNotJailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DatasetNotJailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS share was not flagged as such.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DatasetNotMounted">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DatasetNotMounted</code><span class="sig-paren">(</span><em>dataset</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DatasetNotMounted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DatasetNotMounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a dataset is not mounted but should be.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DefaultConfigNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DefaultConfigNotFound</code><span class="sig-paren">(</span><em>config_file_path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DefaultConfigNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DefaultConfigNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></p>
+<p>Raised when no default config was found on the host.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DefaultReleaseNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DefaultReleaseNotFound</code><span class="sig-paren">(</span><em>host_release_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DefaultReleaseNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DefaultReleaseNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the default (host) release does not match a remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DevfsRuleException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DevfsRuleException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DevfsRuleException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DevfsRuleException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised on errors in devfs rules.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DistributionUnknown">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DistributionUnknown</code><span class="sig-paren">(</span><em>distribution_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DistributionUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DistributionUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the host distribution is unknown or not supported.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DownloadFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DownloadFailed</code><span class="sig-paren">(</span><em>url</em>, <em>code</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DownloadFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DownloadFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when downloading EOL warnings failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.DuplicateDevfsRuleset">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">DuplicateDevfsRuleset</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#DuplicateDevfsRuleset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.DuplicateDevfsRuleset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.DevfsRuleException" title="ioc.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a duplicate devfs rule was found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.EventAlreadyFinished">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">EventAlreadyFinished</code><span class="sig-paren">(</span><em>event</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#EventAlreadyFinished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.EventAlreadyFinished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a event is touched that was already finished.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ExportDestinationExists">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ExportDestinationExists</code><span class="sig-paren">(</span><em>destination</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ExportDestinationExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ExportDestinationExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a backup operation is already in progress.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.FirewallCommandFailure">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">FirewallCommandFailure</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#FirewallCommandFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.FirewallCommandFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a firewall command fails (Secure VNET).</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.FirewallDisabled">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">FirewallDisabled</code><span class="sig-paren">(</span><em>hint=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#FirewallDisabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.FirewallDisabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the firewall is required but disabled (Secure VNET).</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.FstabDestinationExists">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">FstabDestinationExists</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#FstabDestinationExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.FstabDestinationExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the destination directory does not exist.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.HostReleaseUnknown">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">HostReleaseUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#HostReleaseUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.HostReleaseUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the host release could not be determined.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.HostUserlandVersionUnknown">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">HostUserlandVersionUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#HostUserlandVersionUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.HostUserlandVersionUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the hosts userland version could not be detected.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.IllegalArchiveContent">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">IllegalArchiveContent</code><span class="sig-paren">(</span><em>asset_name</em>, <em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#IllegalArchiveContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.IllegalArchiveContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a release asset archive contains malicious content.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InsecureJailPath">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InsecureJailPath</code><span class="sig-paren">(</span><em>path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InsecureJailPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InsecureJailPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SecurityViolation" title="ioc.errors.SecurityViolation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SecurityViolation</span></code></a></p>
+<p>Raised when a a path points outside of a resource.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidDevfsRulesSyntax">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidDevfsRulesSyntax</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidDevfsRulesSyntax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidDevfsRulesSyntax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.DevfsRuleException" title="ioc.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a devfs rule has invalid syntax.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidIPAddress">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidIPAddress</code><span class="sig-paren">(</span><em>reason</em>, <em>ipv6</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidIPAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidIPAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when an invalid IP address was assigned to a network.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidInterfaceName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidInterfaceName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidInterfaceName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidInterfaceName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a NIC name is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidJailConfigAddress">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidJailConfigAddress</code><span class="sig-paren">(</span><em>value</em>, <em>property_name</em>, <em>jail=None</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidJailConfigAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidJailConfigAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.InvalidJailConfigValue" title="ioc.errors.InvalidJailConfigValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.InvalidJailConfigValue</span></code></a></p>
+<p>Raised when a jail address is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidJailConfigValue">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidJailConfigValue</code><span class="sig-paren">(</span><em>property_name</em>, <em>jail=None</em>, <em>reason=None</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidJailConfigValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidJailConfigValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailConfigError" title="ioc.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailConfigError</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a jail configuration value is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidJailName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidJailName</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidJailName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidJailName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailConfigError" title="ioc.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailConfigError</span></code></a></p>
+<p>Raised when a jail has an invalid name.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidLogLevel">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidLogLevel</code><span class="sig-paren">(</span><em>log_level</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidLogLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidLogLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the logger was initialized with an invalid log level.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidMacAddress">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidMacAddress</code><span class="sig-paren">(</span><em>mac_address</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidMacAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidMacAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a jail MAC address is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidNetworkBridge">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidNetworkBridge</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidNetworkBridge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidNetworkBridge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a network bridge is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidReleaseAssetSignature">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidReleaseAssetSignature</code><span class="sig-paren">(</span><em>name</em>, <em>asset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidReleaseAssetSignature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidReleaseAssetSignature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.UpdateFailure" title="ioc.errors.UpdateFailure"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.UpdateFailure</span></code></a></p>
+<p>Raised when a release signature is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidReleaseName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidReleaseName</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidReleaseName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidReleaseName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when interacting with an unsupported release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidSnapshotIdentifier">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidSnapshotIdentifier</code><span class="sig-paren">(</span><em>identifier</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidSnapshotIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidSnapshotIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SnapshotError" title="ioc.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SnapshotError</span></code></a></p>
+<p>Raised when a snapshot identifier is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.InvalidSourceName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">InvalidSourceName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#InvalidSourceName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.InvalidSourceName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a source name is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.IocageException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">IocageException</code><span class="sig-paren">(</span><em>message</em>, <em>level='error'</em>, <em>silent=False</em>, <em>append_warning=False</em>, <em>warning=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#IocageException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.IocageException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>A well-known exception raised by libioc.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.IocageNotActivated">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">IocageNotActivated</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#IocageNotActivated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.IocageNotActivated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage is not active on any ZFS pool.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailAlreadyExists">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailAlreadyExists</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailAlreadyExists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailAlreadyExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jail already exists.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailAlreadyRunning">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailAlreadyRunning</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailAlreadyRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailAlreadyRunning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jail is already running.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailBackendMissing">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailBackendMissing</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailBackendMissing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailBackendMissing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jails backend was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailCommandFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailCommandFailed</code><span class="sig-paren">(</span><em>returncode</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailCommandFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailCommandFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a jail command fails with an exit code &gt; 0.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailConfigError">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailConfigError</code><span class="sig-paren">(</span><em>message</em>, <em>level='error'</em>, <em>silent=False</em>, <em>append_warning=False</em>, <em>warning=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailConfigError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailConfigError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a general configuration error occurs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailConfigNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailConfigNotFound</code><span class="sig-paren">(</span><em>config_type</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailConfigNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailConfigNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a jail is not configured.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailConigZFSIsNotAllowed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailConigZFSIsNotAllowed</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailConigZFSIsNotAllowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailConigZFSIsNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailConfigError" title="ioc.errors.JailConfigError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailConfigError</span></code></a></p>
+<p>Raised when a jail is not allowed to use ZFS shares.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailDestructionFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailDestructionFailed</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailDestructionFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailDestructionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail could not be destroyed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailDoesNotExist">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailDoesNotExist</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailDoesNotExist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailDoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail does not exist.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailException</code><span class="sig-paren">(</span><em>jail</em>, <em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when an exception related to a jail occurs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailExecutionAborted">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailExecutionAborted</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailExecutionAborted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailExecutionAborted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when a jail command fails with an exit code &gt; 0.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailFilterException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailFilterException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailFilterException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailFilterException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a jail filter is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailFilterInvalidName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailFilterInvalidName</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailFilterInvalidName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailFilterInvalidName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailFilterException" title="ioc.errors.JailFilterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailFilterException</span></code></a></p>
+<p>Raised when the name of a jail filter is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailIsTemplate">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailIsTemplate</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailIsTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailIsTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail is a template but should not be.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailLaunchFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailLaunchFailed</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailLaunchFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailLaunchFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail could not be launched.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailNotFound</code><span class="sig-paren">(</span><em>text</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jail was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailNotRunning">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailNotRunning</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailNotRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailNotRunning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jail is not running.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailNotSupplied">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailNotSupplied</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailNotSupplied"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailNotSupplied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when no jail was supplied.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailNotTemplate">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailNotTemplate</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailNotTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailNotTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.JailException" title="ioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail is no template but should be one.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailStateUpdateFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailStateUpdateFailed</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailStateUpdateFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailStateUpdateFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a JLS query failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.JailUnknownIdentifier">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">JailUnknownIdentifier</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#JailUnknownIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.JailUnknownIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the jail has an unknown identifier.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ListableResourceNamespaceUndefined">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ListableResourceNamespaceUndefined</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ListableResourceNamespaceUndefined"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ListableResourceNamespaceUndefined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a ListableResource was not defined with a namespace.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.LogException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">LogException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#LogException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.LogException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when logging fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.MissingDevfsRulesetName">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">MissingDevfsRulesetName</code><span class="sig-paren">(</span><em>devfs_rules_file</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#MissingDevfsRulesetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.MissingDevfsRulesetName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.DevfsRuleException" title="ioc.errors.DevfsRuleException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.DevfsRuleException</span></code></a></p>
+<p>Raised when a duplicate devfs rule was found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.MissingFeature">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">MissingFeature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>plural=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#MissingFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.MissingFeature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code></p>
+<p>Raised when an iocage feature is not fully implemented yet.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.MountFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">MountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#MountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.MountFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a mount operation fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.MustBeRoot">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">MustBeRoot</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#MustBeRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.MustBeRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage is executed without root permission.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.NonReleaseUpdateFetch">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">NonReleaseUpdateFetch</code><span class="sig-paren">(</span><em>resource</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#NonReleaseUpdateFetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.NonReleaseUpdateFetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.UpdateFailure" title="ioc.errors.UpdateFailure"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.UpdateFailure</span></code></a></p>
+<p>Raised when attempting to fetch updates for a custom release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.NotAnIocageZFSProperty">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">NotAnIocageZFSProperty</code><span class="sig-paren">(</span><em>property_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#NotAnIocageZFSProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.NotAnIocageZFSProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage attempts to touch a non-iocage ZFS property.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.PkgNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">PkgNotFound</code><span class="sig-paren">(</span><em>message=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#PkgNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.PkgNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the pkg package was not found in the local mirror.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ReleaseAssetHashesUnavailable">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ReleaseAssetHashesUnavailable</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ReleaseAssetHashesUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ReleaseAssetHashesUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the list could not be downloaded from the remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ReleaseListUnavailable">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ReleaseListUnavailable</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ReleaseListUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ReleaseListUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when the list could not be downloaded from the remote.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ReleaseNotFetched">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ReleaseNotFetched</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ReleaseNotFetched"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ReleaseNotFetched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a release was not yet fetched.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ReleaseUpdateBranchLookup">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ReleaseUpdateBranchLookup</code><span class="sig-paren">(</span><em>release_name</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ReleaseUpdateBranchLookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ReleaseUpdateBranchLookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when failing to lookup the remote update branch.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ResourceLimitUnknown">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ResourceLimitUnknown</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ResourceLimitUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ResourceLimitUnknown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
+<p>Raised when a resource limit has is unknown.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ResourceUnmanaged">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ResourceUnmanaged</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ResourceUnmanaged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ResourceUnmanaged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when locating a resources dataset on a root dataset fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SecurityViolation">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SecurityViolation</code><span class="sig-paren">(</span><em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SecurityViolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SecurityViolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage has security concerns.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SecurityViolationConfigJailEscape">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SecurityViolationConfigJailEscape</code><span class="sig-paren">(</span><em>file</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SecurityViolationConfigJailEscape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SecurityViolationConfigJailEscape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SecurityViolation" title="ioc.errors.SecurityViolation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SecurityViolation</span></code></a></p>
+<p>Raised when a file symlinks to a location outside of the jail.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SnapshotCreation">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SnapshotCreation</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SnapshotCreation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SnapshotCreation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SnapshotError" title="ioc.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SnapshotError</span></code></a></p>
+<p>Raised when creating a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SnapshotDeletion">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SnapshotDeletion</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SnapshotDeletion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SnapshotDeletion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SnapshotError" title="ioc.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SnapshotError</span></code></a></p>
+<p>Raised when deleting a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SnapshotError">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SnapshotError</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SnapshotError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SnapshotError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised on snapshot related errors.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SnapshotNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SnapshotNotFound</code><span class="sig-paren">(</span><em>snapshot_name</em>, <em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SnapshotNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SnapshotNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SnapshotError" title="ioc.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SnapshotError</span></code></a></p>
+<p>Raised when a snapshot was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SnapshotRollback">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SnapshotRollback</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SnapshotRollback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SnapshotRollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.SnapshotError" title="ioc.errors.SnapshotError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.SnapshotError</span></code></a></p>
+<p>Raised when rolling back a snapshot failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.SourceNotFound">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">SourceNotFound</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#SourceNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.SourceNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a source was not found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.UnknownJailConfigProperty">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">UnknownJailConfigProperty</code><span class="sig-paren">(</span><em>key</em>, <em>jail</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#UnknownJailConfigProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.UnknownJailConfigProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
+<p>Raised when a unknown jail config property was used.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.UnknownProvisioner">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">UnknownProvisioner</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#UnknownProvisioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.UnknownProvisioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when an unsupported provisioner method is used.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.UnmountFailed">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">UnmountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#UnmountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.UnmountFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when an unmount operation fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.UnsupportedRelease">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">UnsupportedRelease</code><span class="sig-paren">(</span><em>version</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#UnsupportedRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.UnsupportedRelease" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.MissingFeature" title="ioc.errors.MissingFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.MissingFeature</span></code></a></p>
+<p>Raised when interacting with an unsupported release.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.UpdateFailure">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">UpdateFailure</code><span class="sig-paren">(</span><em>name</em>, <em>reason=None</em>, <em>logger=None</em>, <em>level='error'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#UpdateFailure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.UpdateFailure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when an update fails.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.VirtualFstabLineHasNoRealIndex">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">VirtualFstabLineHasNoRealIndex</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#VirtualFstabLineHasNoRealIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.VirtualFstabLineHasNoRealIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when attempting to access the index of a virtual fstab line.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.VnetBridgeDoesNotExist">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">VnetBridgeDoesNotExist</code><span class="sig-paren">(</span><em>bridge_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#VnetBridgeDoesNotExist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.VnetBridgeDoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a vnet bridge is missing.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.VnetBridgeMissing">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">VnetBridgeMissing</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#VnetBridgeMissing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.VnetBridgeMissing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a vnet bridge is missing.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ZFSException">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ZFSException</code><span class="sig-paren">(</span><em>message</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ZFSException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ZFSException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS pool not available.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ZFSPoolInvalid">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ZFSPoolInvalid</code><span class="sig-paren">(</span><em>consequence</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ZFSPoolInvalid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ZFSPoolInvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></p>
+<p>Raised when a ZFS pool is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ZFSPoolUnavailable">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ZFSPoolUnavailable</code><span class="sig-paren">(</span><em>pool_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ZFSPoolUnavailable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ZFSPoolUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when a ZFS pool not available.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ioc.errors.ZFSSourceMountpoint">
+<em class="property">exception </em><code class="descclassname">ioc.errors.</code><code class="descname">ZFSSourceMountpoint</code><span class="sig-paren">(</span><em>dataset_name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/errors.html#ZFSSourceMountpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.errors.ZFSSourceMountpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.errors.IocageException" title="ioc.errors.IocageException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.errors.IocageException</span></code></a></p>
+<p>Raised when iocage could not determine its mountpoint.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ioc.events.html" class="btn btn-neutral float-right" title="ioc.events module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ioc.decorators.html" class="btn btn-neutral" title="ioc.decorators module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

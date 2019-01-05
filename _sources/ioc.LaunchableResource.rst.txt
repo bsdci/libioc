@@ -1,0 +1,7 @@
+ioc.LaunchableResource module
+=============================
+
+.. automodule:: ioc.LaunchableResource
+    :members:
+    :undoc-members:
+    :show-inheritance:

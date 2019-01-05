@@ -1,7 +1,0 @@
-iocage.decorators module
-========================
-
-.. automodule:: iocage.decorators
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,0 +1,7 @@
+ioc.Config.Type.JSON module
+===========================
+
+.. automodule:: ioc.Config.Type.JSON
+    :members:
+    :undoc-members:
+    :show-inheritance:

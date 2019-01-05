@@ -1,0 +1,26 @@
+ioc.Config package
+==================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    ioc.Config.Jail
+    ioc.Config.Type
+
+Submodules
+----------
+
+.. toctree::
+
+   ioc.Config.Dataset
+   ioc.Config.Prototype
+
+Module contents
+---------------
+
+.. automodule:: ioc.Config
+    :members:
+    :undoc-members:
+    :show-inheritance:

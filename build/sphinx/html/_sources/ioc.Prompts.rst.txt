@@ -1,0 +1,7 @@
+ioc.Prompts module
+==================
+
+.. automodule:: ioc.Prompts
+    :members:
+    :undoc-members:
+    :show-inheritance:

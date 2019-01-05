@@ -1,7 +1,0 @@
-iocage.Types module
-===================
-
-.. automodule:: iocage.Types
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,0 +1,7 @@
+ioc.ResourceSelector module
+===========================
+
+.. automodule:: ioc.ResourceSelector
+    :members:
+    :undoc-members:
+    :show-inheritance:

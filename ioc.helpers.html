@@ -1,0 +1,643 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.helpers module &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ioc.helpers_ioctl module" href="ioc.helpers_ioctl.html" />
+    <link rel="prev" title="ioc.events module" href="ioc.events.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ioc.html">ioc package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ioc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ioc.BridgeInterface.html">ioc.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.CommandQueue.html">ioc.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Datasets.html">ioc.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.DevfsRules.html">ioc.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Distribution.html">ioc.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Filter.html">ioc.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Firewall.html">ioc.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Host.html">ioc.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.IPAddress.html">ioc.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jail.html">ioc.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.JailState.html">ioc.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jails.html">ioc.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.LaunchableResource.html">ioc.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ListableResource.html">ioc.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Logger.html">ioc.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.MacAddress.html">ioc.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Network.html">ioc.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.NetworkInterface.html">ioc.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Pkg.html">ioc.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Prompts.html">ioc.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Release.html">ioc.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Releases.html">ioc.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Resource.html">ioc.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceBackup.html">ioc.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceSelector.html">ioc.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceUpdater.html">ioc.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.SecureTarfile.html">ioc.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Types.html">ioc.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.VersionedResource.html">ioc.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFS.html">ioc.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFSShareStorage.html">ioc.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.decorators.html">ioc.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.errors.html">ioc.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.events.html">ioc.events module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ioc.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_ioctl.html">ioc.helpers_ioctl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_object.html">ioc.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#module-ioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="ioc.html">ioc package</a> &raquo;</li>
+        
+      <li>ioc.helpers module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ioc.helpers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ioc.helpers">
+<span id="ioc-helpers-module"></span><h1>ioc.helpers module<a class="headerlink" href="#module-ioc.helpers" title="Permalink to this headline">¶</a></h1>
+<p>Collection of iocage helper functions.</p>
+<dl class="function">
+<dt id="ioc.helpers.exec">
+<code class="descclassname">ioc.helpers.</code><code class="descname">exec</code><span class="sig-paren">(</span><em>command</em>, <em>logger=None</em>, <em>ignore_error=False</em>, <em>**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a shell command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.exec_generator">
+<code class="descclassname">ioc.helpers.</code><code class="descname">exec_generator</code><span class="sig-paren">(</span><em>command</em>, <em>buffer_lines=True</em>, <em>summarize=True</em>, <em>encoding='UTF-8'</em>, <em>universal_newlines=True</em>, <em>stdin=None</em>, <em>stdout=None</em>, <em>env=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#exec_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.exec_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a command in an interactive shell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.exec_passthru">
+<code class="descclassname">ioc.helpers.</code><code class="descname">exec_passthru</code><span class="sig-paren">(</span><em>command</em>, <em>logger=None</em>, <em>**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#exec_passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.exec_passthru" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a command in an interactive shell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.get_basedir_list">
+<code class="descclassname">ioc.helpers.</code><code class="descname">get_basedir_list</code><span class="sig-paren">(</span><em>distribution_name='FreeBSD'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#get_basedir_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.get_basedir_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of basedirs according to the host distribution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.get_os_version">
+<code class="descclassname">ioc.helpers.</code><code class="descname">get_os_version</code><span class="sig-paren">(</span><em>version_file='/bin/freebsd-version'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#get_os_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.get_os_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the hosts userland version.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.get_random_uuid">
+<code class="descclassname">ioc.helpers.</code><code class="descname">get_random_uuid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#get_random_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.get_random_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random UUID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.is_uuid">
+<code class="descclassname">ioc.helpers.</code><code class="descname">is_uuid</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#is_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.is_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the input string is an UUID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.makedirs_safe">
+<code class="descclassname">ioc.helpers.</code><code class="descname">makedirs_safe</code><span class="sig-paren">(</span><em>target</em>, <em>mode=448</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#makedirs_safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.makedirs_safe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a directory without following symlinks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.parse_bool">
+<code class="descclassname">ioc.helpers.</code><code class="descname">parse_bool</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#parse_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.parse_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to parse booleans from strings.</p>
+<p>On success, it returns the parsed boolean on failure it raises a TypeError.</p>
+<dl class="docutils">
+<dt>Usage:</dt>
+<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;YES&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;false&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;/etc/passwd&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">TypeError</span>: <span class="n">Not a boolean value</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.parse_list">
+<code class="descclassname">ioc.helpers.</code><code class="descname">parse_list</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#parse_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.parse_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a comma separated string into a list.</p>
+<p>Always returns a list of strings. This list is empty when an empty string
+is provided or the value is None. In any other case the string is split by
+comma and returned as list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.parse_none">
+<code class="descclassname">ioc.helpers.</code><code class="descname">parse_none</code><span class="sig-paren">(</span><em>data, none_matches=['none', '-', '']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#parse_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.parse_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise if the input does not translate to None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.parse_user_input">
+<code class="descclassname">ioc.helpers.</code><code class="descname">parse_user_input</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#parse_user_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.parse_user_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse user input.</p>
+<p>uses parse_bool() to partially return Boolean and None values
+All other types as returned as-is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_user_input</span><span class="p">(</span><span class="s2">&quot;YES&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_user_input</span><span class="p">(</span><span class="s2">&quot;false&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_user_input</span><span class="p">(</span><span class="s2">&quot;notfalse&quot;</span><span class="p">)</span>
+<span class="go">&#39;notfalse&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_user_input</span><span class="p">(</span><span class="mf">8.4</span><span class="p">)</span>
+<span class="go">8.4</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.require_no_symlink">
+<code class="descclassname">ioc.helpers.</code><code class="descname">require_no_symlink</code><span class="sig-paren">(</span><em>path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#require_no_symlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.require_no_symlink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise when the path contains a symlink.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.split_list_string">
+<code class="descclassname">ioc.helpers.</code><code class="descname">split_list_string</code><span class="sig-paren">(</span><em>data</em>, <em>separator='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#split_list_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.split_list_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split by separator but keep escaped ones.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>str</em>) – Input data that will be split by the separator.</li>
+<li><strong>separator</strong> (<em>str</em>) – <p>(optional, default=”,”)</p>
+<p>Input data is split by this separator.</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>&gt;&gt; split_strlist(“foo,bar,baz”)
+[“foo”, “bar,baz”]</p>
+<p>Returns a list of strings from the input data where escaped separators are
+ignored and unescaped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.to_humanreadable_name">
+<code class="descclassname">ioc.helpers.</code><code class="descname">to_humanreadable_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#to_humanreadable_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.to_humanreadable_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a shorted UUID or the original name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.to_json">
+<code class="descclassname">ioc.helpers.</code><code class="descname">to_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a JSON string from the input data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.to_string">
+<code class="descclassname">ioc.helpers.</code><code class="descname">to_string</code><span class="sig-paren">(</span><em>data</em>, <em>true='yes'</em>, <em>false='no'</em>, <em>none='-'</em>, <em>delimiter='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate complex types into a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>true</strong> (<em>string</em>) – The expected return value when data is True</li>
+<li><strong>false</strong> (<em>string</em>) – The expected return value when data is False</li>
+<li><strong>none</strong> (<em>string</em>) – The expected return value when data is None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Map input according to arguments or stringified input</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Usage:</dt>
+<dd><div class="first highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&quot;yes&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">&quot;no&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">true</span><span class="o">=</span><span class="s2">&quot;yip&quot;</span><span class="p">,</span> <span class="n">false</span><span class="o">=</span><span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&quot;yip&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">true</span><span class="o">=</span><span class="s2">&quot;yip&quot;</span><span class="p">,</span> <span class="n">false</span><span class="o">=</span><span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<span class="go">&quot;nope&quot;</span>
+</pre></div>
+</div>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="go">&quot;-&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.to_ucl">
+<code class="descclassname">ioc.helpers.</code><code class="descname">to_ucl</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#to_ucl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.to_ucl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create UCL content from the input data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.umount">
+<code class="descclassname">ioc.helpers.</code><code class="descname">umount</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>options=None</em>, <em>force=False</em>, <em>ignore_error=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#umount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.umount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unmount a mountpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.umount_command">
+<code class="descclassname">ioc.helpers.</code><code class="descname">umount_command</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>options=None</em>, <em>force=False</em>, <em>ignore_error=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#umount_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.umount_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the command to unmount a mountpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ioc.helpers.validate_name">
+<code class="descclassname">ioc.helpers.</code><code class="descname">validate_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/helpers.html#validate_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.helpers.validate_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the name matches the naming convention.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ioc.helpers_ioctl.html" class="btn btn-neutral float-right" title="ioc.helpers_ioctl module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ioc.events.html" class="btn btn-neutral" title="ioc.events module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

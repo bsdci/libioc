@@ -1,7 +1,0 @@
-iocage.Datasets module
-======================
-
-.. automodule:: iocage.Datasets
-    :members:
-    :undoc-members:
-    :show-inheritance:

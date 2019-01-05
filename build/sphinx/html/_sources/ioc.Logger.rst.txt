@@ -1,0 +1,7 @@
+ioc.Logger module
+=================
+
+.. automodule:: ioc.Logger
+    :members:
+    :undoc-members:
+    :show-inheritance:

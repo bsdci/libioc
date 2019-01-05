@@ -1,0 +1,7 @@
+ioc.SecureTarfile module
+========================
+
+.. automodule:: ioc.SecureTarfile
+    :members:
+    :undoc-members:
+    :show-inheritance:

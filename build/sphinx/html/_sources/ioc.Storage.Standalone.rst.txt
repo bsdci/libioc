@@ -1,0 +1,7 @@
+ioc.Storage.Standalone module
+=============================
+
+.. automodule:: ioc.Storage.Standalone
+    :members:
+    :undoc-members:
+    :show-inheritance:

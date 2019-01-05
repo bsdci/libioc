@@ -1,0 +1,62 @@
+ioc package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+
+    ioc.Config
+    ioc.Provisioning
+    ioc.Storage
+
+Submodules
+----------
+
+.. toctree::
+
+   ioc.BridgeInterface
+   ioc.CommandQueue
+   ioc.Datasets
+   ioc.DevfsRules
+   ioc.Distribution
+   ioc.Filter
+   ioc.Firewall
+   ioc.Host
+   ioc.IPAddress
+   ioc.Jail
+   ioc.JailState
+   ioc.Jails
+   ioc.LaunchableResource
+   ioc.ListableResource
+   ioc.Logger
+   ioc.MacAddress
+   ioc.Network
+   ioc.NetworkInterface
+   ioc.Pkg
+   ioc.Prompts
+   ioc.Release
+   ioc.Releases
+   ioc.Resource
+   ioc.ResourceBackup
+   ioc.ResourceSelector
+   ioc.ResourceUpdater
+   ioc.SecureTarfile
+   ioc.Types
+   ioc.VersionedResource
+   ioc.ZFS
+   ioc.ZFSShareStorage
+   ioc.decorators
+   ioc.errors
+   ioc.events
+   ioc.helpers
+   ioc.helpers_ioctl
+   ioc.helpers_object
+
+Module contents
+---------------
+
+.. automodule:: ioc
+    :members:
+    :undoc-members:
+    :show-inheritance:

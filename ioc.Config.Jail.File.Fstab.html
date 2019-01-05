@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.Config.Jail.File.Fstab module &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ioc.Config.Jail.File.RCConf module" href="ioc.Config.Jail.File.RCConf.html" />
+    <link rel="prev" title="ioc.Config.Jail.File package" href="ioc.Config.Jail.File.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ioc.html">ioc package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ioc.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ioc.Config.html">ioc.Config package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ioc.Config.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ioc.Config.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ioc.Config.html#module-ioc.Config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Provisioning.html">ioc.Provisioning package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Storage.html">ioc.Storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#module-ioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="ioc.html">ioc package</a> &raquo;</li>
+        
+          <li><a href="ioc.Config.html">ioc.Config package</a> &raquo;</li>
+        
+          <li><a href="ioc.Config.Jail.html">ioc.Config.Jail package</a> &raquo;</li>
+        
+          <li><a href="ioc.Config.Jail.File.html">ioc.Config.Jail.File package</a> &raquo;</li>
+        
+      <li>ioc.Config.Jail.File.Fstab module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ioc.Config.Jail.File.Fstab.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ioc.Config.Jail.File.Fstab">
+<span id="ioc-config-jail-file-fstab-module"></span><h1>ioc.Config.Jail.File.Fstab module<a class="headerlink" href="#module-ioc.Config.Jail.File.Fstab" title="Permalink to this headline">¶</a></h1>
+<p>Manage fstab files.</p>
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">Fstab</code><span class="sig-paren">(</span><em>jail</em>, <em>release=None</em>, <em>logger=None</em>, <em>host=None</em>, <em>file='fstab'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ioc.Config.Jail.File.html#ioc.Config.Jail.File.ResourceConfig" title="ioc.Config.Jail.File.ResourceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.Config.Jail.File.ResourceConfig</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableSequence</span></code></p>
+<p>Fstab configuration file wrapper.</p>
+<p>This object allows to read, programatically edit and write fstab files.
+Bound to an iocage resource, the location of the /etc/fstab file is
+relative to the resource’s root_dataset <cite>&lt;resource&gt;/root</cite>.</p>
+<dl class="attribute">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.AUTO_COMMENT_IDENTIFIER">
+<code class="descname">AUTO_COMMENT_IDENTIFIER</code><em class="property"> = 'iocage-auto'</em><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.AUTO_COMMENT_IDENTIFIER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>line</em>, <em>skip_existing=False</em>, <em>replace=False</em>, <em>auto_create_destination=False</em>, <em>auto_mount_jail=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.add_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directly append a FstabLine type.</p>
+<p>Use save() to write changes to the fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.basejail_lines">
+<code class="descname">basejail_lines</code><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.basejail_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-generate lines of NullFS basejails.</p>
+<p>When a jail is a NullFS basejail, this list represent the corresponding
+fstab lines that mount the release.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabBasejailLine" title="ioc.Config.Jail.File.Fstab.FstabBasejailLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabBasejailLine</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>line</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the index position of a FstabLine in the Fstab instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.insert">
+<code class="descname">insert</code><span class="sig-paren">(</span><em>index</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a line at a given position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The numeric line insertion position</li>
+<li><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabLine" title="ioc.Config.Jail.File.Fstab.FstabLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabLine</span></code></a>, <a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabCommentLine" title="ioc.Config.Jail.File.Fstab.FstabCommentLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabCommentLine</span></code></a>, <a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabAutoPlaceholderLine" title="ioc.Config.Jail.File.Fstab.FstabAutoPlaceholderLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabAutoPlaceholderLine</span></code></a>]) – A FstabLine, Comment or Placeholder</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.maintenance_lines">
+<code class="descname">maintenance_lines</code><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.maintenance_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-generate lines that are required for jail start and stop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabMaintenanceLine" title="ioc.Config.Jail.File.Fstab.FstabMaintenanceLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabMaintenanceLine</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.new_line">
+<code class="descname">new_line</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>type='nullfs'</em>, <em>options='ro'</em>, <em>dump='0'</em>, <em>passnum='0'</em>, <em>comment=None</em>, <em>replace=False</em>, <em>auto_create_destination=False</em>, <em>auto_mount_jail=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.new_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.new_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a new line to the fstab file.</p>
+<p>Use save() to write changes to the fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.parse_lines">
+<code class="descname">parse_lines</code><span class="sig-paren">(</span><em>input_text</em>, <em>ignore_auto_created=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.parse_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.parse_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the content of a fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The text content of an existing fstab file</li>
+<li><strong>ignore_auto_created</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Skips reading entries that were created by iocage</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.path">
+<code class="descname">path</code><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute fstab file path.</p>
+<p>This is the file read from and written to.</p>
+<p>When the path begins with a / it is assumed to be absolute, so that
+the jails dataset mountpoint is not used as path prefix. This is useful
+when moving around jail backups.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.read_file">
+<code class="descname">read_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.read_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.replace_path">
+<code class="descname">replace_path</code><span class="sig-paren">(</span><em>pattern</em>, <em>replacement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.replace_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.replace_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace a path in all fstab entries (source or destination).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update or create the fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.update_and_save">
+<code class="descname">update_and_save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.update_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.update_and_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read file and then write changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.Config.Jail.File.Fstab.Fstab.update_release">
+<code class="descname">update_release</code><span class="sig-paren">(</span><em>release=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#Fstab.update_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.Fstab.update_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a new release and save the updated file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.FstabAutoPlaceholderLine">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">FstabAutoPlaceholderLine</code><span class="sig-paren">(</span><em>data={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#FstabAutoPlaceholderLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.FstabAutoPlaceholderLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A placeholder for auto-created fstab lines.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.FstabBasejailLine">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">FstabBasejailLine</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#FstabBasejailLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.FstabBasejailLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabLine" title="ioc.Config.Jail.File.Fstab.FstabLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.Config.Jail.File.Fstab.FstabLine</span></code></a></p>
+<p>Model a fstab line automatically created by a NullFS basejail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.FstabCommentLine">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">FstabCommentLine</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#FstabCommentLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.FstabCommentLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Model a fstab comment line (beginning with #).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.FstabLine">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">FstabLine</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#FstabLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.FstabLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Model a line of an fstab file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.Config.Jail.File.Fstab.FstabMaintenanceLine">
+<em class="property">class </em><code class="descclassname">ioc.Config.Jail.File.Fstab.</code><code class="descname">FstabMaintenanceLine</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/Config/Jail/File/Fstab.html#FstabMaintenanceLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.Config.Jail.File.Fstab.FstabMaintenanceLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ioc.Config.Jail.File.Fstab.FstabLine" title="ioc.Config.Jail.File.Fstab.FstabLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">ioc.Config.Jail.File.Fstab.FstabLine</span></code></a></p>
+<p>Model a fstab line automatically created for jail launch scripts.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ioc.Config.Jail.File.RCConf.html" class="btn btn-neutral float-right" title="ioc.Config.Jail.File.RCConf module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ioc.Config.Jail.File.html" class="btn btn-neutral" title="ioc.Config.Jail.File package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

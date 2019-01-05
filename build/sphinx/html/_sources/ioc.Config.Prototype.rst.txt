@@ -1,0 +1,7 @@
+ioc.Config.Prototype module
+===========================
+
+.. automodule:: ioc.Config.Prototype
+    :members:
+    :undoc-members:
+    :show-inheritance:

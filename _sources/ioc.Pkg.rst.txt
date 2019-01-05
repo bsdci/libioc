@@ -1,0 +1,7 @@
+ioc.Pkg module
+==============
+
+.. automodule:: ioc.Pkg
+    :members:
+    :undoc-members:
+    :show-inheritance:

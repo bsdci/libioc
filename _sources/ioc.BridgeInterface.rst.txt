@@ -1,0 +1,7 @@
+ioc.BridgeInterface module
+==========================
+
+.. automodule:: ioc.BridgeInterface
+    :members:
+    :undoc-members:
+    :show-inheritance:

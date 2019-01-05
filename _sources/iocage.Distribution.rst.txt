@@ -1,7 +1,0 @@
-iocage.Distribution module
-==========================
-
-.. automodule:: iocage.Distribution
-    :members:
-    :undoc-members:
-    :show-inheritance:

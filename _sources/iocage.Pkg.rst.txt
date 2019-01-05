@@ -1,7 +1,0 @@
-iocage.Pkg module
-=================
-
-.. automodule:: iocage.Pkg
-    :members:
-    :undoc-members:
-    :show-inheritance:

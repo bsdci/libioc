@@ -1,0 +1,7 @@
+ioc.Config.Jail.BaseConfig module
+=================================
+
+.. automodule:: ioc.Config.Jail.BaseConfig
+    :members:
+    :undoc-members:
+    :show-inheritance:

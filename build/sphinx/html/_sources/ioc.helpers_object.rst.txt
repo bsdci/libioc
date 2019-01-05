@@ -1,0 +1,7 @@
+ioc.helpers\_object module
+==========================
+
+.. automodule:: ioc.helpers_object
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+ioc.Config.Jail.Properties.ResourceLimit module
+===============================================
+
+.. automodule:: ioc.Config.Jail.Properties.ResourceLimit
+    :members:
+    :undoc-members:
+    :show-inheritance:

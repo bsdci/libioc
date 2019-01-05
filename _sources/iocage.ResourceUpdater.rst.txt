@@ -1,7 +1,0 @@
-iocage.ResourceUpdater module
-=============================
-
-.. automodule:: iocage.ResourceUpdater
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-iocage.Config.Jail.File.RCConf module
-=====================================
-
-.. automodule:: iocage.Config.Jail.File.RCConf
-    :members:
-    :undoc-members:
-    :show-inheritance:

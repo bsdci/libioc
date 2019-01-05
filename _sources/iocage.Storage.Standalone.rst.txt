@@ -1,7 +1,0 @@
-iocage.Storage.Standalone module
-================================
-
-.. automodule:: iocage.Storage.Standalone
-    :members:
-    :undoc-members:
-    :show-inheritance:

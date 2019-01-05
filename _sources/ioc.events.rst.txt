@@ -1,0 +1,7 @@
+ioc.events module
+=================
+
+.. automodule:: ioc.events
+    :members:
+    :undoc-members:
+    :show-inheritance:

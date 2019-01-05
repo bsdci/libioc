@@ -1,0 +1,7 @@
+ioc.CommandQueue module
+=======================
+
+.. automodule:: ioc.CommandQueue
+    :members:
+    :undoc-members:
+    :show-inheritance:

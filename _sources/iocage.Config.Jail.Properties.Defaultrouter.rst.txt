@@ -1,7 +1,0 @@
-iocage.Config.Jail.Properties.Defaultrouter module
-==================================================
-
-.. automodule:: iocage.Config.Jail.Properties.Defaultrouter
-    :members:
-    :undoc-members:
-    :show-inheritance:

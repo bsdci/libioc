@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ioc.DevfsRules module &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ioc.Distribution module" href="ioc.Distribution.html" />
+    <link rel="prev" title="ioc.Datasets module" href="ioc.Datasets.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ioc.html">ioc package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ioc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ioc.BridgeInterface.html">ioc.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.CommandQueue.html">ioc.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Datasets.html">ioc.Datasets module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ioc.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Distribution.html">ioc.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Filter.html">ioc.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Firewall.html">ioc.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Host.html">ioc.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.IPAddress.html">ioc.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jail.html">ioc.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.JailState.html">ioc.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Jails.html">ioc.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.LaunchableResource.html">ioc.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ListableResource.html">ioc.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Logger.html">ioc.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.MacAddress.html">ioc.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Network.html">ioc.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.NetworkInterface.html">ioc.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Pkg.html">ioc.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Prompts.html">ioc.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Release.html">ioc.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Releases.html">ioc.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Resource.html">ioc.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceBackup.html">ioc.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceSelector.html">ioc.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ResourceUpdater.html">ioc.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.SecureTarfile.html">ioc.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.Types.html">ioc.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.VersionedResource.html">ioc.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFS.html">ioc.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.ZFSShareStorage.html">ioc.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.decorators.html">ioc.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.errors.html">ioc.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.events.html">ioc.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers.html">ioc.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_ioctl.html">ioc.helpers_ioctl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ioc.helpers_object.html">ioc.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ioc.html#module-ioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="ioc.html">ioc package</a> &raquo;</li>
+        
+      <li>ioc.DevfsRules module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ioc.DevfsRules.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ioc.DevfsRules">
+<span id="ioc-devfsrules-module"></span><h1>ioc.DevfsRules module<a class="headerlink" href="#module-ioc.DevfsRules" title="Permalink to this headline">¶</a></h1>
+<p>iocage module for host devfs rule configuration.</p>
+<dl class="class">
+<dt id="ioc.DevfsRules.DevfsRules">
+<em class="property">class </em><code class="descclassname">ioc.DevfsRules.</code><code class="descname">DevfsRules</code><span class="sig-paren">(</span><em>rules_file='/etc/devfs.rules'</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Abstraction for the hosts /etc/devfs.rules.</p>
+<p>Read and edit devfs rules in a programmatic way.
+Restart the devfs service after applying changes.</p>
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>ruleset</em>, <em>is_system_rule=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a DevfsRuleset to the list.</p>
+<p>The rulesets added become indexed, so that lookups and duplication
+checks are easy and fast</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ruleset</strong> (<em>ioc.DevfsRules.DevfsRuleset|string</em>) – The ruleset that gets added if it is not already in the list</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#ioc.DevfsRules.DevfsRuleset" title="ioc.DevfsRules.DevfsRuleset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRuleset</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.DevfsRules.DevfsRules.default_rules_file">
+<code class="descname">default_rules_file</code><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.default_rules_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default path to the devfs rules file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.find_by_name">
+<code class="descname">find_by_name</code><span class="sig-paren">(</span><em>rule_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.find_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.find_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a devfs rule by its name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#ioc.DevfsRules.DevfsRuleset" title="ioc.DevfsRules.DevfsRuleset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRuleset</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.find_by_number">
+<code class="descname">find_by_number</code><span class="sig-paren">(</span><em>rule_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.find_by_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.find_by_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a devfs rule by its rule number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#ioc.DevfsRules.DevfsRuleset" title="ioc.DevfsRules.DevfsRuleset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRuleset</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.new_ruleset">
+<code class="descname">new_ruleset</code><span class="sig-paren">(</span><em>ruleset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.new_ruleset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.new_ruleset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a new ruleset.</p>
+<p>Similar to append(), but automatically assigns a new number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ruleset</strong> (<a class="reference internal" href="#ioc.DevfsRules.DevfsRuleset" title="ioc.DevfsRules.DevfsRuleset"><em>ioc.DevfsRules.DevfsRuleset</em></a>) – The new devfs ruleset that is going to be added</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The devfs ruleset number of the created ruleset</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.DevfsRules.DevfsRules.next_number">
+<code class="descname">next_number</code><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.next_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next highest ruleset number that is available.</p>
+<p>This counting includes the systems default devfs rulesets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.read_rules">
+<code class="descname">read_rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.read_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.read_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read existing devfs.rules file.</p>
+<p>Existing devfs rules get reset and read from the rules_file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ioc.DevfsRules.DevfsRules.rules_file">
+<code class="descname">rules_file</code><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.rules_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path of the devfs.rules file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRules.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRules.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRules.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply changes to the devfs.rules file.</p>
+<p>Automatically restarts devfs service when the file was changed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ioc.DevfsRules.DevfsRuleset">
+<em class="property">class </em><code class="descclassname">ioc.DevfsRules.</code><code class="descname">DevfsRuleset</code><span class="sig-paren">(</span><em>value=None</em>, <em>number=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRuleset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRuleset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Representation of a devfs ruleset in the devfs.rules file.</p>
+<p>DevfsRuleset instances behave like standard lists and can store strings
+that multiple lines (string)</p>
+<dl class="attribute">
+<dt id="ioc.DevfsRules.DevfsRuleset.PATTERN">
+<code class="descname">PATTERN</code><em class="property"> = re.compile('^\\[(?P&lt;name&gt;[a-z](?:[a-z0-9\\-_]*[a-z0-9])?)=\n                (?P&lt;number&gt;[0-9]+)\\]\\s*(?:\\#\\s*(?P&lt;comment&gt;.*))?$', re.VERBOSE)</em><a class="headerlink" href="#ioc.DevfsRules.DevfsRuleset.PATTERN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRuleset.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>rule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRuleset.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRuleset.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a rule to the devfs rules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRuleset.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><em>source_ruleset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRuleset.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRuleset.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clone the rules from another ruleset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source_ruleset</strong> (<a class="reference internal" href="#ioc.DevfsRules.DevfsRuleset" title="ioc.DevfsRules.DevfsRuleset"><em>ioc.DevfsRules.DevfsRuleset</em></a>) – Ruleset to copy all rules from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ioc.DevfsRules.DevfsRuleset.has_rule">
+<code class="descname">has_rule</code><span class="sig-paren">(</span><em>rule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ioc/DevfsRules.html#DevfsRuleset.has_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ioc.DevfsRules.DevfsRuleset.has_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the rule is part of the current ruleset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rule</strong> (<em>string</em>) – The rule string to be compared with current rules of the
+ruleset instance</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ioc.Distribution.html" class="btn btn-neutral float-right" title="ioc.Distribution module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ioc.Datasets.html" class="btn btn-neutral" title="ioc.Datasets module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4.1 2019/01/05',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

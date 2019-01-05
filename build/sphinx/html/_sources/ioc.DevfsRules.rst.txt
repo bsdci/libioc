@@ -1,0 +1,7 @@
+ioc.DevfsRules module
+=====================
+
+.. automodule:: ioc.DevfsRules
+    :members:
+    :undoc-members:
+    :show-inheritance:
