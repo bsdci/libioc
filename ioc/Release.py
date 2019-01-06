@@ -859,7 +859,6 @@ class ReleaseGenerator(ReleaseResource):
                     urllib.request.urlretrieve(url, path)  # nosec: validated
                     self.logger.verbose(f"{url} was saved to {path}")
                     yield releaseAssetDownloadEvent.end()
-                    return
                 except urllib.error.HTTPError as http_error:
                     yield releaseAssetDownloadEvent.fail()
                     raise ioc.errors.DownloadFailed(
