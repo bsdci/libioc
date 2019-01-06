@@ -66,7 +66,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         release: 'ioc.Release.ReleaseGenerator',
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator[ioc.events.IocageEvent, None, None]:
+    ) -> typing.Generator[ioc.events.IocEvent, None, None]:
         """Fetch a bunch of packages to the local mirror."""
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
@@ -88,7 +88,7 @@ class Pkg:
             self._mirror_packages(_packages, pkg_ds, release_major_version)
             self.logger.spam("Build mirror index")
             self._build_mirror_index(release_major_version)
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield packageFetchEvent.fail(e)
             raise e
         yield packageFetchEvent.end()
@@ -175,7 +175,7 @@ class Pkg:
         jail: 'ioc.Jail.JailGenerator',
         event_scope: typing.Optional['ioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[ioc.events.IocageEvent, None, None]:
+    ) -> typing.Generator[ioc.events.IocEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
         release_major_version = math.floor(jail.release.version_number)
@@ -255,7 +255,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         jail: 'ioc.Jail.JailGenerator',
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator[ioc.events.IocageEvent, None, None]:
+    ) -> typing.Generator[ioc.events.IocEvent, None, None]:
         """Remove installed packages from a jail."""
         _packages = self._normalize_packages(packages)
 
@@ -304,7 +304,7 @@ class Pkg:
         jail: 'ioc.Jail.JailGenerator',
         event_scope: typing.Optional['ioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[ioc.events.IocageEvent, None, None]:
+    ) -> typing.Generator[ioc.events.IocEvent, None, None]:
         """Mirror and install packages to a jail."""
         yield from self.fetch(
             packages=packages,

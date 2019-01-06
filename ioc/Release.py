@@ -651,7 +651,7 @@ class ReleaseGenerator(ReleaseResource):
         update: typing.Optional[bool]=None,
         fetch_updates: typing.Optional[bool]=None,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Fetch the release from the remote."""
         release_changed = False
         self._require_release_supported()
@@ -742,15 +742,15 @@ class ReleaseGenerator(ReleaseResource):
                         if (event.done and event.skipped) is True:
                             update = False
                     yield event
-            except ioc.errors.IocageException:
+            except ioc.errors.IocException:
                 update = False
 
         if update is True:
             for event in self.updater.apply():
-                if isinstance(event, ioc.events.IocageEvent):
+                if isinstance(event, ioc.events.IocEvent):
                     yield event
                 else:
-                    # the only non-IocageEvent is our return value
+                    # the only non-IocEvent is our return value
                     release_changed = event
 
         if release_changed is True:
@@ -841,7 +841,7 @@ class ReleaseGenerator(ReleaseResource):
 
     def _fetch_assets(
         self
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         for asset in self.assets:
 
             releaseAssetDownloadEvent = ioc.events.ReleaseAssetDownload(
@@ -988,7 +988,7 @@ class ReleaseGenerator(ReleaseResource):
         self,
         force: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Delete a release."""
         zfsDatasetDestroyEvent = ioc.events.ZFSDatasetDestroy(
             dataset=self.dataset,
@@ -1011,7 +1011,7 @@ class Release(ReleaseGenerator):
         update: typing.Optional[bool]=None,
         fetch_updates: typing.Optional[bool]=None,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Fetch the release from the remote synchronously."""
         return list(ReleaseGenerator.fetch(
             self,
@@ -1024,7 +1024,7 @@ class Release(ReleaseGenerator):
         self,
         force: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Delete a release."""
         return list(ReleaseGenerator.destroy(
             self,

@@ -94,7 +94,7 @@ class Storage:
         self,
         new_name: str,
         event_scope: typing.Optional[int]=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Rename the dataset and its snapshots."""
         for event in self._rename_dataset(new_name, event_scope=event_scope):
             yield event
@@ -105,7 +105,7 @@ class Storage:
         self,
         new_name: str,
         event_scope: typing.Optional[int]
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         current_dataset_name = self.jail.dataset.name
         renameDatasetEvent = ioc.events.ZFSDatasetRename(
@@ -134,7 +134,7 @@ class Storage:
         self,
         new_name: str,
         event_scope: typing.Optional[int]
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         root_dataset_properties = self.jail.root_dataset.properties
 

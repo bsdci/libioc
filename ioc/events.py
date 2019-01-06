@@ -48,7 +48,7 @@ class Scope(list):
         super().__init__([])
 
 
-class IocageEvent:
+class IocEvent:
     """The base event class of libioc."""
 
     _scope: Scope
@@ -62,16 +62,16 @@ class IocageEvent:
     reverted: bool
     error: typing.Optional[typing.Union[bool, BaseException]]
     _rollback_steps: typing.List[typing.Callable[[], typing.Optional[
-        typing.Generator['IocageEvent', None, None]
+        typing.Generator['IocEvent', None, None]
     ]]]
-    _child_events: typing.List['IocageEvent']
+    _child_events: typing.List['IocEvent']
 
     def __init__(
         self,
         message: typing.Optional[str]=None,
         scope: typing.Optional[Scope]=None
     ) -> None:
-        """Initialize an IocageEvent."""
+        """Initialize an IocEvent."""
         self.scope = scope
         for event in self.scope:
             if event.__hash__() == self.__hash__():
@@ -122,7 +122,7 @@ class IocageEvent:
 
         return pending
 
-    def child_event(self, event: 'IocageEvent') -> 'IocageEvent':
+    def child_event(self, event: 'IocEvent') -> 'IocEvent':
         """Append the event to the child_events for later notification."""
         self._child_events.append(event)
         return event
@@ -133,7 +133,7 @@ class IocageEvent:
 
     def rollback(
         self
-    ) -> typing.Optional[typing.Generator['IocageEvent', None, None]]:
+    ) -> typing.Optional[typing.Generator['IocEvent', None, None]]:
         """Rollback all rollback steps in reverse order."""
         if self.reverted is True:
             return
@@ -161,7 +161,7 @@ class IocageEvent:
         """
         Return the events type.
 
-        The event type is obtained from an IocageEvent's class name.
+        The event type is obtained from an IocEvent's class name.
         """
         return type(self).__name__
 
@@ -210,7 +210,7 @@ class IocageEvent:
     ) -> None:
         self.message = message
 
-    def begin(self, message: typing.Optional[str]=None) -> 'IocageEvent':
+    def begin(self, message: typing.Optional[str]=None) -> 'IocEvent':
         """Begin an event."""
         self._update_message(message)
         self.pending = True
@@ -218,7 +218,7 @@ class IocageEvent:
         self.parent_count = self.scope.PENDING_COUNT - 1
         return self
 
-    def end(self, message: typing.Optional[str]=None) -> 'IocageEvent':
+    def end(self, message: typing.Optional[str]=None) -> 'IocEvent':
         """Successfully finish an event."""
         self._update_message(message)
         self.done = True
@@ -226,13 +226,13 @@ class IocageEvent:
         self.parent_count = self.scope.PENDING_COUNT
         return self
 
-    def step(self, message: typing.Optional[str]=None) -> 'IocageEvent':
+    def step(self, message: typing.Optional[str]=None) -> 'IocEvent':
         """Reflect partial event progress."""
         self._update_message(message)
         self.parent_count = self.scope.PENDING_COUNT
         return self
 
-    def skip(self, message: typing.Optional[str]=None) -> 'IocageEvent':
+    def skip(self, message: typing.Optional[str]=None) -> 'IocEvent':
         """Mark an event as skipped."""
         self._update_message(message)
         self.skipped = True
@@ -244,7 +244,7 @@ class IocageEvent:
         self,
         exception: bool=True,
         message: typing.Optional[str]=None
-    ) -> 'IocageEvent':
+    ) -> 'IocEvent':
         """End an event with a failure."""
         list(self.fail_generator(exception=exception, message=message))
         return self
@@ -253,7 +253,7 @@ class IocageEvent:
         self,
         exception: bool=True,
         message: typing.Optional[str]=None
-    ) -> typing.Generator['IocageEvent', None, None]:
+    ) -> typing.Generator['IocEvent', None, None]:
         """End an event with a failure via a generator of rollback steps."""
         self._update_message(message)
         self.error = exception
@@ -278,7 +278,7 @@ class IocageEvent:
 # Jail
 
 
-class JailEvent(IocageEvent):
+class JailEvent(IocEvent):
     """Any event related to a jail."""
 
     jail: 'ioc.Jail.JailGenerator'
@@ -296,7 +296,7 @@ class JailEvent(IocageEvent):
         except AttributeError:
             self.identifier = None
         self.jail = jail
-        IocageEvent.__init__(self, message=message, scope=scope)
+        IocEvent.__init__(self, message=message, scope=scope)
 
 
 class JailLaunch(JailEvent):
@@ -317,10 +317,10 @@ class JailLaunch(JailEvent):
         self,
         message: typing.Optional[str]=None,
         stdout: str=""
-    ) -> 'IocageEvent':
+    ) -> 'IocEvent':
         """Successfully finish an event."""
         self.stdout = stdout
-        return IocageEvent.end(self, message)
+        return IocEvent.end(self, message)
 
 
 class JailRename(JailEvent):
@@ -397,7 +397,7 @@ class JailClone(JailEvent):
 # Release
 
 
-class ReleaseEvent(IocageEvent):
+class ReleaseEvent(IocEvent):
     """Event related to a release."""
 
     release: 'ioc.Release.ReleaseGenerator'
@@ -411,7 +411,7 @@ class ReleaseEvent(IocageEvent):
 
         self.identifier = release.full_name
         self.release = release
-        IocageEvent.__init__(self, message=message, scope=scope)
+        IocEvent.__init__(self, message=message, scope=scope)
 
 
 class ReleaseUpdate(ReleaseEvent):
@@ -477,7 +477,7 @@ class ReleaseUpdateDownload(ReleaseUpdate):
 # Resource
 
 
-class ResourceEvent(IocageEvent):
+class ResourceEvent(IocEvent):
     """Event with a resource."""
 
     def __init__(
@@ -488,7 +488,7 @@ class ResourceEvent(IocageEvent):
     ) -> None:
 
         self.identifier = resource.full_name
-        IocageEvent.__init__(self, message)
+        IocEvent.__init__(self, message)
 
 
 class ResourceUpdate(ResourceEvent):
@@ -512,7 +512,7 @@ class ExecuteResourceUpdate(ResourceUpdate):
 # ZFS
 
 
-class ZFSEvent(IocageEvent):
+class ZFSEvent(IocEvent):
     """Event related to ZFS storage."""
 
     def __init__(
@@ -524,7 +524,7 @@ class ZFSEvent(IocageEvent):
 
         self.identifier = zfs_object.name
         self.zfs_object = zfs_object
-        IocageEvent.__init__(self, message=message, scope=scope)
+        IocEvent.__init__(self, message=message, scope=scope)
 
 
 class ZFSDatasetRename(ZFSEvent):
@@ -622,7 +622,7 @@ class ZFSSnapshotRollback(ZFSEvent):
 # Backup
 
 
-class ResourceBackup(IocageEvent):
+class ResourceBackup(IocEvent):
     """Events that occur when backing up a resource."""
 
     resource: 'ioc.Resource.Resource'
@@ -639,7 +639,7 @@ class ResourceBackup(IocageEvent):
         else:
             self.identifier = resource.dataset_name
         self.resource = resource
-        IocageEvent.__init__(
+        IocEvent.__init__(
             self,
             message=message,
             scope=scope
@@ -844,7 +844,7 @@ class JailDependantsStart(JailEvent):
         self,
         message: typing.Optional[str]=None,
         started_jails: typing.List['ioc.Jail.JailGenerator']=[],
-    ) -> 'IocageEvent':
+    ) -> 'IocEvent':
         """Successfully finish starting dependant Jails."""
         self.started_jails = started_jails
         return JailEvent.end(self, message)
@@ -886,15 +886,15 @@ class JailCommandExecution(JailEvent):
         self,
         message: typing.Optional[str]=None,
         stdout: str=""
-    ) -> 'IocageEvent':
+    ) -> 'IocEvent':
         """Successfully finish an event."""
         self.stdout = stdout
-        return IocageEvent.end(self, message)
+        return IocEvent.end(self, message)
 
 # PKG
 
 
-class PackageFetch(IocageEvent):
+class PackageFetch(IocEvent):
     """Fetch packages for offline installation."""
 
     packages: typing.List[str]
@@ -908,7 +908,7 @@ class PackageFetch(IocageEvent):
 
         self.identifier = "global"
         self.packages = packages
-        IocageEvent.__init__(self, message=message, scope=scope)
+        IocEvent.__init__(self, message=message, scope=scope)
 
 
 class PackageInstall(JailEvent):

@@ -65,7 +65,7 @@ class DependsProp(ioc.Filter.Terms):
                 self,
                 terms=data
             )
-        except ioc.errors.IocageException:
+        except ioc.errors.IocException:
             if skip_on_error is False:
                 raise
 

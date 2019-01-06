@@ -425,7 +425,7 @@ class JailGenerator(JailResource):
         event_scope: typing.Optional['ioc.events.Scope']=None,
         dependant_jails_seen: typing.List['JailGenerator']=[],
         start_dependant_jails: bool=True
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Start the jail.
 
@@ -576,7 +576,7 @@ class JailGenerator(JailResource):
         yield jailLaunchEvent.begin()
 
         def _stop_failed_jail(
-        ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+        ) -> typing.Generator['ioc.events.IocEvent', None, None]:
             jails_to_stop = [self]
             if start_dependant_jails is True:
                 jails_to_stop.extend(list(reversed(dependant_jails_started)))
@@ -609,7 +609,7 @@ class JailGenerator(JailResource):
                     jail=self,
                     logger=self.logger
                 )
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield from jailLaunchEvent.fail_generator(e)
             raise e
 
@@ -620,7 +620,7 @@ class JailGenerator(JailResource):
         terms: ioc.Filter.Terms,
         dependant_jails_seen: typing.List['JailGenerator'],
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         jailDependantsStartEvent = ioc.events.JailDependantsStart(
             jail=self,
@@ -669,7 +669,7 @@ class JailGenerator(JailResource):
                     event_scope=jailDependantStartEvent.scope,
                     dependant_jails_seen=dependant_jails_seen
                 )
-            except ioc.errors.IocageException as err:
+            except ioc.errors.IocException as err:
                 yield jailDependantStartEvent.fail(err)
                 yield from jailDependantsStartEvent.fail_generator(err)
                 raise err
@@ -682,10 +682,10 @@ class JailGenerator(JailResource):
                 jail: JailGenerator
             ) -> typing.Callable[
                 [],
-                typing.Generator['ioc.events.IocageEvent', None, None]
+                typing.Generator['ioc.events.IocEvent', None, None]
             ]:
                 def revert_method() -> typing.Generator[
-                    'ioc.events.IocageEvent',
+                    'ioc.events.IocEvent',
                     None,
                     None
                 ]:
@@ -759,7 +759,7 @@ class JailGenerator(JailResource):
         start_dependant_jails: bool=True,
         dependant_jails_seen: typing.List['JailGenerator']=[],
         **temporary_config_override: typing.Any
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Start a jail, run a command and shut it down immediately.
 
@@ -928,7 +928,7 @@ class JailGenerator(JailResource):
         force: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None,
         log_errors: bool=True
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Stop a jail.
 
@@ -1032,7 +1032,7 @@ class JailGenerator(JailResource):
         shutdown: bool=False,
         force: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Restart the jail."""
         failed: bool = False
         jailRestartEvent = ioc.events.JailRestart(
@@ -1061,7 +1061,7 @@ class JailGenerator(JailResource):
             try:
                 self._run_hook("stop")
                 yield JailSoftShutdownEvent.end()
-            except ioc.errors.IocageException:
+            except ioc.errors.IocException:
                 yield JailSoftShutdownEvent.fail(exception=False)
 
             # service start
@@ -1069,7 +1069,7 @@ class JailGenerator(JailResource):
             try:
                 self._run_hook("start")
                 yield jailStartEvent.end()
-            except ioc.errors.IocageException:
+            except ioc.errors.IocException:
                 yield jailStartEvent.fail(exception=False)
 
         else:
@@ -1080,7 +1080,7 @@ class JailGenerator(JailResource):
                 for event in self.stop():
                     yield event
                 yield jailShutdownEvent.end()
-            except ioc.errors.IocageException:
+            except ioc.errors.IocException:
                 failed = True
                 yield jailShutdownEvent.fail(exception=False)
                 if force is False:
@@ -1094,7 +1094,7 @@ class JailGenerator(JailResource):
                 for event in self.start():
                     yield event
                 yield jailStartEvent.end()
-            except ioc.errors.IocageException:
+            except ioc.errors.IocException:
                 failed = True
                 yield jailStartEvent.fail(exception=False)
 
@@ -1110,7 +1110,7 @@ class JailGenerator(JailResource):
         force: bool=False,
         force_stop: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Destroy a Jail and it's datasets.
 
@@ -1168,7 +1168,7 @@ class JailGenerator(JailResource):
         self,
         new_name: str,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Change the name of a jail.
 
@@ -1237,7 +1237,7 @@ class JailGenerator(JailResource):
         old_path_prefix: str,
         new_path_prefix: typing.Optional[str]=None,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Update a path in the whole fstab file.
 
@@ -1346,7 +1346,7 @@ class JailGenerator(JailResource):
         self,
         source_jail: 'JailGenerator',
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Create a Jail from another Jail."""
         self.autoset_dataset_name()
         if event_scope is None:
@@ -1371,7 +1371,7 @@ class JailGenerator(JailResource):
         destination_dataset_name: str,
         delete_existing: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Clones the jails dataset to another dataset with the given name."""
         jailCloneEvent = ioc.events.JailClone(
             jail=self,
@@ -2242,7 +2242,7 @@ class Jail(JailGenerator):
         self,
         *args,
         **kwargs
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Start the jail."""
         return list(JailGenerator.start(self, *args, **kwargs))
 
@@ -2250,7 +2250,7 @@ class Jail(JailGenerator):
         self,
         *args,
         **kwargs
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Stop the jail."""
         return list(JailGenerator.stop(self, *args, **kwargs))
 
@@ -2258,7 +2258,7 @@ class Jail(JailGenerator):
         self,
         *args,
         **kwargs
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))
 
@@ -2266,14 +2266,14 @@ class Jail(JailGenerator):
         self,
         *args,
         **kwargs
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """Update a path in the whole fstab file."""
         return list(JailGenerator._update_fstab_paths(self, *args, **kwargs))
 
     def destroy(  # noqa: T484
         self,
         force: bool=False
-    ) -> typing.List['ioc.events.IocageEvent']:
+    ) -> typing.List['ioc.events.IocEvent']:
         """
         Destroy a Jail and it's datasets.
 

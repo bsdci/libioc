@@ -124,7 +124,7 @@ class LaunchableResourceBackup:
         self,
         source: str,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Import a resource from an archive.
 
@@ -204,7 +204,7 @@ class LaunchableResourceBackup:
         self,
         source: str,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         extractBundleEvent = ioc.events.ExtractBundle(
             source=source,
@@ -230,7 +230,7 @@ class LaunchableResourceBackup:
         self,
         data: typing.Dict[str, typing.Any],
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         importConfigEvent = ioc.events.ImportConfig(
             self.resource,
@@ -244,7 +244,7 @@ class LaunchableResourceBackup:
             self.logger.verbose(
                 f"Config imported from {self.resource.config_handler.file}"
             )
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield importConfigEvent.fail(e)
             raise e
 
@@ -253,7 +253,7 @@ class LaunchableResourceBackup:
     def _import_fstab(
         self,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         importFstabEvent = ioc.events.ImportFstab(
             self.resource,
@@ -274,7 +274,7 @@ class LaunchableResourceBackup:
             fstab.file = _old_fstab_file
             fstab.save()
             self.logger.verbose(f"Fstab restored from {fstab.file}")
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield importFstabEvent.fail(e)
             raise e
         yield importFstabEvent.end()
@@ -282,7 +282,7 @@ class LaunchableResourceBackup:
     def _import_root_dataset(
         self,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Import data from an exported root dataset.
 
@@ -309,7 +309,7 @@ class LaunchableResourceBackup:
                 f"{temp_root_dir}/",
                 f"{self.resource.root_dataset.mountpoint}/"
             ])
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield importRootDatasetEvent.fail(e)
             raise e
         yield importRootDatasetEvent.end()
@@ -317,7 +317,7 @@ class LaunchableResourceBackup:
     def _import_other_datasets_recursive(
         self,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         importOtherDatasetsEvent = ioc.events.ImportOtherDatasets(
             self.resource,
@@ -341,7 +341,7 @@ class LaunchableResourceBackup:
                     )
                     dataset.receive(f.fileno(), force=True)
                     hasImportedOtherDatasets = True
-            except ioc.errors.IocageException as e:
+            except ioc.errors.IocException as e:
                 yield importOtherDatasetEvent.fail(e)
                 raise e
             yield importOtherDatasetEvent.end()
@@ -381,7 +381,7 @@ class LaunchableResourceBackup:
         standalone: typing.Optional[bool]=None,
         recursive: bool=False,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """
         Export the resource.
 
@@ -470,7 +470,7 @@ class LaunchableResourceBackup:
     def _export_config(
         self,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         exportConfigEvent = ioc.events.ExportConfig(
             self.resource,
@@ -486,7 +486,7 @@ class LaunchableResourceBackup:
             temp_config.data = self.resource.config.data
             temp_config.write(temp_config.data)
             self.logger.verbose(f"Config duplicated to {temp_config.file}")
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield exportConfigEvent.fail(e)
             raise e
         yield exportConfigEvent.end()
@@ -494,7 +494,7 @@ class LaunchableResourceBackup:
     def _export_fstab(
         self,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         exportFstabEvent = ioc.events.ExportFstab(
             self.resource,
@@ -517,7 +517,7 @@ class LaunchableResourceBackup:
             )
             fstab.save()
             self.logger.verbose(f"Fstab saved to {fstab.file}")
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield exportFstabEvent.fail(e)
             raise e
         yield exportFstabEvent.end()
@@ -526,7 +526,7 @@ class LaunchableResourceBackup:
         self,
         flags: typing.Set[libzfs.SendFlag],
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         exportRootDatasetEvent = ioc.events.ExportRootDataset(
             self.resource,
@@ -566,7 +566,7 @@ class LaunchableResourceBackup:
                 f"{self.resource.root_dataset.mountpoint}/",
                 temp_root_dir,
             ], logger=self.logger)
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield exportRootDatasetEvent.fail(e)
             raise e
         yield exportRootDatasetEvent.end()
@@ -577,7 +577,7 @@ class LaunchableResourceBackup:
         flags: typing.Set[libzfs.SendFlag],
         event_scope: typing.Optional['ioc.events.Scope'],
         limit_depth: bool=False,
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
 
         exportOtherDatasetsEvent = ioc.events.ExportOtherDatasets(
             self.resource,
@@ -606,7 +606,7 @@ class LaunchableResourceBackup:
             yield exportOtherDatasetEvent.begin()
             try:
                 self._export_other_dataset(dataset, flags)
-            except ioc.errors.IocageException as e:
+            except ioc.errors.IocException as e:
                 yield exportOtherDatasetEvent.fail(e)
                 raise e
             yield exportOtherDatasetEvent.end()
@@ -646,7 +646,7 @@ class LaunchableResourceBackup:
         self,
         destination: str,
         event_scope: typing.Optional['ioc.events.Scope']
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Create the an archive file from the backup assets."""
         bundleBackupEvent = ioc.events.BundleBackup(
             destination=destination,
@@ -660,7 +660,7 @@ class LaunchableResourceBackup:
             tar = tarfile.open(destination, "w:gz")
             tar.add(self.work_dir, arcname=".")
             tar.close()
-        except ioc.errors.IocageException as e:
+        except ioc.errors.IocException as e:
             yield bundleBackupEvent.fail(e)
             raise e
 

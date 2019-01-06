@@ -162,7 +162,7 @@ class Resource(metaclass=abc.ABCMeta):
     def destroy(
         self,
         force: bool=False
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Destroy the resource."""
         pass
 
@@ -406,7 +406,7 @@ class DefaultResource(Resource):
     def destroy(
         self,
         force: bool=False
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Cannot destroy the default resource."""
         raise NotImplementedError("destroy unimplemented for DefaultResource")
 

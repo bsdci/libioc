@@ -38,7 +38,7 @@ import ioc.Pkg
 import ioc.Provisioning
 
 
-class PluginUnavailableError(ioc.errors.IocageException):
+class PluginUnavailableError(ioc.errors.IocException):
     """Raised when an iX iocage plugin is not available."""
 
     def __init__(
@@ -48,7 +48,7 @@ class PluginUnavailableError(ioc.errors.IocageException):
         logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
         msg = f"iX iocage plugin '{name}' is not available: {reason}"
-        ioc.errors.IocageException.__init__(
+        ioc.errors.IocException.__init__(
             self,
             message=msg,
             logger=logger
@@ -116,7 +116,7 @@ class PluginDefinition(dict):
 def provision(
     self: 'ioc.Provisioning.Prototype',
     event_scope: typing.Optional['ioc.events.Scope']=None
-) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+) -> typing.Generator['ioc.events.IocEvent', None, None]:
     """
     Provision the jail from an ix-iocage-plugin.
 

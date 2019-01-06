@@ -264,7 +264,7 @@ class Updater:
     def fetch(
         self,
         event_scope: typing.Optional['ioc.events.Scope']=None
-    ) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['ioc.events.IocEvent', None, None]:
         """Fetch the update of a release."""
         ReleaseGenerator = ioc.Release.ReleaseGenerator
         if isinstance(self.resource, ReleaseGenerator) is False:
@@ -334,7 +334,7 @@ class Updater:
         self,
         event_scope: typing.Optional['ioc.events.Scope']=None
     ) -> typing.Generator[typing.Union[
-        'ioc.events.IocageEvent',
+        'ioc.events.IocEvent',
         bool
     ], None, None]:
         """Apply the fetched updates to the associated release or jail."""
@@ -366,7 +366,7 @@ class Updater:
 
         try:
             for event in self._update_jail(jail, event_scope=_scope):
-                if isinstance(event, ioc.events.IocageEvent):
+                if isinstance(event, ioc.events.IocEvent):
                     yield event
                 else:
                     changed = (event is True)
@@ -384,7 +384,7 @@ class Updater:
         jail: 'ioc.Jail.JailGenerator',
         event_scope: typing.Optional['ioc.events.Scope']
     ) -> typing.Generator[typing.Union[
-        'ioc.events.IocageEvent',
+        'ioc.events.IocEvent',
         bool
     ], None, None]:
 

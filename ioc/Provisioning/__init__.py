@@ -94,7 +94,7 @@ class Provisioner(Prototype):
 
 	def provision(
 		self
-	) -> typing.Generator['ioc.events.IocageEvent', None, None]:
+	) -> typing.Generator['ioc.events.IocEvent', None, None]:
 		"""Run the provision method on the enabled provisioner."""
 		Prototype.check_requirements(self)
 		yield from self.__provisioning_module.provision(self)
