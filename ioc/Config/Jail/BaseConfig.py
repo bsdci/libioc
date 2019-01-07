@@ -528,18 +528,24 @@ class BaseConfig(dict):
 
     def _get_data(
         self,
-        key: str,
-        data: typing.Optional[typing.Dict[str, typing.Any]]=None
+        key: str
     ) -> typing.Any:
-        data = self.data if (data is None) else data
-        if "." not in key:
-            if key in data.keys():
-                return data[key]
+        data = self.data
+        keys = data.keys()
+        while True:
+            if "." not in key:
+                if key in keys:
+                    return data[key]
+                else:
+                    raise KeyError(f"User property not found: {key}")
             else:
-                raise KeyError(f"User defined property not found: {key}")
-        else:
-            current_key, rest_key = key.split(".", maxsplit=1)
-            return self._get_data(rest_key, data[current_key])
+                current, key = key.split(".", maxsplit=1)
+                if current not in keys:
+                    raise KeyError(f"User property not found: {current}")
+                data = data[current]
+                if isinstance(data, dict) is False:
+                    raise KeyError(f"User property is not nested: {current}")
+                keys = data.keys()
 
     def get(
         self,
