@@ -91,16 +91,16 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         return key.startswith("user.") is True
 
     def _is_known_property(self, key: str) -> bool:
-        key_is_default = key in self.host.defaults.config.keys()
-        key_is_setter = f"_set_{key}" in dict.__dir__(self)
-        key_is_special = key in ioc.Config.Jail.Properties.properties
-        return any([
-            key_is_default,
-            key_is_setter,
-            key_is_special,
-            self._key_is_mac_config(key),
-            self._is_user_property(key)
-        ]) is True
+        if key in self.host.defaults.config.keys():
+            return True  # key is default
+        if  f"_set_{key}" in dict.__dir__(self):
+            return True  # key is setter
+        if key in ioc.Config.Jail.Properties.properties:
+            return True  # key is special property
+        if self._key_is_mac_config(key) is True:
+            return True  # nic mac config property
+        if self._is_user_property(key) is True:
+            return True  # user.* property
 
     def __setitem__(
         self,
