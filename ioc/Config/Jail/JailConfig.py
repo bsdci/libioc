@@ -37,7 +37,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
     legacy: bool = False
     jail: typing.Optional['ioc.Jail.JailGenerator']
     data: dict = {}
-    ignore_host_defaults: bool
+    ignore_user_defaults: bool
 
     def __init__(
         self,
@@ -47,7 +47,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         host: typing.Optional['ioc.Host.HostGenerator']=None
     ) -> None:
 
-        self.ignore_host_defaults = False
+        self.ignore_user_defaults = False
         ioc.Config.Jail.BaseConfig.BaseConfig.__init__(
             self,
             logger=logger
@@ -138,7 +138,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         try:
             return super().__getitem__(key)
         except KeyError:
-            if self.ignore_host_defaults is True:
+            if self.ignore_user_defaults is True:
                 raise
             pass
 

@@ -471,7 +471,7 @@ class Pkg:
             host=source_jail.host,
             dataset=source_jail.dataset
         )
-        temporary_jail.config.ignore_host_defaults = True
+        temporary_jail.config.ignore_user_defaults = True
         self.__mount_pkg_directory(temporary_jail)
 
         return temporary_jail
