@@ -86,7 +86,8 @@ class BaseConfig(dict):
         logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
 
-        self.data = ioc.Config.Data.Data()
+        if self.data is None:
+            self.data = ioc.Config.Data.Data()
         self.logger = ioc.helpers_object.init_logger(self, logger)
 
         Properties = ioc.Config.Jail.Properties.JailConfigProperties
@@ -508,6 +509,15 @@ class BaseConfig(dict):
         return self.stringify(self.__getitem__(key))
 
     def _getitem_user(self, key: str) -> typing.Any:
+        # special property
+        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
+        if self.special_properties.is_special_property(key) is True:
+            is_existing = key in self.data.keys()
+            is_resource_limit = key in _rlimits
+            if is_existing is True:
+                return self.special_properties.get_or_create(key)
+            elif is_resource_limit is True:
+                return None
 
         # data with mappings
         method_name = f"_get_{key}"
@@ -517,6 +527,22 @@ class BaseConfig(dict):
 
         # plain data attribute
         return self.data[key]
+
+    def update_special_property(self, name: str) -> None:
+        """Triggered when a special property was updated."""
+        self.data[name] = str(self.special_properties[name])
+
+        if (name == "ip6_addr") and (self.jail is not None):
+            rc_conf = self.jail.rc_conf
+            rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
+
+    def attach_special_property(
+        self,
+        name: str,
+        special_property: 'ioc.Config.Jail.Properties.Property'
+    ) -> None:
+        """Attach a special property to the configuration."""
+        self.special_properties[name] = special_property
 
     def get(
         self,
@@ -565,8 +591,29 @@ class BaseConfig(dict):
         skip_on_error: bool=False
     ) -> None:
         """Set a configuration value."""
+        if self._is_known_property(key) is False:
+            err = ioc.errors.UnknownConfigProperty(
+                key=key,
+                logger=self.logger,
+                level=("warn" if skip_on_error else "error")
+            )
+            if skip_on_error is False:
+                raise err
+
         try:
+            if self.special_properties.is_special_property(key):
+                special_property = self.special_properties.get_or_create(key)
+                special_property.set(value, skip_on_error=skip_on_error)
+                self.update_special_property(key)
+                return
+
             parsed_value = ioc.helpers.parse_user_input(value)
+            setter_method_name = f"_set_{key}"
+            if setter_method_name in object.__dir__(self):
+                setter_method = self.__getattribute__(setter_method_name)
+                setter_method(parsed_value)
+                return
+
             self.data[key] = parsed_value
             error = None
         except ValueError as err:
@@ -684,6 +731,33 @@ class BaseConfig(dict):
         special_properties = ioc.Config.Jail.Properties.properties
         properties = properties.union(special_properties)
         return list(properties)
+
+    def _key_is_mac_config(self, key: str, explicit: bool=False) -> bool:
+        fragments = key.rsplit("_", maxsplit=1)
+        if len(fragments) < 2:
+            return False
+        elif fragments[1].lower() != "mac":
+            return False
+        elif explicit is False:
+            # do not explicitly check if the interface exists
+            return True
+        return (fragments[0] in self["interfaces"].keys()) is True
+
+    def _is_user_property(self, key: str) -> bool:
+        return key.startswith("user.") is True
+
+    def _is_known_property(self, key: str) -> bool:
+        if key in ioc.Config.Jail.Defaults.DEFAULTS.keys():
+            return True  # key is default
+        if f"_set_{key}" in dict.__dir__(self):
+            return True  # key is setter
+        if key in ioc.Config.Jail.Properties.properties:
+            return True  # key is special property
+        if self._key_is_mac_config(key) is True:
+            return True  # nic mac config property
+        if self._is_user_property(key) is True:
+            return True  # user.* property
+        return False
 
     @property
     def _sorted_user_properties(self) -> typing.List[str]:

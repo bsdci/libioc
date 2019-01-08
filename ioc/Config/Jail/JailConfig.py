@@ -56,22 +56,6 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         self.host = ioc.helpers_object.init_host(self, host)
         self.jail = jail
 
-    def update_special_property(self, name: str) -> None:
-        """Triggered when a special property was updated."""
-        self.data[name] = str(self.special_properties[name])
-
-        if (name == "ip6_addr") and (self.jail is not None):
-            rc_conf = self.jail.rc_conf
-            rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
-
-    def attach_special_property(
-        self,
-        name: str,
-        special_property: 'ioc.Config.Jail.Properties.Property'
-    ) -> None:
-        """Attach a special property to the configuration."""
-        self.special_properties[name] = special_property
-
     def _get_host_hostname(self) -> str:
         try:
             return str(self.data["host_hostname"])
@@ -84,33 +68,6 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
     def _get_legacy(self) -> bool:
         return self.legacy
 
-    def _key_is_mac_config(self, key: str, explicit: bool=False) -> bool:
-        fragments = key.rsplit("_", maxsplit=1)
-        if len(fragments) < 2:
-            return False
-        elif fragments[1].lower() != "mac":
-            return False
-        elif explicit is False:
-            # do not explicitly check if the interface exists
-            return True
-        return (fragments[0] in self["interfaces"].keys()) is True
-
-    def _is_user_property(self, key: str) -> bool:
-        return key.startswith("user.") is True
-
-    def _is_known_property(self, key: str) -> bool:
-        if key in self.host.defaults.config.keys():
-            return True  # key is default
-        if f"_set_{key}" in dict.__dir__(self):
-            return True  # key is setter
-        if key in ioc.Config.Jail.Properties.properties:
-            return True  # key is special property
-        if self._key_is_mac_config(key) is True:
-            return True  # nic mac config property
-        if self._is_user_property(key) is True:
-            return True  # user.* property
-        return False
-
     def __setitem__(
         self,
         key: str,
@@ -118,45 +75,6 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         skip_on_error: bool=False
     ) -> None:
         """Set a configuration value."""
-        # require the config property to be defined in the defaults
-        if self._is_known_property(key) is False:
-            err = ioc.errors.UnknownJailConfigProperty(
-                jail=self.jail,
-                key=key,
-                logger=self.logger,
-                level=("warn" if skip_on_error else "error")
-            )
-            if skip_on_error is False:
-                raise err
-
-        try:
-
-            if self.special_properties.is_special_property(key):
-                special_property = self.special_properties.get_or_create(key)
-                special_property.set(value, skip_on_error=skip_on_error)
-                self.update_special_property(key)
-                return
-
-            parsed_value = ioc.helpers.parse_user_input(value)
-            setter_method_name = f"_set_{key}"
-            if setter_method_name in object.__dir__(self):
-                setter_method = self.__getattribute__(setter_method_name)
-                setter_method(parsed_value)
-                return
-
-            error = None
-
-        except ValueError as err:
-            error = ioc.errors.InvalidJailConfigValue(
-                reason=str(err),
-                property_name=key,
-                logger=self.logger,
-                level=("warn" if (skip_on_error is True) else "error")
-            )
-
-        if (error is not None) and (skip_on_error is False):
-            raise error
-
         BaseConfig.__setitem__(
             self,
             key=key,
@@ -165,16 +83,6 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         )
 
     def _getitem_user(self, key: str) -> typing.Any:
-
-        # special property
-        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
-        if self.special_properties.is_special_property(key) is True:
-            is_existing = key in self.data.keys()
-            is_resource_limit = key in _rlimits
-            if is_existing is True:
-                return self.special_properties.get_or_create(key)
-            elif is_resource_limit is True:
-                return None
 
         return BaseConfig._getitem_user(
             self,

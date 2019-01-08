@@ -29,25 +29,97 @@ import ioc.helpers_object
 import ioc.Config.Data
 import ioc.Config.Jail.BaseConfig
 
+DEFAULTS = ioc.Config.Data.Data({
+    "id": None,
+    "release": None,
+    "boot": False,
+    "priority": 0,
+    "legacy": False,
+    "priority": 0,
+    "depends": [],
+    "basejail": False,
+    "basejail_type": "nullfs",
+    "clonejail": False,
+    "defaultrouter": None,
+    "defaultrouter6": None,
+    "mac_prefix": "02ff60",
+    "vnet": False,
+    "interfaces": [],
+    "vnet_interfaces": [],
+    "ip4": "new",
+    "ip4_saddrsel": 1,
+    "ip4_addr": None,
+    "ip6": "new",
+    "ip6_saddrsel": 1,
+    "ip6_addr": None,
+    "resolver": "/etc/resolv.conf",
+    "host_hostuuid": None,
+    "host_hostname": None,
+    "host_domainname": None,
+    "devfs_ruleset": 4,
+    "enforce_statfs": 2,
+    "children_max": 0,
+    "allow_set_hostname": 1,
+    "allow_sysvipc": 0,
+    "allow_raw_sockets": 0,
+    "allow_chflags": 0,
+    "allow_mount": 0,
+    "allow_mount_devfs": 0,
+    "allow_mount_nullfs": 0,
+    "allow_mount_procfs": 0,
+    "allow_mount_fdescfs": 0,
+    "allow_mount_zfs": 0,
+    "allow_mount_tmpfs": 0,
+    "allow_quotas": 0,
+    "allow_socket_af": 0,
+    "rlimits": None,
+    "sysvmsg": "new",
+    "sysvsem": "new",
+    "sysvshm": "new",
+    "exec_clean": 1,
+    "exec_fib": 1,
+    "exec_prestart": None,
+    "exec_created": None,
+    "exec_start": "/bin/sh /etc/rc",
+    "exec_poststart": None,
+    "exec_prestop": None,
+    "exec_stop": "/bin/sh /etc/rc.shutdown",
+    "exec_poststop": None,
+    "exec_jail_user": "root",
+    "exec_timeout": "600",
+    "stop_timeout": "30",
+    "mount_procfs": "0",
+    "mount_devfs": "1",
+    "mount_fdescfs": "0",
+    "securelevel": "2",
+    "tags": [],
+    "template": False,
+    "jail_zfs": False,
+    "jail_zfs_dataset": None,
+    "provisioning": {
+        "method": None,
+        "source": None,
+        "rev": "master"
+    }
+})
+
 
 class DefaultsUserData(dict):
     """Data-structure of default configuration data."""
 
     user_data: ioc.Config.Data.Data
-    defaults: ioc.Config.Data.Data  # noqa: E704
 
     def __init__(
         self,
         defaults: typing.Dict[str, typing.Any]={}
     ) -> None:
-        self.defaults = ioc.Config.Data.Data(defaults)
         self.user_data = ioc.Config.Data.Data()
 
     def __getitem__(self, key: str) -> typing.Any:
         """Return a user provided value or the hardcoded default."""
         if key in self.user_data.keys():
             return self.user_data.__getitem__(key)
-        return self.defaults.__getitem__(key)
+        return DEFAULTS.__getitem__(key)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
         """Set a user provided default setting."""
@@ -59,7 +131,7 @@ class DefaultsUserData(dict):
 
     def __iter__(self) -> typing.Iterator[str]:
         """Iterate over all default properties."""
-        return iter(self.user_properties.union(self.defaults.keys()))
+        return iter(self.user_properties.union(DEFAULTS.keys()))
 
     def __len__(self) -> int:
         """Return the number of default config properties."""
@@ -69,7 +141,7 @@ class DefaultsUserData(dict):
         """List all default property keys."""
         return typing.cast(
             typing.KeysView[str],
-            list(self.user_properties.union(self.defaults.keys()))
+            list(self.user_properties.union(DEFAULTS.keys()))
         )
 
     @property
@@ -91,89 +163,12 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
 
     _data: DefaultsUserData
 
-    DEFAULTS: dict = {
-        "id": None,
-        "release": None,
-        "boot": False,
-        "priority": 0,
-        "legacy": False,
-        "priority": 0,
-        "depends": [],
-        "basejail": False,
-        "basejail_type": "nullfs",
-        "clonejail": False,
-        "defaultrouter": None,
-        "defaultrouter6": None,
-        "mac_prefix": "02ff60",
-        "vnet": False,
-        "interfaces": [],
-        "vnet_interfaces": [],
-        "ip4": "new",
-        "ip4_saddrsel": 1,
-        "ip4_addr": None,
-        "ip6": "new",
-        "ip6_saddrsel": 1,
-        "ip6_addr": None,
-        "resolver": "/etc/resolv.conf",
-        "host_hostuuid": None,
-        "host_hostname": None,
-        "host_domainname": None,
-        "devfs_ruleset": 4,
-        "enforce_statfs": 2,
-        "children_max": 0,
-        "allow_set_hostname": 1,
-        "allow_sysvipc": 0,
-        "allow_raw_sockets": 0,
-        "allow_chflags": 0,
-        "allow_mount": 0,
-        "allow_mount_devfs": 0,
-        "allow_mount_nullfs": 0,
-        "allow_mount_procfs": 0,
-        "allow_mount_fdescfs": 0,
-        "allow_mount_zfs": 0,
-        "allow_mount_tmpfs": 0,
-        "allow_quotas": 0,
-        "allow_socket_af": 0,
-        "rlimits": None,
-        "sysvmsg": "new",
-        "sysvsem": "new",
-        "sysvshm": "new",
-        "exec_clean": 1,
-        "exec_fib": 1,
-        "exec_prestart": None,
-        "exec_created": None,
-        "exec_start": "/bin/sh /etc/rc",
-        "exec_poststart": None,
-        "exec_prestop": None,
-        "exec_stop": "/bin/sh /etc/rc.shutdown",
-        "exec_poststop": None,
-        "exec_jail_user": "root",
-        "exec_timeout": "600",
-        "stop_timeout": "30",
-        "mount_procfs": "0",
-        "mount_devfs": "1",
-        "mount_fdescfs": "0",
-        "securelevel": "2",
-        "tags": [],
-        "template": False,
-        "jail_zfs": False,
-        "jail_zfs_dataset": None,
-        "provisioning": {
-            "method": None,
-            "source": None,
-            "rev": "master"
-        }
-    }
-
     def __init__(
         self,
         logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
-
-        self.logger = ioc.helpers_object.init_logger(self, logger)
-        self._data = DefaultsUserData(
-            defaults=self.DEFAULTS
-        )
+        self._data = DefaultsUserData()
+        super().__init__(logger=logger)
 
     @property
     def data(self) -> DefaultsUserData:
