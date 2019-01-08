@@ -171,9 +171,8 @@ class ResourceLimitProp(ResourceLimitValue):
         if property_name not in properties:
             raise ioc.errors.ResourceLimitUnknown(logger=self.logger)
 
-        self.__update_from_config()
-
         ResourceLimitValue.__init__(self)
+        self.__update_from_config()
 
     def _parse_resource_limit(self, value: str) -> typing.Tuple[
         typing.Optional[str],
