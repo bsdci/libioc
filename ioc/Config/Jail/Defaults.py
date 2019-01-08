@@ -139,11 +139,12 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
             return self.user_data.__getitem__(key)
         except KeyError:
             pass
-        return DEFAULTS.__getitem__(key)
 
-    def __setitem__(self, key: str, value: typing.Any) -> None:
-        """Set a user provided default setting."""
-        self.user_data.__setitem__(key, value)
+        try:
+            return DEFAULTS.__getitem__(key)
+        except KeyError:
+            if self.special_properties.is_special_property(key):
+                return None
 
     def __delitem__(self, key: str) -> None:
         """Remove a user provided default setting."""
