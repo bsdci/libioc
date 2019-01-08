@@ -25,30 +25,57 @@
 """Global jail configuration defaults."""
 import typing
 
+import ioc.helpers_object
+import ioc.Config.Data
 import ioc.Config.Jail.BaseConfig
 
 
 class DefaultsUserData(dict):
     """Data-structure of default configuration data."""
 
-    user_properties: set = set()
+    user_data: ioc.Config.Data.Data
+    defaults: ioc.Config.Data.Data  # noqa: E704
 
-    def __init__(self, defaults: dict={}) -> None:
-        self.defaults = defaults
-        dict.__init__(self, defaults)
+    def __init__(
+        self,
+        defaults: typing.Dict[str, typing.Any]={}
+    ) -> None:
+        self.defaults = ioc.Config.Data.Data(defaults)
+        self.user_data = ioc.Config.Data.Data()
+
+    def __getitem__(self, key: str) -> typing.Any:
+        """Return a user provided value or the hardcoded default."""
+        if key in self.user_data.keys():
+            return self.user_data.__getitem__(key)
+        return self.defaults.__getitem__(key)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
         """Set a user provided default setting."""
-        dict.__setitem__(self, key, value)
-        self.user_properties.add(key)
+        self.user_data.__setitem__(key, value)
 
     def __delitem__(self, key: str) -> None:
         """Remove a user provided default setting."""
-        if key in self.defaults:
-            self[key] = self.defaults[key]
-        else:
-            dict.__delitem__(self, key)
-        self.user_properties.remove(key)
+        self.user_data.__delitem__(key)
+
+    def __iter__(self) -> typing.Iterator[str]:
+        """Iterate over all default properties."""
+        return iter(self.user_properties.union(self.defaults.keys()))
+
+    def __len__(self) -> int:
+        """Return the number of default config properties."""
+        return len(self.keys())
+
+    def keys(self) -> typing.KeysView[str]:
+        """List all default property keys."""
+        return typing.cast(
+            typing.KeysView[str],
+            list(self.user_properties.union(self.defaults.keys()))
+        )
+
+    @property
+    def user_properties(self) -> typing.Set[str]:
+        """Return a set of user defined properties."""
+        return set(self.user_data.keys())
 
     @property
     def exclusive_user_data(self) -> dict:
@@ -62,7 +89,7 @@ class DefaultsUserData(dict):
 class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
     """BaseConfig object filled with global defaults."""
 
-    _user_data: DefaultsUserData
+    _data: DefaultsUserData
 
     DEFAULTS: dict = {
         "id": None,
@@ -143,22 +170,27 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
         logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
 
-        self._user_data = DefaultsUserData(
+        self.logger = ioc.helpers_object.init_logger(self, logger)
+        self._data = DefaultsUserData(
             defaults=self.DEFAULTS
         )
-        super().__init__(logger=logger)
 
     @property
     def data(self) -> DefaultsUserData:
-        """Return global default configuration data including user defaults."""
-        return self._user_data
+        """Return the DefaultsUserData object."""
+        return self._data
 
     @data.setter
-    def data(self, value: dict) -> None:
-        """Global defaults data cannot be written directly."""
-        pass
+    def data(self, value: ioc.Config.Data.Data) -> None:
+        """Override the DefaultsUserData object."""
+        self._data = value
+
+    def clone(self, data: typing.Dict[str, typing.Any]) -> None:
+        """Clone data from another dict."""
+        for key in data:
+            self._data[key] = data[key]
 
     @property
-    def user_data(self) -> dict:
+    def user_data(self) -> ioc.Config.Data.Data:
         """User provided defaults differing from the global defaults."""
-        return self._user_data.exclusive_user_data
+        return self._data.user_data
