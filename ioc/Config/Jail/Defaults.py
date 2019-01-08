@@ -104,21 +104,41 @@ DEFAULTS = ioc.Config.Data.Data({
 })
 
 
-class DefaultsUserData(dict):
-    """Data-structure of default configuration data."""
+class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
+    """BaseConfig object filled with global defaults."""
 
     user_data: ioc.Config.Data.Data
 
     def __init__(
         self,
-        defaults: typing.Dict[str, typing.Any]={}
+        logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
         self.user_data = ioc.Config.Data.Data()
+        super().__init__(logger=logger)
+
+    @property
+    def data(self) -> ioc.Config.Data.Data:
+        """Return the Config.Data object."""
+        return self.user_data
+
+    @data.setter
+    def data(self, value: ioc.Config.Data.Data) -> None:
+        """Override the Config.Data object."""
+        if isinstance(value, ioc.Config.Data.Data) is False:
+            raise ValueError("expecting Config.Data structure")
+        self.user_data = value
+
+    def clone(self, data: typing.Dict[str, typing.Any]) -> None:
+        """Clone data from another dict."""
+        for key in data:
+            self.user_data[key] = data[key]
 
     def __getitem__(self, key: str) -> typing.Any:
         """Return a user provided value or the hardcoded default."""
-        if key in self.user_data.keys():
+        try:
             return self.user_data.__getitem__(key)
+        except KeyError:
+            pass
         return DEFAULTS.__getitem__(key)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
@@ -156,36 +176,3 @@ class DefaultsUserData(dict):
         for key in self.user_properties:
             data[key] = self[key]
         return data
-
-
-class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
-    """BaseConfig object filled with global defaults."""
-
-    _data: DefaultsUserData
-
-    def __init__(
-        self,
-        logger: typing.Optional['ioc.Logger.Logger']=None
-    ) -> None:
-        self._data = DefaultsUserData()
-        super().__init__(logger=logger)
-
-    @property
-    def data(self) -> DefaultsUserData:
-        """Return the DefaultsUserData object."""
-        return self._data
-
-    @data.setter
-    def data(self, value: ioc.Config.Data.Data) -> None:
-        """Override the DefaultsUserData object."""
-        self._data = value
-
-    def clone(self, data: typing.Dict[str, typing.Any]) -> None:
-        """Clone data from another dict."""
-        for key in data:
-            self._data[key] = data[key]
-
-    @property
-    def user_data(self) -> ioc.Config.Data.Data:
-        """User provided defaults differing from the global defaults."""
-        return self._data.user_data
