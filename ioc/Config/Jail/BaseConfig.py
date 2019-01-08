@@ -532,10 +532,6 @@ class BaseConfig(dict):
         """Triggered when a special property was updated."""
         self.data[name] = str(self.special_properties[name])
 
-        if (name == "ip6_addr") and (self.jail is not None):
-            rc_conf = self.jail.rc_conf
-            rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
-
     def attach_special_property(
         self,
         name: str,
