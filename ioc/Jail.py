@@ -321,9 +321,7 @@ class JailGenerator(JailResource):
         self._relative_hook_script_dir = "/.iocage"
 
         if isinstance(data, str):
-            data = {
-                "id": data
-            }
+            data = dict(id=data)
 
         if "id" in data.keys():
             data["id"] = self._resolve_name(data["id"])
