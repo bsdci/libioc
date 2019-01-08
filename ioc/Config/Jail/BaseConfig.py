@@ -653,8 +653,7 @@ class BaseConfig(dict):
         """
         hash_before: typing.Any
         hash_after: typing.Any
-
-        existed_before = (key in self) is True
+        existed_before = (key in self.keys()) is True
 
         try:
             hash_before = str(self._getitem_user(key)).__hash__()
@@ -663,7 +662,7 @@ class BaseConfig(dict):
 
         self.__setitem__(key, value, skip_on_error=skip_on_error)  # noqa: T484
 
-        exists_after = key in self.keys()
+        exists_after = (key in self.keys()) is True
 
         try:
             hash_after = str(self._getitem_user(key)).__hash__()

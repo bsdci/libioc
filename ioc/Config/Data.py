@@ -78,11 +78,11 @@ class Data(dict):
                 dict.__setitem__(data, key, value)
                 return
             else:
-                keys = data.keys()
+                keys = dict.keys(data)
                 current, key = key.split(self.delimiter, maxsplit=1)
                 if current not in keys:
                     dict.__setitem__(data, current, Data())
-                    data = data[current]
+                data = data[current]
 
     def __contains__(self, key: typing.Any) -> bool:
         """Return whether a (nested) key is included in the dict."""
