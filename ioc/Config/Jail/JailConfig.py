@@ -56,6 +56,14 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         self.host = ioc.helpers_object.init_host(self, host)
         self.jail = jail
 
+    def update_special_property(self, name: str) -> None:
+        """Triggered when a special property was updated."""
+        super().update_special_property(name)
+
+        if (name == "ip6_addr") and (self.jail is not None):
+            rc_conf = self.jail.rc_conf
+            rc_conf["rtsold_enable"] = "accept_rtadv" in str(self["ip6_addr"])
+
     def _get_host_hostname(self) -> str:
         try:
             return str(self.data["host_hostname"])
