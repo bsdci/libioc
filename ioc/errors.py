@@ -486,19 +486,17 @@ class DefaultConfigNotFound(IocageException, FileNotFoundError):
         IocageException.__init__(self, message=msg, logger=logger)
 
 
-class UnknownJailConfigProperty(IocageException, KeyError):
+class UnknownConfigProperty(IocageException, KeyError):
     """Raised when a unknown jail config property was used."""
 
     def __init__(
         self,
         key: str,
-        jail: 'ioc.Jail.JailGenerator',
         logger: typing.Optional['ioc.Logger.Logger']=None,
         level: str="error"
     ) -> None:
         msg = (
-            f"The config property '{key}' "
-            f"of jail '{jail.humanreadable_name}' is unknown."
+            f"The config property '{key}' is unknown"
         )
         IocageException.__init__(self, message=msg, logger=logger, level=level)
 
