@@ -517,7 +517,7 @@ class BaseConfig(dict):
             if is_existing is True:
                 return self.special_properties.get_or_create(key)
             elif is_resource_limit is True:
-                return None
+                raise KeyError(f"Resource-Limit unconfigured: {key}")
 
         # data with mappings
         method_name = f"_get_{key}"
