@@ -134,6 +134,10 @@ class ResourceLimitValue:
         else:
             return self.limit_string
 
+    def __repr__(self) -> str:
+        """Return a string representation of the object."""
+        return f"<{self.__class__.__name__} {self.limit_string}>"
+
     @property
     def limit_string(self) -> str:
         """Return the limit string in rctl syntax."""
@@ -231,3 +235,8 @@ class ResourceLimitProp(ResourceLimitValue):
         if self.config is None:
             return
         self.config.update_special_property(self.property_name)
+
+    def __repr__(self) -> str:
+        """Return a string representation of the object."""
+        class_name = self.__class__.__name__
+        return f"<{class_name} {self.property_name}={self.limit_string}>"
