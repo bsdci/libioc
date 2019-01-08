@@ -412,4 +412,4 @@ class DefaultResource(Resource):
 
     def save(self) -> None:
         """Save changes to the default configuration."""
-        self._write_config(self.config.user_data)
+        self._write_config(self.config.user_data.nested)

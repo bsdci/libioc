@@ -26,6 +26,7 @@
 import typing
 import re
 
+import ioc.Config.Data
 import ioc.Config.Jail.Properties
 import ioc.errors
 import ioc.helpers
@@ -33,6 +34,14 @@ import ioc.helpers_object
 
 # mypy
 import ioc.Logger
+InputData = typing.Dict[str, typing.Union[
+    ioc.Config.Jail.Properties.Property,
+    str,
+    int,
+    bool,
+    typing.Dict[str, typing.Union[str, int, bool]]
+]]
+Data = ioc.Config.Data.Data
 
 
 class BaseConfig(dict):
@@ -69,7 +78,7 @@ class BaseConfig(dict):
 
     """
 
-    data: typing.Dict[str, typing.Any]
+    data: ioc.Config.Data.Data
     special_properties: 'ioc.Config.Jail.Properties.Properties'
 
     def __init__(
@@ -77,9 +86,7 @@ class BaseConfig(dict):
         logger: typing.Optional['ioc.Logger.Logger']=None
     ) -> None:
 
-        self.data = {}
-        dict.__init__(self)
-
+        self.data = ioc.Config.Data.Data()
         self.logger = ioc.helpers_object.init_logger(self, logger)
 
         Properties = ioc.Config.Jail.Properties.JailConfigProperties
@@ -90,13 +97,7 @@ class BaseConfig(dict):
 
     def clone(
         self,
-        data: typing.Dict[str, typing.Union[
-            ioc.Config.Jail.Properties.Property,
-            str,
-            int,
-            bool,
-            typing.Dict[str, typing.Union[str, int, bool]]
-        ]],
+        data: InputData,
         skip_on_error: bool=False
     ) -> None:
         """
@@ -113,33 +114,34 @@ class BaseConfig(dict):
                 Passed to __setitem__
 
         """
-        if len(data.keys()) == 0:
+        Data = ioc.Config.Data.Data
+        if isinstance(data, dict) and not isinstance(data, Data):
+            data = ioc.Config.Data.Data(dict(data))
+        keys = data.keys()
+        if len(keys) == 0:
             return
 
         # the name is used in many other variables and needs to be set first
         for key in ["id", "name", "uuid"]:
             if key in data.keys():
-                self["id"] = data[key]
+                data["id"] = data[key]
                 break
 
-        current_id = self["id"]
-        items = list(data.items())
-        while len(items) > 0:
-            key, value = items.pop()
+        try:
+            current_id = self.data["id"]
+        except KeyError:
+            current_id = None
 
-            if type(value) == dict:
-                _subitems = value.items()  # noqa: T484
-                items += [(f"{key}.{k}", v) for k, v in _subitems]
-                continue
+        # overwrite different identifiers with the detected current_id
+        if current_id is not None:
+            for key in ["id", "name", "uuid"]:
+                if key in keys:
+                    data[key] = current_id
 
-            if (key in ["id", "name", "uuid"]) and (current_id is not None):
-                value = current_id
-
-            self.__setitem__(  # noqa: T484
-                key,
-                value,
-                skip_on_error=skip_on_error
-            )
+        new_data = ioc.Config.Data.Data(data)
+        if current_id is not None:
+            new_data["id"] = current_id
+        self.data = new_data
 
     def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
@@ -278,7 +280,7 @@ class BaseConfig(dict):
 
     @property
     def _has_legacy_tag(self) -> bool:
-        return "tag" in self.data.keys()
+        return ("tag" in self.data.keys()) is True
 
     def _get_vnet_interfaces(self) -> typing.List[str]:
         return list(
@@ -507,16 +509,6 @@ class BaseConfig(dict):
 
     def _getitem_user(self, key: str) -> typing.Any:
 
-        # special property
-        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
-        if self.special_properties.is_special_property(key) is True:
-            is_existing = key in self.data.keys()
-            is_resource_limit = key in _rlimits
-            if is_existing is True:
-                return self.special_properties.get_or_create(key)
-            elif is_resource_limit is True:
-                return None
-
         # data with mappings
         method_name = f"_get_{key}"
         if method_name in dict.__dir__(self):
@@ -524,28 +516,7 @@ class BaseConfig(dict):
             return get_method()
 
         # plain data attribute
-        return self._get_data(key)
-
-    def _get_data(
-        self,
-        key: str
-    ) -> typing.Any:
-        data = self.data
-        keys = data.keys()
-        while True:
-            if "." not in key:
-                if key in keys:
-                    return data[key]
-                else:
-                    raise KeyError(f"User property not found: {key}")
-            else:
-                current, key = key.split(".", maxsplit=1)
-                if current not in keys:
-                    raise KeyError(f"User property not found: {current}")
-                data = data[current]
-                if isinstance(data, dict) is False:
-                    raise KeyError(f"User property is not nested: {current}")
-                keys = data.keys()
+        return self.data[key]
 
     def get(
         self,
@@ -585,24 +556,7 @@ class BaseConfig(dict):
 
     def __delitem__(self, key: str) -> None:
         """Delete a setting from the configuration."""
-        self.__deleteitem(key, self.data)
-
-    def __deleteitem(
-        self,
-        key: str,
-        data: typing.Dict[str, typing.Any]
-    ) -> None:
-        if "." in key:
-            current_key, rest_key = key.split(".", maxsplit=1)
-            self.__deleteitem(rest_key, data[current_key])
-
-            if len(data[current_key]) == 0:
-                # delete parent when it became empty
-                del data[current_key]
-
-            return
-
-        del data[key]
+        self.data.__delitem__(key)
 
     def __setitem__(  # noqa: T400
         self,
@@ -612,20 +566,8 @@ class BaseConfig(dict):
     ) -> None:
         """Set a configuration value."""
         try:
-            if self.special_properties.is_special_property(key):
-                special_property = self.special_properties.get_or_create(key)
-                special_property.set(value, skip_on_error=skip_on_error)
-                self.update_special_property(key)
-                return
-
             parsed_value = ioc.helpers.parse_user_input(value)
-            setter_method_name = f"_set_{key}"
-            if setter_method_name in object.__dir__(self):
-                setter_method = self.__getattribute__(setter_method_name)
-                setter_method(parsed_value)
-                return
-
-            self.__set_data(key, parsed_value)
+            self.data[key] = parsed_value
             error = None
         except ValueError as err:
             error = ioc.errors.InvalidJailConfigValue(
@@ -637,34 +579,6 @@ class BaseConfig(dict):
 
         if (error is not None) and (skip_on_error is False):
             raise error
-
-    def __set_data(
-        self,
-        key: str,
-        value: typing.Any,
-        data: typing.Optional[typing.Dict[str, typing.Any]]=None
-    ) -> None:
-
-        data = self.data if (data is None) else data
-        if "." not in key:
-            data[key] = value
-        else:
-            current_key, rest_key = key.split(".", maxsplit=1)
-            if current_key not in data.keys():
-                data[current_key] = dict()
-            self.__set_data(rest_key, value, data[current_key])
-
-    def update_special_property(self, name: str) -> None:
-        """Triggered when a special property was updated."""
-        self.data[name] = str(self.special_properties[name])
-
-    def attach_special_property(
-        self,
-        name: str,
-        special_property: 'ioc.Config.Jail.Properties.Property'
-    ) -> None:
-        """Attach a special property to the configuration."""
-        self.special_properties[name] = special_property
 
     def set(  # noqa: T484
         self,
@@ -693,7 +607,7 @@ class BaseConfig(dict):
         hash_before: typing.Any
         hash_after: typing.Any
 
-        existed_before = key in self.keys()
+        existed_before = (key in self) is True
 
         try:
             hash_before = str(self._getitem_user(key)).__hash__()
@@ -716,7 +630,7 @@ class BaseConfig(dict):
 
     def __str__(self) -> str:
         """Return the JSON object with all user configured settings."""
-        return str(ioc.helpers.to_json(self.data))
+        return str(ioc.helpers.to_json(self.data.nested))
 
     def __repr__(self) -> str:
         """Return the confgured settings in human and robot friendly format."""
@@ -734,30 +648,29 @@ class BaseConfig(dict):
 
     def keys(self) -> typing.KeysView[str]:
         """Return the available configuration keys."""
-        return dict.keys(dict(self.items()))
+        return typing.cast(typing.KeysView[typing.Any], self.data.keys())
 
     def values(self) -> typing.ValuesView[typing.Any]:
         """Return all config values."""
-        return dict.values(dict(self.items()))
+        return typing.cast(typing.ValuesView[typing.Any], self.data.values())
 
     def items(self) -> typing.ItemsView[str, typing.Any]:
         """Return the combined config properties."""
-        out: typing.Dict[str, typing.Any] = {}
+        return typing.cast(
+            typing.ItemsView[str, typing.Any],
+            self.data.items()
+        )
 
-        items = list(self.data.items())
-
-        while len(items) > 0:
-            key, value = items.pop()
-            if type(value) == dict:
-                items += [(f"{key}.{k}", v) for k, v in value.items()]
-            else:
-                out[key] = value
-
-        return dict.items(out)
+    def __contains__(self, key: typing.Any) -> bool:
+        """Return whether a (nested) key is included in the dict."""
+        return (self.data.__contains__(key) is True)
 
     def __iter__(self) -> typing.Iterator[str]:
         """Return the combined config properties."""
-        return self.data.__iter__()
+        return typing.cast(
+            typing.Iterator[str],
+            self.data.__iter__()
+        )
 
     def __len__(self) -> int:
         """Return the number of user configuration properties."""
