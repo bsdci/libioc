@@ -115,7 +115,6 @@ class BaseConfig(dict):
                 Passed to __setitem__
 
         """
-        Data = ioc.Config.Data.Data
         if isinstance(data, dict) and not isinstance(data, Data):
             data = ioc.Config.Data.Data(dict(data))
         keys = data.keys()
