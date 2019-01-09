@@ -183,11 +183,11 @@ class ResourceLimitProp(ResourceLimitValue):
 
     def __update_from_config(self) -> None:
         name = self.property_name
-        if (self.config is None) or (name not in self.config.data.keys()):
+        if (self.config is None) or (name not in self.config):
             self.set(None)
         else:
             self.set(
-                self.config.data[self.property_name]
+                self.config.get_raw(self.property_name)
             )
 
     def set(
@@ -204,8 +204,8 @@ class ResourceLimitProp(ResourceLimitValue):
         if data is None:
             name = self.property_name
             config = self.config
-            if (config is not None) and (name in config.data.keys()):
-                config.data.__delitem__(name)
+            if (config is not None) and (name in config):
+                del config[name]
             amount = None
             action = None
             per = None

@@ -133,6 +133,16 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
         for key in data:
             self.user_data[key] = data[key]
 
+    def _getitem_special_property(
+        self,
+        key: str,
+        data: ioc.Config.Data.Data
+    ) -> ioc.Config.Jail.Properties.Property:
+        try:
+            return super()._getitem_special_property(key, data)
+        except KeyError:
+            return super()._getitem_special_property(key, DEFAULTS)
+
     def __getitem__(self, key: str) -> typing.Any:
         """Return a user provided value or the hardcoded default."""
         try:
@@ -141,6 +151,10 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
             pass
 
         return self.getitem_default(key)
+
+    def __contains__(self, key: typing.Any) -> bool:
+        """Return true if the storage or hardcoded defaults contain the key."""
+        return ((key in self.user_data) or (key in DEFAULTS)) is True
 
     def getitem_default(self, key: str) -> typing.Any:
         """Return the interpreted hardcoded default value."""

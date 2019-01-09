@@ -107,6 +107,13 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
             # mixed with user defaults
             return self.host.defaults.config[key]
 
+    def get_raw(self, key: str) -> typing.Any:
+        """Return the raw data value or its raw default."""
+        self._require_known_config_property(key)
+        if key in self.data:
+            return self.data[key]
+        return self.host.defaults.config[key]
+
     @property
     def all_properties(self) -> list:
         """Return a list of all config properties (default and custom)."""

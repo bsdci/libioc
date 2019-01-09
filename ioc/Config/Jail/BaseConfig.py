@@ -536,6 +536,24 @@ class BaseConfig(dict):
                 raise
             return args[0]
 
+    def get_raw(self, key: str) -> typing.Any:
+        """Return the raw data value."""
+        return self.data[key]
+
+    def _getitem_special_property(
+        self,
+        key: str,
+        data: ioc.Config.Data.Data
+    ) -> ioc.Config.Jail.Properties.Property:
+        if key in self:
+            special_property = self.special_properties.get_or_create(key)
+            special_property.set(data[key], skip_on_error=False)
+            return special_property
+        elif key in ioc.Config.Jail.Properties.ResourceLimit.properties:
+            raise KeyError(f"Resource-Limit unconfigured: {key}")
+        else:
+            raise KeyError(f"Special Property unconfigured: {key}")
+
     def __getitem__(self, key: str) -> typing.Any:
         """
         Get the user configured value of a jail configuration property.
@@ -548,21 +566,11 @@ class BaseConfig(dict):
 
         A KeyError is raised when no criteria applies.
         """
-        if self._is_known_property(key) is False:
-            raise ioc.errors.UnknownConfigProperty(
-                key=key,
-                logger=self.logger
-            )
+        self._require_known_config_property(key)
 
         # special property
-        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
         if self.special_properties.is_special_property(key) is True:
-            is_existing = key in self.data.keys()
-            is_resource_limit = key in _rlimits
-            if is_existing is True:
-                return self.special_properties.get_or_create(key)
-            elif is_resource_limit is True:
-                raise KeyError(f"Resource-Limit unconfigured: {key}")
+            return self._getitem_special_property(key, self.data)
 
         # data with mappings
         method_name = f"_get_{key}"
@@ -760,6 +768,13 @@ class BaseConfig(dict):
         """Stringify user supplied values."""
         parsed_input = ioc.helpers.parse_user_input(value)
         return str(ioc.helpers.to_string(parsed_input))
+
+    def _require_known_config_property(self, key: str) -> None:
+        if self._is_known_property(key) is False:
+            raise ioc.errors.UnknownConfigProperty(
+                key=key,
+                logger=self.logger
+            )
 
 
 class JailConfigList(list):

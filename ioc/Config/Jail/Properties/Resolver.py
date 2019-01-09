@@ -79,7 +79,7 @@ class ResolverProp(collections.MutableSequence):
     @property
     def value(self) -> typing.Optional[str]:
         """Return the raw configuration string or None."""
-        value = self.config.data["resolver"]
+        value = self.config.get_raw("resolver")
         try:
             ioc.helpers.parse_none(value, self.none_matches)
             return None
@@ -162,7 +162,7 @@ class ResolverProp(collections.MutableSequence):
                 )
         elif method == "skip":
             # directly set config property
-            self.config.data["resolver"] = None
+            self.config.get_raw["resolver"] = None
         else:
             if isinstance(value, str):
                 self.append(str(value), notify=False)
