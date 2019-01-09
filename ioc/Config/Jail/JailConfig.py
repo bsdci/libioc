@@ -37,7 +37,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
     legacy: bool = False
     jail: typing.Optional['ioc.Jail.JailGenerator']
     data: dict = {}
-    ignore_user_defaults: bool
+    ignore_source_config: bool
 
     def __init__(
         self,
@@ -47,7 +47,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
         host: typing.Optional['ioc.Host.HostGenerator']=None
     ) -> None:
 
-        self.ignore_user_defaults = False
+        self.ignore_source_config = False
         ioc.Config.Jail.BaseConfig.BaseConfig.__init__(
             self,
             logger=logger
@@ -90,24 +90,22 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
             skip_on_error=skip_on_error
         )
 
-    def _getitem_user(self, key: str) -> typing.Any:
-
-        return BaseConfig._getitem_user(
-            self,
-            key=key
-        )
-
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""
         try:
             return super().__getitem__(key)
+        except ioc.errors.UnknownConfigProperty:
+            raise
         except KeyError:
-            if self.ignore_user_defaults is True:
-                raise
             pass
 
         # fall back to default
-        return self.host.defaults.config[key]
+        if self.ignore_source_config is True:
+            # only hardcoded defaults
+            return self.host.defaults.config.getitem_default(key)
+        else:
+            # mixed with user defaults
+            return self.host.defaults.config[key]
 
     @property
     def all_properties(self) -> list:

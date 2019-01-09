@@ -136,10 +136,14 @@ class JailConfigDefaults(ioc.Config.Jail.BaseConfig.BaseConfig):
     def __getitem__(self, key: str) -> typing.Any:
         """Return a user provided value or the hardcoded default."""
         try:
-            return self._getitem_user(key)
+            return super().__getitem__(key)
         except KeyError:
             pass
 
+        return self.getitem_default(key)
+
+    def getitem_default(self, key: str) -> typing.Any:
+        """Return the interpreted hardcoded default value."""
         try:
             return DEFAULTS.__getitem__(key)
         except KeyError:
