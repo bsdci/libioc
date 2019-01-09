@@ -222,12 +222,11 @@ class JailResource(
     def get(self, key: str) -> typing.Any:
         """Get a config value from the jail or defer to its resource."""
         try:
-            out = self.jail.config[key]
-            return out
-        except KeyError:
+            return ioc.Resource.Resource.get(self, key)
+        except AttributeError:
             pass
 
-        return ioc.Resource.Resource.get(self, key)
+        return self.jail.config[key]
 
 
 class JailGenerator(JailResource):
