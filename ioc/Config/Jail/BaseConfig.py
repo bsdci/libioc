@@ -507,26 +507,6 @@ class BaseConfig(dict):
         """Get the stringified value of a configuration property."""
         return self.stringify(self.__getitem__(key))
 
-    def _getitem_user(self, key: str) -> typing.Any:
-        # special property
-        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
-        if self.special_properties.is_special_property(key) is True:
-            is_existing = key in self.data.keys()
-            is_resource_limit = key in _rlimits
-            if is_existing is True:
-                return self.special_properties.get_or_create(key)
-            elif is_resource_limit is True:
-                raise KeyError(f"Resource-Limit unconfigured: {key}")
-
-        # data with mappings
-        method_name = f"_get_{key}"
-        if method_name in dict.__dir__(self):
-            get_method = self.__getattribute__(method_name)
-            return get_method()
-
-        # plain data attribute
-        return self.data[key]
-
     def update_special_property(self, name: str) -> None:
         """Triggered when a special property was updated."""
         self.data[name] = str(self.special_properties[name])
@@ -568,12 +548,30 @@ class BaseConfig(dict):
 
         A KeyError is raised when no criteria applies.
         """
-        try:
-            return self._getitem_user(key)
-        except (KeyError, TypeError):
-            pass
+        if self._is_known_property(key) is False:
+            raise ioc.errors.UnknownConfigProperty(
+                key=key,
+                logger=self.logger
+            )
 
-        raise KeyError(f"Item not found: {key}")
+        # special property
+        _rlimits = ioc.Config.Jail.Properties.ResourceLimit.properties
+        if self.special_properties.is_special_property(key) is True:
+            is_existing = key in self.data.keys()
+            is_resource_limit = key in _rlimits
+            if is_existing is True:
+                return self.special_properties.get_or_create(key)
+            elif is_resource_limit is True:
+                raise KeyError(f"Resource-Limit unconfigured: {key}")
+
+        # data with mappings
+        method_name = f"_get_{key}"
+        if method_name in dict.__dir__(self):
+            get_method = self.__getattribute__(method_name)
+            return get_method()
+
+        # plain data attribute
+        return self.data[key]
 
     def __delitem__(self, key: str) -> None:
         """Delete a setting from the configuration."""
@@ -651,7 +649,7 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
-            hash_before = str(self._getitem_user(key)).__hash__()
+            hash_before = str(self.__getitem__(key)).__hash__()
         except Exception:
             hash_before = None
 
@@ -660,7 +658,7 @@ class BaseConfig(dict):
         exists_after = (key in self.keys()) is True
 
         try:
-            hash_after = str(self._getitem_user(key)).__hash__()
+            hash_after = str(self.__getitem__(key)).__hash__()
         except Exception:
             hash_after = None
 
@@ -738,7 +736,7 @@ class BaseConfig(dict):
         return (fragments[0] in self["interfaces"].keys()) is True
 
     def _is_user_property(self, key: str) -> bool:
-        return key.startswith("user.") is True
+        return (key == "user") or (key.startswith("user.") is True)
 
     def _is_known_property(self, key: str) -> bool:
         if key in ioc.Config.Jail.Defaults.DEFAULTS.keys():
