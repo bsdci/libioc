@@ -739,6 +739,7 @@ class BaseConfig(dict):
         return (key == "user") or (key.startswith("user.") is True)
 
     def _is_known_property(self, key: str) -> bool:
+        """Return True when the key is a known config property."""
         if key in ioc.Config.Jail.Defaults.DEFAULTS.keys():
             return True  # key is default
         if f"_set_{key}" in dict.__dir__(self):

@@ -343,7 +343,7 @@ class Resource(metaclass=abc.ABCMeta):
         try:
             return self.__getattribute__(key)
         except AttributeError:
-            return None
+            raise
 
     def getstring(self, key: str) -> str:
         """
