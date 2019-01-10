@@ -1628,6 +1628,11 @@ class JailGenerator(JailResource):
                         f"add path {current_dataset_name}/* unhide"
                     )
 
+        if self.config["allow_vmm"] is True:
+            devfs_ruleset.append("add path vmm unhide")
+            devfs_ruleset.append("add path vmm/* unhide")
+            devfs_ruleset.append("add path nmdm* unhide")
+
         # create if the final rule combination does not exist as ruleset
         if devfs_ruleset not in self.host.devfs:
             self.logger.verbose("New devfs ruleset combination")
