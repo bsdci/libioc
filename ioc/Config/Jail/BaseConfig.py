@@ -362,7 +362,7 @@ class BaseConfig(dict):
         self.data["clonejail"] = self.stringify(value)
 
     def _get_template(self) -> bool:
-        return self.data.get("template", False) is True
+        return ioc.helpers.parse_bool(self.data.get("template", False)) is True
 
     def _set_template(
         self,
