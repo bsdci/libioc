@@ -1700,6 +1700,7 @@ class JailGenerator(JailResource):
             f"allow.mount.zfs={self._allow_mount_zfs}",
             f"allow.quotas={self._get_value('allow_quotas')}",
             f"allow.socket_af={self._get_value('allow_socket_af')}",
+            f"allow.vmm={self._get_value('allow_vmm')}",
             f"exec.timeout={self._get_value('exec_timeout')}",
             f"stop.timeout={self._get_value('stop_timeout')}",
             f"mount.fstab={self.fstab.path}",

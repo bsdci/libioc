@@ -72,6 +72,7 @@ DEFAULTS = libioc.Config.Data.Data({
     "allow_mount_tmpfs": 0,
     "allow_quotas": 0,
     "allow_socket_af": 0,
+    "allow_vmm": False,
     "rlimits": None,
     "sysvmsg": "new",
     "sysvsem": "new",
