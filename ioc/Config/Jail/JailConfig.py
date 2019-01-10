@@ -32,7 +32,11 @@ BaseConfig = ioc.Config.Jail.BaseConfig.BaseConfig
 
 
 class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
-    """The configuration of a Jail or other LaunchableResource."""
+    """
+    The configuration of a Jail or other LaunchableResource.
+
+    In extend to a BasicConfig a JailConfig 
+    """
 
     legacy: bool = False
     jail: typing.Optional['ioc.Jail.JailGenerator']
@@ -75,20 +79,6 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
 
     def _get_legacy(self) -> bool:
         return self.legacy
-
-    def __setitem__(
-        self,
-        key: str,
-        value: typing.Any,
-        skip_on_error: bool=False
-    ) -> None:
-        """Set a configuration value."""
-        BaseConfig.__setitem__(
-            self,
-            key=key,
-            value=value,
-            skip_on_error=skip_on_error
-        )
 
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""
