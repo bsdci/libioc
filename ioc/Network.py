@@ -51,7 +51,7 @@ class Network:
     and an optional MTU.
     """
 
-    bridge: typing.Optional['ioc.BridgeInterface.BridgeInterface']
+    bridge: typing.Optional[ioc.BridgeInterface.BridgeInterface]
     nic: str = "vnet0"
     _nic_hash_cache: typing.Dict[str, str]
     _mtu: typing.Optional[int]
@@ -166,14 +166,14 @@ class Network:
     @property
     def __autodetected_bridge_mtu(self) -> int:
         self.__require_bridge()
-        bridge_name = str(self.bridge)
+        bridge = self.bridge  # type: ioc.BridgeInterface.BridgeInterface
         try:
-            mtu = int(ioc.helpers_ioctl.get_interface_mtu(bridge_name))
-            self.logger.debug(f"Bridge {bridge_name} MTU detected: {mtu}")
+            mtu = int(ioc.helpers_ioctl.get_interface_mtu(bridge.name))
+            self.logger.debug(f"Bridge {bridge.name} MTU detected: {mtu}")
         except OSError:
-            self.logger.debug(f"Bridge {bridge_name} MTU detection failed")
+            self.logger.debug(f"Bridge {bridge.name} MTU detection failed")
             raise ioc.errors.VnetBridgeDoesNotExist(
-                bridge_name=bridge_name,
+                bridge_name=bridge.name,
                 logger=self.logger
             )
         self._mtu = mtu
