@@ -262,7 +262,9 @@ class AddressesProp(dict):
             notify=False,
             skip_on_error=skip_on_error
         )
-        self.__notify()
+
+        if notify is True:
+            self.__notify()
 
     @property
     def networks(self) -> typing.List[str]:
