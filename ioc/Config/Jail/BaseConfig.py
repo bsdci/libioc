@@ -559,7 +559,6 @@ class BaseConfig(dict):
         Get the user configured value of a jail configuration property.
 
         The lookup order of such values is:
-            - native attributes
             - special properties
             - _get_{key} methods
             - plain data keys (without special processing)
