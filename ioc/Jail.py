@@ -2170,7 +2170,7 @@ class JailGenerator(JailResource):
 
         for prop in self.config.all_properties:
             prop_name = f"IOCAGE_{prop.replace('.', '_').upper()}"
-            jail_env[prop_name] = self.getstring(prop)
+            jail_env[prop_name] = str(self.config[prop])
 
         jail_env["IOCAGE_JAIL_PATH"] = self.root_dataset.mountpoint
         jail_env["IOCAGE_JID"] = str(self.jid)
