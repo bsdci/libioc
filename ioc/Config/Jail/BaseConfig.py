@@ -726,11 +726,9 @@ class BaseConfig(dict):
     @property
     def all_properties(self) -> typing.List[str]:
         """Return a list of config object attributes."""
-        properties: typing.Set[str] = set()
-        properties = properties.union(self.keys())
+        properties: typing.Set[str] = set(self.keys())
         special_properties = ioc.Config.Jail.Properties.properties
-        properties = properties.union(special_properties)
-        return list(properties)
+        return list(properties.union(special_properties))
 
     def _key_is_mac_config(self, key: str, explicit: bool=False) -> bool:
         fragments = key.rsplit("_", maxsplit=1)
