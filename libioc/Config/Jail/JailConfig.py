@@ -26,6 +26,7 @@
 import typing
 
 import libioc.helpers_object
+import libioc.Config.Jail.Defaults
 import libioc.Config.Jail.BaseConfig
 
 BaseConfig = libioc.Config.Jail.BaseConfig.BaseConfig
@@ -96,6 +97,45 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
         else:
             # mixed with user defaults
             return self.host.defaults.config[key]
+
+    def __setitem__(  # noqa: T400
+        self,
+        key: str,
+        value: typing.Any,
+        skip_on_error: bool=False
+    ) -> None:
+        """
+        Normalize and set values to the configuration.
+
+        The type if the value defined in hardcoded defaults constraints the
+        accepted input.
+        """
+        super().__setitem__(
+            key=key,
+            value=self.__sanitize_value(key, value),
+            skip_on_error=skip_on_error
+        )
+
+    def __sanitize_value(self, key: str, value: typing.Any) -> typing.Any:
+        """Sanitize the value type to the same found in hardcoded defaults."""
+        try:
+            default_type = self.__get_default_type(key)
+        except KeyError:
+            return value
+
+        if default_type == list:
+            return ioc.helpers.parse_list(value)
+        elif default_type == str:
+            return str(value)
+        elif default_type == bool:
+            return ioc.helpers.parse_bool(value)
+        elif default_type == int:
+            return ioc.helpers.parse_int(value)
+
+        return value
+
+    def __get_default_type(self, key: str) -> typing.Optional[type]:
+        return type(ioc.Config.Jail.Defaults.DEFAULTS[key])
 
     def get_raw(self, key: str) -> typing.Any:
         """Return the raw data value or its raw default."""
