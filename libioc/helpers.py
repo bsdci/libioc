@@ -260,6 +260,37 @@ def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
     raise TypeError("Value is not a boolean")
 
 
+def parse_int(data: typing.Optional[typing.Union[str, int]]) -> int:
+    """
+    Try to parse integer from strings.
+
+    On success, it returns the parsed integer on failure it raises a TypeError.
+
+    Usage:
+        >>> parse_int("-1")
+        -1
+        >>> parse_int(3)
+        3
+        >>> parse_int(None)
+        TypeError: None is not a number
+        >>> parse_int("invalid")
+        TypeError: Value is not an integer: invalid
+        >>> parse_int(5.0)
+        5
+        >>> parse_int(5.1)
+        TypeError: Value is not an integer: 5.1
+    """
+    if data is None:
+        raise TypeError("None is not a number")
+    try:
+        if isinstance(data, float) and (float(data).is_integer() is False):
+            raise ValueError
+        return int(data)
+    except ValueError:
+        pass
+    raise TypeError(f"Value is not an integer: {data}")
+
+
 def parse_user_input(
     data: typing.Optional[typing.Union[str, bool]]
 ) -> typing.Optional[typing.Union[str, bool]]:
