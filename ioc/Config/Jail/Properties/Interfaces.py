@@ -70,7 +70,10 @@ class InterfaceProp(dict):
             dict.__init__(self, data)
             return
 
-        nic_pairs = data.replace(",", " ").split(" ")
+        if isinstance(data, list):
+            nic_pairs = data
+        else:
+            nic_pairs = data.replace(",", " ").split(" ")
 
         if not all([(":" in nic_pair) for nic_pair in nic_pairs]):
             e = ioc.errors.InvalidJailConfigValue(
