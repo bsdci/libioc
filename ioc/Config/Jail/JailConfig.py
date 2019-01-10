@@ -35,7 +35,7 @@ class JailConfig(ioc.Config.Jail.BaseConfig.BaseConfig):
     """
     The configuration of a Jail or other LaunchableResource.
 
-    In extend to a BasicConfig a JailConfig 
+    In extend to a BaseConfig a JailConfig is related to a Jail.
     """
 
     legacy: bool = False
