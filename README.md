@@ -45,9 +45,9 @@ Operations can be pointed to an alternative root by prefixing the subject with t
 
 ```python
 import ioc
-release = ioc.Release("12.0-RELEASE")
+release = libioc.Release("12.0-RELEASE")
 
-jail_a = ioc.Jail(new=True, {})
+jail_a = libioc.Jail(new=True, {})
 ioc create othersource/myjail
 ioc rename othersource/myjail myjail2
 ```
@@ -61,7 +61,7 @@ When `othersource` is the only datasource with a jail named `myjail` the above o
 ```python
 import ioc
 
-jail = ioc.Jail()
+jail = libioc.Jail()
 jail.create("11.1-RELEASE")
 ```
 

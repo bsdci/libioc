@@ -22,42 +22,27 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
-import typing
-import libzfs
-
-import libioc.lib
+"""iocage standalone jail storage backend."""
+import libioc.Storage
 
 
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
+class StandaloneJailStorage(libioc.Storage.Storage):
+    """iocage standalone jail storage backend."""
 
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
-
-
-class TestDatasets(object):
-    """Run Datasets unit tests."""
-
-    @pytest.fixture
-    def MockedDatasets(
+    def apply(
         self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
-
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
-
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
+        release: 'libioc.Release.ReleaseGenerator'
     ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+        """Attach the jail storage."""
+        self.logger.warn(
+            "Standalone jails do not require storage operations to start",
+            jail=self.jail
+        )
+
+    def setup(
+        self,
+        resource: 'libioc.Resource.Resource'
+    ) -> None:
+        """Configure the jail storage."""
+        self.logger.verbose("Cloning the release once to the root dataset")
+        self.clone_resource(resource)

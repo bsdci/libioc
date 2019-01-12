@@ -22,42 +22,36 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
+"""iocage configuration stored in an UCL file."""
 import typing
-import libzfs
 
-import libioc.lib
-
-
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
-
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+import libioc.Config
+import libioc.Config.Prototype
+import libioc.Config.Dataset
+import libioc.errors
 
 
-class TestDatasets(object):
-    """Run Datasets unit tests."""
+class ConfigUCL(libioc.Config.Prototype.Prototype):
+    """iocage configuration stored in an UCL file."""
 
-    @pytest.fixture
-    def MockedDatasets(
-        self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
+    config_type = "ucl"
 
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
+    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        """Normalize data read from the UCL file."""
+        import ucl
+        result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
+        result["legacy"] = True
+        return result
 
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
-    ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+    def map_output(self, data: dict) -> str:
+        """Output configuration in UCL format."""
+        return str(libioc.helpers.to_ucl(data))
+
+
+class DatasetConfigUCL(
+    libioc.Config.Dataset.DatasetConfig,
+    ConfigUCL
+):
+    """ResourceConfig in UCL format."""
+
+    pass

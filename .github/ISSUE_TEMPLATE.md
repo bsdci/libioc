@@ -1,6 +1,6 @@
 Make sure to follow and check these boxes before submitting an issue! Thank you.
 
-- [ ] Supply `print(ioc.VERSION)`
+- [ ] Supply `print(libioc.VERSION)`
 - [ ] Supply the commands used, along with any steps to recreate it.
 - [ ] Provide the output from the command you issued.
 - [ ] Supply what you expected the result or output to be

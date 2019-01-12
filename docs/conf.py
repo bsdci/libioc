@@ -14,7 +14,7 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, '/usr/local/src/libioc/iocage')
+# sys.path.insert(0, '/usr/local/src/libioc/libioc')
 import sphinx.apidoc
 import os.path
 from datetime import datetime

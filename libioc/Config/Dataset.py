@@ -22,42 +22,46 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
-import typing
+"""iocage configuration associated with ZFS datasets."""
+import os.path
 import libzfs
+import typing
 
-import libioc.lib
-
-
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
-
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+import libioc.Config.Prototype
 
 
-class TestDatasets(object):
-    """Run Datasets unit tests."""
+class DatasetConfig(libioc.Config.Prototype.Prototype):
+    """iocage configuration associated with ZFS datasets."""
 
-    @pytest.fixture
-    def MockedDatasets(
+    _dataset: libzfs.ZFSDataset
+
+    def __init__(
         self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
-
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
-
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
+        dataset: typing.Optional[libzfs.ZFSDataset]=None,
+        file: typing.Optional[str]=None,
+        logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+
+        if dataset is not None:
+            self._dataset = dataset
+
+        libioc.Config.Prototype.Prototype.__init__(
+            self,
+            file=file,
+            logger=logger
+        )
+
+    @property
+    def dataset(self) -> libzfs.ZFSDataset:
+        """Get the configured dataset."""
+        return self._dataset
+
+    @property
+    def file(self) -> str:
+        """Get the absolute path to the config file."""
+        return str(os.path.join(self.dataset.mountpoint, self._file))
+
+    @file.setter
+    def file(self, value: str) -> None:
+        """Set the relative path of the config file."""
+        self._file = value

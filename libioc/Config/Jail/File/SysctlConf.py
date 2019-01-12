@@ -22,42 +22,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
-import typing
-import libzfs
+"""Manage sysctl.conf files."""
+import libioc.helpers
+import libioc.Config.Jail.File
 
-import libioc.lib
-
-
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
-
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+# MyPy
+import libioc.Logger
 
 
-class TestDatasets(object):
-    """Run Datasets unit tests."""
+class SysctlConf(libioc.Config.Jail.File.ResourceConfigFile):
+    """Abstract the sysctl.conf file."""
 
-    @pytest.fixture
-    def MockedDatasets(
-        self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
-
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
-
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
-    ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+    _file: str = "/etc/sysctl.conf"

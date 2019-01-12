@@ -22,42 +22,37 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
+"""iocage configuration stored in a JSON file."""
 import typing
-import libzfs
+import json
 
-import libioc.lib
-
-
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
-
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+import libioc.Config
+import libioc.Config.Prototype
+import libioc.Config.Dataset
+import libioc.helpers
 
 
-class TestDatasets(object):
-    """Run Datasets unit tests."""
+class ConfigJSON(libioc.Config.Prototype.Prototype):
+    """iocage configuration stored in a JSON file."""
 
-    @pytest.fixture
-    def MockedDatasets(
-        self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
+    config_type = "json"
 
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
+    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+        """Parse and normalize JSON data."""
+        if data == "":
+            return {}
+        result = json.load(data)  # type: typing.Dict[str, typing.Any]
+        return result
 
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
-    ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+    def map_output(self, data: dict) -> str:
+        """Output configuration data as JSON string."""
+        return str(libioc.helpers.to_json(data))
+
+
+class DatasetConfigJSON(
+    libioc.Config.Dataset.DatasetConfig,
+    ConfigJSON
+):
+    """ResourceConfig in JSON format."""
+
+    pass

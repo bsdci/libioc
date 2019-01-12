@@ -22,42 +22,34 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Unit tests for Datasets."""
-import pytest
-import typing
-import libzfs
+"""Collection of iocage Python decorators."""
+import functools
+import time
 
-import libioc.lib
-
-
-class DatasetsMock(libioc.Datasets.Datasets):
-    """Mock the database."""
-
-    ZFS_POOL_ACTIVE_PROPERTY = "org.freebsd.ioc-test:active"
+import libioc.helpers
 
 
-class TestDatasets(object):
-    """Run Datasets unit tests."""
+def json(fn):
+    """Return the functions output as JSON string."""
+    @functools.wraps(fn)
+    def wrapped(*args, **kwargs):  # noqa: T484
+        return libioc.helpers.to_json(fn(*args, **kwargs))
+    return wrapped
 
-    @pytest.fixture
-    def MockedDatasets(
-        self,
-        logger: 'libioc.Logger.Logger',
-        pool: libzfs.ZFSPool
-    ) -> typing.Generator[DatasetsMock, None, None]:
-        """Mock a dataset in a disabled pool."""
-        yield DatasetsMock  # noqa: T484
 
-        prop = DatasetsMock.ZFS_POOL_ACTIVE_PROPERTY
-        pool.root_dataset.properties[prop].value = "no"
-
-    def test_pool_can_be_activated(
-        self,
-        MockedDatasets: typing.Generator[DatasetsMock, None, None],
-        pool: libzfs.ZFSPool,
-        logger: 'libioc.Logger.Logger'
-    ) -> None:
-        """Test if a pool can be activated."""
-        datasets = DatasetsMock(pool=pool, logger=logger)
-        datasets.deactivate()
-        datasets.activate(mountpoint="/iocage-test")
+def timeit(fn):
+    """Measure and print the functions execution time."""
+    @functools.wraps(fn)
+    def wrapped(*args, **kwargs):  # noqa: T484
+        startTime = time.time()
+        try:
+            output = fn(*args, **kwargs)
+            error = None
+        except Exception as err:
+            error = err
+        elapsedTime = (time.time() - startTime) * 1000
+        print(f"function [{fn.__qualname__}] finished in {elapsedTime} ms")
+        if error is not None:
+            raise error
+        return output
+    return wrapped

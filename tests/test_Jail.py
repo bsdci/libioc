@@ -30,7 +30,7 @@ import helper_functions
 import pytest
 import libzfs
 
-import ioc.Jail
+import libioc.Jail
 
 
 def read_jail_config_json(config_file: str) -> dict:
@@ -45,11 +45,11 @@ class TestJail(object):
     @pytest.fixture
     def local_release(
         self,
-        release: 'ioc.Release.ReleaseGenerator',
+        release: 'libioc.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
         zfs: libzfs.ZFS
-    ) -> 'ioc.Release.ReleaseGenerator':
+    ) -> 'libioc.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
             release.fetch()
@@ -64,14 +64,14 @@ class TestJail(object):
 
     def test_can_be_created(
         self,
-        host: 'ioc.Host.Host',
-        local_release: 'ioc.Release.ReleaseGenerator',
-        logger: 'ioc.Logger.Logger',
+        host: 'libioc.Host.Host',
+        local_release: 'libioc.Release.ReleaseGenerator',
+        logger: 'libioc.Logger.Logger',
         zfs: libzfs.ZFS,
         root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if jails can be created."""
-        jail = ioc.Jail.Jail(
+        jail = libioc.Jail.Jail(
             dict(id="foobar"),
             new=True,
             host=host,
@@ -118,11 +118,11 @@ class TestNullFSBasejail(object):
     @pytest.fixture
     def local_release(
         self,
-        release: 'ioc.Release.ReleaseGenerator',
+        release: 'libioc.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
         force_clean: bool,
         zfs: libzfs.ZFS
-    ) -> 'ioc.Release.ReleaseGenerator':
+    ) -> 'libioc.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
             release.fetch()
@@ -137,14 +137,14 @@ class TestNullFSBasejail(object):
 
     def test_can_be_created(
         self,
-        host: 'ioc.Host.Host',
-        local_release: 'ioc.Release.ReleaseGenerator',
-        logger: 'ioc.Logger.Logger',
+        host: 'libioc.Host.Host',
+        local_release: 'libioc.Release.ReleaseGenerator',
+        logger: 'libioc.Logger.Logger',
         zfs: libzfs.ZFS,
         root_dataset: libzfs.ZFSDataset
     ) -> None:
         """Test if NullFS basejails can be created."""
-        jail = ioc.Jail.Jail(
+        jail = libioc.Jail.Jail(
             {
                 "basejail": True
             },

@@ -28,9 +28,9 @@ import helper_functions
 import libzfs
 import pytest
 
-import ioc.Host
-import ioc.Logger
-import ioc.Release
+import libioc.Host
+import libioc.Logger
+import libioc.Release
 
 # Inject lib directory to path
 # iocage_lib_dir = os.path.abspath(os.path.join(
@@ -78,7 +78,7 @@ def zfs() -> libzfs.ZFS:
 def pool(
     request: typing.Any,
     zfs: libzfs.ZFS,
-    logger: 'ioc.Logger.Logger'
+    logger: 'libioc.Logger.Logger'
 ) -> libzfs.ZFSPool:
     """Find the active iocage pool."""
     requested_pool = request.config.getoption("--zpool")
@@ -95,7 +95,7 @@ def pool(
         lambda pool: (pool.name == requested_pool),
         zfs.pools
     ))[0]
-    datasets = ioc.Datasets.Datasets(
+    datasets = libioc.Datasets.Datasets(
         pool=target_pool,
         zfs=zfs,
         logger=logger
@@ -107,9 +107,9 @@ def pool(
 
 
 @pytest.fixture
-def logger() -> 'ioc.Logger.Logger':
+def logger() -> 'libioc.Logger.Logger':
     """Make the iocage Logger available to the tests."""
-    return ioc.Logger.Logger()
+    return libioc.Logger.Logger()
 
 
 @pytest.fixture
@@ -147,11 +147,11 @@ def root_dataset(
 @pytest.fixture
 def host(
     root_dataset: libzfs.ZFSDataset,
-    logger: 'ioc.Logger.Logger',
+    logger: 'libioc.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'ioc.Host.HostGenerator':
-    """Make the ioc.Host available to the tests."""
-    host = ioc.Host.Host(
+) -> 'libioc.Host.HostGenerator':
+    """Make the libioc.Host available to the tests."""
+    host = libioc.Host.Host(
         root_dataset=root_dataset, logger=logger, zfs=zfs
     )
     return host
@@ -160,11 +160,11 @@ def host(
 
 @pytest.fixture
 def release(
-    host: 'ioc.Host.HostGenerator',
-    logger: 'ioc.Logger.Logger',
+    host: 'libioc.Host.HostGenerator',
+    logger: 'libioc.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'ioc.Release.ReleaseGenerator':
+) -> 'libioc.Release.ReleaseGenerator':
     """Return the test release matching the host release version."""
-    return ioc.Release.Release(
+    return libioc.Release.Release(
         name=host.release_version, host=host, logger=logger, zfs=zfs
     )
