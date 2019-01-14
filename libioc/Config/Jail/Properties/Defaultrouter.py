@@ -184,7 +184,7 @@ class Defaultrouter6Prop(DefaultrouterMixin, ipaddress.IPv6Address):
 
         if self.logger is not None:
             self.logger.verbose(
-                f"setting default IPv4 gateway to {gateway}",
+                f"setting default IPv6 gateway to {gateway}",
             )
         commands.append(f"/sbin/route -q add -6 default {gateway}")
         return commands
