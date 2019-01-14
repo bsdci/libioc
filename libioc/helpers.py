@@ -297,8 +297,14 @@ def _normalize_data(
 ) -> typing.Dict[str, typing.Any]:
     output_data: typing.Dict[str, typing.Any] = {}
     for key, value in data.items():
-        if type(value) == dict:
+        if isinstance(value, dict):
             output_data[key] = _normalize_data(value)
+        elif isinstance(value, int) or isinstance(value, float):
+            output_data[key] = value
+        elif isinstance(value, bool):
+            output_data[key] = value
+        elif value is None:
+            output_data[key] = None
         else:
             output_data[key] = to_string(
                 value,
