@@ -376,7 +376,7 @@ class BaseConfig(dict):
             raise ValueError(str(e))
 
     def _get_vnet(self) -> bool:
-        return libioc.helpers.parse_user_input(self.data["vnet"]) is True
+        return libioc.helpers.parse_bool(self.data["vnet"]) is True
 
     def _set_vnet(self, value: typing.Union[str, bool]) -> None:
         self.data["vnet"] = libioc.helpers.to_string(
@@ -610,6 +610,7 @@ class BaseConfig(dict):
                 return
 
             parsed_value = libioc.helpers.parse_user_input(value)
+
             setter_method_name = f"_set_{key}"
             if setter_method_name in object.__dir__(self):
                 setter_method = self.__getattribute__(setter_method_name)
