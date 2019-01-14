@@ -683,6 +683,8 @@ class BaseConfig(dict):
         try:
             hash_before = str(self.__getitem__(key)).__hash__()
         except Exception:
+            if existed_before is True:
+                raise
             hash_before = None
 
         self.__setitem__(key, value, skip_on_error=skip_on_error)  # noqa: T484
