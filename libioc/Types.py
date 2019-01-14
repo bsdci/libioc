@@ -27,18 +27,43 @@ import typing
 import re
 
 
-class AbsolutePath(str):
+class Path(str):
     """Wrapper Type for ensuring a `str` matches a Unix Path."""
 
-    unix_path = re.compile(r"/([^/\0]+/*)+")
+    blacklist = re.compile(
+        r"(\/\/)|(\/\.\.)|(\.\.\/)|(\n)|(\r)|(^\.+$)",
+        re.MULTILINE
+    )
 
     def __init__(
-            self,
-            sequence: str
+        self,
+        sequence: str
     ) -> None:
-        if self.unix_path.fullmatch(sequence) is None:
-            raise TypeError(f"Invalid value for AbsolutePath: {sequence}")
+        if isinstance(sequence, str) is False:
+            raise TypeError("Path must be a string")
+
+        if len(self.blacklist.findall(sequence)) > 0:
+            raise TypeError(f"Illegal path: {sequence}")
+
         self = sequence  # type: ignore
+
+
+class AbsolutePath(Path):
+    """Wrapper Type for ensuring a `str` matches an absolute Unix Path."""
+
+    def __init__(
+        self,
+        sequence: str
+    ) -> None:
+        if isinstance(sequence, str) is False:
+            raise TypeError("AbsolutePath must be a string or Path")
+
+        if str(sequence).startswith("/") is False:
+            raise TypeError(
+                f"Expected AbsolutePath to begin with /, but got: {sequence}"
+            )
+
+        super().__init__(sequence)
 
 
 class UserInput:

@@ -76,10 +76,16 @@ class FstabLine(dict):
         value: typing.Union[str, libioc.Types.AbsolutePath]
     ) -> None:
         """Set an item of the FstabLine."""
-        if (key == "source") or (key == "destination"):
+        _type = None
+        if key == "source":
+            _type = libioc.Types.Path
+        elif key == "destination":
+            _type = libioc.Types.AbsolutePath
+
+        if _type is not None:  # source or destination
             if isinstance(value, str) is True:
-                absolute_path = libioc.Types.AbsolutePath(value)
-            elif isinstance(value, libioc.Types.AbsolutePath) is True:
+                absolute_path = _type(value)
+            elif isinstance(value, _type) is True:
                 absolute_path = value
             else:
                 raise ValueError("String or AbsolutePath expected")
@@ -287,7 +293,7 @@ class Fstab(
                 ])
 
             new_line = FstabLine({
-                "source": libioc.Types.AbsolutePath(source),
+                "source": libioc.Types.Path(source),
                 "destination": libioc.Types.AbsolutePath(destination),
                 "type": fragments[2],
                 "options": fragments[3],
