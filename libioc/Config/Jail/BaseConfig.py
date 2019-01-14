@@ -250,7 +250,7 @@ class BaseConfig(dict):
         return int(self.data["priority"])
 
     def _set_priority(self, value: typing.Union[int, str]) -> None:
-        self.data["priority"] = str(value)
+        self.data["priority"] = str(libioc.helpers.parse_int(value))
 
     # legacy support
     def _get_tag(self) -> typing.Optional[str]:
