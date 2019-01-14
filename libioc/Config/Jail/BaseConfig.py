@@ -27,6 +27,7 @@ import typing
 import re
 
 import libioc.Config.Data
+import libioc.Config.Jail.Defaults
 import libioc.Config.Jail.Properties
 import libioc.errors
 import libioc.helpers
@@ -617,7 +618,7 @@ class BaseConfig(dict):
                 setter_method(parsed_value)
                 return
 
-            self.data[key] = parsed_value
+            self.data[key] = self.__sanitize_value(key, parsed_value)
             error = None
         except ValueError as err:
             error = libioc.errors.InvalidJailConfigValue(
@@ -629,6 +630,27 @@ class BaseConfig(dict):
 
         if (error is not None) and (skip_on_error is False):
             raise error
+
+    def __sanitize_value(self, key: str, value: typing.Any) -> typing.Any:
+        """Sanitize the value type to the same found in hardcoded defaults."""
+        try:
+            default_type = self.__get_default_type(key)
+        except KeyError:
+            return value
+
+        if default_type == list:
+            return libioc.helpers.parse_list(value)
+        elif default_type == str:
+            return str(value)
+        elif default_type == bool:
+            return libioc.helpers.parse_bool(value)
+        elif default_type == int:
+            return libioc.helpers.parse_int(value)
+
+        return value
+
+    def __get_default_type(self, key: str) -> typing.Optional[type]:
+        return type(libioc.Config.Jail.Defaults.DEFAULTS[key])
 
     def set(  # noqa: T484
         self,
