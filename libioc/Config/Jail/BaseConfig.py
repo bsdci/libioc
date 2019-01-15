@@ -581,7 +581,7 @@ class BaseConfig(dict):
             return get_method()
 
         # plain data attribute
-        return self.data[key]
+        return libioc.helpers.parse_user_input(self.data[key])
 
     def __delitem__(self, key: str) -> None:
         """Delete a setting from the configuration."""
@@ -637,6 +637,12 @@ class BaseConfig(dict):
             default_type = self.__get_default_type(key)
         except KeyError:
             return value
+
+        try:
+            # allow any time to be None
+            return libioc.helpers.parse_none(value)
+        except ValueError:
+            pass
 
         if default_type == list:
             return libioc.helpers.parse_list(value)

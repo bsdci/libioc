@@ -163,7 +163,9 @@ def parse_none(
     none_matches: typing.List[str]=["none", "-", ""]
 ) -> None:
     """Raise if the input does not translate to None."""
-    if (data is None) or (data in none_matches):
+    if data is None:
+        return None
+    if isinstance(data, str) and (data.lower() in none_matches):
         return None
     raise TypeError("Value is not None")
 
@@ -308,6 +310,8 @@ def parse_user_input(
     'notfalse'
     >>> parse_user_input(8.4)
     8.4
+    >>> parse_user_input(dict(ioc=123))
+    {'ioc': 123}
     """
     try:
         return parse_bool(data)
