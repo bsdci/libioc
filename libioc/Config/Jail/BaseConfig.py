@@ -641,7 +641,7 @@ class BaseConfig(dict):
         try:
             # allow any time to be None
             return libioc.helpers.parse_none(value)
-        except ValueError:
+        except TypeError:
             pass
 
         if default_type == list:
