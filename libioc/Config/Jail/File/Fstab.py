@@ -68,8 +68,8 @@ class FstabLine(dict):
             self._escape("destination"),
             self.get("type", "nullfs"),
             self.get("options", "ro"),
-            self.get("dump", "0"),
-            self.get("passnum", "0")
+            str(self.get("freq", 0)),
+            str(self.get("passno", 0))
         ])
 
         if self["comment"] is not None:
@@ -92,7 +92,7 @@ class FstabLine(dict):
             dict.__setitem__(self, key, FstabFsSpec(value))
         elif key == "destination":
             dict.__setitem__(self, key, libioc.Types.AbsolutePath(value))
-        elif key in ["type", "options", "dump", "passnum", "comment"]:
+        elif key in ["type", "options", "freq", "passno", "comment"]:
             dict.__setitem__(self, key, value)
         else:
             raise KeyError(f"Invalid FstabLine key: {key}")
@@ -299,8 +299,8 @@ class Fstab(
                 "destination": libioc.Types.AbsolutePath(destination),
                 "type": fragments[2],
                 "options": fragments[3],
-                "dump": fragments[4],
-                "passnum": fragments[5],
+                "freq": int(fragments[4]),
+                "passno": int(fragments[5]),
                 "comment": comment
             })
 
@@ -354,8 +354,8 @@ class Fstab(
         destination: str,
         type: str="nullfs",
         options: str="ro",
-        dump: str="0",
-        passnum: str="0",
+        freq: int=0,
+        passno: int=0,
         comment: typing.Optional[str]=None,
         replace: bool=False,
         auto_create_destination: bool=False,
@@ -371,8 +371,8 @@ class Fstab(
             "destination": destination,
             "type": type,
             "options": options,
-            "dump": dump,
-            "passnum": passnum,
+            "freq": freq,
+            "passno": passno,
             "comment": comment
         })
 
@@ -506,8 +506,8 @@ class Fstab(
             ),
             options="ro",
             type="nullfs",
-            dump="0",
-            passnum="0",
+            freq=0,
+            passno=0,
             comment=self.AUTO_COMMENT_IDENTIFIER
         ))]
 
@@ -543,8 +543,8 @@ class Fstab(
                 "destination": destination,
                 "type": "nullfs",
                 "options": "ro",
-                "dump": "0",
-                "passnum": "0",
+                "freq": 0,
+                "passno": 0,
                 "comment": self.AUTO_COMMENT_IDENTIFIER
             }))
 
