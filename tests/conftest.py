@@ -25,20 +25,25 @@
 """Unit test configuration."""
 import typing
 import helper_functions
+
 import libzfs
 import pytest
+import os.path
+import sys
+import tempfile
 
+# Inject lib directory to path
+iocage_lib_dir = os.path.abspath(os.path.join(
+    os.path.dirname(__file__),
+    ".."
+))
+if iocage_lib_dir not in sys.path:
+    sys.path = [iocage_lib_dir] + sys.path
+
+import libioc.Datasets
 import libioc.Host
 import libioc.Logger
 import libioc.Release
-
-# Inject lib directory to path
-# iocage_lib_dir = os.path.abspath(os.path.join(
-#     os.path.dirname(__file__),
-#     "..", "lib"
-# ))
-# if iocage_lib_dir not in sys.path:
-#     sys.path = [iocage_lib_dir] + sys.path
 
 _force_clean = False
 
@@ -51,9 +56,9 @@ def pytest_addoption(parser: typing.Any) -> None:
         help="Force cleaning the /iocage-test dataset"
     )
     parser.addoption(
-        "--zpool",
+        "--dataset-name",
         action="store",
-        help="Select a ZFS pool for the unit tests"
+        help="Select a ZFS dataset for the unit tests"
     )
 
 
@@ -75,56 +80,31 @@ def zfs() -> libzfs.ZFS:
 
 
 @pytest.fixture
-def pool(
-    request: typing.Any,
-    zfs: libzfs.ZFS,
-    logger: 'libioc.Logger.Logger'
-) -> libzfs.ZFSPool:
-    """Find the active iocage pool."""
-    requested_pool = request.config.getoption("--zpool")
-
-    if requested_pool is None:
-        logger.error(
-            "No ZFS pool was activated. "
-            "Please activate or specify a pool using the "
-            "--zpool option"
-        )
-        exit(1)
-
-    target_pool = list(filter(
-        lambda pool: (pool.name == requested_pool),
-        zfs.pools
-    ))[0]
-    datasets = libioc.Datasets.Datasets(
-        pool=target_pool,
-        zfs=zfs,
-        logger=logger
-    )
-    if datasets.is_pool_active(target_pool) is False:
-        datasets.activate(mountpoint="/iocage-tests")
-
-    return target_pool
-
-
-@pytest.fixture
 def logger() -> 'libioc.Logger.Logger':
     """Make the iocage Logger available to the tests."""
-    return libioc.Logger.Logger()
+    return libioc.Logger.Logger(print_level="spam")
 
 
 @pytest.fixture
 def root_dataset(
+    request: typing.Any,
     force_clean: bool,
     zfs: libzfs.ZFS,
-    pool: libzfs.ZFSPool
 ) -> libzfs.ZFSDataset:
     """Return the root dataset for tests."""
-    dataset_name = f"{pool.name}/iocage-test"
+    dataset_name = request.config.getoption("--dataset-name")
+
+    pool = list(filter(
+        lambda pool: (pool.name == dataset_name[:dataset_name.index("/")]),
+        zfs.pools
+    ))[0]
 
     if force_clean:
         try:
             dataset = zfs.get_dataset(dataset_name)
-            helper_functions.unmount_and_destroy_dataset_recursive(dataset)
+            helper_functions.unmount_and_destroy_dataset_recursive(
+                dataset
+            )
         except libzfs.ZFSException:
             pass
 
@@ -135,6 +115,9 @@ def root_dataset(
             raise
 
     dataset = zfs.get_dataset(dataset_name)
+    temp_dir = tempfile.mkdtemp(suffix="ioc")
+    new_mountpoint = libzfs.ZFSUserProperty(temp_dir)
+    dataset.properties["mountpoint"] = new_mountpoint
     if not dataset.mountpoint:
         dataset.mount()
 
@@ -145,17 +128,30 @@ def root_dataset(
 
 
 @pytest.fixture
-def host(
+def datasets(
     root_dataset: libzfs.ZFSDataset,
+    logger: 'libioc.Logger.Logger',
+    zfs: libzfs.ZFS
+) -> libioc.Datasets.Datasets:
+    return libioc.Datasets.Datasets(
+        sources=dict(testing=root_dataset),
+        logger=logger,
+        zfs=zfs
+    )
+
+
+@pytest.fixture
+def host(
+    datasets: libioc.Datasets,
     logger: 'libioc.Logger.Logger',
     zfs: libzfs.ZFS
 ) -> 'libioc.Host.HostGenerator':
     """Make the libioc.Host available to the tests."""
-    host = libioc.Host.Host(
-        root_dataset=root_dataset, logger=logger, zfs=zfs
+    return libioc.Host.Host(
+        datasets=datasets,
+        logger=logger,
+        zfs=zfs
     )
-    return host
-    del host
 
 
 @pytest.fixture

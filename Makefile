@@ -23,7 +23,7 @@ check:
 	flake8 --exclude=".travis,.eggs,__init__.py,docs" --ignore=E203,E252,W391,D107,A001,A002,A003,A004
 	bandit --skip B404 --exclude tests/ -r .
 test:
-	pytest tests --zpool $(ZPOOL)
+	pytest tests --dataset-name $(TEST_DATASET_NAME)
 regression-test:
 	tests/run-integration.sh
 .PHONY: docs
