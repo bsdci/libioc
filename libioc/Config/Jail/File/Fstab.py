@@ -35,6 +35,18 @@ import libioc.Types
 import libioc.Config.Jail.File
 
 
+class FstabFsSpec(libioc.Types.AbsolutePath):
+    """Enforces an AbsolutePath or special device name."""
+
+    PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
+
+    def __init__(self, sequence: str) -> None:
+        if self.PATTERN.match(sequence) is not None:
+            self = str(sequence)  # type: ignore
+        else:
+            super().__init__(sequence)
+
+
 class FstabLine(dict):
     """Model a line of an fstab file."""
 
@@ -76,20 +88,10 @@ class FstabLine(dict):
         value: typing.Union[str, libioc.Types.AbsolutePath]
     ) -> None:
         """Set an item of the FstabLine."""
-        _type = None
         if key == "source":
-            _type = libioc.Types.Path
+            dict.__setitem__(self, key, FstabFsSpec(value))
         elif key == "destination":
-            _type = libioc.Types.AbsolutePath
-
-        if _type is not None:  # source or destination
-            if isinstance(value, str) is True:
-                absolute_path = _type(value)
-            elif isinstance(value, _type) is True:
-                absolute_path = value
-            else:
-                raise ValueError("String or AbsolutePath expected")
-            dict.__setitem__(self, key, absolute_path)
+            dict.__setitem__(self, key, libioc.Types.AbsolutePath(value))
         elif key in ["type", "options", "dump", "passnum", "comment"]:
             dict.__setitem__(self, key, value)
         else:
