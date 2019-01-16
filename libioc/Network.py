@@ -117,7 +117,7 @@ class Network:
 
         if self._is_secure_vnet_bridge is True:
             commands += self.__down_secure_mode_devices()
-            self.firewall.delete_rule("$IOCAGE_JID")
+            self.firewall.delete_rule("$IOC_JID")
             commands += self.firewall.read_commands()
 
         return commands
@@ -128,7 +128,7 @@ class Network:
 
     def __down_host_interface(self) -> typing.List[str]:
         nic = libioc.NetworkInterface.QueuingNetworkInterface(
-            name=f"{self._escaped_nic_name}:$IOCAGE_JID",
+            name=f"{self._escaped_nic_name}:$IOC_JID",
             extra_settings=["destroy"],
             logger=self.logger,
             insecure=True
@@ -140,8 +140,8 @@ class Network:
         self.logger.verbose("Downing secure mode devices")
         commands: typing.List[str] = []
         secure_mode_nics = [
-            f"{self._escaped_nic_name}:$IOCAGE_JID:a",
-            f"{self._escaped_nic_name}:$IOCAGE_JID:net"
+            f"{self._escaped_nic_name}:$IOC_JID:a",
+            f"{self._escaped_nic_name}:$IOC_JID:net"
         ]
         for nic in secure_mode_nics:
             commands += libioc.NetworkInterface.QueuingNetworkInterface(
@@ -237,7 +237,7 @@ class Network:
 
         epair_a = libioc.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            rename=f"{self._escaped_nic_name}:$IOCAGE_JID{nic_suffix_a}",
+            rename=f"{self._escaped_nic_name}:$IOC_JID{nic_suffix_a}",
             destroy=True,
             shell_variable_nic_name=variable_name_a,
             logger=self.logger,
@@ -248,7 +248,7 @@ class Network:
 
         epair_b = libioc.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            rename=f"{self._escaped_nic_name}:$IOCAGE_JID{nic_suffix_b}",
+            rename=f"{self._escaped_nic_name}:$IOC_JID{nic_suffix_b}",
             destroy=True,
             shell_variable_nic_name=variable_name_b,
             logger=self.logger,
@@ -274,8 +274,8 @@ class Network:
             self.firewall.ensure_firewall_enabled()
 
         commands_created += self.__create_new_epair_interface(
-            variable_name_a=f"IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
-            variable_name_b=f"IOCAGE_NIC_EPAIR_B_{self._nic_hash}",
+            variable_name_a=f"IOC_NIC_EPAIR_A_{self._nic_hash}",
+            variable_name_b=f"IOC_NIC_EPAIR_B_{self._nic_hash}",
             nic_suffix_a="",
             nic_suffix_b=":j"
         )
@@ -294,7 +294,7 @@ class Network:
 
         host_if = libioc.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
+            shell_variable_nic_name=f"IOC_NIC_EPAIR_A_{self._nic_hash}",
             mac=mac_address_pair.a,
             mtu=self.mtu,
             description=self.nic_local_description,
@@ -305,15 +305,15 @@ class Network:
         if self._is_secure_vnet_bridge is False:
             jail_bridge = libioc.NetworkInterface.QueuingNetworkInterface(
                 name=self.bridge.name,
-                addm=f"$IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
+                addm=f"$IOC_NIC_EPAIR_A_{self._nic_hash}",
                 logger=self.logger,
                 insecure=True
             )
             commands_created += jail_bridge.read_commands()
         else:
             commands_created += self.__create_new_epair_interface(
-                variable_name_a=f"IOCAGE_NIC_EPAIR_C_{self._nic_hash}",
-                variable_name_b=f"IOCAGE_NIC_EPAIR_D_{self._nic_hash}",
+                variable_name_a=f"IOC_NIC_EPAIR_C_{self._nic_hash}",
+                variable_name_b=f"IOC_NIC_EPAIR_D_{self._nic_hash}",
                 nic_suffix_a=":a",
                 nic_suffix_b=":b",
                 mtu=self.mtu
@@ -328,19 +328,19 @@ class Network:
                 name="bridge",
                 create=True,
                 destroy=True,
-                rename=f"{self._escaped_nic_name}:$IOCAGE_JID:net",
+                rename=f"{self._escaped_nic_name}:$IOC_JID:net",
                 insecure=True,
-                shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._nic_hash}",
+                shell_variable_nic_name=f"IOC_NIC_BRIDGE_{self._nic_hash}",
             )
             commands_created += sec_bridge.read_commands()
 
             # add nic to secure bridge
             sec_bridge = libioc.NetworkInterface.QueuingNetworkInterface(
                 name=None,
-                shell_variable_nic_name=f"IOCAGE_NIC_BRIDGE_{self._nic_hash}",
+                shell_variable_nic_name=f"IOC_NIC_BRIDGE_{self._nic_hash}",
                 addm=[
-                    f"$IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
-                    f"$IOCAGE_NIC_EPAIR_D_{self._nic_hash}"
+                    f"$IOC_NIC_EPAIR_A_{self._nic_hash}",
+                    f"$IOC_NIC_EPAIR_D_{self._nic_hash}"
                 ],
                 logger=self.logger,
                 insecure=True
@@ -350,7 +350,7 @@ class Network:
             # add nic to jail bridge
             jail_bridge = libioc.NetworkInterface.QueuingNetworkInterface(
                 name=self.bridge.name,
-                addm=f"$IOCAGE_NIC_EPAIR_C_{self._nic_hash}",
+                addm=f"$IOC_NIC_EPAIR_C_{self._nic_hash}",
                 logger=self.logger,
                 insecure=True
             )
@@ -360,7 +360,7 @@ class Network:
 
         # assign epair_b to jail
         assigned_if = libioc.NetworkInterface.QueuingNetworkInterface(
-            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_B_{self._nic_hash}",
+            shell_variable_nic_name=f"IOC_NIC_EPAIR_B_{self._nic_hash}",
             vnet=self.jail.identifier,
             extra_settings=[],
             logger=self.logger
@@ -369,7 +369,7 @@ class Network:
 
         # configure network inside the jail
         jail_if = libioc.NetworkInterface.QueuingNetworkInterface(
-            name=f"{self._escaped_nic_name}:$IOCAGE_JID:j",
+            name=f"{self._escaped_nic_name}:$IOC_JID:j",
             mac=str(mac_address_pair.b),
             mtu=self.mtu,
             rename=self._escaped_nic_name,
@@ -388,7 +388,7 @@ class Network:
         self.logger.verbose(
             f"Configuring Secure VNET Firewall for {self._escaped_nic_name}"
         )
-        firewall_rule_number = f"$IOCAGE_JID"
+        firewall_rule_number = f"$IOC_JID"
 
         for protocol in ["ipv4", "ipv6"]:
             addresses = self.__getattribute__(f"{protocol}_addresses")
@@ -405,7 +405,7 @@ class Network:
                     "from", _address, "to", "any",
                     "layer2",
                     "MAC", "any", mac_address,
-                    "via", f"{self._escaped_nic_name}:$IOCAGE_JID:b",
+                    "via", f"{self._escaped_nic_name}:$IOC_JID:b",
                     "out"
                 ], insecure=True)
                 self.firewall.add_rule(firewall_rule_number, [
@@ -413,26 +413,26 @@ class Network:
                     "from", "any", "to", _address,
                     "layer2",
                     "MAC", mac_address, "any",
-                    "via", f"{self._escaped_nic_name}:$IOCAGE_JID",
+                    "via", f"{self._escaped_nic_name}:$IOC_JID",
                     "out"
                 ], insecure=True)
                 self.firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", "any", "to", _address,
-                    "via", f"{self._escaped_nic_name}:$IOCAGE_JID",
+                    "via", f"{self._escaped_nic_name}:$IOC_JID",
                     "out"
                 ], insecure=True)
             self.firewall.add_rule(firewall_rule_number, [
                 "deny", "log", protocol,
                 "from", "any", "to", "any",
                 "layer2",
-                "via", f"{self._escaped_nic_name}:$IOCAGE_JID:b",
+                "via", f"{self._escaped_nic_name}:$IOC_JID:b",
                 "out"
             ], insecure=True)
             self.firewall.add_rule(firewall_rule_number, [
                 "deny", "log", protocol,
                 "from", "any", "to", "any",
-                "via", f"{self._escaped_nic_name}:$IOCAGE_JID",
+                "via", f"{self._escaped_nic_name}:$IOC_JID",
                 "out"
             ], insecure=True)
         self.logger.debug("Firewall rules added")
@@ -442,7 +442,7 @@ class Network:
     def __up_host_if(self) -> typing.List[str]:
         host_if = libioc.NetworkInterface.QueuingNetworkInterface(
             name=None,
-            shell_variable_nic_name=f"IOCAGE_NIC_EPAIR_A_{self._nic_hash}",
+            shell_variable_nic_name=f"IOC_NIC_EPAIR_A_{self._nic_hash}",
             logger=self.logger
         )
         commands: typing.List[str] = host_if.read_commands()
@@ -453,12 +453,12 @@ class Network:
         """Return a dict of env variables used by the network."""
         name = self._escaped_nic_name
         script_env: typing.Dict[str, typing.Union[str, int]] = {
-            f"IOCAGE_NIC_EPAIR_A_{self._nic_hash}": f"{name}:$IOCAGE_JID",
-            f"IOCAGE_NIC_EPAIR_B_{self._nic_hash}": name,
-            f"IOCAGE_NIC_EPAIR_C_{self._nic_hash}": f"{name}:$IOCAGE_JID:a",
-            f"IOCAGE_NIC_EPAIR_D_{self._nic_hash}": f"{name}:$IOCAGE_JID:b",
-            f"IOCAGE_NIC_BRIDGE_{self._nic_hash}": f"{name}:$IOCAGE_JID:net",
-            f"IOCAGE_NIC_ID_{self._nic_hash}": self.epair_id
+            f"IOC_NIC_EPAIR_A_{self._nic_hash}": f"{name}:$IOC_JID",
+            f"IOC_NIC_EPAIR_B_{self._nic_hash}": name,
+            f"IOC_NIC_EPAIR_C_{self._nic_hash}": f"{name}:$IOC_JID:a",
+            f"IOC_NIC_EPAIR_D_{self._nic_hash}": f"{name}:$IOC_JID:b",
+            f"IOC_NIC_BRIDGE_{self._nic_hash}": f"{name}:$IOC_JID:net",
+            f"IOC_NIC_ID_{self._nic_hash}": self.epair_id
         }
         return script_env
 

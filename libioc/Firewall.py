@@ -133,7 +133,7 @@ class QueuingFirewall(Firewall, libioc.CommandQueue.CommandQueue):
     ) -> None:
         self.clear_command_queue()
 
-        # disable shlex.quote on rule numbers (e.g. $IOCAGE_JID)
+        # disable shlex.quote on rule numbers (e.g. $IOC_JID)
         self.insecure = insecure
 
         Firewall.__init__(self, **firewall_arguments)

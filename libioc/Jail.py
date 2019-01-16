@@ -505,7 +505,7 @@ class JailGenerator(JailResource):
             f". {self._relative_hook_script_dir}/.env"
         ]
         exec_created: typing.List[str] = [
-            f"echo \"export IOCAGE_JID=$IOCAGE_JID\" > {self.script_env_path}",
+            f"echo \"export IOC_JID=$IOC_JID\" > {self.script_env_path}",
             "set -eu",
         ]
         exec_poststart: typing.List[str] = []
@@ -992,7 +992,7 @@ class JailGenerator(JailResource):
         )
         self._ensure_script_dir()
         with open(self.script_env_path, "w") as f:
-            f.write(f"export IOCAGE_JID={self.jid}")
+            f.write(f"export IOC_JID={self.jid}")
 
     def _write_jail_conf(self, force: bool=False) -> None:
         if force is True:
@@ -1766,7 +1766,7 @@ class JailGenerator(JailResource):
         _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
         self._write_hook_script("host_command", "\n".join(
             [
-                f"IOCAGE_JID=$({_jls_command} 2>&1 || echo -1)",
+                f"IOC_JID=$({_jls_command} 2>&1 || echo -1)",
                 "set -e",
                 f"/bin/sh {self.get_hook_script_path('created')}",
                 (
@@ -1853,7 +1853,7 @@ class JailGenerator(JailResource):
             _identifier = str(shlex.quote(self.identifier))
             _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
             command_string = (
-                "IOCAGE_JID="
+                "IOC_JID="
                 f"$({_jls_command} 2>&1 || echo -1)"
                 "\n" + command_string
             )
@@ -2169,11 +2169,11 @@ class JailGenerator(JailResource):
             jail_env = {}
 
         for prop in self.config.all_properties:
-            prop_name = f"IOCAGE_{prop.replace('.', '_').upper()}"
+            prop_name = f"IOC_{prop.replace('.', '_').upper()}"
             jail_env[prop_name] = str(self.config[prop])
 
-        jail_env["IOCAGE_JAIL_PATH"] = self.root_dataset.mountpoint
-        jail_env["IOCAGE_JID"] = str(self.jid)
+        jail_env["IOC_JAIL_PATH"] = self.root_dataset.mountpoint
+        jail_env["IOC_JID"] = str(self.jid)
 
         return jail_env
 

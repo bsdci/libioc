@@ -223,8 +223,8 @@ class QueuingZFSShareStorage(
 
     @property
     def _zfs_jail_command(self) -> typing.List[str]:
-        return ["/sbin/zfs", "jail", "$IOCAGE_JID"]
+        return ["/sbin/zfs", "jail", "$IOC_JID"]
 
     @property
     def _zfs_unjail_command(self) -> typing.List[str]:
-        return ["/sbin/zfs", "unjail", "$IOCAGE_JID"]
+        return ["/sbin/zfs", "unjail", "$IOC_JID"]
