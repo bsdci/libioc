@@ -1,0 +1,9 @@
+task:
+  freebsd_instance:
+    matrix:
+      image: freebsd-12-0-release-amd64
+  env:
+    CIRRUS_SHELL: /bin/sh
+    TEST_DATASET_NAME: "zroot/ioc-test"
+  install_script: make install-dev
+  test_script: make test
