@@ -532,7 +532,11 @@ class JailGenerator(JailResource):
             exec_prestart += [self.config["exec_prestart"]]
         if self.config["exec_created"] is not None:
             exec_created += [self.config["exec_created"]]
-        if self.config["exec_start"] is not None and (single_command is None):
+        if self.config["exec_start"] is not None:
+            if single_command is not None:
+                raise libioc.errors.JailConfigError(
+                    "Cannot use exec_start in combination with a single command"
+                )
             exec_start += [self.config["exec_start"]]
         if self.config["exec_poststart"] is not None:
             exec_poststart += [self.config["exec_poststart"]]
@@ -758,6 +762,7 @@ class JailGenerator(JailResource):
         event_scope: typing.Optional['libioc.events.Scope']=None,
         start_dependant_jails: bool=True,
         dependant_jails_seen: typing.List['JailGenerator']=[],
+        env: typing.Optional[typing.Dict[str, typing.Any]]=None,
         **temporary_config_override: typing.Any
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
@@ -790,6 +795,10 @@ class JailGenerator(JailResource):
 
                 When disabled, no dependant jails will be started.
 
+            env:
+
+                Supply the jail command with additional env variables.
+
             **temporary_config_override (dict(str, any)):
 
                 Other named arguments temporary override JailConfig properties.
@@ -821,6 +830,7 @@ class JailGenerator(JailResource):
                 self,
                 single_command=command,
                 passthru=passthru,
+                env=env,
                 event_scope=event_scope,
                 dependant_jails_seen=dependant_jails_seen,
                 start_dependant_jails=start_dependant_jails
