@@ -117,7 +117,10 @@ def provision(
     If the repo is a filesystem path, it will be mounted appropriately.
     If the repo is a URL, it will be setup with `r10k`.
 
-        ioc set provisioning.method=puppet provisioning.source=http://example.com/my/puppet-env myjail
+        ioc set \
+            provisioning.method=puppet \
+            provisioning.source=http://example.com/my/puppet-env \
+            myjail
 
     """
     events = libioc.events
