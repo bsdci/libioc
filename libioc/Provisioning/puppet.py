@@ -168,7 +168,7 @@ def provision(
     self.jail.fstab.save()
 
     if "pkgs" in controlRepoDefinition.keys():
-        pkg_packages = list(controlRepoDefinition["pkgs"])
+        pkg_packages = list(controlRepoDefinition.pkgs)
     else:
         pkg_packages = []
 
