@@ -84,7 +84,8 @@ class Provisioner(Prototype):
 		self
 	) -> typing.Dict[str, Prototype]:
 		return dict(
-			ix=libioc.Provisioning.ix
+			ix=libioc.Provisioning.ix,
+			puppet=libioc.Provisioning.puppet
 		)
 
 	@property
