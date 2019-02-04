@@ -25,8 +25,6 @@
 import typing
 import os.path
 import json
-import urllib.error
-import urllib.request
 import libzfs
 
 import git
@@ -106,11 +104,12 @@ class ControlRepoDefinition(dict):
         self._name = value
 
     @property
-    def pkgs(self, value: str) -> typing.List[str]:
+    def pkgs(self) -> typing.List[str]:
         """Return list of packages required for this Provisioning method."""
         return self._pkgs
 
     def generate_postinstall(self) -> typing.List[str]:
+        """Return list of strings representing our postinstall"""
         if self.remote:
             # write /usr/local/etc/r10k/r10k.yaml with
             # ---
@@ -130,11 +129,12 @@ class ControlRepoDefinition(dict):
     #    """Set (list) of additional packagess required for this Puppet Control-Repo URL."""
     #    self._pkgs += value
 
+
 def provision(
     self: 'libioc.Provisioning.Prototype',
     event_scope: typing.Optional['libioc.events.Scope']=None
 ) -> typing.Generator['libioc.events.IocEvent', None, None]:
-    """
+    r"""
     Provision the jail with Puppet apply using the supplied control-repo.
 
     The repo can either be a filesystem path, or a http[s]/git URL.
@@ -180,19 +180,21 @@ def provision(
             plugin_dataset_name
         )
 
-        git.Repo.clone_from(
-            pluginDefinition.url,
-            plugin_dataset.mountpoint
-        )
+        if not os.path.isdir(plugin_dataset_name):
+            # only clone if it doesn't already exist
+            git.Repo.clone_from(
+                pluginDefinition.url,
+                plugin_dataset.mountpoint
+            )
 
         mount_source = plugin_dataset.mountpoint
     else:
-        mount_source = source
+        mount_source = self.source
 
     self.jail.fstab.new_line(
         source=mount_source,
         destination="/usr/local/etc/puppet",
-        options="ro",
+        options="rw",
         auto_create_destination=True,
         replace=True
     )
