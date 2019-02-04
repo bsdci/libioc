@@ -1743,7 +1743,7 @@ class JailGenerator(JailResource):
                         )
                 except StopIteration as return_statement:
                     output: libioc.helpers.CommandOutput
-                    output = return_statement.value
+                    output = return_statement.value  # noqa: T484
                     return output
         except (KeyboardInterrupt, SystemExit):
             raise libioc.errors.JailExecutionAborted(
