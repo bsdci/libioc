@@ -35,7 +35,7 @@ JailStatesDict = typing.Dict[str, 'JailState']
 
 
 def _get_userland_version() -> float:
-        return float(libioc.helpers.get_os_version()["userland"])
+    return float(libioc.helpers.get_os_version()["userland"])
 
 
 def _parse(text: str) -> JailStatesDict:

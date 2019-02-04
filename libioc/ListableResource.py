@@ -99,8 +99,8 @@ class ListableResource(list):
             for child_dataset in children:
                 name = self._get_asset_name_from_dataset(child_dataset)
                 if has_filters and (filters.match_key("name", name) is False):
-                        # Skip all jails that do not even match the name
-                        continue
+                    # Skip all jails that do not even match the name
+                    continue
 
                 # ToDo: Do not load jail if filters do not require to
                 resource = self._get_resource_from_dataset(child_dataset)
