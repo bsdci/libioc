@@ -76,6 +76,16 @@ class ControlRepoDefinition(dict):
             _pkgs += 'rubygem-r10k'
 
     @property
+    def local(self) -> bool:
+        if not (self.url.startswith('file://') or self.url.startswith('/')):
+            return False
+        return True
+
+    @property
+    def remote(self) -> bool:
+        return not self.local
+
+    @property
     def url(self) -> str:
         """Return the Puppet Control-Repo URL."""
         return str(self._url)
@@ -134,6 +144,7 @@ def provision(
         ioc set \
             provisioning.method=puppet \
             provisioning.source=http://example.com/my/puppet-env \
+            provisioning.source.name=my-puppet-env \
             myjail
 
     """
@@ -198,10 +209,8 @@ def provision(
             host=self.jail.host
         )
 
-        if os.path.isfile(f"{plugin_dataset.mountpoint}/post_install.sh"):
-            postinstall = ["/.puppet/post_install.sh"]
-        else:
-            postinstall = []
+        postinstall_scripts = pluginDefinition.generate_postinstall()
+        # write postinstall
 
         yield from pkg.fetch_and_install(
             jail=self.jail,
