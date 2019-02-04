@@ -175,9 +175,10 @@ def provision(
 
     if not (self.source.startswith('file://') or self.source.startswith('/')):
         # clone control repo
-        controlrepo_dataset_name = f"{self.jail.dataset.name}/puppet"
-        controlrepo_dataset = self.zfs.get_or_create_dataset(
-            control_repo_dataset_name, self.jail.zfs)
+        plugin_dataset_name = f"{self.jail.dataset.name}/puppet"
+        plugin_dataset = self.zfs.get_or_create_dataset(
+            plugin_dataset_name
+        )
 
         git.Repo.clone_from(
             pluginDefinition.url,
