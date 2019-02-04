@@ -73,12 +73,14 @@ class ControlRepoDefinition(dict):
 
     @property
     def local(self) -> bool:
+        """Return whether this control repo resides locally."""
         if not (self.url.startswith('file://') or self.url.startswith('/')):
             return False
         return True
 
     @property
     def remote(self) -> bool:
+        """Return whether this control repo resides locally."""
         return not self.local
 
     @property
@@ -86,17 +88,17 @@ class ControlRepoDefinition(dict):
         """Return the Puppet Control-Repo URL."""
         return str(self._url)
 
-    @property.setter
-    def url(self) -> str:
+    @url.setter
+    def url(self, value: str) -> None:
         """Set the Puppet Control-Repo URL."""
-        return str(self._url)
+        self._url = value
 
     @property
-    def name(self, value: str) -> str:
+    def name(self) -> str:
         """Return the unique name for this Puppet Control-Repo URL."""
         return self._name
 
-    @property.setter
+    @name.setter
     def name(self, value: str) -> None:
         """Set a unique name for this Puppet Control-Repo URL."""
         self._name = value
