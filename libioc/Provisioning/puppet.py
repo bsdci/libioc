@@ -100,11 +100,25 @@ class ControlRepoDefinition(dict):
         """Return list of packages required for this Provisioning method."""
         return self._pkgs
 
+    def generate_postinstall(self) -> typing.List[str]:
+        if self.remote:
+            # write /usr/local/etc/r10k/r10k.yaml with
+            # ---
+            # :sources:
+            #     puppet:
+            #         basedir: /usr/local/etc/puppet/environments
+            #         remote: {self.url}
+
+            # run r10k -p
+            pass
+
+        # run puppet apply {debug} {manifest}
+        return ['']
+
     #@property.setter
     #def pkgs(self, value: str) -> None:
     #    """Set (list) of additional packagess required for this Puppet Control-Repo URL."""
     #    self._pkgs += value
-
 
 def provision(
     self: 'libioc.Provisioning.Prototype',
@@ -139,7 +153,8 @@ def provision(
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = ControlRepoDefinition(
-            self.source,
+            name=self.source.name,
+            url=self.source,
             logger=self.jail.logger
         )
         yield jailProvisioningAssetDownloadEvent.end()
@@ -150,25 +165,29 @@ def provision(
     if not (self.source.startswith('file://') or self.source.startswith('/')):
         # clone control repo
         controlrepo_dataset_name = f"{self.jail.dataset.name}/puppet"
-        controlrepo_dataset = __get_empty_dataset(
+        controlrepo_dataset = self.zfs.get_or_create_dataset(
             control_repo_dataset_name, self.jail.zfs)
 
         git.Repo.clone_from(
-            ControlRepoDefinition["url"],
+            pluginDefinition.url,
             plugin_dataset.mountpoint
         )
 
+        mount_source = plugin_dataset.mountpoint
+    else:
+        mount_source = source
+
     self.jail.fstab.new_line(
-        source=plugin_dataset.mountpoint,
-        destination="/.puppet",
+        source=mount_source,
+        destination="/usr/local/etc/puppet",
         options="ro",
         auto_create_destination=True,
         replace=True
     )
     self.jail.fstab.save()
 
-    if "pkgs" in controlRepoDefinition.keys():
-        pkg_packages = list(controlRepoDefinition.pkgs)
+    if "pkgs" in pluginDefinition.keys():
+        pkg_packages = list(pluginDefinition.pkgs)
     else:
         pkg_packages = []
 
