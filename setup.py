@@ -31,6 +31,12 @@ try:
 except ModuleNotFoundError:
     from pip.req import parse_requirements
 
+try:
+    import setuptools_scm.integration
+    setuptools_scm.integration.find_files = lambda _: []
+except ImportError:
+    pass
+
 
 def _read_requirements(
     filename: str="requirements.txt"
