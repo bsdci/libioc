@@ -24,8 +24,6 @@
 """ioc provisioner for use with `puppet apply`."""
 import typing
 import os.path
-import json
-import libzfs
 
 import git
 
@@ -108,26 +106,30 @@ class ControlRepoDefinition(dict):
         """Return list of packages required for this Provisioning method."""
         return self._pkgs
 
-    def generate_postinstall(self) -> typing.List[str]:
-        """Return list of strings representing our postinstall"""
+    def generate_postinstall(self) -> str:
+        """Return list of strings representing our postinstall."""
+        postinstall = """#!/bin/sh
+        set -eu
+
+        """
+
         if self.remote:
-            # write /usr/local/etc/r10k/r10k.yaml with
-            # ---
-            # :sources:
-            #     puppet:
-            #         basedir: /usr/local/etc/puppet/environments
-            #         remote: {self.url}
+            postinstall += """cat > /usr/local/etc/r10k/r10k.yml <EOF
+            ---
+            :source:
+                puppet:
+                    basedir: /usr/local/etc/puppet/environments
+                    remote: {self.url}
+            >EOF
 
-            # run r10k -p
-            pass
+            r10k deploy environment -p
 
-        # run puppet apply {debug} {manifest}
-        return ['']
+            """
 
-    #@property.setter
-    #def pkgs(self, value: str) -> None:
-    #    """Set (list) of additional packagess required for this Puppet Control-Repo URL."""
-    #    self._pkgs += value
+        postinstall += """
+        puppet apply /usr/local/etc/puppet/environments/manifests/site.pp
+        """
+        return postinstall
 
 
 def provision(
@@ -173,7 +175,7 @@ def provision(
         yield jailProvisioningAssetDownloadEvent.fail(e)
         raise e
 
-    if not (self.source.startswith('file://') or self.source.startswith('/')):
+    if pluginDefinition.remote:
         mode = 'rw'  # we'll need to run r10k here..
         plugin_dataset_name = f"{self.jail.dataset.name}/puppet"
         plugin_dataset = self.zfs.get_or_create_dataset(
@@ -213,8 +215,10 @@ def provision(
             host=self.jail.host
         )
 
-        postinstall_scripts = pluginDefinition.generate_postinstall()
-        # write postinstall
+        postinstall_script = pluginDefinition.generate_postinstall()
+        postinstall = "{self.jail.abspath}/launch-scripts/provision.sh"
+        with open(postinstall, 'w') as f:
+            f.write(postinstall_script)
 
         yield from pkg.fetch_and_install(
             jail=self.jail,
