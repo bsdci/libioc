@@ -174,7 +174,7 @@ def provision(
         raise e
 
     if not (self.source.startswith('file://') or self.source.startswith('/')):
-        # clone control repo
+        mode = 'rw'  # we'll need to run r10k here..
         plugin_dataset_name = f"{self.jail.dataset.name}/puppet"
         plugin_dataset = self.zfs.get_or_create_dataset(
             plugin_dataset_name
@@ -189,12 +189,13 @@ def provision(
 
         mount_source = plugin_dataset.mountpoint
     else:
+        mode = 'ro'
         mount_source = self.source
 
     self.jail.fstab.new_line(
         source=mount_source,
         destination="/usr/local/etc/puppet",
-        options="rw",
+        options=mode,
         auto_create_destination=True,
         replace=True
     )
