@@ -222,19 +222,3 @@ def provision(
         yield jailProvisioningEvent.fail(e)
         raise e
 
-
-def __get_empty_dataset(
-    dataset_name: str,
-    zfs: 'libioc.ZFS.ZFS'
-) -> libzfs.ZFSDataset:
-    try:
-        dataset = zfs.get_dataset(dataset_name)
-    except libzfs.ZFSException:
-        dataset = None
-        pass
-    if dataset is not None:
-        dataset.umount()
-        zfs.delete_dataset_recursive(dataset)
-
-    output: libzfs.ZFSDataset = zfs.get_or_create_dataset(dataset_name)
-    return output
