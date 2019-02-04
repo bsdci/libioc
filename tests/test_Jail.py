@@ -96,12 +96,12 @@ class TestJail(object):
             data = read_jail_config_json(f"{dataset.mountpoint}/config.json")
 
             try:
-                assert data["basejail"] is "no"
+                assert data["basejail"] == "no"
             except KeyError:
                 pass
 
             try:
-                assert (data["basejail"] is "") or (data["basejail"] == "none")
+                assert (data["basejail"] == "") or (data["basejail"] == "none")
             except KeyError:
                 pass
 
