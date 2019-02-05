@@ -28,6 +28,7 @@ import typing
 import libioc.errors
 import libioc.helpers
 import libioc.Provisioning.ix
+import libioc.Provisioning.puppet
 
 
 class Prototype:

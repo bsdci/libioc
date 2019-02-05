@@ -148,27 +148,27 @@ def provision(
         ioc set \
             provisioning.method=puppet \
             provisioning.source=http://example.com/my/puppet-env \
-            provisioning.source.name=my-puppet-env \
+            provisioning.name=my-puppet-env \
             myjail
 
     """
     events = libioc.events
     jailProvisioningEvent = events.JailProvisioning(
         jail=self.jail,
-        event_scope=event_scope
+        scope=event_scope
     )
     yield jailProvisioningEvent.begin()
     _scope = jailProvisioningEvent.scope
     jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
         jail=self.jail,
-        event_scope=_scope
+        scope=_scope
     )
 
     # download / mount provisioning assets
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = ControlRepoDefinition(
-            name=self.source.name,
+            name=self.name,
             url=self.source,
             logger=self.jail.logger
         )
