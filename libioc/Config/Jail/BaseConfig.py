@@ -170,7 +170,8 @@ class BaseConfig(dict):
         new_data = libioc.Config.Data.Data(data)
         if current_id is not None:
             new_data["id"] = current_id
-        self.data = new_data
+        for key, value in new_data.items():
+            self.data[key] = value
 
     def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
