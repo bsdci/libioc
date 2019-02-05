@@ -79,7 +79,7 @@ class BaseConfig(dict):
 
     """
 
-    data: libioc.Config.Data.Data
+    _data: libioc.Config.Data.Data
     special_properties: 'libioc.Config.Jail.Properties.Properties'
 
     def __init__(
@@ -87,8 +87,8 @@ class BaseConfig(dict):
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
-        if self.data is None:
-            self.data = libioc.Config.Data.Data()
+        if hasattr(self, "_data") is False:
+            self._data = libioc.Config.Data.Data()
         self.logger = libioc.helpers_object.init_logger(self, logger)
 
         Properties = libioc.Config.Jail.Properties.JailConfigProperties
@@ -96,6 +96,34 @@ class BaseConfig(dict):
             config=self,
             logger=self.logger
         )
+
+    @property
+    def data(self) -> libioc.Config.Data.Data:
+        """Return the data object."""
+        return self._data
+
+    @data.setter
+    def data(self, new_data: libioc.Config.Data.Data) -> None:
+        """Validate and set the data object."""
+        if isinstance(new_data, libioc.Config.Data.Data) is False:
+            raise TypeError("data needs to be a flat dict structure")
+        new_data_keys = new_data.keys()
+        old_data = self._data
+        try:
+            self._data = dict()
+            identifier_keys = ["id", "name", "uuid"]
+            for key in identifier_keys:
+                if key in new_data_keys:
+                    self["id"] = new_data[key]
+                    break
+            for key in new_data_keys:
+                if key in identifier_keys:
+                    continue
+                self[key] = new_data[key]
+        except Exception:
+            self.logger.verbose("Configuration was not modified")
+            self._data = old_data
+            raise
 
     def clone(
         self,

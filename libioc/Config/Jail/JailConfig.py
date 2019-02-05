@@ -40,7 +40,6 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
 
     legacy: bool = False
     jail: typing.Optional['libioc.Jail.JailGenerator']
-    data: dict = {}
     ignore_source_config: bool
 
     def __init__(
