@@ -24,6 +24,7 @@
 """ioc provisioner for use with `puppet apply`."""
 import typing
 import os.path
+import urllib.parse
 
 import git
 
@@ -54,27 +55,28 @@ class ControlRepoDefinition(dict):
     """Puppet control-repo definition."""
 
     _url: str
-    _name: str
     _pkgs: typing.List[str]
 
     def __init__(
         self,
-        name: str,
-        url: str,
+        url: urllib.parse.DefragResult,
         logger: 'libioc.Logger.Logger'
     ) -> None:
         self.logger = logger
-        self.url = url
-        self.name = name
 
-        _pkgs = ['puppet6']  # make this a Global Varialbe
-        if not (url.startswith('file://') or url.startswith('/')):
-            _pkgs += 'rubygem-r10k'
+        if isinstance(url, urllib.parse.ParseResult) is False:
+            raise TypeError("Source must be an URL")
+        self.url = url
+
+        self._pkgs = ['puppet6']  # make this a Global Varialbe
+        if not (self.url.startswith('file://') or self.url.startswith('/')):
+            self._pkgs += 'rubygem-r10k'
 
     @property
     def local(self) -> bool:
         """Return whether this control repo resides locally."""
-        if not (self.url.startswith('file://') or self.url.startswith('/')):
+        _url = self.url
+        if not (_url.startswith('file://') or _url.startswith('/')):
             return False
         return True
 
@@ -86,22 +88,26 @@ class ControlRepoDefinition(dict):
     @property
     def url(self) -> str:
         """Return the Puppet Control-Repo URL."""
-        return str(self._url)
+        return self._url
 
     @url.setter
-    def url(self, value: str) -> None:
+    def url(self, value: typing.Union[urllib.parse.ParseResult, str]) -> None:
         """Set the Puppet Control-Repo URL."""
-        self._url = value
+        _url: urllib.parse.ParseResult
+        if isinstance(value, urllib.parse.ParseResult) is True:
+            _url = typing.cast(urllib.parse.ParseResult, value)
+        elif isinstance(value, str) is True:
+            _url = urllib.parse.urlparse(
+                str(value),
+                allow_fragments=False
+            )
+        else:
+            raise TypeError("URL must be urllib.parse.ParseResult or string")
 
-    @property
-    def name(self) -> str:
-        """Return the unique name for this Puppet Control-Repo URL."""
-        return self._name
+        if _url.fragment != "":
+            raise ValueError("URL may not contain fragment")
 
-    @name.setter
-    def name(self, value: str) -> None:
-        """Set a unique name for this Puppet Control-Repo URL."""
-        self._name = value
+        self._url = _url.geturl()
 
     @property
     def pkgs(self) -> typing.List[str]:
@@ -148,7 +154,6 @@ def provision(
         ioc set \
             provisioning.method=puppet \
             provisioning.source=http://example.com/my/puppet-env \
-            provisioning.name=my-puppet-env \
             myjail
 
     """
@@ -168,8 +173,7 @@ def provision(
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = ControlRepoDefinition(
-            name=self.name,
-            url=self.source,
+            url=urllib.parse.urlparse(self.source).geturl(),
             logger=self.jail.logger
         )
         yield jailProvisioningAssetDownloadEvent.end()
