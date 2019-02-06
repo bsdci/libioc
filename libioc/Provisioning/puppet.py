@@ -54,29 +54,33 @@ class ControlRepoUnavailableError(libioc.errors.IocException):
 class ControlRepoDefinition(dict):
     """Puppet control-repo definition."""
 
-    _url: str
+    _source: str
     _pkgs: typing.List[str]
 
     def __init__(
         self,
-        url: urllib.parse.DefragResult,
+        source: typing.Union[
+            urllib.parse.DefragResult,
+            libioc.Types.AbsolutePath
+        ],
         logger: 'libioc.Logger.Logger'
     ) -> None:
         self.logger = logger
 
-        if isinstance(url, urllib.parse.ParseResult) is False:
-            raise TypeError("Source must be an URL")
-        self.url = url
+        if isinstance(source, libioc.Types.AbsolutePath) is False \
+           and isinstance(source, urllib.parse.ParseResult) is False:
+            raise TypeError("Source must be an URL or an absolute path")
+        self.source = source
 
         self._pkgs = ['puppet6']  # make this a Global Varialbe
-        if not (self.url.startswith('file://') or self.url.startswith('/')):
+        if isinstance(source, libioc.Types.AbsolutePath) is False:
             self._pkgs += 'rubygem-r10k'
 
     @property
     def local(self) -> bool:
         """Return whether this control repo resides locally."""
-        _url = self.url
-        if not (_url.startswith('file://') or _url.startswith('/')):
+        _source = self.source
+        if isinstance(_source, libioc.Types.AbsolutePath) is False:
             return False
         return True
 
@@ -86,28 +90,30 @@ class ControlRepoDefinition(dict):
         return not self.local
 
     @property
-    def url(self) -> str:
+    def source(self) -> str:
         """Return the Puppet Control-Repo URL."""
-        return self._url
+        return self._source
 
-    @url.setter
-    def url(self, value: typing.Union[urllib.parse.ParseResult, str]) -> None:
+    @source.setter
+    def source(self, value: typing.Union[
+            urllib.parse.ParseResult,
+            libioc.Types.AbsolutePath
+    ]) -> None:
         """Set the Puppet Control-Repo URL."""
-        _url: urllib.parse.ParseResult
+        _source: urllib.parse.ParseResult
         if isinstance(value, urllib.parse.ParseResult) is True:
-            _url = typing.cast(urllib.parse.ParseResult, value)
-        elif isinstance(value, str) is True:
-            _url = urllib.parse.urlparse(
-                str(value),
-                allow_fragments=False
-            )
+            _source = typing.cast(urllib.parse.ParseResult, value)
+            if _source.fragment != "":
+                raise ValueError("URL may not contain fragment")
+
+            self._source = _source.geturl()
+        elif isinstance(value, libioc.Types.AbsolutePath) is True:
+            _source = value
         else:
-            raise TypeError("URL must be urllib.parse.ParseResult or string")
+            raise TypeError(
+                "Source must be urllib.parse.ParseResult or absolute path"
+            )
 
-        if _url.fragment != "":
-            raise ValueError("URL may not contain fragment")
-
-        self._url = _url.geturl()
 
     @property
     def pkgs(self) -> typing.List[str]:
@@ -116,6 +122,7 @@ class ControlRepoDefinition(dict):
 
     def generate_postinstall(self) -> str:
         """Return list of strings representing our postinstall."""
+        basedir = "/usr/local/etc/puppet/environments"
         postinstall = """#!/bin/sh
         set -eu
 
@@ -126,8 +133,8 @@ class ControlRepoDefinition(dict):
             ---
             :source:
                 puppet:
-                    basedir: /usr/local/etc/puppet/environments
-                    remote: {self.url}
+                    basedir: {basedir}
+                    remote: {self.source}
             >EOF
 
             r10k deploy environment -p
