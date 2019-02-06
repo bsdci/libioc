@@ -137,12 +137,12 @@ class ControlRepoDefinition(dict):
                     remote: {self.source}
             >EOF
 
-            r10k deploy environment -p
+            r10k deploy environment -pv
 
             """
 
         postinstall += """
-        puppet apply /usr/local/etc/puppet/environments/manifests/site.pp
+        puppet apply --debug {basedir}/manifests/site.pp
         """
         return postinstall
 
