@@ -128,7 +128,7 @@ class ControlRepoDefinition(dict):
         """
 
         if self.remote:
-            postinstall += """cat > /usr/local/etc/r10k/r10k.yml <EOF
+            postinstall += f"""cat > /usr/local/etc/r10k/r10k.yml <EOF
             ---
             :source:
                 puppet:
@@ -140,7 +140,7 @@ class ControlRepoDefinition(dict):
 
             """
 
-        postinstall += """
+        postinstall += f"""
         puppet apply --debug {basedir}/manifests/site.pp
         """
         return postinstall
