@@ -114,7 +114,6 @@ class ControlRepoDefinition(dict):
                 "Source must be urllib.parse.ParseResult or absolute path"
             )
 
-
     @property
     def pkgs(self) -> typing.List[str]:
         """Return list of packages required for this Provisioning method."""
@@ -180,7 +179,7 @@ def provision(
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = ControlRepoDefinition(
-            url=urllib.parse.urlparse(self.source).geturl(),
+            source=urllib.parse.urlparse(self.source).geturl(),
             logger=self.jail.logger
         )
         yield jailProvisioningAssetDownloadEvent.end()
@@ -198,7 +197,7 @@ def provision(
         if not os.path.isdir(plugin_dataset_name):
             # only clone if it doesn't already exist
             git.Repo.clone_from(
-                pluginDefinition.url,
+                pluginDefinition.source,
                 plugin_dataset.mountpoint
             )
 
