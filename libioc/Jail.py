@@ -726,7 +726,7 @@ class JailGenerator(JailResource):
         self,
         commands: typing.Optional[typing.Union[str, typing.List[str]]],
         ignore_errors: bool=True,
-        jailed: bool=False,
+        jailed: bool=False,  # ToDo: remove unused argument
         write_env: bool=True
     ) -> typing.List[str]:
 
