@@ -43,7 +43,7 @@ class Path(str):
             raise TypeError("Path must be a string")
 
         if len(self.blacklist.findall(sequence)) > 0:
-            raise TypeError(f"Illegal path: {sequence}")
+            raise ValueError(f"Illegal path: {sequence}")
 
         self = sequence  # type: ignore
 
@@ -59,7 +59,7 @@ class AbsolutePath(Path):
             raise TypeError("AbsolutePath must be a string or Path")
 
         if str(sequence).startswith("/") is False:
-            raise TypeError(
+            raise ValueError(
                 f"Expected AbsolutePath to begin with /, but got: {sequence}"
             )
 
