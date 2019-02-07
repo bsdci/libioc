@@ -25,8 +25,6 @@
 import typing
 import os.path
 
-import git
-
 import libioc.errors
 import libioc.events
 import libioc.Pkg
@@ -78,7 +76,7 @@ class ControlRepoDefinition(dict):
         self.source = source
         self._pkgs = ['puppet6']  # make this a Global Varialbe
         if source.remote is True:
-            self._pkgs += 'rubygem-r10k'
+            self._pkgs += ['rubygem-r10k', 'git-lite']
 
     @property
     def source(
@@ -150,16 +148,9 @@ def provision(
     if self.source.remote:
         mode = 'rw'  # we'll need to run r10k here..
         plugin_dataset_name = f"{self.jail.dataset.name}/puppet"
-        plugin_dataset = self.zfs.get_or_create_dataset(
+        plugin_dataset = self.jail.zfs.get_or_create_dataset(
             plugin_dataset_name
         )
-
-        if not os.path.isdir(plugin_dataset_name):
-            # only clone if it doesn't already exist
-            git.Repo.clone_from(
-                pluginDefinition.source,
-                plugin_dataset.mountpoint
-            )
 
         mount_source = plugin_dataset.mountpoint
     else:
@@ -211,15 +202,17 @@ def provision(
 
             yield r10kDeployEvent.begin()
             try:
-                r10k_cfg = f"{self.jail.root_path}/usr/local/etc/r10k/r10k.yml"
+                r10k_dir = f"{self.jail.root_path}/usr/local/etc/r10k"
+                r10k_cfg = f"{r10k_dir}/r10k.yaml"
+                if not os.path.isdir(f"{r10k_dir}"):
+                    os.mkdir(r10k_dir, mode=0o755)
                 self.jail.logger.verbose(f"Writing r10k config {r10k_cfg}")
                 with open(r10k_cfg, "w") as f:
-                    f.write(f"""---
-                    :source:
-                        puppet:
-                            basedir: {puppet_env_dir}
-                            remote: {self.source}
-                    """)
+                    f.write("\n".join([f"---",
+                    ":sources:",
+                    "    puppet:",
+                    f"       basedir: {puppet_env_dir}",
+                    f"       remote: {self.source}\n"]))
 
                 self.jail.logger.verbose("Deploying r10k config")
                 self.jail.exec([
