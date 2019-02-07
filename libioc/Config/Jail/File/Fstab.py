@@ -642,7 +642,7 @@ class Fstab(collections.MutableSequence):
             # find FstabAutoPlaceholderLine instead
             line = list(filter(
                 lambda x: isinstance(x, FstabAutoPlaceholderLine),
-                self._line
+                self._lines
             ))[0]
             real_index = self._lines.index(line)
         else:
