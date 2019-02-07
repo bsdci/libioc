@@ -106,14 +106,20 @@ def provision(
     Provision the jail with Puppet apply using the supplied control-repo.
 
     The repo can either be a filesystem path, or a http[s]/git URL.
-    If the repo is a filesystem path, it will be mounted appropriately.
-    If the repo is a URL, it will be setup with `r10k`.
+    If the repo is a filesystem path, it will be mounted to
+    `/usr/local/etc/puppet/environments`.
+    If the repo is a URL, we will setup a ZFS dataset and mount that to
+    `/usr/local/etc/puppet/environments`, before deploying it with `r10k`.
+
+    Example:
 
         ioc set \
             provisioning.method=puppet \
-            provisioning.source=http://example.com/my/puppet-env \
-            myjail
+            provisioning.source=http://github.com/bsdci/puppet-control-repo \
+            webserver
 
+    This should install a webserver that listens on port 80, and delivers a
+    Hello-World HTML site.
     """
     events = libioc.events
     jailProvisioningEvent = events.JailProvisioning(
