@@ -2175,6 +2175,14 @@ class JailGenerator(JailResource):
 
         jail_env["IOC_JAIL_PATH"] = self.root_dataset.mountpoint
         jail_env["IOC_JID"] = str(self.jid)
+        jail_env["PATH"] = ":".join((
+            "/sbin",
+            "/bin",
+            "/usr/sbin",
+            "/usr/bin",
+            "/usr/local/sbin",
+            "/usr/local/bin",
+        ))
 
         return jail_env
 

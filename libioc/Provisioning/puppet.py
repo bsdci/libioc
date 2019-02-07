@@ -202,10 +202,6 @@ def provision(
     )
 
     try:
-        env = {
-            'PATH':
-            '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'
-        }
         if self.source.remote is True:
 
             r10kDeployEvent = R10kDeployEvent(
@@ -231,7 +227,7 @@ def provision(
                     "deploy",
                     "environment",
                     "-pv"
-                ], env=env )
+                ])
             except Exception as e:
                 yield r10kDeployEvent.fail(e)
                 raise e
@@ -250,7 +246,7 @@ def provision(
                 "--logdest",
                 "syslog",
                 f"{puppet_env_dir}/production/manifests/site.pp"
-            ], env=env)
+            ])
             yield puppetApplyEvent.end()
         except Exception as e:
             yield puppetApplyEvent.fail(e)
