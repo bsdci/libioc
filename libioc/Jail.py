@@ -862,6 +862,7 @@ class JailGenerator(JailResource):
         raise NotImplementedError("_run_hook only supports start/stop")
 
     def _ensure_script_dir(self) -> None:
+        """Ensure that the launch scripts dir exists."""
         realpath = os.path.realpath(self.launch_script_dir)
         if realpath.startswith(self.dataset.mountpoint) is False:
             raise libioc.errors.SecurityViolationConfigJailEscape(
