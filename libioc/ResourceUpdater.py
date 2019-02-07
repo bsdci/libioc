@@ -560,12 +560,19 @@ class FreeBSD(Updater):
         return f"{base_url}/{release_name}/{filename}"
 
     @property
+    def _base_release_symlink_location(self) -> str:
+        """Return the virtual path of a symlink to the release p0 snapshot."""
+        return f"/tmp/ioc-release-{self.release.full_name}-p0"  # nosec: B108
+
+    @property
     def _update_command(self) -> typing.List[str]:
         return [
             f"{self.local_release_updates_dir}/{self.update_script_name}",
             "--not-running-from-cron",
             "-d",
             self.local_temp_dir,
+            "-b",
+            f"{self._base_release_symlink_location}/",
             "--currently-running",
             self.release.name,
             "-r",
@@ -583,6 +590,8 @@ class FreeBSD(Updater):
             f"{self.host_updates_dir}/temp",
             "--currently-running",
             self.release.name,
+            "-b",
+            f"{self._base_release_symlink_location}/",
             "-f",
             f"{self.host_updates_dir}/{self.update_conf_name}",
             "--not-running-from-cron",
@@ -603,12 +612,17 @@ class FreeBSD(Updater):
     def _wrap_command(self, command: str, kind: str) -> str:
 
         if kind == "update":
+            symlink_command = f"ln -s / {self._base_release_symlink_location}"
             tolerated_error_message = (
                 "echo $OUTPUT"
                 " | grep -c 'No updates are available to install.'"
                 " >> /dev/null || exit $RC"
             )
         elif kind == "fetch":
+            symlink_command = (
+                f"ln -s  {self.release.root_path}/.zfs/snapshot/p0 "
+                f"{self._base_release_symlink_location}"
+            )
             tolerated_error_message = (
                 "echo $OUTPUT"
                 " | grep -c 'HAS PASSED ITS END-OF-LIFE DATE.'"
@@ -619,9 +633,11 @@ class FreeBSD(Updater):
 
         _command = "\n".join([
             "set +e",
+            symlink_command,
             f"OUTPUT=\"$({command})\"",
-            "echo $OUTPUT",
             "RC=$?",
+            "echo $OUTPUT",
+            f"rm {self._base_release_symlink_location}",
             "if [ $RC -gt 0 ]; then",
             tolerated_error_message,
             "fi"
