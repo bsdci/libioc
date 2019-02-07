@@ -24,11 +24,90 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage provisioning prototype."""
 import typing
+import urllib.parse
 
 import libioc.errors
+import libioc.Types
 import libioc.helpers
 import libioc.Provisioning.ix
 import libioc.Provisioning.puppet
+
+_SourceType = typing.Union[
+    urllib.parse.ParseResult,
+    libioc.Types.AbsolutePath,
+]
+_SourceInputType = typing.Union[_SourceType, str]
+
+class Source(str):
+
+    _value: _SourceType
+
+    def __init__(
+        self,
+        value: _SourceInputType
+    ) -> None:
+       self.value = value
+
+    @property
+    def value(self) -> _SourceType:
+        return self._value
+
+    @value.setter
+    def value(self, value: _SourceInputType) -> None:
+
+        if isinstance(value, libioc.Types.AbsolutePath) is True:
+            self._value = typing.Cast(libioc.Types.AbsolutePath, value)
+            return
+        elif isinstance(value, urllib.parse.ParseResult) is True:
+            url = typing.Cast(urllib.parse.ParseResult, value)
+            self.__require_valid_url(url)
+            self._value = _value
+            return
+        elif isinstance(value, str) is False:
+            raise TypeError(
+                f"Input must be URL, AbsolutePath or str, but was {type(value)}"
+            )
+
+        try:
+            self._value = libioc.Types.AbsolutePath(value)
+            return
+        except ValueError as e:
+            pass
+
+        try:
+            url = urllib.parse.urlparse(value)
+            self.__require_valid_url(url)
+            self._value = url
+            return
+        except ValueError:
+            pass
+
+        raise ValueError("Provisioning Source must be AbsolutePath or URL")
+
+    @property
+    def local(self) -> bool:
+        """Return True when the source is local."""
+        return (isinstance(self.value, libioc.Types.AbsolutePath) is True)
+
+    @property
+    def remote(self) -> bool:
+        """Return True when the source is a remote URL."""
+        return (self.local is False)
+
+    def __require_valid_url(self, url: urllib.parse.ParseResult) -> None:
+        if url.scheme not in ("https", "http", "ssh", "git"):
+            raise ValueError(f"Invalid Source Scheme: {url.scheme}")
+
+    def __str__(self) -> str:
+        """Return the Provisioning Source as string."""
+        value = self.value
+        if isinstance(value, urllib.parse.ParseResult) is True:
+            return value.geturl()
+        else:
+            return str(value)
+
+    def __repr__(self) -> str:
+        return f"<Source '{self.__str__()}'>"
 
 
 class Prototype:
@@ -47,14 +126,14 @@ class Prototype:
 		self.__METHOD
 
 	@property
-	def source(self) -> typing.Optional[str]:
+	def source(self) -> typing.Optional[Source]:
 		config_value = self.jail.config["provisioning.source"]
-		return None if (config_value is None) else str(config_value)
+		return None if (config_value is None) else Source(config_value)
 
 	@property
 	def rev(self) -> typing.Optional[str]:
 		config_value = self.jail.config["provisioning.rev"]
-		return None if (config_value is None) else str(config_value)
+		return None if (config_value is None) else str(Source(config_value))
 
 	def check_requirements(self) -> None:
 		"""Check requirements before executing the provisioner."""

@@ -24,7 +24,6 @@
 """ioc provisioner for use with `puppet apply`."""
 import typing
 import os.path
-import urllib.parse
 
 import git
 
@@ -51,99 +50,54 @@ class ControlRepoUnavailableError(libioc.errors.IocException):
         )
 
 
+class R10kDeployEvent(libioc.events.JailEvent):
+    """Deploy control repo and install puppet modules."""
+
+    pass
+
+
+class PuppetApplyEvent(libioc.events.JailEvent):
+    """Apply the puppet manifest."""
+
+    pass
+
+
 class ControlRepoDefinition(dict):
     """Puppet control-repo definition."""
 
-    _source: str
+    __source: str
     _pkgs: typing.List[str]
 
     def __init__(
         self,
-        source: typing.Union[
-            urllib.parse.DefragResult,
-            libioc.Types.AbsolutePath
-        ],
+        source: 'libioc.Provisioning.Source',
         logger: 'libioc.Logger.Logger'
     ) -> None:
         self.logger = logger
 
-        if isinstance(source, libioc.Types.AbsolutePath) is False \
-           and isinstance(source, urllib.parse.ParseResult) is False:
-            raise TypeError("Source must be an URL or an absolute path")
         self.source = source
-
         self._pkgs = ['puppet6']  # make this a Global Varialbe
-        if isinstance(source, libioc.Types.AbsolutePath) is False:
+        if source.remote is True:
             self._pkgs += 'rubygem-r10k'
 
     @property
-    def local(self) -> bool:
-        """Return whether this control repo resides locally."""
-        _source = self.source
-        if isinstance(_source, libioc.Types.AbsolutePath) is False:
-            return False
-        return True
-
-    @property
-    def remote(self) -> bool:
-        """Return whether this control repo resides locally."""
-        return not self.local
-
-    @property
-    def source(self) -> str:
+    def source(
+        self
+    ) -> 'libioc.Provisioning.Source':
         """Return the Puppet Control-Repo URL."""
-        return self._source
+        return self.__source
 
     @source.setter
-    def source(self, value: typing.Union[
-            urllib.parse.ParseResult,
-            libioc.Types.AbsolutePath
-    ]) -> None:
+    def source(self, source: 'libioc.Provisioning.Source') -> None:
         """Set the Puppet Control-Repo URL."""
-        _source: urllib.parse.ParseResult
-        if isinstance(value, urllib.parse.ParseResult) is True:
-            _source = typing.cast(urllib.parse.ParseResult, value)
-            if _source.fragment != "":
-                raise ValueError("URL may not contain fragment")
-
-            self._source = _source.geturl()
-        elif isinstance(value, libioc.Types.AbsolutePath) is True:
-            _source = value
-        else:
-            raise TypeError(
-                "Source must be urllib.parse.ParseResult or absolute path"
-            )
+        if isinstance(source, libioc.Provisioning.Source) is False:
+            raise TypeError("Source must be libioc.Provisioning.Source")
+        self.__source = source
 
     @property
     def pkgs(self) -> typing.List[str]:
         """Return list of packages required for this Provisioning method."""
         return self._pkgs
-
-    def generate_postinstall(self) -> str:
-        """Return list of strings representing our postinstall."""
-        basedir = "/usr/local/etc/puppet/environments"
-        postinstall = """#!/bin/sh
-        set -eu
-
-        """
-
-        if self.remote:
-            postinstall += f"""cat > /usr/local/etc/r10k/r10k.yml <EOF
-            ---
-            :source:
-                puppet:
-                    basedir: {basedir}
-                    remote: {self.source}
-            >EOF
-
-            r10k deploy environment -pv
-
-            """
-
-        postinstall += f"""
-        puppet apply --debug {basedir}/manifests/site.pp
-        """
-        return postinstall
 
 
 def provision(
@@ -178,8 +132,14 @@ def provision(
     # download / mount provisioning assets
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
+        if self.source is None:
+            raise libioc.errors.InvalidJailConfigValue(
+                property_name="provisioning.source",
+                reason="Source may not be empty",
+                logger=self.jail.logger
+            )
         pluginDefinition = ControlRepoDefinition(
-            source=urllib.parse.urlparse(self.source).geturl(),
+            source=self.source,
             logger=self.jail.logger
         )
         yield jailProvisioningAssetDownloadEvent.end()
@@ -187,7 +147,7 @@ def provision(
         yield jailProvisioningAssetDownloadEvent.fail(e)
         raise e
 
-    if pluginDefinition.remote:
+    if self.source.remote:
         mode = 'rw'  # we'll need to run r10k here..
         plugin_dataset_name = f"{self.jail.dataset.name}/puppet"
         plugin_dataset = self.zfs.get_or_create_dataset(
@@ -206,38 +166,106 @@ def provision(
         mode = 'ro'
         mount_source = self.source
 
+    if self.jail.stopped is True:
+        started = True
+        jailStartEvent = libioc.events.JailStart(
+            jail=self.jail,
+            scope=jailProvisioningEvent.scope
+        )
+        yield jailStartEvent.begin()
+        yield from self.jail.start(event_scope=jailStartEvent.scope)
+        yield jailStartEvent.end()
+    else:
+        started = False
+
+    pkg = libioc.Pkg.Pkg(
+        logger=self.jail.logger,
+        zfs=self.jail.zfs,
+        host=self.jail.host
+    )
+
+    yield from pkg.install(
+        jail=self.jail,
+        packages=list(pluginDefinition.pkgs),
+        event_scope=jailProvisioningEvent.scope
+    )
+
+    puppet_env_dir = "/usr/local/etc/puppet/environments"
+
+    self.jail.logger.spam("Mounting puppet environment")
     self.jail.fstab.new_line(
         source=mount_source,
-        destination="/usr/local/etc/puppet",
+        destination=puppet_env_dir,
         options=mode,
         auto_create_destination=True,
         replace=True
     )
-    self.jail.fstab.save()
-
-    if "pkgs" in pluginDefinition.keys():
-        pkg_packages = list(pluginDefinition.pkgs)
-    else:
-        pkg_packages = []
 
     try:
-        pkg = libioc.Pkg.Pkg(
-            logger=self.jail.logger,
-            zfs=self.jail.zfs,
-            host=self.jail.host
+        env = {
+            'PATH':
+            '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'
+        }
+        if self.source.remote is True:
+
+            r10kDeployEvent = R10kDeployEvent(
+                scope=jailProvisioningEvent.scope,
+                jail=self.jail
+            )
+
+            yield r10kDeployEvent.begin()
+            try:
+                r10k_cfg = f"{self.jail.root_path}/usr/local/etc/r10k/r10k.yml"
+                self.jail.logger.verbose(f"Writing r10k config {r10k_cfg}")
+                with open(r10k_cfg, "w") as f:
+                    f.write(f"""---
+                    :source:
+                        puppet:
+                            basedir: {puppet_env_dir}
+                            remote: {self.source}
+                    """)
+
+                self.jail.logger.verbose("Deploying r10k config")
+                self.jail.exec([
+                    "r10k",
+                    "deploy",
+                    "environment",
+                    "-pv"
+                ], env=env )
+            except Exception as e:
+                yield r10kDeployEvent.fail(e)
+                raise e
+            yield r10kDeployEvent.end()
+
+        puppetApplyEvent = PuppetApplyEvent(
+            scope=jailProvisioningEvent.scope,
+            jail=self.jail
         )
+        yield puppetApplyEvent.begin()
+        try:
+            self.jail.exec([
+                "puppet",
+                "apply",
+                "--debug",
+                "--logdest",
+                "syslog",
+                f"{puppet_env_dir}/production/manifests/site.pp"
+            ], env=env)
+            yield puppetApplyEvent.end()
+        except Exception as e:
+            yield puppetApplyEvent.fail(e)
+            raise e
 
-        postinstall_script = pluginDefinition.generate_postinstall()
-        postinstall = "{self.jail.abspath}/launch-scripts/provision.sh"
-        with open(postinstall, 'w') as f:
-            f.write(postinstall_script)
+        if started is True:
+            jailStopEvent = libioc.events.JailShutdown(
+                jail=self.jail,
+                scope=jailProvisioningEvent.scope
+            )
+            yield jailStopEvent.begin()
+            yield from self.jail.stop(event_scope=jailStopEvent.scope)
+            yield jailStopEvent.end()
+    finally:
+        # in case anything fails the fstab mount needs to be removed
+        del self.jail.fstab[-1]
 
-        yield from pkg.fetch_and_install(
-            jail=self.jail,
-            packages=pkg_packages,
-            postinstall=postinstall
-        )
-    except Exception as e:
-        yield jailProvisioningEvent.fail(e)
-        raise e
-
+    yield jailProvisioningEvent.end()
