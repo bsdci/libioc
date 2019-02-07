@@ -147,10 +147,7 @@ class FstabAutoPlaceholderLine(dict):
         return hash(None)
 
 
-class Fstab(
-    libioc.Config.Jail.File.ResourceConfig,
-    collections.MutableSequence
-):
+class Fstab(collections.MutableSequence):
     """
     Fstab configuration file wrapper.
 
@@ -203,10 +200,7 @@ class Fstab(
             path = self.file
         else:
             path = f"{self.jail.dataset.mountpoint}/{self.file}"
-            self._require_path_relative_to_resource(
-                filepath=path,
-                resource=self.jail
-            )
+            self.jail._require_relative_path(path)
 
         return path
 
@@ -400,7 +394,16 @@ class Fstab(
 
         Use save() to write changes to the fstab file.
         """
-        if self.__contains__(line):
+        if type(line) == FstabLine:
+            if self.jail._is_path_relative(line["destination"]) is False:
+                line = FstabLine(line)  # clone to prevent mutation
+                line["destination"] = libioc.Types.AbsolutePath("/".join([
+                    self.jail.root_path,
+                    line["destination"].lstrip("/")
+                ]))
+
+        line_already_exists = self.__contains__(line)
+        if line_already_exists:
             destination = line["destination"]
             if replace is True:
                 self.logger.verbose(
@@ -425,11 +428,13 @@ class Fstab(
 
         if type(line) == FstabLine:
             # destination is always relative to the jail resource
-            if line["destination"].startswith(self.jail.root_path) is False:
-                line["destination"] = libioc.Types.AbsolutePath("/".join([
+            if self.jail._is_path_relative(line["destination"]) is False:
+                _destination = libioc.Types.AbsolutePath("/".join([
                     self.jail.root_path,
                     line["destination"].strip("/")
                 ]))
+                self.jail._require_relative_path(_destination)
+                line["destination"] = _destination
 
             libioc.helpers.require_no_symlink(str(line["destination"]))
 
@@ -442,12 +447,17 @@ class Fstab(
                     os.makedirs(line["destination"], 0o700)
 
             if (auto_mount_jail and self.jail.running) is True:
+                destination = line["destination"]
+                self.jail._require_relative_path(destination)
+                self.logger.verbose(
+                    f"auto-mount {destination}"
+                )
                 mount_command = [
                     "/sbin/mount",
                     "-o", line["options"],
                     "-t", line["type"],
                     line["source"],
-                    line["destination"]
+                    destination
                 ]
                 libioc.helpers.exec(mount_command, logger=self.logger)
                 _source = line["source"]

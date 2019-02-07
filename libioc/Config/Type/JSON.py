@@ -53,6 +53,6 @@ class DatasetConfigJSON(
     libioc.Config.Dataset.DatasetConfig,
     ConfigJSON
 ):
-    """ResourceConfig in JSON format."""
+    """ConfigFile in JSON format."""
 
     pass

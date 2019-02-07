@@ -52,6 +52,6 @@ class DatasetConfigUCL(
     libioc.Config.Dataset.DatasetConfig,
     ConfigUCL
 ):
-    """ResourceConfig in UCL format."""
+    """ConfigFile in UCL format."""
 
     pass

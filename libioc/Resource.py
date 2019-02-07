@@ -365,6 +365,28 @@ class Resource(metaclass=abc.ABCMeta):
             "This needs to be implemented by the inheriting class"
         )
 
+    def _require_relative_path(
+        self,
+        filepath: str,
+    ) -> None:
+        if self._is_path_relative(filepath) is False:
+            raise libioc.errors.SecurityViolationConfigJailEscape(
+                file=filepath
+            )
+
+    def _is_path_relative(
+        self,
+        filepath: str
+    ) -> bool:
+
+        real_resource_path = self._resolve_path(self.dataset.mountpoint)
+        real_file_path = self._resolve_path(filepath)
+
+        return real_file_path.startswith(real_resource_path)
+
+    def _resolve_path(self, filepath: str) -> str:
+        return os.path.realpath(os.path.abspath(filepath))
+
 
 class DefaultResource(Resource):
     """The resource storing the default configuration."""

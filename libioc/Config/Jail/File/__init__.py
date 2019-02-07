@@ -30,36 +30,6 @@ import libioc.helpers
 import libioc.helpers_object
 import libioc.LaunchableResource
 
-
-class ResourceConfig:
-    """Shared abstract code between various config files in a resource."""
-
-    def _require_path_relative_to_resource(
-        self,
-        filepath: str,
-        resource: 'libioc.LaunchableResource.LaunchableResource'
-    ) -> None:
-
-        if self._is_path_relative_to_resource(filepath, resource) is False:
-            raise libioc.errors.SecurityViolationConfigJailEscape(
-                file=filepath
-            )
-
-    def _is_path_relative_to_resource(
-        self,
-        filepath: str,
-        resource: 'libioc.LaunchableResource.LaunchableResource'
-    ) -> bool:
-
-        real_resource_path = self._resolve_path(resource.dataset.mountpoint)
-        real_file_path = self._resolve_path(filepath)
-
-        return real_file_path.startswith(real_resource_path)
-
-    def _resolve_path(self, filepath: str) -> str:
-        return os.path.realpath(os.path.abspath(filepath))
-
-
 class ConfigFile(dict):
     """Abstraction of UCL file based config files in Resources."""
 
@@ -221,7 +191,7 @@ class ConfigFile(dict):
         return None
 
 
-class ResourceConfigFile(ConfigFile, ResourceConfig):
+class ResourceConfigFile(ConfigFile):
     """Abstraction of UCL file based config files in Resources."""
 
     def __init__(
@@ -238,8 +208,5 @@ class ResourceConfigFile(ConfigFile, ResourceConfig):
     def path(self) -> str:
         """Absolute path to the file."""
         path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
-        self._require_path_relative_to_resource(
-            filepath=path,
-            resource=self.resource
-        )
+        self.resource._require_relative_path(path)
         return os.path.abspath(path)
