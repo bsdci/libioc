@@ -215,10 +215,10 @@ def provision(
                 self.jail.logger.verbose(f"Writing r10k config {r10k_cfg}")
                 with open(r10k_cfg, "w") as f:
                     f.write("\n".join([f"---",
-                    ":sources:",
-                    "    puppet:",
-                    f"       basedir: {puppet_env_dir}",
-                    f"       remote: {self.source}\n"]))
+                                       ":sources:",
+                                       "    puppet:",
+                                       f"       basedir: {puppet_env_dir}",
+                                       f"       remote: {self.source}\n"]))
 
                 self.jail.logger.verbose("Deploying r10k config")
                 self.jail.exec([
