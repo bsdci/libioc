@@ -735,6 +735,8 @@ class ReleaseGenerator(ReleaseResource):
         else:
             yield releaseConfigurationEvent.skip()
 
+        self.snapshot("p0")
+
         if fetch_updates is True:
             try:
                 for event in self.updater.fetch(event_scope=_scope):
