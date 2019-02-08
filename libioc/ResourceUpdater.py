@@ -317,11 +317,7 @@ class Updater:
             f"Fetching updates for release '{self.release.name}'"
         )
 
-        symlink_src = self.release.root_path
-        if "p0" in [x.snapshot_name for x in self.release.version_snapshots]:
-            # use p0 snapshot if available
-            symlink_src += "/.zfs/snapshot/p0"
-        os.symlink(symlink_src, self._base_release_symlink_location)
+        self._pre_fetch()
 
         try:
             self._create_download_dir()
@@ -334,7 +330,7 @@ class Updater:
             yield releaseUpdateDownloadEvent.fail(e)
             raise
         finally:
-            os.unlink(self._base_release_symlink_location)
+            self._post_fetch()
         yield releaseUpdateDownloadEvent.end()
 
     def _snapshot_release_after_update(self) -> None:
@@ -411,10 +407,8 @@ class Updater:
         yield executeResourceUpdateEvent.begin()
 
         skipped = False
+        self._pre_update()
 
-        lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
-        self.resource._require_relative_path(lnk)
-        os.symlink("/", lnk)
         try:
             self._create_jail_update_dir()
             for event in libioc.Jail.JailGenerator.fork_exec(
@@ -454,7 +448,7 @@ class Updater:
                     force=True,
                     event_scope=executeResourceUpdateEvent.scope
                 )
-            os.unlink(lnk)
+            self._post_update()
 
         if skipped is True:
             yield executeResourceUpdateEvent.skip("already up to date")
@@ -463,6 +457,22 @@ class Updater:
 
         self.logger.verbose(f"Resource '{self.resource.name}' updated")
         yield True  # ToDo: yield False if nothing was updated
+
+    def _pre_fetch(self) -> None:
+        """Execute before executing the fetch command."""
+        pass
+
+    def _post_fetch(self) -> None:
+        """Execute after executing the fetch command."""
+        pass
+
+    def _pre_update(self) -> None:
+        """Execute before executing the update command."""
+        pass
+
+    def _post_update(self) -> None:
+        """Execute after executing the update command."""
+        pass
 
 
 class HardenedBSD(Updater):
@@ -666,6 +676,30 @@ class FreeBSD(Updater):
         return int(libioc.helpers.get_os_version(
             f"{self.resource.root_path}/bin/freebsd-version"
         )["patch"])
+
+    def _pre_fetch(self) -> None:
+        """Execute before executing the fetch command."""
+        symlink_src = self.release.root_path
+        if "p0" in [x.snapshot_name for x in self.release.version_snapshots]:
+            # use p0 snapshot if available
+            symlink_src += "/.zfs/snapshot/p0"
+        os.symlink(symlink_src, self._base_release_symlink_location)
+
+    def _post_fetch(self) -> None:
+        """Execute after executing the fetch command."""
+        os.unlink(self._base_release_symlink_location)
+
+    def _pre_update(self) -> None:
+        """Execute before executing the update command."""
+        lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
+        self.resource._require_relative_path(lnk)
+        os.symlink("/", lnk)
+
+    def _post_update(self) -> None:
+        """Execute after executing the update command."""
+        lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
+        self.resource._require_relative_path(f"{lnk}/..")
+        os.unlink(lnk)
 
 
 def get_launchable_update_resource(  # noqa: T484
