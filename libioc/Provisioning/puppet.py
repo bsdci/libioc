@@ -114,8 +114,8 @@ def provision(
     Example:
 
         ioc set \
-            provisioning.method=puppet \
-            provisioning.source=http://github.com/bsdci/puppet-control-repo \
+            provision.method=puppet \
+            provision.source=http://github.com/bsdci/puppet-control-repo \
             webserver
 
     This should install a webserver that listens on port 80, and delivers a
@@ -138,7 +138,7 @@ def provision(
         yield jailProvisioningAssetDownloadEvent.begin()
         if self.source is None:
             raise libioc.errors.InvalidJailConfigValue(
-                property_name="provisioning.source",
+                property_name="provision.source",
                 reason="Source may not be empty",
                 logger=self.jail.logger
             )

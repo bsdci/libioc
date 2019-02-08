@@ -122,9 +122,9 @@ def provision(
 
     Installable ix-iocage plugins can be found on the registry repository
     https://github.com/freenas/iocage-ix-plugins/ and may be configured
-    as a jails provisioning.source property, e.g.:
+    as a jails provision.source property, e.g.:
 
-        ioc set provisioning.method=ix provisioning.source=jenkins myjail
+        ioc set provision.method=ix provision.source=jenkins myjail
     """
     events = libioc.events
     jailProvisioningEvent = events.JailProvisioning(

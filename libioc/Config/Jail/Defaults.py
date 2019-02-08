@@ -96,7 +96,7 @@ DEFAULTS = libioc.Config.Data.Data({
     "template": False,
     "jail_zfs": False,
     "jail_zfs_dataset": None,
-    "provisioning": {
+    "provision": {
         "method": None,
         "source": None,
         "rev": "master"
