@@ -25,6 +25,7 @@
 """iocage ZFS share storage backend."""
 import typing
 import libzfs
+import shlex
 
 import libioc.errors
 import libioc.helpers
@@ -58,23 +59,23 @@ class ZFSShareStorage:
                 "/sbin/zfs",
                 "set",
                 "jailed=off",
-                dataset.name
+                shlex.quote(dataset.name)
             ])
             self._exec([
                 "/sbin/zfs",
                 "umount",
-                dataset.name
+                shlex.quote(dataset.name)
             ])
             self._exec([
                 "/sbin/zfs",
                 "mount",
-                dataset.name
+                shlex.quote(dataset.name)
             ])
             self._exec([
                 "/sbin/zfs",
                 "set",
                 "jailed=on",
-                dataset.name
+                shlex.quote(dataset.name)
             ])
 
     def get_zfs_datasets(
@@ -125,7 +126,7 @@ class ZFSShareStorage:
 
             # ToDo: bake jail feature into py-libzfs
             self._exec(
-                self._zfs_jail_command + [dataset.name],
+                self._zfs_jail_command + [shlex.quote(dataset.name)],
                 logger=self.logger
             )
 
