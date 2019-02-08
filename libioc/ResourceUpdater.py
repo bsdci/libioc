@@ -335,7 +335,7 @@ class Updater:
             os.unlink(self._base_release_symlink_location)
         yield releaseUpdateDownloadEvent.end()
 
-    def _snapshot_after_release_update(self) -> None:
+    def _snapshot_release_after_update(self) -> None:
         self.release.snapshot(f"p{self.patch_version}")
 
     def apply(
@@ -346,9 +346,9 @@ class Updater:
         bool
     ], None, None]:
         """Apply the fetched updates to the associated release or jail."""
-        dataset = self.host_updates_dataset
+        updates_dataset = self.host_updates_dataset
         snapshot_name = libioc.ZFS.append_snapshot_datetime(
-            f"{dataset.name}@pre-update"
+            f"{updates_dataset.name}@pre-update"
         )
 
         runResourceUpdateEvent = libioc.events.RunResourceUpdate(
@@ -359,15 +359,15 @@ class Updater:
         yield runResourceUpdateEvent.begin()
 
         # create snapshot before the changes
-        dataset.snapshot(name=snapshot_name, recursive=True)
+        updates_dataset.snapshot(name=snapshot_name, recursive=True)
 
-        def _rollback_snapshot() -> None:
+        def _rollback_updates_snapshot() -> None:
             self.logger.spam(f"Rolling back to snapshot {snapshot_name}")
             snapshot = self.resource.zfs.get_snapshot(snapshot_name)
             snapshot.rollback(force=True)
             snapshot.delete()
 
-        runResourceUpdateEvent.add_rollback_step(_rollback_snapshot)
+        runResourceUpdateEvent.add_rollback_step(_rollback_updates_snapshot)
 
         jail = self.temporary_jail
         changed: bool = False
@@ -382,8 +382,12 @@ class Updater:
             yield runResourceUpdateEvent.fail(e)
             raise
 
-        _rollback_snapshot()
-        self._snapshot_after_release_update()
+        # restore any changes to the update dataset
+        _rollback_updates_snapshot()
+
+        if isinstance(self.resource, libioc.Release.ReleaseGenerator):
+            self._snapshot_release_after_update()
+
         yield runResourceUpdateEvent.end()
         yield changed
 
