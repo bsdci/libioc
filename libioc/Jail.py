@@ -1705,12 +1705,14 @@ class JailGenerator(JailResource):
             f"allow.mount.zfs={self._allow_mount_zfs}",
             f"allow.quotas={self._get_value('allow_quotas')}",
             f"allow.socket_af={self._get_value('allow_socket_af')}",
-            f"allow.vmm={self._get_value('allow_vmm')}",
             f"exec.timeout={self._get_value('exec_timeout')}",
             f"stop.timeout={self._get_value('stop_timeout')}",
             f"mount.fstab={self.fstab.path}",
             f"mount.devfs={self._get_value('mount_devfs')}"
         ]
+
+        if self.config["allow_vmm"] is True:
+            command.append("allow.vmm=1")
 
         if self.host.userland_version > 9.3:
             command += [
