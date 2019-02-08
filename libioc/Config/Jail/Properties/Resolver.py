@@ -162,7 +162,7 @@ class ResolverProp(collections.MutableSequence):
                 )
         elif method == "skip":
             # directly set config property
-            self.config.get_raw["resolver"] = None
+            self.config.data["resolver"] = None
         else:
             if isinstance(value, str):
                 self.append(str(value), notify=False)
