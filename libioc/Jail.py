@@ -1609,6 +1609,25 @@ class JailGenerator(JailResource):
         if self._allow_mount_zfs == "1":
             devfs_ruleset.append("add path zfs unhide")
 
+        if self.config["jail_zfs"] is True:
+            unhidden_parents: typing.Set[str] = set()
+            shared_datasets = self._zfs_share_storage.get_zfs_datasets()
+            if len(shared_datasets) > 0:
+                devfs_ruleset.append("add path zvol unhide")
+                for shared_dataset in shared_datasets:
+                    current_dataset_name = "zvol"
+                    for fragment in shared_dataset.name.split("/"):
+                        current_dataset_name += f"/{fragment}"
+                        if current_dataset_name in unhidden_parents:
+                            continue
+                        unhidden_parents.add(current_dataset_name)
+                        devfs_ruleset.append(
+                            f"add path {current_dataset_name} unhide"
+                        )
+                    devfs_ruleset.append(
+                        f"add path {current_dataset_name}/* unhide"
+                    )
+
         # create if the final rule combination does not exist as ruleset
         if devfs_ruleset not in self.host.devfs:
             self.logger.verbose("New devfs ruleset combination")
