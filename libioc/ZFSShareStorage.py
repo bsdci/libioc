@@ -87,18 +87,18 @@ class ZFSShareStorage:
         datasets = set()
         for name in dataset_names:
 
-            try:
-                zpool = self._get_pool_from_dataset_name(name)
-            except libioc.errors.ZFSPoolUnavailable:
-                # legacy support (datasets not prefixed with pool/)
-                zpool = self.jail.pool
-                name = f"{self.jail.pool_name}/{name}"
+            if auto_create is True:
+                try:
+                    zpool = self._get_pool_from_dataset_name(name)
+                except libioc.errors.ZFSPoolUnavailable:
+                    # legacy support (datasets not prefixed with pool/)
+                    zpool = self.jail.pool
+                    name = f"{self.jail.pool_name}/{name}"
 
-            try:
-                if auto_create is True:
+                try:
                     zpool.create(name, {}, create_ancestors=True)
-            except libzfs.ZFSException:
-                pass
+                except libzfs.ZFSException:
+                    pass
 
             try:
                 dataset = self.zfs.get_dataset(name)
