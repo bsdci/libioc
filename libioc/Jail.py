@@ -520,10 +520,7 @@ class JailGenerator(JailResource):
                 exec_start.append("service ipfw onestop")
 
         if self.config["jail_zfs"] is True:
-            share_storage = libioc.ZFSShareStorage.QueuingZFSShareStorage(
-                jail=self,
-                logger=self.logger
-            )
+            share_storage = self._zfs_share_storage
             share_storage.mount_zfs_shares()
             exec_start += share_storage.read_commands("jail")
             exec_created += share_storage.read_commands()
@@ -614,6 +611,15 @@ class JailGenerator(JailResource):
             raise e
 
         yield jailLaunchEvent.end(stdout=stdout)
+
+    @property
+    def _zfs_share_storage(
+        self
+    ) -> libioc.ZFSShareStorage.QueuingZFSShareStorage:
+        return libioc.ZFSShareStorage.QueuingZFSShareStorage(
+            jail=self,
+            logger=self.logger
+        )
 
     def _start_dependant_jails(
         self,
