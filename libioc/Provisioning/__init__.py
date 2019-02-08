@@ -46,7 +46,7 @@ class Source(str):
         self,
         value: _SourceInputType
     ) -> None:
-        self._value = value
+        self.value = value
 
     @property
     def value(self) -> _SourceType:
