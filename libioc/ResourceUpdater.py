@@ -411,10 +411,10 @@ class Updater:
         yield executeResourceUpdateEvent.begin()
 
         skipped = False
-        self.resource._require_relative_path(
-            self._base_release_symlink_location
-        )
-        os.symlink("/", self._base_release_symlink_location)
+
+        lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
+        self.resource._require_relative_path(lnk)
+        os.symlink("/", lnk)
         try:
             self._create_jail_update_dir()
             for event in libioc.Jail.JailGenerator.fork_exec(
@@ -454,7 +454,7 @@ class Updater:
                     force=True,
                     event_scope=executeResourceUpdateEvent.scope
                 )
-            os.unlink(self._base_release_symlink_location)
+            os.unlink(lnk)
 
         if skipped is True:
             yield executeResourceUpdateEvent.skip("already up to date")
