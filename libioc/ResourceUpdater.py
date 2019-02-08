@@ -317,10 +317,12 @@ class Updater:
             f"Fetching updates for release '{self.release.name}'"
         )
 
-        os.symlink(
-            f"{self.release.root_path}/.zfs/snapshot/p0",
-            self._base_release_symlink_location
-        )
+        symlink_src = self.release.root_path
+        if "p0" in [x.snapshot_name for x in self.release.version_snapshots]:
+            # use p0 snapshot if available
+            symlink_src += "/.zfs/snapshot/p0"
+        os.symlink(symlink_src, self._base_release_symlink_location)
+
         try:
             self._create_download_dir()
             libioc.helpers.exec(
