@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Updater for Releases and other LaunchableResources like Jails."""
 import typing
+import os
 import os.path
 import re
 import shutil
@@ -315,6 +316,11 @@ class Updater:
         self.logger.verbose(
             f"Fetching updates for release '{self.release.name}'"
         )
+
+        os.symlink(
+            f"{self.release.root_path}/.zfs/snapshot/p0",
+            self._base_release_symlink_location
+        )
         try:
             self._create_download_dir()
             libioc.helpers.exec(
@@ -325,6 +331,8 @@ class Updater:
         except Exception as e:
             yield releaseUpdateDownloadEvent.fail(e)
             raise
+        finally:
+            os.unlink(self._base_release_symlink_location)
         yield releaseUpdateDownloadEvent.end()
 
     def _snapshot_after_release_update(self) -> None:
@@ -397,6 +405,10 @@ class Updater:
         yield executeResourceUpdateEvent.begin()
 
         skipped = False
+        self.resource._require_relative_path(
+            self._base_release_symlink_location
+        )
+        os.symlink("/", self._base_release_symlink_location)
         try:
             self._create_jail_update_dir()
             for event in libioc.Jail.JailGenerator.fork_exec(
@@ -436,6 +448,7 @@ class Updater:
                     force=True,
                     event_scope=executeResourceUpdateEvent.scope
                 )
+            os.unlink(self._base_release_symlink_location)
 
         if skipped is True:
             yield executeResourceUpdateEvent.skip("already up to date")
@@ -612,17 +625,12 @@ class FreeBSD(Updater):
     def _wrap_command(self, command: str, kind: str) -> str:
 
         if kind == "update":
-            symlink_command = f"ln -s / {self._base_release_symlink_location}"
             tolerated_error_message = (
                 "echo $OUTPUT"
                 " | grep -c 'No updates are available to install.'"
                 " >> /dev/null || exit $RC"
             )
         elif kind == "fetch":
-            symlink_command = (
-                f"ln -s  {self.release.root_path}/.zfs/snapshot/p0 "
-                f"{self._base_release_symlink_location}"
-            )
             tolerated_error_message = (
                 "echo $OUTPUT"
                 " | grep -c 'HAS PASSED ITS END-OF-LIFE DATE.'"
@@ -633,11 +641,9 @@ class FreeBSD(Updater):
 
         _command = "\n".join([
             "set +e",
-            symlink_command,
             f"OUTPUT=\"$({command})\"",
             "RC=$?",
             "echo $OUTPUT",
-            f"rm {self._base_release_symlink_location}",
             "if [ $RC -gt 0 ]; then",
             tolerated_error_message,
             "fi"
