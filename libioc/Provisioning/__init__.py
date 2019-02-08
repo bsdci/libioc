@@ -112,70 +112,70 @@ class Source(str):
 
 class Prototype:
 
-	jail: 'libioc.Jail.JailGenerator'
-	__METHOD: str
+    jail: 'libioc.Jail.JailGenerator'
+    __METHOD: str
 
-	def __init__(
-		self,
-		jail: 'libioc.Jail.JailGenerator'
-	) -> None:
-		self.jail = jail
+    def __init__(
+            self,
+            jail: 'libioc.Jail.JailGenerator'
+    ) -> None:
+        self.jail = jail
 
-	@property
-	def method(self) -> str:
-		self.__METHOD
+    @property
+    def method(self) -> str:
+        return self.__METHOD
 
-	@property
-	def source(self) -> typing.Optional[Source]:
-		config_value = self.jail.config["provisioning.source"]
-		return None if (config_value is None) else Source(config_value)
+    @property
+    def source(self) -> typing.Optional[Source]:
+        config_value = self.jail.config["provision.source"]
+        return None if (config_value is None) else Source(config_value)
 
-	@property
-	def rev(self) -> typing.Optional[str]:
-		config_value = self.jail.config["provisioning.rev"]
-		return None if (config_value is None) else str(Source(config_value))
+    @property
+    def rev(self) -> typing.Optional[str]:
+        config_value = self.jail.config["provision.rev"]
+        return None if (config_value is None) else str(Source(config_value))
 
-	def check_requirements(self) -> None:
-		"""Check requirements before executing the provisioner."""
-		if self.source is None:
-			raise libioc.errors.UndefinedProvisionerSource(
-				logger=self.jail.logger
-			)
-		if self.method is None:
-			raise libioc.errors.UndefinedProvisionerMethod(
-				logger=self.jail.logger
-			)
+    def check_requirements(self) -> None:
+        """Check requirements before executing the provisioner."""
+        if self.source is None:
+            raise libioc.errors.UndefinedProvisionerSource(
+                logger=self.jail.logger
+            )
+        if self.method is None:
+            raise libioc.errors.UndefinedProvisionerMethod(
+                logger=self.jail.logger
+            )
 
 
 class Provisioner(Prototype):
 
-	@property
-	def method(self) -> str:
-		method = self.jail.config["provisioning.method"]
-		if method in self.__available_provisioning_modules:
-			return method
-		raise libioc.errors.InvalidProvisionerMethod(
-			method,
-			logger=self.jail.logger
-		)
+    @property
+    def method(self) -> str:
+        method = self.jail.config["provision.method"]
+        if method in self.__available_provisioning_modules:
+            return method
+        raise libioc.errors.InvalidProvisionerMethod(
+            method,
+            logger=self.jail.logger
+        )
 
-	@property
-	def __available_provisioning_modules(
-		self
-	) -> typing.Dict[str, Prototype]:
-		return dict(
-			ix=libioc.Provisioning.ix,
-			puppet=libioc.Provisioning.puppet
-		)
+    @property
+    def __available_provisioning_modules(
+            self
+    ) -> typing.Dict[str, Prototype]:
+        return dict(
+            ix=libioc.Provisioning.ix,
+            puppet=libioc.Provisioning.puppet
+        )
 
-	@property
-	def __provisioning_module(self) -> 'libioc.Provisioning.Provisioner':
-		"""Return the class of the currently configured provisioner."""
-		return self.__available_provisioning_modules[self.method]
+    @property
+    def __provisioning_module(self) -> 'libioc.Provisioning.Provisioner':
+        """Return the class of the currently configured provisioner."""
+        return self.__available_provisioning_modules[self.method]
 
-	def provision(
-		self
-	) -> typing.Generator['libioc.events.IocEvent', None, None]:
-		"""Run the provision method on the enabled provisioner."""
-		Prototype.check_requirements(self)
-		yield from self.__provisioning_module.provision(self)
+    def provision(
+            self
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
+        """Run the provision method on the enabled provisioner."""
+        Prototype.check_requirements(self)
+        yield from self.__provisioning_module.provision(self)
