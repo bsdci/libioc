@@ -46,7 +46,7 @@ class Source(str):
         self,
         value: _SourceInputType
     ) -> None:
-       self.value = value
+        self._value = value
 
     @property
     def value(self) -> _SourceType:
@@ -56,22 +56,23 @@ class Source(str):
     def value(self, value: _SourceInputType) -> None:
 
         if isinstance(value, libioc.Types.AbsolutePath) is True:
-            self._value = typing.Cast(libioc.Types.AbsolutePath, value)
+            self._value = typing.cast(libioc.Types.AbsolutePath, value)
             return
         elif isinstance(value, urllib.parse.ParseResult) is True:
-            url = typing.Cast(urllib.parse.ParseResult, value)
+            url = typing.cast(urllib.parse.ParseResult, value)
             self.__require_valid_url(url)
-            self._value = _value
+            self._value = url
             return
         elif isinstance(value, str) is False:
             raise TypeError(
-                f"Input must be URL, AbsolutePath or str, but was {type(value)}"
+                f"Input must be URL, AbsolutePath or str, "
+                "but was {type(value)}"
             )
 
         try:
             self._value = libioc.Types.AbsolutePath(value)
             return
-        except ValueError as e:
+        except ValueError:
             pass
 
         try:
