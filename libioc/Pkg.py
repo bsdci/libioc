@@ -113,9 +113,13 @@ class Pkg:
             ],
             logger=self.logger,
             env=dict(
+                ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints"
             )
         )
+
+    def __get_abi_string(self, release_major_version: int) -> str:
+        return f"FreeBSD:{release_major_version}:{self.host.processor}"
 
     def _mirror_packages(
         self,
@@ -132,6 +136,7 @@ class Pkg:
             ] + packages,
             logger=self.logger,
             env=dict(
+                ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints"
             )
         )
@@ -149,6 +154,7 @@ class Pkg:
                 cache_ds.mountpoint
             ],
             env=dict(
+                ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints",
                 FINGERPRINTS="/usr/share/keys/pkg"
             ),
@@ -361,6 +367,7 @@ class Pkg:
         self._update_pkg_conf(
             filename=f"{conf_ds.mountpoint}/pkg.conf",
             data=dict(
+                ABI=self.__get_abi_string(release_major_version),
                 PKG_DBDIR=db_ds.mountpoint,
                 PKG_CACHEDIR=cache_ds.mountpoint,
                 REPOS_DIR=[str(repos_ds.mountpoint)],
