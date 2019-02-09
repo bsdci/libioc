@@ -70,7 +70,7 @@ class Pkg:
         """Fetch a bunch of packages to the local mirror."""
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
-        release_major_version = math.floor(release.version_number)
+        release_major_version = int(math.floor(release.version_number))
         pkg_ds = self._get_release_pkg_dataset(release_major_version)
 
         packageFetchEvent = libioc.events.PackageFetch(
