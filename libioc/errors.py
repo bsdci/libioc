@@ -461,6 +461,23 @@ class ResourceLimitUnknown(IocException, KeyError):
         IocException.__init__(self, message=msg, logger=logger)
 
 
+class JailHostIdMismatch(JailException):
+    """Raised when attempting to start a jail with mismatching hostid."""
+
+    def __init__(
+        self,
+        host_hostid: str,
+        jail: 'libioc.Jail.JailGenerator',
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+        jail_hostid = jail.config["hostid"]
+        msg = (
+            f"The jail hostid '{jail_hostid}' "
+            f"does not match the hosts hostid '{host_hostid}'"
+        )
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
+
+
 class JailConfigNotFound(IocException):
     """Raised when a jail is not configured."""
 

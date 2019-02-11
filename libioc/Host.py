@@ -55,6 +55,7 @@ class HostGenerator:
     _devfs: libioc.DevfsRules.DevfsRules
     _defaults: libioc.Resource.DefaultResource
     _defaults_initialized = False
+    __hostid: str
     releases_dataset: libzfs.ZFSDataset
     datasets: libioc.Datasets.Datasets
     distribution: _distribution_types
@@ -113,6 +114,19 @@ class HostGenerator:
                 logger=self.logger,
                 zfs=self.zfs
             )
+
+    @property
+    def id(self) -> str:
+        """Return the hostid and memoize on first lookup."""
+        try:
+            return self.__hostid
+        except AttributeError:
+            pass
+
+        with open("/etc/hostid", "r") as f:
+            self.__hostid = f.read().strip()
+
+        return self.__hostid
 
     @property
     def defaults(self) -> 'libioc.Resource.DefaultResource':

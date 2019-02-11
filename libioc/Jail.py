@@ -466,6 +466,7 @@ class JailGenerator(JailResource):
         """
         self.require_jail_existing()
         self.require_jail_stopped()
+        self.require_jail_match_hostid()
 
         try:
             yield from self.config["resolver"].apply(
@@ -1430,6 +1431,8 @@ class JailGenerator(JailResource):
         if backend is not None:
             backend.setup(self.storage, resource)
 
+        self.config["hostid"] = self.host.id
+
         self._update_fstab()
         self.save()
 
@@ -2011,6 +2014,26 @@ class JailGenerator(JailResource):
                 jail=self,
                 logger=(self.logger if log_errors else None)
             )
+
+    def require_jail_match_hostid(self, log_errors: bool=True) -> None:
+        """Raise JailIsTemplate exception if the jail is a template."""
+        if self.hostid_check_ok is False:
+            raise libioc.errors.JailHostIdMismatch(
+                jail=self,
+                host_hostid=self.host.id,
+                logger=(self.logger if log_errors else None)
+            )
+
+    @property
+    def hostid_check_ok(self) -> bool:
+        """Return true if the hostid check passes."""
+        if self.config["hostid_strict_check"] is False:
+            self.logger.spam("hostid_strict_check is disabled")
+            return True
+        jail_hostid = self.config["hostid"]
+        if (jail_hostid is None) or (jail_hostid == self.host.id):
+            return True
+        return False
 
     def require_storage_backend(self, log_errors: bool=True) -> None:
         """Raise if the jail was not initialized with a storage backend."""

@@ -56,6 +56,8 @@ DEFAULTS = libioc.Config.Data.Data({
     "host_hostuuid": None,
     "host_hostname": None,
     "host_domainname": None,
+    "hostid": None,
+    "hostid_strict_check": False,
     "devfs_ruleset": 4,
     "enforce_statfs": 2,
     "children_max": 0,
