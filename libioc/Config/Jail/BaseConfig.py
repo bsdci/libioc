@@ -597,7 +597,8 @@ class BaseConfig(dict):
 
         A KeyError is raised when no criteria applies.
         """
-        self._require_known_config_property(key)
+        if key not in self.data.keys():
+            self._require_known_config_property(key)
 
         # special property
         if self.special_properties.is_special_property(key) is True:
