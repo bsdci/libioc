@@ -613,6 +613,13 @@ class BaseConfig(dict):
         # plain data attribute
         return libioc.helpers.parse_user_input(self.data[key])
 
+    @property
+    def unknown_config_parameters(self) -> typing.Iterator[str]:
+        """Yield unknown config parameters already stored in the config."""
+        for key in self.data.keys():
+            if self._is_known_property(key) is False:
+                yield key
+
     def __delitem__(self, key: str) -> None:
         """Delete a setting from the configuration."""
         self.data.__delitem__(key)

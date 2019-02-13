@@ -589,6 +589,14 @@ class JailGenerator(JailResource):
             self.storage_backend.apply(self.storage, self.release)
 
         if quick is False:
+            unknown_config_parameters = list(
+                self.config.unknown_config_parameters
+            )
+            if len(unknown_config_parameters) > 0:
+                _unused_parameters = str(", ".join(unknown_config_parameters))
+                self.logger.warn(
+                    f"Unused JailConfig parameters: {_unused_parameters}"
+                )
             self._save_autoconfig()
 
         try:
