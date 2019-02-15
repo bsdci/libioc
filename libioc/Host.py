@@ -54,7 +54,7 @@ class HostGenerator:
 
     _devfs: libioc.DevfsRules.DevfsRules
     _defaults: libioc.Resource.DefaultResource
-    _defaults_initialized = False
+    __user_provided_defaults: typing.Dict[str, typing.Any]
     __hostid: str
     releases_dataset: libzfs.ZFSDataset
     datasets: libioc.Datasets.Datasets
@@ -99,13 +99,12 @@ class HostGenerator:
             zfs=self.zfs
         )
 
-        self._init_defaults(defaults)
+        # this variable stores user provided defaults until the property
+        # was initialized and accessed the first time
+        self.__user_provided_defaults = defaults
 
-    def _init_defaults(
-        self,
-        defaults: typing.Optional[libioc.Resource.DefaultResource]=None
-    ) -> None:
-
+    def __init_defaults(self) -> None:
+        defaults = self.__user_provided_defaults
         if defaults is not None:
             self._defaults = defaults
         else:
@@ -114,6 +113,8 @@ class HostGenerator:
                 logger=self.logger,
                 zfs=self.zfs
             )
+        self.__user_provided_defaults = None
+        self._defaults.read_config()
 
     @property
     def id(self) -> str:
@@ -131,9 +132,12 @@ class HostGenerator:
     @property
     def defaults(self) -> 'libioc.Resource.DefaultResource':
         """Return the lazy-loaded defaults."""
-        if self._defaults_initialized is False:
-            self._defaults.read_config()
-            self._defaults_initialized = True
+        try:
+            return self._defaults
+        except AttributeError:
+            pass
+
+        self.__init_defaults()
         return self._defaults
 
     @property
