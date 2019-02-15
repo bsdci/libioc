@@ -167,18 +167,18 @@ class LaunchableResourceBackup:
         resourceBackupEvent.add_rollback_step(_destroy_failed_import)
 
         # ToDo: Allow importing of releases or empty jails
-        config_data = libioc.Config.Type.JSON.ConfigJSON(
+        archived_config = libioc.Config.Type.JSON.ConfigJSON(
             file=f"{self.work_dir}/config.json",
             logger=self.logger
         ).read()
 
         is_standalone = os.path.isfile(f"{self.work_dir}/root.zfs") is True
-        has_release = ("release" in config_data.keys()) is True
+        has_release = ("release" in archived_config.keys()) is True
 
         try:
             if has_release and not is_standalone:
                 release = libioc.Release.ReleaseGenerator(
-                    name=config_data["release"],
+                    name=archived_config["release"],
                     logger=self.logger,
                     zfs=self.zfs,
                     host=self.resource.host
@@ -191,7 +191,10 @@ class LaunchableResourceBackup:
                 yield from self._import_root_dataset(event_scope=scope)
 
             yield from self._import_other_datasets_recursive(event_scope=scope)
-            yield from self._import_config(config_data, event_scope=scope)
+            yield from self._import_config(
+                libioc.Config.Data.Data(archived_config),
+                event_scope=scope
+            )
             yield from self._import_fstab(event_scope=scope)
         except Exception as e:
             yield resourceBackupEvent.fail(e)
@@ -228,7 +231,7 @@ class LaunchableResourceBackup:
 
     def _import_config(
         self,
-        data: typing.Dict[str, typing.Any],
+        data: libioc.Config.Data.Data,
         event_scope: typing.Optional['libioc.events.Scope']
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
