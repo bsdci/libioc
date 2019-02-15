@@ -32,6 +32,7 @@ import libioc.Config.Jail.Properties
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
+import libioc.JailParams
 
 # mypy
 import libioc.Logger
@@ -815,6 +816,8 @@ class BaseConfig(dict):
 
     def _is_known_property(self, key: str) -> bool:
         """Return True when the key is a known config property."""
+        if self._is_known_jail_param(key):
+            return True
         if key in libioc.Config.Jail.Defaults.DEFAULTS.keys():
             return True  # key is default
         if f"_set_{key}" in dict.__dir__(self):
@@ -826,6 +829,9 @@ class BaseConfig(dict):
         if self._is_user_property(key) is True:
             return True  # user.* property
         return False
+
+    def _is_known_jail_param(self, key: str) -> bool:
+        return key in libioc.JailParams.HostJailParams()
 
     @property
     def _sorted_user_properties(self) -> typing.List[str]:
