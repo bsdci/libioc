@@ -27,7 +27,7 @@ import typing
 import os
 import platform
 import re
-import sysctl
+import freebsd_sysctl
 
 import libzfs
 
@@ -187,8 +187,11 @@ class HostGenerator:
     @property
     def ipfw_enabled(self) -> bool:
         """Return True if ipfw is enabled on the host system."""
-        _sysctl = sysctl.filter("net.inet.ip.fw.enable")
-        return ((len(_sysctl) == 1) and (_sysctl[0].value == 1))
+        try:
+            firewall_enabled = freebsd_sysctl.Sysctl("net.inet.ip.fw.enable")
+            return (firewall_enabled.value == 1) is True
+        except Exception:
+            return False
 
 
 class Host(HostGenerator):

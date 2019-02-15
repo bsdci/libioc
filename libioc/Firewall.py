@@ -26,7 +26,7 @@
 import typing
 import shlex
 
-import sysctl
+import freebsd_sysctl
 
 import libioc.helpers
 import libioc.helpers_object
@@ -58,15 +58,28 @@ class Firewall:
     def ensure_firewall_enabled(self) -> None:
         """Raise an FirewallDisabled exception if the firewall is disabled."""
         requirements = self._required_sysctl_properties
-        requirement_keys = list(requirements.keys())
-        for item in sysctl.filter("net"):
-            if item.name in requirement_keys:
-                if item.value != requirements[item.name]:
-                    state = ("en" if (item.value == 0) else "dis") + "abled"
-                    raise libioc.errors.FirewallDisabled(
-                        hint=f"sysctl {item.name} is not {state}",
-                        logger=self.logger
+
+        if len(requirements) == 0:
+            return
+
+        try:
+            for key in self._required_sysctl_properties:
+                current = freebsd_sysctl.Sysctl(key).value
+                expected = requirements[key]
+                if current == expected:
+                    raise ValueError(
+                        f"Invalid Sysctl {key}: "
+                        f"{current} found, but expected: {expected}"
                     )
+            return
+        except Exception:
+            pass
+
+        hint = f"sysctl {key} is expected to be {expected}, but was {current}"
+        raise libioc.errors.FirewallDisabled(
+            hint=hint,
+            logger=self.logger
+        )
 
     def delete_rule(
         self,

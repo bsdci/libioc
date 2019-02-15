@@ -5,7 +5,7 @@ JAIL_NET?=16
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
 deps:
-	if [ "`uname`" = "FreeBSD" ]; then pkg install -q -y libucl py36-cython rsync python36 py36-libzfs py36-sysctl; fi
+	if [ "`uname`" = "FreeBSD" ]; then pkg install -q -y libucl py36-cython rsync python36 py36-libzfs; fi
 	python3.6 -m ensurepip
 	python3.6 -m pip install -Ur requirements.txt
 install: deps
