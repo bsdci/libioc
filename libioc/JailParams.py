@@ -49,7 +49,8 @@ class JailParam(freebsd_sysctl.Sysctl):
         """Set the user defined value of this jail parameter."""
         if self.ctl_type == freebsd_sysctl.types.NODE:
             raise TypeError("sysctl NODE has no value")
-        elif self.ctl_type in [
+
+        if self.ctl_type in [
             freebsd_sysctl.types.STRING,
             freebsd_sysctl.types.OPAQUE,
         ]:
