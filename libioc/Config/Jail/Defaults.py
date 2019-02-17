@@ -94,7 +94,7 @@ DEFAULTS = libioc.Config.Data.Data({
     "mount_procfs": "0",
     "mount_devfs": "1",
     "mount_fdescfs": "0",
-    "securelevel": "2",
+    "securelevel": 2,
     "tags": [],
     "template": False,
     "jail_zfs": False,
