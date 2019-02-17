@@ -54,7 +54,7 @@ class HostGenerator:
 
     _devfs: libioc.DevfsRules.DevfsRules
     _defaults: libioc.Resource.DefaultResource
-    __user_provided_defaults: typing.Dict[str, typing.Any]
+    __user_provided_defaults: typing.Optional[libioc.Resource.DefaultResource]
     __hostid: str
     releases_dataset: libzfs.ZFSDataset
     datasets: libioc.Datasets.Datasets
