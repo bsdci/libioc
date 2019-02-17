@@ -1983,16 +1983,16 @@ class JailGenerator(JailResource):
         return [f"/usr/bin/rctl -r jail:{self.identifier} 2>/dev/null || true"]
 
     @property
-    def _allow_mount(self) -> str:
-        if self._allow_mount_zfs == "1":
-            return "1"
-        return self._get_value("allow_mount")
+    def _allow_mount(self) -> int:
+        if self._allow_mount_zfs == 1:
+            return 1
+        return int(self._get_value("allow_mount"))
 
     @property
-    def _allow_mount_zfs(self) -> str:
+    def _allow_mount_zfs(self) -> int:
         if self.config["jail_zfs"] is True:
-            return "1"
-        return self._get_value("allow_mount_zfs")
+            return 1
+        return int(self._get_value("allow_mount_zfs"))
 
     def _configure_routes_commands(self) -> typing.List[str]:
 
