@@ -114,7 +114,7 @@ class JailParams(collections.abc.MutableMapping):
     """Collection of jail parameters."""
 
     __base_class = JailParam
-    __sysrc_params: typing.Dict[str, freebsd_sysctl.Sysctl]
+    __sysctl_params: typing.Dict[str, freebsd_sysctl.Sysctl]
 
     def __iter__(self) -> typing.Iterator[str]:
         """Iterate over the jail param names."""
@@ -133,28 +133,28 @@ class JailParams(collections.abc.MutableMapping):
         return collections.abc.KeysView(list(self.__iter__()))  # noqa: T484
 
     def __getitem__(self, key: str) -> typing.Any:
-        """Set of jail params sysrc is not implemented."""
+        """Set of jail params sysctl is not implemented."""
         return self.memoized_params.__getitem__(key)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
-        """Set of jail params sysrc is not supportes."""
+        """Set of jail params sysctl is not supportes."""
         self.memoized_params.__setitem__(key, value)
 
     def __delitem__(self, key: str) -> None:
-        """Delete of jail param sysrc not supported."""
+        """Delete of jail param sysctl not supported."""
         self.memoized_params.__delitem__(key)
 
     @property
     def memoized_params(self) -> typing.Dict[str, freebsd_sysctl.Sysctl]:
         """Return the memorized params initialized on first access."""
         try:
-            return self.__sysrc_params
+            return self.__sysctl_params
         except AttributeError:
             pass
-        self.__update_sysrc_jail_params()
-        return self.__sysrc_params
+        self.__update_sysctl_jail_params()
+        return self.__sysctl_params
 
-    def __update_sysrc_jail_params(self) -> None:
+    def __update_sysctl_jail_params(self) -> None:
         prefix = "security.jail.param"
         jail_params = filter(
             lambda x: not any((
@@ -163,19 +163,19 @@ class JailParams(collections.abc.MutableMapping):
             )),
             self.__base_class(prefix).children
         )
-        # permanently store the queried sysrc in the singleton class
-        JailParams.__sysrc_params = dict([(x.name, x,) for x in jail_params])
+        # permanently store the queried sysctl in the singleton class
+        JailParams.__sysctl_params = dict([(x.name, x,) for x in jail_params])
 
 
 class HostJailParams(JailParams):
-    """Read-only host jail parameters obtained from sysrc."""
+    """Read-only host jail parameters obtained from sysctl."""
 
     __base_class = freebsd_sysctl.Sysctl
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
-        """Set of jail params sysrc is not supportes."""
+        """Set of jail params sysctl is not supportes."""
         raise NotImplementedError("jail param sysctl cannot be modified")
 
     def __delitem__(self, key: str) -> None:
-        """Delete of jail param sysrc not supported."""
+        """Delete of jail param sysctl not supported."""
         raise NotImplementedError("jail param sysctl cannot be deleted")
