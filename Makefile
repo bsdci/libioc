@@ -11,7 +11,7 @@ deps:
 install: deps
 	python3.6 -m pip install -U .
 install-dev: deps
-	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake; fi
+	if [[ "`uname`" = "FreeBSD" ]]; then pkg install -y gmake py36-sqlite3; fi
 	python3.6 -m pip install -Ur requirements-dev.txt
 	python3.6 -m pip install -e .
 install-travis:
