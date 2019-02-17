@@ -73,6 +73,7 @@ class Firewall:
                     )
             return
         except Exception:
+            # an IocageException is raised in the next step at the right level
             pass
 
         hint = f"sysctl {key} is expected to be {expected}, but was {current}"

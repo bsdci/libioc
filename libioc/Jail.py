@@ -1661,6 +1661,7 @@ class JailGenerator(JailResource):
     @property
     def _launch_args(self) -> typing.List[str]:
         config = self.config
+        vnet = (config["vnet"] is True)
         value: str
         jail_param_args: typing.List[str] = []
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
@@ -1677,11 +1678,13 @@ class JailGenerator(JailResource):
             elif sysctl_name == "security.jail.param.allow.mount.zfs":
                 value = str(self._allow_mount_zfs)
             elif sysctl_name == "security.jail.param.vnet":
-                if config["vnet"] is False:
+                if vnet is False:
                     # vnet is only used when explicitly enabled
                     # (friendly to Kernels without VIMAGE support)
                     continue
                 value = "vnet"
+            elif vnet and sysctl_name.startswith("security.jail.param.ip"):
+                continue
             else:
                 config_property_name = sysctl.iocage_name
                 if self.config._is_known_property(config_property_name):
