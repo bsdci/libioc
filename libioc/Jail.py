@@ -890,11 +890,9 @@ class JailGenerator(JailResource):
             exec_prestop.append(self.config["exec_prestop"])
         if self.config["exec_stop"] is not None:
             exec_stop.append(self.config["exec_stop"])
+        exec_poststop = self._stop_network() + exec_poststop
         if self.config["exec_poststop"] is not None:
             exec_poststop.append(self.config["exec_poststop"])
-
-        if self.config["vnet"]:
-            exec_poststop = self._stop_vimage_network() + exec_poststop
 
         if self.config["jail_zfs"] is True:
             share_storage = libioc.ZFSShareStorage.QueuingZFSShareStorage(
@@ -1939,6 +1937,31 @@ class JailGenerator(JailResource):
             start += _start
 
         return created, start
+
+    def _stop_network(self) -> typing.List[str]:
+        if self.config["vnet"]:
+            return self._stop_vimage_network()
+        else:
+            return self._stop_non_vimage_network()
+
+    def _stop_non_vimage_network(self) -> typing.List[str]:
+        commands: typing.List[str] = []
+        for protocol in (4, 6,):
+            config_value = self.config[f"ip{protocol}_addr"]
+            if config_value is None:
+                return commands
+            for nic, addresses in config_value.items():
+                if addresses is None:
+                    continue
+                for address in addresses:
+                    if isinstance(address, str):
+                        # skip DHCP and ACCEPT_RTADV
+                        continue
+                    inet = "inet" if (protocol == 4) else "inet6"
+                    commands.append(
+                        f"/sbin/ifconfig {nic} {inet} {address} remove"
+                    )
+        return commands
 
     def _stop_vimage_network(self) -> typing.List[str]:
         commands: typing.List[str] = []
