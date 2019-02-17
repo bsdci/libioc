@@ -21,7 +21,7 @@ uninstall:
 check:
 	flake8 --version
 	flake8 --exclude=".travis,.eggs,__init__.py,docs" --ignore=E203,E252,W391,D107,A001,A002,A003,A004
-	bandit --skip B404 --exclude tests/ -r .
+	bandit --skip B404,B110 --exclude tests/ -r .
 test:
 	pytest tests --zpool $(ZPOOL)
 regression-test:
