@@ -25,29 +25,111 @@
 """Sysctl jail params signeton."""
 import typing
 import freebsd_sysctl
+import freebsd_sysctl.types
 import collections.abc
+import shlex
 
-class HostJailParams(collections.abc.MutableMapping):
-    __params: typing.Dict[str, freebsd_sysctl.Sysctl]
+import libioc.helpers
+
+JailParamValueType = typing.Optional[typing.Union[bool, int, str]]
+
+
+class JailParam(freebsd_sysctl.Sysctl):
+    """Single jail parameter represented by sysctl."""
+
+    user_value: JailParamValueType
+
+    @property
+    def value(self) -> JailParamValueType:
+        """Return the user defined value of this jail parameter."""
+        return self.user_value
+
+    @value.setter
+    def value(self, value: JailParamValueType) -> None:
+        """Set the user defined value of this jail parameter."""
+        if self.ctl_type == freebsd_sysctl.types.NODE:
+            raise TypeError("sysctl NODE has no value")
+        elif self.ctl_type in [
+            freebsd_sysctl.types.STRING,
+            freebsd_sysctl.types.OPAQUE,
+        ]:
+            if (isinstance(value, int) or isinstance(value, str)) is False:
+                try:
+                    value = str(value)
+                except Exception:
+                    self.__raise_value_type_error()
+        else:
+            if (isinstance(value, int) or isinstance(value, bool)) is False:
+                try:
+                    value = int(value)  # noqa: T484
+                except Exception:
+                    self.__raise_value_type_error()
+        self.user_value = value
+
+    @property
+    def sysctl_value(self) -> JailParamValueType:
+        """Return the original freebsd_sysctl.Sysctl value."""
+        return typing.cast(
+            JailParamValueType,
+            super().value
+        )
+
+    def __raise_value_type_error(self) -> None:
+        type_name = self.ctl_type.__name__
+        raise TypeError(f"{self.name} sysctl requires {type_name}")
+
+    @property
+    def jail_arg_name(self) -> str:
+        """Return the name of the param formatted for the jail command."""
+        name = str(self.name)
+        prefix = "security.jail.param."
+        if name.startswith(prefix) is True:
+            return name[len(prefix):]
+        return name
+
+    @property
+    def iocage_name(self) -> str:
+        """Return the name of the param formatted for iocage config."""
+        return self.jail_arg_name.replace(".", "_")
+
+    def __str__(self) -> str:
+        """Return the jail command argument notation of the param."""
+        if (self.value is None):
+            return self.jail_arg_name
+
+        if (self.ctl_type == freebsd_sysctl.types.STRING):
+            escaped_value = shlex.quote(str(self.value))
+            return f"{self.jail_arg_name}={escaped_value}"
+
+        mapped_value = str(libioc.helpers.to_string(
+            self.value,
+            true="1",
+            false="0"
+        ))
+        return f"{self.jail_arg_name}={mapped_value}"
+
+
+class JailParams(collections.abc.MutableMapping):
+    """Collection of jail parameters."""
+
+    __base_class = JailParam
+    __sysrc_params: typing.Dict[str, freebsd_sysctl.Sysctl]
 
     def __iter__(self) -> typing.Iterator[str]:
         """Iterate over the jail param names."""
-        yield self.memoized_params.__iter__()
-    
+        yield from self.memoized_params.__iter__()
+
     def __len__(self) -> int:
         """Return the number of available jail params."""
         return self.memoized_params.__len__()
 
-    def items(self) -> typing.ItemsView[str, typing.Any]:
+    def items(self) -> typing.ItemsView[str, freebsd_sysctl.Sysctl]:
         """Iterate over the keys and values."""
-        return typing.cast(
-            typing.ItemsView[str, typing.Any],
-            self.memoized_params.items()
-        )
+        return self.memoized_params.items()
 
     def keys(self) -> typing.KeysView[str]:
         """Return a list of all jail param names."""
-        return collections.abc.KeysView(*list(self.__iter__()))  # noqa: T484
+        return collections.abc.KeysView(list(self.__iter__()))  # noqa: T484
 
     def __getitem__(self, key: str) -> typing.Any:
         """Set of jail params sysrc is not implemented."""
@@ -55,27 +137,44 @@ class HostJailParams(collections.abc.MutableMapping):
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
         """Set of jail params sysrc is not supportes."""
-        raise NotImplementedError("jail param sysctl cannot be modified")
+        self.memoized_params.__setitem__(key, value)
 
-    def __delitem__(self, key: str, value: typing.Any) -> None:
+    def __delitem__(self, key: str) -> None:
         """Delete of jail param sysrc not supported."""
-        raise NotImplementedError("jail param sysctl cannot be deleted")
+        self.memoized_params.__delitem__(key)
 
     @property
     def memoized_params(self) -> typing.Dict[str, freebsd_sysctl.Sysctl]:
+        """Return the memorized params initialized on first access."""
         try:
-            return self.__params
+            return self.__sysrc_params
         except AttributeError:
             pass
         self.__update_sysrc_jail_params()
-        return self.__params
+        return self.__sysrc_params
 
     def __update_sysrc_jail_params(self) -> None:
         prefix = "security.jail.param"
         jail_params = filter(
-            lambda x: x.name.endswith(".") is False,  # filter NODE
-            freebsd_sysctl.Sysctl(prefix).children
+            lambda x: not any((
+                x.name.endswith("."),  # quick filter NODE
+                x.name == "security.jail.allow_raw_sockets",  # deprecated
+            )),
+            self.__base_class(prefix).children
         )
-        HostJailParams.__params = dict(
-            [(x.name[len(prefix) + 1:], x,) for x in jail_params]
-        )
+        # permanently store the queried sysrc in the singleton class
+        JailParams.__sysrc_params = dict([(x.name, x,) for x in jail_params])
+
+
+class HostJailParams(JailParams):
+    """Read-only host jail parameters obtained from sysrc."""
+
+    __base_class = freebsd_sysctl.Sysctl
+
+    def __setitem__(self, key: str, value: typing.Any) -> None:
+        """Set of jail params sysrc is not supportes."""
+        raise NotImplementedError("jail param sysctl cannot be modified")
+
+    def __delitem__(self, key: str) -> None:
+        """Delete of jail param sysrc not supported."""
+        raise NotImplementedError("jail param sysctl cannot be deleted")

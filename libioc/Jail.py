@@ -30,6 +30,7 @@ import shlex
 import shutil
 
 import libzfs
+import freebsd_sysctl
 
 import libioc.Types
 import libioc.errors
@@ -1653,93 +1654,66 @@ class JailGenerator(JailResource):
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
             return self.host.devfs[ruleset_line_position].number
 
+    @staticmethod
+    def __get_launch_command(jail_args: typing.List[str]) -> typing.List[str]:
+        return ["/usr/sbin/jail", "-c"] + jail_args
+
     @property
-    def _launch_command(self) -> typing.List[str]:
+    def _launch_args(self) -> typing.List[str]:
+        config = self.config
+        value: str
+        jail_param_args: typing.List[str] = []
+        for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
+            if sysctl.ctl_type == freebsd_sysctl.types.NODE:
+                # skip NODE
+                continue
 
-        command = ["/usr/sbin/jail", "-c"]
+            if sysctl_name == "security.jail.param.devfs_ruleset":
+                value = str(self.devfs_ruleset)
+            elif sysctl_name == "security.jail.param.path":
+                value = self.root_dataset.mountpoint
+            elif sysctl_name == "security.jail.param.name":
+                value = self.identifier
+            elif sysctl_name == "security.jail.param.allow.mount.zfs":
+                value = str(self._allow_mount_zfs)
+            elif sysctl_name == "security.jail.param.vnet":
+                if config["vnet"] is False:
+                    # vnet is only used when explicitly enabled
+                    # (friendly to Kernels without VIMAGE support)
+                    continue
+                value = "vnet"
+            else:
+                config_property_name = sysctl.iocage_name
+                if self.config._is_known_property(config_property_name):
+                    value = config[config_property_name]
+                else:
+                    continue
 
-        if self.config["vnet"]:
-            command.append("vnet")
-        else:
+            sysctl.value = value
+            jail_param_args.append(str(sysctl))
 
-            if self.config["ip4_addr"] is not None:
-                ip4_addr = self.config["ip4_addr"]
-                command += [
-                    f"ip4.addr={ip4_addr}",
-                    f"ip4.saddrsel={self.config['ip4_saddrsel']}",
-                    f"ip4={self.config['ip4']}",
-                ]
-
-            if self.config['ip6_addr'] is not None:
-                ip6_addr = self.config['ip6_addr']
-                command += [
-                    f"ip6.addr={ip6_addr}",
-                    f"ip6.saddrsel={self.config['ip6_saddrsel']}",
-                    f"ip6={self.config['ip6']}",
-                ]
-
-        command += [
-            f"name={self.identifier}",
-            f"host.hostname={self.config['host_hostname']}",
-            f"host.domainname={self.config['host_domainname']}",
-            f"path={self.root_dataset.mountpoint}",
-            f"securelevel={self._get_value('securelevel')}",
-            f"host.hostuuid={self.name}",
-            f"devfs_ruleset={self.devfs_ruleset}",
-            f"enforce_statfs={self._get_value('enforce_statfs')}",
-            f"children.max={self._get_value('children_max')}",
-            f"allow.set_hostname={self._get_value('allow_set_hostname')}",
-            f"allow.sysvipc={self._get_value('allow_sysvipc')}",
+        jail_args = [
+            f"exec.timeout={self._get_value('exec_timeout')}",
+            f"stop.timeout={self._get_value('stop_timeout')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
             f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
             f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
-            f"exec.jail_user={self._get_value('exec_jail_user')}"
-        ]
-
-        if self.host.userland_version > 10.3:
-            command += [
-                f"sysvmsg={self._get_value('sysvmsg')}",
-                f"sysvsem={self._get_value('sysvsem')}",
-                f"sysvshm={self._get_value('sysvshm')}"
-            ]
-
-        command += [
-            f"allow.raw_sockets={self._get_value('allow_raw_sockets')}",
-            f"allow.chflags={self._get_value('allow_chflags')}",
-            f"allow.mount={self._allow_mount}",
-            f"allow.mount.devfs={self._get_value('allow_mount_devfs')}",
-            f"allow.mount.nullfs={self._get_value('allow_mount_nullfs')}",
-            f"allow.mount.procfs={self._get_value('allow_mount_procfs')}",
-            f"allow.mount.fdescfs={self._get_value('allow_mount_fdescfs')}",
-            f"allow.mount.zfs={self._allow_mount_zfs}",
-            f"allow.quotas={self._get_value('allow_quotas')}",
-            f"allow.socket_af={self._get_value('allow_socket_af')}",
-            f"exec.timeout={self._get_value('exec_timeout')}",
-            f"stop.timeout={self._get_value('stop_timeout')}",
+            f"exec.jail_user={self._get_value('exec_jail_user')}",
             f"mount.fstab={self.fstab.path}",
-            f"mount.devfs={self._get_value('mount_devfs')}"
+            f"mount.devfs={self._get_value('mount_devfs')}",
+            "allow.dying"
         ]
 
-        if self.config["allow_vmm"] is True:
-            command.append("allow.vmm=1")
-
-        if self.host.userland_version > 9.3:
-            command += [
-                f"mount.fdescfs={self._get_value('mount_fdescfs')}",
-                f"allow.mount.tmpfs={self._get_value('allow_mount_tmpfs')}"
-            ]
-
-        command += ["allow.dying"]
-        return command
+        return jail_param_args + jail_args
 
     def _launch_persistent_jail(
         self,
         passthru: bool
     ) -> libioc.helpers.CommandOutput:
-        command = self._launch_command + [
+        command = self.__get_launch_command(self._launch_args + [
             "persist",
             f"exec.poststart=\"{self.get_hook_script_path('poststart')}\""
-        ]
+        ])
 
         stdout, stderr, returncode = self._exec_host_command(
             command=command,
@@ -1799,11 +1773,11 @@ class JailGenerator(JailResource):
         jail_command: str,
         passthru: bool
     ) -> libioc.helpers.CommandOutput:
-        command = self._launch_command + [
+        command = self.__get_launch_command(self._launch_args + [
             "nopersist",
             f"exec.poststart=\"{self.get_hook_script_path('host_command')}\"",
             "command=/usr/bin/true"
-        ]
+        ])
 
         _identifier = str(shlex.quote(self.identifier))
         _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
