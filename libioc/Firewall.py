@@ -63,9 +63,10 @@ class Firewall:
             return
 
         try:
-            for key in self._required_sysctl_properties:
-                current = freebsd_sysctl.Sysctl(key).value
+            current = "not found"
+            for key in requirements:
                 expected = requirements[key]
+                current = freebsd_sysctl.Sysctl(key).value
                 if current == expected:
                     raise ValueError(
                         f"Invalid Sysctl {key}: "
