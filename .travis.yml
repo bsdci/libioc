@@ -10,3 +10,7 @@ script:
   - make check
 notifications:
   email: false
+addons:
+  apt:
+    packages:
+      - sqlite3
