@@ -37,7 +37,6 @@ import libioc.errors
 import libioc.events
 import libioc.helpers
 import libioc.helpers_object
-import libioc.JailState
 import libioc.DevfsRules
 import libioc.Host
 import libioc.Config.Jail.JailConfig
@@ -53,6 +52,8 @@ import libioc.VersionedResource
 import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.ResourceSelector
 import libioc.Config.Jail.File.Fstab
+
+import jail as libjail
 
 
 class JailResource(
@@ -280,7 +281,6 @@ class JailGenerator(JailResource):
     """
 
     _class_storage = libioc.Storage.Storage
-    _state: typing.Optional['libioc.JailState.JailState']
     _relative_hook_script_dir: str
     _provisioner: 'libioc.Provisioning.Prototype'
 
@@ -367,32 +367,6 @@ class JailGenerator(JailResource):
                 self.config["id"] = self.dataset_name.split("/").pop()
 
     @property
-    def state(self) -> 'libioc.JailState.JailState':
-        """
-        Memoized JailState.
-
-        This object holds information about the jail state. The information
-        is memoized on first access because the lookup is expensive. Please
-        keep in mind to update the object when executing operations that
-        potentially change a jails state.
-        """
-        if "_state" not in object.__dir__(self):
-            return self._init_state()
-        elif object.__getattribute__(self, "_state") is None:
-            return self._init_state()
-        return object.__getattribute__(self, "_state")
-
-    @state.setter
-    def state(self, value: 'libioc.JailState.JailState') -> None:
-        """
-        Return the jails JailState object.
-
-        A public interface to set a jails state. This behavior is part of a
-        performance optimization when dealing with large numbers of jails.
-        """
-        object.__setattr__(self, '_state', value)
-
-    @property
     def provisioner(self) -> 'libioc.Provisioning.prototype.Provisioner':
         """
         Return the jails Provisioner instance.
@@ -408,15 +382,6 @@ class JailGenerator(JailResource):
         import libioc.Provisioning
         self._provisioner = libioc.Provisioning.Provisioner(jail=self)
         return self._provisioner
-
-    def _init_state(self) -> 'libioc.JailState.JailState':
-        state = libioc.JailState.JailState(
-            self.identifier,
-            logger=self.logger
-        )
-        self.state = state
-        state.query()
-        return state
 
     def start(
         self,
@@ -675,7 +640,6 @@ class JailGenerator(JailResource):
                 scope=jailDependantsStartEvent.scope
             )
             yield jailDependantStartEvent.begin()
-            dependant_jail.state.query()
             if dependant_jail.running is True:
                 yield jailDependantStartEvent.skip("already running")
                 continue
@@ -992,14 +956,6 @@ class JailGenerator(JailResource):
                 raise e
         yield jailDestroyEvent.end()
 
-        try:
-            self.state.query()
-        except Exception as e:
-            if force is True:
-                self.logger.warn(str(e))
-            else:
-                raise e
-
     def _write_temporary_script_env(self) -> None:
         self.logger.debug(
             f"Writing the hook script .env file {self.script_env_path}"
@@ -1142,8 +1098,6 @@ class JailGenerator(JailResource):
                 When being enabled the argument invokes a full stop before
                 destroying the jail.
         """
-        self.state.query()
-
         if event_scope is None:
             event_scope = libioc.events.Scope()
 
@@ -1729,7 +1683,6 @@ class JailGenerator(JailResource):
             )
             return stdout, stderr, returncode
 
-        self.state.query()
         self.logger.verbose(
             f"Jail '{self.humanreadable_name}' started with JID {self.jid}"
         )
@@ -2215,13 +2168,10 @@ class JailGenerator(JailResource):
     @property
     def jid(self) -> typing.Optional[int]:
         """Return a jails JID if it is running or None."""
-        if "_state" not in object.__dir__(self):
-            # force state init when jid was requested
-            self._init_state()
-
         try:
-            return int(self.state["jid"])
-        except (KeyError, TypeError):
+            jid = int(libjail.get_jid_by_name(self.identifier))
+            return jid if (jid > 0) else None
+        except Exception:
             return None
 
     @property

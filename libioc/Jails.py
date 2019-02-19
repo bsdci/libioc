@@ -35,8 +35,6 @@ import libioc.helpers_object
 class JailsGenerator(libioc.ListableResource.ListableResource):
     """Asynchronous representation of a collection of jails."""
 
-    states = libioc.JailState.JailStates()
-
     # Keys that are stored on the Jail object, not the configuration
     JAIL_KEYS = [
         "jid",
@@ -86,32 +84,7 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
             zfs=self.zfs
         )
 
-        if jail.identifier in self.states:
-            self.logger.spam(
-                f"Injecting pre-loaded state to '{jail.humanreadable_name}'"
-            )
-            jail.jail_state = self.states[jail.identifier]
-
         return jail
-
-    def __iter__(
-        self
-    ) -> typing.Generator['libioc.Resource.Resource', None, None]:
-        """Iterate over all jails matching the filter criteria."""
-        if self.states.queried is False:
-            self.states.query(logger=self.logger)
-
-        iterator = libioc.ListableResource.ListableResource.__iter__(self)
-        for jail in iterator:
-
-            if jail.identifier in self.states:
-                jail.state = self.states[jail.identifier]
-            else:
-                jail.state = libioc.JailState.JailState(
-                    jail.identifier, {}
-                )
-
-            yield jail
 
     def __getitem__(self, index: int) -> 'libioc.Jail.JailGenerator':
         """Return the JailGenerator at a certain index position."""
