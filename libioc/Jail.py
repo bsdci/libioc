@@ -283,6 +283,7 @@ class JailGenerator(JailResource):
     _class_storage = libioc.Storage.Storage
     _relative_hook_script_dir: str
     _provisioner: 'libioc.Provisioning.Prototype'
+    __jid: int
 
     def __init__(
         self,
@@ -576,6 +577,7 @@ class JailGenerator(JailResource):
                     single_command,
                     passthru=passthru
                 )
+            self.query_jid()
             if returncode != 0:
                 raise libioc.errors.JailLaunchFailed(
                     jail=self,
@@ -1528,6 +1530,8 @@ class JailGenerator(JailResource):
             env=self.env
         )
 
+        self.query_jid()
+
         if returncode > 0:
             raise libioc.errors.JailDestructionFailed(
                 jail=self,
@@ -2163,16 +2167,24 @@ class JailGenerator(JailResource):
     @property
     def running(self) -> bool:
         """Return True if a jail is running."""
+        self.query_jid()
         return self.jid is not None
 
     @property
     def jid(self) -> typing.Optional[int]:
         """Return a jails JID if it is running or None."""
         try:
+            return self.__jid
+        except AttributeError:
+            self.query_jid()
+        return self.__jid
+
+    def query_jid(self) -> None:
+        try:
             jid = int(libjail.get_jid_by_name(self.identifier))
-            return jid if (jid > 0) else None
+            self.__jid = jid if (jid > 0) else None
         except Exception:
-            return None
+            self.__jid = None
 
     @property
     def env(self) -> typing.Dict[str, str]:
