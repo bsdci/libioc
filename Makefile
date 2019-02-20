@@ -17,13 +17,13 @@ deps:
 	$(PYTHON) -m pip install -Ur requirements.txt
 install: deps
 	$(PYTHON) -m pip install -U .
-	@if [ -f /usr/local/etc/init.d ]; then \
+	@if [ -d /usr/local/etc/init.d ]; then \
 		install -m 0755 rc.d/ioc /usr/local/etc/init.d; \
 	else \
 		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
 	fi
 install-dev: deps
-	if [[ "`uname`" = "FreeBSD" ]]; then pkg install -y gmake py36-sqlite3; fi
+	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py36-sqlite3; fi
 	$(PYTHON) -m pip install -Ur requirements-dev.txt
 	$(PYTHON) -m pip install -e .
 install-travis:
