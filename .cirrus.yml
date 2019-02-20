@@ -1,0 +1,15 @@
+task:
+  freebsd_instance:
+    matrix:
+      image: freebsd-11-2-release-amd64
+      image: freebsd-12-0-release-amd64
+  install_script:
+    - truncate -s 20G /ioc-test.img
+    - zpool create ioc-test /ioc-test.img
+    - mount -t fdescfs null /dev/fd
+    - make deps install-travis
+  pip_cache:
+    folder: ~/.cache/pip
+  test_script:
+    - env ZPOOL=ioc-test make check
+    - env ZPOOL=ioc-test make test
