@@ -27,7 +27,7 @@ import pytest
 import typing
 import libzfs
 
-import libioc.lib
+import libioc
 
 
 class DatasetsMock(libioc.Datasets.Datasets):
