@@ -7,9 +7,8 @@ task:
     - truncate -s 20G /ioc-test.img
     - zpool create ioc-test /ioc-test.img
     - mount -t fdescfs null /dev/fd
-    - make deps install-travis
+    - make deps install-dev
   pip_cache:
     folder: ~/.cache/pip
   test_script:
-    - env ZPOOL=ioc-test make check
     - env ZPOOL=ioc-test make test
