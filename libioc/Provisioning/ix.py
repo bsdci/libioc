@@ -129,13 +129,13 @@ def provision(
     events = libioc.events
     jailProvisioningEvent = events.JailProvisioning(
         jail=self.jail,
-        event_scope=event_scope
+        scope=event_scope
     )
     yield jailProvisioningEvent.begin()
     _scope = jailProvisioningEvent.scope
     jailProvisioningAssetDownloadEvent = events.JailProvisioningAssetDownload(
         jail=self.jail,
-        event_scope=_scope
+        scope=_scope
     )
 
     # download provisioning assets
