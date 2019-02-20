@@ -1351,15 +1351,25 @@ class PkgNotFound(IocException):
 # Provisioning
 
 
-class UnknownProvisioner(IocException):
-    """Raised when an unsupported provisioner method is used."""
+class UndefinedProvisionerSource(IocException):
+    """Raised when a provisioner source is not set."""
 
     def __init__(
         self,
-        name: str,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Unknown provisioner: {name}"
+        msg = f"Missing provisioner source"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
+class UndefinedProvisionerMethod(IocException):
+    """Raised when a provisioner method is not set."""
+
+    def __init__(
+        self,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+        msg = f"Missing provisioner method"
         IocException.__init__(self, message=msg, logger=logger)
 
 
