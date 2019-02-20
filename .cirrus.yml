@@ -4,11 +4,22 @@ task:
       image: freebsd-11-2-release-amd64
       image: freebsd-12-0-release-amd64
   install_script:
-    - truncate -s 20G /ioc-test.img
-    - zpool create ioc-test /ioc-test.img
+    - mkdir -p /pools/
+    - '[ ! -f /pools/ioc-tests-1.img ] && truncate -s 10G /pools/ioc-test-1.img'
+    - '[ ! -f /pools/ioc-tests-2.img ] && truncate -s 10G /pools/ioc-test-2.img'
+    - zpool create ioc-test-1 /pools/ioc-test-1.img
+    - zpool create ioc-test-2 /pools/ioc-test-2.img
     - mount -t fdescfs null /dev/fd
     - make deps install-dev
   pip_cache:
     folder: ~/.cache/pip
+  zfs_cache:
+    folder: /pools/
   test_script:
-    - env ZPOOL=ioc-test make test
+    - env ZPOOL=ioc-test-1 make test
+  cleanup_before_cache_script:
+    - zfs list
+    - zfs destroy -r ioc-test-1/jails
+    - zfs destroy -r ioc-test-1/base
+    - zfs destroy -r ioc-test-2/jails
+    - zfs destroy -r ioc-test-2/base
