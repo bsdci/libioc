@@ -5,12 +5,13 @@ sudo: false
 env:
   - MYPYPATH="$TRAVIS_BUILD_DIR/.travis/mypy-stubs"
 install:
-  - make install-travis
+  - bmake install-travis
 script:
-  - make check
+  - bmake check
 notifications:
   email: false
 addons:
   apt:
     packages:
       - sqlite3
+      - bmake
