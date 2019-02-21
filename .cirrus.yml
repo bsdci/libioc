@@ -14,8 +14,8 @@ task:
     - zfs list
   pip_cache:
     folder: ~/.cache/pip
-  # zfs_cache:
-  #   folder: /pools/
+  zfs_cache:
+    folder: /pools/
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
   cleanup_before_cache_script:
