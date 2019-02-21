@@ -5,17 +5,18 @@ task:
       image: freebsd-12-0-release-amd64
   pip_cache:
     folder: ~/.cache/pip
+    fingerprint_script: cat requirements*
+    populate_script: make install-python-requirements-dev
   zfs_cache:
     folder: /pools/
+    fingerprint_script: cat libioc/VERSION
+    populate_script:
+      - mkdir -p /pools/
+      - '[ -f "/pools/ioc-test-`uname -r`.img" ] && zpool import -d /pools "ioc-test-`uname -r`"'
+      - '[ ! -f "/pools/ioc-test-`uname -r`.img" ] && truncate -s 10G "/pools/ioc-test-`uname -r`.img" && zpool create -m   "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"'
   install_script:
-    - mkdir -p /pools/
-    - '[ -f "/pools/ioc-test-`uname -r`.img" ] && zpool import -d /pools "ioc-test-`uname -r`"'
-    - '[ ! -f "/pools/ioc-test-`uname -r`.img" ] && truncate -s 10G "/pools/ioc-test-`uname -r`.img" && zpool create -m   "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"'
     - mount -t fdescfs null /dev/fd
-    - make deps install-dev
-    # debug info
-    - zpool list
-    - zfs list
+    - deps
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
   cleanup_before_cache_script:
