@@ -48,7 +48,7 @@ def pytest_addoption(parser: typing.Any) -> None:
     parser.addoption(
         "--force-clean",
         action="store_true",
-        help="Force cleaning the /iocage-test dataset"
+        help="Force cleaning the /libioc-test dataset"
     )
     parser.addoption(
         "--zpool",
@@ -95,14 +95,6 @@ def pool(
         lambda pool: (pool.name == requested_pool),
         zfs.pools
     ))[0]
-    datasets = libioc.Datasets.Datasets(
-        pool=target_pool,
-        zfs=zfs,
-        logger=logger
-    )
-    if datasets.is_pool_active(target_pool) is False:
-        datasets.activate(mountpoint="/iocage-tests")
-
     return target_pool
 
 
@@ -119,7 +111,7 @@ def root_dataset(
     pool: libzfs.ZFSPool
 ) -> libzfs.ZFSDataset:
     """Return the root dataset for tests."""
-    dataset_name = f"{pool.name}/iocage-test"
+    dataset_name = f"{pool.name}/libioc-test"
 
     if force_clean:
         try:
@@ -135,13 +127,15 @@ def root_dataset(
             raise
 
     dataset = zfs.get_dataset(dataset_name)
+
+    if dataset.properties["mountpoint"].value == "none":
+        mountpoint = libzfs.ZFSUserProperty("/.libioc-test")
+        dataset.properties["mountpoint"] = mountpoint
+
     if not dataset.mountpoint:
         dataset.mount()
 
     return dataset
-
-    if force_clean:
-        helper_functions.unmount_and_destroy_dataset_recursive(dataset)
 
 
 @pytest.fixture
@@ -151,8 +145,15 @@ def host(
     zfs: libzfs.ZFS
 ) -> 'libioc.Host.HostGenerator':
     """Make the libioc.Host available to the tests."""
+    datasets = libioc.Datasets.Datasets(
+        sources=dict(test=root_dataset),
+        logger=logger,
+        zfs=zfs
+    )
     host = libioc.Host.Host(
-        root_dataset=root_dataset, logger=logger, zfs=zfs
+        datasets=datasets,
+        logger=logger,
+        zfs=zfs
     )
     return host
     del host

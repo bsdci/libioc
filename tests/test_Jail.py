@@ -72,7 +72,7 @@ class TestJail(object):
     ) -> None:
         """Test if jails can be created."""
         jail = libioc.Jail.Jail(
-            dict(id="foobar"),
+            dict(name="foobar"),
             new=True,
             host=host,
             logger=logger,
