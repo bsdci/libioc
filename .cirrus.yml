@@ -5,21 +5,21 @@ task:
       image: freebsd-12-0-release-amd64
   install_script:
     - mkdir -p /pools/
-    - '[ ! -f /pools/ioc-tests-1.img ] && truncate -s 10G /pools/ioc-test-1.img'
-    - '[ ! -f /pools/ioc-tests-2.img ] && truncate -s 10G /pools/ioc-test-2.img'
-    - zpool create ioc-test-1 /pools/ioc-test-1.img
-    - zpool create ioc-test-2 /pools/ioc-test-2.img
+    - '[ -f "/pools/ioc-test-`uname -r`.img" ] && zpool import -d /pools "ioc-test-`uname -r`"'
+    - '[ ! -f "/pools/ioc-test-`uname -r`.img" ] && truncate -s 10G "/pools/ioc-test-`uname -r`.img" && zpool create -m   "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"'
     - mount -t fdescfs null /dev/fd
     - make deps install-dev
+    # debug info
+    - zpool list
+    - zfs list
   pip_cache:
     folder: ~/.cache/pip
-  zfs_cache:
-    folder: /pools/
+  # zfs_cache:
+  #   folder: /pools/
   test_script:
-    - env ZPOOL=ioc-test-1 make test
+    - env ZPOOL="ioc-test-`uname -r`" make test
   cleanup_before_cache_script:
     - zfs list
-    - zfs destroy -r ioc-test-1/jails
-    - zfs destroy -r ioc-test-1/base
-    - zfs destroy -r ioc-test-2/jails
-    - zfs destroy -r ioc-test-2/base
+    - zfs destroy -r ioc-test-`uname -r`/jails || true
+    - zfs destroy -r ioc-test-`uname -r`/base || true
+    - zpool export ioc-test-`uname -r`
