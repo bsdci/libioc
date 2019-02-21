@@ -11,23 +11,26 @@ pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 . error "libioc cannot run with a Python version < 3.5"
 .endif
 
-deps:
-	pkg install -q -y libucl py$(pyver)-cython rsync python$(pyver) py$(pyver)-libzfs
-	$(PYTHON) -m ensurepip
-	$(PYTHON) -m pip install -Ur requirements.txt
-install: deps
+install: install-python-requirements install-deps
 	$(PYTHON) -m pip install -U .
 	@if [ -d /usr/local/etc/init.d ]; then \
 		install -m 0755 rc.d/ioc /usr/local/etc/init.d; \
 	else \
 		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
 	fi
-install-dev: deps
-	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py36-sqlite3; fi
+install-python-requirements:
+	$(PYTHON) -m ensurepip
+	$(PYTHON) -m pip install -Ur requirements.txt
+install-python-requirements-dev: install-python-requirements
 	$(PYTHON) -m pip install -Ur requirements-dev.txt
+install-deps:
+	pkg install -q -y libucl py$(pyver)-cython rsync python$(pyver) py$(pyver)-libzfs
+install-deps-dev: install-deps
+	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py36-sqlite3; fi
+install-dev: install-python-requirements-dev install-deps-dev
 	$(PYTHON) -m pip install -e .
 install-travis:
-	$(PYTHON) -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
+	python3.6 -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
 uninstall:
 	$(PYTHON) -m pip uninstall -y ioc
 	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
