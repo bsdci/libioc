@@ -3,6 +3,10 @@ task:
     matrix:
       #image: freebsd-11-2-release-amd64
       image: freebsd-12-0-release-amd64
+  pip_cache:
+    folder: ~/.cache/pip
+  zfs_cache:
+    folder: /pools/
   install_script:
     - mkdir -p /pools/
     - '[ -f "/pools/ioc-test-`uname -r`.img" ] && zpool import -d /pools "ioc-test-`uname -r`"'
@@ -12,10 +16,6 @@ task:
     # debug info
     - zpool list
     - zfs list
-  pip_cache:
-    folder: ~/.cache/pip
-  zfs_cache:
-    folder: /pools/
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
   cleanup_before_cache_script:
