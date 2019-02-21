@@ -11,7 +11,7 @@ pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 . error "libioc cannot run with a Python version < 3.5"
 .endif
 
-install: install-python-requirements install-deps
+install: install-deps install-python-requirements
 	$(PYTHON) -m pip install -U .
 	@if [ -d /usr/local/etc/init.d ]; then \
 		install -m 0755 rc.d/ioc /usr/local/etc/init.d; \
@@ -27,7 +27,7 @@ install-deps:
 	pkg install -q -y libucl py$(pyver)-cython rsync python$(pyver) py$(pyver)-libzfs
 install-deps-dev: install-deps
 	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py36-sqlite3; fi
-install-dev: install-python-requirements-dev install-deps-dev
+install-dev: install-deps-dev install-python-requirements-dev
 	$(PYTHON) -m pip install -e .
 install-travis:
 	python3.6 -m pip install flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit bandit-high-entropy-string
