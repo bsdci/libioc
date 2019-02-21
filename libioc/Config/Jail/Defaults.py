@@ -22,89 +22,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Global jail configuration defaults."""
+"""A dataset default configuration."""
 import typing
 
 import libioc.helpers_object
 import libioc.Config.Data
+import libioc.Config.Jail.Globals
 import libioc.Config.Jail.BaseConfig
 
-DEFAULTS = libioc.Config.Data.Data({
-    "id": None,
-    "release": None,
-    "boot": False,
-    "priority": 0,
-    "legacy": False,
-    "priority": 0,
-    "depends": [],
-    "basejail": False,
-    "basejail_type": "nullfs",
-    "clonejail": False,
-    "defaultrouter": None,
-    "defaultrouter6": None,
-    "mac_prefix": "02ff60",
-    "vnet": False,
-    "interfaces": [],
-    "vnet_interfaces": [],
-    "ip4": "new",
-    "ip4_saddrsel": 1,
-    "ip4_addr": None,
-    "ip6": "new",
-    "ip6_saddrsel": 1,
-    "ip6_addr": None,
-    "resolver": "/etc/resolv.conf",
-    "host_hostuuid": None,
-    "host_hostname": None,
-    "host_domainname": None,
-    "hostid": None,
-    "hostid_strict_check": False,
-    "devfs_ruleset": 4,
-    "enforce_statfs": 2,
-    "children_max": 0,
-    "allow_set_hostname": 1,
-    "allow_sysvipc": 0,
-    "allow_raw_sockets": 0,
-    "allow_chflags": 0,
-    "allow_mount": 0,
-    "allow_mount_devfs": 0,
-    "allow_mount_nullfs": 0,
-    "allow_mount_procfs": 0,
-    "allow_mount_fdescfs": 0,
-    "allow_mount_zfs": 0,
-    "allow_mount_tmpfs": 0,
-    "allow_quotas": 0,
-    "allow_socket_af": 0,
-    "allow_vmm": False,
-    "rlimits": None,
-    "sysvmsg": "new",
-    "sysvsem": "new",
-    "sysvshm": "new",
-    "exec_clean": 1,
-    "exec_fib": 1,
-    "exec_prestart": None,
-    "exec_created": None,
-    "exec_start": "/bin/sh /etc/rc",
-    "exec_poststart": None,
-    "exec_prestop": None,
-    "exec_stop": "/bin/sh /etc/rc.shutdown",
-    "exec_poststop": None,
-    "exec_jail_user": "root",
-    "exec_timeout": "600",
-    "stop_timeout": "30",
-    "mount_procfs": "0",
-    "mount_devfs": "1",
-    "mount_fdescfs": "0",
-    "securelevel": 2,
-    "tags": [],
-    "template": False,
-    "jail_zfs": False,
-    "jail_zfs_dataset": None,
-    "provision": {
-        "method": None,
-        "source": None,
-        "rev": "master"
-    }
-})
+_DEFAULTS = libioc.Config.Jail.Globals.DEFAULTS
 
 
 class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
@@ -144,7 +70,7 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
         try:
             return super()._getitem_special_property(key, data)
         except KeyError:
-            return super()._getitem_special_property(key, DEFAULTS)
+            return super()._getitem_special_property(key, _DEFAULTS)
 
     def __getitem__(self, key: str) -> typing.Any:
         """Return a user provided value or the hardcoded default."""
@@ -157,12 +83,12 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
 
     def __contains__(self, key: typing.Any) -> bool:
         """Return true if the storage or hardcoded defaults contain the key."""
-        return ((key in self.user_data) or (key in DEFAULTS)) is True
+        return ((key in self.user_data) or (key in _DEFAULTS)) is True
 
     def getitem_default(self, key: str) -> typing.Any:
         """Return the interpreted hardcoded default value."""
         try:
-            return DEFAULTS.__getitem__(key)
+            return _DEFAULTS.__getitem__(key)
         except KeyError:
             if self.special_properties.is_special_property(key):
                 return None
@@ -173,7 +99,7 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
 
     def __iter__(self) -> typing.Iterator[str]:
         """Iterate over all default properties."""
-        return iter(self.user_properties.union(DEFAULTS.keys()))
+        return iter(self.user_properties.union(_DEFAULTS.keys()))
 
     def __len__(self) -> int:
         """Return the number of default config properties."""
@@ -183,7 +109,7 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
         """List all default property keys."""
         return typing.cast(
             typing.KeysView[str],
-            list(self.user_properties.union(DEFAULTS.keys()))
+            list(self.user_properties.union(_DEFAULTS.keys()))
         )
 
     @property

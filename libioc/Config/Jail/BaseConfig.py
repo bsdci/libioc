@@ -27,7 +27,7 @@ import typing
 import re
 
 import libioc.Config.Data
-import libioc.Config.Jail.Defaults
+import libioc.Config.Jail.Globals
 import libioc.Config.Jail.Properties
 import libioc.errors
 import libioc.helpers
@@ -694,7 +694,7 @@ class BaseConfig(dict):
         return value
 
     def __get_default_type(self, key: str) -> typing.Optional[type]:
-        return type(libioc.Config.Jail.Defaults.DEFAULTS[key])
+        return type(libioc.Config.Jail.Globals.DEFAULTS[key])
 
     def set(  # noqa: T484
         self,
@@ -818,7 +818,7 @@ class BaseConfig(dict):
         """Return True when the key is a known config property."""
         if self._is_known_jail_param(key):
             return True
-        if key in libioc.Config.Jail.Defaults.DEFAULTS.keys():
+        if key in libioc.Config.Jail.Globals.DEFAULTS.keys():
             return True  # key is default
         if f"_set_{key}" in dict.__dir__(self):
             return True  # key is setter
