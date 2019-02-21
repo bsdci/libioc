@@ -1,7 +1,0 @@
-ioc.Network module
-==================
-
-.. automodule:: ioc.Network
-    :members:
-    :undoc-members:
-    :show-inheritance:

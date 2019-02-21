@@ -1,7 +1,0 @@
-ioc.Config.Jail.Properties.Resolver module
-==========================================
-
-.. automodule:: ioc.Config.Jail.Properties.Resolver
-    :members:
-    :undoc-members:
-    :show-inheritance:

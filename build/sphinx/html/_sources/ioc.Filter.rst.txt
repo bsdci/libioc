@@ -1,7 +1,0 @@
-ioc.Filter module
-=================
-
-.. automodule:: ioc.Filter
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-ioc.Config.Jail.Properties.Interfaces module
-============================================
-
-.. automodule:: ioc.Config.Jail.Properties.Interfaces
-    :members:
-    :undoc-members:
-    :show-inheritance:

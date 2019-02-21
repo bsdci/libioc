@@ -1,7 +1,0 @@
-ioc.ResourceUpdater module
-==========================
-
-.. automodule:: ioc.ResourceUpdater
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-ioc.Types module
-================
-
-.. automodule:: ioc.Types
-    :members:
-    :undoc-members:
-    :show-inheritance:

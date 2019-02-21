@@ -1,7 +1,0 @@
-ioc.errors module
-=================
-
-.. automodule:: ioc.errors
-    :members:
-    :undoc-members:
-    :show-inheritance:

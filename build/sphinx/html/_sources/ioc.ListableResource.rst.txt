@@ -1,7 +1,0 @@
-ioc.ListableResource module
-===========================
-
-.. automodule:: ioc.ListableResource
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-ioc.Config.Type.ZFS module
-==========================
-
-.. automodule:: ioc.Config.Type.ZFS
-    :members:
-    :undoc-members:
-    :show-inheritance:

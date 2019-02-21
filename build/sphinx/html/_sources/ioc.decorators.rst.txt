@@ -1,7 +1,0 @@
-ioc.decorators module
-=====================
-
-.. automodule:: ioc.decorators
-    :members:
-    :undoc-members:
-    :show-inheritance:
