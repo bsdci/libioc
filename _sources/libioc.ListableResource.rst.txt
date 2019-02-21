@@ -1,0 +1,7 @@
+libioc.ListableResource module
+==============================
+
+.. automodule:: libioc.ListableResource
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+libioc.Config.Data module
+=========================
+
+.. automodule:: libioc.Config.Data
+    :members:
+    :undoc-members:
+    :show-inheritance:

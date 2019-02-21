@@ -1,0 +1,7 @@
+libioc.Filter module
+====================
+
+.. automodule:: libioc.Filter
+    :members:
+    :undoc-members:
+    :show-inheritance:

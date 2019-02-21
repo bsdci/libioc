@@ -1,0 +1,7 @@
+libioc.Config.Jail.File.Fstab module
+====================================
+
+.. automodule:: libioc.Config.Jail.File.Fstab
+    :members:
+    :undoc-members:
+    :show-inheritance:

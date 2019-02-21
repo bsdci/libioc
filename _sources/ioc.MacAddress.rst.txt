@@ -1,7 +1,0 @@
-ioc.MacAddress module
-=====================
-
-.. automodule:: ioc.MacAddress
-    :members:
-    :undoc-members:
-    :show-inheritance:

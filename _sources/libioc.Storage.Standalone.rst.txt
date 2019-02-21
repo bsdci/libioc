@@ -1,0 +1,7 @@
+libioc.Storage.Standalone module
+================================
+
+.. automodule:: libioc.Storage.Standalone
+    :members:
+    :undoc-members:
+    :show-inheritance:

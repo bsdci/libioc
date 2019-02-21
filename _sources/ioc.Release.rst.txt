@@ -1,7 +1,0 @@
-ioc.Release module
-==================
-
-.. automodule:: ioc.Release
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,0 +1,912 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>libioc.ResourceUpdater &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../libioc.html">libioc package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>libioc.ResourceUpdater</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for libioc.ResourceUpdater</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
+<span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;Updater for Releases and other LaunchableResources like Jails.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+
+<span class="kn">import</span> <span class="nn">libioc.events</span>
+<span class="kn">import</span> <span class="nn">libioc.errors</span>
+<span class="kn">import</span> <span class="nn">libioc.Jail</span>
+
+<span class="c1"># MyPy</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>
+
+
+<div class="viewcode-block" id="Updater"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater">[docs]</a><span class="k">class</span> <span class="nc">Updater</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Updater for Releases and other LaunchableResources like Jails.&quot;&quot;&quot;</span>
+
+    <span class="n">update_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">update_script_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">update_conf_name</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_temporary_jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.LaunchableResource.LaunchableResource&#39;</span><span class="p">,</span>
+        <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;libioc.Host.HostGenerator&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Shortcut to the resources logger.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">logger</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_release_updates_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the absolute path to updater directory (os-dependend).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;/var/db/</span><span class="si">{self.update_name}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host_updates_dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the name of the updates dataset.&quot;&quot;&quot;</span>
+        <span class="n">ReleaseGenerator</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span> <span class="n">ReleaseGenerator</span><span class="p">):</span>
+            <span class="n">release_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">release_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">dataset</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{release_dataset.name}</span><span class="s2">/updates&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host_updates_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the updates dataset.&quot;&quot;&quot;</span>
+        <span class="n">dataset_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host_updates_dataset_name</span>
+        <span class="n">zfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span>
+        <span class="n">_dataset</span> <span class="o">=</span> <span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">_dataset</span>  <span class="c1"># type: libzfs.ZFSDataset</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host_updates_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the mountpoint of the updates dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host_updates_dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_temp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the update temp directory relative to the jail root.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/temp&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the associated release.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">release</span>
+
+    <span class="k">def</span> <span class="nf">_wrap_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">command</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">patch_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the latest known patch version.</span>
+
+<span class="sd">        When no patch version is known the release was not updated yet.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">temporary_jail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Temporary jail instance that will be created to run the update.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_temporary_jail&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">temporary_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_u&quot;</span>
+            <span class="n">temporary_jail</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">temporary_name</span><span class="p">,</span>
+                    <span class="s2">&quot;basejail&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;allow_mount_nullfs&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;exec_start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;securelevel&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;allow_chflags&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;vnet&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;ip4_addr&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;ip6_addr&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;defaultrouter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;mount_devfs&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;mount_fdescfs&quot;</span><span class="p">:</span> <span class="kc">False</span>
+                <span class="p">},</span>
+                <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span>
+            <span class="p">)</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;config_update.json&quot;</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ignore_source_config</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">root_path</span> <span class="o">=</span> <span class="n">temporary_jail</span><span class="o">.</span><span class="n">root_path</span>
+            <span class="n">destination_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{root_path}{self.local_release_updates_dir}</span><span class="s2">&quot;</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;fstab_update&quot;</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host_updates_dir</span><span class="p">,</span>
+                <span class="n">destination</span><span class="o">=</span><span class="n">destination_dir</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="s2">&quot;rw&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">destination_dir</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">destination_dir</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+            <span class="n">temporary_jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_temporary_jail</span> <span class="o">=</span> <span class="n">temporary_jail</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temporary_jail</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_fetch_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;To be implemented by inheriting classes&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_update_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;To be implemented by inheriting classes&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_release_trunk_file_url</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;To be implemented by inheriting classes&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_updates_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host_updates_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_download_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_dir</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/temp&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_jail_update_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">root_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_path</span>
+        <span class="n">jail_update_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{root_path}{self.local_release_updates_dir}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_create_dir</span><span class="p">(</span><span class="n">jail_update_dir</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">chown</span><span class="p">(</span><span class="n">jail_update_dir</span><span class="p">,</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="s2">&quot;wheel&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">jail_update_dir</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>  <span class="c1"># nosec: accessible directory</span>
+
+    <span class="k">def</span> <span class="nf">_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clean_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting existing directory </span><span class="si">{directory}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_dir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_release_updater_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the local path to the release updater config.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_download_updater_asset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">local</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">remote</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_release_trunk_file_url</span><span class="p">(</span>
+            <span class="n">release</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">remote</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local</span><span class="p">)</span>
+
+        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>  <span class="c1"># type: ignore</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Downloading update assets from </span><span class="si">{url}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">_request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span>  <span class="c1"># nosec: url validated</span>
+        <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">http_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DownloadFailed</span><span class="p">(</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;EOL Warnings&quot;</span><span class="p">,</span>
+                <span class="n">code</span><span class="o">=</span><span class="n">http_error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Update-asset </span><span class="si">{remote}</span><span class="s2"> for release &#39;</span><span class="si">{self.release.name}</span><span class="s2">&#39;&quot;</span>
+            <span class="n">f</span><span class="s2">&quot; saved to </span><span class="si">{local}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_modify_updater_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_pull_updater</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_updates_dir</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_updater_asset</span><span class="p">(</span>
+            <span class="n">mode</span><span class="o">=</span><span class="mo">0o744</span><span class="p">,</span>
+            <span class="n">remote</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;usr.sbin/</span><span class="si">{self.update_name}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">local</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">version_number</span> <span class="o">&gt;=</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">conf_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;usr.sbin/</span><span class="si">{self.update_name}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conf_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;etc/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_updater_asset</span><span class="p">(</span>
+            <span class="n">mode</span><span class="o">=</span><span class="mo">0o644</span><span class="p">,</span>
+            <span class="n">remote</span><span class="o">=</span><span class="n">conf_path</span><span class="p">,</span>
+            <span class="n">local</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modify_updater_config</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Updater.fetch"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch the update of a release.&quot;&quot;&quot;</span>
+        <span class="n">ReleaseGenerator</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span> <span class="n">ReleaseGenerator</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">NonReleaseUpdateFetch</span><span class="p">(</span>
+                <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">_require_release_supported</span><span class="p">()</span>
+
+        <span class="n">events</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span>
+        <span class="n">releaseUpdatePullEvent</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">ReleaseUpdatePull</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">releaseUpdateDownloadEvent</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">ReleaseUpdateDownload</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pull_updater</span><span class="p">()</span>
+
+            <span class="c1"># Additional pre-fetch check on HardenedBSD</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+                <span class="n">_version_snapshot_name</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.release.root_dataset.name}</span><span class="s2">&quot;</span>
+                    <span class="n">f</span><span class="s2">&quot;@p</span><span class="si">{self.patch_version}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">_version_snapshot_name</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">yield</span> <span class="n">releaseUpdateDownloadEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">releaseUpdatePullEvent</span><span class="o">.</span><span class="n">skipped</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">releaseUpdateDownloadEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Fetching updates for release &#39;</span><span class="si">{self.release.name}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pre_fetch</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_download_dir</span><span class="p">()</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_wrap_command</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_command</span><span class="p">),</span> <span class="s2">&quot;fetch&quot;</span><span class="p">),</span>
+                <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># nosec: B604</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">releaseUpdateDownloadEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_post_fetch</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">releaseUpdateDownloadEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_snapshot_release_after_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;p</span><span class="si">{self.patch_version}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Updater.apply"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span>
+        <span class="nb">bool</span>
+    <span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the fetched updates to the associated release or jail.&quot;&quot;&quot;</span>
+        <span class="n">updates_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host_updates_dataset</span>
+        <span class="n">snapshot_name</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">ZFS</span><span class="o">.</span><span class="n">append_snapshot_datetime</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{updates_dataset.name}</span><span class="s2">@pre-update&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">runResourceUpdateEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">RunResourceUpdate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">_scope</span> <span class="o">=</span> <span class="n">runResourceUpdateEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="k">yield</span> <span class="n">runResourceUpdateEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="c1"># create snapshot before the changes</span>
+        <span class="n">updates_dataset</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">snapshot_name</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_rollback_updates_snapshot</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Rolling back to snapshot </span><span class="si">{snapshot_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">snapshot_name</span><span class="p">)</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">rollback</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="n">runResourceUpdateEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_rollback_updates_snapshot</span><span class="p">)</span>
+
+        <span class="n">jail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_jail</span>
+        <span class="n">changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_jail</span><span class="p">(</span><span class="n">jail</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">IocEvent</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">event</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">changed</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">runResourceUpdateEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="c1"># restore any changes to the update dataset</span>
+        <span class="n">_rollback_updates_snapshot</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_release_after_update</span><span class="p">()</span>
+
+        <span class="k">yield</span> <span class="n">runResourceUpdateEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">changed</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_jail</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span>
+        <span class="nb">bool</span>
+    <span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">events</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span>
+        <span class="n">executeResourceUpdateEvent</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">ExecuteResourceUpdate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">_scope</span> <span class="o">=</span> <span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="k">yield</span> <span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="n">skipped</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pre_update</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_jail_update_dir</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="o">.</span><span class="n">fork_exec</span><span class="p">(</span>
+                <span class="n">jail</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_wrap_command</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_command</span><span class="p">),</span> <span class="s2">&quot;update&quot;</span><span class="p">),</span>
+                <span class="n">passthru</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">start_dependant_jails</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailLaunch</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">done</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">_skipped_text</span> <span class="o">=</span> <span class="s2">&quot;No updates are available to install.&quot;</span>
+                        <span class="n">skipped</span> <span class="o">=</span> <span class="p">(</span><span class="n">_skipped_text</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">event</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Update of resource &#39;</span><span class="si">{self.resource.name}</span><span class="s2">&#39; finished&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">UpdateFailure</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.update_name}</span><span class="s2"> failed&quot;</span>
+                <span class="p">),</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">jail</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">jail</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;The update jail is still running. &quot;</span>
+                    <span class="s2">&quot;Force-stopping it now.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">yield from</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
+                    <span class="n">jail</span><span class="p">,</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_post_update</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">skipped</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;already up to date&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">executeResourceUpdateEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Resource &#39;</span><span class="si">{self.resource.name}</span><span class="s2">&#39; updated&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="kc">True</span>  <span class="c1"># ToDo: yield False if nothing was updated</span>
+
+    <span class="k">def</span> <span class="nf">_pre_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute before executing the fetch command.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_post_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute after executing the fetch command.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_pre_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute before executing the update command.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_post_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute after executing the update command.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="HardenedBSD"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.HardenedBSD">[docs]</a><span class="k">class</span> <span class="nc">HardenedBSD</span><span class="p">(</span><span class="n">Updater</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updater for HardenedBSD.&quot;&quot;&quot;</span>
+
+    <span class="n">update_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hbsd-update&quot;</span>
+    <span class="n">update_script_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hbsd-update&quot;</span>
+    <span class="n">update_conf_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hbsd-update.conf&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_update_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>  <span class="c1"># ignore version check (offline)</span>
+            <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_version</span><span class="p">),</span> <span class="s2">&quot;-U&quot;</span><span class="p">,</span>  <span class="c1"># skip version check</span>
+            <span class="s2">&quot;-n&quot;</span><span class="p">,</span>  <span class="c1"># no kernel</span>
+            <span class="s2">&quot;-V&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-D&quot;</span><span class="p">,</span>  <span class="c1"># no download,</span>
+            <span class="s2">&quot;-T&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_temp_dir</span>
+        <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_fetch_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-k&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;-f&quot;</span><span class="p">,</span>  <span class="c1"># fetch only</span>
+            <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-V&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-T&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/temp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}</span><span class="s2">&quot;</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_release_trunk_file_url</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s2">&quot;https://raw.githubusercontent.com/HardenedBSD/hardenedBSD&quot;</span><span class="p">,</span>
+            <span class="n">release</span><span class="o">.</span><span class="n">hbds_release_branch</span><span class="p">,</span>
+            <span class="n">filename</span>
+        <span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">release_branch_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the branch name of the HBSD release.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;hardened/{self.host.release_version.lower()}/master&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_pull_updater</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_pull_updater</span><span class="p">()</span>
+        <span class="n">update_info_url</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s2">&quot;https://updates.hardenedbsd.org/pub/HardenedBSD/updates/&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release_branch_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">processor</span><span class="p">,</span>
+            <span class="s2">&quot;update-latest.txt&quot;</span>
+        <span class="p">])</span>
+        <span class="n">local_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/update-latest.txt&quot;</span>
+        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>  <span class="c1"># type: ignore</span>
+        <span class="n">_request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span>  <span class="c1"># nosec: official HardenedBSD URL</span>
+            <span class="n">update_info_url</span><span class="p">,</span>
+            <span class="n">local_path</span>
+        <span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="mo">0o744</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">patch_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the latest known patch version.</span>
+
+<span class="sd">        On HardenedBSD this version is published among the updated downloaded</span>
+<span class="sd">        by hbsd-update. Right before fetching an updater this file is</span>
+<span class="sd">        downloaded, so that the revision mentioned can be used for snapshot</span>
+<span class="sd">        creation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">local_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/update-latest.txt&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="FreeBSD"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.FreeBSD">[docs]</a><span class="k">class</span> <span class="nc">FreeBSD</span><span class="p">(</span><span class="n">Updater</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updater for FreeBSD.&quot;&quot;&quot;</span>
+
+    <span class="n">update_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;freebsd-update&quot;</span>
+    <span class="n">update_script_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;freebsd-update.sh&quot;</span>
+    <span class="n">update_conf_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;freebsd-update.conf&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_release_trunk_file_url</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">release</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;11.0-RELEASE&quot;</span><span class="p">:</span>
+            <span class="n">release_name</span> <span class="o">=</span> <span class="s2">&quot;11.0.1&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fragments</span> <span class="o">=</span> <span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">release_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{fragments[0]}</span><span class="s2">.0&quot;</span>
+
+        <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://svn.freebsd.org/base/release&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{base_url}</span><span class="s2">/</span><span class="si">{release_name}</span><span class="s2">/</span><span class="si">{filename}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_base_release_symlink_location</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the virtual path of a symlink to the release p0 snapshot.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;/tmp/ioc-release-</span><span class="si">{self.release.full_name}</span><span class="s2">-p0&quot;</span>  <span class="c1"># nosec: B108</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_update_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--not-running-from-cron&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_temp_dir</span><span class="p">,</span>
+            <span class="s2">&quot;-b&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._base_release_symlink_location}</span><span class="s2">/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--currently-running&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.local_release_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;install&quot;</span>
+        <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_fetch_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_script_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/temp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--currently-running&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;-b&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._base_release_symlink_location}</span><span class="s2">/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/</span><span class="si">{self.update_conf_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--not-running-from-cron&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fetch&quot;</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_modify_updater_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^Components .+$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="s2">&quot;Components world&quot;</span><span class="p">,</span>
+                <span class="n">content</span>
+            <span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_wrap_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;update&quot;</span><span class="p">:</span>
+            <span class="n">tolerated_error_message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;echo $OUTPUT&quot;</span>
+                <span class="s2">&quot; | grep -c &#39;No updates are available to install.&#39;&quot;</span>
+                <span class="s2">&quot; &gt;&gt; /dev/null || exit $RC&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;fetch&quot;</span><span class="p">:</span>
+            <span class="n">tolerated_error_message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;echo $OUTPUT&quot;</span>
+                <span class="s2">&quot; | grep -c &#39;HAS PASSED ITS END-OF-LIFE DATE.&#39;&quot;</span>
+                <span class="s2">&quot; &gt;&gt; /dev/null || exit $RC&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+        <span class="n">_command</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s2">&quot;set +e&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;OUTPUT=</span><span class="se">\&quot;</span><span class="s2">$(</span><span class="si">{command}</span><span class="s2">)</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;RC=$?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;echo $OUTPUT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if [ $RC -gt 0 ]; then&quot;</span><span class="p">,</span>
+            <span class="n">tolerated_error_message</span><span class="p">,</span>
+            <span class="s2">&quot;fi&quot;</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">_command</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">patch_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the latest known patch version.</span>
+
+<span class="sd">        This version is parsed from FreeBSDs /bin/freebsd-version file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_os_version</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}</span><span class="s2">/bin/freebsd-version&quot;</span>
+        <span class="p">)[</span><span class="s2">&quot;patch&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_pre_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute before executing the fetch command.&quot;&quot;&quot;</span>
+        <span class="n">symlink_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_path</span>
+        <span class="k">if</span> <span class="s2">&quot;p0&quot;</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">snapshot_name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">version_snapshots</span><span class="p">]:</span>
+            <span class="c1"># use p0 snapshot if available</span>
+            <span class="n">symlink_src</span> <span class="o">+=</span> <span class="s2">&quot;/.zfs/snapshot/p0&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">symlink_src</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_release_symlink_location</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute after executing the fetch command.&quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_release_symlink_location</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pre_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute before executing the update command.&quot;&quot;&quot;</span>
+        <span class="n">lnk</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}{self._base_release_symlink_location}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">lnk</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">lnk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute after executing the update command.&quot;&quot;&quot;</span>
+        <span class="n">lnk</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}{self._base_release_symlink_location}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{lnk}</span><span class="s2">/..&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">lnk</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_launchable_update_resource"><a class="viewcode-back" href="../../libioc.ResourceUpdater.html#libioc.ResourceUpdater.get_launchable_update_resource">[docs]</a><span class="k">def</span> <span class="nf">get_launchable_update_resource</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+    <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;libioc.Host.HostGenerator&#39;</span><span class="p">,</span>
+    <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.Resource.Resource&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Updater</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return an updater instance for the host distribution.&quot;&quot;&quot;</span>
+    <span class="n">_class</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">Updater</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HardenedBSD&quot;</span><span class="p">:</span>
+        <span class="n">_class</span> <span class="o">=</span> <span class="n">HardenedBSD</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_class</span> <span class="o">=</span> <span class="n">FreeBSD</span>
+
+    <span class="k">return</span> <span class="n">_class</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+        <span class="n">resource</span><span class="o">=</span><span class="n">resource</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

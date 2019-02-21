@@ -1,7 +1,0 @@
-ioc.Host module
-===============
-
-.. automodule:: ioc.Host
-    :members:
-    :undoc-members:
-    :show-inheritance:

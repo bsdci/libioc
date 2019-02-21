@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; ioc 0.4.1 2019/01/05 documentation</title>
+  <title>Overview: module code &mdash; libioc 0.6.0 2019/02/08 documentation</title>
   
 
   
@@ -17,36 +17,38 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../index.html" class="icon icon-home"> ioc
+            <a href="../index.html" class="icon icon-home"> libioc
           
 
           
@@ -56,7 +58,7 @@
             
             
               <div class="version">
-                0.4.1
+                0.6.0
               </div>
             
           
@@ -82,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../ioc.html">ioc package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libioc.html">libioc package</a></li>
 </ul>
 
             
@@ -97,7 +99,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">ioc</a>
+          <a href="../index.html">libioc</a>
         
       </nav>
 
@@ -144,68 +146,71 @@
            <div itemprop="articleBody">
             
   <h1>All modules for which code is available</h1>
-<ul><li><a href="ioc/BridgeInterface.html">ioc.BridgeInterface</a></li>
-<li><a href="ioc/CommandQueue.html">ioc.CommandQueue</a></li>
-<li><a href="ioc/Config/Dataset.html">ioc.Config.Dataset</a></li>
-<li><a href="ioc/Config/Jail/BaseConfig.html">ioc.Config.Jail.BaseConfig</a></li>
-<li><a href="ioc/Config/Jail/Defaults.html">ioc.Config.Jail.Defaults</a></li>
-<li><a href="ioc/Config/Jail/File.html">ioc.Config.Jail.File</a></li>
-<ul><li><a href="ioc/Config/Jail/File/Fstab.html">ioc.Config.Jail.File.Fstab</a></li>
-<li><a href="ioc/Config/Jail/File/RCConf.html">ioc.Config.Jail.File.RCConf</a></li>
-<li><a href="ioc/Config/Jail/File/SysctlConf.html">ioc.Config.Jail.File.SysctlConf</a></li>
-</ul><li><a href="ioc/Config/Jail/JailConfig.html">ioc.Config.Jail.JailConfig</a></li>
-<li><a href="ioc/Config/Jail/Properties.html">ioc.Config.Jail.Properties</a></li>
-<ul><li><a href="ioc/Config/Jail/Properties/Addresses.html">ioc.Config.Jail.Properties.Addresses</a></li>
-<li><a href="ioc/Config/Jail/Properties/Defaultrouter.html">ioc.Config.Jail.Properties.Defaultrouter</a></li>
-<li><a href="ioc/Config/Jail/Properties/Depends.html">ioc.Config.Jail.Properties.Depends</a></li>
-<li><a href="ioc/Config/Jail/Properties/Interfaces.html">ioc.Config.Jail.Properties.Interfaces</a></li>
-<li><a href="ioc/Config/Jail/Properties/Resolver.html">ioc.Config.Jail.Properties.Resolver</a></li>
-<li><a href="ioc/Config/Jail/Properties/ResourceLimit.html">ioc.Config.Jail.Properties.ResourceLimit</a></li>
-</ul><li><a href="ioc/Config/Prototype.html">ioc.Config.Prototype</a></li>
-<li><a href="ioc/Config/Type/JSON.html">ioc.Config.Type.JSON</a></li>
-<li><a href="ioc/Config/Type/UCL.html">ioc.Config.Type.UCL</a></li>
-<li><a href="ioc/Config/Type/ZFS.html">ioc.Config.Type.ZFS</a></li>
-<li><a href="ioc/Datasets.html">ioc.Datasets</a></li>
-<li><a href="ioc/DevfsRules.html">ioc.DevfsRules</a></li>
-<li><a href="ioc/Distribution.html">ioc.Distribution</a></li>
-<li><a href="ioc/Filter.html">ioc.Filter</a></li>
-<li><a href="ioc/Firewall.html">ioc.Firewall</a></li>
-<li><a href="ioc/Host.html">ioc.Host</a></li>
-<li><a href="ioc/IPAddress.html">ioc.IPAddress</a></li>
-<li><a href="ioc/Jail.html">ioc.Jail</a></li>
-<li><a href="ioc/JailState.html">ioc.JailState</a></li>
-<li><a href="ioc/Jails.html">ioc.Jails</a></li>
-<li><a href="ioc/LaunchableResource.html">ioc.LaunchableResource</a></li>
-<li><a href="ioc/ListableResource.html">ioc.ListableResource</a></li>
-<li><a href="ioc/Logger.html">ioc.Logger</a></li>
-<li><a href="ioc/MacAddress.html">ioc.MacAddress</a></li>
-<li><a href="ioc/Network.html">ioc.Network</a></li>
-<li><a href="ioc/NetworkInterface.html">ioc.NetworkInterface</a></li>
-<li><a href="ioc/Pkg.html">ioc.Pkg</a></li>
-<li><a href="ioc/Prompts.html">ioc.Prompts</a></li>
-<li><a href="ioc/Provisioning.html">ioc.Provisioning</a></li>
-<ul><li><a href="ioc/Provisioning/ix.html">ioc.Provisioning.ix</a></li>
-</ul><li><a href="ioc/Release.html">ioc.Release</a></li>
-<li><a href="ioc/Releases.html">ioc.Releases</a></li>
-<li><a href="ioc/Resource.html">ioc.Resource</a></li>
-<li><a href="ioc/ResourceBackup.html">ioc.ResourceBackup</a></li>
-<li><a href="ioc/ResourceSelector.html">ioc.ResourceSelector</a></li>
-<li><a href="ioc/ResourceUpdater.html">ioc.ResourceUpdater</a></li>
-<li><a href="ioc/SecureTarfile.html">ioc.SecureTarfile</a></li>
-<li><a href="ioc/Storage.html">ioc.Storage</a></li>
-<ul><li><a href="ioc/Storage/NullFSBasejail.html">ioc.Storage.NullFSBasejail</a></li>
-<li><a href="ioc/Storage/Standalone.html">ioc.Storage.Standalone</a></li>
-<li><a href="ioc/Storage/ZFSBasejail.html">ioc.Storage.ZFSBasejail</a></li>
-</ul><li><a href="ioc/Types.html">ioc.Types</a></li>
-<li><a href="ioc/VersionedResource.html">ioc.VersionedResource</a></li>
-<li><a href="ioc/ZFS.html">ioc.ZFS</a></li>
-<li><a href="ioc/ZFSShareStorage.html">ioc.ZFSShareStorage</a></li>
-<li><a href="ioc/decorators.html">ioc.decorators</a></li>
-<li><a href="ioc/errors.html">ioc.errors</a></li>
-<li><a href="ioc/events.html">ioc.events</a></li>
-<li><a href="ioc/helpers.html">ioc.helpers</a></li>
-<li><a href="ioc/helpers_ioctl.html">ioc.helpers_ioctl</a></li>
-<li><a href="ioc/helpers_object.html">ioc.helpers_object</a></li>
+<ul><li><a href="libioc/BridgeInterface.html">libioc.BridgeInterface</a></li>
+<li><a href="libioc/CommandQueue.html">libioc.CommandQueue</a></li>
+<li><a href="libioc/Config/Data.html">libioc.Config.Data</a></li>
+<li><a href="libioc/Config/Dataset.html">libioc.Config.Dataset</a></li>
+<li><a href="libioc/Config/Jail/BaseConfig.html">libioc.Config.Jail.BaseConfig</a></li>
+<li><a href="libioc/Config/Jail/Defaults.html">libioc.Config.Jail.Defaults</a></li>
+<li><a href="libioc/Config/Jail/File.html">libioc.Config.Jail.File</a></li>
+<ul><li><a href="libioc/Config/Jail/File/Fstab.html">libioc.Config.Jail.File.Fstab</a></li>
+<li><a href="libioc/Config/Jail/File/RCConf.html">libioc.Config.Jail.File.RCConf</a></li>
+<li><a href="libioc/Config/Jail/File/SysctlConf.html">libioc.Config.Jail.File.SysctlConf</a></li>
+</ul><li><a href="libioc/Config/Jail/JailConfig.html">libioc.Config.Jail.JailConfig</a></li>
+<li><a href="libioc/Config/Jail/Properties.html">libioc.Config.Jail.Properties</a></li>
+<ul><li><a href="libioc/Config/Jail/Properties/Addresses.html">libioc.Config.Jail.Properties.Addresses</a></li>
+<li><a href="libioc/Config/Jail/Properties/Defaultrouter.html">libioc.Config.Jail.Properties.Defaultrouter</a></li>
+<li><a href="libioc/Config/Jail/Properties/Depends.html">libioc.Config.Jail.Properties.Depends</a></li>
+<li><a href="libioc/Config/Jail/Properties/Interfaces.html">libioc.Config.Jail.Properties.Interfaces</a></li>
+<li><a href="libioc/Config/Jail/Properties/Resolver.html">libioc.Config.Jail.Properties.Resolver</a></li>
+<li><a href="libioc/Config/Jail/Properties/ResourceLimit.html">libioc.Config.Jail.Properties.ResourceLimit</a></li>
+</ul><li><a href="libioc/Config/Prototype.html">libioc.Config.Prototype</a></li>
+<li><a href="libioc/Config/Type/JSON.html">libioc.Config.Type.JSON</a></li>
+<li><a href="libioc/Config/Type/UCL.html">libioc.Config.Type.UCL</a></li>
+<li><a href="libioc/Config/Type/ZFS.html">libioc.Config.Type.ZFS</a></li>
+<li><a href="libioc/Datasets.html">libioc.Datasets</a></li>
+<li><a href="libioc/DevfsRules.html">libioc.DevfsRules</a></li>
+<li><a href="libioc/Distribution.html">libioc.Distribution</a></li>
+<li><a href="libioc/Filter.html">libioc.Filter</a></li>
+<li><a href="libioc/Firewall.html">libioc.Firewall</a></li>
+<li><a href="libioc/Host.html">libioc.Host</a></li>
+<li><a href="libioc/IPAddress.html">libioc.IPAddress</a></li>
+<li><a href="libioc/Jail.html">libioc.Jail</a></li>
+<li><a href="libioc/JailParams.html">libioc.JailParams</a></li>
+<li><a href="libioc/JailState.html">libioc.JailState</a></li>
+<li><a href="libioc/Jails.html">libioc.Jails</a></li>
+<li><a href="libioc/LaunchableResource.html">libioc.LaunchableResource</a></li>
+<li><a href="libioc/ListableResource.html">libioc.ListableResource</a></li>
+<li><a href="libioc/Logger.html">libioc.Logger</a></li>
+<li><a href="libioc/MacAddress.html">libioc.MacAddress</a></li>
+<li><a href="libioc/Network.html">libioc.Network</a></li>
+<li><a href="libioc/NetworkInterface.html">libioc.NetworkInterface</a></li>
+<li><a href="libioc/Pkg.html">libioc.Pkg</a></li>
+<li><a href="libioc/Prompts.html">libioc.Prompts</a></li>
+<li><a href="libioc/Provisioning.html">libioc.Provisioning</a></li>
+<ul><li><a href="libioc/Provisioning/ix.html">libioc.Provisioning.ix</a></li>
+<li><a href="libioc/Provisioning/puppet.html">libioc.Provisioning.puppet</a></li>
+</ul><li><a href="libioc/Release.html">libioc.Release</a></li>
+<li><a href="libioc/Releases.html">libioc.Releases</a></li>
+<li><a href="libioc/Resource.html">libioc.Resource</a></li>
+<li><a href="libioc/ResourceBackup.html">libioc.ResourceBackup</a></li>
+<li><a href="libioc/ResourceSelector.html">libioc.ResourceSelector</a></li>
+<li><a href="libioc/ResourceUpdater.html">libioc.ResourceUpdater</a></li>
+<li><a href="libioc/SecureTarfile.html">libioc.SecureTarfile</a></li>
+<li><a href="libioc/Storage.html">libioc.Storage</a></li>
+<ul><li><a href="libioc/Storage/NullFSBasejail.html">libioc.Storage.NullFSBasejail</a></li>
+<li><a href="libioc/Storage/Standalone.html">libioc.Storage.Standalone</a></li>
+<li><a href="libioc/Storage/ZFSBasejail.html">libioc.Storage.ZFSBasejail</a></li>
+</ul><li><a href="libioc/Types.html">libioc.Types</a></li>
+<li><a href="libioc/VersionedResource.html">libioc.VersionedResource</a></li>
+<li><a href="libioc/ZFS.html">libioc.ZFS</a></li>
+<li><a href="libioc/ZFSShareStorage.html">libioc.ZFSShareStorage</a></li>
+<li><a href="libioc/decorators.html">libioc.decorators</a></li>
+<li><a href="libioc/errors.html">libioc.errors</a></li>
+<li><a href="libioc/events.html">libioc.events</a></li>
+<li><a href="libioc/helpers.html">libioc.helpers</a></li>
+<li><a href="libioc/helpers_ioctl.html">libioc.helpers_ioctl</a></li>
+<li><a href="libioc/helpers_object.html">libioc.helpers_object</a></li>
 </ul>
 
            </div>
@@ -218,7 +223,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017-2019, Stefan Grönke.
+        &copy; Copyright 2017-2019, Stefan Grönke
 
     </p>
   </div>
@@ -235,33 +240,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.4.1 2019/01/05',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

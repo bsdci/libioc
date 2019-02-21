@@ -1,0 +1,22 @@
+libioc.Config.Jail.Properties package
+=====================================
+
+Submodules
+----------
+
+.. toctree::
+
+   libioc.Config.Jail.Properties.Addresses
+   libioc.Config.Jail.Properties.Defaultrouter
+   libioc.Config.Jail.Properties.Depends
+   libioc.Config.Jail.Properties.Interfaces
+   libioc.Config.Jail.Properties.Resolver
+   libioc.Config.Jail.Properties.ResourceLimit
+
+Module contents
+---------------
+
+.. automodule:: libioc.Config.Jail.Properties
+    :members:
+    :undoc-members:
+    :show-inheritance:

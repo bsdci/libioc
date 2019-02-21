@@ -1,7 +1,0 @@
-ioc.Config.Jail.File.Fstab module
-=================================
-
-.. automodule:: ioc.Config.Jail.File.Fstab
-    :members:
-    :undoc-members:
-    :show-inheritance:

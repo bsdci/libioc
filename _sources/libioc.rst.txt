@@ -1,0 +1,63 @@
+libioc package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+
+    libioc.Config
+    libioc.Provisioning
+    libioc.Storage
+
+Submodules
+----------
+
+.. toctree::
+
+   libioc.BridgeInterface
+   libioc.CommandQueue
+   libioc.Datasets
+   libioc.DevfsRules
+   libioc.Distribution
+   libioc.Filter
+   libioc.Firewall
+   libioc.Host
+   libioc.IPAddress
+   libioc.Jail
+   libioc.JailParams
+   libioc.JailState
+   libioc.Jails
+   libioc.LaunchableResource
+   libioc.ListableResource
+   libioc.Logger
+   libioc.MacAddress
+   libioc.Network
+   libioc.NetworkInterface
+   libioc.Pkg
+   libioc.Prompts
+   libioc.Release
+   libioc.Releases
+   libioc.Resource
+   libioc.ResourceBackup
+   libioc.ResourceSelector
+   libioc.ResourceUpdater
+   libioc.SecureTarfile
+   libioc.Types
+   libioc.VersionedResource
+   libioc.ZFS
+   libioc.ZFSShareStorage
+   libioc.decorators
+   libioc.errors
+   libioc.events
+   libioc.helpers
+   libioc.helpers_ioctl
+   libioc.helpers_object
+
+Module contents
+---------------
+
+.. automodule:: libioc
+    :members:
+    :undoc-members:
+    :show-inheritance:

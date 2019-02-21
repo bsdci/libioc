@@ -1,7 +1,0 @@
-ioc.ZFSShareStorage module
-==========================
-
-.. automodule:: ioc.ZFSShareStorage
-    :members:
-    :undoc-members:
-    :show-inheritance:

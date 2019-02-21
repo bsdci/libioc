@@ -1,7 +1,0 @@
-ioc.Provisioning.ix module
-==========================
-
-.. automodule:: ioc.Provisioning.ix
-    :members:
-    :undoc-members:
-    :show-inheritance:

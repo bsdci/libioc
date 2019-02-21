@@ -1,0 +1,7 @@
+libioc.Config.Jail.Globals module
+=================================
+
+.. automodule:: libioc.Config.Jail.Globals
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+libioc.helpers\_ioctl module
+============================
+
+.. automodule:: libioc.helpers_ioctl
+    :members:
+    :undoc-members:
+    :show-inheritance:

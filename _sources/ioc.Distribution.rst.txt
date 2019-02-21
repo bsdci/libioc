@@ -1,7 +1,0 @@
-ioc.Distribution module
-=======================
-
-.. automodule:: ioc.Distribution
-    :members:
-    :undoc-members:
-    :show-inheritance:

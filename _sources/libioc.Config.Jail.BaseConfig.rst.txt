@@ -1,0 +1,7 @@
+libioc.Config.Jail.BaseConfig module
+====================================
+
+.. automodule:: libioc.Config.Jail.BaseConfig
+    :members:
+    :undoc-members:
+    :show-inheritance:

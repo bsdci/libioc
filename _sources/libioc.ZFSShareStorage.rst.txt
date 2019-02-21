@@ -1,0 +1,7 @@
+libioc.ZFSShareStorage module
+=============================
+
+.. automodule:: libioc.ZFSShareStorage
+    :members:
+    :undoc-members:
+    :show-inheritance:

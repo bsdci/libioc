@@ -1,0 +1,7 @@
+libioc.Distribution module
+==========================
+
+.. automodule:: libioc.Distribution
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+libioc.Pkg module
+=================
+
+.. automodule:: libioc.Pkg
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+libioc.ResourceBackup module
+============================
+
+.. automodule:: libioc.ResourceBackup
+    :members:
+    :undoc-members:
+    :show-inheritance:

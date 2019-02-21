@@ -1,7 +1,0 @@
-ioc.Config.Dataset module
-=========================
-
-.. automodule:: ioc.Config.Dataset
-    :members:
-    :undoc-members:
-    :show-inheritance:

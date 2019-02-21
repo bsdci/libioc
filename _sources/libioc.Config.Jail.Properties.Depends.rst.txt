@@ -1,0 +1,7 @@
+libioc.Config.Jail.Properties.Depends module
+============================================
+
+.. automodule:: libioc.Config.Jail.Properties.Depends
+    :members:
+    :undoc-members:
+    :show-inheritance:

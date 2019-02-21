@@ -1,0 +1,597 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>libioc.DevfsRules &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../libioc.html">libioc package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>libioc.DevfsRules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for libioc.DevfsRules</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
+<span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage module for host devfs rule configuration.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">libioc.errors</span>
+<span class="kn">import</span> <span class="nn">libioc.helpers</span>
+
+
+<div class="viewcode-block" id="DevfsRuleset"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRuleset">[docs]</a><span class="k">class</span> <span class="nc">DevfsRuleset</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Representation of a devfs ruleset in the devfs.rules file.</span>
+
+<span class="sd">    DevfsRuleset instances behave like standard lists and can store strings</span>
+<span class="sd">    that multiple lines (string)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;^\[(?P&lt;name&gt;[a-z](?:[a-z0-9\-_]*[a-z0-9])?)=</span>
+<span class="s2">                (?P&lt;number&gt;[0-9]+)\]\s*(?:\#\s*(?P&lt;comment&gt;.*))?$&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">number</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">comment</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">number</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">comment</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the DevfsRuleset.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            value (string): (optional)</span>
+<span class="sd">                If specified in combination with a number, this parameter is</span>
+<span class="sd">                interpreted as the ruleset name. Otherwise it is parsed with</span>
+<span class="sd">                the expectation to find a [&lt;name&gt;=&lt;number&gt;] ruleset definition.</span>
+
+<span class="sd">                When value is not specified or None, DevfsRuleset is assumed</span>
+<span class="sd">                to be new or unspecified (cannot be exported before name and</span>
+<span class="sd">                number were assigned at a later time)</span>
+
+<span class="sd">            number (int): (optional)</span>
+<span class="sd">                The number of the ruleset. Must be specified to export the</span>
+<span class="sd">                ruleset, but is like the name not required to compare the</span>
+<span class="sd">                ruleset with another</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+        <span class="c1"># when only one argument is passed, it&#39;s a line that need to be parsed</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">number</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># name and number will be assigned later</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">number</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_line</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+
+        <span class="k">if</span> <span class="n">number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
+
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DevfsRuleset.has_rule"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRuleset.has_rule">[docs]</a>    <span class="k">def</span> <span class="nf">has_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if the rule is part of the current ruleset.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            rule (string):</span>
+<span class="sd">                The rule string to be compared with current rules of the</span>
+<span class="sd">                ruleset instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DevfsRuleset.append"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRuleset.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Append a rule to the devfs rules.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rule</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DevfsRuleset.clone"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRuleset.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_ruleset</span><span class="p">:</span> <span class="s1">&#39;DevfsRuleset&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clone the rules from another ruleset.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            source_ruleset (libioc.DevfsRules.DevfsRuleset):</span>
+<span class="sd">                Ruleset to copy all rules from</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">source_ruleset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_line</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">line</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+
+        <span class="c1"># marks beginning of a new ruleset</span>
+        <span class="n">ruleset_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">DevfsRuleset</span><span class="o">.</span><span class="n">PATTERN</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ruleset_match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ruleset_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+            <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ruleset_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">))</span>
+            <span class="n">comment</span> <span class="o">=</span> <span class="n">ruleset_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;comment&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">comment</span>
+
+        <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s2">&quot;DevfsRuleset line parsing failed&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the devfs ruleset as string.&quot;&quot;&quot;</span>
+        <span class="n">ruleset_line</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;[</span><span class="si">{self.name}</span><span class="s2">=</span><span class="si">{self.number}</span><span class="s2">]&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ruleset_line</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot; # </span><span class="si">{self.comment}</span><span class="s2">&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">ruleset_line</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="DevfsRules"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules">[docs]</a><span class="k">class</span> <span class="nc">DevfsRules</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstraction for the hosts /etc/devfs.rules.</span>
+
+<span class="sd">    Read and edit devfs rules in a programmatic way.</span>
+<span class="sd">    Restart the devfs service after applying changes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_rules_file</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">_ruleset_number_index</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_ruleset_name_index</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_system_rule_lines</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rules_file</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;/etc/devfs.rules&quot;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a DevfsRules manager for devfs.rules files.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            rules_file (string): (default=/etc/devfs.rules)</span>
+<span class="sd">                Path of the devfs.rules file</span>
+
+<span class="sd">            logger (libioc.Logger): (optional)</span>
+<span class="sd">                Instance of the logger that is passed to occuring errors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+        <span class="c1"># index rulesets to find duplicated and provide easy access</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_number_index</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_name_index</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># remember all lines that were loaded from defaults (system)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_system_rule_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># will automatically read from file - needs to be the last item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span> <span class="o">=</span> <span class="n">rules_file</span>
+
+<div class="viewcode-block" id="DevfsRules.append"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ruleset</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">DevfsRuleset</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">is_system_rule</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">DevfsRuleset</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a DevfsRuleset to the list.</span>
+
+<span class="sd">        The rulesets added become indexed, so that lookups and duplication</span>
+<span class="sd">        checks are easy and fast</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            ruleset (libioc.DevfsRules.DevfsRuleset|string):</span>
+<span class="sd">                The ruleset that gets added if it is not already in the list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">next_line_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ruleset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ruleset</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ruleset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_system_rule</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_system_rule_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_line_index</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ruleset</span>
+
+        <span class="k">if</span> <span class="n">ruleset</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_name_index</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DuplicateDevfsRuleset</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;Ruleset named &#39;</span><span class="si">{ruleset.name}</span><span class="s2">&#39; already present&quot;</span><span class="p">,</span>
+                <span class="n">devfs_rules_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ruleset</span><span class="o">.</span><span class="n">number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_number_index</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DuplicateDevfsRuleset</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;Ruleset number &#39;</span><span class="si">{ruleset.number}</span><span class="s2">&#39; already present&quot;</span><span class="p">,</span>
+                <span class="n">devfs_rules_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ruleset</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">MissingDevfsRulesetName</span><span class="p">(</span>
+                <span class="n">devfs_rules_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="c1"># build indexes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_number_index</span><span class="p">[</span><span class="n">ruleset</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_line_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_name_index</span><span class="p">[</span><span class="n">ruleset</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_line_index</span>
+        <span class="k">if</span> <span class="n">is_system_rule</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_system_rule_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_line_index</span><span class="p">)</span>
+
+        <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ruleset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ruleset</span></div>
+
+<div class="viewcode-block" id="DevfsRules.new_ruleset"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.new_ruleset">[docs]</a>    <span class="k">def</span> <span class="nf">new_ruleset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ruleset</span><span class="p">:</span> <span class="n">DevfsRuleset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append a new ruleset.</span>
+
+<span class="sd">        Similar to append(), but automatically assigns a new number</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ruleset (libioc.DevfsRules.DevfsRuleset):</span>
+<span class="sd">                The new devfs ruleset that is going to be added</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The devfs ruleset number of the created ruleset</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ruleset</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_number</span>
+
+        <span class="k">if</span> <span class="n">ruleset</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ruleset</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;iocage_auto_</span><span class="si">{ruleset.number}</span><span class="s2">&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ruleset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ruleset</span><span class="o">.</span><span class="n">number</span></div>
+
+<div class="viewcode-block" id="DevfsRules.find_by_name"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.find_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">find_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DevfsRuleset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Find a devfs rule by its name.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_name_index</span>
+        <span class="n">ruleset</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">rule_name</span><span class="p">]]</span>  <span class="c1"># type: DevfsRuleset</span>
+        <span class="k">return</span> <span class="n">ruleset</span></div>
+
+<div class="viewcode-block" id="DevfsRules.find_by_number"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.find_by_number">[docs]</a>    <span class="k">def</span> <span class="nf">find_by_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DevfsRuleset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Find a devfs rule by its rule number.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_number_index</span>
+        <span class="n">ruleset</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">rule_number</span><span class="p">]]</span>  <span class="c1"># type: DevfsRuleset</span>
+        <span class="k">return</span> <span class="n">ruleset</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_rules_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the default path to the devfs rules file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;/etc/defaults/devfs.rules&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rules_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Path of the devfs.rules file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rules_file</span>
+
+    <span class="nd">@rules_file</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">rules_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devfs_rules_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set different devfs rules file.</span>
+
+<span class="sd">        When setting a new devfs.rules source, it is read automatically</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rules_file</span> <span class="o">=</span> <span class="n">devfs_rules_path</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_rules</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">next_number</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the next highest ruleset number that is available.</span>
+
+<span class="sd">        This counting includes the systems default devfs rulesets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ruleset_name_index</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="DevfsRules.read_rules"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.read_rules">[docs]</a>    <span class="k">def</span> <span class="nf">read_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read existing devfs.rules file.</span>
+
+<span class="sd">        Existing devfs rules get reset and read from the rules_file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Reading devfs.rules from </span><span class="si">{self.rules_file}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_rules_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_rules_file</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_rules_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_rules_file</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">system</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+
+        <span class="n">current_ruleset</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># add comments and empty lines as string</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">line</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">is_system_rule</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">current_ruleset</span> <span class="o">=</span> <span class="n">DevfsRuleset</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_ruleset</span><span class="p">,</span> <span class="n">is_system_rule</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="c1"># the first item must be a ruleset</span>
+            <span class="k">if</span> <span class="n">current_ruleset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidDevfsRulesSyntax</span><span class="p">(</span>
+                    <span class="n">devfs_rules_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span>
+                    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Rules must follow a ruleset declaration&quot;</span><span class="p">,</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                <span class="p">)</span>
+
+            <span class="n">current_ruleset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DevfsRules.save"><a class="viewcode-back" href="../../libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply changes to the devfs.rules file.</span>
+
+<span class="sd">        Automatically restarts devfs service when the file was changed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_before</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">)</span>
+            <span class="n">content_before</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rules_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+
+        <span class="n">new_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">content_before</span> <span class="o">==</span> <span class="n">new_content</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;devfs.rules file </span><span class="si">{self.rules_file}</span><span class="s2"> unchanged&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;Writing devfs.rules to </span><span class="si">{self.rules_file}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">new_content</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_restart_devfs_service</span><span class="p">()</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_restart_devfs_service</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Restart devfs service after changing devfs.rules.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Restarting devfs service&quot;</span><span class="p">)</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span><span class="s2">&quot;service&quot;</span><span class="p">,</span> <span class="s2">&quot;devfs&quot;</span><span class="p">,</span> <span class="s2">&quot;restart&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the devfs.rules content as string.&quot;&quot;&quot;</span>
+        <span class="n">out_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_system_rule_lines</span><span class="p">:</span>
+                <span class="n">out_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_lines</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

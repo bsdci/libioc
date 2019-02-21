@@ -1,7 +1,0 @@
-ioc.VersionedResource module
-============================
-
-.. automodule:: ioc.VersionedResource
-    :members:
-    :undoc-members:
-    :show-inheritance:

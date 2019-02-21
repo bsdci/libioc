@@ -1,0 +1,7 @@
+libioc.Storage.ZFSBasejail module
+=================================
+
+.. automodule:: libioc.Storage.ZFSBasejail
+    :members:
+    :undoc-members:
+    :show-inheritance:

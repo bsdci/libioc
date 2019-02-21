@@ -1,0 +1,7 @@
+libioc.Logger module
+====================
+
+.. automodule:: libioc.Logger
+    :members:
+    :undoc-members:
+    :show-inheritance:

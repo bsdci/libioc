@@ -1,0 +1,900 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>libioc.events module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="libioc.helpers module" href="libioc.helpers.html" />
+    <link rel="prev" title="libioc.errors module" href="libioc.errors.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> libioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="libioc.html">libioc package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="libioc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="libioc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="libioc.BridgeInterface.html">libioc.BridgeInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.CommandQueue.html">libioc.CommandQueue module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Datasets.html">libioc.Datasets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.DevfsRules.html">libioc.DevfsRules module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Distribution.html">libioc.Distribution module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Filter.html">libioc.Filter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Firewall.html">libioc.Firewall module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Host.html">libioc.Host module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Logger.html">libioc.Logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.MacAddress.html">libioc.MacAddress module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Network.html">libioc.Network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.NetworkInterface.html">libioc.NetworkInterface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Pkg.html">libioc.Pkg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Prompts.html">libioc.Prompts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Release.html">libioc.Release module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Releases.html">libioc.Releases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Resource.html">libioc.Resource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ResourceBackup.html">libioc.ResourceBackup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ResourceSelector.html">libioc.ResourceSelector module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ResourceUpdater.html">libioc.ResourceUpdater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.SecureTarfile.html">libioc.SecureTarfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.Types.html">libioc.Types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.VersionedResource.html">libioc.VersionedResource module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ZFS.html">libioc.ZFS module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.ZFSShareStorage.html">libioc.ZFSShareStorage module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.decorators.html">libioc.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.errors.html">libioc.errors module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">libioc.events module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.helpers.html">libioc.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.helpers_ioctl.html">libioc.helpers_ioctl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="libioc.helpers_object.html">libioc.helpers_object module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="libioc.html#module-libioc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="libioc.html">libioc package</a> &raquo;</li>
+        
+      <li>libioc.events module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/libioc.events.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-libioc.events">
+<span id="libioc-events-module"></span><h1>libioc.events module<a class="headerlink" href="#module-libioc.events" title="Permalink to this headline">¶</a></h1>
+<p>iocage events collection.</p>
+<dl class="class">
+<dt id="libioc.events.BundleBackup">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">BundleBackup</code><span class="sig-paren">(</span><em>destination</em>, <em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#BundleBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.BundleBackup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Bundle exported data into a backup archive.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExecuteResourceUpdate">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExecuteResourceUpdate</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExecuteResourceUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExecuteResourceUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceUpdate" title="libioc.events.ResourceUpdate"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceUpdate</span></code></a></p>
+<p>Execute the updater script in a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExportConfig">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExportConfig</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExportConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExportConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when the config of a resource is exported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExportFstab">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExportFstab</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExportFstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExportFstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when the fstab file of a jail is exported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExportOtherDataset">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExportOtherDataset</code><span class="sig-paren">(</span><em>resource</em>, <em>dataset</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExportOtherDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExportOtherDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Export one of a resources datasets.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExportOtherDatasets">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExportOtherDatasets</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExportOtherDatasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExportOtherDatasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when other resource datasets get exported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExportRootDataset">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExportRootDataset</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExportRootDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExportRootDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Export a resources root dataset.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ExtractBundle">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ExtractBundle</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ExtractBundle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ExtractBundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Extract a bundled backup archive.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.FetchRelease">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">FetchRelease</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#FetchRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.FetchRelease" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ReleaseEvent" title="libioc.events.ReleaseEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ReleaseEvent</span></code></a></p>
+<p>Fetch release assets.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ImportConfig">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ImportConfig</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ImportConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ImportConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when the config of a resource is imported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ImportFstab">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ImportFstab</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ImportFstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ImportFstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when the fstab file of a jail is imported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ImportOtherDataset">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ImportOtherDataset</code><span class="sig-paren">(</span><em>resource</em>, <em>dataset_name</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ImportOtherDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ImportOtherDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Export one of a resources datasets.</p>
+<dl class="attribute">
+<dt id="libioc.events.ImportOtherDataset.dataset_name">
+<code class="descname">dataset_name</code><a class="headerlink" href="#libioc.events.ImportOtherDataset.dataset_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the event identifier to dataset_name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ImportOtherDatasets">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ImportOtherDatasets</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ImportOtherDatasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ImportOtherDatasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Event that occurs when other resource datasets get exported.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ImportRootDataset">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ImportRootDataset</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ImportRootDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ImportRootDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceBackup" title="libioc.events.ResourceBackup"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceBackup</span></code></a></p>
+<p>Import data from an an archived root dataset.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.IocEvent">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">IocEvent</code><span class="sig-paren">(</span><em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The base event class of liblibioc.</p>
+<dl class="method">
+<dt id="libioc.events.IocEvent.add_rollback_step">
+<code class="descname">add_rollback_step</code><span class="sig-paren">(</span><em>method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.add_rollback_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.add_rollback_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a rollback step that is executed when the event fails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.begin">
+<code class="descname">begin</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.begin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin an event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.child_event">
+<code class="descname">child_event</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.child_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.child_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the event to the child_events for later notification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.events.IocEvent.duration">
+<code class="descname">duration</code><a class="headerlink" href="#libioc.events.IocEvent.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the duration of finished events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully finish an event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>exception=True</em>, <em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.fail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>End an event with a failure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.fail_generator">
+<code class="descname">fail_generator</code><span class="sig-paren">(</span><em>exception=True</em>, <em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.fail_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.fail_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>End an event with a failure via a generator of rollback steps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.get_state_string">
+<code class="descname">get_state_string</code><span class="sig-paren">(</span><em>error='failed'</em>, <em>skipped='skipped'</em>, <em>done='done'</em>, <em>pending='pending'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.get_state_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.get_state_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a humanreadable string according to the jail state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.events.IocEvent.pending">
+<code class="descname">pending</code><a class="headerlink" href="#libioc.events.IocEvent.pending" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the event is pending.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.rollback">
+<code class="descname">rollback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.rollback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rollback all rollback steps in reverse order.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.events.IocEvent.scope">
+<code class="descname">scope</code><a class="headerlink" href="#libioc.events.IocEvent.scope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the currently used event scope.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.Scope" title="libioc.events.Scope"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scope</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.skip">
+<code class="descname">skip</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.skip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.skip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark an event as skipped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.events.IocEvent.step">
+<code class="descname">step</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#IocEvent.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.IocEvent.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reflect partial event progress.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.events.IocEvent.type">
+<code class="descname">type</code><a class="headerlink" href="#libioc.events.IocEvent.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the events type.</p>
+<p>The event type is obtained from an IocEvent’s class name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailClone">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailClone</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailClone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailClone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Clone a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailCommandExecution">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailCommandExecution</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailCommandExecution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailCommandExecution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Run command in a jail.</p>
+<dl class="method">
+<dt id="libioc.events.JailCommandExecution.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>message=None</em>, <em>stdout=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailCommandExecution.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailCommandExecution.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully finish an event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailDependantStart">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailDependantStart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailDependantStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailDependantStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Start one dependant jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailDependantsStart">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailDependantsStart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailDependantsStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailDependantsStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Start dependant jails.</p>
+<dl class="method">
+<dt id="libioc.events.JailDependantsStart.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>message=None</em>, <em>started_jails=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailDependantsStart.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailDependantsStart.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully finish starting dependant Jails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailDestroy">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailDestroy</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailDestroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailDestroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Destroy the jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailEvent">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailEvent</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Any event related to a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailFstabUpdate">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailFstabUpdate</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailFstabUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailFstabUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Update a jails fstab file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailLaunch">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailLaunch</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailLaunch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailLaunch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Launch a jail.</p>
+<dl class="method">
+<dt id="libioc.events.JailLaunch.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>message=None</em>, <em>stdout=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailLaunch.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailLaunch.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully finish an event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailProvisioning">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailProvisioning</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailProvisioning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailProvisioning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Provision a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailProvisioningAssetDownload">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailProvisioningAssetDownload</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailProvisioningAssetDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailProvisioningAssetDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Provision a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailRename">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailRename</code><span class="sig-paren">(</span><em>jail</em>, <em>current_name</em>, <em>new_name</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailRename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailRename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Change the name of a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailResolverConfig">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailResolverConfig</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailResolverConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailResolverConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Update a jails /etc/resolv.conf file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailRestart">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailRestart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailRestart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Restart a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailShutdown">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailShutdown</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailShutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailShutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Shutdown a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailSoftShutdown">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailSoftShutdown</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailSoftShutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailSoftShutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Soft-restart a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.JailStart">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">JailStart</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#JailStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.JailStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Start a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.PackageConfiguration">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">PackageConfiguration</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#PackageConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.PackageConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Install packages in a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.PackageFetch">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">PackageFetch</code><span class="sig-paren">(</span><em>packages</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#PackageFetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.PackageFetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Fetch packages for offline installation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.PackageInstall">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">PackageInstall</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#PackageInstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.PackageInstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Install packages in a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.PackageRemove">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">PackageRemove</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#PackageRemove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.PackageRemove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
+<p>Remove packages from a jail.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseAssetDownload">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseAssetDownload</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseAssetDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseAssetDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Download release assets.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseConfiguration">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseConfiguration</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Pre-configure a release with reasonable defaults.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseCopyBase">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseCopyBase</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseCopyBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseCopyBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Copy the basejail folders of a release into individual ZFS datasets.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseDownload">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseDownload</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Download release assets.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseEvent">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseEvent</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Event related to a release.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseExtraction">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseExtraction</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseExtraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseExtraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Extract a release asset.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleasePrepareStorage">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleasePrepareStorage</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleasePrepareStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleasePrepareStorage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.FetchRelease" title="libioc.events.FetchRelease"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.FetchRelease</span></code></a></p>
+<p>Prepare the storage of a release before fetching it.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseUpdate">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseUpdate</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ReleaseEvent" title="libioc.events.ReleaseEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ReleaseEvent</span></code></a></p>
+<p>Update a release.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseUpdateDownload">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseUpdateDownload</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseUpdateDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseUpdateDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ReleaseUpdate" title="libioc.events.ReleaseUpdate"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ReleaseUpdate</span></code></a></p>
+<p>Download resource updates/patches.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ReleaseUpdatePull">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ReleaseUpdatePull</code><span class="sig-paren">(</span><em>release</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ReleaseUpdatePull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ReleaseUpdatePull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ReleaseUpdate" title="libioc.events.ReleaseUpdate"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ReleaseUpdate</span></code></a></p>
+<p>Pull resource updater and patches from the remote.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ResourceBackup">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ResourceBackup</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ResourceBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ResourceBackup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Events that occur when backing up a resource.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ResourceEvent">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ResourceEvent</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ResourceEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ResourceEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Event with a resource.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ResourceUpdate">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ResourceUpdate</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ResourceUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ResourceUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceEvent" title="libioc.events.ResourceEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceEvent</span></code></a></p>
+<p>Update a resource.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.RunResourceUpdate">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">RunResourceUpdate</code><span class="sig-paren">(</span><em>resource</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#RunResourceUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.RunResourceUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ResourceUpdate" title="libioc.events.ResourceUpdate"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ResourceUpdate</span></code></a></p>
+<p>Run the update of a resource.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.Scope">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">Scope</code><a class="reference internal" href="_modules/libioc/events.html#Scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.Scope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>An independent event history scope.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSDatasetDestroy">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSDatasetDestroy</code><span class="sig-paren">(</span><em>dataset</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSDatasetDestroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSDatasetDestroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ZFSEvent" title="libioc.events.ZFSEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ZFSEvent</span></code></a></p>
+<p>Rename a ZFS dataset.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSDatasetRename">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSDatasetRename</code><span class="sig-paren">(</span><em>dataset</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSDatasetRename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSDatasetRename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ZFSEvent" title="libioc.events.ZFSEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ZFSEvent</span></code></a></p>
+<p>Rename a ZFS dataset.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSEvent">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSEvent</code><span class="sig-paren">(</span><em>zfs_object</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.IocEvent</span></code></a></p>
+<p>Event related to ZFS storage.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSSnapshotClone">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSSnapshotClone</code><span class="sig-paren">(</span><em>snapshot</em>, <em>target</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSSnapshotClone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSSnapshotClone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ZFSEvent" title="libioc.events.ZFSEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ZFSEvent</span></code></a></p>
+<p>Clone a ZFS snapshot to a target.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSSnapshotRename">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSSnapshotRename</code><span class="sig-paren">(</span><em>snapshot</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSSnapshotRename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSSnapshotRename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ZFSEvent" title="libioc.events.ZFSEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ZFSEvent</span></code></a></p>
+<p>Rename a ZFS snapshot.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.events.ZFSSnapshotRollback">
+<em class="property">class </em><code class="descclassname">libioc.events.</code><code class="descname">ZFSSnapshotRollback</code><span class="sig-paren">(</span><em>snapshot</em>, <em>target</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/events.html#ZFSSnapshotRollback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.events.ZFSSnapshotRollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.events.ZFSEvent" title="libioc.events.ZFSEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.ZFSEvent</span></code></a></p>
+<p>Rollback a ZFS dataset to a snapshot.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="libioc.helpers.html" class="btn btn-neutral float-right" title="libioc.helpers module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="libioc.errors.html" class="btn btn-neutral float-left" title="libioc.errors module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+libioc.Config.Type.JSON module
+==============================
+
+.. automodule:: libioc.Config.Type.JSON
+    :members:
+    :undoc-members:
+    :show-inheritance:

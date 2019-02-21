@@ -1,7 +1,0 @@
-ioc.Firewall module
-===================
-
-.. automodule:: ioc.Firewall
-    :members:
-    :undoc-members:
-    :show-inheritance:

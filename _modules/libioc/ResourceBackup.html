@@ -1,0 +1,865 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>libioc.ResourceBackup &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> libioc
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../libioc.html">libioc package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">libioc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>libioc.ResourceBackup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for libioc.ResourceBackup</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
+<span class="c1"># Copyright (c) 2014-2018, iocage</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted providing that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="c1"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="c1"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span>
+<span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
+<span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;iocage Resource extension that managed exporting and importing backups.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">libzfs</span>
+
+<span class="kn">import</span> <span class="nn">libioc.events</span>
+
+
+<div class="viewcode-block" id="LaunchableResourceBackup"><a class="viewcode-back" href="../../libioc.ResourceBackup.html#libioc.ResourceBackup.LaunchableResourceBackup">[docs]</a><span class="k">class</span> <span class="nc">LaunchableResourceBackup</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create and restore backups of a LaunchableResource.</span>
+
+<span class="sd">    It is only possible to run one concurrent backup operation because this</span>
+<span class="sd">    instance uses a global temp directory that is deleted when the lock is</span>
+<span class="sd">    removed. In fact the existence of a temp directory indicates the locked</span>
+<span class="sd">    state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.LaunchableResource.LaunchableResource&#39;</span>
+    <span class="n">_work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span>
+    <span class="n">_snapshot_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.LaunchableResource.LaunchableResource&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the resources logger instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">logger</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.ZFS.ZFS&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the resources ZFS instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">work_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the absolute path to the current temporary directory.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unlocked_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">snapshot_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the snapshot_name that was chosen when locking.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span>
+        <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unlocked_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">full_snapshot_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the dataset name with the snapshot name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.dataset_name}</span><span class="s2">@</span><span class="si">{self.snapshot_name}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__has_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the resource is forked from a release.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;config&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;release&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__unlocked_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># this error cannot occur when using public API</span>
+        <span class="k">return</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Resource backup is not locked&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True when a temporary directory exists.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_require_unlocked</span><span class="p">()</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{work_dir.name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="n">work_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">ZFS</span><span class="o">.</span><span class="n">append_snapshot_datetime</span><span class="p">(</span><span class="s2">&quot;backup&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting Resource backup temp directory </span><span class="si">{work_dir}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_require_unlocked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">BackupInProgress</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LaunchableResourceBackup.restore"><a class="viewcode-back" href="../../libioc.ResourceBackup.html#libioc.ResourceBackup.LaunchableResourceBackup.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import a resource from an archive.</span>
+
+<span class="sd">        Resource archives created with libiocage backup export can be restored</span>
+<span class="sd">        on any host. When importing a basejail the linked release needs to</span>
+<span class="sd">        exist on the host.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            source (str):</span>
+
+<span class="sd">                The path to the exported archive file (tar.gz)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resourceBackupEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ResourceBackup</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">_unlock_resource_backup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unlock</span><span class="p">()</span>
+
+        <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_unlock_resource_backup</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_bundle</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">def</span> <span class="nf">_destroy_failed_import</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">delete_dataset_recursive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSException</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_destroy_failed_import</span><span class="p">)</span>
+
+        <span class="c1"># ToDo: Allow importing of releases or empty jails</span>
+        <span class="n">archived_config</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">JSON</span><span class="o">.</span><span class="n">ConfigJSON</span><span class="p">(</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">is_standalone</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root.zfs&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="n">has_release</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;release&quot;</span> <span class="ow">in</span> <span class="n">archived_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">has_release</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_standalone</span><span class="p">:</span>
+                <span class="n">release</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">archived_config</span><span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">],</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+                    <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_release</span><span class="p">(</span><span class="n">release</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">create_from_scratch</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">is_standalone</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_root_dataset</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_other_datasets_recursive</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_config</span><span class="p">(</span>
+                <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">archived_config</span><span class="p">),</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span>
+            <span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="n">_unlock_resource_backup</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_extract_bundle</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">extractBundleEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExtractBundle</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">extractBundleEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">SecureTarfile</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                <span class="n">compression_format</span><span class="o">=</span><span class="s2">&quot;gz&quot;</span><span class="p">,</span>
+                <span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">extractBundleEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">yield</span> <span class="n">extractBundleEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_import_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">importConfigEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportConfig</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">importConfigEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config_handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Config imported from </span><span class="si">{self.resource.config_handler.file}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importConfigEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">yield</span> <span class="n">importConfigEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_import_fstab</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">importFstabEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportFstab</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="n">fstab_file_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fstab_file_path</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fstab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">fstab</span>
+            <span class="n">_old_fstab_file</span> <span class="o">=</span> <span class="n">fstab</span><span class="o">.</span><span class="n">file</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">fstab_file_path</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">_old_fstab_file</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Fstab restored from </span><span class="si">{fstab.file}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">importFstabEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_import_root_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import data from an exported root dataset.</span>
+
+<span class="sd">        The file structure is imported using using rsync. All assets that</span>
+<span class="sd">        already exist in the resources root dataset will be overwritten.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">importRootDatasetEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportRootDataset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">importRootDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Importing root dataset data from </span><span class="si">{temp_root_dir}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
+                <span class="s2">&quot;rsync&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-av&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--links&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--hard-links&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--safe-links&quot;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{temp_root_dir}</span><span class="s2">/&quot;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_dataset.mountpoint}</span><span class="s2">/&quot;</span>
+            <span class="p">])</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importRootDatasetEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">importRootDatasetEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_import_other_datasets_recursive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">importOtherDatasetsEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportOtherDatasets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">importOtherDatasetsEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="n">hasImportedOtherDatasets</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">dataset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_importable_datasets</span><span class="p">():</span>
+            <span class="n">absolute_asset_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/</span><span class="si">{dataset_name}</span><span class="s2">.zfs&quot;</span>
+            <span class="n">importOtherDatasetEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ImportOtherDataset</span><span class="p">(</span>
+                <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+                <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">importOtherDatasetsEvent</span><span class="o">.</span><span class="n">scope</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">importOtherDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">absolute_asset_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_or_create_dataset</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.dataset.name}</span><span class="s2">/</span><span class="si">{dataset_name}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">dataset</span><span class="o">.</span><span class="n">receive</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">hasImportedOtherDatasets</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">importOtherDatasetEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">yield</span> <span class="n">importOtherDatasetEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">hasImportedOtherDatasets</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importOtherDatasetsEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">importOtherDatasetsEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_list_importable_datasets</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">current_directory</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">current_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">current_directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span>
+
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;.zfs&quot;</span>
+
+        <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">current_directory</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">current_file</span> <span class="ow">in</span> <span class="n">current_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">current_file</span> <span class="o">==</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">current_file</span><span class="p">):</span>
+                <span class="n">nested_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_importable_datasets</span><span class="p">(</span><span class="n">current_file</span><span class="p">)</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">files</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{current_file}</span><span class="s2">/</span><span class="si">{x}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nested_files</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">current_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_file</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">files</span>
+
+<div class="viewcode-block" id="LaunchableResourceBackup.export"><a class="viewcode-back" href="../../libioc.ResourceBackup.html#libioc.ResourceBackup.LaunchableResourceBackup.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">standalone</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export the resource.</span>
+
+<span class="sd">        Resource exports contain the jails configuration and differing files</span>
+<span class="sd">        between the jails root dataset and its release. Other datasets in the</span>
+<span class="sd">        jails dataset are snapshotted and attached to the export entirely.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            destination (str):</span>
+
+<span class="sd">                The resource is exported to this location as archive file.</span>
+
+<span class="sd">            standalone (bool):</span>
+
+<span class="sd">                The default depends on whether the resource is forked from a</span>
+<span class="sd">                release or not. If there is a origin release, the export will</span>
+<span class="sd">                contain the changed files relative to the release. Enabling</span>
+<span class="sd">                this option will enforce ZFS dataset exports instead of rsync</span>
+<span class="sd">                compare-dest diffs.</span>
+<span class="sd">                Standalone exports will cause duplicated data on the importing</span>
+<span class="sd">                host, but are independent of any release.</span>
+
+<span class="sd">            recursive (bool):</span>
+
+<span class="sd">                    Includes snapshots of all exported ZFS datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resourceBackupEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ResourceBackup</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="n">_scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_take_resource_snapshot</span><span class="p">()</span>
+
+        <span class="n">zfs_send_flags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">recursive</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">zfs_send_flags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">libzfs</span><span class="o">.</span><span class="n">SendFlag</span><span class="o">.</span><span class="n">REPLICATE</span><span class="p">)</span>
+
+        <span class="n">is_standalone</span> <span class="o">=</span> <span class="p">(</span><span class="n">standalone</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_release</span>
+
+        <span class="k">def</span> <span class="nf">_unlock_resource_backup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delete_resource_snapshot</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unlock</span><span class="p">()</span>
+
+        <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_unlock_resource_backup</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;config&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">():</span>
+            <span class="c1"># only export config when the resource has one</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_config</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_fstab</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_standalone</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_root_dataset</span><span class="p">(</span>
+                <span class="n">flags</span><span class="o">=</span><span class="n">zfs_send_flags</span><span class="p">,</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+            <span class="p">)</span>
+
+        <span class="c1"># other datasets include `root` when the resource is no basejail</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_other_datasets_recursive</span><span class="p">(</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">zfs_send_flags</span><span class="p">,</span>
+            <span class="n">standalone</span><span class="o">=</span><span class="n">is_standalone</span><span class="p">,</span>
+            <span class="n">limit_depth</span><span class="o">=</span><span class="p">(</span><span class="n">recursive</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+        <span class="p">)</span>
+
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_backup</span><span class="p">(</span>
+            <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+        <span class="p">)</span>
+
+        <span class="n">_unlock_resource_backup</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_take_resource_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">full_snapshot_name</span><span class="p">,</span>
+            <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_delete_resource_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_snapshot_name</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_export_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">exportConfigEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExportConfig</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">exportConfigEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">temp_config</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">JSON</span><span class="o">.</span><span class="n">ConfigJSON</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/config.json&quot;</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+            <span class="n">temp_config</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">temp_config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">temp_config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Config duplicated to </span><span class="si">{temp_config.file}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">exportConfigEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">exportConfigEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_export_fstab</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">exportFstabEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExportFstab</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">exportFstabEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fstab</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Fstab</span><span class="o">.</span><span class="n">Fstab</span><span class="p">(</span>
+                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+                <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span>
+            <span class="p">)</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/fstab&quot;</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">replace_path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="s2">&quot;backup:///&quot;</span>
+            <span class="p">)</span>
+            <span class="n">fstab</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Fstab saved to </span><span class="si">{fstab.file}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">exportFstabEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">exportFstabEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_export_root_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">SendFlag</span><span class="p">],</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">exportRootDatasetEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExportRootDataset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">exportRootDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">temp_root_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/root&quot;</span>
+            <span class="n">compare_dest</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+                <span class="n">f</span><span class="s2">&quot;.zfs/snapshot/</span><span class="si">{self.resource.release_snapshot.snapshot_name}</span><span class="s2">&quot;</span>
+            <span class="p">])</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">temp_root_dir</span><span class="p">)</span>
+
+            <span class="n">excludes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">basedirs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_basedir_list</span><span class="p">(</span>
+                <span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">basedir</span> <span class="ow">in</span> <span class="n">basedirs</span><span class="p">:</span>
+                <span class="n">_exclude</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_dataset.mountpoint}</span><span class="s2">/</span><span class="si">{basedir}</span><span class="s2">&quot;</span>
+                <span class="n">excludes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--exclude&quot;</span><span class="p">)</span>
+                <span class="n">excludes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_exclude</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Writing root dataset delta to </span><span class="si">{temp_root_dir}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
+                <span class="s2">&quot;rsync&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-av&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--checksum&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--links&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--hard-links&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--safe-links&quot;</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="n">excludes</span> <span class="o">+</span> <span class="p">[</span>
+                <span class="n">f</span><span class="s2">&quot;--compare-dest=</span><span class="si">{compare_dest}</span><span class="s2">/&quot;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_dataset.mountpoint}</span><span class="s2">/&quot;</span><span class="p">,</span>
+                <span class="n">temp_root_dir</span><span class="p">,</span>
+            <span class="p">],</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">exportRootDatasetEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">exportRootDatasetEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_export_other_datasets_recursive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">standalone</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">SendFlag</span><span class="p">],</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">],</span>
+        <span class="n">limit_depth</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">exportOtherDatasetsEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExportOtherDatasets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">exportOtherDatasetsEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="n">hasExportedOtherDatasets</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">limit_depth</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">child_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">children</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">child_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">children_recursive</span>
+
+        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">child_datasets</span><span class="p">:</span>
+            <span class="n">__is_root</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">__is_root</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">standalone</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">hasExportedOtherDatasets</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">exportOtherDatasetEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ExportOtherDataset</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span>
+                <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">exportOtherDatasetsEvent</span><span class="o">.</span><span class="n">scope</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">exportOtherDatasetEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_export_other_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">exportOtherDatasetEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">yield</span> <span class="n">exportOtherDatasetEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">hasExportedOtherDatasets</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">exportOtherDatasetsEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">exportOtherDatasetsEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_export_other_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">SendFlag</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">relative_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_relative_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">name_fragments</span> <span class="o">=</span> <span class="n">relative_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">minor_dataset_name</span> <span class="o">=</span> <span class="n">name_fragments</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">relative_dir_name</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name_fragments</span><span class="p">)</span>
+        <span class="n">absolute_dir_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.work_dir}</span><span class="s2">/</span><span class="si">{relative_dir_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">absolute_asset_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{absolute_dir_name}</span><span class="s2">/</span><span class="si">{minor_dataset_name}</span><span class="s2">.zfs&quot;</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">absolute_dir_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">absolute_dir_name</span><span class="p">)</span>
+            <span class="c1"># ToDo: manually set permissions</span>
+
+        <span class="n">full_snapshot_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{dataset.name}</span><span class="s2">@</span><span class="si">{self.snapshot_name}</span><span class="s2">&quot;</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">(</span><span class="n">full_snapshot_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Exporting dataset </span><span class="si">{dataset.name}</span><span class="s2"> to </span><span class="si">{absolute_asset_name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">absolute_asset_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">fromname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_bundle_backup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Create the an archive file from the backup assets.&quot;&quot;&quot;</span>
+        <span class="n">bundleBackupEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">BundleBackup</span><span class="p">(</span>
+            <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">bundleBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Bundling backup to </span><span class="si">{destination}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;w:gz&quot;</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">bundleBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">yield</span> <span class="n">bundleBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_relative_dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):])</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Stefan Grönke
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

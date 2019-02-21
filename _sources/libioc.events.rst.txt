@@ -1,0 +1,7 @@
+libioc.events module
+====================
+
+.. automodule:: libioc.events
+    :members:
+    :undoc-members:
+    :show-inheritance:

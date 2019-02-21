@@ -1,0 +1,27 @@
+libioc.Config package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    libioc.Config.Jail
+    libioc.Config.Type
+
+Submodules
+----------
+
+.. toctree::
+
+   libioc.Config.Data
+   libioc.Config.Dataset
+   libioc.Config.Prototype
+
+Module contents
+---------------
+
+.. automodule:: libioc.Config
+    :members:
+    :undoc-members:
+    :show-inheritance:

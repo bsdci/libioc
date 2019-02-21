@@ -1,0 +1,7 @@
+libioc.Prompts module
+=====================
+
+.. automodule:: libioc.Prompts
+    :members:
+    :undoc-members:
+    :show-inheritance:

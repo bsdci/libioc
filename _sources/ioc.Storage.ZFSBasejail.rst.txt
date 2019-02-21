@@ -1,7 +1,0 @@
-ioc.Storage.ZFSBasejail module
-==============================
-
-.. automodule:: ioc.Storage.ZFSBasejail
-    :members:
-    :undoc-members:
-    :show-inheritance:

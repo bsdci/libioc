@@ -1,0 +1,7 @@
+libioc.Config.Prototype module
+==============================
+
+.. automodule:: libioc.Config.Prototype
+    :members:
+    :undoc-members:
+    :show-inheritance:

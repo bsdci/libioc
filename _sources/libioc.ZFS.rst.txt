@@ -1,0 +1,7 @@
+libioc.ZFS module
+=================
+
+.. automodule:: libioc.ZFS
+    :members:
+    :undoc-members:
+    :show-inheritance:

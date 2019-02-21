@@ -1,0 +1,7 @@
+libioc.errors module
+====================
+
+.. automodule:: libioc.errors
+    :members:
+    :undoc-members:
+    :show-inheritance:
