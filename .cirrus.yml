@@ -12,9 +12,14 @@ task:
     fingerprint_script: cat libioc/VERSION
     populate_script:
       - mkdir -p /pools/
-  zfs_script:
-    - '[ -f "/pools/ioc-test-`uname -r`.img" ] && zpool import -d /pools "ioc-test-`uname -r`"'
-    - '[ ! -f "/pools/ioc-test-`uname -r`.img" ] && truncate -s 10G "/pools/ioc-test-`uname -r`.img" && zpool create -m "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img" && zfs set compression=lz4 "ioc-test-`uname -r`"'
+  zfs_script: |
+    if [ -f "/pools/ioc-test-`uname -r`.img" ]
+    then
+      zpool import -d /pools "ioc-test-`uname -r`"
+    else
+      truncate -s 10G "/pools/ioc-test-`uname -r`.img"
+      zpool create -m "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"
+      zfs set compression=lz4 "ioc-test-`uname -r`"'
   install_script:
     - mount -t fdescfs null /dev/fd
     - make install-dev
