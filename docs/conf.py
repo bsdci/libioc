@@ -35,7 +35,7 @@ with open(__license_file, "r") as f:
     author = __license_info["author"]
     copyright = __license_info["full"]
 
-__version_file = os.path.join(__dirname, '../ioc/VERSION')
+__version_file = os.path.join(__dirname, '../libioc/VERSION')
 with open(__version_file, "r") as f:
     release = f.read().split("\n")[0]
 version = release.split()[0]
@@ -49,7 +49,7 @@ def setup(app):
         '--no-toc',
         '-o', 'docs',
         '--full',
-        'ioc',
+        'libioc',
         'tests'
     ])
 
