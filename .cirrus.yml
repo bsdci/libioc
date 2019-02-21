@@ -6,7 +6,7 @@ task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: cat requirements*
-    populate_script: make install-python-requirements-dev
+    populate_script: mkdir -p ~/.cache/pip
   zfs_cache:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
@@ -16,7 +16,7 @@ task:
       - '[ ! -f "/pools/ioc-test-`uname -r`.img" ] && truncate -s 10G "/pools/ioc-test-`uname -r`.img" && zpool create -m   "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"'
   install_script:
     - mount -t fdescfs null /dev/fd
-    - deps
+    - make install-dev
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
   cleanup_before_cache_script:
