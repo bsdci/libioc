@@ -637,12 +637,14 @@ class FreeBSD(Updater):
     def _modify_updater_config(self, path: str) -> None:
         with open(path, "r+") as f:
             content = f.read()
-            pattern = re.compile(r"^Components .+$", re.MULTILINE)
-            f.seek(0)
-            f.write(pattern.sub(
+            content = re.sub(
+                r"^Components .+$",
                 "Components world",
-                content
-            ))
+                content,
+                flags=re.MULTILINE
+            )
+            f.seek(0)
+            f.write(content)
             f.truncate()
 
     def _wrap_command(self, command: str, kind: str) -> str:
