@@ -320,11 +320,18 @@ class Updater:
         self._pre_fetch()
 
         try:
+            env = dict()
+            env_clone_keys = ["http_proxy"]
+            for key in os.environ:
+                if key.lower() in env_clone_keys:
+                    env[key.lower()] = os.environ[key]
+
             self._create_download_dir()
             libioc.helpers.exec(
                 self._wrap_command(" ".join(self._fetch_command), "fetch"),
                 shell=True,  # nosec: B604
-                logger=self.logger
+                logger=self.logger,
+                env=env
             )
         except Exception as e:
             yield releaseUpdateDownloadEvent.fail(e)
