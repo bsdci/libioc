@@ -6,7 +6,7 @@ import urllib.request
 import urllib.parse
 import threading
 
-LOCAL_MIRROR_PORT=8234
+LOCAL_MIRROR_PORT = 8234
 
 uname = os.uname()
 
@@ -29,16 +29,16 @@ class CacheHandler(SimpleHTTPRequestHandler):
 
         if os.path.exists(cache_filename) is False:
             print(f"Cache miss: {cache_filename} ({self.path})")
-            
+
             if os.path.isdir(os.path.dirname(cache_filename)) is False:
                 os.makedirs(os.path.dirname(cache_filename))
             try:
                 self.__urlretrieve(self.path, cache_filename)
                 print(f"{self.path} saved to {cache_filename}")
-            except urllib.error.HTTPError as e:
+            except urllib.error.HTTPError:  # noqa: T484
                 self.send_error(e.getcode())
                 return
-    
+
         try:
             with open(cache_filename, "rb") as f:
                 fs = os.fstat(f.fileno())
@@ -51,7 +51,7 @@ class CacheHandler(SimpleHTTPRequestHandler):
                 return
         except Exception:
             pass
-        
+
         try:
             self.send_error(500)
         except BrokenPipeError:
@@ -65,6 +65,7 @@ class CacheHandler(SimpleHTTPRequestHandler):
 
 
 class BackgroundServer:
+    """HTTP server thread."""
 
     def __init__(self, port: int) -> None:
         self.httpd = HTTPServer(("localhost", port,), CacheHandler)
@@ -79,4 +80,5 @@ class BackgroundServer:
         httpd.serve_forever()
 
     def stop(self) -> None:
+        """Stop the HTTP server."""
         self.httpd.shutdown()

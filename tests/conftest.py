@@ -45,7 +45,9 @@ import libioc.Distribution
 import libioc.Logger
 import libioc.Release
 
-_force_clean = False
+import release_mirror_cache
+cache_server = release_mirror_cache.BackgroundServer(8081)
+os.environ["http_proxy"] = "http://127.0.0.1:8081"
 
 
 def pytest_addoption(parser: typing.Any) -> None:
@@ -60,17 +62,6 @@ def pytest_addoption(parser: typing.Any) -> None:
         action="store",
         help="Select a ZFS pool for the unit tests"
     )
-
-
-def pytest_generate_tests(metafunc: typing.Any) -> None:
-    """Configure test function creation."""
-    metafunc.config.getoption("force_clean")
-
-
-@pytest.fixture
-def force_clean() -> bool:
-    """Return True when force-clean is enabled."""
-    return _force_clean
 
 
 @pytest.fixture
@@ -111,19 +102,11 @@ def logger() -> 'libioc.Logger.Logger':
 
 @pytest.fixture
 def root_dataset(
-    force_clean: bool,
     zfs: libzfs.ZFS,
     pool: libzfs.ZFSPool
 ) -> libzfs.ZFSDataset:
     """Return the root dataset for tests."""
     dataset_name = f"{pool.name}/libioc-test"
-
-    if force_clean:
-        try:
-            dataset = zfs.get_dataset(dataset_name)
-            helper_functions.unmount_and_destroy_dataset_recursive(dataset)
-        except libzfs.ZFSException:
-            pass
 
     try:
         pool.create(dataset_name, {})
@@ -196,11 +179,6 @@ def release(
         name=target_release, host=host, logger=logger, zfs=zfs
     )
     return release
-
-
-import release_mirror_cache
-cache_server = release_mirror_cache.BackgroundServer(8081)
-os.environ["http_proxy"] = "http://127.0.0.1:8081"
 
 
 def pytest_unconfigure() -> None:

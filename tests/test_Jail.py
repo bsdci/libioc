@@ -52,7 +52,7 @@ class TestJail(object):
     ) -> 'libioc.Release.ReleaseGenerator':
         """Mock a local release."""
         if not release.fetched:
-            release.fetch()
+            release.fetch(fetch_updates=True, update=True)
 
         yield release
 
