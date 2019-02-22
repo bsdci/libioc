@@ -12,10 +12,16 @@ task:
   zfs_cache:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
-    populate_script: /bin/sh .cirrus/zfs_cache_populate_script.sh
-  # zfs_script: zpool import -d /pools "$POOL"
+    populate_script: >
+      print "Cirrus Ci: populate ZFS pool $POOL"
+      mkdir -p /pools/
+      truncate -s 16G "/pools/$POOL.img"
+      zpool create -m "/.$POOL" "$POOL" "/pools/$POOL.img"
+      zfs set compression=lz4 "$POOL"
+      zpool export "$POOL"
   install_script:
     - mount -t fdescfs null /dev/fd
+    - zpool import -d /pools "$POOL"
     - make install-dev
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
