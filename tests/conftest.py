@@ -29,6 +29,7 @@ import libzfs
 import pytest
 
 import libioc.Host
+import libioc.Distribution
 import libioc.Logger
 import libioc.Release
 
@@ -138,25 +139,37 @@ def root_dataset(
     return dataset
 
 
+class MockedDistribution(libioc.Distribution.Distribution):
+
+    @property
+    def mirror_url(self) -> str:
+        print("MIRROR REQUESTED")
+        return "http://127.0.0.1:8081"
+
+
+class MockedHost(libioc.Host.Host):
+
+    _class_distribution = MockedDistribution
+
+
 @pytest.fixture
 def host(
     root_dataset: libzfs.ZFSDataset,
     logger: 'libioc.Logger.Logger',
     zfs: libzfs.ZFS
-) -> 'libioc.Host.HostGenerator':
+) -> 'libioc.Host.Host':
     """Make the libioc.Host available to the tests."""
     datasets = libioc.Datasets.Datasets(
         sources=dict(test=root_dataset),
         logger=logger,
         zfs=zfs
     )
-    host = libioc.Host.Host(
+    host = MockedHost(
         datasets=datasets,
         logger=logger,
         zfs=zfs
     )
     return host
-    del host
 
 
 @pytest.fixture
@@ -166,6 +179,17 @@ def release(
     zfs: libzfs.ZFS
 ) -> 'libioc.Release.ReleaseGenerator':
     """Return the test release matching the host release version."""
-    return libioc.Release.Release(
-        name=host.release_version, host=host, logger=logger, zfs=zfs
+    if host.release_version.endswith("RELEASE"):
+        target_release = host.release_version
+    else:
+        target_release = "12.0-RELEASE"
+
+    release = libioc.Release.Release(
+        name=target_release, host=host, logger=logger, zfs=zfs
     )
+    return release
+
+
+import release_mirror_cache
+release_mirror_cache.run_thread(8081)
+
