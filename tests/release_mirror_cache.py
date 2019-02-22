@@ -60,7 +60,8 @@ class CacheHandler(SimpleHTTPRequestHandler):
 
     @staticmethod
     def __urlretrieve(url: str, cache_file: str) -> None:
-        opener = urllib.request.FancyURLopener({})
+        proxy_handler = urllib.request.ProxyHandler({})
+        opener = urllib.request.build_opener(proxy_handler)
         opener.retrieve(url, cache_file)
 
 
