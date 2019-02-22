@@ -650,7 +650,8 @@ class ReleaseGenerator(ReleaseResource):
         self,
         update: typing.Optional[bool]=None,
         fetch_updates: typing.Optional[bool]=None,
-        event_scope: typing.Optional['libioc.events.Scope']=None
+        event_scope: typing.Optional['libioc.events.Scope']=None,
+        update_base: bool=False
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Fetch the release from the remote."""
         release_changed = False
@@ -757,8 +758,14 @@ class ReleaseGenerator(ReleaseResource):
 
         if release_changed is True:
             yield releaseCopyBaseEvent.begin()
-            self.update_base_release()
-            yield releaseCopyBaseEvent.end()
+
+            if update_base is True:
+                self.update_base_release()
+                yield releaseCopyBaseEvent.end()
+            else:
+                yield releaseCopyBaseEvent.skip(
+                    message="legacy basejal support disabled"
+                )
         else:
             yield releaseCopyBaseEvent.skip(message="release unchanged")
 
