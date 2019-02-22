@@ -1,6 +1,4 @@
 task:
-  env:
-    POOL: "ioc-test-`uname -r`"
   freebsd_instance:
     matrix:
       #image: freebsd-11-2-release-amd64
@@ -13,15 +11,15 @@ task:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
     populate_script: >
-      print "Cirrus Ci: populate ZFS pool $POOL"
+      print "Cirrus Ci: populate ZFS pool ioc-test-`uname -r`"
       mkdir -p /pools/
-      truncate -s 16G "/pools/$POOL.img"
-      zpool create -m "/.$POOL" "$POOL" "/pools/$POOL.img"
-      zfs set compression=lz4 "$POOL"
-      zpool export "$POOL"
+      truncate -s 16G "/pools/ioc-test-`uname -r`.img"
+      zpool create -m "/.ioc-test-`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"
+      zfs set compression=lz4 "ioc-test-`uname -r`"
+      zpool export "ioc-test-`uname -r`"
   install_script:
     - mount -t fdescfs null /dev/fd
-    - zpool import -d /pools "$POOL"
+    - zpool import -d /pools "ioc-test-`uname -r`"
     - make install-dev
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
