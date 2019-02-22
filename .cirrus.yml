@@ -13,7 +13,7 @@ task:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
     populate_script: /bin/sh .cirrus/zfs_cache_populate_script.sh
-  zfs_script: zpool import -d /pools "$POOL"
+  # zfs_script: zpool import -d /pools "$POOL"
   install_script:
     - mount -t fdescfs null /dev/fd
     - make install-dev
