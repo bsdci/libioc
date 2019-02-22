@@ -53,11 +53,6 @@ os.environ["http_proxy"] = "http://127.0.0.1:8081"
 def pytest_addoption(parser: typing.Any) -> None:
     """Add force option to pytest."""
     parser.addoption(
-        "--force-clean",
-        action="store_true",
-        help="Force cleaning the /libioc-test dataset"
-    )
-    parser.addoption(
         "--zpool",
         action="store",
         help="Select a ZFS pool for the unit tests"
@@ -111,8 +106,7 @@ def root_dataset(
     try:
         pool.create(dataset_name, {})
     except libzfs.ZFSException:
-        if force_clean is True:
-            raise
+        pass
 
     dataset = zfs.get_dataset(dataset_name)
 

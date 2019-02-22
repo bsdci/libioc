@@ -47,7 +47,6 @@ class TestJail(object):
         self,
         release: 'libioc.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
-        force_clean: bool,
         zfs: libzfs.ZFS
     ) -> 'libioc.Release.ReleaseGenerator':
         """Mock a local release."""
@@ -55,10 +54,6 @@ class TestJail(object):
             release.fetch(fetch_updates=True, update=True)
 
         yield release
-
-        if force_clean:
-            release.dataset.umount()
-            release.dataset.delete()
 
         del release
 
@@ -120,7 +115,6 @@ class TestNullFSBasejail(object):
         self,
         release: 'libioc.Release.ReleaseGenerator',
         root_dataset: libzfs.ZFSDataset,
-        force_clean: bool,
         zfs: libzfs.ZFS
     ) -> 'libioc.Release.ReleaseGenerator':
         """Mock a local release."""
@@ -128,10 +122,6 @@ class TestNullFSBasejail(object):
             release.fetch()
 
         yield release
-
-        if force_clean:
-            release.dataset.umount()
-            release.dataset.delete()
 
         del release
 
