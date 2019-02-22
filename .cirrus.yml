@@ -7,9 +7,8 @@ task:
     folder: ~/.cache/pip
     fingerprint_script: cat requirements*
     populate_script: mkdir -p ~/.cache/pip
-  release_cache:
-    folder: /releases/
-    populate_script: mkdir -p /releases
+  mirror_cache:
+    folder: .cache/libioc
   zfs_script: |
     mkdir -p /pools
     truncate -s 16G "/pools/ioc-test-`uname -r`.img"
