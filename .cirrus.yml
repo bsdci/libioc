@@ -12,8 +12,9 @@ task:
   zfs_cache:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
-    populate_script: 'mkdir -p /pools/ && truncate -s 16G "/pools/$POOL.img" && zpool create -m "/.$POOL" "$POOL" "/pools/$POOL.img" && zfs set compression=lz4 "$POOL"'
-  zfs_script: 'zpool list "$POOL" 2>/dev/null || zpool import -d /pools "$POOL"'
+    populate_script: sh -c 'mkdir -p /pools/ && truncate -s 16G "/pools/$POOL.img" && zpool create -m "/.$POOL" "$POOL" "/pools/$POOL.img" && zfs set compression=lz4 "$POOL"'
+  zfs_script:
+    - 'zpool list "$POOL" 2>/dev/null || zpool import -d /pools "$POOL"'
   install_script:
     - mount -t fdescfs null /dev/fd
     - make install-dev
