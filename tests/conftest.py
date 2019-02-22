@@ -24,6 +24,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit test configuration."""
 import typing
+import os
+import os.path
+import sys
 import helper_functions
 import libzfs
 import pytest
@@ -144,8 +147,12 @@ class MockedDistribution(libioc.Distribution.Distribution):
 
     @property
     def mirror_url(self) -> str:
-        print("MIRROR REQUESTED")
-        return "http://127.0.0.1:8081"
+        """Return the mirror URL of the distribution."""
+        architecture = os.uname().machine
+        return (
+            "http://download.FreeBSD.org/ftp/releases"
+            f"/{architecture}/{architecture}"
+        )
 
 
 class MockedHost(libioc.Host.Host):
@@ -192,5 +199,10 @@ def release(
 
 
 import release_mirror_cache
-release_mirror_cache.run_thread(8081)
+cache_server = release_mirror_cache.BackgroundServer(8081)
+os.environ["http_proxy"] = "http://127.0.0.1:8081"
 
+
+def pytest_unconfigure() -> None:
+    print("Stop HTTP Proxy")
+    cache_server.stop()
