@@ -10,7 +10,7 @@ task:
   zfs_cache:
     folder: /pools/
     fingerprint_script: cat libioc/VERSION
-    populate_script: |
+    populate_script: >
       mkdir -p /pools/
       truncate -s 16G "/pools/ioc-test-`uname -r`.img"
       zpool create -m "/.iocage-test`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"
