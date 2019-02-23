@@ -27,7 +27,7 @@ import typing
 import libioc.Config.Jail.File.RCConf
 
 
-class RCConf(libioc.Config.Jail.File.RCConf):
+class RCConf(libioc.Config.Jail.File.RCConf.RCConf):
 	"""Host RCConf file /etc/rc.conf."""
 
 	def save(self) -> bool:
