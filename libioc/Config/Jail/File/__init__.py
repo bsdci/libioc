@@ -75,7 +75,6 @@ class ConfigFile(dict):
 
     def _read_file(
         self,
-        silent: bool=False,
         delete: bool=False,
         merge: bool=False
     ) -> None:
@@ -83,9 +82,6 @@ class ConfigFile(dict):
         Read the config file.
 
         Args:
-
-            silent:
-                Do not use the logger
 
             delete:
                 Delete entries that do not exist in the file
@@ -95,7 +91,7 @@ class ConfigFile(dict):
         """
         try:
             if (self.path is not None) and os.path.isfile(self.path):
-                data = self._read(silent=silent)
+                data = self._read()
             else:
                 data = {}
         except (FileNotFoundError, ValueError):
@@ -118,8 +114,7 @@ class ConfigFile(dict):
                 self[key] = data[key]
                 self._file_content_changed = True
 
-        if silent is False:
-            self.logger.verbose(f"Updated {self._file} data from {self.path}")
+        self.logger.verbose(f"Updated {self._file} data from {self.path}")
 
         if delete is False and len(delete_keys) > 0:
             # There are properties that are not in the file
@@ -128,7 +123,7 @@ class ConfigFile(dict):
             # Current data matches with file contents
             self._file_content_changed = False
 
-    def _read(self, silent: bool=False) -> dict:
+    def _read(self) -> dict:
         import ucl
         data = dict(ucl.load(open(self.path).read()))
         self.logger.spam(f"{self._file} was read from {self.path}")
