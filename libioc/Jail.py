@@ -283,7 +283,7 @@ class JailGenerator(JailResource):
     _class_storage = libioc.Storage.Storage
     _relative_hook_script_dir: str
     _provisioner: 'libioc.Provisioning.Prototype'
-    __jid: int
+    __jid: typing.Optional[int]
 
     def __init__(
         self,
@@ -1620,7 +1620,7 @@ class JailGenerator(JailResource):
     def _launch_args(self) -> typing.List[str]:
         config = self.config
         vnet = (config["vnet"] is True)
-        value: str
+        value: typing.Union[str, int, bool]
         jail_param_args: typing.List[str] = []
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
             if sysctl.ctl_type == freebsd_sysctl.types.NODE:
@@ -2180,6 +2180,7 @@ class JailGenerator(JailResource):
         return self.__jid
 
     def query_jid(self) -> None:
+        """Invoke update of the jails JID."""
         try:
             jid = int(libjail.get_jid_by_name(self.identifier))
             self.__jid = jid if (jid > 0) else None
