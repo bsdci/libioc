@@ -27,9 +27,12 @@ import typing
 import os
 import os.path
 import sys
+import subprocess
+import random
+import pytest
+
 import helper_functions
 import libzfs
-import pytest
 
 # Inject lib directory to path
 iocage_lib_dir = os.path.abspath(os.path.join(
@@ -175,6 +178,49 @@ def release(
     return release
 
 
+@pytest.fixture
+def local_release(
+    release: 'libioc.Release.ReleaseGenerator',
+    root_dataset: libzfs.ZFSDataset,
+    zfs: libzfs.ZFS
+) -> 'libioc.Release.ReleaseGenerator':
+    """Mock a local release."""
+    if not release.fetched:
+        release.fetch(fetch_updates=True, update=True)
+
+    yield release
+    del release
+
+
+@pytest.fixture(scope="function")
+def new_jail(
+    host: 'libioc.Host.Host',
+    logger: 'libioc.Logger.Logger',
+    zfs: libzfs.ZFS,
+) -> 'libioc.Jail.Jail':
+    jail_name = "new-jail-" + str(random.randint(1, 32768))
+    new_jail = libioc.Jail.Jail(
+        dict(name=jail_name),
+        new=True,
+        host=host,
+        logger=logger,
+        zfs=zfs
+    )
+    yield new_jail
+    new_jail.destroy(force=True)
+
+
+@pytest.fixture(scope="function")
+def bridge_interface() -> str:
+    bridge_name = "bridgeTest" + str(random.randint(1024, 4096))
+    subprocess.check_output(
+        ["/sbin/ifconfig", "bridge", "create", "name", str(bridge_name), "up"]
+    )
+    yield bridge_name
+    subprocess.check_output(
+        ["/sbin/ifconfig", str(bridge_name), "destroy"]
+    )
+
+
 def pytest_unconfigure() -> None:
-    print("Stop HTTP Proxy")
     cache_server.stop()

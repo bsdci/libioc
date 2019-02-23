@@ -26,7 +26,6 @@
 import json
 import os
 
-import helper_functions
 import pytest
 import libzfs
 
@@ -42,133 +41,61 @@ def read_jail_config_json(config_file: str) -> dict:
 class TestJail(object):
     """Run Jail unit tests."""
 
-    @pytest.fixture
-    def local_release(
-        self,
-        release: 'libioc.Release.ReleaseGenerator',
-        root_dataset: libzfs.ZFSDataset,
-        zfs: libzfs.ZFS
-    ) -> 'libioc.Release.ReleaseGenerator':
-        """Mock a local release."""
-        if not release.fetched:
-            release.fetch(fetch_updates=True, update=True)
-
-        yield release
-
-        del release
-
     def test_can_be_created(
         self,
-        host: 'libioc.Host.Host',
+        new_jail: 'libioc.Jail.Jail',
         local_release: 'libioc.Release.ReleaseGenerator',
-        logger: 'libioc.Logger.Logger',
-        zfs: libzfs.ZFS,
-        root_dataset: libzfs.ZFSDataset
+        root_dataset: libzfs.ZFSDataset,
+        zfs: libzfs.ZFS
     ) -> None:
         """Test if jails can be created."""
-        jail = libioc.Jail.Jail(
-            dict(name="foobar"),
-            new=True,
-            host=host,
-            logger=logger,
-            zfs=zfs
-        )
-        jail.create(local_release)
+        new_jail.config["basejail"] = False
+        new_jail.create(local_release)
 
-        dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
+        dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{new_jail.name}")
 
-        def cleanup() -> None:
-            helper_functions.unmount_and_destroy_dataset_recursive(dataset)
+        assert new_jail.is_basejail is False
+        assert new_jail.config["basejail"] is False
+        assert not new_jail.config["basejail_type"]
 
-        try:
-            assert not jail.config["basejail"]
-            assert not jail.config["basejail_type"]
+        assert dataset.mountpoint is not None
+        assert os.path.isfile(f"{dataset.mountpoint}/config.json")
+        assert os.path.isdir(f"{dataset.mountpoint}/root")
 
-            assert dataset.mountpoint is not None
-            assert os.path.isfile(f"{dataset.mountpoint}/config.json")
-            assert os.path.isdir(f"{dataset.mountpoint}/root")
+        data = read_jail_config_json(f"{dataset.mountpoint}/config.json")
 
-            data = read_jail_config_json(f"{dataset.mountpoint}/config.json")
-
-            try:
-                assert data["basejail"] == "no"
-            except KeyError:
-                pass
-
-            try:
-                assert (data["basejail"] == "") or (data["basejail"] == "none")
-            except KeyError:
-                pass
-
-        except BaseException as e:
-            cleanup()
-            raise e
-
-        cleanup()
+        assert data["basejail"] != "yes"
+        assert data["basejail"] != "on"
+        assert data["basejail"] != 1
+        assert data["basejail"] != True
 
 
 class TestNullFSBasejail(object):
     """Run tests for NullFS Basejails."""
 
-    @pytest.fixture
-    def local_release(
-        self,
-        release: 'libioc.Release.ReleaseGenerator',
-        root_dataset: libzfs.ZFSDataset,
-        zfs: libzfs.ZFS
-    ) -> 'libioc.Release.ReleaseGenerator':
-        """Mock a local release."""
-        if not release.fetched:
-            release.fetch()
-
-        yield release
-
-        del release
-
     def test_can_be_created(
         self,
-        host: 'libioc.Host.Host',
+        new_jail: 'libioc.Jail.Jail',
         local_release: 'libioc.Release.ReleaseGenerator',
-        logger: 'libioc.Logger.Logger',
-        zfs: libzfs.ZFS,
-        root_dataset: libzfs.ZFSDataset
+        root_dataset: libzfs.ZFSDataset,
+        zfs: libzfs.ZFS
     ) -> None:
         """Test if NullFS basejails can be created."""
-        jail = libioc.Jail.Jail(
-            {
-                "basejail": True
-            },
-            new=True,
-            host=host,
-            logger=logger,
-            zfs=zfs
-        )
-        jail.create(local_release)
+        new_jail.config["basejail"] = True
+        new_jail.create(local_release)
 
-        dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{jail.name}")
+        dataset = zfs.get_dataset(f"{root_dataset.name}/jails/{new_jail.name}")
 
-        def cleanup() -> None:
-            helper_functions.unmount_and_destroy_dataset_recursive(dataset)
+        assert new_jail.is_basejail is True
+        assert new_jail.config["basejail"] is True
+        assert new_jail.config["basejail_type"] == "nullfs"
 
-        try:
-            assert jail.config["basejail"]
-            assert jail.config["basejail_type"] == "nullfs"
+        assert dataset.mountpoint is not None
+        assert os.path.isfile(f"{dataset.mountpoint}/config.json")
+        assert os.path.isdir(f"{dataset.mountpoint}/root")
 
-            assert dataset.mountpoint is not None
-            assert os.path.isfile(f"{dataset.mountpoint}/config.json")
-            assert os.path.isdir(f"{dataset.mountpoint}/root")
+        data = read_jail_config_json(f"{dataset.mountpoint}/config.json")
 
-            data = read_jail_config_json(f"{dataset.mountpoint}/config.json")
-
-            assert data["basejail"] == "yes"
-
-            try:
-                assert data["basejail_type"] == "nullfs"
-            except KeyError:
-                pass
-
-        except Exception as e:
-            cleanup()
-            raise e
-
-        cleanup()
+        assert data["basejail"] == "yes"
+        if "basejail_type" in data:
+            assert data["basejail_type"] == "nullfs"
