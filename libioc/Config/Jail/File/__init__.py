@@ -35,6 +35,7 @@ class ConfigFile(dict):
 
     _file: str
     _file_content_changed: bool = False
+    logger: typing.Optional['libioc.Logger.Logger']
 
     def __init__(
         self,
@@ -43,7 +44,7 @@ class ConfigFile(dict):
     ) -> None:
 
         dict.__init__(self, {})
-        self.logger = libioc.helpers_object.init_logger(self, logger)
+        self.logger = logger
 
         # No file was loaded yet, so we can't know the delta yet
         self._file_content_changed = True
@@ -114,7 +115,8 @@ class ConfigFile(dict):
                 self[key] = data[key]
                 self._file_content_changed = True
 
-        self.logger.verbose(f"Updated {self._file} data from {self.path}")
+        if self.logger is not None:
+            self.logger.verbose(f"Updated {self._file} data from {self.path}")
 
         if delete is False and len(delete_keys) > 0:
             # There are properties that are not in the file
@@ -126,15 +128,17 @@ class ConfigFile(dict):
     def _read(self) -> dict:
         import ucl
         data = dict(ucl.load(open(self.path).read()))
-        self.logger.spam(f"{self._file} was read from {self.path}")
+        if self.logger is not None:
+            self.logger.spam(f"{self._file} was read from {self.path}")
         return data
 
     def save(self) -> bool:
         """Save the changes to the file."""
         if self.changed is False:
-            self.logger.debug(
-                f"{self._file} was not modified - skipping write"
-            )
+            if self.logger is not None:
+                self.logger.debug(
+                    f"{self._file} was not modified - skipping write"
+                )
             return False
 
         with open(self.path, "w") as rcconf:
@@ -143,14 +147,17 @@ class ConfigFile(dict):
             output = output.replace(" = \"", "=\"")
             output = output.replace("\";\n", "\"\n")
 
-            self.logger.verbose(f"Writing {self._file} to {self.path}")
+            if self.logger is not None:
+                self.logger.verbose(f"Writing {self._file} to {self.path}")
 
             rcconf.write(output)
             rcconf.truncate()
             rcconf.close()
 
             self._file_content_changed = False
-            self.logger.spam(output[:-1], indent=1)
+            if self.logger is not None:
+                self.logger.spam(output[:-1], indent=1)
+
             return True
 
     def __setitem__(
