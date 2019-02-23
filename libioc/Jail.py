@@ -1640,7 +1640,7 @@ class JailGenerator(JailResource):
                     # vnet is only used when explicitly enabled
                     # (friendly to Kernels without VIMAGE support)
                     continue
-                value = "vnet"
+                value = 1
             elif vnet and sysctl_name.startswith("security.jail.param.ip"):
                 continue
             else:
