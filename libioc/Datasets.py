@@ -30,6 +30,7 @@ import libzfs
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
+import libioc.Config.Host
 
 # MyPy
 import libioc.Types
@@ -334,10 +335,7 @@ class Datasets(dict):
     def _read_root_datasets_from_rc_conf(self) -> typing.Dict[str, str]:
         prefix = "ioc_dataset_"
 
-        import libioc.Config.Jail.File.RCConf
-        rc_conf = libioc.Config.Jail.File.RCConf.RCConf(
-            logger=self.logger
-        )
+        rc_conf = libioc.Config.Host.rc_conf
         rc_conf_keys = list(filter(lambda x: x.startswith(prefix), rc_conf))
 
         output: typing.Dict[str, str] = {}
