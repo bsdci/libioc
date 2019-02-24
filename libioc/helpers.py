@@ -254,9 +254,9 @@ def parse_bool(data: typing.Optional[typing.Union[str, bool]]) -> bool:
         return data
     if isinstance(data, str):
         val = data.lower()
-        if val in ["yes", "true", "on"]:
+        if val in ["yes", "true", "on", "1", 1]:
             return True
-        elif val in ["no", "false", "off"]:
+        elif val in ["no", "false", "off", "0", 0]:
             return False
 
     raise TypeError("Value is not a boolean")
