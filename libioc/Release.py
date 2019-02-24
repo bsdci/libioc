@@ -648,13 +648,40 @@ class ReleaseGenerator(ReleaseResource):
 
     def fetch(
         self,
-        update: typing.Optional[bool]=None,
-        fetch_updates: typing.Optional[bool]=None,
+        update: bool=False,
+        fetch_updates: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None,
-        update_base: bool=False
+        update_base: typing.Optional[bool]=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
-        """Fetch the release from the remote."""
-        release_changed = False
+        """
+        Fetch the release from the remote.
+
+        Args:
+
+            update (bool): (default=False)
+
+                When enabled, updates are applied to the release,
+                unless fetching updates was without success.
+
+            fetch_updates (bool): (default=False)
+
+                When enabled, updates are fetched.
+                Disabling this option has no impact on applying updates.
+
+            event_scope (libioc.events.Scope): (optional)
+
+                Pass on the IocEvent stack for use in higher order functions.
+
+            update_base (bool): (optional)
+
+                When unset, the sysrc config `ioc_legacy_support` is taken
+                into account to determine whether ZFS basejail datasets should
+                be updated in case the release was created or modified.
+                Those ZFS basejail datasets are required to start basejails
+                created with iocage_legacy.
+                A boolean value overrides the configuration from /etc/rc.conf.
+        """
+        release_changed: typing.Optional[bool] = None
         self._require_release_supported()
 
         events = libioc.events
@@ -685,6 +712,8 @@ class ReleaseGenerator(ReleaseResource):
         )
 
         if self.fetched is False:
+
+            release_changed = False
 
             yield fetchReleaseEvent.begin()
             yield releasePrepareStorageEvent.begin()
@@ -732,6 +761,7 @@ class ReleaseGenerator(ReleaseResource):
             rc_conf_changed = True
             release_changed = True
         if (self._set_default_sysctl_conf() or rc_conf_changed) is True:
+            release_changed = True
             yield releaseConfigurationEvent.end()
         else:
             yield releaseConfigurationEvent.skip()
@@ -756,18 +786,29 @@ class ReleaseGenerator(ReleaseResource):
                     # the only non-IocEvent is our return value
                     release_changed = event
 
-        if release_changed is True:
-            yield releaseCopyBaseEvent.begin()
-
-            if update_base is True:
-                self.update_base_release()
-                yield releaseCopyBaseEvent.end()
+        yield releaseCopyBaseEvent.begin()
+        if update_base is True:
+            _update_base = True
+        elif update_base is None:
+            # if not specified, lookup global host configuration
+            legacy_support_key = "ioc_legacy_support"
+            rc_conf = libioc.Config.Host.rc_conf
+            if legacy_support_key in rc_conf:
+                _update_base = (rc_conf[legacy_support_key] is True)
             else:
-                yield releaseCopyBaseEvent.skip(
-                    message="legacy basejal support disabled"
-                )
+                _update_base = False
         else:
-            yield releaseCopyBaseEvent.skip(message="release unchanged")
+            _update_base = False
+
+        if _update_base is True:
+            if release_changed is False:
+                yield releaseCopyBaseEvent.skip(message="release unchanged")
+            self.update_base_release()
+            yield releaseCopyBaseEvent.end()
+        else:
+            yield releaseCopyBaseEvent.skip(
+                message="legacy basejal support disabled"
+            )
 
         self._cleanup()
 
@@ -1017,8 +1058,8 @@ class Release(ReleaseGenerator):
 
     def fetch(  # noqa: T484
         self,
-        update: typing.Optional[bool]=None,
-        fetch_updates: typing.Optional[bool]=None,
+        update: bool=False,
+        fetch_updates: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.List['libioc.events.IocEvent']:
         """Fetch the release from the remote synchronously."""
