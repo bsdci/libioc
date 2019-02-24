@@ -13,11 +13,6 @@ pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 
 install: install-deps install-python-requirements
 	$(PYTHON) -m pip install -U .
-	@if [ -d /usr/local/etc/init.d ]; then \
-		install -m 0755 rc.d/ioc /usr/local/etc/init.d; \
-	else \
-		install -m 0755 rc.d/ioc /usr/local/etc/rc.d; \
-	fi
 install-python-requirements:
 	$(PYTHON) -m ensurepip
 	$(PYTHON) -m pip install -Ur requirements.txt
