@@ -10,8 +10,8 @@ This library provides programmatic access to iocage features and jails, while ai
 ## Install
 
 ```sh
-git clone https://github.com/iocage/libiocage
-cd libiocage
+git clone https://github.com/bsdci/libioc
+cd libioc
 make install
 ```
 
