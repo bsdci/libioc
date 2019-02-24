@@ -67,7 +67,7 @@ DEFAULTS = libioc.Config.Data.Data({
     "allow_mlock": None,
     "allow_mount": 0,
     "allow_mount_devfs": 0,
-    "allow_mount_fusefs": 0,
+    "allow_mount_fusefs": False,
     "allow_mount_nullfs": 0,
     "allow_mount_procfs": 0,
     "allow_mount_fdescfs": 0,
