@@ -414,7 +414,7 @@ class JailGenerator(JailResource):
                 reduces to the `prestart`, `command` and `poststop` hooks with
                 the singe_command being executed in a /bin/sh context.
 
-            event_scope (libioc.lib.events.Scope): (default=None)
+            event_scope (libioc.events.Scope): (default=None)
 
                 Provide an existing libiocage event scope or automatically
                 create a new one instead.
@@ -755,7 +755,7 @@ class JailGenerator(JailResource):
 
                 Execute commands in an interactive shell.
 
-            event_scope (libioc.lib.events.Scope): (default=None)
+            event_scope (libioc.events.Scope): (default=None)
 
                 Provide an existing libiocage event scope or automatically
                 create a new one instead.
@@ -918,7 +918,7 @@ class JailGenerator(JailResource):
             force (bool): (default=False)
                 Ignores failures and enforces teardown if True.
 
-            event_scope (libioc.lib.events.Scope): (default=None)
+            event_scope (libioc.events.Scope): (default=None)
                 Provide an existing libiocage event scope or automatically
                 create a new one instead.
 
@@ -1119,7 +1119,7 @@ class JailGenerator(JailResource):
                 )
                 for event in stop_events:
                     yield event
-            except libioc.lib.errors.JailDestructionFailed:
+            except libioc.errors.JailDestructionFailed:
                 pass
 
         zfsDatasetDestroyEvent = libioc.events.ZFSDatasetDestroy(
@@ -2344,7 +2344,7 @@ class Jail(JailGenerator):
 
                 Execute commands in an interactive shell.
 
-            event_scope (libioc.lib.events.Scope): (default=None)
+            event_scope (libioc.events.Scope): (default=None)
 
                 Provide an existing libiocage event scope or automatically
                 create a new one instead.
