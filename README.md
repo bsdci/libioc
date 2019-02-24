@@ -54,6 +54,18 @@ ioc rename othersource/myjail myjail2
 
 When `othersource` is the only datasource with a jail named `myjail` the above operation would have worked without explicitly stating the dataset name.
 
+### Legacy Support
+
+With upcoming releases existing and future legacy / compatibility features will be disabled by default. Setting the sysrc ioc_legacy_support="YES" these compatibility features:
+
+- ZFS Basejail Support (iocage_legacy)
+
+On initialization libioc detects the hosts sysrc setting `ioc_legacy_support` that can be enabled to unlock features liste above.
+
+```sh
+sysrc ioc_legacy_support="YES"
+```
+
 ## Usage
 
 ### Library
