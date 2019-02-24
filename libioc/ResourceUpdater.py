@@ -444,7 +444,6 @@ class Updater:
             yield executeResourceUpdateEvent.fail(err)
             raise e
         finally:
-            jail.state.query()
             if jail.running:
                 self.logger.debug(
                     "The update jail is still running. "
