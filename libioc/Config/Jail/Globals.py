@@ -64,7 +64,7 @@ DEFAULTS = libioc.Config.Data.Data({
     "allow_sysvipc": 0,
     "allow_raw_sockets": 0,
     "allow_chflags": 0,
-    "allow_mlock": 0,
+    "allow_mlock": None,
     "allow_mount": 0,
     "allow_mount_devfs": 0,
     "allow_mount_fusefs": 0,
