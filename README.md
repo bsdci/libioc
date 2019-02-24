@@ -21,6 +21,7 @@ At the current time libiocage is not packaged or available in FreeBSD ports.
 
 - Iocage Handbook: https://bsdci.github.io/handbook
 - Reference Documentation: https://bsdci.github.io/libioc
+- Gitter Chat: https://gitter.im/libioc/community
 
 ## Configuration
 
