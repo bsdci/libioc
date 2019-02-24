@@ -442,12 +442,14 @@ class BaseConfig(dict):
         self,
         value: typing.Optional[typing.Union[bool, str]],
     ) -> None:
-        parsed_value = libioc.helpers.parse_user_input(value)
-        if parsed_value is None:
+        try:
+            libioc.helpers.parse_none(value)
             del self.data["jail_zfs"]
             return
+        except TypeError:
+            pass
         self.data["jail_zfs"] = libioc.helpers.to_string(
-            parsed_value,
+            libioc.helpers.parse_bool(value),
             true="on",
             false="off"
         )
