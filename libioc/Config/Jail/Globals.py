@@ -26,7 +26,6 @@ import libioc.Config.Data
 
 
 DEFAULTS = libioc.Config.Data.Data({
-    "CONFIG_VERSION": 17,
     "id": None,
     "release": None,
     "boot": False,
