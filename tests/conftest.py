@@ -34,14 +34,6 @@ import pytest
 import helper_functions
 import libzfs
 
-# Inject lib directory to path
-iocage_lib_dir = os.path.abspath(os.path.join(
-    os.path.dirname(__file__),
-    ".."
-))
-if iocage_lib_dir not in sys.path:
-    sys.path = [iocage_lib_dir] + sys.path
-
 import libioc
 import libioc.Host
 import libioc.Distribution
