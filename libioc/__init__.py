@@ -32,7 +32,7 @@ import typing
 def _get_version():
     __dirname = os.path.dirname(__file__)
     __version_file = os.path.join(__dirname, 'VERSION')
-    with open(__version_file, "r") as f:
+    with open(__version_file, "r", encoding="utf-8") as f:
         return f.read().split("\n")[0]
 
 

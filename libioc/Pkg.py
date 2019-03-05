@@ -426,7 +426,7 @@ class Pkg:
                 logger=self.logger
             )
         import ucl
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(ucl.dump(data, ucl.UCL_EMIT_JSON))
 
     def _get_release_pkg_dataset(

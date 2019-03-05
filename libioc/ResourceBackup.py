@@ -338,7 +338,7 @@ class LaunchableResourceBackup:
             )
             yield importOtherDatasetEvent.begin()
             try:
-                with open(absolute_asset_name, "r") as f:
+                with open(absolute_asset_name, "r", encoding="utf-8") as f:
                     dataset = self.resource.zfs.get_or_create_dataset(
                         f"{self.resource.dataset.name}/{dataset_name}"
                     )
@@ -642,7 +642,7 @@ class LaunchableResourceBackup:
             f"Exporting dataset {dataset.name} to {absolute_asset_name}"
         )
 
-        with open(absolute_asset_name, "w") as f:
+        with open(absolute_asset_name, "w", encoding="utf-8") as f:
             snapshot.send(f.fileno(), fromname=None, flags=flags)
 
     def _bundle_backup(

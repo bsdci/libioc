@@ -640,7 +640,7 @@ class ReleaseGenerator(ReleaseResource):
 
         libioc.helpers.require_no_symlink(source_file, logger=self.logger)
 
-        with open(source_file, "r") as f:
+        with open(source_file, "r", encoding="utf-8") as f:
             import ucl
             hbsd_update_conf = ucl.load(f.read())
             self._hbsd_release_branch = hbsd_update_conf["branch"]
@@ -922,7 +922,7 @@ class ReleaseGenerator(ReleaseResource):
         # yes, this can read HardenedBSD and FreeBSD hash files
         path = self.__get_hashfile_location()
         hashes = {}
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             for line in f.read().splitlines():
                 s = set(line.replace("\t", " ").split(" "))
                 fingerprint = None
@@ -1022,7 +1022,7 @@ class ReleaseGenerator(ReleaseResource):
     def _read_asset_hash(self, asset_name: str) -> str:
         asset_location = self._get_asset_location(asset_name)
         sha256 = hashlib.sha256()
-        with open(asset_location, 'rb') as f:
+        with open(asset_location, 'rb', encoding="utf-8") as f:
             for block in iter(lambda: f.read(65536), b''):
                 sha256.update(block)
         return sha256.hexdigest()

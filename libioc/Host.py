@@ -124,7 +124,7 @@ class HostGenerator:
         except AttributeError:
             pass
 
-        with open("/etc/hostid", "r") as f:
+        with open("/etc/hostid", "r", encoding="utf-8") as f:
             self.__hostid = f.read().strip()
 
         return self.__hostid

@@ -566,7 +566,7 @@ class HardenedBSD(Updater):
         """
         local_path = f"{self.host_updates_dir}/update-latest.txt"
         if os.path.isfile(local_path):
-            with open(local_path, "r") as f:
+            with open(local_path, "r", encoding="utf-8") as f:
                 return int(f.read().split("|")[1].split("-")[1][1:])
         else:
             return 0
@@ -634,7 +634,7 @@ class FreeBSD(Updater):
         ]
 
     def _modify_updater_config(self, path: str) -> None:
-        with open(path, "r+") as f:
+        with open(path, "r+", encoding="utf-8") as f:
             content = f.read()
             content = re.sub(
                 r"^Components .+$",
