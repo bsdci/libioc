@@ -62,9 +62,14 @@ def init_host(
     if (host is not None) and isinstance(host, libioc.Host.HostGenerator):
         return host
 
+    try:
+        zfs = self.zfs
+    except AttributeError:
+        zfs = None
+
     return libioc.Host.HostGenerator(
         logger=self.logger,
-        zfs=self.zfs
+        zfs=zfs
     )
 
 
