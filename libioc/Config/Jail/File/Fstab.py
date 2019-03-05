@@ -32,6 +32,7 @@ import re
 import libioc.helpers
 import libioc.helpers_object
 import libioc.Types
+import libioc.Config.Jail
 import libioc.Config.Jail.File
 
 
@@ -161,7 +162,7 @@ class Fstab(collections.MutableSequence):
     release: typing.Optional['libioc.Release.ReleaseGenerator']
     host: 'libioc.Host.HostGenerator'
     logger: 'libioc.Logger.Logger'
-    jail: 'libioc.Jail.JailGenerator'
+    _jail: typing.Optional['libioc.Jail.JailGenerator']
     _lines: typing.List[typing.Union[
         FstabLine,
         FstabCommentLine,
@@ -170,7 +171,7 @@ class Fstab(collections.MutableSequence):
 
     def __init__(
         self,
-        jail: 'libioc.Jail.JailGenerator',
+        jail: typing.Optional['libioc.Jail.JailGenerator']=None,
         release: typing.Optional['libioc.Release.ReleaseGenerator']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None,
         host: typing.Optional['libioc.Host.HostGenerator']=None,
@@ -180,11 +181,20 @@ class Fstab(collections.MutableSequence):
         self._lines = []
         self.logger = libioc.helpers_object.init_logger(self, logger)
         self.host = libioc.helpers_object.init_host(self, host)
-        self.jail = jail
+        self._jail = jail
         self.release = release
         self.file = file
         # ToDo: could be lazy-loaded
         self.read_file()
+
+    @property
+    def jail(self) -> 'libioc.Jail.JailGenerator':
+        """Return the associated JailGenerator or raise an AttributeError."""
+        if isinstance(self._jail, libioc.Jail.JailGenerator):
+            return self._jail
+        raise AttributeError(
+            "Fstab requires a jail or absolute file path"
+        )
 
     @property
     def path(self) -> str:
