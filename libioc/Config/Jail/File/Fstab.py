@@ -166,7 +166,7 @@ class Fstab(collections.MutableSequence):
         FstabLine,
         FstabCommentLine,
         FstabAutoPlaceholderLine
-    ]] = []
+    ]]
 
     def __init__(
         self,
@@ -177,6 +177,7 @@ class Fstab(collections.MutableSequence):
         file: str="fstab"
     ) -> None:
 
+        self._lines = []
         self.logger = libioc.helpers_object.init_logger(self, logger)
         self.host = libioc.helpers_object.init_host(self, host)
         self.jail = jail
