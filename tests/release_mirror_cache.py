@@ -29,7 +29,14 @@ class CacheHandler(SimpleHTTPRequestHandler):
 
         if os.path.exists(cache_filename) is False:
             print(f"Cache miss: {cache_filename} ({self.path})")
+            download = True
+        elif url.path.endswith(".ssl") or url.path.endswith("/MANIFEST"):
+            print(f"Force re-download if {cache_filename}")
+            download = True
+        else:
+            download = False
 
+        if download is True:
             if os.path.isdir(os.path.dirname(cache_filename)) is False:
                 os.makedirs(os.path.dirname(cache_filename))
             try:
