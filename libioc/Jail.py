@@ -886,7 +886,7 @@ class JailGenerator(JailResource):
                 yield event.fail(f"exited with {code}")
                 raise libioc.errors.JailHookFailed(
                     jail=self,
-                    hook="prestop",
+                    hook=hook,
                     logger=self.logger
                 )
         else:
