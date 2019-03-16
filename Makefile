@@ -37,8 +37,6 @@ check:
 	bandit --skip B404,B110 --exclude tests/ -r .
 test:
 	pytest tests --zpool $(ZPOOL)
-regression-test:
-	tests/run-integration.sh
 .PHONY: docs
 docs:
 	$(PYTHON) setup.py build_sphinx
