@@ -62,7 +62,15 @@ class CacheHandler(SimpleHTTPRequestHandler):
     def __urlretrieve(url: str, cache_file: str) -> None:
         proxy_handler = urllib.request.ProxyHandler({})
         opener = urllib.request.build_opener(proxy_handler)
-        opener.retrieve(url, cache_file)
+
+        chunk_size = 1024
+        with open(cache_file, "wb") as f:
+            with opener.open(url) as res:
+                while True:
+                    chunk = res.read(chunk_size)
+                    if not chunk:
+                        break
+                    f.write(chunk)
 
 
 class BackgroundServer:
