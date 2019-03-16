@@ -570,7 +570,12 @@ class JailGenerator(JailResource):
                     single_command,
                     passthru=passthru
                 )
-            self.query_jid()
+                scope = jailLaunchEvent.scope
+                yield from self.__destroy_jail(scope)
+                yield from self.__run_hook("poststop", False, scope)
+                yield from self.__teardown_mounts(False, scope)
+                yield from self.__clear_resource_limits(False, scope)
+
             if returncode != 0:
                 raise libioc.errors.JailLaunchFailed(
                     jail=self,
