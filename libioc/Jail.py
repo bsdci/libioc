@@ -565,6 +565,7 @@ class JailGenerator(JailResource):
                 stdout, stderr, returncode = self._launch_persistent_jail(
                     passthru=passthru
                 )
+                self.query_jid()
             else:
                 stdout, stderr, returncode = self._launch_single_command_jail(
                     single_command,
