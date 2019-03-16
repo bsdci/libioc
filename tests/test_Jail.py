@@ -23,8 +23,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Jail."""
+import typing
 import json
 import os
+import subprocess
 
 import pytest
 import libzfs
@@ -69,9 +71,60 @@ class TestJail(object):
         assert data["basejail"] != 1
         assert data["basejail"] != True
 
+    def test_can_be_started(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.config["mount_devfs"] = False
+        existing_jail.save()
+
+        assert existing_jail.running is False
+        existing_jail.start()
+        assert existing_jail.running is True
+
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+
+        assert "launch-scripts in stdout"
+        assert stdout.strip().count("\n") == 1
+
+    def test_can_be_stopped(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.start()
+        assert existing_jail.running is True
+        existing_jail.stop()
+        assert existing_jail.running is False
+
 
 class TestNullFSBasejail(object):
     """Run tests for NullFS Basejails."""
+
+    @pytest.fixture
+    def basedirs(self, host: 'libioc.Host.Host'):
+        basedirs = [
+            "bin",
+            "boot",
+            "lib",
+            "libexec",
+            "rescue",
+            "sbin",
+            "usr/bin",
+            "usr/include",
+            "usr/lib",
+            "usr/libexec",
+            "usr/sbin",
+            "usr/share",
+            "usr/libdata",
+        ]
+        if host.distribution.name == "FreeBSD":
+            basedirs.append("usr/lib32")
+        return basedirs
 
     def test_can_be_created(
         self,
@@ -99,3 +152,46 @@ class TestNullFSBasejail(object):
         assert data["basejail"] == "yes"
         if "basejail_type" in data:
             assert data["basejail_type"] == "nullfs"
+
+    def test_can_be_started(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        basedirs: typing.List[str]
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.config["mount_devfs"] = False
+        existing_jail.config["basejail"] = True
+        existing_jail.save()
+
+        assert existing_jail.running is False
+        existing_jail.start()
+        assert existing_jail.running is True
+
+        root_path = existing_jail.root_dataset.name
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "launch-scripts in stdout"
+        assert stdout.strip().count("\n") == 1 + len(basedirs)
+        for basedir in basedirs:
+            assert f"{root_path}/{basedir}" in stdout
+
+    def test_can_be_stopped(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        basedirs: typing.List[str]
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.start()
+        assert existing_jail.running is True
+        existing_jail.stop()
+        assert existing_jail.running is False
+
+        root_path = existing_jail.root_dataset.name
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {root_path}"],
+            shell=True
+        ).decode("utf-8")
+        for basedir in basedirs:
+            assert f"{root_path}/{basedir}" not in stdout

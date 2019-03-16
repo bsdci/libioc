@@ -203,6 +203,15 @@ def new_jail(
 
 
 @pytest.fixture(scope="function")
+def existing_jail(
+    new_jail: 'libioc.Jail.Jail',
+    local_release: 'libioc.Release.ReleaseGenerator',
+) -> 'libioc.Jail.Jail':
+    new_jail.create(local_release)
+    return new_jail
+
+
+@pytest.fixture(scope="function")
 def bridge_interface() -> str:
     bridge_name = "bridgeTest" + str(random.randint(1024, 4096))
     subprocess.check_output(
