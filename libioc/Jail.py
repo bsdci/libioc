@@ -1611,8 +1611,6 @@ class JailGenerator(JailResource):
             f"exec.timeout={self._get_value('exec_timeout')}",
             f"stop.timeout={self._get_value('stop_timeout')}",
             f"exec.prestart=\"{self.get_hook_script_path('prestart')}\"",
-            f"exec.prestop=\"{self.get_hook_script_path('prestop')}\"",
-            f"exec.poststop=\"{self.get_hook_script_path('poststop')}\"",
             f"exec.jail_user={self._get_value('exec_jail_user')}",
             f"mount.fstab={self.fstab.path}",
             f"mount.devfs={self._get_value('mount_devfs')}",
@@ -1704,8 +1702,7 @@ class JailGenerator(JailResource):
                     f"/usr/sbin/jexec {self.identifier} "
                     f"{self._relative_hook_script_dir}/command.sh"
                     " 2>&1"
-                ),
-                f"/bin/sh {self.get_hook_script_path('poststop')}"
+                )
             ]
         ))
 
@@ -1780,7 +1777,7 @@ class JailGenerator(JailResource):
     def _write_hook_script(self, hook_name: str, command_string: str) -> None:
         file = self.get_hook_script_path(hook_name)
         existed = os.path.isfile(file)
-        if hook_name in ["created", "poststart", "prestop"]:
+        if hook_name in ["created", "poststart"]:
             _identifier = str(shlex.quote(self.identifier))
             _jls_command = f"/usr/sbin/jls -j {_identifier} jid"
             command_string = (
@@ -1788,12 +1785,6 @@ class JailGenerator(JailResource):
                 f"$({_jls_command} 2>&1 || echo -1)"
                 "\n" + command_string
             )
-        if hook_name == "poststop":
-            command_string = (
-                "[ -f \"$(dirname $0)/.env\" ] && "
-                ". \"$(dirname $0)/.env\""
-                "\n"
-            ) + command_string
         with open(file, "w") as f:
             f.write("\n".join([
                 "#!/bin/sh",
