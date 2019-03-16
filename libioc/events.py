@@ -343,17 +343,52 @@ class JailRename(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
-class JailDestroy(JailEvent):
+class JailStop(JailEvent):
     """Destroy the jail."""
 
-    def __init__(
-        self,
-        jail: 'libioc.Jail.JailGenerator',
-        message: typing.Optional[str]=None,
-        scope: typing.Optional[Scope]=None
-    ) -> None:
+    pass
 
-        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
+
+class JailRemove(JailEvent):
+    """Remove the jail(2)."""
+
+    pass
+
+
+class TeardownJailMounts(JailStop):
+    """Teardown a jails mountpoints."""
+
+    pass
+
+
+class JailResourceLimitAction(JailEvent):
+    """Set or unset a jails resource limits."""
+
+    pass
+
+
+class JailHook(JailEvent):
+    """Run jail hook."""
+
+    pass
+
+
+class JailHookPrestop(JailHook):
+    """Run jail prestop hook."""
+
+    pass
+
+
+class JailHookStop(JailHook):
+    """Run jail prestop hook."""
+
+    pass
+
+
+class JailHookPoststop(JailHook):
+    """Run jail prestop hook."""
+
+    pass
 
 
 class JailFstabUpdate(JailEvent):

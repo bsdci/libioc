@@ -51,33 +51,6 @@ class ZFSShareStorage:
         self.logger.verbose("Mounting ZFS shares")
         self._mount_jail_datasets(auto_create=auto_create)
 
-    def umount_zfs_shares(self) -> None:
-        """Unmount a running jails shared ZFS datasets."""
-        for dataset in self.get_zfs_datasets():
-            self.logger.verbose(f"Unmounting ZFS Dataset {dataset.name}")
-            self._exec([
-                "/sbin/zfs",
-                "set",
-                "jailed=off",
-                shlex.quote(dataset.name)
-            ])
-            self._exec([
-                "/sbin/zfs",
-                "umount",
-                shlex.quote(dataset.name)
-            ])
-            self._exec([
-                "/sbin/zfs",
-                "mount",
-                shlex.quote(dataset.name)
-            ])
-            self._exec([
-                "/sbin/zfs",
-                "set",
-                "jailed=on",
-                shlex.quote(dataset.name)
-            ])
-
     def get_zfs_datasets(
         self,
         auto_create: bool=False

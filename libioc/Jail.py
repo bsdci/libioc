@@ -561,7 +561,6 @@ class JailGenerator(JailResource):
             self._save_autoconfig()
 
         try:
-            self._prepare_stop()
             if single_command is None:
                 stdout, stderr, returncode = self._launch_persistent_jail(
                     passthru=passthru
@@ -847,56 +846,55 @@ class JailGenerator(JailResource):
         if os.path.isdir(realpath) is False:
             os.makedirs(realpath, 0o755)
 
-    def _prepare_stop(self) -> None:
-        self._ensure_script_dir()
+    def __run_hook(
+        self,
+        hook: str,
+        force: bool,
+        event_scope: 'libioc.events.Scope'
+    ) -> typing.Generator['libioc.events.JailHook', None, None]:
 
-        exec_prestop = []
-        exec_stop = []
-        exec_poststop = self._teardown_mounts() + self._clear_resource_limits()
+        exec_func = libioc.helpers.exec
+        exec_args = dict(logger=self.logger, env=self.env)
+        if hook == "prestop":
+            Event = libioc.events.JailHookPrestop
+        elif hook == "stop":
+            Event = libioc.events.JailHookStop
+            exec_func = self.exec
+            exec_args = dict()
+        elif hook == "poststop":
+            Event = libioc.events.JailHookPoststop
+        else:
+            raise NotImplementedError(f"jail hook {hook} is unsupported")
 
-        # ToDo: self.config.get("exec_prestop", "")
-        if self.config["exec_prestop"] is not None:
-            exec_prestop.append(self.config["exec_prestop"])
-        if self.config["exec_stop"] is not None:
-            exec_stop.append(self.config["exec_stop"])
-        exec_poststop = self._stop_network() + exec_poststop
-        if self.config["exec_poststop"] is not None:
-            exec_poststop.append(self.config["exec_poststop"])
+        event = Event(self, scope=event_scope)
 
-        if self.config["jail_zfs"] is True:
-            share_storage = libioc.ZFSShareStorage.QueuingZFSShareStorage(
-                jail=self,
-                logger=self.logger
-            )
-            share_storage.umount_zfs_shares()
-            exec_stop += share_storage.read_commands("jail")
-            exec_poststop += share_storage.read_commands()
+        yield event.begin()
 
-        if self.running and (os.path.isfile(self.script_env_path) is False):
-            # when a jail was started from other iocage variants
-            self._write_temporary_script_env()
-            exec_poststop.append(f"rm \"{shlex.quote(self.script_env_path)}\"")
+        config_value = self.config[f"exec_{hook}"]
 
-        self._write_hook_script(
-            "prestop",
-            self._wrap_hook_script_command_string(exec_prestop)
+        if config_value is None:
+            yield event.skip()
+            return
+
+        stdout, stderr, code = exec_func(
+            ["/bin/sh", "-c", config_value],
+            **exec_args
         )
-        self._write_hook_script(
-            "stop",
-            self._wrap_hook_script_command_string(
-                exec_stop,
-                jailed=True,
-                ignore_errors=True
-            )
-        )
-        self._write_hook_script(
-            "poststop",
-            self._wrap_hook_script_command_string(
-                exec_poststop,
-                write_env=False,
-                ignore_errors=True
-            )
-        )
+        event.stdout = stdout
+        event.stderr = stderr
+        event.code = code
+        if code > 0:
+            if force is True:
+                yield event.skip("failed")
+            else:
+                yield event.fail(f"exited with {code}")
+                raise libioc.errors.JailHookFailed(
+                    jail=self,
+                    hook="prestop",
+                    logger=self.logger
+                )
+        else:
+            yield event.end()
 
     def stop(
         self,
@@ -926,31 +924,18 @@ class JailGenerator(JailResource):
             self.require_jail_running(log_errors=log_errors)
 
         events: typing.Any = libioc.events
-        jailDestroyEvent = events.JailDestroy(self, scope=event_scope)
+        jailStopEvent = events.JailStop(self, scope=event_scope)
 
-        self._prepare_stop()
+        yield jailStopEvent.begin()
 
-        yield jailDestroyEvent.begin()
-        try:
-            self._write_jail_conf(force=force)
-            self._destroy_jail(log_errors=log_errors)
-        except Exception as e:
-            if force is True:
-                yield jailDestroyEvent.skip()
-                self.logger.debug(
-                    "Manually executing prestop and poststop hooks"
-                )
-                try:
-                    for hook_name in ["prestop", "poststop"]:
-                        libioc.helpers.exec(
-                            command=[self.get_hook_script_path(hook_name)]
-                        )
-                except Exception as e:
-                    self.logger.warn(str(e))
-            else:
-                yield jailDestroyEvent.fail(e)
-                raise e
-        yield jailDestroyEvent.end()
+        yield from self.__run_hook("prestop", force, jailStopEvent.scope)
+        yield from self.__run_hook("stop", force, jailStopEvent.scope)
+        yield from self.__destroy_jail(jailStopEvent.scope)
+        yield from self.__run_hook("poststop", force, jailStopEvent.scope)
+        yield from self.__teardown_mounts(force, jailStopEvent.scope)
+        yield from self.__clear_resource_limits(force, jailStopEvent.scope)
+
+        yield jailStopEvent.end()
 
     def _write_temporary_script_env(self) -> None:
         self.logger.debug(
@@ -1509,28 +1494,36 @@ class JailGenerator(JailResource):
             ["/usr/bin/login"] + self.config["login_flags"]
         )
 
-    def _destroy_jail(self, log_errors: bool=True) -> None:
+    def __destroy_jail(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.JailStop', None, None]:
 
-        stdout, stderr, returncode = self._exec_host_command(
-            [
-                "/usr/sbin/jail",
-                "-v",
-                "-r",
-                "-f",
-                self._jail_conf_file,
-                self.identifier
-            ],
-            passthru=False,
-            env=self.env
+        jailRemoveEvent = libioc.events.JailRemove(
+            jail=self,
+            scope=event_scope
         )
 
-        self.query_jid()
+        yield jailRemoveEvent.begin()
 
-        if returncode > 0:
-            raise libioc.errors.JailDestructionFailed(
-                jail=self,
-                logger=(self.logger if log_errors else None)
-            )
+        if self.running is False:
+            yield jailRemoveEvent.skip()
+            return
+
+        jid = self.jid
+        try:
+            libjail.dll.jail_remove(self.jid)
+            self.query_jid()
+            yield jailRemoveEvent.end()
+            return
+        except Exception:
+            pass
+
+        yield jailRemoveEvent.fail(f"libc jail_remove failed for {jid}")
+        raise libioc.errors.JailDestructionFailed(
+            jail=self,
+            logger=self.logger
+        )
 
     @property
     def _dhcp_enabled(self) -> bool:
@@ -1930,11 +1923,42 @@ class JailGenerator(JailResource):
             ]))
         return commands
 
-    def _clear_resource_limits(self) -> typing.List[str]:
-        if self.config['rlimits'] is False:
-            return []
+    def __clear_resource_limits(
+        self,
+        force: bool,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.JailResourceLimitAction', None, None]:
+        jailResourceLimitActionEvent = libioc.events.JailResourceLimitAction(
+            jail=self,
+            scope=event_scope
+        )
+
+        yield jailResourceLimitActionEvent.begin()
+
+        config_value = self.config['rlimits']
+        if (config_value is False) or (config_value is None):
+            yield jailResourceLimitActionEvent.skip()
+            return
+
         self.logger.verbose("Clearing resource limits")
-        return [f"/usr/bin/rctl -r jail:{self.identifier} 2>/dev/null || true"]
+        _, _, returncode = libioc.helpers.exec(
+            [
+                "/usr/bin/rctl",
+                "-r",
+                f"jail:{self.identifier}"
+            ],
+            ignore_error=True
+        )
+
+        if returncode > 0:
+            yield jailResourceLimitActionEvent.fail()
+            if force is False:
+                raise libioc.errors.ResourceLimitActionFailed(
+                    action=f"clear resource limits of jail {self.full_name}",
+                    logger=self.logger
+                )
+
+        yield jailResourceLimitActionEvent.end()
 
     @property
     def _allow_mount(self) -> int:
@@ -2039,9 +2063,18 @@ class JailGenerator(JailResource):
                 logger=(self.logger if log_errors else None)
             )
 
-    def _teardown_mounts(self) -> typing.List[str]:
+    def __teardown_mounts(
+        self,
+        force: bool,
+        event_scope: typing.Optional['libioc.events.Scope']=None,
+    ) -> typing.Generator[libioc.events.TeardownJailMounts, None, None]:
 
-        commands: typing.List[str] = []
+        teardownJailMountsEvent = libioc.events.TeardownJailMounts(
+            jail=self,
+            scope=event_scope
+        )
+
+        yield teardownJailMountsEvent.begin()
 
         fstab_destinations = [
             line["destination"] for line in self.fstab
@@ -2065,28 +2098,57 @@ class JailGenerator(JailResource):
         ))
 
         mountpoints = fstab_destinations + system_mountpoints
+        error = False
 
-        commands.append(" ".join(libioc.helpers.umount_command(
-            mountpoints,
-            force=True,
+        _, _, returncode = libioc.helpers.exec(
+            libioc.helpers.umount_command(
+                mountpoints,
+                force=True
+            ),
+            logger=self.logger,
             ignore_error=True
-        )))
+        )
+        error |= (returncode > 0)
 
-        commands.append(" ".join(libioc.helpers.umount_command(
-            ["-a", "-F", self.fstab.path],
-            force=True,
+        _, _, returncode = libioc.helpers.exec(
+            libioc.helpers.umount_command(
+                ["-a", "-F", self.fstab.path],
+                force=True
+            ),
+            logger=self.logger,
             ignore_error=True
-        )))
+        )
+        error |= (returncode > 0)
 
-        if self.config.legacy is True:
-            commands.append(" | ".join([
-                "mount -t nullfs",
-                "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
-                f"grep '^{self.root_dataset.mountpoint}/'",
-                "xargs umount"
-            ]))
+        if (self.config.legacy is True) and error:
+            try:
+                libioc.helpers.exec(
+                    [
+                        "/bin/sh", "-c",
+                        " | ".join([
+                            "mount -t nullfs",
+                            "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
+                            f"grep '^{self.root_dataset.mountpoint}/'",
+                            "xargs umount"
+                        ])
+                    ],
+                    logger=self.logger
+                )
+            except Exception:
+                error = True
+        else:
+            error = False
 
-        return commands
+        if error is True:
+            yield teardownJailMountsEvent.fail()
+            if force is False:
+                name = self.full_name
+                raise libioc.errors.UnmountFailed(
+                    reason=f"failed to unmount mountpoints of jail {name}",
+                    logger=self.logger
+                )
+
+        yield teardownJailMountsEvent.end()
 
     def _get_absolute_path_from_jail_asset(
         self,

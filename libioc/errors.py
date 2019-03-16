@@ -211,6 +211,20 @@ class JailNotTemplate(JailException):
         JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
+class JailHookFailed(JailException):
+    """Raised when the jail could not be launched."""
+
+    def __init__(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        hook: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+        self.hook = hook
+        msg = f"Jail {jail.full_name} hook {hook} failed"
+        JailException.__init__(self, message=msg, jail=jail, logger=logger)
+
+
 class JailLaunchFailed(JailException):
     """Raised when the jail could not be launched."""
 
@@ -458,6 +472,18 @@ class ResourceLimitUnknown(IocException, KeyError):
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         msg = f"The specified resource limit is unknown"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
+class ResourceLimitActionFailed(IocException, KeyError):
+    """Raised when a resource limit has is unknown."""
+
+    def __init__(
+        self,
+        action: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+        msg = f"Resource Limit failed to {action}"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -733,12 +759,15 @@ class UnmountFailed(IocException):
 
     def __init__(
         self,
-        mountpoint: typing.Any,
+        mountpoint: typing.Any=None,
         reason: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
-        msg = f"Unmount of {mountpoint} failed"
+        if mountpoint is None:
+            msg = "Umount failed"
+        else:
+            msg = f"Unmount of {mountpoint} failed"
         if reason is not None:
             msg += f": {reason}"
         super().__init__(message=msg, logger=logger)
