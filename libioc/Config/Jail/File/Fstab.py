@@ -157,12 +157,11 @@ class Fstab(collections.MutableSequence):
     relative to the resource's root_dataset `<resource>/root`.
     """
 
-    AUTO_COMMENT_IDENTIFIER = "iocage-auto"
+    AUTO_COMMENT_IDENTIFIER = "iocage-auto"  # ToDo: rename to ioc-auto
 
     release: typing.Optional['libioc.Release.ReleaseGenerator']
     host: 'libioc.Host.HostGenerator'
     logger: 'libioc.Logger.Logger'
-    _jail: typing.Optional['libioc.Jail.JailGenerator']
     _lines: typing.List[typing.Union[
         FstabLine,
         FstabCommentLine,
@@ -171,30 +170,17 @@ class Fstab(collections.MutableSequence):
 
     def __init__(
         self,
-        jail: typing.Optional['libioc.Jail.JailGenerator']=None,
-        release: typing.Optional['libioc.Release.ReleaseGenerator']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None,
         host: typing.Optional['libioc.Host.HostGenerator']=None,
-        file: str="fstab"
+        file: str="/etc/fstab"
     ) -> None:
 
         self._lines = []
         self.logger = libioc.helpers_object.init_logger(self, logger)
         self.host = libioc.helpers_object.init_host(self, host)
-        self._jail = jail
-        self.release = release
         self.file = file
         # ToDo: could be lazy-loaded
         self.read_file()
-
-    @property
-    def jail(self) -> 'libioc.Jail.JailGenerator':
-        """Return the associated JailGenerator or raise an AttributeError."""
-        if isinstance(self._jail, libioc.Jail.JailGenerator):
-            return self._jail
-        raise AttributeError(
-            "Fstab requires a jail or absolute file path"
-        )
 
     @property
     def path(self) -> str:
@@ -202,23 +188,14 @@ class Fstab(collections.MutableSequence):
         Absolute fstab file path.
 
         This is the file read from and written to.
-
-        When the path begins with a / it is assumed to be absolute, so that
-        the jails dataset mountpoint is not used as path prefix. This is useful
-        when moving around jail backups.
         """
-        if self.file.startswith("/") is True:
-            path = self.file
-        else:
-            path = f"{self.jail.dataset.mountpoint}/{self.file}"
-            self.jail._require_relative_path(path)
-
-        return path
+        return self.file
 
     def parse_lines(
         self,
         input_text: str,
-        ignore_auto_created: bool=True
+        ignore_auto_created: bool=True,
+        skip_destinations: typing.List[str]=[]
     ) -> None:
         """
         Parse the content of a fstab file.
@@ -230,18 +207,18 @@ class Fstab(collections.MutableSequence):
 
             ignore_auto_created:
                 Skips reading entries that were created by iocage
+
+            exclude_destinations:
+                List of destination strings that is skipped
         """
         list.clear(self._lines)
 
         line: str
         comment: typing.Optional[str]
         auto_comment_found: bool = False
-        basejail_destinations = map(
-            lambda x: str(x['destination']),
-            self.basejail_lines
-        )
 
         for line in input_text.rstrip("\n").splitlines():
+            print(line)
             if _is_comment_line(line) or _is_empty_line(line):
                 self.add_line(FstabCommentLine({
                     "line": line
@@ -283,21 +260,11 @@ class Fstab(collections.MutableSequence):
             source = fragments[0].strip()
             destination = fragments[1].strip()
 
-            # skip lines with destinations overlapping self.basejail_lines
-            if destination in basejail_destinations:
+            if destination in skip_destinations:
                 continue
 
-            _backup_prefix = "backup:///"
-            if destination.startswith(_backup_prefix) is True:
-                destination = "".join([
-                    self.jail.dataset.mountpoint,
-                    destination[len(_backup_prefix):]
-                ])
-            if source.startswith(_backup_prefix) is True:
-                source = "".join([
-                    self.jail.dataset.mountpoint,
-                    source[len(_backup_prefix):]
-                ])
+            destination = self.__replace_magic_path(destination)
+            source = self.__replace_magic_path(source)
 
             new_line = FstabLine({
                 "source": libioc.Types.Path(source),
@@ -310,6 +277,9 @@ class Fstab(collections.MutableSequence):
             })
 
             self.add_line(new_line, skip_existing=True, auto_mount_jail=False)
+
+    def __replace_magic_path(self, filepath: str) -> str:
+        return filepath
 
     def read_file(self) -> None:
         """Read the fstab file."""
@@ -345,14 +315,6 @@ class Fstab(collections.MutableSequence):
         self._save_file_handle(f)
         f.close()
 
-    def update_release(
-        self,
-        release: typing.Optional['libioc.Release.ReleaseGenerator'] = None
-    ) -> None:
-        """Set a new release and save the updated file."""
-        self.release = release
-        self.update_and_save()
-
     def new_line(
         self,
         source: str,
@@ -387,6 +349,362 @@ class Fstab(collections.MutableSequence):
             auto_create_destination=auto_create_destination,
             auto_mount_jail=auto_mount_jail
         )
+
+    def add_line(
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ],
+        skip_existing: bool=False,
+        replace: bool=False,
+        auto_create_destination: bool=False,
+        auto_mount_jail: bool=True
+    ) -> None:
+        """
+        Directly append a FstabLine type.
+
+        Use save() to write changes to the fstab file.
+        """
+        FstabCommentLine
+        FstabAutoPlaceholderLine
+        if any((
+            isinstance(line, FstabLine),
+            isinstance(line, FstabCommentLine),
+            isinstance(line, FstabAutoPlaceholderLine),
+        )) is False:
+            raise TypeError(
+                "line needs to be FstabLine, FstabCommentLine "
+                f"or FstabAutoPlaceholderLine, but was {type(line).__name__}"
+            )
+
+        self._lines.append(line)
+
+    def index(
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ],
+        start: typing.Optional[int]=None,
+        end: typing.Optional[int]=None
+    ) -> int:
+        """Find the index position of a FstabLine in the Fstab instance."""
+        i: int = 0
+        items = list(self)
+        start = 0 if (start is None) else start
+        end = (len(items) - 1) if (end is None) else end
+        for existing_line in items:
+            if (i >= start) and (hash(existing_line) == hash(line)):
+                return i
+            i += 1
+            if (i > end):
+                break
+        raise ValueError("Fstab line does not exist")
+
+    def __contains__(  # noqa: T484
+        self,
+        line: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> bool:
+        """Return True when the FstabLine already exists."""
+        try:
+            self.index(line)
+            return True
+        except ValueError:
+            return False
+
+    def __str__(self) -> str:
+        """Return the entire content of the fstab file as string."""
+        return "\n".join(map(
+            str,
+            list(self)
+        ))
+
+    def __len__(self) -> int:
+        """Return the number of lines in the fstab file."""
+        return list.__len__(list(self.__iter__()))
+
+    def __delitem__(self, index: int) -> None:  # noqa: T484
+        """Delete an FstabLine at the given index."""
+        deletion_target_line = self.__getitem__(index)
+        source = deletion_target_line["source"]
+        destination = deletion_target_line["destination"]
+
+        self.logger.verbose(
+            f"Deleting fstab entry: {source} -> {destination}"
+        )
+        real_index = self._get_real_index(index)
+        self._lines.__delitem__(real_index)
+
+    def __getitem__(self, index: int) -> typing.Union[  # noqa: T484
+        FstabLine,
+        FstabCommentLine,
+        FstabAutoPlaceholderLine
+    ]:
+        """Get the FstabLine at the given index."""
+        return list(self.__iter__())[index]
+
+    def __setitem__(  # noqa: T484
+        self,
+        index: int,
+        value: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
+        """Set or overwrite the FstabLine at the given index."""
+        real_index = self._get_real_index(index)
+        self._lines.__setitem__(real_index, value)
+
+    def insert(
+        self,
+        index: int,
+        value: typing.Union[
+            FstabLine,
+            FstabCommentLine,
+            FstabAutoPlaceholderLine
+        ]
+    ) -> None:
+        """
+        Insert a line at a given position.
+
+        Args:
+
+            index:
+                The numeric line insertion position
+
+            value:
+                A FstabLine, Comment or Placeholder
+        """
+        target_line = list(self.__iter__())[index]
+
+        if isinstance(target_line, FstabBasejailLine):
+            # find FstabAutoPlaceholderLine instead
+            line = list(filter(
+                lambda x: isinstance(x, FstabAutoPlaceholderLine),
+                self._lines
+            ))[0]
+            real_index = self._lines.index(line)
+        else:
+            real_index = self._get_real_index(index)
+
+        self._lines.insert(real_index, value)
+
+    def _get_real_index(self, index: int) -> int:
+        target_line = list(self.__iter__())[index]
+        if isinstance(target_line, FstabBasejailLine):
+            raise libioc.errors.VirtualFstabLineHasNoRealIndex(
+                logger=self.logger
+            )
+        return self._lines.index(target_line)
+
+    def __iter__(self) -> typing.Iterator[typing.Union[
+        FstabAutoPlaceholderLine,
+        FstabCommentLine,
+        FstabLine
+    ]]:
+        """
+        Return an iterator of all printable lines.
+
+        The output includes user configured and auto created lines for NullFS
+        basejails. The previous position of auto-created entries is preserved.
+        """
+        return iter(self._lines)
+
+    def replace_path(self, pattern: str, replacement: str) -> None:
+        """Replace a path in all fstab entries (source or destination)."""
+        for i, line in enumerate(self._lines):
+            if not isinstance(line, FstabLine):
+                continue
+            line["source"] = _replace_path_prefix(
+                line["source"],
+                pattern,
+                replacement
+            )
+            line["destination"] = _replace_path_prefix(
+                line["destination"],
+                pattern,
+                replacement
+            )
+            self._lines[i] = line
+
+
+class JailFstab(Fstab):
+    """
+    Fstab file abstraction of a Jails fstab file.
+
+    The jails fstab file is stored in its main dataset.
+    """
+
+    jail: 'libioc.Jail.JailGenerator'
+
+    def __init__(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        logger: typing.Optional['libioc.Logger.Logger']=None,
+        host: typing.Optional['libioc.Host.HostGenerator']=None,
+        file: str="fstab"
+    ) -> None:
+        self.jail = jail
+        super().__init__(
+            logger=logger,
+            host=host,
+            file=file
+        )
+
+    @property
+    def maintenance_lines(self) -> typing.List[FstabMaintenanceLine]:
+        """Auto-generate lines that are required for jail start and stop."""
+        if self.jail is None:
+            return []
+
+        return [FstabMaintenanceLine(dict(
+            source=libioc.Types.AbsolutePath(self.jail.launch_script_dir),
+            destination=libioc.Types.AbsolutePath(
+                f"{self.jail.root_dataset.mountpoint}/.iocage"
+            ),
+            options="ro",
+            type="nullfs",
+            freq=0,
+            passno=0,
+            comment=self.AUTO_COMMENT_IDENTIFIER
+        ))]
+
+    def parse_lines(
+        self,
+        input_text: str,
+        ignore_auto_created: bool=True,
+        skip_destinations: typing.List[str]=[]
+    ) -> None:
+        """
+        Parse the content of a fstab file.
+
+        Args:
+
+            input_text:
+                The text content of an existing fstab file
+
+            ignore_auto_created:
+                Skips reading entries that were created by iocage
+
+            exclude_destinations:
+                List of destination strings that is skipped
+        """
+        # skip lines with destinations overlapping self.basejail_lines
+        skip_destinations += list(map(
+            lambda x: str(x['destination']),
+            self.basejail_lines
+        ))
+        Fstab.parse_lines(
+            self,
+            input_text=input_text,
+            ignore_auto_created=ignore_auto_created,
+            skip_destinations=skip_destinations
+        )
+
+    @property
+    def basejail_lines(self) -> typing.List[FstabBasejailLine]:
+        """
+        Auto-generate lines of NullFS basejails.
+
+        When a jail is a NullFS basejail, this list represent the corresponding
+        fstab lines that mount the release.
+        """
+        try:
+            self.jail.release
+        except AttributeError:
+            return []
+
+        if self.jail.config["basejail_type"] != "nullfs":
+            return []
+
+        basedirs = libioc.helpers.get_basedir_list(
+            distribution_name=self.host.distribution.name
+        )
+
+        fstab_basejail_lines = []
+        release_root_path = "/".join([
+            self.jail.release.root_dataset.mountpoint,
+            f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
+        ])
+        for basedir in basedirs:
+
+            source = f"{release_root_path}/{basedir}"
+            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+            fstab_basejail_lines.append(FstabBasejailLine({
+                "source": source,
+                "destination": destination,
+                "type": "nullfs",
+                "options": "ro",
+                "freq": 0,
+                "passno": 0,
+                "comment": self.AUTO_COMMENT_IDENTIFIER
+            }))
+
+        return fstab_basejail_lines
+
+    def __iter__(self) -> typing.Iterator[typing.Union[
+        FstabAutoPlaceholderLine,
+        FstabBasejailLine,
+        FstabCommentLine,
+        FstabLine
+    ]]:
+        """
+        Return an iterator of all printable lines.
+
+        The output includes user configured and auto created lines for NullFS
+        basejails. The previous position of auto-created entries is preserved.
+        """
+        basejail_lines_added = False
+        output: typing.List[
+            typing.Union[
+                FstabAutoPlaceholderLine,
+                FstabBasejailLine,
+                FstabCommentLine,
+                FstabLine
+            ]
+        ] = []
+
+        for line in self._lines:
+            if isinstance(line, FstabAutoPlaceholderLine):
+                if basejail_lines_added is False:
+                    output += self.basejail_lines
+                    output += self.maintenance_lines
+                    basejail_lines_added = True
+            else:
+                output.append(line)
+
+        if basejail_lines_added is False:
+            _basejail = self.basejail_lines
+            _maintenance = self.maintenance_lines
+            output = _basejail + _maintenance + self._lines  # noqa: T484
+
+        return iter(output)
+
+    @property
+    def path(self) -> str:
+        """
+        Absolute fstab file path.
+
+        This is the file read from and written to.
+
+        When the path begins with a / it is assumed to be absolute, so that
+        the jails dataset mountpoint is not used as path prefix. This is useful
+        when moving around jail backups.
+        """
+        if self.file.startswith("/") is True:
+            return self.file
+        else:
+            path = f"{self.jail.dataset.mountpoint}/{self.file}"
+            self.jail._require_relative_path(path)
+            return path
 
     def add_line(
         self,
@@ -479,250 +797,44 @@ class Fstab(collections.MutableSequence):
 
         self._lines.append(line)
 
-    def index(
+    def update_release(
         self,
-        line: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ],
-        start: typing.Optional[int]=None,
-        end: typing.Optional[int]=None
-    ) -> int:
-        """Find the index position of a FstabLine in the Fstab instance."""
-        i: int = 0
-        items = list(self)
-        start = 0 if (start is None) else start
-        end = (len(items) - 1) if (end is None) else end
-        for existing_line in items:
-            if (i >= start) and (hash(existing_line) == hash(line)):
-                return i
-            i += 1
-            if (i > end):
-                break
-        raise ValueError("Fstab line does not exist")
+        release: typing.Optional['libioc.Release.ReleaseGenerator'] = None
+    ) -> None:
+        """Set a new release and save the updated file."""
+        self.jail.release = release
+        self.update_and_save()
 
-    def __contains__(  # noqa: T484
-        self,
-        line: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ]
-    ) -> bool:
-        """Return True when the FstabLine already exists."""
-        try:
-            self.index(line)
-            return True
-        except ValueError:
-            return False
-
-    @property
-    def maintenance_lines(self) -> typing.List[FstabMaintenanceLine]:
-        """Auto-generate lines that are required for jail start and stop."""
-        return [FstabMaintenanceLine(dict(
-            source=libioc.Types.AbsolutePath(self.jail.launch_script_dir),
-            destination=libioc.Types.AbsolutePath(
-                f"{self.jail.root_dataset.mountpoint}/.iocage"
-            ),
-            options="ro",
-            type="nullfs",
-            freq=0,
-            passno=0,
-            comment=self.AUTO_COMMENT_IDENTIFIER
-        ))]
-
-    @property
-    def basejail_lines(self) -> typing.List[FstabBasejailLine]:
-        """
-        Auto-generate lines of NullFS basejails.
-
-        When a jail is a NullFS basejail, this list represent the corresponding
-        fstab lines that mount the release.
-        """
-        if self.release is None:
-            return []
-
-        if self.jail.config["basejail_type"] != "nullfs":
-            return []
-
-        basedirs = libioc.helpers.get_basedir_list(
-            distribution_name=self.host.distribution.name
-        )
-
-        fstab_basejail_lines = []
-        release_root_path = "/".join([
-            self.release.root_dataset.mountpoint,
-            f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
+    def __replace_magic_path(self, filepath: str) -> str:
+        _backup_prefix = "backup:///"
+        if filepath.startswith(_backup_prefix) is False:
+            return filepath
+        return "".join([
+            self.jail.dataset.mountpoint,
+            filepath[len(_backup_prefix):]
         ])
-        for basedir in basedirs:
-
-            source = f"{release_root_path}/{basedir}"
-            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
-            fstab_basejail_lines.append(FstabBasejailLine({
-                "source": source,
-                "destination": destination,
-                "type": "nullfs",
-                "options": "ro",
-                "freq": 0,
-                "passno": 0,
-                "comment": self.AUTO_COMMENT_IDENTIFIER
-            }))
-
-        return fstab_basejail_lines
-
-    def __str__(self) -> str:
-        """Return the entire content of the fstab file as string."""
-        return "\n".join(map(
-            str,
-            list(self)
-        ))
-
-    def __len__(self) -> int:
-        """Return the number of lines in the fstab file."""
-        return list.__len__(list(self.__iter__()))
 
     def __delitem__(self, index: int) -> None:  # noqa: T484
-        """Delete an FstabLine at the given index."""
+        """Delete an FstabLine at the given index of the jails fstab file."""
         deletion_target_line = self.__getitem__(index)
-        jail_name = self.jail.humanreadable_name
         source = deletion_target_line["source"]
         destination = deletion_target_line["destination"]
 
         self.logger.verbose(
-            f"Deleting fstab entry from jail {jail_name}: "
-            f"{source} -> {destination}"
+            f"Deleting fstab entry: {source} -> {destination}"
         )
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
         if self.jail.running is True:
             self.logger.verbose(
-                f"Unmounting {destination} from running jail {jail_name}"
+                f"Unmounting {destination}"
             )
             libioc.helpers.umount(
                 destination,
                 force=True,
                 logger=self.logger
             )
-
-    def __getitem__(self, index: int) -> typing.Union[  # noqa: T484
-        FstabLine,
-        FstabCommentLine,
-        FstabAutoPlaceholderLine
-    ]:
-        """Get the FstabLine at the given index."""
-        return list(self.__iter__())[index]
-
-    def __setitem__(  # noqa: T484
-        self,
-        index: int,
-        value: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ]
-    ) -> None:
-        """Set or overwrite the FstabLine at the given index."""
-        real_index = self._get_real_index(index)
-        self._lines.__setitem__(real_index, value)
-
-    def insert(
-        self,
-        index: int,
-        value: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ]
-    ) -> None:
-        """
-        Insert a line at a given position.
-
-        Args:
-
-            index:
-                The numeric line insertion position
-
-            value:
-                A FstabLine, Comment or Placeholder
-        """
-        target_line = list(self.__iter__())[index]
-
-        if isinstance(target_line, FstabBasejailLine):
-            # find FstabAutoPlaceholderLine instead
-            line = list(filter(
-                lambda x: isinstance(x, FstabAutoPlaceholderLine),
-                self._lines
-            ))[0]
-            real_index = self._lines.index(line)
-        else:
-            real_index = self._get_real_index(index)
-
-        self._lines.insert(real_index, value)
-
-    def _get_real_index(self, index: int) -> int:
-        target_line = list(self.__iter__())[index]
-        if isinstance(target_line, FstabBasejailLine):
-            raise libioc.errors.VirtualFstabLineHasNoRealIndex(
-                logger=self.logger
-            )
-        return self._lines.index(target_line)
-
-    def __iter__(self) -> typing.Iterator[typing.Union[
-        FstabAutoPlaceholderLine,
-        FstabBasejailLine,
-        FstabCommentLine,
-        FstabLine
-    ]]:
-        """
-        Return an iterator of all printable lines.
-
-        The output includes user configured and auto created lines for NullFS
-        basejails. The previous position of auto-created entries is preserved.
-        """
-        basejail_lines_added = False
-        output: typing.List[
-            typing.Union[
-                FstabAutoPlaceholderLine,
-                FstabBasejailLine,
-                FstabCommentLine,
-                FstabLine
-            ]
-        ] = []
-
-        for line in self._lines:
-            if isinstance(line, FstabAutoPlaceholderLine):
-                if basejail_lines_added is False:
-                    output += self.basejail_lines
-                    output += self.maintenance_lines
-                    basejail_lines_added = True
-            else:
-                output.append(line)
-
-        if basejail_lines_added is False:
-            _basejail = self.basejail_lines
-            _maintenance = self.maintenance_lines
-            output = _basejail + _maintenance + self._lines  # noqa: T484
-
-        return iter(output)
-
-    def replace_path(self, pattern: str, replacement: str) -> None:
-        """Replace a path in all fstab entries (source or destination)."""
-        for i, line in enumerate(self._lines):
-            if not isinstance(line, FstabLine):
-                continue
-            line["source"] = _replace_path_prefix(
-                line["source"],
-                pattern,
-                replacement
-            )
-            line["destination"] = _replace_path_prefix(
-                line["destination"],
-                pattern,
-                replacement
-            )
-            self._lines[i] = line
 
 
 def _is_comment_line(text: str) -> bool:

@@ -506,9 +506,8 @@ class LaunchableResourceBackup:
         yield exportFstabEvent.begin()
 
         try:
-            fstab = libioc.Config.Jail.File.Fstab.Fstab(
+            fstab = libioc.Config.Jail.File.Fstab.JailFstab(
                 jail=self.resource,
-                release=None,
                 logger=self.resource.logger,
                 host=self.resource.host
             )

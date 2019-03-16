@@ -833,7 +833,7 @@ class BaseConfig(dict):
         return False
 
     def _is_known_jail_param(self, key: str) -> bool:
-        return key in libioc.JailParams.HostJailParams()
+        return (key in libioc.JailParams.HostJailParams()) is True
 
     @property
     def _sorted_user_properties(self) -> typing.List[str]:

@@ -122,7 +122,7 @@ class JailResource(
         raise Exception("This resource is not a jail or not linked to one")
 
     @property
-    def fstab(self) -> 'libioc.Config.Jail.File.Fstab.Fstab':
+    def fstab(self) -> 'libioc.Config.Jail.File.Fstab.JailFstab':
         """
         Memoized fstab wrapper of a Jail.
 
@@ -133,15 +133,9 @@ class JailResource(
         except AttributeError:
             pass
 
-        try:
-            release = self.release
-        except AttributeError:
-            release = None
-
         jail = self.jail
-        fstab = libioc.Config.Jail.File.Fstab.Fstab(
+        fstab = libioc.Config.Jail.File.Fstab.JailFstab(
             jail=jail,
-            release=release,
             logger=self.logger,
             host=jail.host
         )
@@ -2049,7 +2043,10 @@ class JailGenerator(JailResource):
 
         commands: typing.List[str] = []
 
-        fstab_destinations = [line["destination"] for line in self.fstab]
+        fstab_destinations = [
+            line["destination"] for line in self.fstab
+            if isinstance(line, libioc.Config.Jail.File.Fstab.FstabLine)
+        ]
         system_mountpoints = list(filter(
             os.path.isdir,
             map(
