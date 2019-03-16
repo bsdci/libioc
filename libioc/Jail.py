@@ -674,10 +674,6 @@ class JailGenerator(JailResource):
             started_jails=started_jails
         )
 
-    def _run_poststop_hook_manually(self) -> None:
-        self.logger.debug("Running poststop hook manually")
-        libioc.helpers.exec(self.get_hook_script_path("poststop"))
-
     def _wrap_jail_command(
         self,
         commands: typing.Optional[typing.List[str]]
@@ -945,35 +941,6 @@ class JailGenerator(JailResource):
         self._ensure_script_dir()
         with open(self.script_env_path, "w") as f:
             f.write(f"export IOC_JID={self.jid}")
-
-    def _write_jail_conf(self, force: bool=False) -> None:
-        if force is True:
-            stop_command = "/usr/bin/true"
-        else:
-            stop_command = (
-                f"[ -f \"{self._relative_hook_script_dir}/stop.sh\" ]"
-                " || exit 0; "
-                f". {self._relative_hook_script_dir}/stop.sh"
-            )
-
-        content = "\n".join([
-            self.identifier + " {",
-            (
-                "exec.prestop = "
-                f"\"/bin/sh {self.get_hook_script_path('prestop')}\";"
-            ), (
-                "exec.poststop = "
-                f"\"/bin/sh {self.get_hook_script_path('poststop')}\";"
-            ), (
-                f"exec.stop = \"{stop_command}\";"
-            ), (
-                f"exec.jail_user = {self._get_value('exec_jail_user')};"
-            ),
-            "}"
-        ])
-        self.logger.debug(f"Writing jail.conf file to {self._jail_conf_file}")
-        with open(self._jail_conf_file, "w") as f:
-            f.write(content)
 
     @property
     def _jail_conf_file(self) -> str:
