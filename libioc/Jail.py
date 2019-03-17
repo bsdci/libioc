@@ -1488,7 +1488,7 @@ class JailGenerator(JailResource):
         jid = self.jid
         try:
             libjail.dll.jail_remove(jid)
-            while libjail.is_jid_dying(jid) is True:
+            while self.running or (libjail.is_jid_dying(jid) is True):
                 # wait for death
                 continue
             self.__jid = None
