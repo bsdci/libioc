@@ -85,3 +85,30 @@ class TestVNET(object):
 
         # filter lines that begin with a whitespace
         assert "172.16.99.23" in stdout
+
+    def test_vnet_interfaces_are_removed_on_stop(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        bridge_interface: str
+    ) -> None:
+        """Test if VNET interfaces are removed from the host on stop."""
+        existing_jail.config["vnet"] = True
+        existing_jail.config["interfaces"] = f"vnet22:{bridge_interface}"
+        existing_jail.config["ip4_addr"] = f"vnet22|172.16.99.23/24"
+        existing_jail.save()
+
+        existing_jail.start()
+        jid = existing_jail.jid
+
+        stdout = subprocess.check_output(
+            ["/sbin/ifconfig", f"vnet22:{jid}"]
+        ).decode("utf-8")
+
+        assert "UP" in stdout
+
+        existing_jail.stop()
+
+        with pytest.raises(subprocess.CalledProcessError) as excinfo:
+            stdout = subprocess.check_output(
+                ["/sbin/ifconfig", f"vnet22:{jid}"]
+            ).decode("utf-8")

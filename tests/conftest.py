@@ -199,7 +199,8 @@ def new_jail(
         zfs=zfs
     )
     yield new_jail
-    new_jail.destroy(force=True)
+    new_jail.stop(force=True)
+    new_jail.destroy()
 
 
 @pytest.fixture(scope="function")
@@ -208,7 +209,7 @@ def existing_jail(
     local_release: 'libioc.Release.ReleaseGenerator',
 ) -> 'libioc.Jail.Jail':
     new_jail.create(local_release)
-    return new_jail
+    yield new_jail
 
 
 @pytest.fixture(scope="function")
