@@ -37,20 +37,19 @@ class TestVNET(object):
 
     def test_vnet_without_interfaces_can_only_see_lo0(
         self,
-        new_jail: 'libioc.Jail.Jail',
-        local_release: 'libioc.Release.ReleaseGenerator'
+        existing_jail: 'libioc.Jail.Jail'
     ) -> None:
         """Test if a VNET jail without interfaces can only see lo0."""
-        new_jail.config["vnet"] = True
-        new_jail.create(local_release)
+        existing_jail.config["vnet"] = True
+        existing_jail.save()
 
-        assert len(list(new_jail.networks)) == 0
+        assert len(list(existing_jail.networks)) == 0
 
-        new_jail.start()
+        existing_jail.start()
 
         stdout_lines = subprocess.check_output(
-            ["/usr/sbin/jexec", str(new_jail.jid), "/sbin/ifconfig"]
-        ).decode().split("\n")
+            ["/usr/sbin/jexec", str(existing_jail.jid), "/sbin/ifconfig"]
+        ).decode("utf-8").split("\n")
 
         # filter lines that begin with a whitespace
         configured_nics = [
@@ -64,23 +63,25 @@ class TestVNET(object):
 
     def test_static_ip_configuration(
         self,
-        new_jail: 'libioc.Jail.Jail',
-        local_release: 'libioc.Release.ReleaseGenerator',
+        existing_jail: 'libioc.Jail.Jail',
         bridge_interface: str
     ) -> None:
         """Test if static IPv4 and IPv6 addresses can be configured."""
-        new_jail.config["vnet"] = True
-        new_jail.config["interfaces"] = f"vnet23:{bridge_interface}"
-        new_jail.config["ip4_addr"] = f"vnet23|172.16.99.23/24"
-        new_jail.create(local_release)
+        existing_jail.config["vnet"] = True
+        existing_jail.config["interfaces"] = f"vnet23:{bridge_interface}"
+        existing_jail.config["ip4_addr"] = f"vnet23|172.16.99.23/24"
+        existing_jail.save()
 
-        assert len(list(new_jail.networks)) == 1
+        assert len(list(existing_jail.networks)) == 1
 
-        new_jail.start()
+        existing_jail.start()
 
-        stdout = subprocess.check_output(
-            ["/usr/sbin/jexec", str(new_jail.jid), "/sbin/ifconfig", "vnet23"]
-        ).decode()
+        stdout = subprocess.check_output([
+            "/usr/sbin/jexec",
+            str(existing_jail.jid),
+            "/sbin/ifconfig",
+            "vnet23"
+        ]).decode("utf-8")
 
         # filter lines that begin with a whitespace
         assert "172.16.99.23" in stdout
