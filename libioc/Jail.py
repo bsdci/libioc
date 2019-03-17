@@ -31,6 +31,7 @@ import shutil
 
 import libzfs
 import freebsd_sysctl
+import jail as libjail
 
 import libioc.Types
 import libioc.errors
@@ -2061,47 +2062,17 @@ class JailGenerator(JailResource):
             )
         ))
 
-        mountpoints = fstab_destinations + system_mountpoints
         error = False
-
-        _, _, returncode = libioc.helpers.exec(
-            libioc.helpers.umount_command(
-                mountpoints,
-                force=True
-            ),
-            logger=self.logger,
-            ignore_error=True
-        )
-        error |= (returncode > 0)
-
-        _, _, returncode = libioc.helpers.exec(
-            libioc.helpers.umount_command(
-                ["-a", "-F", self.fstab.path],
-                force=True
-            ),
-            logger=self.logger,
-            ignore_error=True
-        )
-        error |= (returncode > 0)
-
-        if (self.config.legacy is True) and error:
-            try:
-                libioc.helpers.exec(
-                    [
-                        "/bin/sh", "-c",
-                        " | ".join([
-                            "mount -t nullfs",
-                            "sed -r 's/(.+) on (.+) \\(nullfs, .+\\)$/\\2/'",
-                            f"grep '^{self.root_dataset.mountpoint}/'",
-                            "xargs umount"
-                        ])
-                    ],
-                    logger=self.logger
-                )
-            except Exception:
+        for mountpoint in (fstab_destinations + system_mountpoints):
+            if os.path.ismount(mountpoint) is False:
+                continue
+            if libjail.dll.unmount(mountpoint.encode("utf-8")) == 0:
+                self.logger.verbose(f"{mountpoint} successfully unmounted")
+            else:
                 error = True
-        else:
-            error = False
+                self.logger.warn(f"{mountpoint} unmount failed")
+                if force is False:
+                    break
 
         if error is True:
             yield teardownJailMountsEvent.fail()
