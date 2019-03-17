@@ -218,7 +218,6 @@ class Fstab(collections.MutableSequence):
         auto_comment_found: bool = False
 
         for line in input_text.rstrip("\n").splitlines():
-            print(line)
             if _is_comment_line(line) or _is_empty_line(line):
                 self.add_line(FstabCommentLine({
                     "line": line
