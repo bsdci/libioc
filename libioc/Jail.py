@@ -1489,8 +1489,11 @@ class JailGenerator(JailResource):
 
         jid = self.jid
         try:
-            libjail.dll.jail_remove(self.jid)
-            self.query_jid()
+            libjail.dll.jail_remove(jid)
+            while libjail.is_jid_dying(jid) is True:
+                # wait for death
+                continue
+            self.__jid = None
             yield jailRemoveEvent.end()
             return
         except Exception:
