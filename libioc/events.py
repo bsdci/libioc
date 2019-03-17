@@ -361,6 +361,12 @@ class TeardownJailMounts(JailStop):
     pass
 
 
+class TeardownJailNetwork(JailStop):
+    """Teardown a jails mountpoints."""
+
+    pass
+
+
 class JailResourceLimitAction(JailEvent):
     """Set or unset a jails resource limits."""
 
@@ -925,6 +931,7 @@ class JailCommandExecution(JailEvent):
         """Successfully finish an event."""
         self.stdout = stdout
         return IocEvent.end(self, message)
+
 
 # PKG
 

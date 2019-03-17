@@ -70,9 +70,12 @@ class Network:
     ) -> None:
 
         self.logger = libioc.helpers_object.init_logger(self, logger)
-        self.firewall = libioc.Firewall.QueuingFirewall(
+        self.queuing_firewall = libioc.Firewall.QueuingFirewall(
             logger=self.logger,
             insecure=True
+        )
+        self.firewall = libioc.Firewall.Firewall(
+            logger=self.logger
         )
 
         if nic is not None:
@@ -101,55 +104,49 @@ class Network:
             self.__require_bridge()
         return self.__create_vnet_iface()
 
-    def teardown(self) -> typing.List[str]:
+    def teardown(self, jid: typing.Optional[int]=None) -> None:
         """
         Teardown the applied changes.
 
         After Jails are stopped the devices that were used by it remain on the
         host. This method is called by jails after they terminated.
         """
-        commands: typing.List[str] = []
-
         if self.vnet is False:
-            return commands
+            return
 
-        commands += self.__down_host_interface()
+        if jid is None:
+            jid = self.jail.jid
+
+        self.__down_host_interface(jid)
 
         if self._is_secure_vnet_bridge is True:
-            commands += self.__down_secure_mode_devices()
-            self.firewall.delete_rule("$IOC_JID")
-            commands += self.firewall.read_commands()
-
-        return commands
+            self.__down_secure_mode_devices(jid)
+            self.firewall.delete_rule(jid)
 
     def __require_bridge(self) -> None:
         if (self.bridge is None):
             raise libioc.errors.VnetBridgeMissing(logger=self.logger)
 
-    def __down_host_interface(self) -> typing.List[str]:
-        nic = libioc.NetworkInterface.QueuingNetworkInterface(
-            name=f"{self._escaped_nic_name}:$IOC_JID",
+    def __down_host_interface(self, jid: int) -> None:
+        libioc.NetworkInterface.NetworkInterface(
+            name=f"{self._escaped_nic_name}:{jid}",
             extra_settings=["destroy"],
             logger=self.logger,
             insecure=True
         )
-        commands: typing.List[str] = nic.read_commands()
-        return commands
 
-    def __down_secure_mode_devices(self) -> typing.List[str]:
+    def __down_secure_mode_devices(self, jid: int) -> None:
         self.logger.verbose("Downing secure mode devices")
-        commands: typing.List[str] = []
         secure_mode_nics = [
-            f"{self._escaped_nic_name}:$IOC_JID:a",
-            f"{self._escaped_nic_name}:$IOC_JID:net"
+            f"{self._escaped_nic_name}:{jid}:a",
+            f"{self._escaped_nic_name}:{jid}:net"
         ]
         for nic in secure_mode_nics:
-            commands += libioc.NetworkInterface.QueuingNetworkInterface(
+            libioc.NetworkInterface.NetworkInterface(
                 name=nic,
                 extra_settings=["destroy"],
                 insecure=True
-            ).read_commands()
-        return commands
+            )
 
     @property
     def mtu(self) -> int:
@@ -271,7 +268,7 @@ class Network:
             raise libioc.errors.VnetBridgeMissing(logger=self.logger)
 
         if self._is_secure_vnet_bridge is True:
-            self.firewall.ensure_firewall_enabled()
+            self.queuing_firewall.ensure_firewall_enabled()
 
         commands_created += self.__create_new_epair_interface(
             variable_name_a=f"IOC_NIC_EPAIR_A_{self._nic_hash}",
@@ -400,7 +397,7 @@ class Network:
                         f"Firewall permit not possible for address '{address}'"
                     )
                     continue
-                self.firewall.add_rule(firewall_rule_number, [
+                self.queuing_firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", _address, "to", "any",
                     "layer2",
@@ -408,7 +405,7 @@ class Network:
                     "via", f"{self._escaped_nic_name}:$IOC_JID:b",
                     "out"
                 ], insecure=True)
-                self.firewall.add_rule(firewall_rule_number, [
+                self.queuing_firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", "any", "to", _address,
                     "layer2",
@@ -416,27 +413,27 @@ class Network:
                     "via", f"{self._escaped_nic_name}:$IOC_JID",
                     "out"
                 ], insecure=True)
-                self.firewall.add_rule(firewall_rule_number, [
+                self.queuing_firewall.add_rule(firewall_rule_number, [
                     "allow", protocol,
                     "from", "any", "to", _address,
                     "via", f"{self._escaped_nic_name}:$IOC_JID",
                     "out"
                 ], insecure=True)
-            self.firewall.add_rule(firewall_rule_number, [
+            self.queuing_firewall.add_rule(firewall_rule_number, [
                 "deny", "log", protocol,
                 "from", "any", "to", "any",
                 "layer2",
                 "via", f"{self._escaped_nic_name}:$IOC_JID:b",
                 "out"
             ], insecure=True)
-            self.firewall.add_rule(firewall_rule_number, [
+            self.queuing_firewall.add_rule(firewall_rule_number, [
                 "deny", "log", protocol,
                 "from", "any", "to", "any",
                 "via", f"{self._escaped_nic_name}:$IOC_JID",
                 "out"
             ], insecure=True)
         self.logger.debug("Firewall rules added")
-        commands: typing.List[str] = self.firewall.read_commands()
+        commands: typing.List[str] = self.queuing_firewall.read_commands()
         return commands
 
     def __up_host_if(self) -> typing.List[str]:

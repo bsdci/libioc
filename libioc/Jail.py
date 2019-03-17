@@ -54,8 +54,6 @@ import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.ResourceSelector
 import libioc.Config.Jail.File.Fstab
 
-import jail as libjail
-
 
 class JailResource(
     libioc.LaunchableResource.LaunchableResource,
@@ -566,15 +564,17 @@ class JailGenerator(JailResource):
                 stdout, stderr, returncode = self._launch_persistent_jail(
                     passthru=passthru
                 )
-                self.query_jid()
             else:
                 stdout, stderr, returncode = self._launch_single_command_jail(
                     single_command,
                     passthru=passthru
                 )
                 scope = jailLaunchEvent.scope
+                jid = self.jid
                 yield from self.__destroy_jail(scope)
                 yield from self.__run_hook("poststop", False, scope)
+                if jid is not None:
+                    yield from self.__stop_network(jid, False, scope)
                 yield from self.__teardown_mounts(False, scope)
                 yield from self.__clear_resource_limits(False, scope)
 
@@ -930,11 +930,14 @@ class JailGenerator(JailResource):
         jailStopEvent = events.JailStop(self, scope=event_scope)
 
         yield jailStopEvent.begin()
+        jid = self.jid
 
         yield from self.__run_hook("prestop", force, jailStopEvent.scope)
         yield from self.__run_hook("stop", force, jailStopEvent.scope)
         yield from self.__destroy_jail(jailStopEvent.scope)
         yield from self.__run_hook("poststop", force, jailStopEvent.scope)
+        if jid is not None:
+            yield from self.__stop_network(jid, force, jailStopEvent.scope)
         yield from self.__teardown_mounts(force, jailStopEvent.scope)
         yield from self.__clear_resource_limits(force, jailStopEvent.scope)
 
@@ -1646,6 +1649,7 @@ class JailGenerator(JailResource):
             )
             return stdout, stderr, returncode
 
+        self.query_jid()
         self.logger.verbose(
             f"Jail '{self.humanreadable_name}' started with JID {self.jid}"
         )
@@ -1729,6 +1733,7 @@ class JailGenerator(JailResource):
         )
 
         if returncode > 0:
+            self.query_jid()
             message = f"Jail {self.humanreadable_name} command failed."
         else:
             message = f"Jail {self.humanreadable_name} command finished."
@@ -1832,18 +1837,35 @@ class JailGenerator(JailResource):
 
         return created, start
 
-    def _stop_network(self) -> typing.List[str]:
-        if self.config["vnet"]:
-            return self._stop_vimage_network()
-        else:
-            return self._stop_non_vimage_network()
+    def __stop_network(
+        self,
+        jid: int,
+        force: bool,
+        event_scope: 'libioc.events.Scope'
+    ) -> typing.Generator['libioc.events.JailHook', None, None]:
+        teardownJailNetworkEvent = libioc.events.TeardownJailNetwork(
+            jail=self,
+            scope=event_scope
+        )
+        yield teardownJailNetworkEvent.begin()
+        try:
+            if self.config["vnet"] is True:
+                self._stop_vimage_network(jid)
+            else:
+                self._stop_non_vimage_network()
+        except Exception:
+            yield teardownJailNetworkEvent.fail()
+            if force is False:
+                raise
+            else:
+                return
+        yield teardownJailNetworkEvent.end()
 
-    def _stop_non_vimage_network(self) -> typing.List[str]:
-        commands: typing.List[str] = []
+    def _stop_non_vimage_network(self) -> None:
         for protocol in (4, 6,):
             config_value = self.config[f"ip{protocol}_addr"]
             if config_value is None:
-                return commands
+                continue
             for nic, addresses in config_value.items():
                 if addresses is None:
                     continue
@@ -1852,16 +1874,13 @@ class JailGenerator(JailResource):
                         # skip DHCP and ACCEPT_RTADV
                         continue
                     inet = "inet" if (protocol == 4) else "inet6"
-                    commands.append(
-                        f"/sbin/ifconfig {nic} {inet} {address} remove"
+                    libioc.helpers.exec(
+                        ["/sbin/ifconfig", nic, inet, str(address), "remove"]
                     )
-        return commands
 
-    def _stop_vimage_network(self) -> typing.List[str]:
-        commands: typing.List[str] = []
+    def _stop_vimage_network(self, jid: int) -> None:
         for network in self.networks:
-            commands += network.teardown()
-        return commands
+            network.teardown(jid)
 
     def _configure_localhost_commands(self) -> typing.List[str]:
         return ["/sbin/ifconfig lo0 localhost"]
@@ -2082,6 +2101,7 @@ class JailGenerator(JailResource):
                     reason=f"failed to unmount mountpoints of jail {name}",
                     logger=self.logger
                 )
+            return
 
         yield teardownJailMountsEvent.end()
 
