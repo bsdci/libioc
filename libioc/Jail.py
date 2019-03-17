@@ -1067,14 +1067,12 @@ class JailGenerator(JailResource):
 
         if _stop_jail is True:
             try:
-                stop_events = JailGenerator.stop(
+                yield from JailGenerator.stop(
                     self,
                     force=True,
                     event_scope=event_scope,
                     log_errors=(force_stop is False)
                 )
-                for event in stop_events:
-                    yield event
             except libioc.errors.JailDestructionFailed:
                 pass
 
