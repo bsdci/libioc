@@ -471,6 +471,9 @@ class JailGenerator(JailResource):
         ]
         exec_poststart: typing.List[str] = []
 
+        if self.host.ipfw_enabled is True:
+            exec_start += ["set +e", "service ipfw onestop", "set -e"]
+
         if self.config["vnet"]:
             _created, _start = self._start_vimage_network()
             exec_created += _created
@@ -1718,9 +1721,13 @@ class JailGenerator(JailResource):
             ]
         ))
 
-        _ipfw_enabled = self.host.ipfw_enabled
         self._write_hook_script("command", "\n".join(
-            (["set +e", "service ipfw onestop"] if _ipfw_enabled else []) + [
+            (
+                [
+                    "set +e",
+                    "/usr/sbin/service ipfw onestop"
+                ] if self.host.ipfw_enabled else []
+            ) + [
                 "set -e",
                 f". {self._relative_hook_script_dir}/start.sh",
                 jail_command,
