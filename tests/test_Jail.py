@@ -188,6 +188,11 @@ class TestNullFSBasejail(object):
         existing_jail.stop()
         assert existing_jail.running is False
 
+        with pytest.raises(subprocess.CalledProcessError):
+            stdout = subprocess.check_output(
+                [f"/usr/sbin/jls", "-j", existing_jail.identifier]
+            ).decode("utf-8")
+
         root_path = existing_jail.root_dataset.name
         stdout = subprocess.check_output(
             [f"/sbin/mount | grep {root_path}"],
