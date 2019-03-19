@@ -162,3 +162,16 @@ class TestUserDefaultConfig(object):
 		default_resource: 'libioc.Resource.DefaultResource',
 	) -> None:
 		assert default_resource.config["vnet"] == False
+
+	def test_fail_to_read_unknown_property(
+		self,
+		default_resource: 'libioc.Resource.DefaultResource',
+	) -> None:
+		with pytest.raises(libioc.errors.UnknownConfigProperty):
+			default_resource.config["not-available"]
+		with pytest.raises(libioc.errors.UnknownConfigProperty):
+			default_resource.config["not-available"] = "foobar"
+
+		# check that valid properties still can be set
+		default_resource.config["user.valid-property"] = "ok"
+		assert default_resource.config.data["user.valid-property"] == "ok"
