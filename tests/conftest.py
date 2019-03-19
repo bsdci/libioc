@@ -199,8 +199,9 @@ def new_jail(
         zfs=zfs
     )
     yield new_jail
-    new_jail.stop(force=True)
-    new_jail.destroy()
+    if new_jail.exists is True:
+        new_jail.stop(force=True)
+        new_jail.destroy()
 
 
 @pytest.fixture(scope="function")
