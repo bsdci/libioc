@@ -47,6 +47,7 @@ import libioc.SecureTarfile
 import libioc.Resource
 import libioc.Host
 import libioc.Logger
+import libioc.Config.Host
 import libioc.Config.Jail.File.RCConf
 import libioc.Config.Jail.File.SysctlConf
 
