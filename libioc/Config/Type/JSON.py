@@ -27,6 +27,7 @@ import typing
 import json
 
 import libioc.Config
+import libioc.Config.Data
 import libioc.Config.Prototype
 import libioc.Config.Dataset
 import libioc.helpers
@@ -44,7 +45,7 @@ class ConfigJSON(libioc.Config.Prototype.Prototype):
         result = json.load(data)  # type: typing.Dict[str, typing.Any]
         return result
 
-    def map_output(self, data: dict) -> str:
+    def map_output(self, data: libioc.Config.Data.Data) -> str:
         """Output configuration data as JSON string."""
         return str(libioc.helpers.to_json(data.nested))
 

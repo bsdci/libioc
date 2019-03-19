@@ -26,6 +26,7 @@
 import typing
 
 import libioc.Config
+import libioc.Config.Data
 import libioc.Config.Prototype
 import libioc.Config.Dataset
 import libioc.errors
@@ -43,7 +44,7 @@ class ConfigUCL(libioc.Config.Prototype.Prototype):
         result["legacy"] = True
         return result
 
-    def map_output(self, data: dict) -> str:
+    def map_output(self, data: libioc.Config.Data.Data) -> str:
         """Output configuration in UCL format."""
         return str(libioc.helpers.to_ucl(data))
 
