@@ -172,7 +172,7 @@ class BaseConfig(dict):
         if current_id is not None:
             new_data["id"] = current_id
         for key, value in new_data.items():
-            self.data[key] = value
+            self.__setitem__(key, value)
 
     def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
