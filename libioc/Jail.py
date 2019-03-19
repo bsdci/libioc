@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage Jail module."""
 import typing
+import ctypes
 import os
 import random
 import shlex
@@ -2090,10 +2091,14 @@ class JailGenerator(JailResource):
         ))
 
         error = False
+
+        umount_flags = ctypes.c_ulonglong(0x80000)
+
         for mountpoint in (fstab_destinations + system_mountpoints):
             if os.path.ismount(mountpoint) is False:
                 continue
-            if libjail.dll.unmount(mountpoint.encode("utf-8")) == 0:
+            _mountpoint = mountpoint.encode("utf-8")
+            if libjail.dll.unmount(_mountpoint, umount_flags) == 0:
                 self.logger.verbose(f"{mountpoint} successfully unmounted")
             else:
                 error = True
