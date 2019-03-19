@@ -46,7 +46,7 @@ class ConfigJSON(libioc.Config.Prototype.Prototype):
 
     def map_output(self, data: dict) -> str:
         """Output configuration data as JSON string."""
-        return str(libioc.helpers.to_json(data))
+        return str(libioc.helpers.to_json(data.nested))
 
 
 class DatasetConfigJSON(
