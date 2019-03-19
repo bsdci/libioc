@@ -340,10 +340,7 @@ class Resource(metaclass=abc.ABCMeta):
 
     def get(self, key: str) -> typing.Any:
         """Get any resource attribute."""
-        try:
-            return self.__getattribute__(key)
-        except AttributeError:
-            raise
+        return self.__getattribute__(key)
 
     def getstring(self, key: str) -> str:
         """

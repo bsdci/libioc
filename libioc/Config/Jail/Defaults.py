@@ -76,10 +76,22 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
         """Return a user provided value or the hardcoded default."""
         try:
             return super().__getitem__(key)
+        except libioc.errors.IocException:
+            raise
         except KeyError:
             pass
 
-        return self.getitem_default(key)
+        try:
+            return self.getitem_default(key)
+        except libioc.errors.IocException:
+            raise
+        except KeyError:
+            pass
+
+        raise libioc.errors.UnknownConfigProperty(
+            key=key,
+            logger=self.logger
+        )
 
     def __contains__(self, key: typing.Any) -> bool:
         """Return true if the storage or hardcoded defaults contain the key."""
@@ -92,6 +104,7 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
         except KeyError:
             if self.special_properties.is_special_property(key):
                 return None
+            raise
 
     def __delitem__(self, key: str) -> None:
         """Remove a user provided default setting."""
