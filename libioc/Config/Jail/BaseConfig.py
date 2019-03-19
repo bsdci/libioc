@@ -218,7 +218,7 @@ class BaseConfig(dict):
             self.data["id"] = None
             return
 
-        disallowed_characters_pattern = "([^A-Za-z0-9\\._\\-]|\\^)"
+        disallowed_characters_pattern = "([^A-Za-z0-9_\\-]|\\^)"
         invalid_characters = re.findall(disallowed_characters_pattern, name)
         if len(invalid_characters) > 0:
             msg = (
