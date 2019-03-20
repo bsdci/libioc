@@ -187,7 +187,7 @@ def local_release(
 def new_jail(
     host: 'libioc.Host.Host',
     logger: 'libioc.Logger.Logger',
-    zfs: libzfs.ZFS,
+    zfs: libzfs.ZFS
 ) -> 'libioc.Jail.Jail':
     jail_name = "new-jail-" + str(random.randint(1, 32768))
     new_jail = libioc.Jail.Jail(
