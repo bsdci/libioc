@@ -747,6 +747,27 @@ class BaseConfig(dict):
 
         return (hash_before != hash_after) is True
 
+    def set_dict(
+        self,
+        data: typing.Dict[str, typing.Any],
+        skip_on_error: bool=False
+    ) -> typing.Tuple[str, ...]:
+        """
+        Set a dict of jail config properties.
+
+        Returns a list of updated properties.
+        """
+        updated_properties = set()
+        for key in sorted(data.keys(), key=self.__sort_config_keys):
+            if self.set(key, data[key], skip_on_error=skip_on_error) is True:
+                updated_properties.add(key)
+        return updated_properties
+
+    @staticmethod
+    def __sort_config_keys(key) -> int:
+        """Penalizes certain config keys, so that they are always set later."""
+        return 1 if key.endswith("_mac") else 0
+
     def __str__(self) -> str:
         """Return the JSON object with all user configured settings."""
         return str(libioc.helpers.to_json(self.data.nested))

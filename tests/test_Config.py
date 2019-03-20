@@ -91,6 +91,28 @@ class TestJailConfig(object):
 		with pytest.raises(libioc.errors.InvalidJailName):
 			new_jail.config.clone(invalid_data)
 
+	def test_can_only_set_vnet_mac_when_the_interface_exists(
+		self,
+		new_jail: 'libioc.Jail.Jail'
+	) -> None:
+		with pytest.raises(libioc.errors.UnknownConfigProperty):
+			new_jail.config["vnet0_mac"] = "63ECAC12D0F5"
+
+		new_jail.config["vnet"] = True
+		new_jail.config["interfaces"] = "vnet0:bridge0"
+		new_jail.config["vnet0_mac"] = "63ECAC12D0F6"
+		assert new_jail.config.data["vnet0_mac"] == "63ECAC12D0F6"
+
+	def test_order_of_mac_and_interfaces_does_not_matter(
+		self,
+		new_jail: 'libioc.Jail.Jail'
+	) -> None:
+		new_jail.config.set_dict(dict(
+			vnet0_mac="63ECAC12D0F7",
+			interfaces="vnet0:bridge0"
+		))
+		assert new_jail.config.data["vnet0_mac"] == "63ECAC12D0F7"
+
 
 class TestUserDefaultConfig(object):
 
