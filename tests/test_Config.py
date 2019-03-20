@@ -113,6 +113,38 @@ class TestJailConfig(object):
 		))
 		assert new_jail.config.data["vnet0_mac"] == "63ECAC12D0F7"
 
+	def test_jails_with_already_existing_unknown_macs_can_be_loaded(
+		self,
+		existing_jail: 'libioc.Jail.Jail',
+		host: 'libioc.Host.Host',
+	    logger: 'libioc.Logger.Logger',
+	    zfs: libzfs.ZFS
+	) -> None:
+		config_file = existing_jail.config_handler.file
+		with open(config_file, "w", encoding="UTF-8") as f:
+			json.dump(dict(
+				name=existing_jail.config["name"],
+				release=existing_jail.config["release"],
+				vnet="yes",
+				vnet0_mac="63ECAC12D0F8",
+				vnet1_mac="63ECAC12D0F9"
+			), f)
+
+		jail = libioc.Jail.Jail(
+			existing_jail.name,
+			host=host,
+			logger=logger,
+			zfs=zfs
+		)
+		assert jail.config["vnet0_mac"] == "63ECAC12D0F8"
+		assert jail.config["vnet1_mac"] == "63ECAC12D0F9"
+		assert "interfaces" not in jail.config.data
+		assert len(jail.config["interfaces"]) == 0
+
+		# can start, although config is not explicitly valid
+		jail.start()
+		assert jail.running
+
 
 class TestUserDefaultConfig(object):
 

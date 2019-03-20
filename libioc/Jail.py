@@ -1614,7 +1614,10 @@ class JailGenerator(JailResource):
                 continue
             else:
                 config_property_name = sysctl.iocage_name
-                if self.config._is_known_property(config_property_name):
+                if self.config._is_known_property(
+                    config_property_name,
+                    explicit=False
+                ) is True:
                     value = config[config_property_name]
                 else:
                     continue

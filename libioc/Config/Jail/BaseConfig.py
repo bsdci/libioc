@@ -171,8 +171,8 @@ class BaseConfig(dict):
         new_data = libioc.Config.Data.Data(data)
         if current_id is not None:
             new_data["id"] = current_id
-        for key, value in new_data.items():
-            self.__setitem__(key, value)
+
+        self.set_dict(new_data, explicit=False, skip_on_error=False)
 
     def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
@@ -601,7 +601,7 @@ class BaseConfig(dict):
         A KeyError is raised when no criteria applies.
         """
         if key not in self.data.keys():
-            self._require_known_config_property(key)
+            self._require_known_config_property(key, explicit=False)
 
         # special property
         if self.special_properties.is_special_property(key) is True:
@@ -620,7 +620,7 @@ class BaseConfig(dict):
     def unknown_config_parameters(self) -> typing.Iterator[str]:
         """Yield unknown config parameters already stored in the config."""
         for key in self.data.keys():
-            if self._is_known_property(key) is False:
+            if self._is_known_property(key, explicit=True) is False:
                 yield key
 
     def __delitem__(self, key: str) -> None:
@@ -631,10 +631,11 @@ class BaseConfig(dict):
         self,
         key: str,
         value: typing.Any,
-        skip_on_error: bool=False
+        skip_on_error: bool=False,
+        explicit: bool=True
     ) -> None:
         """Set a configuration value."""
-        if self._is_known_property(key) is False:
+        if self._is_known_property(key, explicit=explicit) is False:
             err = libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger,
@@ -702,7 +703,8 @@ class BaseConfig(dict):
         self,
         key: str,
         value: typing.Any,
-        skip_on_error: bool=False
+        skip_on_error: bool=False,
+        explicit: bool=False
     ) -> bool:
         """
         Set a JailConfig property.
@@ -733,7 +735,12 @@ class BaseConfig(dict):
                 raise
             hash_before = None
 
-        self.__setitem__(key, value, skip_on_error=skip_on_error)  # noqa: T484
+        self.__setitem__(  # noqa: T484
+            key,
+            value,
+            skip_on_error=skip_on_error,
+            explicit=explicit
+        )
 
         exists_after = (key in self.keys()) is True
 
@@ -750,21 +757,23 @@ class BaseConfig(dict):
     def set_dict(
         self,
         data: typing.Dict[str, typing.Any],
-        skip_on_error: bool=False
-    ) -> typing.Tuple[str, ...]:
+        skip_on_error: bool=False,
+        explicit: bool=True
+    ) -> typing.Set[str]:
         """
         Set a dict of jail config properties.
 
         Returns a list of updated properties.
         """
+        setter_args = dict(skip_on_error=skip_on_error, explicit=explicit)
         updated_properties = set()
         for key in sorted(data.keys(), key=self.__sort_config_keys):
-            if self.set(key, data[key], skip_on_error=skip_on_error) is True:
+            if self.set(key, data[key], **setter_args) is True:
                 updated_properties.add(key)
         return updated_properties
 
     @staticmethod
-    def __sort_config_keys(key) -> int:
+    def __sort_config_keys(key: str) -> int:
         """Penalizes certain config keys, so that they are always set later."""
         return 1 if key.endswith("_mac") else 0
 
@@ -823,7 +832,7 @@ class BaseConfig(dict):
         special_properties = libioc.Config.Jail.Properties.properties
         return list(properties.union(special_properties))
 
-    def _key_is_mac_config(self, key: str, explicit: bool=True) -> bool:
+    def _key_is_mac_config(self, key: str, explicit: bool) -> bool:
         fragments = key.rsplit("_", maxsplit=1)
         if len(fragments) < 2:
             return False
@@ -837,7 +846,7 @@ class BaseConfig(dict):
     def _is_user_property(self, key: str) -> bool:
         return (key == "user") or (key.startswith("user.") is True)
 
-    def _is_known_property(self, key: str) -> bool:
+    def _is_known_property(self, key: str, explicit: bool) -> bool:
         """Return True when the key is a known config property."""
         if self._is_known_jail_param(key):
             return True
@@ -847,7 +856,7 @@ class BaseConfig(dict):
             return True  # key is setter
         if key in libioc.Config.Jail.Properties.properties:
             return True  # key is special property
-        if self._key_is_mac_config(key) is True:
+        if self._key_is_mac_config(key, explicit=explicit) is True:
             return True  # nic mac config property
         if self._is_user_property(key) is True:
             return True  # user.* property
@@ -865,8 +874,12 @@ class BaseConfig(dict):
         parsed_input = libioc.helpers.parse_user_input(value)
         return str(libioc.helpers.to_string(parsed_input))
 
-    def _require_known_config_property(self, key: str) -> None:
-        if self._is_known_property(key) is False:
+    def _require_known_config_property(
+        self,
+        key: str,
+        explicit: bool=True
+    ) -> None:
+        if self._is_known_property(key, explicit=explicit) is False:
             raise libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger
