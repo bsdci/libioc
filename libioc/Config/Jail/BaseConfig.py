@@ -727,7 +727,7 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
-            hash_before = str(self.__getitem__(key)).__hash__()
+            hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()
         except Exception:
             if existed_before is True:
                 raise
