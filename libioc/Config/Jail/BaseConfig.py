@@ -823,7 +823,7 @@ class BaseConfig(dict):
         special_properties = libioc.Config.Jail.Properties.properties
         return list(properties.union(special_properties))
 
-    def _key_is_mac_config(self, key: str, explicit: bool=False) -> bool:
+    def _key_is_mac_config(self, key: str, explicit: bool=True) -> bool:
         fragments = key.rsplit("_", maxsplit=1)
         if len(fragments) < 2:
             return False
