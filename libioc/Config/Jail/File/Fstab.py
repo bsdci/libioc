@@ -34,6 +34,7 @@ import libioc.helpers_object
 import libioc.Types
 import libioc.Config.Jail
 import libioc.Config.Jail.File
+import libioc.Storage.Basejail
 
 
 class FstabFsSpec(libioc.Types.AbsolutePath):
@@ -558,24 +559,6 @@ class JailFstab(Fstab):
             file=file
         )
 
-    @property
-    def maintenance_lines(self) -> typing.List[FstabMaintenanceLine]:
-        """Auto-generate lines that are required for jail start and stop."""
-        if self.jail is None:
-            return []
-
-        return [FstabMaintenanceLine(dict(
-            source=libioc.Types.AbsolutePath(self.jail.launch_script_dir),
-            destination=libioc.Types.AbsolutePath(
-                f"{self.jail.root_dataset.mountpoint}/.iocage"
-            ),
-            options="ro",
-            type="nullfs",
-            freq=0,
-            passno=0,
-            comment=self.AUTO_COMMENT_IDENTIFIER
-        ))]
-
     def parse_lines(
         self,
         input_text: str,
@@ -596,58 +579,18 @@ class JailFstab(Fstab):
             exclude_destinations:
                 List of destination strings that is skipped
         """
-        # skip lines with destinations overlapping self.basejail_lines
-        skip_destinations += list(map(
-            lambda x: str(x['destination']),
-            self.basejail_lines
-        ))
+        BasejailStorage = libioc.Storage.Basejail.BasejailStorage
+        if isinstance(self.jail.storage_backend, BasejailStorage) is True:
+            skip_destinations += list(map(
+                lambda x: str(x[1]),
+                self.jail.storage_backend.basejail_mounts
+            ))
         Fstab.parse_lines(
             self,
             input_text=input_text,
             ignore_auto_created=ignore_auto_created,
             skip_destinations=skip_destinations
         )
-
-    @property
-    def basejail_lines(self) -> typing.List[FstabBasejailLine]:
-        """
-        Auto-generate lines of NullFS basejails.
-
-        When a jail is a NullFS basejail, this list represent the corresponding
-        fstab lines that mount the release.
-        """
-        try:
-            self.jail.release
-        except AttributeError:
-            return []
-
-        if self.jail.config["basejail_type"] != "nullfs":
-            return []
-
-        basedirs = libioc.helpers.get_basedir_list(
-            distribution_name=self.host.distribution.name
-        )
-
-        fstab_basejail_lines = []
-        release_root_path = "/".join([
-            self.jail.release.root_dataset.mountpoint,
-            f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
-        ])
-        for basedir in basedirs:
-
-            source = f"{release_root_path}/{basedir}"
-            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
-            fstab_basejail_lines.append(FstabBasejailLine({
-                "source": source,
-                "destination": destination,
-                "type": "nullfs",
-                "options": "ro",
-                "freq": 0,
-                "passno": 0,
-                "comment": self.AUTO_COMMENT_IDENTIFIER
-            }))
-
-        return fstab_basejail_lines
 
     def __iter__(self) -> typing.Iterator[typing.Union[
         FstabAutoPlaceholderLine,
@@ -661,7 +604,6 @@ class JailFstab(Fstab):
         The output includes user configured and auto created lines for NullFS
         basejails. The previous position of auto-created entries is preserved.
         """
-        basejail_lines_added = False
         output: typing.List[
             typing.Union[
                 FstabAutoPlaceholderLine,
@@ -672,18 +614,8 @@ class JailFstab(Fstab):
         ] = []
 
         for line in self._lines:
-            if isinstance(line, FstabAutoPlaceholderLine):
-                if basejail_lines_added is False:
-                    output += self.basejail_lines
-                    output += self.maintenance_lines
-                    basejail_lines_added = True
-            else:
+            if isinstance(line, FstabAutoPlaceholderLine) is False:
                 output.append(line)
-
-        if basejail_lines_added is False:
-            _basejail = self.basejail_lines
-            _maintenance = self.maintenance_lines
-            output = _basejail + _maintenance + self._lines  # noqa: T484
 
         return iter(output)
 
@@ -834,6 +766,56 @@ class JailFstab(Fstab):
                 force=True,
                 logger=self.logger
             )
+
+    def mount(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.MountFstab', None, None]:
+        """Mount all fstab entries to the jail."""
+        event = libioc.events.MountFstab(
+            jail=self.jail,
+            scope=event_scope
+        )
+        yield event.begin()
+        try:
+            list(self.unmount())
+            for line in [x for x in self if isinstance(x, FstabLine)]:
+                libioc.helpers.mount(
+                    destination=line["destination"],
+                    source=line["source"],
+                    fstype=line["type"],
+                    opts=[x.strip() for x in line["options"].split(",")]
+                )
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+        yield event.end()
+
+    def unmount(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.MountFstab', None, None]:
+        """Unmount all fstab entries from the jail."""
+        event = libioc.events.MountFstab(
+            jail=self.jail,
+            scope=event_scope
+        )
+        yield event.begin()
+        has_unmounted_any = False
+        try:
+            for line in [x for x in self if isinstance(x, FstabLine)]:
+                if os.path.ismount(line["destination"]) is False:
+                    continue
+                libioc.helpers.umount(line["destination"], force=True)
+                has_unmounted_any = True
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+
+        if has_unmounted_any is False:
+            yield event.skip()
+        else:
+            yield event.end()
 
 
 def _is_comment_line(text: str) -> bool:

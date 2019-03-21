@@ -1,5 +1,4 @@
 # Copyright (c) 2017-2019, Stefan Grönke
-# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -23,29 +22,54 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage ZFS basejail storage backend."""
-import libioc.Storage
+import typing
+
+import libioc.Storage.Basejail
 import libioc.helpers
 
 
-class ZFSBasejailStorage(libioc.Storage.Storage):
+class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
     """iocage ZFS basejail storage backend."""
 
-    def apply(self, release=None):
+    def apply(
+        self,
+        release: 'libioc.Release.ReleaseGenerator'=None,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Attach the jail storage."""
         if release is None:
             release = self.jail.cloned_release
 
-        return ZFSBasejailStorage.clone(self, release)
+        event = libioc.events.BaseJailStorageConfig(
+            jail=self.jail,
+        )
+        yield event.begin()
 
-    def setup(self, release):
+        try:
+            ZFSBasejailStorage.clone(self, release)
+        except Exception as e:
+            yield event.fail(e)
+            raise
+
+        yield event.end()
+
+    def setup(
+        self,
+        release: 'libioc.Release.ReleaseGenerator'=None
+    ) -> None:
         """Configure the jail storage."""
-        libioc.StandaloneJailStorage.StandaloneJailStorage.setup(
+        libioc.Storage.Standalone.StandaloneJailStorage.setup(
             self,
             release
         )
 
-    def clone(self, release):
+    def clone(
+        self,
+        release: 'libioc.Release.ReleaseGenerator'
+    ) -> None:
         """Clone ZFS basejail datasets from a release."""
+        if isinstance(release, libioc.Release.ReleaseGenerator) is False:
+            raise ValueError("ReleaseGenerator required")
         current_basejail_type = self.jail.config["basejail_type"]
         if not current_basejail_type == "zfs":
             raise libioc.errors.InvalidJailConfigValue(
@@ -71,6 +95,6 @@ class ZFSBasejailStorage(libioc.Storage.Storage):
                 delete_existing=True
             )
 
-    def _create_mountpoints(self):
+    def _create_mountpoints(self) -> None:
         for basedir in ["dev", "etc"]:
             self.create_jail_mountpoint(basedir)

@@ -727,7 +727,7 @@ class ReleaseGenerator(ReleaseResource):
             yield releasePrepareStorageEvent.end()
             yield releaseDownloadEvent.begin()
             try:
-                yield from self._fetch_assets()
+                yield from self._fetch_assets(releaseDownloadEvent.scope)
             except Exception:
                 yield releaseDownloadEvent.fail()
                 raise
@@ -891,12 +891,14 @@ class ReleaseGenerator(ReleaseResource):
         self.logger.debug(f"Hashes downloaded to {path}")
 
     def _fetch_assets(
-        self
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None,
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         for asset in self.assets:
 
             releaseAssetDownloadEvent = libioc.events.ReleaseAssetDownload(
-                release=self
+                release=self,
+                scope=event_scope
             )
             yield releaseAssetDownloadEvent.begin()
             url = f"{self.remote_url}/{asset}.txz"

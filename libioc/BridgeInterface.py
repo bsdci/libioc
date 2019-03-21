@@ -24,7 +24,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage host bridge interface module."""
 import typing
-import shlex
 
 
 class BridgeInterface:
@@ -39,8 +38,7 @@ class BridgeInterface:
     def __init__(
         self,
         name: str,
-        secure_vnet: typing.Optional[bool]=None,
-        insecure: bool=False
+        secure_vnet: typing.Optional[bool]=None
     ) -> None:
         """
         Initialize a (Secure VNET) bridge interface.
@@ -66,8 +64,7 @@ class BridgeInterface:
             self.secure_vnet = (secure_vnet or (secure_vnet is None)) is False
             _name = name
 
-        self.insecure = (insecure is True)
-        self.name = self._escape(_name)
+        self.name = _name
 
         # may override name set secure_vnet mode
         if secure_vnet is not None:
@@ -81,10 +78,6 @@ class BridgeInterface:
         used to mitigate ARP spoofing with IPFW.
         """
         if self.secure_vnet is True:
-            output = f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
+            return f"{self.SECURE_BRIDGE_PREFIX}{self.name}"
         else:
-            output = self.name
-        return self._escape(output)
-
-    def _escape(self, value: str) -> str:
-        return value if self.insecure else str(shlex.quote(value))
+            return self.name

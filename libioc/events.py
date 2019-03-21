@@ -299,30 +299,6 @@ class JailEvent(IocEvent):
         IocEvent.__init__(self, message=message, scope=scope)
 
 
-class JailLaunch(JailEvent):
-    """Launch a jail."""
-
-    stdout: typing.Optional[str]
-
-    def __init__(
-        self,
-        jail: 'libioc.Jail.JailGenerator',
-        message: typing.Optional[str]=None,
-        scope: typing.Optional[Scope]=None
-    ) -> None:
-        self.stdout = None
-        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
-
-    def end(
-        self,
-        message: typing.Optional[str]=None,
-        stdout: str=""
-    ) -> 'IocEvent':
-        """Successfully finish an event."""
-        self.stdout = stdout
-        return IocEvent.end(self, message)
-
-
 class JailRename(JailEvent):
     """Change the name of a jail."""
 
@@ -355,7 +331,7 @@ class JailRemove(JailEvent):
     pass
 
 
-class TeardownJailMounts(JailStop):
+class TeardownSystemMounts(JailStop):
     """Teardown a jails mountpoints."""
 
     pass
@@ -373,8 +349,140 @@ class JailResourceLimitAction(JailEvent):
     pass
 
 
+class VnetEvent(JailEvent):
+    """A group of events around VNET operations."""
+
+    pass
+
+
+class VnetSetup(VnetEvent):
+    """Start VNET networks."""
+
+    pass
+
+
+class VnetTeardown(VnetEvent):
+    """Teardown VNET networks."""
+
+    pass
+
+
+class VnetInterfaceConfig(VnetSetup):
+    """Configure VNET network interfaces and firewall."""
+
+    pass
+
+
+class JailAttach(JailEvent):
+    """Remove the jail(2)."""
+
+    pass
+
+
+class DevFSEvent(JailEvent):
+    """Group of events that occor on DevFS operations."""
+
+    pass
+
+
+class MountDevFS(DevFSEvent):
+    """Mount /dev into a jail."""
+
+    pass
+
+
+class UnmountDevFS(DevFSEvent):
+    """Unmount /dev from a jail."""
+
+    pass
+
+
+class FstabEvent(JailEvent):
+    """Group of events that occor on Fstab operations."""
+
+    pass
+
+
+class MountFstab(FstabEvent):
+    """Mount entries from a jails fstab file."""
+
+    pass
+
+
+class UnmountFstab(FstabEvent):
+    """Unmount entries from a jails fstab file."""
+
+    pass
+
+
 class JailHook(JailEvent):
     """Run jail hook."""
+
+    stdout: typing.Optional[str]
+
+    def __init__(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        message: typing.Optional[str]=None,
+        scope: typing.Optional[Scope]=None
+    ) -> None:
+
+        self.stdout = None
+        super().__init__(
+            jail=jail,
+            message=message,
+            scope=scope
+        )
+
+    def end(
+        self,
+        message: typing.Optional[str]=None,
+        stdout: str=""
+    ) -> 'IocEvent':
+        """Successfully finish an event."""
+        self.stdout = stdout
+        return super().end(message)
+
+    def fail(
+        self,
+        exception: bool=True,
+        message: typing.Optional[str]=None,
+        stdout: str=""
+    ) -> 'IocEvent':
+        """Successfully finish an event."""
+        self.stdout = stdout
+        return super().fail(
+            exception=exception,
+            message=message
+        )
+
+
+class JailHookPrestart(JailHook):
+    """Run jail prestart hook."""
+
+    pass
+
+
+class JailHookStart(JailHook):
+    """Run jail start hook."""
+
+    pass
+
+
+class JailCommand(JailHook):
+    """Run command in a jail."""
+
+    pass
+
+
+class JailHookCreated(JailHook):
+    """Run jail created hook."""
+
+    pass
+
+
+class JailHookPoststart(JailHook):
+    """Run jail poststart hook."""
 
     pass
 
@@ -386,13 +494,13 @@ class JailHookPrestop(JailHook):
 
 
 class JailHookStop(JailHook):
-    """Run jail prestop hook."""
+    """Run jail stop hook."""
 
     pass
 
 
 class JailHookPoststop(JailHook):
-    """Run jail prestop hook."""
+    """Run jail poststop hook."""
 
     pass
 
@@ -421,6 +529,32 @@ class JailResolverConfig(JailEvent):
     ) -> None:
 
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
+
+
+class JailZFSShare(JailEvent):
+    """Group of events that mounts or unmounts shared ZFS datasets."""
+
+    pass
+
+
+class BasejailStorageConfig(JailEvent):
+    """Mount or unmount basejail storage of a jail."""
+
+    pass
+
+
+class AttachZFSDataset(JailZFSShare):
+    """Mount an individual dataset when starting a jail with shared ZFS."""
+
+    def __init__(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        dataset: libzfs.ZFSDataset,
+        scope: typing.Optional[Scope]=None
+    ) -> None:
+
+        msg = f"Dataset {dataset.name} was attached to Jail {jail.full_name}"
+        JailEvent.__init__(self, jail=jail, message=msg, scope=scope)
 
 
 class JailClone(JailEvent):
@@ -844,12 +978,6 @@ class JailRestart(JailEvent):
     pass
 
 
-class JailShutdown(JailEvent):
-    """Shutdown a jail."""
-
-    pass
-
-
 class JailSoftShutdown(JailEvent):
     """Soft-restart a jail."""
 
@@ -907,30 +1035,6 @@ class JailProvisioningAssetDownload(JailEvent):
     """Provision a jail."""
 
     pass
-
-
-class JailCommandExecution(JailEvent):
-    """Run command in a jail."""
-
-    stdout: typing.Optional[str]
-
-    def __init__(
-        self,
-        jail: 'libioc.Jail.JailGenerator',
-        message: typing.Optional[str]=None,
-        scope: typing.Optional[Scope]=None
-    ) -> None:
-        self.stdout = None
-        JailEvent.__init__(self, jail=jail, message=message, scope=scope)
-
-    def end(
-        self,
-        message: typing.Optional[str]=None,
-        stdout: str=""
-    ) -> 'IocEvent':
-        """Successfully finish an event."""
-        self.stdout = stdout
-        return IocEvent.end(self, message)
 
 
 # PKG

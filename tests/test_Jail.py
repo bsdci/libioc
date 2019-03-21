@@ -87,8 +87,7 @@ class TestJail(object):
             shell=True
         ).decode("utf-8")
 
-        assert "launch-scripts in stdout"
-        assert stdout.strip().count("\n") == 1
+        assert stdout.strip().count("\n") == 0
 
     def test_can_be_stopped(
         self,
@@ -172,7 +171,7 @@ class TestNullFSBasejail(object):
             shell=True
         ).decode("utf-8")
         assert "launch-scripts in stdout"
-        assert stdout.strip().count("\n") == 1 + len(basedirs)
+        assert stdout.strip().count("\n") == len(basedirs)
         for basedir in basedirs:
             assert f"{root_path}/{basedir}" in stdout
 

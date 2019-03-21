@@ -58,7 +58,6 @@ class NetworkInterface:
     rename: bool
     create: bool
     destroy: bool
-    insecure: bool
 
     def __init__(
         self,
@@ -80,14 +79,10 @@ class NetworkInterface:
         destroy: bool=False,
         auto_apply: typing.Optional[bool]=True,
         logger: typing.Optional['libioc.Logger.Logger']=None,
-        insecure: bool=False
     ) -> None:
 
         self.jail = jail
         self.logger = libioc.helpers_object.init_logger(self, logger)
-
-        # disable shlex quoting on purpose (use with caution)
-        self.insecure = (insecure is True)
 
         self.name = name
         self.create = create
@@ -112,15 +107,15 @@ class NetworkInterface:
             self.settings["description"] = str(shlex.quote(description))
 
         if vnet is not None:
-            self.settings["vnet"] = str(self._escape(vnet))
+            self.settings["vnet"] = str(vnet)
 
         if addm is not None:
-            _addm_list = self._escape_list(addm)
+            _addm_list = addm
             if _addm_list is not None:
                 self.settings["addm"] = _addm_list
 
         if group is not None:
-            self.settings["group"] = str(self._escape(group))
+            self.settings["group"] = str(group)
 
         # rename interface when applying settings next time
         if isinstance(rename, str):
@@ -189,7 +184,7 @@ class NetworkInterface:
         for nic_name_to_destroy in nic_names:
             libioc.helper.exec([
                 self.ifconfig_command,
-                self._escape(nic_name_to_destroy),
+                nic_name_to_destroy,
                 "destroy"
             ])
 
@@ -203,7 +198,7 @@ class NetworkInterface:
     @property
     def current_nic_name(self) -> str:
         """Return the current NIC reference for usage in shell scripts."""
-        return str(self._escape(self.name))
+        return str(self.name)
 
     def __apply_addresses(
         self,
@@ -249,95 +244,3 @@ class NetworkInterface:
     def _handle_exec_stdout(self, stdout: str) -> None:
         if (self.create or self.rename) is True:
             self.name = stdout.strip()
-
-    def _escape(self, value: typing.Optional[str]) -> typing.Optional[str]:
-        if value is None:
-            return None
-        elif self.insecure is True:
-            return value
-        else:
-            return str(shlex.quote(value))
-
-    def _escape_list(
-        self,
-        value: typing.Optional[typing.Union[str, typing.List[str]]]
-    ) -> typing.Optional[typing.List[str]]:
-        if value is None:
-            return None
-        value_list = [value] if (isinstance(value, str) is True) else value
-        return [str(self._escape(str(x))) for x in value_list]
-
-
-class QueuingNetworkInterface(
-    NetworkInterface,
-    libioc.CommandQueue.CommandQueue
-):
-    """Delay command execution for bulk execution."""
-
-    shell_variable_nic_name: typing.Optional[str]
-
-    def __init__(  # noqa: T484
-        self,
-        name: typing.Optional[str]="vnet0",
-        shell_variable_nic_name: typing.Optional[str]=None,
-        **network_interface_options
-    ) -> None:
-
-        self.shell_variable_nic_name = shell_variable_nic_name
-
-        self.clear_command_queue()
-        NetworkInterface.__init__(self, name=name, **network_interface_options)
-
-        if (self.create or self.rename) is False:
-            self._set_shell_variable_nic_name()
-
-    def _set_shell_variable_nic_name(
-        self,
-        name: typing.Optional[str]=None
-    ) -> None:
-        """Append an environment variable for the current NIC to the queue."""
-        name = self.name if name is None else name
-        if (name is None) or (self.shell_variable_nic_name is None):
-            return
-        _name = str(self._escape(name))
-        setter_command = f"export {self.shell_variable_nic_name}={_name}"
-        self.append_command_queue(setter_command)
-
-    @property
-    def current_nic_name(self) -> str:
-        """Return the current NIC reference for usage in shell scripts."""
-        _has_no_variable_name = (self.shell_variable_nic_name is None)
-        if (_has_no_variable_name or self.create) and (self.name is not None):
-            return str(self._escape(self.name))
-        return f"${self.shell_variable_nic_name}"
-
-    def _exec(self, command: typing.List[str]) -> str:
-
-        _command = " ".join(command)
-        _has_variable_name = (self.shell_variable_nic_name is not None)
-
-        if self.rename is True:
-            new_name = self.settings["name"]
-            if isinstance(new_name, str) is True:
-                self.name = str(self._escape(str(new_name)))
-            else:
-                raise ValueError("Cannot rename multiple interfaces")
-
-        if (_has_variable_name and (self.create or self.rename)) is True:
-            self.append_command_queue(
-                # export the ifconfig output
-                f"export {self.shell_variable_nic_name}=\"$({_command})\""
-            )
-        else:
-            self.append_command_queue(f"{_command} > /dev/null")
-
-        return ""
-
-    def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
-        for nic_name_to_destroy in nic_names:
-            self.append_command_queue(" ".join([
-                self.ifconfig_command,
-                str(self._escape(nic_name_to_destroy)),
-                "destroy"
-                " 2>/dev/null || :"
-            ]))

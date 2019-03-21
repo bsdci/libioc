@@ -114,7 +114,7 @@ class JailParams(collections.abc.MutableMapping):
     """Collection of jail parameters."""
 
     __base_class = JailParam
-    __sysctl_params: typing.Dict[str, freebsd_sysctl.Sysctl]
+    __sysctl_params: typing.Dict[str, JailParam]
 
     def __iter__(self) -> typing.Iterator[str]:
         """Iterate over the jail param names."""
@@ -124,7 +124,7 @@ class JailParams(collections.abc.MutableMapping):
         """Return the number of available jail params."""
         return self.memoized_params.__len__()
 
-    def items(self) -> typing.ItemsView[str, freebsd_sysctl.Sysctl]:
+    def items(self) -> typing.ItemsView[str, JailParam]:
         """Iterate over the keys and values."""
         return self.memoized_params.items()
 
@@ -145,7 +145,7 @@ class JailParams(collections.abc.MutableMapping):
         self.memoized_params.__delitem__(key)
 
     @property
-    def memoized_params(self) -> typing.Dict[str, freebsd_sysctl.Sysctl]:
+    def memoized_params(self) -> typing.Dict[str, JailParam]:
         """Return the memorized params initialized on first access."""
         try:
             return self.__sysctl_params

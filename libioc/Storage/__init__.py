@@ -101,6 +101,60 @@ class Storage:
         for event in self._rename_snapshot(new_name, event_scope=event_scope):
             yield event
 
+    def teardown(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.TeardownSystemMounts', None, None]:
+        """Unmount system mountpoints and devices from a jail."""
+
+        system_mountpoints = list(filter(
+            os.path.isdir,
+            map(
+                self.__get_absolute_path_from_jail_asset,
+                [
+                    "/dev/fd",
+                    "/dev",
+                    "/proc",
+                    "/root/compat/linux/proc",
+                    "/root/etcupdate",
+                    "/root/usr/ports",
+                    "/root/usr/src",
+                    "/tmp"  # nosec: B108
+                ]
+            )
+        ))
+
+        event = libioc.events.TeardownSystemMounts(
+            jail=self.jail,
+            scope=event_scope
+        )
+        yield event.begin()
+
+        has_unmounted_any = False
+        try:
+            for mountpoint in system_mountpoints:
+                if os.path.ismount(mountpoint) is False:
+                    continue
+                libioc.helpers.umount(
+                    mountpoint=mountpoint,
+                    force=True
+                )
+                has_unmounted_any = True
+        except Exception:
+            yield event.fail("Failed to unmount system mountpoints")
+            raise
+
+        if has_unmounted_any is False:
+            yield event.skip()
+        else:
+            yield event.end()
+
+    def __get_absolute_path_from_jail_asset(
+        self,
+        value: str
+    ) -> libioc.Types.AbsolutePath:
+        return libioc.Types.AbsolutePath(f"{self.jail.root_path}{value}")
+
     def _rename_dataset(
         self,
         new_name: str,

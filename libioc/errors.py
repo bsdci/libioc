@@ -779,10 +779,26 @@ class MountFailed(IocException):
     def __init__(
         self,
         mountpoint: libioc.Types.AbsolutePath,
+        reason: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
         msg = f"Failed to mount {mountpoint}"
+        if reason is not None:
+            msg += f": {reason}"
+        super().__init__(message=msg, logger=logger)
+
+
+class InvalidMountpoint(IocException):
+    """Raised when a mountpoint was invalid or not found."""
+
+    def __init__(
+        self,
+        mountpoint: libioc.Types.AbsolutePath,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+
+        msg = f"Invalid mountpoint {mountpoint}"
         super().__init__(message=msg, logger=logger)
 
 

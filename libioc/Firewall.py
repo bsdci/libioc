@@ -24,7 +24,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage firewall module."""
 import typing
-import shlex
 
 import freebsd_sysctl
 
@@ -136,42 +135,3 @@ class Firewall:
             raise libioc.errors.FirewallCommandFailure(
                 logger=self.logger
             )
-
-
-class QueuingFirewall(Firewall, libioc.CommandQueue.CommandQueue):
-    """Command queuing Firewall for bulk execution."""
-
-    def __init__(  # noqa: T484
-        self,
-        insecure: bool=False,
-        **firewall_arguments
-    ) -> None:
-        self.clear_command_queue()
-
-        # disable shlex.quote on rule numbers (e.g. $IOC_JID)
-        self.insecure = insecure
-
-        Firewall.__init__(self, **firewall_arguments)
-
-    def _offset_rule_number(
-        self,
-        rule_number: typing.Union[int, str],
-        insecure: bool=False
-    ) -> str:
-        if isinstance(rule_number, int):
-            return str(rule_number + self.IPFW_RULE_OFFSET)
-        _rule_number = rule_number if insecure else self._escape(rule_number)
-        return f"$(expr {_rule_number} + {self.IPFW_RULE_OFFSET})"
-
-    def _exec(
-        self,
-        command: typing.List[str],
-        ignore_error: bool=False
-    ) -> None:
-        command_line = " ".join(command)
-        if ignore_error is True:
-            command_line += " || true"
-        self.append_command_queue(command_line)
-
-    def _escape(self, value: str) -> str:
-        return str(shlex.quote(value))

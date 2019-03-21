@@ -46,10 +46,26 @@ class ZFSShareStorage:
         self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.jail = jail
 
-    def mount_zfs_shares(self, auto_create: bool=False) -> None:
+    def mount_zfs_shares(
+        self,
+        auto_create: bool=False,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.JailZFSShare', None, None]:
         """Invoke mounting the ZFS shares."""
-        self.logger.verbose("Mounting ZFS shares")
-        self._mount_jail_datasets(auto_create=auto_create)
+        event = libioc.events.JailZFSShare(
+            jail=self.jail,
+            scope=event_scope
+        )
+        yield event.begin()
+        try:
+            self._require_datasets_exist_and_jailed()
+        except libioc.errors.DatasetNotJailed:
+            yield event.fail("ZFS dataset not jailed")
+            raise
+
+        yield from self._mount_jail_datasets(auto_create=auto_create)
+
+        yield event.end()
 
     def get_zfs_datasets(
         self,
@@ -87,13 +103,19 @@ class ZFSShareStorage:
 
     def _mount_jail_datasets(
         self,
-        auto_create: bool=False
-    ) -> None:
-
-        if self.jail.storage.safe_mode:
-            self._require_datasets_exist_and_jailed()
+        auto_create: bool=False,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.AttachZFSDataset', None, None]:
 
         for dataset in self.get_zfs_datasets():
+
+            event = libioc.events.AttachZFSDataset(
+                jail=self.jail,
+                dataset=dataset,
+                scope=event_scope
+            )
+            yield event.begin()
+
             self.logger.verbose(f"Mounting ZFS Dataset {dataset.name}")
             self._umount_dataset(dataset)
 
@@ -102,6 +124,8 @@ class ZFSShareStorage:
                 self._zfs_jail_command + [shlex.quote(dataset.name)],
                 logger=self.logger
             )
+
+            yield event.end()
 
         self._exec_jail(["/sbin/zfs", "mount", "-a"])
 
@@ -142,7 +166,7 @@ class ZFSShareStorage:
 
         existing_datasets = self.get_zfs_datasets(auto_create=False)
         for existing_dataset in existing_datasets:
-            if existing_dataset.properties["jailed"] != "on":
+            if existing_dataset.properties["jailed"].value != "on":
                 raise libioc.errors.DatasetNotJailed(
                     dataset=existing_dataset,
                     logger=self.logger
@@ -164,41 +188,3 @@ class ZFSShareStorage:
         command: typing.List[str]
     ) -> 'libioc.helpers.CommandOutput':
         self.jail.exec(command)
-
-
-class QueuingZFSShareStorage(
-    ZFSShareStorage,
-    libioc.CommandQueue.CommandQueue
-):
-    """Delay ZFSShareStorage commands for bulk execution."""
-
-    def __init__(
-        self,
-        jail: 'libioc.Jail.JailGenerator',
-        logger: typing.Optional['libioc.Logger.Logger']=None,
-        zfs: typing.Optional['libioc.ZFS.ZFS']=None
-    ) -> None:
-        self.clear_command_queue()
-        ZFSShareStorage.__init__(self, jail=jail, logger=logger, zfs=zfs)
-
-    def _exec(
-        self,
-        command: typing.List[str],
-        **exec_arguments: typing.Dict[str, typing.Any]
-    ) -> libioc.helpers.CommandOutput:
-        self.append_command_queue(" ".join(command))
-
-    def _exec_jail(
-        self,
-        command: typing.List[str],
-        **exec_arguments: typing.Dict[str, typing.Any]
-    ) -> libioc.helpers.CommandOutput:
-        self.append_command_queue(" ".join(command), queue_name="jail")
-
-    @property
-    def _zfs_jail_command(self) -> typing.List[str]:
-        return ["/sbin/zfs", "jail", "$IOC_JID"]
-
-    @property
-    def _zfs_unjail_command(self) -> typing.List[str]:
-        return ["/sbin/zfs", "unjail", "$IOC_JID"]

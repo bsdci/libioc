@@ -192,7 +192,9 @@ class Updater:
         os.makedirs(directory)
 
     def _clean_create_dir(self, directory: str) -> None:
-        if os.path.isdir(directory):
+        if os.path.ismount(directory) is True:
+            libioc.helpers.umount(directory, force=True, logger=self.logger)
+        if os.path.isdir(directory) is True:
             self.logger.verbose(f"Deleting existing directory {directory}")
             shutil.rmtree(directory)
         self._create_dir(directory)
@@ -425,10 +427,10 @@ class Updater:
                 start_dependant_jails=False,
                 event_scope=_scope
             ):
-                if isinstance(event, libioc.events.JailLaunch) is True:
-                    if event.done is True:
+                if isinstance(event, libioc.events.JailCommand) is True:
+                    if (event.done is True) and (event.error is None):
                         _skipped_text = "No updates are available to install."
-                        skipped = (_skipped_text in event.stdout)
+                        skipped = (_skipped_text in event.stdout) is True
                 yield event
             self.logger.debug(
                 f"Update of resource '{self.resource.name}' finished"

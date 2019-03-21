@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Collection of iocage helper functions."""
 import typing
+import ctypes
 import json
 import os
 import random
@@ -32,6 +33,8 @@ import subprocess  # nosec: B404
 import sys
 import pty
 import select
+
+import jail as libjail
 
 import libioc.errors
 import libioc.Logger
@@ -532,35 +535,27 @@ def exec_passthru(
     return None, None, child.returncode
 
 
-# ToDo: replace with (u)mount library
-def umount_command(
-    mountpoint: typing.Optional[typing.Union[
-        libioc.Types.AbsolutePath,
-        typing.List[libioc.Types.AbsolutePath],
-    ]]=None,
-    options: typing.Optional[typing.List[str]]=None,
-    force: bool=False,
-    ignore_error: bool=False,
-    logger: typing.Optional['libioc.Logger.Logger']=None
-) -> typing.List[str]:
-    """Return the command to unmount a mountpoint."""
-    cmd = ["/sbin/umount"]
-
-    if force is True:
-        cmd.append("-f")
-
-    if options is not None and len(options) != 0:
-        cmd + options
-
-    if isinstance(mountpoint, list):
-        cmd += mountpoint
-    elif isinstance(mountpoint, libioc.Types.AbsolutePath):
-        cmd.append(str(mountpoint))
-
-    if ignore_error is True:
-        cmd.append(">/dev/null 2>&1 || :")
-
-    return cmd
+def mount(
+    destination: str,
+    source: str=None,
+    fstype: str="nullfs",
+    opts: typing.List[str]=[]
+) -> None:
+    """Mount a filesystem using libc."""
+    data: typing.Dict[str, typing.Optional[str]] = dict(
+        fstype=fstype,
+        fspath=destination
+    )
+    if source is not None:
+        data["target"] = source
+    for opt in opts:
+        data[opt] = None
+    jiov = libjail.Jiov(data)
+    if libjail.dll.nmount(jiov.pointer, len(jiov), 0) != 0:
+        raise libioc.errors.MountFailed(
+            mountpoint=destination,
+            reason=jiov.errmsg.value
+        )
 
 
 def umount(
@@ -573,26 +568,54 @@ def umount(
     ignore_error: bool=False,
     logger: typing.Optional['libioc.Logger.Logger']=None
 ) -> None:
-    """Unmount a mountpoint."""
-    cmd = umount_command(
-        mountpoint=mountpoint,
-        options=options,
-        force=force
-    )
-    try:
-        libioc.helpers.exec(cmd, logger=logger)
+    """Unmount a mountpoint using libc."""
+    if isinstance(mountpoint, list) is True:
+        for entry in typing.cast(
+            typing.List[libioc.Types.AbsolutePath],
+            mountpoint
+        ):
+            try:
+                umount(
+                    mountpoint=entry,
+                    options=options,
+                    force=force,
+                    ignore_error=ignore_error,
+                    logger=logger
+                )
+            except (
+                libioc.errors.UnmountFailed,
+                libioc.errors.InvalidMountpoint
+            ):
+                if force is False:
+                    raise
+        return
+
+    mountpoint_path = libioc.Types.AbsolutePath(mountpoint)
+
+    if force is False:
+        umount_flags = ctypes.c_ulonglong(0)
+    else:
+        umount_flags = ctypes.c_ulonglong(0x80000)
+
+    if os.path.ismount(str(mountpoint_path)) is False:
+        raise libioc.errors.InvalidMountpoint(
+            mountpoint=mountpoint,
+            logger=logger
+        )
+
+    _mountpoint = str(mountpoint_path).encode("utf-8")
+    if libjail.dll.unmount(_mountpoint, umount_flags) == 0:
         if logger is not None:
             logger.debug(
                 f"Jail mountpoint {mountpoint} umounted"
             )
-    except libioc.errors.CommandFailure as e:
+    else:
         if logger is not None:
             logger.spam(
                 f"Jail mountpoint {mountpoint} not unmounted"
             )
         if ignore_error is False:
             raise libioc.errors.UnmountFailed(
-                reason=str(e),
                 mountpoint=mountpoint,
                 logger=logger
             )
