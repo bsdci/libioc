@@ -44,17 +44,22 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
         "ip6.addr"
     ]
 
+    resource_args: typing.Dict[str, typing.Any]
+
     def __init__(
         self,
         filters: typing.Optional[libioc.Filter.Terms]=None,
         host: typing.Optional['libioc.Host.HostGenerator']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None,
-        zfs: typing.Optional['libioc.ZFS.ZFS']=None
+        zfs: typing.Optional['libioc.ZFS.ZFS']=None,
+        **resource_args: typing.Any
     ) -> None:
 
         self.logger = libioc.helpers_object.init_logger(self, logger)
         self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.host = libioc.helpers_object.init_host(self, host)
+
+        self.resource_args = resource_args
 
         libioc.ListableResource.ListableResource.__init__(
             self,
@@ -81,7 +86,8 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
             ),
             logger=self.logger,
             host=self.host,
-            zfs=self.zfs
+            zfs=self.zfs,
+            **self.resource_args
         )
 
         return jail

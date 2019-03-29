@@ -46,7 +46,7 @@ class ListableResource(list):
         namespace: typing.Optional[str]=None,
         filters: typing.Optional['libioc.Filter.Terms']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None,
-        zfs: typing.Optional['libioc.ZFS.ZFS']=None,
+        zfs: typing.Optional['libioc.ZFS.ZFS']=None
     ) -> None:
 
         list.__init__(self, [])

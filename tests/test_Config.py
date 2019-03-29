@@ -267,13 +267,22 @@ class TestBrokenConfig(object):
         with open(existing_jail.config_json.file, "w", encoding="UTF-8") as f:
             json.dump(invalid_config_data, f)
 
-        with pytest.raises(libioc.errors.InvalidJailConfigAddress):
+        with pytest.raises(libioc.errors.InvalidJailConfigValue):
             jail = libioc.Jail.Jail(
                 existing_jail.name,
                 host=host,
                 logger=logger,
                 zfs=zfs
             )
+
+        # multiple jails
+        with pytest.raises(libioc.errors.InvalidJailConfigValue):
+            list(libioc.Jails.Jails(
+                existing_jail.name,
+                host=host,
+                logger=logger,
+                zfs=zfs
+            ))
 
     def test_can_optionally_ignore_invalid_config(
         self,
@@ -303,3 +312,15 @@ class TestBrokenConfig(object):
 
         stdout, stderr = capsys.readouterr()
         assert 'expected "<nic>|<address>"' in stdout
+
+        assert len(jail.config["ip4_addr"].keys()) == 0
+        assert "ip4_addr" not in jail.config.data.keys()
+
+        # multiple jails
+        list(libioc.Jails.Jails(
+            existing_jail.name,
+            skip_invalid_config=True,
+            host=host,
+            logger=logger,
+            zfs=zfs
+        ))
