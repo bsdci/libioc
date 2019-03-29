@@ -29,12 +29,43 @@ import libioc.Jail
 
 class Storage(object):
 
-	def test_nullfs_basejail_is_default(
-		self,
-		existing_jail: 'libioc.Jail.Jail'
-	) -> None:
-		NullFSBasejailStorage = libioc.Storage.NullFSBasejail.NullFSBasejail
-		assert existing_jail.storage_backend == NullFSBasejailStorage
-		assert existing_jail.config["basejail"] == True
-		assert existing_jail.config["basejail_type"] == "nullfs"
+    def test_nullfs_basejail_is_default(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        NullFSBasejailStorage = libioc.Storage.NullFSBasejail.NullFSBasejail
+        assert existing_jail.storage_backend == NullFSBasejailStorage
+        assert existing_jail.config["basejail"] == True
+        assert existing_jail.config["basejail_type"] == "nullfs"
 
+    def test_does_not_mount_devfs_by_default(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev" not in stdout
+
+    def test_devfs_can_be_enabled_and_is_mounted_and_unmounted(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        existing_jail.config["mount_devfs"] = True
+        existing_jail.save()
+
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev" in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev" not in stdout
