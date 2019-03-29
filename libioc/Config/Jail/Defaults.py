@@ -57,7 +57,11 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
             raise ValueError("expecting Config.Data structure")
         self.user_data = value
 
-    def clone(self, data: typing.Dict[str, typing.Any]) -> None:
+    def clone(
+        self,
+        data: typing.Dict[str, typing.Any],
+        skip_on_error: bool=False
+    ) -> None:
         """Clone data from another dict."""
         for key in data:
             self.user_data[key] = data[key]

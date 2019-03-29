@@ -160,6 +160,7 @@ class AddressesProp(dict):
         """Set the special property value."""
         self.clear()
         error_log_level = "warn" if (skip_on_error is True) else "error"
+        skip_on_error = (self.skip_on_error or skip_on_error) is True
 
         try:
             libioc.helpers.parse_none(data)

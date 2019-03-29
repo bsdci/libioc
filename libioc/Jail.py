@@ -289,7 +289,8 @@ class JailGenerator(JailResource):
         host: typing.Optional['libioc.Host.Host']=None,
         fstab: typing.Optional['libioc.Config.Jail.File.Fstab.Fstab']=None,
         root_datasets_name: typing.Optional[str]=None,
-        new: bool=False
+        new: bool=False,
+        skip_invalid_config: bool=False
     ) -> None:
         """
         Initialize a Jail.
@@ -354,7 +355,10 @@ class JailGenerator(JailResource):
         )
 
         if new is False:
-            self.config.read(data=self.read_config(), skip_on_error=True)
+            self.config.read(
+                data=self.read_config(),
+                skip_on_error=skip_invalid_config
+            )
             if self.config["id"] is None:
                 self.config["id"] = self.dataset_name.split("/").pop()
 

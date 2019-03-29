@@ -172,7 +172,11 @@ class BaseConfig(dict):
         if current_id is not None:
             new_data["id"] = current_id
 
-        self.set_dict(new_data, explicit=False, skip_on_error=False)
+        self.set_dict(
+            new_data,
+            explicit=False,
+            skip_on_error=skip_on_error
+        )
 
     def read(self, data: dict, skip_on_error: bool=False) -> None:
         """
@@ -662,12 +666,15 @@ class BaseConfig(dict):
             self.data[key] = self.__sanitize_value(key, parsed_value)
             error = None
         except ValueError as err:
-            error = libioc.errors.InvalidJailConfigValue(
-                reason=str(err),
-                property_name=key,
-                logger=self.logger,
-                level=("warn" if (skip_on_error is True) else "error")
-            )
+            if isinstance(err, libioc.errors.IocException) is True:
+                error = err
+            else:
+                error = libioc.errors.InvalidJailConfigValue(
+                    reason=str(err),
+                    property_name=key,
+                    logger=self.logger,
+                    level=("warn" if (skip_on_error is True) else "error")
+                )
 
         if (error is not None) and (skip_on_error is False):
             raise error

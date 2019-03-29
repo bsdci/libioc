@@ -327,7 +327,10 @@ class Resource(metaclass=abc.ABCMeta):
         """Write the configuration to disk."""
         self.config_handler.write(data)
 
-    def read_config(self) -> typing.Dict[str, typing.Any]:
+    def read_config(
+        self,
+        skip_invalid: bool=False
+    ) -> typing.Dict[str, typing.Any]:
         """Read the configuration from disk."""
         data = self.config_handler.read()  # type: typing.Dict[str, typing.Any]
         return data
@@ -416,7 +419,10 @@ class DefaultResource(Resource):
             logger=logger
         )
 
-    def read_config(self) -> typing.Dict[str, typing.Any]:
+    def read_config(
+        self,
+        skip_invalid: bool=False
+    ) -> typing.Dict[str, typing.Any]:
         """Read the default configuration."""
         o = Resource.read_config(self)
         self.config.clone(o)
