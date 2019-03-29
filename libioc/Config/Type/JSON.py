@@ -42,8 +42,14 @@ class ConfigJSON(libioc.Config.Prototype.Prototype):
         """Parse and normalize JSON data."""
         if data == "":
             return {}
-        result = json.load(data)  # type: typing.Dict[str, typing.Any]
-        return result
+        try:
+            result = json.load(data)  # type: typing.Dict[str, typing.Any]
+            return result
+        except json.decoder.JSONDecodeError as e:
+            raise libioc.errors.JailConfigError(
+                message=str(e),
+                logger=self.logger
+            )
 
     def map_output(self, data: libioc.Config.Data.Data) -> str:
         """Output configuration data as JSON string."""
