@@ -249,3 +249,57 @@ class TestBrokenConfig(object):
                 logger=logger,
                 zfs=zfs
             )
+
+    def test_fail_on_invalid_config_by_default(
+        self,
+        existing_jail: 'libioc.Jail.JailGenerator',
+        host: 'libioc.Host.Host',
+        logger: 'libioc.Logger.Logger',
+        zfs: libzfs.ZFS
+    ) -> None:
+
+        invalid_config_data = dict(
+            name=existing_jail.name,
+            release=existing_jail.release.name,
+            ip4_addr="192.168.2.1/24"  # forgot device
+        )
+
+        with open(existing_jail.config_json.file, "w", encoding="UTF-8") as f:
+            json.dump(invalid_config_data, f)
+
+        with pytest.raises(libioc.errors.InvalidJailConfigAddress):
+            jail = libioc.Jail.Jail(
+                existing_jail.name,
+                host=host,
+                logger=logger,
+                zfs=zfs
+            )
+
+    def test_can_optionally_ignore_invalid_config(
+        self,
+        existing_jail: 'libioc.Jail.JailGenerator',
+        host: 'libioc.Host.Host',
+        logger: 'libioc.Logger.Logger',
+        zfs: libzfs.ZFS,
+        capsys
+    ) -> None:
+
+        invalid_config_data = dict(
+            name=existing_jail.name,
+            release=existing_jail.release.name,
+            ip4_addr="192.168.2.1/24"  # forgot device
+        )
+
+        with open(existing_jail.config_json.file, "w", encoding="UTF-8") as f:
+            json.dump(invalid_config_data, f)
+
+        jail = libioc.Jail.Jail(
+            existing_jail.name,
+            skip_invalid_config=True,
+            host=host,
+            logger=logger,
+            zfs=zfs
+        )
+
+        stdout, stderr = capsys.readouterr()
+        assert 'expected "<nic>|<address>"' in stdout
