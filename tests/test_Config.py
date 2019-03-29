@@ -154,13 +154,8 @@ class TestUserDefaultConfig(object):
         root_dataset: libzfs.ZFSDataset
     ) -> typing.IO[str]:
         defaults_config_file = f"{root_dataset.mountpoint}/defaults.json"
-        f = open(defaults_config_file, "w", encoding="UTF-8")
-        yield f
-
-        with open(defaults_config_file, "r") as x:
-            print(x.read())
-
-        f.close()
+        with open(defaults_config_file, "w", encoding="UTF-8") as f:
+            yield f
         os.remove(defaults_config_file)
 
     @pytest.fixture(scope="function")
