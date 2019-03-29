@@ -177,16 +177,17 @@ class AddressesProp(dict):
 
             try:
                 nic, address = ip_address_string.split("|", maxsplit=1)
+                err = None
             except ValueError:
-                libioc.errors.InvalidJailConfigAddress(
+                err = libioc.errors.InvalidJailConfigAddress(
                     jail=self.config.jail,
                     value=ip_address_string,
                     property_name=self.property_name,
                     logger=self.logger,
                     level=error_log_level
                 )
-                if self.skip_on_error is False:
-                    exit(1)
+            if (err is not None) and (self.skip_on_error is False):
+                raise err
 
             self.add(nic, address, skip_on_error=skip_on_error)  # noqa: T484
 
@@ -246,17 +247,18 @@ class AddressesProp(dict):
             err = None
         except (ipaddress.AddressValueError, ipaddress.NetmaskValueError) as e:
             err = e
-        finally:
-            if err is not None:
-                _e = libioc.errors.InvalidIPAddress(
-                    reason=str(err),
-                    ipv6=(self.IP_VERSION == 6),
-                    logger=self.logger,
-                    level=error_log_level
-                )
-                if skip_on_error is False:
-                    raise _e
-                return
+
+        if err is not None:
+            _e = libioc.errors.InvalidIPAddress(
+                reason=str(err),
+                ipv6=(self.IP_VERSION == 6),
+                logger=self.logger,
+                level=error_log_level
+            )
+            if skip_on_error is False:
+                raise _e
+            return
+
         self._add_ip_addresses(
             nic=nic,
             addresses=_addresses,
