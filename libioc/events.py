@@ -373,6 +373,18 @@ class VnetInterfaceConfig(VnetSetup):
     pass
 
 
+class VnetSetupLocalhost(VnetSetup):
+    """Configure VNET network interfaces and firewall."""
+
+    pass
+
+
+class VnetSetRoutes(VnetSetup):
+    """Configure VNET network interfaces and firewall."""
+
+    pass
+
+
 class JailAttach(JailEvent):
     """Remove the jail(2)."""
 

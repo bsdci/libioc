@@ -1772,8 +1772,21 @@ class JailGenerator(JailResource):
 
         yield event.end()
 
-    def _configure_localhost_commands(self) -> typing.List[str]:
-        return ["/sbin/ifconfig lo0 localhost"]
+    def _configure_localhost_commands(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.VnetInterface', None, None]:
+        event = libioc.events.VnetSetupLocalhost(
+            jail=self,
+            scope=event_scope
+        )
+        yield event.begin()
+        try:
+            self.exec(["/sbin/ifconfig lo0 localhost"])
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+        yield event.end()
 
     def _apply_resource_limits(
         self,
@@ -1867,23 +1880,35 @@ class JailGenerator(JailResource):
             return 1
         return int(self._get_value("allow_mount_zfs"))
 
-    def _configure_routes_commands(self) -> typing.List[str]:
+    def _configure_routes_commands(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.VnetInterface', None, None]:
+        event = libioc.events.VnetSetRoutes(
+            jail=self,
+            scope=event_scope
+        )
+        yield event.begin()
+        try:
+            defaultrouter = self.config["defaultrouter"]
+            defaultrouter6 = self.config["defaultrouter6"]
 
-        defaultrouter = self.config["defaultrouter"]
-        defaultrouter6 = self.config["defaultrouter6"]
+            commands: typing.List[str] = []
 
-        commands: typing.List[str] = []
+            if defaultrouter is not None:
+                commands += list(defaultrouter.apply(jail=self))
 
-        if defaultrouter is not None:
-            commands += list(defaultrouter.apply(jail=self))
+            if defaultrouter6 is not None:
+                commands += list(defaultrouter6.apply(jail=self))
 
-        if defaultrouter6 is not None:
-            commands += list(defaultrouter6.apply(jail=self))
+            if len(commands) == 0:
+                self.logger.spam("no static routes configured")
 
-        if len(commands) == 0:
-            self.logger.spam("no static routes configured")
-
-        return commands
+            self.exec(["/bin/sh", "-c", "\n".join(commands)])
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+        yield event.end()
 
     def require_jail_is_template(self, log_errors: bool=True) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
