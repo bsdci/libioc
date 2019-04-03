@@ -1,5 +1,4 @@
 # Copyright (c) 2017-2019, Stefan Grönke
-# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,10 +43,10 @@ _PkgConfDataType = typing.Union[
 
 
 class Pkg:
-    """iocage pkg management utility."""
+    """ioc pkg management utility."""
 
     _dataset: libzfs.ZFSDataset
-    package_source_directory: str = "/.iocage-pkg"
+    package_source_directory: str = "/.ioc-pkg"
     __pkg_directory_mounted: bool
 
     def __init__(
@@ -222,13 +221,13 @@ class Pkg:
                     "/usr/sbin/pkg",
                     "update",
                     "--force",
-                    "--repository", "libiocage"
+                    "--repository", "libioc"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "install",
                     "--yes",
-                    "--repository", "libiocage",
+                    "--repository", "libioc",
                     " ".join(_packages)
                 ])
             ] + postinstall)
@@ -341,13 +340,13 @@ class Pkg:
         return _packages
 
     def _get_repo_name(self, release_major_version: int) -> str:
-        return f"iocage-release-{release_major_version}"
+        return f"ioc-release-{release_major_version}"
 
     def _config_jail_repo(self, jail: 'libioc.Jail.JailGenerator') -> None:
         jail_directory = "/usr/local/etc/pkg/repos"
         host_directory = f"{jail.root_path}/{jail_directory}"
         self._update_repo_conf(
-            repo_name="libiocage",
+            repo_name="libioc",
             url=f"file://{self.package_source_directory}",
             directory=host_directory,
             signature_type="none"
