@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """iocage MacAddress module."""
 import typing
+import collections.abc
 
 import libioc.helpers_object
 import libioc.errors
@@ -92,11 +93,21 @@ class MacAddressPair:
                 mac_address=x,
                 logger=self.logger
             ) for x in mac_pair.split(",")]
-        elif isinstance(mac_pair[0], str):
-            a = MacAddress(mac_pair[0], logger=self.logger)
-            b = MacAddress(mac_pair[1], logger=self.logger)
+        elif all((
+            isinstance(mac_pair, collections.abc.Iterable),
+            (len(mac_pair) == 2)
+        )) is True:
+            left, right = mac_pair
+            if isinstance(left, MacAddress) and isinstance(right, MacAddress):
+                a = left
+                b = right
+            elif isinstance(left, str) and isinstance(right, str):
+                a = MacAddress(left, logger=self.logger)
+                b = MacAddress(right, logger=self.logger)
+            else:
+                raise ValueError("tuple of string or MacAddress expected")
         else:
-            a, b = mac_pair  # type: ignore
+            raise ValueError("str or tuple of 2 items required")
 
         self.a = a
         self.b = b
