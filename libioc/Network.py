@@ -286,10 +286,12 @@ class Network:
             except libioc.errors.FirewallDisabled as error:
                 raise error
 
-        try:
-            mac_config = self.jail.config[f"{self._escaped_nic_name}_mac"]
-        except KeyError:
+        mac_config_key = f"{self._escaped_nic_name}_mac"
+        if mac_config_key in self.jail.config.keys():
+            mac_config = self.jail.config[mac_config_key]
+        else:
             mac_config = None
+
         if mac_config is None or mac_config == "":
             mac_address_pair = self.__generate_mac_address_pair()
         else:
