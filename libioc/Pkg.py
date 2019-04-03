@@ -26,6 +26,7 @@
 import typing
 import math
 import os.path
+import os
 import re
 
 import libzfs
@@ -112,14 +113,22 @@ class Pkg:
                 "--repository", self._get_repo_name(release_major_version)
             ],
             logger=self.logger,
-            env=dict(
+            env=self.__mixin_env(dict(
                 ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints"
-            )
+            ))
         )
 
     def __get_abi_string(self, release_major_version: int) -> str:
         return f"FreeBSD:{release_major_version}:{self.host.processor}"
+
+    @staticmethod
+    def __mixin_env(env: typing.Dict[str, str]) -> typing.Dict[str, str]:
+        env_clone_keys = ["http_proxy"]
+        for key in os.environ:
+            if key.lower() in env_clone_keys:
+                env[key.lower()] = os.environ[key]
+        return env
 
     def _mirror_packages(
         self,
@@ -135,10 +144,10 @@ class Pkg:
                 "--repository", self._get_repo_name(release_major_version)
             ] + packages,
             logger=self.logger,
-            env=dict(
+            env=self.__mixin_env(dict(
                 ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints"
-            )
+            ))
         )
 
         if (stderr is not None) and (len(stderr) > 0):
@@ -155,11 +164,11 @@ class Pkg:
                 "repo",
                 cache_ds.mountpoint
             ],
-            env=dict(
+            env=self.__mixin_env(dict(
                 ABI=self.__get_abi_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints",
                 FINGERPRINTS="/usr/share/keys/pkg"
-            ),
+            )),
             logger=self.logger
         )
 
