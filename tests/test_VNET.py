@@ -111,3 +111,33 @@ class TestVNET(object):
             stdout = subprocess.check_output(
                 ["/sbin/ifconfig", f"vnet22:{jid}"]
             ).decode("utf-8")
+
+    def test_vnet_mac_address_can_be_configured(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        bridge_interface: str
+    ) -> None:
+        """Test manual MAC address setting."""
+        mac_a = "02:ab:cd:ef:23:01"
+        mac_b = "02:ab:cd:ef:23:02"
+
+        existing_jail.config["vnet"] = True
+        existing_jail.config["interfaces"] = f"vnet7:{bridge_interface}"
+        existing_jail.config["ip4_addr"] = f"vnet7|172.16.99.7/24"
+        existing_jail.config["vnet7_mac"] = (mac_a, mac_b)
+        existing_jail.save()
+        existing_jail.start()
+
+        stdout = subprocess.check_output([
+            "/usr/sbin/jexec",
+            str(existing_jail.jid),
+            "/sbin/ifconfig",
+            "vnet7"
+        ]).decode("utf-8")
+        assert mac_b in stdout
+
+        stdout = subprocess.check_output([
+            "/sbin/ifconfig",
+            f"vnet7:{existing_jail.jid}"
+        ]).decode("utf-8")
+        assert mac_a in stdout
