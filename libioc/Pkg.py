@@ -245,7 +245,7 @@ class Pkg:
                     event_scope=packageInstallEvent.scope
                 )
                 for event in jail_exec_events:
-                    if isinstance(event, libioc.events.JailLaunch) is True:
+                    if isinstance(event, libioc.events.JailCommand) is True:
                         if event.done is True:
                             stdout = event.stdout.strip("\r\n")
                     yield event
