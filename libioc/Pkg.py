@@ -55,8 +55,8 @@ class Pkg:
         host: typing.Optional['libioc.Host.Host']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.logger = libioc.helpers_object.init_logger(self, logger)
+        self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.host = libioc.helpers_object.init_host(self, host)
         self.__pkg_directory_mounted = False
 
