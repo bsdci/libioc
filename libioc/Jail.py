@@ -1799,7 +1799,7 @@ class JailGenerator(JailResource):
         )
         yield event.begin()
 
-        if self.config['rlimits'] is False:
+        if self.__resource_limits_enabled is False:
             yield event.skip("disabled")
             return
 
@@ -1829,6 +1829,10 @@ class JailGenerator(JailResource):
         else:
             yield event.end()
 
+    @property
+    def __resource_limits_enabled(self) -> bool:
+        return (self.config["rlimits"] is False) is False
+
     def __clear_resource_limits(
         self,
         force: bool,
@@ -1841,22 +1845,23 @@ class JailGenerator(JailResource):
 
         yield jailResourceLimitActionEvent.begin()
 
-        config_value = self.config['rlimits']
-        if (config_value is False) or (config_value is None):
+        if self.__resource_limits_enabled is False:
             yield jailResourceLimitActionEvent.skip()
             return
 
         self.logger.verbose("Clearing resource limits")
-        _, _, returncode = libioc.helpers.exec(
-            [
+        stdout, _, returncode = libioc.helpers.exec(
+            " ".join([
                 "/usr/bin/rctl",
                 "-r",
-                f"jail:{self.identifier}"
-            ],
-            ignore_error=True
+                f"jail:{self.identifier}",
+                "2>&1"
+            ]),
+            ignore_error=True,
+            shell=True
         )
 
-        if returncode > 0:
+        if (returncode > 0) and ("No such process" not in stdout):
             yield jailResourceLimitActionEvent.fail()
             if force is False:
                 raise libioc.errors.ResourceLimitActionFailed(
