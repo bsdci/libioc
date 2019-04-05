@@ -521,9 +521,9 @@ class JailGenerator(JailResource):
 
         # Setup Network
         if self.config["vnet"]:
-            yield from self._start_vimage_network(jailStartEvent.scope)
-            yield from self._configure_localhost_commands(jailStartEvent.scope)
-            yield from self._configure_routes_commands(jailStartEvent.scope)
+            yield from self._start_vimage_network()
+            yield from self._configure_localhost_commands()
+            yield from self._configure_routes_commands()
             if self.host.ipfw_enabled is True:
                 self.logger.verbose(
                     f"Disabling IPFW in the jail {self.full_name}"
@@ -532,9 +532,7 @@ class JailGenerator(JailResource):
 
         # Attach shared ZFS datasets
         if self.config["jail_zfs"] is True:
-            yield from self._zfs_share_storage.mount_zfs_shares(
-                event_scope=jailStartEvent.scope
-            )
+            yield from self._zfs_share_storage.mount_zfs_shares()
 
         if quick is False:
             unknown_config_parameters = list(
@@ -1801,12 +1799,11 @@ class JailGenerator(JailResource):
         )
         yield event.begin()
 
-        args: typing.List[str] = []
-
         if self.config['rlimits'] is False:
             yield event.skip("disabled")
             return
 
+        skipped = True
         for key in libioc.Config.Jail.Properties.ResourceLimit.properties:
             try:
                 rlimit_prop = self.config[key]
@@ -1816,22 +1813,21 @@ class JailGenerator(JailResource):
                 continue
 
             rule = f"jail:{self.identifier}:{key}:{rlimit_prop.limit_string}"
-            args.append("-a")
-            args.append(rule)
+            try:
+                libioc.helpers.exec(
+                    ["/usr/bin/rctl", "-a", rule],
+                    logger=self.logger
+                )
+                skipped = False
+            except Exception:
+                yield event.fail()
+                raise
 
-        if len(args) == 0:
+        if skipped is True:
             yield event.skip()
             return
-
-        try:
-            libioc.helpers.exec(
-                ["/usr/bin/rctl"] + args,
-                logger=self.logger
-            )
+        else:
             yield event.end()
-        except Exception:
-            yield event.fail()
-            raise
 
     def __clear_resource_limits(
         self,
