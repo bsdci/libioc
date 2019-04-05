@@ -26,7 +26,20 @@ import typing
 import pytest
 import subprocess
 
+import freebsd_sysctl
 
+try:
+    rctl_supported = (freebsd_sysctl.Sysctl("kern.features.rctl").value == 1)
+    rctl_enabled = (freebsd_sysctl.Sysctl("kern.racct.enable").value == 1)
+    rctl_supported = (rctl_supported and rctl_enabled) is True
+except Exception:
+    rctl_supported = False
+
+
+@pytest.mark.skipif(
+    (rctl_supported is False),
+    reason="Resource Limits disabled (kern.features.rctl=0)."
+)
 class TestResourceLimits(object):
     """Run Resource Limit tests."""
 
