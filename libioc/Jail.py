@@ -520,19 +520,13 @@ class JailGenerator(JailResource):
         yield from self.__mount_devfs(jailStartEvent.scope)
 
         # Setup Network
-        if self.config["vnet"]:
-            yield from self._start_vimage_network()
-            yield from self._configure_localhost_commands()
-            yield from self._configure_routes_commands()
-            if self.host.ipfw_enabled is True:
-                self.logger.verbose(
-                    f"Disabling IPFW in the jail {self.full_name}"
-                )
-                self.exec(["service", "ipfw", "onestop"])
+        yield from self.__start_network(jailStartEvent.scope)
 
         # Attach shared ZFS datasets
         if self.config["jail_zfs"] is True:
-            yield from self._zfs_share_storage.mount_zfs_shares()
+            yield from self._zfs_share_storage.mount_zfs_shares(
+                event_scope=jailStartEvent.scope
+            )
 
         if quick is False:
             unknown_config_parameters = list(
@@ -561,12 +555,16 @@ class JailGenerator(JailResource):
                 script=str(single_command),
                 passthru=passthru
             )
-            yield from self.__destroy_jail(event_scope=jailStartEvent.scope)
-            if jid is not None:
-                yield from self.__stop_network(
-                    jid,
+            if self.config["vnet"] is False:
+                yield from self._stop_non_vimage_network(
                     force=False,
-                    event_scope=jailStartEvent.scope
+                    event_scope=event_scope
+                )
+            yield from self.__destroy_jail(event_scope=jailStartEvent.scope)
+            if (jid is not None) and (self.config["vnet"] is True):
+                yield from self.__stop_vimage_network(
+                    jid,
+                    event_scope=event_scope
                 )
             yield from self.fstab.unmount(event_scope=jailStartEvent.scope)
             yield from self.storage_backend.teardown(
@@ -919,9 +917,17 @@ class JailGenerator(JailResource):
         yield from self.__run_hook("prestop", force, jailStopEvent.scope)
         yield from self.__run_hook("stop", force, jailStopEvent.scope)
         yield from self.__destroy_jail(jailStopEvent.scope)
+        if self.config["vnet"] is False:
+            yield from self._stop_non_vimage_network(
+                force=force,
+                event_scope=event_scope
+            )
         yield from self.__run_hook("poststop", force, jailStopEvent.scope)
-        if jid is not None:
-            yield from self.__stop_network(jid, force, jailStopEvent.scope)
+        if (jid is not None) and (self.config["vnet"] is True):
+            yield from self.__stop_vimage_network(
+                jid,
+                event_scope=event_scope
+            )
         yield from self.storage_backend.teardown(
             self.storage,
             event_scope=jailStopEvent.scope
@@ -1688,11 +1694,11 @@ class JailGenerator(JailResource):
         """Return the absolute path to the hook script file."""
         return f"{self.jail.launch_script_dir}/{hook_name}.sh"
 
-    def _start_vimage_network(
+    def __start_vimage_network(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterface', None, None]:
-        event = libioc.events.VnetSetup(
+    ) -> typing.Generator['libioc.events.JailNetworkSetup', None, None]:
+        event = libioc.events.JailNetworkSetup(
             jail=self,
             scope=event_scope
         )
@@ -1701,33 +1707,57 @@ class JailGenerator(JailResource):
             yield from network.setup(event_scope=event.scope)
         yield event.end()
 
-    def __stop_network(
+    def __start_network(
         self,
-        jid: int,
-        force: bool,
         event_scope: 'libioc.events.Scope'
     ) -> typing.Generator['libioc.events.IocEvnet', None, None]:
-
         if self.config["vnet"] is True:
-            yield from self._stop_vimage_network(jid, event_scope=event_scope)
+            yield from self.__start_vimage_network(event_scope)
+            yield from self.__configure_localhost_commands(event_scope)
+            yield from self.__configure_routes_commands(event_scope)
+            if self.host.ipfw_enabled is True:
+                self.logger.verbose(
+                    f"Disabling IPFW in the jail {self.full_name}"
+                )
+                self.exec(["service", "ipfw", "onestop"])
         else:
-            # ToDo: clarify why this step is wanted
-            return
-            yield from self._stop_non_vimage_network(
-                force=force,
-                event_scope=event_scope
-            )
+            yield from self._start_non_vimage_network(event_scope)
+
+    def _start_non_vimage_network(
+        self,
+        event_scope: 'libioc.event.Scope'
+    ) -> typing.Generator['libioc.events.IocEvnet', None, None]:
+        yield from self.__apply_non_vnet_network(
+            force=False,
+            event=libioc.events.JailNetworkSetup,
+            event_scope=event_scope,
+            teardown=False
+        )
 
     def _stop_non_vimage_network(
         self,
         force: bool,
         event_scope: 'libioc.events.Scope'
-    ) -> typing.Generator['libioc.events.TeardownJailNetwork', None, None]:
-        teardownJailNetworkEvent = libioc.events.TeardownJailNetwork(
+    ) -> typing.Generator['libioc.events.JailNetworkTeardown', None, None]:
+        yield from self.__apply_non_vnet_network(
+            force=force,
+            event=libioc.events.JailNetworkTeardown,
+            event_scope=event_scope,
+            teardown=True
+        )
+
+    def __apply_non_vnet_network(
+        self,
+        force: bool,
+        event: 'libioc.event.IocEvent',
+        event_scope: 'libioc.events.Scope',
+        teardown: bool=False
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
+        network_event = event(
             jail=self,
             scope=event_scope
         )
-        yield teardownJailNetworkEvent.begin()
+        yield network_event.begin()
         try:
             for protocol in (4, 6,):
                 config_value = self.config[f"ip{protocol}_addr"]
@@ -1741,27 +1771,29 @@ class JailGenerator(JailResource):
                             # skip DHCP and ACCEPT_RTADV
                             continue
                         inet = "inet" if (protocol == 4) else "inet6"
-                        libioc.helpers.exec([
+                        command = [
                             "/sbin/ifconfig",
                             nic,
                             inet,
-                            str(address),
-                            "remove"
-                        ])
+                            str(address)
+                        ]
+                        if teardown is True:
+                            command.append("remove")
+                        libioc.helpers.exec(command)
         except Exception:
-            yield teardownJailNetworkEvent.fail()
-            if force is False:
+            yield network_event.fail()
+            if (force is False) or (teardown is False):
                 raise
             else:
                 return
-        yield teardownJailNetworkEvent.end()
+        yield network_event.end()
 
-    def _stop_vimage_network(
+    def __stop_vimage_network(
         self,
         jid: int,
         event_scope: 'libioc.events.Scope'
-    ) -> typing.Generator['libioc.events.VnetTeardown', None, None]:
-        event = libioc.events.VnetTeardown(
+    ) -> typing.Generator['libioc.events.JailNetworkTeardown', None, None]:
+        event = libioc.events.JailNetworkTeardown(
             jail=self,
             scope=event_scope
         )
@@ -1772,10 +1804,10 @@ class JailGenerator(JailResource):
 
         yield event.end()
 
-    def _configure_localhost_commands(
+    def __configure_localhost_commands(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterface', None, None]:
+    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
         event = libioc.events.VnetSetupLocalhost(
             jail=self,
             scope=event_scope
@@ -1882,10 +1914,10 @@ class JailGenerator(JailResource):
             return 1
         return int(self._get_value("allow_mount_zfs"))
 
-    def _configure_routes_commands(
+    def __configure_routes_commands(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterface', None, None]:
+    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
         event = libioc.events.VnetSetRoutes(
             jail=self,
             scope=event_scope

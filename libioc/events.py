@@ -337,12 +337,6 @@ class TeardownSystemMounts(JailStop):
     pass
 
 
-class TeardownJailNetwork(JailStop):
-    """Teardown a jails mountpoints."""
-
-    pass
-
-
 class JailResourceLimitAction(JailEvent):
     """Set or unset a jails resource limits."""
 
@@ -355,32 +349,32 @@ class VnetEvent(JailEvent):
     pass
 
 
-class VnetSetup(VnetEvent):
+class JailNetworkSetup(VnetEvent):
     """Start VNET networks."""
 
     pass
 
 
-class VnetTeardown(VnetEvent):
-    """Teardown VNET networks."""
+class JailNetworkTeardown(JailStop):
+    """Teardown a jails network."""
 
     pass
 
 
-class VnetInterfaceConfig(VnetSetup):
+class VnetInterfaceConfig(JailNetworkSetup):
     """Configure VNET network interfaces and firewall."""
 
     pass
 
 
-class VnetSetupLocalhost(VnetSetup):
-    """Configure VNET network interfaces and firewall."""
+class VnetSetupLocalhost(JailNetworkSetup):
+    """Configure a VNET jails localhost."""
 
     pass
 
 
-class VnetSetRoutes(VnetSetup):
-    """Configure VNET network interfaces and firewall."""
+class VnetSetRoutes(JailNetworkSetup):
+    """Set a VNET jails network routes."""
 
     pass
 
