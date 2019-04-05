@@ -1782,7 +1782,7 @@ class JailGenerator(JailResource):
         )
         yield event.begin()
         try:
-            self.exec(["/sbin/ifconfig lo0 localhost"])
+            self.exec(["/sbin/ifconfig", "lo0", "localhost"])
         except Exception as e:
             yield event.fail(e)
             raise e

@@ -46,19 +46,20 @@ class TestVNET(object):
 
         existing_jail.start()
 
-        stdout_lines = subprocess.check_output(
+        stdout = subprocess.check_output(
             ["/usr/sbin/jexec", str(existing_jail.jid), "/sbin/ifconfig"]
-        ).decode("utf-8").split("\n")
+        ).decode("utf-8")
 
         # filter lines that begin with a whitespace
         configured_nics = [
             x.split(": ", maxsplit=1)[0]
-            for x in stdout_lines
+            for x in stdout.split("\n")
             if (x.startswith("\t") is False) and (len(x) > 0)
         ]
 
         assert len(configured_nics) == 1
         assert configured_nics[0] == "lo0"
+        assert "127.0.0.1" in stdout
 
     def test_static_ip_configuration(
         self,
