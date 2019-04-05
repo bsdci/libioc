@@ -284,13 +284,13 @@ class Fstab(collections.MutableSequence):
     def read_file(self) -> None:
         """Read the fstab file."""
         if os.path.isfile(self.path):
-            with open(self.path, "r") as f:
+            with open(self.path, "r", encoding="UTF-8") as f:
                 self._read_file_handle(f)
                 self.logger.debug(f"fstab loaded from {self.path}")
 
     def save(self) -> None:
         """Update or create the fstab file."""
-        with open(self.path, "w") as f:
+        with open(self.path, "w", encoding="UTF-8") as f:
             self._save_file_handle(f)
             self.logger.verbose(f"{self.path} written")
 
@@ -306,11 +306,11 @@ class Fstab(collections.MutableSequence):
     ) -> None:
         """Read file and then write changes."""
         if os.path.isfile(self.path):
-            f = open(self.path, "r+")
+            f = open(self.path, "r+", encoding="UTF-8")
             self._read_file_handle(f)
             f.seek(0)
         else:
-            f = open(self.path, "w")
+            f = open(self.path, "w", encoding="UTF-8")
 
         self._save_file_handle(f)
         f.close()
