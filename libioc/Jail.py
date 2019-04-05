@@ -1830,7 +1830,7 @@ class JailGenerator(JailResource):
 
     @property
     def __resource_limits_enabled(self) -> bool:
-        return (self.config["rlimits"] is False) is False
+        return (self.config["rlimits"] is True)
 
     def __clear_resource_limits(
         self,
