@@ -1858,7 +1858,7 @@ class JailGenerator(JailResource):
                 "2>&1"
             ]),
             ignore_error=True,
-            shell=True
+            shell=True  # nosec: B604
         )
 
         if (returncode > 0) and ("No such process" not in stdout):
