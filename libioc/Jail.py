@@ -1825,7 +1825,6 @@ class JailGenerator(JailResource):
 
         if skipped is True:
             yield event.skip()
-            return
         else:
             yield event.end()
 
