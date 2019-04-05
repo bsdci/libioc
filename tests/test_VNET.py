@@ -32,7 +32,7 @@ import libzfs
 import libioc.Jail
 
 class TestVNET(object):
-    """Run tests for NullFS Basejails."""
+    """Run tests for VNET networking."""
 
     def test_vnet_without_interfaces_can_only_see_lo0(
         self,
