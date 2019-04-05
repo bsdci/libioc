@@ -521,9 +521,9 @@ class JailGenerator(JailResource):
 
         # Setup Network
         if self.config["vnet"]:
-            yield from self._start_vimage_network()
-            yield from self._configure_localhost_commands()
-            yield from self._configure_routes_commands()
+            yield from self._start_vimage_network(jailStartEvent.scope)
+            yield from self._configure_localhost_commands(jailStartEvent.scope)
+            yield from self._configure_routes_commands(jailStartEvent.scope)
             if self.host.ipfw_enabled is True:
                 self.logger.verbose(
                     f"Disabling IPFW in the jail {self.full_name}"
@@ -532,7 +532,9 @@ class JailGenerator(JailResource):
 
         # Attach shared ZFS datasets
         if self.config["jail_zfs"] is True:
-            yield from self._zfs_share_storage.mount_zfs_shares()
+            yield from self._zfs_share_storage.mount_zfs_shares(
+                event_scope=jailStartEvent.scope
+            )
 
         if quick is False:
             unknown_config_parameters = list(
