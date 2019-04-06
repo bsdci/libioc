@@ -1779,6 +1779,8 @@ class JailGenerator(JailResource):
                         ]
                         if teardown is True:
                             command.append("remove")
+                        else:
+                            command.append("alias")
                         libioc.helpers.exec(command)
         except Exception:
             yield network_event.fail()
