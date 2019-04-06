@@ -58,3 +58,48 @@ class TestNetwork(object):
         stdout = subprocess.check_output(["/sbin/ifconfig"]).decode("utf-8")
         assert str(ip4_addr.ip) not in stdout
         assert str(ip6_addr.ip) not in stdout
+
+
+    def test_can_set_multiple_non_vnet_ip_addresses(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        bridge_interface: str
+    ) -> None:
+
+        ip4_addr1 = ipaddress.IPv4Interface("172.16.79.4/24")
+        ip4_addr2 = ipaddress.IPv4Interface("172.16.81.5/24")
+        ip6_addr1 = ipaddress.IPv6Interface("2001:db8:c0de::3/64")
+        ip6_addr2 = ipaddress.IPv6Interface("2001:db8:10c::2/64")
+
+        existing_jail.config["vnet"] = False
+        existing_jail.config["ip4_addr"] = ",".join([
+            f"{bridge_interface}|{ip4_addr1}",
+            f"{bridge_interface}|{ip4_addr2}"
+        ])
+        existing_jail.config["ip6_addr"] = ",".join([
+            f"{bridge_interface}|{ip6_addr1}",
+            f"{bridge_interface}|{ip6_addr2}"
+        ])
+        existing_jail.save()
+
+        existing_jail.start()
+        stdout, _, returncode = existing_jail.exec([
+            "/sbin/ifconfig",
+            bridge_interface
+        ])
+
+        print(stdout)
+        print("-----")
+        print(subprocess.check_output(["jls", "-n"]).decode("utf-8"))
+        assert returncode == 0
+        assert str(ip4_addr1.ip) in stdout
+        assert str(ip4_addr2.ip) in stdout
+        assert str(ip6_addr1.ip) in stdout
+        assert str(ip6_addr2.ip) in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(["/sbin/ifconfig"]).decode("utf-8")
+        assert str(ip4_addr1.ip) not in stdout
+        assert str(ip4_addr2.ip) not in stdout
+        assert str(ip6_addr1.ip) not in stdout
+        assert str(ip6_addr2.ip) not in stdout
