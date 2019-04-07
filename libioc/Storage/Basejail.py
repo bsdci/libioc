@@ -25,7 +25,6 @@
 import typing
 
 import libioc.Types
-import libioc.Release
 
 
 class BasejailStorage(libioc.Storage.Storage):
