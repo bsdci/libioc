@@ -1800,7 +1800,7 @@ class JailGenerator(JailResource):
                             command.append("remove")
                         else:
                             command.append("alias")
-                        libioc.helpers.exec(command)
+                        libioc.helpers.exec(command, logger=self.logger)
         except Exception:
             yield network_event.fail()
             if (force is False) or (teardown is False):
