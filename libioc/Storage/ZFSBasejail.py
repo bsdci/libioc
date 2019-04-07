@@ -24,11 +24,11 @@
 """iocage ZFS basejail storage backend."""
 import typing
 
-import libioc.Storage.Basejail
+import libioc.Storage
 import libioc.helpers
 
 
-class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
+class ZFSBasejailStorage(libioc.Storage.Storage):
     """iocage ZFS basejail storage backend."""
 
     def apply(

@@ -27,14 +27,11 @@ import typing
 import os.path
 
 import libioc.Storage
-import libioc.Storage.Basejail
 import libioc.Storage.Standalone
 import libioc.helpers
 
-BasejailStorage = libioc.Storage.Basejail.BasejailStorage
 
-
-class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
+class NullFSBasejailStorage(libioc.Storage.Storage):
     """iocage NullFS basejail storage backend."""
 
     def apply(
@@ -50,13 +47,13 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
         yield event.begin()
 
         try:
-            NullFSBasejailStorage._create_nullfs_directories(self)
+            self._create_nullfs_directories()
         except Exception:
             yield event.fail("NullFS directory creation failed")
             raise
 
         try:
-            mounts = BasejailStorage._get_basejail_mounts(self)
+            mounts = NullfsBasejailStorage._get_basejail_mounts(self)
             for source, destination in mounts:
                 if os.path.ismount(destination) is True:
                     libioc.helpers.umount(destination)
@@ -85,7 +82,7 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
         has_unmounted_any = False
         try:
-            mounts = BasejailStorage._get_basejail_mounts(self)
+            mounts = _get_basejail_mounts._get_basejail_mounts(self)
             for _, destination in mounts:
                 if os.path.ismount(destination) is False:
                     continue
@@ -122,3 +119,35 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
         for basedir in basedirs:
             self.create_jail_mountpoint(basedir)
+
+    def _get_basejail_mounts(self) -> typing.Iterator[
+        typing.Tuple[libioc.Types.AbsolutePath, libioc.Types.AbsolutePath]
+    ]:
+        """
+        Auto-generate lines of NullFS basejails.
+
+        When a jail is a NullFS basejail, this list represent the corresponding
+        fstab lines that mount the release.
+
+        Return a list of tuples (source, destination,).
+        """
+        try:
+            self.jail.release
+        except AttributeError:
+            return []
+
+        if self.jail.config["basejail_type"] != "nullfs":
+            return []
+
+        basedirs = libioc.helpers.get_basedir_list(
+            distribution_name=self.jail.host.distribution.name
+        )
+
+        release_root_path = "/".join([
+            self.jail.release.root_dataset.mountpoint,
+            f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
+        ])
+        for basedir in basedirs:
+            source = f"{release_root_path}/{basedir}"
+            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+            yield (source, destination,)

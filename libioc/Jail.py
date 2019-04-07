@@ -44,7 +44,6 @@ import libioc.Config.Jail.JailConfig
 import libioc.Network
 import libioc.Release
 import libioc.Storage
-import libioc.Storage.Basejail
 import libioc.Storage.NullFSBasejail
 import libioc.Storage.Standalone
 import libioc.Storage.ZFSBasejail
