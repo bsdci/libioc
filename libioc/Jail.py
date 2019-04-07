@@ -39,6 +39,7 @@ import libioc.helpers
 import libioc.helpers_object
 import libioc.DevfsRules
 import libioc.Host
+import libioc.Config.Jail.BaseConfig
 import libioc.Config.Jail.JailConfig
 import libioc.Network
 import libioc.Release
@@ -222,6 +223,24 @@ class JailResource(
             pass
 
         return self.jail.config[key]
+
+    def getstring(self, key: str) -> str:
+        """
+        Get any resource property as string or '-'.
+
+        Returns the string value, or an empty string in case of an unknown user
+        config property.
+
+        Args:
+            key (string):
+                Name of the jail property to return
+        """
+        try:
+            return str(super().getstring(key))
+        except libioc.errors.UnknownConfigProperty:
+            if libioc.Config.Jail.BaseConfig.BaseConfig.is_user_property(key):
+                return ""
+            raise
 
 
 class JailGenerator(JailResource):

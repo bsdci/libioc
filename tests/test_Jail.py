@@ -198,3 +198,12 @@ class TestNullFSBasejail(object):
         ).decode("utf-8")
         for basedir in basedirs:
             assert f"{root_path}/{basedir}" not in stdout
+
+    def test_getstring_returns_empty_string_for_unknown_user_properties(
+        self,
+        new_jail: 'libioc.Jail.Jail',
+    ) -> None:
+        """Test if getstring for an unknown user property is empty."""
+        assert new_jail.getstring("user.unknown_propery") == ""
+        with pytest.raises(libioc.errors.UnknownConfigProperty):
+            new_jail.getstring("unknown_property")

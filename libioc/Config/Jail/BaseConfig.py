@@ -850,7 +850,9 @@ class BaseConfig(dict):
             return True
         return (fragments[0] in self["interfaces"].keys()) is True
 
-    def _is_user_property(self, key: str) -> bool:
+    @staticmethod
+    def is_user_property(key: str) -> bool:
+        """Return whether the given key belongs to a custom user property."""
         return (key == "user") or (key.startswith("user.") is True)
 
     def _is_known_property(self, key: str, explicit: bool) -> bool:
@@ -865,7 +867,7 @@ class BaseConfig(dict):
             return True  # key is special property
         if self._key_is_mac_config(key, explicit=explicit) is True:
             return True  # nic mac config property
-        if self._is_user_property(key) is True:
+        if self.is_user_property(key) is True:
             return True  # user.* property
         return False
 
