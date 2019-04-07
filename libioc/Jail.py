@@ -577,13 +577,13 @@ class JailGenerator(JailResource):
             if self.config["vnet"] is False:
                 yield from self._stop_non_vimage_network(
                     force=False,
-                    event_scope=event_scope
+                    event_scope=jailStartEvent.scope
                 )
             yield from self.__destroy_jail(event_scope=jailStartEvent.scope)
             if (jid is not None) and (self.config["vnet"] is True):
                 yield from self.__stop_vimage_network(
                     jid,
-                    event_scope=event_scope
+                    event_scope=jailStartEvent.scope
                 )
             yield from self.fstab.unmount(event_scope=jailStartEvent.scope)
             yield from self.storage_backend.teardown(
@@ -939,13 +939,13 @@ class JailGenerator(JailResource):
         if self.config["vnet"] is False:
             yield from self._stop_non_vimage_network(
                 force=force,
-                event_scope=event_scope
+                event_scope=jailStopEvent.scope
             )
         yield from self.__run_hook("poststop", force, jailStopEvent.scope)
         if (jid is not None) and (self.config["vnet"] is True):
             yield from self.__stop_vimage_network(
                 jid,
-                event_scope=event_scope
+                event_scope=jailStopEvent.scope
             )
         yield from self.storage_backend.teardown(
             self.storage,
