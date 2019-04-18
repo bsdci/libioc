@@ -31,7 +31,7 @@ uninstall:
 	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
 		rm /usr/local/etc/rc.d/ioc; \
 	fi
-check:
+check: docs
 	flake8 --version
 	flake8 --exclude=".travis,.eggs,__init__.py,docs,tests" --ignore=E203,E252,W391,D107,A001,A002,A003,A004
 	bandit --skip B404,B110 --exclude tests/ -r .
