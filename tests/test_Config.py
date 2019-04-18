@@ -165,11 +165,14 @@ class TestUserDefaultConfig(object):
         root_dataset: libzfs.ZFSDataset,
         zfs: libzfs.ZFS,
     ) -> 'libioc.Resource.DefaultResource':
-        return libioc.Resource.DefaultResource(
+        default_resource = libioc.Resource.DefaultResource(
             dataset=root_dataset,
             logger=logger,
             zfs=zfs
         )
+        yield default_resource
+        if os.path.isfile(default_resource.config_handler.file):
+            os.remove(default_resource.config_handler.file)
 
     def test_default_config_path(
         self,
@@ -224,6 +227,28 @@ class TestUserDefaultConfig(object):
         # check that valid properties still can be set
         default_resource.config["user.valid-property"] = "ok"
         assert default_resource.config.data["user.valid-property"] == "ok"
+
+    def test_can_set_default_config(
+        self,
+        default_resource: 'libioc.Resource.DefaultResource'
+    ) -> None:
+        defaults_config_path = default_resource.config_handler.file
+
+        default_resource.config.set("vnet", True);
+        default_resource.save()
+        with open(defaults_config_path, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            assert data["vnet"] == "yes"
+            assert len(data.keys()) == 1
+
+        default_resource.config.set("user.comment", "hi there!");
+        default_resource.save()
+        with open(defaults_config_path, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            assert "user" in data.keys()
+            assert "comment" in data["user"].keys()
+            assert data["user"]["comment"] == "hi there!"
+            assert len(data.keys()) == 2
 
 
 class TestBrokenConfig(object):
