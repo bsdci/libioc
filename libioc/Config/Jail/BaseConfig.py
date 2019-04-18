@@ -29,7 +29,6 @@ import re
 import libioc.Config.Data
 import libioc.Config.Jail.Globals
 import libioc.Config.Jail.Properties
-import libioc.Config.Jail.Defaults
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
@@ -737,6 +736,7 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
+            import libioc.Config.Jail.Defaults
             if isinstance(
                 self,
                 libioc.Config.Jail.Defaults.JailConfigDefaults
