@@ -323,7 +323,7 @@ class Resource(metaclass=abc.ABCMeta):
         """Return the absolute path of a path relative to the resource."""
         return str(os.path.join(self.dataset.mountpoint, relative_path))
 
-    def _write_config(self, data: dict) -> None:
+    def _write_config(self, data: libioc.Config.Data.Data) -> None:
         """Write the configuration to disk."""
         self.config_handler.write(data)
 
@@ -437,4 +437,4 @@ class DefaultResource(Resource):
 
     def save(self) -> None:
         """Save changes to the default configuration."""
-        self._write_config(self.config.user_data.nested)
+        self._write_config(self.config.user_data)

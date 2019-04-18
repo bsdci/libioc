@@ -29,6 +29,7 @@ import re
 import libioc.Config.Data
 import libioc.Config.Jail.Globals
 import libioc.Config.Jail.Properties
+import libioc.Config.Jail.Defaults
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
@@ -736,7 +737,13 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
-            hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()
+            if isinstance(
+                self,
+                libioc.Config.Jail.Defaults.JailConfigDefaults
+            ) is True:
+                hash_before = str(self.__getitem__(key)).__hash__()
+            else:
+                hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()
         except Exception:
             if existed_before is True:
                 raise

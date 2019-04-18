@@ -27,6 +27,7 @@ import typing
 import os.path
 
 import libioc.helpers_object
+import libioc.Config.Data
 
 # MyPy
 import libioc.Logger
@@ -44,7 +45,7 @@ class Prototype:
     """Prototype of a JailConfig."""
 
     logger: typing.Type['libioc.Logger.Logger']
-    data: ConfigDataDict = {}
+    data: ConfigDataDict
     _file: str
 
     def __init__(
@@ -54,6 +55,7 @@ class Prototype:
     ) -> None:
 
         self.logger = libioc.helpers_object.init_logger(self, logger)
+        self.data = libioc.Config.Data.Data()
 
         if file is not None:
             self._file = file
@@ -67,7 +69,7 @@ class Prototype:
     def file(self, value: str) -> None:
         self._file = value
 
-    def read(self) -> ConfigDataDict:
+    def read(self) -> libioc.Config.Data.Data:
         """
         Read from the configuration file.
 
@@ -93,14 +95,14 @@ class Prototype:
     def map_input(
         self,
         data: typing.Union[typing.TextIO, ConfigDataDict]
-    ) -> ConfigDataDict:
+    ) -> libioc.Config.Data.Data:
         """
         Map input data (for reading from the configuration).
 
         Implementing classes may provide individual mappings.
         """
         if not isinstance(data, typing.TextIO):
-            return data
+            return libioc.Config.Data.Data(data)
 
         raise NotImplementedError("Mapping not implemented on the prototype")
 
