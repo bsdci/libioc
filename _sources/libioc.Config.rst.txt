@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    libioc.Config.Host
     libioc.Config.Jail
     libioc.Config.Type
 

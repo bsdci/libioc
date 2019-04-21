@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.File.Fstab &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Config.Jail.File.Fstab &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -184,7 +184,9 @@
 <span class="kn">import</span> <span class="nn">libioc.helpers</span>
 <span class="kn">import</span> <span class="nn">libioc.helpers_object</span>
 <span class="kn">import</span> <span class="nn">libioc.Types</span>
+<span class="kn">import</span> <span class="nn">libioc.Config.Jail</span>
 <span class="kn">import</span> <span class="nn">libioc.Config.Jail.File</span>
+<span class="kn">import</span> <span class="nn">libioc.Storage.Basejail</span>
 
 
 <div class="viewcode-block" id="FstabFsSpec"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.FstabFsSpec">[docs]</a><span class="k">class</span> <span class="nc">FstabFsSpec</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">):</span>
@@ -308,31 +310,27 @@
 <span class="sd">    relative to the resource&#39;s root_dataset `&lt;resource&gt;/root`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">AUTO_COMMENT_IDENTIFIER</span> <span class="o">=</span> <span class="s2">&quot;iocage-auto&quot;</span>
+    <span class="n">AUTO_COMMENT_IDENTIFIER</span> <span class="o">=</span> <span class="s2">&quot;iocage-auto&quot;</span>  <span class="c1"># ToDo: rename to ioc-auto</span>
 
     <span class="n">release</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">]</span>
     <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;libioc.Host.HostGenerator&#39;</span>
     <span class="n">logger</span><span class="p">:</span> <span class="s1">&#39;libioc.Logger.Logger&#39;</span>
-    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span>
     <span class="n">_lines</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
         <span class="n">FstabLine</span><span class="p">,</span>
         <span class="n">FstabCommentLine</span><span class="p">,</span>
         <span class="n">FstabAutoPlaceholderLine</span>
-    <span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="p">]]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
-        <span class="n">release</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Host.HostGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;fstab&quot;</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;/etc/fstab&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">jail</span> <span class="o">=</span> <span class="n">jail</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">release</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">file</span>
         <span class="c1"># ToDo: could be lazy-loaded</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">()</span>
@@ -343,23 +341,14 @@
 <span class="sd">        Absolute fstab file path.</span>
 
 <span class="sd">        This is the file read from and written to.</span>
-
-<span class="sd">        When the path begins with a / it is assumed to be absolute, so that</span>
-<span class="sd">        the jails dataset mountpoint is not used as path prefix. This is useful</span>
-<span class="sd">        when moving around jail backups.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.dataset.mountpoint}</span><span class="s2">/</span><span class="si">{self.file}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span>
 
 <div class="viewcode-block" id="Fstab.parse_lines"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.parse_lines">[docs]</a>    <span class="k">def</span> <span class="nf">parse_lines</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">ignore_auto_created</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">ignore_auto_created</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">skip_destinations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse the content of a fstab file.</span>
@@ -371,16 +360,15 @@
 
 <span class="sd">            ignore_auto_created:</span>
 <span class="sd">                Skips reading entries that were created by iocage</span>
+
+<span class="sd">            exclude_destinations:</span>
+<span class="sd">                List of destination strings that is skipped</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">list</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">)</span>
 
         <span class="n">line</span><span class="p">:</span> <span class="nb">str</span>
         <span class="n">comment</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
         <span class="n">auto_comment_found</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">basejail_destinations</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;destination&#39;</span><span class="p">]),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">basejail_lines</span>
-        <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">input_text</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">_is_comment_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_is_empty_line</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
@@ -424,21 +412,11 @@
             <span class="n">source</span> <span class="o">=</span> <span class="n">fragments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="n">destination</span> <span class="o">=</span> <span class="n">fragments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
-            <span class="c1"># skip lines with destinations overlapping self.basejail_lines</span>
-            <span class="k">if</span> <span class="n">destination</span> <span class="ow">in</span> <span class="n">basejail_destinations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">destination</span> <span class="ow">in</span> <span class="n">skip_destinations</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">_backup_prefix</span> <span class="o">=</span> <span class="s2">&quot;backup:///&quot;</span>
-            <span class="k">if</span> <span class="n">destination</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
-                    <span class="n">destination</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">):]</span>
-                <span class="p">])</span>
-            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
-                    <span class="n">source</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">):]</span>
-                <span class="p">])</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__replace_magic_path</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__replace_magic_path</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 
             <span class="n">new_line</span> <span class="o">=</span> <span class="n">FstabLine</span><span class="p">({</span>
                 <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
@@ -452,16 +430,19 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">new_line</span><span class="p">,</span> <span class="n">skip_existing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">auto_mount_jail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">__replace_magic_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">filepath</span>
+
 <div class="viewcode-block" id="Fstab.read_file"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.read_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Read the fstab file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_handle</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;fstab loaded from </span><span class="si">{self.path}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fstab.save"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Update or create the fstab file.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_file_handle</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.path}</span><span class="s2"> written&quot;</span><span class="p">)</span></div>
 
@@ -477,22 +458,14 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Read file and then write changes.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_handle</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_file_handle</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Fstab.update_release"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.update_release">[docs]</a>    <span class="k">def</span> <span class="nf">update_release</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">release</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Set a new release and save the updated file.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">release</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_and_save</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Fstab.new_line"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.new_line">[docs]</a>    <span class="k">def</span> <span class="nf">new_line</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -530,6 +503,293 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fstab.add_line"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.add_line">[docs]</a>    <span class="k">def</span> <span class="nf">add_line</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">FstabLine</span><span class="p">,</span>
+            <span class="n">FstabCommentLine</span><span class="p">,</span>
+            <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="p">],</span>
+        <span class="n">skip_existing</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">auto_create_destination</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">auto_mount_jail</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Directly append a FstabLine type.</span>
+
+<span class="sd">        Use save() to write changes to the fstab file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">FstabCommentLine</span>
+        <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">((</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">),</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabCommentLine</span><span class="p">),</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">),</span>
+        <span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;line needs to be FstabLine, FstabCommentLine &quot;</span>
+                <span class="n">f</span><span class="s2">&quot;or FstabAutoPlaceholderLine, but was {type(line).__name__}&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Fstab.index"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">FstabLine</span><span class="p">,</span>
+            <span class="n">FstabCommentLine</span><span class="p">,</span>
+            <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="p">],</span>
+        <span class="n">start</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Find the index position of a FstabLine in the Fstab instance.&quot;&quot;&quot;</span>
+        <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">start</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">end</span>
+        <span class="k">for</span> <span class="n">existing_line</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">existing_line</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">i</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Fstab line does not exist&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">FstabLine</span><span class="p">,</span>
+            <span class="n">FstabCommentLine</span><span class="p">,</span>
+            <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True when the FstabLine already exists.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the entire content of the fstab file as string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the number of lines in the fstab file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: T484</span>
+        <span class="sd">&quot;&quot;&quot;Delete an FstabLine at the given index.&quot;&quot;&quot;</span>
+        <span class="n">deletion_target_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">deletion_target_line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">deletion_target_line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Deleting fstab entry: </span><span class="si">{source}</span><span class="s2"> -&gt; </span><span class="si">{destination}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="n">real_index</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>  <span class="c1"># noqa: T484</span>
+        <span class="n">FstabLine</span><span class="p">,</span>
+        <span class="n">FstabCommentLine</span><span class="p">,</span>
+        <span class="n">FstabAutoPlaceholderLine</span>
+    <span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get the FstabLine at the given index.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">FstabLine</span><span class="p">,</span>
+            <span class="n">FstabCommentLine</span><span class="p">,</span>
+            <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set or overwrite the FstabLine at the given index.&quot;&quot;&quot;</span>
+        <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">real_index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Fstab.insert"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">FstabLine</span><span class="p">,</span>
+            <span class="n">FstabCommentLine</span><span class="p">,</span>
+            <span class="n">FstabAutoPlaceholderLine</span>
+        <span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a line at a given position.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            index:</span>
+<span class="sd">                The numeric line insertion position</span>
+
+<span class="sd">            value:</span>
+<span class="sd">                A FstabLine, Comment or Placeholder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_line</span><span class="p">,</span> <span class="n">FstabBasejailLine</span><span class="p">):</span>
+            <span class="c1"># find FstabAutoPlaceholderLine instead</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span>
+            <span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">real_index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_real_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">target_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_line</span><span class="p">,</span> <span class="n">FstabBasejailLine</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">VirtualFstabLineHasNoRealIndex</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target_line</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">FstabAutoPlaceholderLine</span><span class="p">,</span>
+        <span class="n">FstabCommentLine</span><span class="p">,</span>
+        <span class="n">FstabLine</span>
+    <span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an iterator of all printable lines.</span>
+
+<span class="sd">        The output includes user configured and auto created lines for NullFS</span>
+<span class="sd">        basejails. The previous position of auto-created entries is preserved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Fstab.replace_path"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.replace_path">[docs]</a>    <span class="k">def</span> <span class="nf">replace_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">replacement</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Replace a path in all fstab entries (source or destination).&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_replace_path_prefix</span><span class="p">(</span>
+                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span>
+                <span class="n">pattern</span><span class="p">,</span>
+                <span class="n">replacement</span>
+            <span class="p">)</span>
+            <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_replace_path_prefix</span><span class="p">(</span>
+                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">],</span>
+                <span class="n">pattern</span><span class="p">,</span>
+                <span class="n">replacement</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span></div></div>
+
+
+<div class="viewcode-block" id="JailFstab"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab">[docs]</a><span class="k">class</span> <span class="nc">JailFstab</span><span class="p">(</span><span class="n">Fstab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fstab file abstraction of a Jails fstab file.</span>
+
+<span class="sd">    The jails fstab file is stored in its main dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Host.HostGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;fstab&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jail</span> <span class="o">=</span> <span class="n">jail</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">file</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="JailFstab.parse_lines"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.parse_lines">[docs]</a>    <span class="k">def</span> <span class="nf">parse_lines</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ignore_auto_created</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">skip_destinations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the content of a fstab file.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            input_text:</span>
+<span class="sd">                The text content of an existing fstab file</span>
+
+<span class="sd">            ignore_auto_created:</span>
+<span class="sd">                Skips reading entries that were created by iocage</span>
+
+<span class="sd">            exclude_destinations:</span>
+<span class="sd">                List of destination strings that is skipped</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">BasejailStorage</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Basejail</span><span class="o">.</span><span class="n">BasejailStorage</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">storage_backend</span><span class="p">,</span> <span class="n">BasejailStorage</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">skip_destinations</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">storage_backend</span><span class="o">.</span><span class="n">basejail_mounts</span>
+            <span class="p">))</span>
+        <span class="n">Fstab</span><span class="o">.</span><span class="n">parse_lines</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">input_text</span><span class="o">=</span><span class="n">input_text</span><span class="p">,</span>
+            <span class="n">ignore_auto_created</span><span class="o">=</span><span class="n">ignore_auto_created</span><span class="p">,</span>
+            <span class="n">skip_destinations</span><span class="o">=</span><span class="n">skip_destinations</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">FstabAutoPlaceholderLine</span><span class="p">,</span>
+        <span class="n">FstabBasejailLine</span><span class="p">,</span>
+        <span class="n">FstabCommentLine</span><span class="p">,</span>
+        <span class="n">FstabLine</span>
+    <span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an iterator of all printable lines.</span>
+
+<span class="sd">        The output includes user configured and auto created lines for NullFS</span>
+<span class="sd">        basejails. The previous position of auto-created entries is preserved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+                <span class="n">FstabAutoPlaceholderLine</span><span class="p">,</span>
+                <span class="n">FstabBasejailLine</span><span class="p">,</span>
+                <span class="n">FstabCommentLine</span><span class="p">,</span>
+                <span class="n">FstabLine</span>
+            <span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Absolute fstab file path.</span>
+
+<span class="sd">        This is the file read from and written to.</span>
+
+<span class="sd">        When the path begins with a / it is assumed to be absolute, so that</span>
+<span class="sd">        the jails dataset mountpoint is not used as path prefix. This is useful</span>
+<span class="sd">        when moving around jail backups.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.dataset.mountpoint}</span><span class="s2">/</span><span class="si">{self.file}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">path</span>
+
+<div class="viewcode-block" id="JailFstab.add_line"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.add_line">[docs]</a>    <span class="k">def</span> <span class="nf">add_line</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
             <span class="n">FstabLine</span><span class="p">,</span>
@@ -620,126 +880,38 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Fstab.index"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span>
+<div class="viewcode-block" id="JailFstab.update_release"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.update_release">[docs]</a>    <span class="k">def</span> <span class="nf">update_release</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-            <span class="n">FstabLine</span><span class="p">,</span>
-            <span class="n">FstabCommentLine</span><span class="p">,</span>
-            <span class="n">FstabAutoPlaceholderLine</span>
-        <span class="p">],</span>
-        <span class="n">start</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">end</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Find the index position of a FstabLine in the Fstab instance.&quot;&quot;&quot;</span>
-        <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">start</span>
-        <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">end</span>
-        <span class="k">for</span> <span class="n">existing_line</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">existing_line</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
-                <span class="k">return</span> <span class="n">i</span>
-            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">):</span>
-                <span class="k">break</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Fstab line does not exist&quot;</span><span class="p">)</span></div>
+        <span class="n">release</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set a new release and save the updated file.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">release</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_and_save</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">line</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-            <span class="n">FstabLine</span><span class="p">,</span>
-            <span class="n">FstabCommentLine</span><span class="p">,</span>
-            <span class="n">FstabAutoPlaceholderLine</span>
-        <span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return True when the FstabLine already exists.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">maintenance_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FstabMaintenanceLine</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Auto-generate lines that are required for jail start and stop.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">FstabMaintenanceLine</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">launch_script_dir</span><span class="p">),</span>
-            <span class="n">destination</span><span class="o">=</span><span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span>
-                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.root_dataset.mountpoint}</span><span class="s2">/.iocage&quot;</span>
-            <span class="p">),</span>
-            <span class="n">options</span><span class="o">=</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;nullfs&quot;</span><span class="p">,</span>
-            <span class="n">freq</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">passno</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">comment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">AUTO_COMMENT_IDENTIFIER</span>
-        <span class="p">))]</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">basejail_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FstabBasejailLine</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Auto-generate lines of NullFS basejails.</span>
-
-<span class="sd">        When a jail is a NullFS basejail, this list represent the corresponding</span>
-<span class="sd">        fstab lines that mount the release.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">release</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;basejail_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;nullfs&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="n">basedirs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_basedir_list</span><span class="p">(</span>
-            <span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span>
-        <span class="p">)</span>
-
-        <span class="n">fstab_basejail_lines</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">release_root_path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">release</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;.zfs/snapshot/</span><span class="si">{self.jail.release_snapshot.snapshot_name}</span><span class="s2">&quot;</span>
+    <span class="k">def</span> <span class="nf">__replace_magic_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">_backup_prefix</span> <span class="o">=</span> <span class="s2">&quot;backup:///&quot;</span>
+        <span class="k">if</span> <span class="n">filepath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">filepath</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span>
+            <span class="n">filepath</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_backup_prefix</span><span class="p">):]</span>
         <span class="p">])</span>
-        <span class="k">for</span> <span class="n">basedir</span> <span class="ow">in</span> <span class="n">basedirs</span><span class="p">:</span>
-
-            <span class="n">source</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{release_root_path}</span><span class="s2">/</span><span class="si">{basedir}</span><span class="s2">&quot;</span>
-            <span class="n">destination</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.root_dataset.mountpoint}</span><span class="s2">/</span><span class="si">{basedir}</span><span class="s2">&quot;</span>
-            <span class="n">fstab_basejail_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FstabBasejailLine</span><span class="p">({</span>
-                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">,</span>
-                <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="n">destination</span><span class="p">,</span>
-                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;nullfs&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="s2">&quot;ro&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;passno&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUTO_COMMENT_IDENTIFIER</span>
-            <span class="p">}))</span>
-
-        <span class="k">return</span> <span class="n">fstab_basejail_lines</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the entire content of the fstab file as string.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
-            <span class="nb">str</span><span class="p">,</span>
-            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the number of lines in the fstab file.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: T484</span>
-        <span class="sd">&quot;&quot;&quot;Delete an FstabLine at the given index.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Delete an FstabLine at the given index of the jails fstab file.&quot;&quot;&quot;</span>
         <span class="n">deletion_target_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="n">jail_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">humanreadable_name</span>
         <span class="n">source</span> <span class="o">=</span> <span class="n">deletion_target_line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
         <span class="n">destination</span> <span class="o">=</span> <span class="n">deletion_target_line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
-            <span class="n">f</span><span class="s2">&quot;Deleting fstab entry from jail </span><span class="si">{jail_name}</span><span class="s2">: &quot;</span>
-            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{source}</span><span class="s2"> -&gt; </span><span class="si">{destination}</span><span class="s2">&quot;</span>
+            <span class="n">f</span><span class="s2">&quot;Deleting fstab entry: </span><span class="si">{source}</span><span class="s2"> -&gt; </span><span class="si">{destination}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="n">real_index</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">running</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
-                <span class="n">f</span><span class="s2">&quot;Unmounting </span><span class="si">{destination}</span><span class="s2"> from running jail </span><span class="si">{jail_name}</span><span class="s2">&quot;</span>
+                <span class="n">f</span><span class="s2">&quot;Unmounting </span><span class="si">{destination}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
             <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span>
                 <span class="n">destination</span><span class="p">,</span>
@@ -747,123 +919,55 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>  <span class="c1"># noqa: T484</span>
-        <span class="n">FstabLine</span><span class="p">,</span>
-        <span class="n">FstabCommentLine</span><span class="p">,</span>
-        <span class="n">FstabAutoPlaceholderLine</span>
-    <span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get the FstabLine at the given index.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span>  <span class="c1"># noqa: T484</span>
+<div class="viewcode-block" id="JailFstab.mount"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.mount">[docs]</a>    <span class="k">def</span> <span class="nf">mount</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-            <span class="n">FstabLine</span><span class="p">,</span>
-            <span class="n">FstabCommentLine</span><span class="p">,</span>
-            <span class="n">FstabAutoPlaceholderLine</span>
-        <span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Set or overwrite the FstabLine at the given index.&quot;&quot;&quot;</span>
-        <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">real_index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.MountFstab&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Mount all fstab entries to the jail.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">MountFstab</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unmount</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">)]:</span>
+                <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">],</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span>
+                    <span class="n">fstype</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+                    <span class="n">opts</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[</span><span class="s2">&quot;options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Fstab.insert"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span>
+<div class="viewcode-block" id="JailFstab.unmount"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.unmount">[docs]</a>    <span class="k">def</span> <span class="nf">unmount</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-            <span class="n">FstabLine</span><span class="p">,</span>
-            <span class="n">FstabCommentLine</span><span class="p">,</span>
-            <span class="n">FstabAutoPlaceholderLine</span>
-        <span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Insert a line at a given position.</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.MountFstab&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Unmount all fstab entries from the jail.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">MountFstab</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">)]:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">],</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
-<span class="sd">        Args:</span>
-
-<span class="sd">            index:</span>
-<span class="sd">                The numeric line insertion position</span>
-
-<span class="sd">            value:</span>
-<span class="sd">                A FstabLine, Comment or Placeholder</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">target_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_line</span><span class="p">,</span> <span class="n">FstabBasejailLine</span><span class="p">):</span>
-            <span class="c1"># find FstabAutoPlaceholderLine instead</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span>
-            <span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_unmounted_any</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">real_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">real_index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_real_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="n">target_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">())[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_line</span><span class="p">,</span> <span class="n">FstabBasejailLine</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">VirtualFstabLineHasNoRealIndex</span><span class="p">(</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target_line</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-        <span class="n">FstabAutoPlaceholderLine</span><span class="p">,</span>
-        <span class="n">FstabBasejailLine</span><span class="p">,</span>
-        <span class="n">FstabCommentLine</span><span class="p">,</span>
-        <span class="n">FstabLine</span>
-    <span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return an iterator of all printable lines.</span>
-
-<span class="sd">        The output includes user configured and auto created lines for NullFS</span>
-<span class="sd">        basejails. The previous position of auto-created entries is preserved.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">basejail_lines_added</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-                <span class="n">FstabAutoPlaceholderLine</span><span class="p">,</span>
-                <span class="n">FstabBasejailLine</span><span class="p">,</span>
-                <span class="n">FstabCommentLine</span><span class="p">,</span>
-                <span class="n">FstabLine</span>
-            <span class="p">]</span>
-        <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">basejail_lines_added</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                    <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basejail_lines</span>
-                    <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintenance_lines</span>
-                    <span class="n">basejail_lines_added</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">basejail_lines_added</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">_basejail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basejail_lines</span>
-            <span class="n">_maintenance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintenance_lines</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">_basejail</span> <span class="o">+</span> <span class="n">_maintenance</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span>  <span class="c1"># noqa: T484</span>
-
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Fstab.replace_path"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.replace_path">[docs]</a>    <span class="k">def</span> <span class="nf">replace_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">replacement</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Replace a path in all fstab entries (source or destination).&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="n">line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_replace_path_prefix</span><span class="p">(</span>
-                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span>
-                <span class="n">pattern</span><span class="p">,</span>
-                <span class="n">replacement</span>
-            <span class="p">)</span>
-            <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_replace_path_prefix</span><span class="p">(</span>
-                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">],</span>
-                <span class="n">pattern</span><span class="p">,</span>
-                <span class="n">replacement</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span></div></div>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_is_comment_line</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>

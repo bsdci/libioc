@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.helpers module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.helpers module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -303,6 +302,20 @@
 <dt id="libioc.helpers.makedirs_safe">
 <code class="descclassname">libioc.helpers.</code><code class="descname">makedirs_safe</code><span class="sig-paren">(</span><em>target</em>, <em>mode=448</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#makedirs_safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.makedirs_safe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a directory without following symlinks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libioc.helpers.mount">
+<code class="descclassname">libioc.helpers.</code><code class="descname">mount</code><span class="sig-paren">(</span><em>destination</em>, <em>source=None</em>, <em>fstype='nullfs'</em>, <em>opts=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mount a filesystem using libc.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -571,26 +584,12 @@ ignored and unescaped.</p>
 <dl class="function">
 <dt id="libioc.helpers.umount">
 <code class="descclassname">libioc.helpers.</code><code class="descname">umount</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>options=None</em>, <em>force=False</em>, <em>ignore_error=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#umount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.umount" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unmount a mountpoint.</p>
+<dd><p>Unmount a mountpoint using libc.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="libioc.helpers.umount_command">
-<code class="descclassname">libioc.helpers.</code><code class="descname">umount_command</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>options=None</em>, <em>force=False</em>, <em>ignore_error=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#umount_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.umount_command" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the command to unmount a mountpoint.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
 </tr>
 </tbody>
 </table>

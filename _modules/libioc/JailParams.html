@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.JailParams &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.JailParams &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -264,7 +264,7 @@
     <span class="sd">&quot;&quot;&quot;Collection of jail parameters.&quot;&quot;&quot;</span>
 
     <span class="n">__base_class</span> <span class="o">=</span> <span class="n">JailParam</span>
-    <span class="n">__sysctl_params</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">Sysctl</span><span class="p">]</span>
+    <span class="n">__sysctl_params</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JailParam</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Iterate over the jail param names.&quot;&quot;&quot;</span>
@@ -274,7 +274,7 @@
         <span class="sd">&quot;&quot;&quot;Return the number of available jail params.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">memoized_params</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="JailParams.items"><a class="viewcode-back" href="../../libioc.JailParams.html#libioc.JailParams.JailParams.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">ItemsView</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">Sysctl</span><span class="p">]:</span>
+<div class="viewcode-block" id="JailParams.items"><a class="viewcode-back" href="../../libioc.JailParams.html#libioc.JailParams.JailParams.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">ItemsView</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JailParam</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Iterate over the keys and values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">memoized_params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
 
@@ -295,7 +295,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">memoized_params</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">memoized_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">Sysctl</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">memoized_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JailParam</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Return the memorized params initialized on first access.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sysctl_params</span>

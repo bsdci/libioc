@@ -26,7 +26,6 @@ Submodules
    libioc.IPAddress
    libioc.Jail
    libioc.JailParams
-   libioc.JailState
    libioc.Jails
    libioc.LaunchableResource
    libioc.ListableResource

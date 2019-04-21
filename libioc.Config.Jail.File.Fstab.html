@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.File.Fstab module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Config.Jail.File.Fstab module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -179,7 +179,7 @@
 <p>Manage fstab files.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.File.Fstab.Fstab">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.Fstab.</code><code class="descname">Fstab</code><span class="sig-paren">(</span><em>jail</em>, <em>release=None</em>, <em>logger=None</em>, <em>host=None</em>, <em>file='fstab'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.Fstab.</code><code class="descname">Fstab</code><span class="sig-paren">(</span><em>logger=None</em>, <em>host=None</em>, <em>file='/etc/fstab'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableSequence</span></code></p>
 <p>Fstab configuration file wrapper.</p>
 <p>This object allows to read, programatically edit and write fstab files.
@@ -200,22 +200,6 @@ relative to the resource’s root_dataset <cite>&lt;resource&gt;/root</cite>.</p
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libioc.Config.Jail.File.Fstab.Fstab.basejail_lines">
-<code class="descname">basejail_lines</code><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.basejail_lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Auto-generate lines of NullFS basejails.</p>
-<p>When a jail is a NullFS basejail, this list represent the corresponding
-fstab lines that mount the release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#libioc.Config.Jail.File.Fstab.FstabBasejailLine" title="libioc.Config.Jail.File.Fstab.FstabBasejailLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabBasejailLine</span></code></a>]</td>
 </tr>
 </tbody>
 </table>
@@ -256,20 +240,6 @@ fstab lines that mount the release.</p>
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libioc.Config.Jail.File.Fstab.Fstab.maintenance_lines">
-<code class="descname">maintenance_lines</code><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.maintenance_lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Auto-generate lines that are required for jail start and stop.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#libioc.Config.Jail.File.Fstab.FstabMaintenanceLine" title="libioc.Config.Jail.File.Fstab.FstabMaintenanceLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">FstabMaintenanceLine</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="method">
 <dt id="libioc.Config.Jail.File.Fstab.Fstab.new_line">
 <code class="descname">new_line</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>type='nullfs'</em>, <em>options='ro'</em>, <em>freq=0</em>, <em>passno=0</em>, <em>comment=None</em>, <em>replace=False</em>, <em>auto_create_destination=False</em>, <em>auto_mount_jail=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab.new_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.new_line" title="Permalink to this definition">¶</a></dt>
@@ -287,7 +257,7 @@ fstab lines that mount the release.</p>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.File.Fstab.Fstab.parse_lines">
-<code class="descname">parse_lines</code><span class="sig-paren">(</span><em>input_text</em>, <em>ignore_auto_created=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab.parse_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.parse_lines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parse_lines</code><span class="sig-paren">(</span><em>input_text</em>, <em>ignore_auto_created=True</em>, <em>skip_destinations=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab.parse_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.parse_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the content of a fstab file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -296,6 +266,7 @@ fstab lines that mount the release.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>input_text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The text content of an existing fstab file</li>
 <li><strong>ignore_auto_created</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Skips reading entries that were created by iocage</li>
+<li><strong>exclude_destinations</strong> – List of destination strings that is skipped</li>
 </ul>
 </td>
 </tr>
@@ -311,9 +282,6 @@ fstab lines that mount the release.</p>
 <code class="descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute fstab file path.</p>
 <p>This is the file read from and written to.</p>
-<p>When the path begins with a / it is assumed to be absolute, so that
-the jails dataset mountpoint is not used as path prefix. This is useful
-when moving around jail backups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -380,20 +348,6 @@ when moving around jail backups.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="libioc.Config.Jail.File.Fstab.Fstab.update_release">
-<code class="descname">update_release</code><span class="sig-paren">(</span><em>release=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#Fstab.update_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.Fstab.update_release" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a new release and save the updated file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -441,6 +395,111 @@ when moving around jail backups.</p>
 <em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.Fstab.</code><code class="descname">FstabMaintenanceLine</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#FstabMaintenanceLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.FstabMaintenanceLine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Config.Jail.File.Fstab.FstabLine" title="libioc.Config.Jail.File.Fstab.FstabLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.File.Fstab.FstabLine</span></code></a></p>
 <p>Model a fstab line automatically created for jail launch scripts.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab">
+<em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.Fstab.</code><code class="descname">JailFstab</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em>, <em>host=None</em>, <em>file='fstab'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.Config.Jail.File.Fstab.Fstab" title="libioc.Config.Jail.File.Fstab.Fstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.File.Fstab.Fstab</span></code></a></p>
+<p>Fstab file abstraction of a Jails fstab file.</p>
+<p>The jails fstab file is stored in its main dataset.</p>
+<dl class="method">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>line</em>, <em>skip_existing=False</em>, <em>replace=False</em>, <em>auto_create_destination=False</em>, <em>auto_mount_jail=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab.add_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directly append a FstabLine type.</p>
+<p>Use save() to write changes to the fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.mount">
+<code class="descname">mount</code><span class="sig-paren">(</span><em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab.mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mount all fstab entries to the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.MountFstab" title="libioc.events.MountFstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">MountFstab</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.parse_lines">
+<code class="descname">parse_lines</code><span class="sig-paren">(</span><em>input_text</em>, <em>ignore_auto_created=True</em>, <em>skip_destinations=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab.parse_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.parse_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the content of a fstab file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The text content of an existing fstab file</li>
+<li><strong>ignore_auto_created</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Skips reading entries that were created by iocage</li>
+<li><strong>exclude_destinations</strong> – List of destination strings that is skipped</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.path">
+<code class="descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute fstab file path.</p>
+<p>This is the file read from and written to.</p>
+<p>When the path begins with a / it is assumed to be absolute, so that
+the jails dataset mountpoint is not used as path prefix. This is useful
+when moving around jail backups.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.unmount">
+<code class="descname">unmount</code><span class="sig-paren">(</span><em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab.unmount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.unmount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unmount all fstab entries from the jail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.MountFstab" title="libioc.events.MountFstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">MountFstab</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Config.Jail.File.Fstab.JailFstab.update_release">
+<code class="descname">update_release</code><span class="sig-paren">(</span><em>release=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File/Fstab.html#JailFstab.update_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.Fstab.JailFstab.update_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a new release and save the updated file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>

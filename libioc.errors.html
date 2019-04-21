@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.errors module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.errors module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -426,6 +425,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="libioc.errors.InvalidMountpoint">
+<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">InvalidMountpoint</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#InvalidMountpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.InvalidMountpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
+<p>Raised when a mountpoint was invalid or not found.</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="libioc.errors.InvalidNetworkBridge">
 <em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">InvalidNetworkBridge</code><span class="sig-paren">(</span><em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#InvalidNetworkBridge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.InvalidNetworkBridge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
@@ -566,6 +572,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="libioc.errors.JailHookFailed">
+<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">JailHookFailed</code><span class="sig-paren">(</span><em>jail</em>, <em>hook</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#JailHookFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.JailHookFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.errors.JailException" title="libioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.JailException</span></code></a></p>
+<p>Raised when the jail could not be launched.</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="libioc.errors.JailHostIdMismatch">
 <em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">JailHostIdMismatch</code><span class="sig-paren">(</span><em>host_hostid</em>, <em>jail</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#JailHostIdMismatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.JailHostIdMismatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.errors.JailException" title="libioc.errors.JailException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.JailException</span></code></a></p>
@@ -658,7 +671,7 @@
 
 <dl class="exception">
 <dt id="libioc.errors.MountFailed">
-<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">MountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#MountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.MountFailed" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">MountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#MountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.MountFailed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
 <p>Raised when a mount operation fails.</p>
 </dd></dl>
@@ -717,6 +730,13 @@
 <em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">ReleaseUpdateBranchLookup</code><span class="sig-paren">(</span><em>release_name</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#ReleaseUpdateBranchLookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.ReleaseUpdateBranchLookup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
 <p>Raised when failing to lookup the remote update branch.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="libioc.errors.ResourceLimitActionFailed">
+<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">ResourceLimitActionFailed</code><span class="sig-paren">(</span><em>action</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#ResourceLimitActionFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.ResourceLimitActionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></p>
+<p>Raised when a resource limit has is unknown.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -812,7 +832,7 @@
 
 <dl class="exception">
 <dt id="libioc.errors.UnmountFailed">
-<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">UnmountFailed</code><span class="sig-paren">(</span><em>mountpoint</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#UnmountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.UnmountFailed" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">libioc.errors.</code><code class="descname">UnmountFailed</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>reason=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/errors.html#UnmountFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.errors.UnmountFailed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
 <p>Raised when an unmount operation fails.</p>
 </dd></dl>

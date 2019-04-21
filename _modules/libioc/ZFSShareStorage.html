@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ZFSShareStorage &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.ZFSShareStorage &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -196,37 +196,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jail</span> <span class="o">=</span> <span class="n">jail</span>
 
-<div class="viewcode-block" id="ZFSShareStorage.mount_zfs_shares"><a class="viewcode-back" href="../../libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares">[docs]</a>    <span class="k">def</span> <span class="nf">mount_zfs_shares</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto_create</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ZFSShareStorage.mount_zfs_shares"><a class="viewcode-back" href="../../libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares">[docs]</a>    <span class="k">def</span> <span class="nf">mount_zfs_shares</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">auto_create</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.JailZFSShare&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Invoke mounting the ZFS shares.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Mounting ZFS shares&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mount_jail_datasets</span><span class="p">(</span><span class="n">auto_create</span><span class="o">=</span><span class="n">auto_create</span><span class="p">)</span></div>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailZFSShare</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require_datasets_exist_and_jailed</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DatasetNotJailed</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;ZFS dataset not jailed&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
 
-<div class="viewcode-block" id="ZFSShareStorage.umount_zfs_shares"><a class="viewcode-back" href="../../libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.umount_zfs_shares">[docs]</a>    <span class="k">def</span> <span class="nf">umount_zfs_shares</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Unmount a running jails shared ZFS datasets.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_zfs_datasets</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Unmounting ZFS Dataset </span><span class="si">{dataset.name}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exec</span><span class="p">([</span>
-                <span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;set&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;jailed=off&quot;</span><span class="p">,</span>
-                <span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exec</span><span class="p">([</span>
-                <span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;umount&quot;</span><span class="p">,</span>
-                <span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exec</span><span class="p">([</span>
-                <span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;mount&quot;</span><span class="p">,</span>
-                <span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exec</span><span class="p">([</span>
-                <span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;set&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;jailed=on&quot;</span><span class="p">,</span>
-                <span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="p">])</span></div>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mount_jail_datasets</span><span class="p">(</span><span class="n">auto_create</span><span class="o">=</span><span class="n">auto_create</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ZFSShareStorage.get_zfs_datasets"><a class="viewcode-back" href="../../libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.get_zfs_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">get_zfs_datasets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -264,13 +253,19 @@
 
     <span class="k">def</span> <span class="nf">_mount_jail_datasets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">auto_create</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">safe_mode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require_datasets_exist_and_jailed</span><span class="p">()</span>
+        <span class="n">auto_create</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.AttachZFSDataset&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_zfs_datasets</span><span class="p">():</span>
+
+            <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">AttachZFSDataset</span><span class="p">(</span>
+                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Mounting ZFS Dataset </span><span class="si">{dataset.name}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_umount_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
@@ -279,6 +274,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_zfs_jail_command</span> <span class="o">+</span> <span class="p">[</span><span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
+
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_exec_jail</span><span class="p">([</span><span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span> <span class="s2">&quot;mount&quot;</span><span class="p">,</span> <span class="s2">&quot;-a&quot;</span><span class="p">])</span>
 
@@ -319,7 +316,7 @@
 
         <span class="n">existing_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_zfs_datasets</span><span class="p">(</span><span class="n">auto_create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">existing_dataset</span> <span class="ow">in</span> <span class="n">existing_datasets</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">existing_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;jailed&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">existing_dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;jailed&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DatasetNotJailed</span><span class="p">(</span>
                     <span class="n">dataset</span><span class="o">=</span><span class="n">existing_dataset</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
@@ -341,44 +338,6 @@
         <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.helpers.CommandOutput&#39;</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="QueuingZFSShareStorage"><a class="viewcode-back" href="../../libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.QueuingZFSShareStorage">[docs]</a><span class="k">class</span> <span class="nc">QueuingZFSShareStorage</span><span class="p">(</span>
-    <span class="n">ZFSShareStorage</span><span class="p">,</span>
-    <span class="n">libioc</span><span class="o">.</span><span class="n">CommandQueue</span><span class="o">.</span><span class="n">CommandQueue</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Delay ZFSShareStorage commands for bulk execution.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clear_command_queue</span><span class="p">()</span>
-        <span class="n">ZFSShareStorage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">zfs</span><span class="o">=</span><span class="n">zfs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_exec</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="o">**</span><span class="n">exec_arguments</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">CommandOutput</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_command_queue</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_exec_jail</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="o">**</span><span class="n">exec_arguments</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">CommandOutput</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_command_queue</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">),</span> <span class="n">queue_name</span><span class="o">=</span><span class="s2">&quot;jail&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_zfs_jail_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span> <span class="s2">&quot;jail&quot;</span><span class="p">,</span> <span class="s2">&quot;$IOC_JID&quot;</span><span class="p">]</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_zfs_unjail_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;/sbin/zfs&quot;</span><span class="p">,</span> <span class="s2">&quot;unjail&quot;</span><span class="p">,</span> <span class="s2">&quot;$IOC_JID&quot;</span><span class="p">]</span></div>
 </pre></div>
 
            </div>

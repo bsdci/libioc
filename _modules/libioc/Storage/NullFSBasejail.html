@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Storage.NullFSBasejail &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Storage.NullFSBasejail &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -175,48 +175,99 @@
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage NullFS basejail storage backend.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
 <span class="kn">import</span> <span class="nn">libioc.Storage</span>
+<span class="kn">import</span> <span class="nn">libioc.Storage.Basejail</span>
 <span class="kn">import</span> <span class="nn">libioc.Storage.Standalone</span>
 <span class="kn">import</span> <span class="nn">libioc.helpers</span>
 
+<span class="n">BasejailStorage</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Basejail</span><span class="o">.</span><span class="n">BasejailStorage</span>
 
-<div class="viewcode-block" id="NullFSBasejailStorage"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">NullFSBasejailStorage</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Storage</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NullFSBasejailStorage"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">NullFSBasejailStorage</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Basejail</span><span class="o">.</span><span class="n">BasejailStorage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;iocage NullFS basejail storage backend.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.apply"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NullFSBasejailStorage.apply"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Attach the jail storage.&quot;&quot;&quot;</span>
-        <span class="n">NullFSBasejailStorage</span><span class="o">.</span><span class="n">_create_nullfs_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">BasejailStorageConfig</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.setup"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">NullFSBasejailStorage</span><span class="o">.</span><span class="n">_create_nullfs_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;NullFS directory creation failed&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mounts</span> <span class="o">=</span> <span class="n">BasejailStorage</span><span class="o">.</span><span class="n">_get_basejail_mounts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">destination</span> <span class="ow">in</span> <span class="n">mounts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+                <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+                    <span class="n">fstype</span><span class="o">=</span><span class="s2">&quot;nullfs&quot;</span><span class="p">,</span>
+                    <span class="n">opts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ro&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;Failed to mount NullFS basedirs&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NullFSBasejailStorage.teardown"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Unmount NullFS basejail mounts.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">BasejailStorageConfig</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mounts</span> <span class="o">=</span> <span class="n">BasejailStorage</span><span class="o">.</span><span class="n">_get_basejail_mounts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">destination</span> <span class="ow">in</span> <span class="n">mounts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;Failed to mount NullFS basedirs&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="n">has_unmounted_any</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">yield from</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="NullFSBasejailStorage.setup"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Prepare the jail storage.&quot;&quot;&quot;</span>
         <span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Standalone</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">release</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="NullFSBasejailStorage.umount_nullfs"><a class="viewcode-back" href="../../../libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.umount_nullfs">[docs]</a>    <span class="k">def</span> <span class="nf">umount_nullfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Unmount all NullFS mounts from fstab.</span>
-
-<span class="sd">        In preparation of starting the jail with NullFS mounts all mountpoints</span>
-<span class="sd">        that are listed in fstab need to be unmounted</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.path}</span><span class="s2">/fstab&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">mounts</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">mount</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-                <span class="n">mount_line_data</span> <span class="o">=</span> <span class="n">mount</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mount_line_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="c1"># line has a mountpoint</span>
-                    <span class="n">mounts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mount_line_data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mounts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span><span class="s2">&quot;/sbin/umount&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">mounts</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">CommandFailure</span><span class="p">:</span>
-                    <span class="c1"># in case directories were not mounted</span>
-                    <span class="k">pass</span></div>
-
-    <span class="k">def</span> <span class="nf">_create_nullfs_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_nullfs_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">basedirs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_basedir_list</span><span class="p">(</span>
             <span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span>
         <span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span> <span class="s2">&quot;etc&quot;</span><span class="p">]</span>

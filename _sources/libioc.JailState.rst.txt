@@ -1,7 +1,0 @@
-libioc.JailState module
-=======================
-
-.. automodule:: libioc.JailState
-    :members:
-    :undoc-members:
-    :show-inheritance:

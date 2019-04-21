@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.errors &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.errors &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -361,6 +361,20 @@
         <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="JailHookFailed"><a class="viewcode-back" href="../../libioc.errors.html#libioc.errors.JailHookFailed">[docs]</a><span class="k">class</span> <span class="nc">JailHookFailed</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the jail could not be launched.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">hook</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hook</span> <span class="o">=</span> <span class="n">hook</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Jail </span><span class="si">{jail.full_name}</span><span class="s2"> hook </span><span class="si">{hook}</span><span class="s2"> failed&quot;</span>
+        <span class="n">JailException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="JailLaunchFailed"><a class="viewcode-back" href="../../libioc.errors.html#libioc.errors.JailLaunchFailed">[docs]</a><span class="k">class</span> <span class="nc">JailLaunchFailed</span><span class="p">(</span><span class="n">JailException</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Raised when the jail could not be launched.&quot;&quot;&quot;</span>
 
@@ -608,6 +622,18 @@
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;The specified resource limit is unknown&quot;</span>
+        <span class="n">IocException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceLimitActionFailed"><a class="viewcode-back" href="../../libioc.errors.html#libioc.errors.ResourceLimitActionFailed">[docs]</a><span class="k">class</span> <span class="nc">ResourceLimitActionFailed</span><span class="p">(</span><span class="n">IocException</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a resource limit has is unknown.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Resource Limit failed to </span><span class="si">{action}</span><span class="s2">&quot;</span>
         <span class="n">IocException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
 
 
@@ -883,12 +909,15 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Unmount of </span><span class="si">{mountpoint}</span><span class="s2"> failed&quot;</span>
+        <span class="k">if</span> <span class="n">mountpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Umount failed&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Unmount of </span><span class="si">{mountpoint}</span><span class="s2"> failed&quot;</span>
         <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
@@ -900,10 +929,26 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mountpoint</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Failed to mount </span><span class="si">{mountpoint}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidMountpoint"><a class="viewcode-back" href="../../libioc.errors.html#libioc.errors.InvalidMountpoint">[docs]</a><span class="k">class</span> <span class="nc">InvalidMountpoint</span><span class="p">(</span><span class="n">IocException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a mountpoint was invalid or not found.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Invalid mountpoint </span><span class="si">{mountpoint}</span><span class="s2">&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
 
 

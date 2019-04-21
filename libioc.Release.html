@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Release module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Release module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -222,7 +221,7 @@
 
 <dl class="method">
 <dt id="libioc.Release.Release.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=None</em>, <em>fetch_updates=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=False</em>, <em>fetch_updates=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the release from the remote synchronously.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -368,13 +367,37 @@ name was found in the distributions eol_list.</p>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=None</em>, <em>fetch_updates=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=False</em>, <em>fetch_updates=False</em>, <em>event_scope=None</em>, <em>update_base=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the release from the remote.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>update</strong> (<em>bool</em>) – <p>(default=False)</p>
+<p>When enabled, updates are applied to the release,
+unless fetching updates was without success.</p>
+</li>
+<li><strong>fetch_updates</strong> (<em>bool</em>) – <p>(default=False)</p>
+<p>When enabled, updates are fetched.
+Disabling this option has no impact on applying updates.</p>
+</li>
+<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(optional)</p>
+<p>Pass on the IocEvent stack for use in higher order functions.</p>
+</li>
+<li><strong>update_base</strong> (<em>bool</em>) – <p>(optional)</p>
+<p>When unset, the sysrc config <cite>ioc_legacy_support</cite> is taken
+into account to determine whether ZFS basejail datasets should
+be updated in case the release was created or modified.
+Those ZFS basejail datasets are required to start basejails
+created with iocage_legacy.
+A boolean value overrides the configuration from /etc/rc.conf.</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</td>
 </tr>
 </tbody>
 </table>

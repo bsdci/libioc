@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.BridgeInterface &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.BridgeInterface &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -174,7 +174,6 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage host bridge interface module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
-<span class="kn">import</span> <span class="nn">shlex</span>
 
 
 <div class="viewcode-block" id="BridgeInterface"><a class="viewcode-back" href="../../libioc.BridgeInterface.html#libioc.BridgeInterface.BridgeInterface">[docs]</a><span class="k">class</span> <span class="nc">BridgeInterface</span><span class="p">:</span>
@@ -189,8 +188,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">secure_vnet</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">insecure</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">secure_vnet</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a (Secure VNET) bridge interface.</span>
@@ -216,8 +214,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">secure_vnet</span> <span class="o">=</span> <span class="p">(</span><span class="n">secure_vnet</span> <span class="ow">or</span> <span class="p">(</span><span class="n">secure_vnet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span>
             <span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">insecure</span> <span class="o">=</span> <span class="p">(</span><span class="n">insecure</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escape</span><span class="p">(</span><span class="n">_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">_name</span>
 
         <span class="c1"># may override name set secure_vnet mode</span>
         <span class="k">if</span> <span class="n">secure_vnet</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -231,13 +228,9 @@
 <span class="sd">        used to mitigate ARP spoofing with IPFW.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">secure_vnet</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.SECURE_BRIDGE_PREFIX}{self.name}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.SECURE_BRIDGE_PREFIX}{self.name}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escape</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_escape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">insecure</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
 </pre></div>
 
            </div>

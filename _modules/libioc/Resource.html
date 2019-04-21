@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Resource &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Resource &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -473,11 +473,14 @@
         <span class="sd">&quot;&quot;&quot;Return the absolute path of a path relative to the resource.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">Data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Write the configuration to disk.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Resource.read_config"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Resource.read_config"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">skip_invalid</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Read the configuration from disk.&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_handler</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>  <span class="c1"># type: typing.Dict[str, typing.Any]</span>
         <span class="k">return</span> <span class="n">data</span></div>
@@ -490,10 +493,7 @@
 
 <div class="viewcode-block" id="Resource.get"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get any resource attribute.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">raise</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Resource.getstring"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.getstring">[docs]</a>    <span class="k">def</span> <span class="nf">getstring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -569,7 +569,10 @@
             <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="DefaultResource.read_config"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.DefaultResource.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="DefaultResource.read_config"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.DefaultResource.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">skip_invalid</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Read the default configuration.&quot;&quot;&quot;</span>
         <span class="n">o</span> <span class="o">=</span> <span class="n">Resource</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
@@ -584,7 +587,7 @@
 
 <div class="viewcode-block" id="DefaultResource.save"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.DefaultResource.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Save changes to the default configuration.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">nested</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">user_data</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

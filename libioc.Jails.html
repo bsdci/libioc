@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Jails module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Jails module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="libioc.LaunchableResource module" href="libioc.LaunchableResource.html" />
-    <link rel="prev" title="libioc.JailState module" href="libioc.JailState.html" /> 
+    <link rel="prev" title="libioc.JailParams module" href="libioc.JailParams.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -203,24 +202,19 @@
 <p>iocage module of jail collections.</p>
 <dl class="class">
 <dt id="libioc.Jails.Jails">
-<em class="property">class </em><code class="descclassname">libioc.Jails.</code><code class="descname">Jails</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>logger=None</em>, <em>zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jails.html#Jails"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jails.Jails" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.Jails.</code><code class="descname">Jails</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>**resource_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jails.html#Jails"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jails.Jails" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Jails.JailsGenerator" title="libioc.Jails.JailsGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Jails.JailsGenerator</span></code></a></p>
 <p>Synchronous wrapper ofs JailsGenerator.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Jails.JailsGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Jails.</code><code class="descname">JailsGenerator</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>logger=None</em>, <em>zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jails.html#JailsGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jails.JailsGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.Jails.</code><code class="descname">JailsGenerator</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>**resource_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jails.html#JailsGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jails.JailsGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.ListableResource.html#libioc.ListableResource.ListableResource" title="libioc.ListableResource.ListableResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.ListableResource.ListableResource</span></code></a></p>
 <p>Asynchronous representation of a collection of jails.</p>
 <dl class="attribute">
 <dt id="libioc.Jails.JailsGenerator.JAIL_KEYS">
 <code class="descname">JAIL_KEYS</code><em class="property"> = ['jid', 'name', 'running', 'ip4.addr', 'ip6.addr']</em><a class="headerlink" href="#libioc.Jails.JailsGenerator.JAIL_KEYS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="libioc.Jails.JailsGenerator.states">
-<code class="descname">states</code><em class="property"> = {}</em><a class="headerlink" href="#libioc.Jails.JailsGenerator.states" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -238,7 +232,7 @@
         <a href="libioc.LaunchableResource.html" class="btn btn-neutral float-right" title="libioc.LaunchableResource module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="libioc.JailState.html" class="btn btn-neutral float-left" title="libioc.JailState module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="libioc.JailParams.html" class="btn btn-neutral float-left" title="libioc.JailParams module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

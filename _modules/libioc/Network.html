@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Network &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Network &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -220,9 +220,8 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Firewall</span><span class="o">.</span><span class="n">QueuingFirewall</span><span class="p">(</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Firewall</span><span class="o">.</span><span class="n">Firewall</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">nic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -236,10 +235,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ipv6_addresses</span> <span class="o">=</span> <span class="n">ipv6_addresses</span> <span class="ow">or</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nic_hash_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Network.setup"><a class="viewcode-back" href="../../libioc.Network.html#libioc.Network.Network.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
-        <span class="n">CreatedCommandList</span><span class="p">,</span>
-        <span class="n">StartCommandList</span>
-    <span class="p">]:</span>
+<div class="viewcode-block" id="Network.setup"><a class="viewcode-back" href="../../libioc.Network.html#libioc.Network.Network.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.VnetInterfaceConfig&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply the network configuration.</span>
 
@@ -249,57 +248,79 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vnet</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__require_bridge</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_vnet_iface</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Network.teardown"><a class="viewcode-back" href="../../libioc.Network.html#libioc.Network.Network.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">VnetInterfaceConfig</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create_vnet_iface</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Network.teardown"><a class="viewcode-back" href="../../libioc.Network.html#libioc.Network.Network.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jid</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.VnetInterfaceConfig&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Teardown the applied changes.</span>
 
 <span class="sd">        After Jails are stopped the devices that were used by it remain on the</span>
 <span class="sd">        host. This method is called by jails after they terminated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">VnetInterfaceConfig</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vnet</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">commands</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+            <span class="k">return</span>
 
-        <span class="n">commands</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__down_host_interface</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">jid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">jid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">jid</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_secure_vnet_bridge</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">commands</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__down_secure_mode_devices</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">delete_rule</span><span class="p">(</span><span class="s2">&quot;$IOC_JID&quot;</span><span class="p">)</span>
-            <span class="n">commands</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__down_host_interface</span><span class="p">(</span><span class="n">jid</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">commands</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_secure_vnet_bridge</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__down_secure_mode_devices</span><span class="p">(</span><span class="n">jid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">delete_rule</span><span class="p">(</span><span class="n">jid</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__require_bridge</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bridge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">VnetBridgeMissing</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__down_host_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">nic</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID&quot;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__down_host_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jid</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{jid}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">extra_settings</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;destroy&quot;</span><span class="p">],</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
-        <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">nic</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">commands</span>
 
-    <span class="k">def</span> <span class="nf">__down_secure_mode_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">__down_secure_mode_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jid</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Downing secure mode devices&quot;</span><span class="p">)</span>
-        <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">secure_mode_nics</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:a&quot;</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:net&quot;</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{jid}</span><span class="s2">:a&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{jid}</span><span class="s2">:net&quot;</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">nic</span> <span class="ow">in</span> <span class="n">secure_mode_nics</span><span class="p">:</span>
-            <span class="n">commands</span> <span class="o">+=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">nic</span><span class="p">,</span>
-                <span class="n">extra_settings</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;destroy&quot;</span><span class="p">],</span>
-                <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">commands</span>
+                <span class="n">extra_settings</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;destroy&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mtu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -364,76 +385,63 @@
 
     <span class="k">def</span> <span class="nf">__create_new_epair_interface</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">variable_name_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">variable_name_b</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">nic_suffix_a</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;:a&quot;</span><span class="p">,</span>
         <span class="n">nic_suffix_b</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;:b&quot;</span><span class="p">,</span>
+        <span class="n">mac_addresses</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libioc</span><span class="o">.</span><span class="n">MacAddress</span><span class="o">.</span><span class="n">MacAddressPair</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">nic_args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreatedCommandList</span><span class="p">:</span>
-
-        <span class="n">commands</span><span class="p">:</span> <span class="n">CreatedCommandList</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="n">commands</span> <span class="o">+=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;epair&quot;</span><span class="p">,</span>
-            <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">variable_name_a</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">f</span><span class="s2">&quot;export </span><span class="si">{variable_name_b}</span><span class="s2">=&quot;</span>
-            <span class="n">f</span><span class="s2">&quot;$(echo $</span><span class="si">{variable_name_a}</span><span class="s2"> | sed &#39;s/.$/b/&#39;)&quot;</span>
-        <span class="p">)</span>
-
-        <span class="n">epair_a</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID</span><span class="si">{nic_suffix_a}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">destroy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">variable_name_a</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">nic_args</span>
-        <span class="p">)</span>
-        <span class="n">commands</span> <span class="o">+=</span> <span class="n">epair_a</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-
-        <span class="n">epair_b</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID</span><span class="si">{nic_suffix_b}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">destroy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">variable_name_b</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">nic_args</span>
-        <span class="p">)</span>
-        <span class="n">commands</span> <span class="o">+=</span> <span class="n">epair_b</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">commands</span>
-
-    <span class="k">def</span> <span class="nf">__create_vnet_iface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
-        <span class="n">CreatedCommandList</span><span class="p">,</span>
-        <span class="n">StartCommandList</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">,</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span>
     <span class="p">]:</span>
 
-        <span class="n">commands_created</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">commands_start</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">mac_addresses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nic_a_mac</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">nic_b_mac</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nic_a_mac</span> <span class="o">=</span> <span class="n">mac_addresses</span><span class="o">.</span><span class="n">a</span>
+            <span class="n">nic_b_mac</span> <span class="o">=</span> <span class="n">mac_addresses</span><span class="o">.</span><span class="n">b</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">VnetBridgeMissing</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">nic_a</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;epair&quot;</span><span class="p">,</span>
+            <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
+        <span class="n">nic_b_name</span> <span class="o">=</span> <span class="n">nic_a</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;b&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_secure_vnet_bridge</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">ensure_firewall_enabled</span><span class="p">()</span>
-
-        <span class="n">commands_created</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_new_epair_interface</span><span class="p">(</span>
-            <span class="n">variable_name_a</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">variable_name_b</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_B_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">nic_suffix_a</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">nic_suffix_b</span><span class="o">=</span><span class="s2">&quot;:j&quot;</span>
+        <span class="n">nic_a</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">nic_a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}{nic_suffix_a}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">mac</span><span class="o">=</span><span class="n">nic_a_mac</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">nic_args</span>
         <span class="p">)</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">mac_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">_mac&quot;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">nic_b</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">nic_b_name</span><span class="p">,</span>
+            <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}{nic_suffix_b}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">mac</span><span class="o">=</span><span class="n">nic_b_mac</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">nic_args</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nic_a</span><span class="p">,</span> <span class="n">nic_b</span>
+
+    <span class="k">def</span> <span class="nf">__create_vnet_iface</span><span class="p">(</span>
+        <span class="bp">self</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_secure_vnet_bridge</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">ensure_firewall_enabled</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">FirewallDisabled</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span>
+
+        <span class="n">mac_config_key</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">_mac&quot;</span>
+        <span class="k">if</span> <span class="n">mac_config_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">mac_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">mac_config_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">mac_config</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="n">mac_config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mac_config</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">mac_address_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_mac_address_pair</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -442,103 +450,92 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
 
-        <span class="n">host_if</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">mac</span><span class="o">=</span><span class="n">mac_address_pair</span><span class="o">.</span><span class="n">a</span><span class="p">,</span>
+        <span class="n">nic_a</span><span class="p">,</span> <span class="n">nic_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_new_epair_interface</span><span class="p">(</span>
+            <span class="n">nic_suffix_a</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">nic_suffix_b</span><span class="o">=</span><span class="s2">&quot;:j&quot;</span><span class="p">,</span>
+            <span class="n">mac_addresses</span><span class="o">=</span><span class="n">mac_address_pair</span><span class="p">,</span>
             <span class="n">mtu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mtu</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nic_local_description</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
-        <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">host_if</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__require_bridge</span><span class="p">()</span>
+        <span class="n">bridge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge</span>  <span class="c1"># type: libioc.BridgeInterface.BridgeInterface</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_secure_vnet_bridge</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">jail_bridge</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bridge</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">addm</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;$IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">bridge</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">addm</span><span class="o">=</span><span class="n">nic_a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">jail_bridge</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_new_epair_interface</span><span class="p">(</span>
-                <span class="n">variable_name_a</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_C_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">variable_name_b</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_D_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">nic_c</span><span class="p">,</span> <span class="n">nic_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_new_epair_interface</span><span class="p">(</span>
                 <span class="n">nic_suffix_a</span><span class="o">=</span><span class="s2">&quot;:a&quot;</span><span class="p">,</span>
                 <span class="n">nic_suffix_b</span><span class="o">=</span><span class="s2">&quot;:b&quot;</span><span class="p">,</span>
                 <span class="n">mtu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mtu</span>
             <span class="p">)</span>
 
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configure_firewall</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__configure_firewall</span><span class="p">(</span>
                 <span class="n">mac_address</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">mac_address_pair</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
             <span class="p">)</span>
 
             <span class="c1"># the secondary bridge in secure mode</span>
-            <span class="n">sec_bridge</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
+            <span class="n">sec_bridge</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;bridge&quot;</span><span class="p">,</span>
                 <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">destroy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:net&quot;</span><span class="p">,</span>
-                <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_BRIDGE_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">rename</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">:net&quot;</span>
             <span class="p">)</span>
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">sec_bridge</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
 
+            <span class="c1"># ToDo: merge with above step by moving addm</span>
             <span class="c1"># add nic to secure bridge</span>
-            <span class="n">sec_bridge</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_BRIDGE_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">sec_bridge</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">addm</span><span class="o">=</span><span class="p">[</span>
-                    <span class="n">f</span><span class="s2">&quot;$IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">f</span><span class="s2">&quot;$IOC_NIC_EPAIR_D_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span>
+                    <span class="n">nic_a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">nic_d</span><span class="o">.</span><span class="n">name</span>
                 <span class="p">],</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">sec_bridge</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
 
             <span class="c1"># add nic to jail bridge</span>
-            <span class="n">jail_bridge</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bridge</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">addm</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;$IOC_NIC_EPAIR_C_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">bridge</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">addm</span><span class="o">=</span><span class="n">nic_c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
-            <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">jail_bridge</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
 
-        <span class="n">commands_created</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__up_host_if</span><span class="p">()</span>
+        <span class="c1"># up host if</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">nic_a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+        <span class="p">)</span>
 
         <span class="c1"># assign epair_b to jail</span>
-        <span class="n">assigned_if</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_B_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">nic_b</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">vnet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
             <span class="n">extra_settings</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
-        <span class="n">commands_created</span> <span class="o">+=</span> <span class="n">assigned_if</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
 
         <span class="c1"># configure network inside the jail</span>
-        <span class="n">jail_if</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:j&quot;</span><span class="p">,</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">:j&quot;</span><span class="p">,</span>
             <span class="n">mac</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">mac_address_pair</span><span class="o">.</span><span class="n">b</span><span class="p">),</span>
             <span class="n">mtu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mtu</span><span class="p">,</span>
             <span class="n">rename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_escaped_nic_name</span><span class="p">,</span>
             <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
             <span class="n">ipv4_addresses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ipv4_addresses</span><span class="p">,</span>
             <span class="n">ipv6_addresses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ipv6_addresses</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
         <span class="p">)</span>
-        <span class="n">commands_start</span> <span class="o">+=</span> <span class="n">jail_if</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">commands_created</span><span class="p">,</span> <span class="n">commands_start</span>
-
-    <span class="k">def</span> <span class="nf">__configure_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mac_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">__configure_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mac_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
             <span class="n">f</span><span class="s2">&quot;Configuring Secure VNET Firewall for </span><span class="si">{self._escaped_nic_name}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-        <span class="n">firewall_rule_number</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;$IOC_JID&quot;</span>
+        <span class="n">firewall_rule_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">jid</span>
 
         <span class="k">for</span> <span class="n">protocol</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ipv4&quot;</span><span class="p">,</span> <span class="s2">&quot;ipv6&quot;</span><span class="p">]:</span>
             <span class="n">addresses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{protocol}</span><span class="s2">_addresses&quot;</span><span class="p">)</span>
@@ -555,62 +552,37 @@
                     <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="n">_address</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;layer2&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;MAC&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="n">mac_address</span><span class="p">,</span>
-                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:b&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">:b&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;out&quot;</span>
-                <span class="p">],</span> <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="n">firewall_rule_number</span><span class="p">,</span> <span class="p">[</span>
                     <span class="s2">&quot;allow&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span>
                     <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="n">_address</span><span class="p">,</span>
                     <span class="s2">&quot;layer2&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;MAC&quot;</span><span class="p">,</span> <span class="n">mac_address</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;out&quot;</span>
-                <span class="p">],</span> <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="n">firewall_rule_number</span><span class="p">,</span> <span class="p">[</span>
                     <span class="s2">&quot;allow&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span>
                     <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="n">_address</span><span class="p">,</span>
-                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;out&quot;</span>
-                <span class="p">],</span> <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="n">firewall_rule_number</span><span class="p">,</span> <span class="p">[</span>
                 <span class="s2">&quot;deny&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span>
                 <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;layer2&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID:b&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">:b&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;out&quot;</span>
-            <span class="p">],</span> <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">add_rule</span><span class="p">(</span><span class="n">firewall_rule_number</span><span class="p">,</span> <span class="p">[</span>
                 <span class="s2">&quot;deny&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span>
                 <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:$IOC_JID&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self._escaped_nic_name}</span><span class="s2">:</span><span class="si">{self.jail.jid}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;out&quot;</span>
-            <span class="p">],</span> <span class="n">insecure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Firewall rules added&quot;</span><span class="p">)</span>
-        <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">commands</span>
-
-    <span class="k">def</span> <span class="nf">__up_host_if</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">host_if</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">NetworkInterface</span><span class="o">.</span><span class="n">QueuingNetworkInterface</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">shell_variable_nic_name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-        <span class="p">)</span>
-        <span class="n">commands</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">host_if</span><span class="o">.</span><span class="n">read_commands</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">commands</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;Return a dict of env variables used by the network.&quot;&quot;&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escaped_nic_name</span>
-        <span class="n">script_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_A_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">:$IOC_JID&quot;</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_B_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_C_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">:$IOC_JID:a&quot;</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_EPAIR_D_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">:$IOC_JID:b&quot;</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_BRIDGE_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">:$IOC_JID:net&quot;</span><span class="p">,</span>
-            <span class="n">f</span><span class="s2">&quot;IOC_NIC_ID_</span><span class="si">{self._nic_hash}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">epair_id</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">script_env</span>
 
     <span class="k">def</span> <span class="nf">__generate_mac_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">sha224</span><span class="p">()</span>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>Index &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -205,7 +205,11 @@
 </li>
       </ul></li>
       <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.add_line">add_line() (libioc.Config.Jail.File.Fstab.Fstab method)</a>
+
+      <ul>
+        <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.add_line">(libioc.Config.Jail.File.Fstab.JailFstab method)</a>
 </li>
+      </ul></li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.add_rollback_step">add_rollback_step() (libioc.events.IocEvent method)</a>
 </li>
       <li><a href="libioc.Firewall.html#libioc.Firewall.Firewall.add_rule">add_rule() (libioc.Firewall.Firewall method)</a>
@@ -276,6 +280,8 @@
 </li>
       <li><a href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig.attach_special_property">attach_special_property() (libioc.Config.Jail.BaseConfig.BaseConfig method)</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.AttachZFSDataset">AttachZFSDataset (class in libioc.events)</a>
+</li>
       <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.AUTO_COMMENT_IDENTIFIER">AUTO_COMMENT_IDENTIFIER (libioc.Config.Jail.File.Fstab.Fstab attribute)</a>
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.JailResource.autoset_dataset_name">autoset_dataset_name() (libioc.Jail.JailResource method)</a>
@@ -308,7 +314,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.basejail_lines">basejail_lines (libioc.Config.Jail.File.Fstab.Fstab attribute)</a>
+      <li><a href="libioc.Storage.Basejail.html#libioc.Storage.Basejail.BasejailStorage">BasejailStorage (class in libioc.Storage.Basejail)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.BasejailStorageConfig">BasejailStorageConfig (class in libioc.events)</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.begin">begin() (libioc.events.IocEvent method)</a>
 </li>
@@ -335,8 +343,6 @@
       <li><a href="libioc.Provisioning.html#libioc.Provisioning.Prototype.check_requirements">check_requirements() (libioc.Provisioning.Prototype method)</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.child_event">child_event() (libioc.events.IocEvent method)</a>
-</li>
-      <li><a href="libioc.JailState.html#libioc.JailState.JailState.clear">clear() (libioc.JailState.JailState method)</a>
 </li>
       <li><a href="libioc.CommandQueue.html#libioc.CommandQueue.CommandQueue.clear_command_queue">clear_command_queue() (libioc.CommandQueue.CommandQueue method)</a>
 </li>
@@ -425,11 +431,7 @@
       <li><a href="libioc.Distribution.html#libioc.Distribution.EOLParser.current_branch">current_branch (libioc.Distribution.EOLParser attribute)</a>
 </li>
       <li><a href="libioc.NetworkInterface.html#libioc.NetworkInterface.NetworkInterface.current_nic_name">current_nic_name (libioc.NetworkInterface.NetworkInterface attribute)</a>
-
-      <ul>
-        <li><a href="libioc.NetworkInterface.html#libioc.NetworkInterface.QueuingNetworkInterface.current_nic_name">(libioc.NetworkInterface.QueuingNetworkInterface attribute)</a>
 </li>
-      </ul></li>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.current_snapshot">current_snapshot (libioc.Release.ReleaseGenerator attribute)</a>
 </li>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.current_snapshot_patchlevel">current_snapshot_patchlevel (libioc.Release.ReleaseGenerator attribute)</a>
@@ -447,11 +449,7 @@
       <ul>
         <li><a href="libioc.Config.Jail.Defaults.html#libioc.Config.Jail.Defaults.JailConfigDefaults.data">(libioc.Config.Jail.Defaults.JailConfigDefaults attribute)</a>
 </li>
-        <li><a href="libioc.Config.Prototype.html#libioc.Config.Prototype.Prototype.data">(libioc.Config.Prototype.Prototype attribute)</a>
-</li>
         <li><a href="libioc.Distribution.html#libioc.Distribution.EOLParser.data">(libioc.Distribution.EOLParser attribute)</a>
-</li>
-        <li><a href="libioc.JailState.html#libioc.JailState.JailState.data">(libioc.JailState.JailState attribute)</a>
 </li>
       </ul></li>
       <li><a href="libioc.Config.Dataset.html#libioc.Config.Dataset.DatasetConfig.dataset">dataset (libioc.Config.Dataset.DatasetConfig attribute)</a>
@@ -524,10 +522,10 @@
         <li><a href="libioc.Resource.html#libioc.Resource.Resource.DEFAULT_ZFS_DATASET_SUFFIX">(libioc.Resource.Resource attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.errors.html#libioc.errors.DefaultConfigNotFound">DefaultConfigNotFound</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.errors.html#libioc.errors.DefaultReleaseNotFound">DefaultReleaseNotFound</a>
 </li>
       <li><a href="libioc.Resource.html#libioc.Resource.DefaultResource">DefaultResource (class in libioc.Resource)</a>
@@ -580,6 +578,8 @@
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.devfs_ruleset">devfs_ruleset (libioc.Jail.JailGenerator attribute)</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.DevFSEvent">DevFSEvent (class in libioc.events)</a>
+</li>
       <li><a href="libioc.errors.html#libioc.errors.DevfsRuleException">DevfsRuleException</a>
 </li>
       <li><a href="libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules">DevfsRules (class in libioc.DevfsRules)</a>
@@ -613,21 +613,15 @@
       <li><a href="libioc.events.html#libioc.events.IocEvent.end">end() (libioc.events.IocEvent method)</a>
 
       <ul>
-        <li><a href="libioc.events.html#libioc.events.JailCommandExecution.end">(libioc.events.JailCommandExecution method)</a>
-</li>
         <li><a href="libioc.events.html#libioc.events.JailDependantsStart.end">(libioc.events.JailDependantsStart method)</a>
 </li>
-        <li><a href="libioc.events.html#libioc.events.JailLaunch.end">(libioc.events.JailLaunch method)</a>
+        <li><a href="libioc.events.html#libioc.events.JailHook.end">(libioc.events.JailHook method)</a>
 </li>
       </ul></li>
       <li><a href="libioc.Firewall.html#libioc.Firewall.Firewall.ensure_firewall_enabled">ensure_firewall_enabled() (libioc.Firewall.Firewall method)</a>
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.env">env (libioc.Jail.JailGenerator attribute)</a>
-
-      <ul>
-        <li><a href="libioc.Network.html#libioc.Network.Network.env">(libioc.Network.Network attribute)</a>
 </li>
-      </ul></li>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.eol">eol (libioc.Release.ReleaseGenerator attribute)</a>
 </li>
       <li><a href="libioc.Distribution.html#libioc.Distribution.DistributionGenerator.eol_list">eol_list (libioc.Distribution.DistributionGenerator attribute)</a>
@@ -699,7 +693,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.events.html#libioc.events.IocEvent.fail">fail() (libioc.events.IocEvent method)</a>
+
+      <ul>
+        <li><a href="libioc.events.html#libioc.events.JailHook.fail">(libioc.events.JailHook method)</a>
 </li>
+      </ul></li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.fail_generator">fail_generator() (libioc.events.IocEvent method)</a>
 </li>
       <li><a href="libioc.Pkg.html#libioc.Pkg.Pkg.fetch">fetch() (libioc.Pkg.Pkg method)</a>
@@ -775,6 +773,8 @@
       <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.FstabCommentLine">FstabCommentLine (class in libioc.Config.Jail.File.Fstab)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.FstabDestinationExists">FstabDestinationExists</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.FstabEvent">FstabEvent (class in libioc.events)</a>
 </li>
       <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.FstabFsSpec">FstabFsSpec (class in libioc.Config.Jail.File.Fstab)</a>
 </li>
@@ -858,8 +858,12 @@
 </li>
       <li><a href="libioc.Config.Jail.Defaults.html#libioc.Config.Jail.Defaults.JailConfigDefaults.getitem_default">getitem_default() (libioc.Config.Jail.Defaults.JailConfigDefaults method)</a>
 </li>
-      <li><a href="libioc.Resource.html#libioc.Resource.Resource.getstring">getstring() (libioc.Resource.Resource method)</a>
+      <li><a href="libioc.Jail.html#libioc.Jail.JailResource.getstring">getstring() (libioc.Jail.JailResource method)</a>
+
+      <ul>
+        <li><a href="libioc.Resource.html#libioc.Resource.Resource.getstring">(libioc.Resource.Resource method)</a>
 </li>
+      </ul></li>
       <li><a href="libioc.Filter.html#libioc.Filter.Term.glob_characters">glob_characters (libioc.Filter.Term attribute)</a>
 </li>
   </ul></td>
@@ -970,13 +974,15 @@
 </li>
       <li><a href="libioc.errors.html#libioc.errors.InvalidJailConfigValue">InvalidJailConfigValue</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.errors.html#libioc.errors.InvalidJailName">InvalidJailName</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.errors.html#libioc.errors.InvalidLogLevel">InvalidLogLevel</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.InvalidMacAddress">InvalidMacAddress</a>
+</li>
+      <li><a href="libioc.errors.html#libioc.errors.InvalidMountpoint">InvalidMountpoint</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.InvalidNetworkBridge">InvalidNetworkBridge</a>
 </li>
@@ -1024,6 +1030,8 @@
 </li>
       <li><a href="libioc.Config.Jail.Properties.ResourceLimit.html#libioc.Config.Jail.Properties.ResourceLimit.ResourceLimitValue.is_unset">is_unset (libioc.Config.Jail.Properties.ResourceLimit.ResourceLimitValue attribute)</a>
 </li>
+      <li><a href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig.is_user_property">is_user_property() (libioc.Config.Jail.BaseConfig.BaseConfig static method)</a>
+</li>
       <li><a href="libioc.helpers.html#libioc.helpers.is_uuid">is_uuid() (in module libioc.helpers)</a>
 </li>
       <li><a href="libioc.Config.Data.html#libioc.Config.Data.Data.items">items() (libioc.Config.Data.Data method)</a>
@@ -1052,11 +1060,13 @@
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailAlreadyRunning">JailAlreadyRunning</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.JailAttach">JailAttach (class in libioc.events)</a>
+</li>
       <li><a href="libioc.errors.html#libioc.errors.JailBackendMissing">JailBackendMissing</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.JailClone">JailClone (class in libioc.events)</a>
 </li>
-      <li><a href="libioc.events.html#libioc.events.JailCommandExecution">JailCommandExecution (class in libioc.events)</a>
+      <li><a href="libioc.events.html#libioc.events.JailCommand">JailCommand (class in libioc.events)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailCommandFailed">JailCommandFailed</a>
 </li>
@@ -1078,8 +1088,6 @@
 </li>
       <li><a href="libioc.events.html#libioc.events.JailDependantStart">JailDependantStart (class in libioc.events)</a>
 </li>
-      <li><a href="libioc.events.html#libioc.events.JailDestroy">JailDestroy (class in libioc.events)</a>
-</li>
       <li><a href="libioc.errors.html#libioc.errors.JailDestructionFailed">JailDestructionFailed</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailDoesNotExist">JailDoesNotExist</a>
@@ -1094,19 +1102,41 @@
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailFilterInvalidName">JailFilterInvalidName</a>
 </li>
+      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab">JailFstab (class in libioc.Config.Jail.File.Fstab)</a>
+</li>
       <li><a href="libioc.events.html#libioc.events.JailFstabUpdate">JailFstabUpdate (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator">JailGenerator (class in libioc.Jail)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHook">JailHook (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookCreated">JailHookCreated (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.errors.html#libioc.errors.JailHookFailed">JailHookFailed</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookPoststart">JailHookPoststart (class in libioc.events)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator">JailGenerator (class in libioc.Jail)</a>
+      <li><a href="libioc.events.html#libioc.events.JailHookPoststop">JailHookPoststop (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookPrestart">JailHookPrestart (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookPrestop">JailHookPrestop (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookStart">JailHookStart (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailHookStop">JailHookStop (class in libioc.events)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailHostIdMismatch">JailHostIdMismatch</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailIsTemplate">JailIsTemplate</a>
 </li>
-      <li><a href="libioc.events.html#libioc.events.JailLaunch">JailLaunch (class in libioc.events)</a>
-</li>
       <li><a href="libioc.errors.html#libioc.errors.JailLaunchFailed">JailLaunchFailed</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailNetworkSetup">JailNetworkSetup (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailNetworkTeardown">JailNetworkTeardown (class in libioc.events)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.JailNotFound">JailNotFound</a>
 </li>
@@ -1124,11 +1154,15 @@
 </li>
       <li><a href="libioc.events.html#libioc.events.JailProvisioningAssetDownload">JailProvisioningAssetDownload (class in libioc.events)</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.JailRemove">JailRemove (class in libioc.events)</a>
+</li>
       <li><a href="libioc.events.html#libioc.events.JailRename">JailRename (class in libioc.events)</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.JailResolverConfig">JailResolverConfig (class in libioc.events)</a>
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.JailResource">JailResource (class in libioc.Jail)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailResourceLimitAction">JailResourceLimitAction (class in libioc.events)</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.JailRestart">JailRestart (class in libioc.events)</a>
 </li>
@@ -1138,19 +1172,17 @@
 </li>
       <li><a href="libioc.Jails.html#libioc.Jails.JailsGenerator">JailsGenerator (class in libioc.Jails)</a>
 </li>
-      <li><a href="libioc.events.html#libioc.events.JailShutdown">JailShutdown (class in libioc.events)</a>
-</li>
       <li><a href="libioc.events.html#libioc.events.JailSoftShutdown">JailSoftShutdown (class in libioc.events)</a>
 </li>
       <li><a href="libioc.events.html#libioc.events.JailStart">JailStart (class in libioc.events)</a>
 </li>
-      <li><a href="libioc.JailState.html#libioc.JailState.JailState">JailState (class in libioc.JailState)</a>
-</li>
-      <li><a href="libioc.JailState.html#libioc.JailState.JailStates">JailStates (class in libioc.JailState)</a>
-</li>
       <li><a href="libioc.errors.html#libioc.errors.JailStateUpdateFailed">JailStateUpdateFailed</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.JailStop">JailStop (class in libioc.events)</a>
+</li>
       <li><a href="libioc.errors.html#libioc.errors.JailUnknownIdentifier">JailUnknownIdentifier</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.JailZFSShare">JailZFSShare (class in libioc.events)</a>
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.jid">jid (libioc.Jail.JailGenerator attribute)</a>
 </li>
@@ -1170,8 +1202,6 @@
         <li><a href="libioc.Config.Jail.Defaults.html#libioc.Config.Jail.Defaults.JailConfigDefaults.keys">(libioc.Config.Jail.Defaults.JailConfigDefaults method)</a>
 </li>
         <li><a href="libioc.JailParams.html#libioc.JailParams.JailParams.keys">(libioc.JailParams.JailParams method)</a>
-</li>
-        <li><a href="libioc.JailState.html#libioc.JailState.JailState.keys">(libioc.JailState.JailState method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1201,6 +1231,8 @@
       <li><a href="libioc.Config.Data.html#module-libioc.Config.Data">libioc.Config.Data (module)</a>
 </li>
       <li><a href="libioc.Config.Dataset.html#module-libioc.Config.Dataset">libioc.Config.Dataset (module)</a>
+</li>
+      <li><a href="libioc.Config.Host.html#module-libioc.Config.Host">libioc.Config.Host (module)</a>
 </li>
       <li><a href="libioc.Config.Jail.html#module-libioc.Config.Jail">libioc.Config.Jail (module)</a>
 </li>
@@ -1272,13 +1304,11 @@
 </li>
       <li><a href="libioc.Jail.html#module-libioc.Jail">libioc.Jail (module)</a>
 </li>
-      <li><a href="libioc.JailParams.html#module-libioc.JailParams">libioc.JailParams (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.Jails.html#module-libioc.Jails">libioc.Jails (module)</a>
+      <li><a href="libioc.JailParams.html#module-libioc.JailParams">libioc.JailParams (module)</a>
 </li>
-      <li><a href="libioc.JailState.html#module-libioc.JailState">libioc.JailState (module)</a>
+      <li><a href="libioc.Jails.html#module-libioc.Jails">libioc.Jails (module)</a>
 </li>
       <li><a href="libioc.LaunchableResource.html#module-libioc.LaunchableResource">libioc.LaunchableResource (module)</a>
 </li>
@@ -1317,6 +1347,8 @@
       <li><a href="libioc.SecureTarfile.html#module-libioc.SecureTarfile">libioc.SecureTarfile (module)</a>
 </li>
       <li><a href="libioc.Storage.html#module-libioc.Storage">libioc.Storage (module)</a>
+</li>
+      <li><a href="libioc.Storage.Basejail.html#module-libioc.Storage.Basejail">libioc.Storage.Basejail (module)</a>
 </li>
       <li><a href="libioc.Storage.NullFSBasejail.html#module-libioc.Storage.NullFSBasejail">libioc.Storage.NullFSBasejail (module)</a>
 </li>
@@ -1386,8 +1418,6 @@
 </li>
       <li><a href="libioc.Datasets.html#libioc.Datasets.Datasets.main">main (libioc.Datasets.Datasets attribute)</a>
 </li>
-      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.maintenance_lines">maintenance_lines (libioc.Config.Jail.File.Fstab.Fstab attribute)</a>
-</li>
       <li><a href="libioc.helpers.html#libioc.helpers.makedirs_safe">makedirs_safe() (in module libioc.helpers)</a>
 </li>
       <li><a href="libioc.Config.Prototype.html#libioc.Config.Prototype.Prototype.map_input">map_input() (libioc.Config.Prototype.Prototype method)</a>
@@ -1416,12 +1446,12 @@
 </li>
       <li><a href="libioc.Filter.html#libioc.Filter.Terms.match_source">match_source() (libioc.Filter.Terms method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.Filter.html#libioc.Filter.Term.matches">matches() (libioc.Filter.Term method)</a>
 </li>
       <li><a href="libioc.Filter.html#libioc.Filter.Term.matches_resource">matches_resource() (libioc.Filter.Term method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.JailParams.html#libioc.JailParams.JailParams.memoized_params">memoized_params (libioc.JailParams.JailParams attribute)</a>
 </li>
       <li><a href="libioc.Config.Jail.Properties.Resolver.html#libioc.Config.Jail.Properties.Resolver.ResolverProp.method">method (libioc.Config.Jail.Properties.Resolver.ResolverProp attribute)</a>
@@ -1446,9 +1476,19 @@
 </li>
       <li><a href="libioc.SecureTarfile.html#libioc.SecureTarfile.SecureTarfile.mode">mode (libioc.SecureTarfile.SecureTarfile attribute)</a>
 </li>
+      <li><a href="libioc.helpers.html#libioc.helpers.mount">mount() (in module libioc.helpers)</a>
+
+      <ul>
+        <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.mount">(libioc.Config.Jail.File.Fstab.JailFstab method)</a>
+</li>
+      </ul></li>
       <li><a href="libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares">mount_zfs_shares() (libioc.ZFSShareStorage.ZFSShareStorage method)</a>
 </li>
+      <li><a href="libioc.events.html#libioc.events.MountDevFS">MountDevFS (class in libioc.events)</a>
+</li>
       <li><a href="libioc.errors.html#libioc.errors.MountFailed">MountFailed</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.MountFstab">MountFstab (class in libioc.events)</a>
 </li>
       <li><a href="libioc.Network.html#libioc.Network.Network.mtu">mtu (libioc.Network.Network attribute)</a>
 </li>
@@ -1527,7 +1567,11 @@
       <li><a href="libioc.helpers.html#libioc.helpers.parse_int">parse_int() (in module libioc.helpers)</a>
 </li>
       <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.parse_lines">parse_lines() (libioc.Config.Jail.File.Fstab.Fstab method)</a>
+
+      <ul>
+        <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.parse_lines">(libioc.Config.Jail.File.Fstab.JailFstab method)</a>
 </li>
+      </ul></li>
       <li><a href="libioc.helpers.html#libioc.helpers.parse_list">parse_list() (in module libioc.helpers)</a>
 </li>
       <li><a href="libioc.helpers.html#libioc.helpers.parse_none">parse_none() (in module libioc.helpers)</a>
@@ -1551,6 +1595,8 @@
       <ul>
         <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.path">(libioc.Config.Jail.File.Fstab.Fstab attribute)</a>
 </li>
+        <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.path">(libioc.Config.Jail.File.Fstab.JailFstab attribute)</a>
+</li>
         <li><a href="libioc.Config.Jail.File.html#libioc.Config.Jail.File.ResourceConfigFile.path">(libioc.Config.Jail.File.ResourceConfigFile attribute)</a>
 </li>
       </ul></li>
@@ -1562,10 +1608,10 @@
       </ul></li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.pending">pending (libioc.events.IocEvent attribute)</a>
 </li>
-      <li><a href="libioc.Pkg.html#libioc.Pkg.Pkg">Pkg (class in libioc.Pkg)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="libioc.Pkg.html#libioc.Pkg.Pkg">Pkg (class in libioc.Pkg)</a>
+</li>
       <li><a href="libioc.Datasets.html#libioc.Datasets.RootDatasets.pkg">pkg (libioc.Datasets.RootDatasets attribute)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.PkgNotFound">PkgNotFound</a>
@@ -1624,19 +1670,7 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.JailState.html#libioc.JailState.JailState.query">query() (libioc.JailState.JailState method)</a>
-
-      <ul>
-        <li><a href="libioc.JailState.html#libioc.JailState.JailStates.query">(libioc.JailState.JailStates method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.Firewall.html#libioc.Firewall.QueuingFirewall">QueuingFirewall (class in libioc.Firewall)</a>
-</li>
-      <li><a href="libioc.NetworkInterface.html#libioc.NetworkInterface.QueuingNetworkInterface">QueuingNetworkInterface (class in libioc.NetworkInterface)</a>
-</li>
-      <li><a href="libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.QueuingZFSShareStorage">QueuingZFSShareStorage (class in libioc.ZFSShareStorage)</a>
+      <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.query_jid">query_jid() (libioc.Jail.JailGenerator method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1648,8 +1682,12 @@
 </li>
       <li><a href="libioc.LaunchableResource.html#libioc.LaunchableResource.LaunchableResource.rc_conf">rc_conf (libioc.LaunchableResource.LaunchableResource attribute)</a>
 </li>
-      <li><a href="libioc.Config.Jail.File.RCConf.html#libioc.Config.Jail.File.RCConf.RCConf">RCConf (class in libioc.Config.Jail.File.RCConf)</a>
+      <li><a href="libioc.Config.Host.html#libioc.Config.Host.RCConf">RCConf (class in libioc.Config.Host)</a>
+
+      <ul>
+        <li><a href="libioc.Config.Jail.File.RCConf.html#libioc.Config.Jail.File.RCConf.RCConf">(class in libioc.Config.Jail.File.RCConf)</a>
 </li>
+      </ul></li>
       <li><a href="libioc.Datasets.html#libioc.Datasets.RCConfEmptyException">RCConfEmptyException</a>
 </li>
       <li><a href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig.read">read() (libioc.Config.Jail.BaseConfig.BaseConfig method)</a>
@@ -1800,6 +1838,8 @@
 </li>
       <li><a href="libioc.events.html#libioc.events.ResourceEvent">ResourceEvent (class in libioc.events)</a>
 </li>
+      <li><a href="libioc.errors.html#libioc.errors.ResourceLimitActionFailed">ResourceLimitActionFailed</a>
+</li>
       <li><a href="libioc.Config.Jail.Properties.ResourceLimit.html#libioc.Config.Jail.Properties.ResourceLimit.ResourceLimitProp">ResourceLimitProp (class in libioc.Config.Jail.Properties.ResourceLimit)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.ResourceLimitUnknown">ResourceLimitUnknown</a>
@@ -1852,9 +1892,11 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="libioc.Config.Jail.File.html#libioc.Config.Jail.File.ConfigFile.save">save() (libioc.Config.Jail.File.ConfigFile method)</a>
+      <li><a href="libioc.Config.Host.html#libioc.Config.Host.RCConf.save">save() (libioc.Config.Host.RCConf method)</a>
 
       <ul>
+        <li><a href="libioc.Config.Jail.File.html#libioc.Config.Jail.File.ConfigFile.save">(libioc.Config.Jail.File.ConfigFile method)</a>
+</li>
         <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.save">(libioc.Config.Jail.File.Fstab.Fstab method)</a>
 </li>
         <li><a href="libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules.save">(libioc.DevfsRules.DevfsRules method)</a>
@@ -1900,6 +1942,8 @@
         <li><a href="libioc.Filter.html#libioc.Filter.Terms.set">(libioc.Filter.Terms method)</a>
 </li>
       </ul></li>
+      <li><a href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig.set_dict">set_dict() (libioc.Config.Jail.BaseConfig.BaseConfig method)</a>
+</li>
       <li><a href="libioc.Network.html#libioc.Network.Network.setup">setup() (libioc.Network.Network method)</a>
 
       <ul>
@@ -1918,12 +1962,12 @@
 </li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.skip">skip() (libioc.events.IocEvent method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.snapshot">snapshot() (libioc.Release.ReleaseGenerator method)</a>
 </li>
       <li><a href="libioc.ResourceBackup.html#libioc.ResourceBackup.LaunchableResourceBackup.snapshot_name">snapshot_name (libioc.ResourceBackup.LaunchableResourceBackup attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.errors.html#libioc.errors.SnapshotCreation">SnapshotCreation</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.SnapshotDeletion">SnapshotDeletion</a>
@@ -1970,10 +2014,6 @@
         <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.start">(libioc.Jail.JailGenerator method)</a>
 </li>
       </ul></li>
-      <li><a href="libioc.Jail.html#libioc.Jail.JailGenerator.state">state (libioc.Jail.JailGenerator attribute)</a>
-</li>
-      <li><a href="libioc.Jails.html#libioc.Jails.JailsGenerator.states">states (libioc.Jails.JailsGenerator attribute)</a>
-</li>
       <li><a href="libioc.events.html#libioc.events.IocEvent.step">step() (libioc.events.IocEvent method)</a>
 </li>
       <li><a href="libioc.Jail.html#libioc.Jail.Jail.stop">stop() (libioc.Jail.Jail method)</a>
@@ -2005,17 +2045,25 @@
       <li><a href="libioc.Distribution.html#libioc.Distribution.EOLParser.td_counter">td_counter (libioc.Distribution.EOLParser attribute)</a>
 </li>
       <li><a href="libioc.Network.html#libioc.Network.Network.teardown">teardown() (libioc.Network.Network method)</a>
+
+      <ul>
+        <li><a href="libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.teardown">(libioc.Storage.NullFSBasejail.NullFSBasejailStorage method)</a>
+</li>
+        <li><a href="libioc.Storage.html#libioc.Storage.Storage.teardown">(libioc.Storage.Storage method)</a>
+</li>
+      </ul></li>
+      <li><a href="libioc.events.html#libioc.events.TeardownSystemMounts">TeardownSystemMounts (class in libioc.events)</a>
 </li>
       <li><a href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater.temporary_jail">temporary_jail (libioc.ResourceUpdater.Updater attribute)</a>
 </li>
       <li><a href="libioc.Filter.html#libioc.Filter.Term">Term (class in libioc.Filter)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.Filter.html#libioc.Filter.Terms">Terms (class in libioc.Filter)</a>
 </li>
       <li><a href="libioc.decorators.html#libioc.decorators.timeit">timeit() (in module libioc.decorators)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.helpers.html#libioc.helpers.to_humanreadable_name">to_humanreadable_name() (in module libioc.helpers)</a>
 </li>
       <li><a href="libioc.helpers.html#libioc.helpers.to_json">to_json() (in module libioc.helpers)</a>
@@ -2038,12 +2086,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.helpers.html#libioc.helpers.umount">umount() (in module libioc.helpers)</a>
 </li>
-      <li><a href="libioc.helpers.html#libioc.helpers.umount_command">umount_command() (in module libioc.helpers)</a>
-</li>
-      <li><a href="libioc.Storage.NullFSBasejail.html#libioc.Storage.NullFSBasejail.NullFSBasejailStorage.umount_nullfs">umount_nullfs() (libioc.Storage.NullFSBasejail.NullFSBasejailStorage method)</a>
-</li>
-      <li><a href="libioc.ZFSShareStorage.html#libioc.ZFSShareStorage.ZFSShareStorage.umount_zfs_shares">umount_zfs_shares() (libioc.ZFSShareStorage.ZFSShareStorage method)</a>
-</li>
       <li><a href="libioc.errors.html#libioc.errors.UndefinedProvisionerMethod">UndefinedProvisionerMethod</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.UndefinedProvisionerSource">UndefinedProvisionerSource</a>
@@ -2052,7 +2094,13 @@
 </li>
       <li><a href="libioc.errors.html#libioc.errors.UnknownConfigProperty">UnknownConfigProperty</a>
 </li>
+      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.unmount">unmount() (libioc.Config.Jail.File.Fstab.JailFstab method)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.UnmountDevFS">UnmountDevFS (class in libioc.events)</a>
+</li>
       <li><a href="libioc.errors.html#libioc.errors.UnmountFailed">UnmountFailed</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.UnmountFstab">UnmountFstab (class in libioc.events)</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.UnsupportedRelease">UnsupportedRelease</a>
 </li>
@@ -2074,7 +2122,7 @@
         <li><a href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.HardenedBSD.update_name">(libioc.ResourceUpdater.HardenedBSD attribute)</a>
 </li>
       </ul></li>
-      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.update_release">update_release() (libioc.Config.Jail.File.Fstab.Fstab method)</a>
+      <li><a href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.update_release">update_release() (libioc.Config.Jail.File.Fstab.JailFstab method)</a>
 </li>
       <li><a href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.FreeBSD.update_script_name">update_script_name (libioc.ResourceUpdater.FreeBSD attribute)</a>
 
@@ -2088,8 +2136,6 @@
         <li><a href="libioc.Config.Jail.JailConfig.html#libioc.Config.Jail.JailConfig.JailConfig.update_special_property">(libioc.Config.Jail.JailConfig.JailConfig method)</a>
 </li>
       </ul></li>
-      <li><a href="libioc.JailState.html#libioc.JailState.JailState.updated">updated (libioc.JailState.JailState attribute)</a>
-</li>
       <li><a href="libioc.errors.html#libioc.errors.UpdateFailure">UpdateFailure</a>
 </li>
       <li><a href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater">Updater (class in libioc.ResourceUpdater)</a>
@@ -2126,12 +2172,12 @@
         <li><a href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig.values">(libioc.Config.Jail.BaseConfig.BaseConfig method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.Logger.html#libioc.Logger.Logger.verbose">verbose() (libioc.Logger.Logger method)</a>
 </li>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.version_number">version_number (libioc.Release.ReleaseGenerator attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="libioc.Release.html#libioc.Release.ReleaseGenerator.version_snapshots">version_snapshots (libioc.Release.ReleaseGenerator attribute)</a>
 </li>
       <li><a href="libioc.VersionedResource.html#libioc.VersionedResource.VersionedResource">VersionedResource (class in libioc.VersionedResource)</a>
@@ -2141,6 +2187,14 @@
       <li><a href="libioc.errors.html#libioc.errors.VnetBridgeDoesNotExist">VnetBridgeDoesNotExist</a>
 </li>
       <li><a href="libioc.errors.html#libioc.errors.VnetBridgeMissing">VnetBridgeMissing</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.VnetEvent">VnetEvent (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.VnetInterfaceConfig">VnetInterfaceConfig (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.VnetSetRoutes">VnetSetRoutes (class in libioc.events)</a>
+</li>
+      <li><a href="libioc.events.html#libioc.events.VnetSetupLocalhost">VnetSetupLocalhost (class in libioc.events)</a>
 </li>
   </ul></td>
 </tr></table>

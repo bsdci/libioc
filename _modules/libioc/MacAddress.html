@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.MacAddress &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.MacAddress &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -174,6 +174,7 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage MacAddress module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">collections.abc</span>
 
 <span class="kn">import</span> <span class="nn">libioc.helpers_object</span>
 <span class="kn">import</span> <span class="nn">libioc.errors</span>
@@ -242,11 +243,21 @@
                 <span class="n">mac_address</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mac_pair</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mac_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">MacAddress</span><span class="p">(</span><span class="n">mac_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">MacAddress</span><span class="p">(</span><span class="n">mac_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">((</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">mac_pair</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterable</span><span class="p">),</span>
+            <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mac_pair</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">mac_pair</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">MacAddress</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">MacAddress</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">left</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">right</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">MacAddress</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">MacAddress</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tuple of string or MacAddress expected&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">mac_pair</span>  <span class="c1"># type: ignore</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;str or tuple of 2 items required&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>

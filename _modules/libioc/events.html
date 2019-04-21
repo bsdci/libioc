@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.events &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.events &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -449,30 +449,6 @@
         <span class="n">IocEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="JailLaunch"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailLaunch">[docs]</a><span class="k">class</span> <span class="nc">JailLaunch</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Launch a jail.&quot;&quot;&quot;</span>
-
-    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
-        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
-
-<div class="viewcode-block" id="JailLaunch.end"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailLaunch.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocEvent&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
-        <span class="k">return</span> <span class="n">IocEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
-
-
 <div class="viewcode-block" id="JailRename"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailRename">[docs]</a><span class="k">class</span> <span class="nc">JailRename</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Change the name of a jail.&quot;&quot;&quot;</span>
 
@@ -493,8 +469,112 @@
         <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="JailDestroy"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailDestroy">[docs]</a><span class="k">class</span> <span class="nc">JailDestroy</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+<div class="viewcode-block" id="JailStop"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailStop">[docs]</a><span class="k">class</span> <span class="nc">JailStop</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Destroy the jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailRemove"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailRemove">[docs]</a><span class="k">class</span> <span class="nc">JailRemove</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove the jail(2).&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TeardownSystemMounts"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.TeardownSystemMounts">[docs]</a><span class="k">class</span> <span class="nc">TeardownSystemMounts</span><span class="p">(</span><span class="n">JailStop</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Teardown a jails mountpoints.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailResourceLimitAction"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailResourceLimitAction">[docs]</a><span class="k">class</span> <span class="nc">JailResourceLimitAction</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set or unset a jails resource limits.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="VnetEvent"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.VnetEvent">[docs]</a><span class="k">class</span> <span class="nc">VnetEvent</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A group of events around VNET operations.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailNetworkSetup"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailNetworkSetup">[docs]</a><span class="k">class</span> <span class="nc">JailNetworkSetup</span><span class="p">(</span><span class="n">VnetEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start VNET networks.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailNetworkTeardown"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailNetworkTeardown">[docs]</a><span class="k">class</span> <span class="nc">JailNetworkTeardown</span><span class="p">(</span><span class="n">JailStop</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Teardown a jails network.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="VnetInterfaceConfig"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.VnetInterfaceConfig">[docs]</a><span class="k">class</span> <span class="nc">VnetInterfaceConfig</span><span class="p">(</span><span class="n">JailNetworkSetup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configure VNET network interfaces and firewall.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="VnetSetupLocalhost"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.VnetSetupLocalhost">[docs]</a><span class="k">class</span> <span class="nc">VnetSetupLocalhost</span><span class="p">(</span><span class="n">JailNetworkSetup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configure a VNET jails localhost.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="VnetSetRoutes"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.VnetSetRoutes">[docs]</a><span class="k">class</span> <span class="nc">VnetSetRoutes</span><span class="p">(</span><span class="n">JailNetworkSetup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set a VNET jails network routes.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailAttach"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailAttach">[docs]</a><span class="k">class</span> <span class="nc">JailAttach</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove the jail(2).&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DevFSEvent"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.DevFSEvent">[docs]</a><span class="k">class</span> <span class="nc">DevFSEvent</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Group of events that occor on DevFS operations.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MountDevFS"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.MountDevFS">[docs]</a><span class="k">class</span> <span class="nc">MountDevFS</span><span class="p">(</span><span class="n">DevFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mount /dev into a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="UnmountDevFS"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.UnmountDevFS">[docs]</a><span class="k">class</span> <span class="nc">UnmountDevFS</span><span class="p">(</span><span class="n">DevFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unmount /dev from a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FstabEvent"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.FstabEvent">[docs]</a><span class="k">class</span> <span class="nc">FstabEvent</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Group of events that occor on Fstab operations.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MountFstab"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.MountFstab">[docs]</a><span class="k">class</span> <span class="nc">MountFstab</span><span class="p">(</span><span class="n">FstabEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mount entries from a jails fstab file.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="UnmountFstab"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.UnmountFstab">[docs]</a><span class="k">class</span> <span class="nc">UnmountFstab</span><span class="p">(</span><span class="n">FstabEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unmount entries from a jails fstab file.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHook"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHook">[docs]</a><span class="k">class</span> <span class="nc">JailHook</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail hook.&quot;&quot;&quot;</span>
+
+    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -503,7 +583,82 @@
         <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
-        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="JailHook.end"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHook.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="JailHook.fail"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHook.fail">[docs]</a>    <span class="k">def</span> <span class="nf">fail</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exception</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocEvent&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
+            <span class="n">exception</span><span class="o">=</span><span class="n">exception</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JailHookPrestart"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookPrestart">[docs]</a><span class="k">class</span> <span class="nc">JailHookPrestart</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail prestart hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookStart"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookStart">[docs]</a><span class="k">class</span> <span class="nc">JailHookStart</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail start hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailCommand"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailCommand">[docs]</a><span class="k">class</span> <span class="nc">JailCommand</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run command in a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookCreated"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookCreated">[docs]</a><span class="k">class</span> <span class="nc">JailHookCreated</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail created hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookPoststart"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookPoststart">[docs]</a><span class="k">class</span> <span class="nc">JailHookPoststart</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail poststart hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookPrestop"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookPrestop">[docs]</a><span class="k">class</span> <span class="nc">JailHookPrestop</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail prestop hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookStop"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookStop">[docs]</a><span class="k">class</span> <span class="nc">JailHookStop</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail stop hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="JailHookPoststop"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookPoststop">[docs]</a><span class="k">class</span> <span class="nc">JailHookPoststop</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run jail poststop hook.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="JailFstabUpdate"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailFstabUpdate">[docs]</a><span class="k">class</span> <span class="nc">JailFstabUpdate</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
@@ -530,6 +685,32 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JailZFSShare"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailZFSShare">[docs]</a><span class="k">class</span> <span class="nc">JailZFSShare</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Group of events that mounts or unmounts shared ZFS datasets.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BasejailStorageConfig"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.BasejailStorageConfig">[docs]</a><span class="k">class</span> <span class="nc">BasejailStorageConfig</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mount or unmount basejail storage of a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="AttachZFSDataset"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.AttachZFSDataset">[docs]</a><span class="k">class</span> <span class="nc">AttachZFSDataset</span><span class="p">(</span><span class="n">JailZFSShare</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mount an individual dataset when starting a jail with shared ZFS.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Dataset </span><span class="si">{dataset.name}</span><span class="s2"> was attached to Jail </span><span class="si">{jail.full_name}</span><span class="s2">&quot;</span>
+        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="JailClone"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailClone">[docs]</a><span class="k">class</span> <span class="nc">JailClone</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
@@ -953,12 +1134,6 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="JailShutdown"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailShutdown">[docs]</a><span class="k">class</span> <span class="nc">JailShutdown</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Shutdown a jail.&quot;&quot;&quot;</span>
-
-    <span class="k">pass</span></div>
-
-
 <div class="viewcode-block" id="JailSoftShutdown"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailSoftShutdown">[docs]</a><span class="k">class</span> <span class="nc">JailSoftShutdown</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Soft-restart a jail.&quot;&quot;&quot;</span>
 
@@ -1017,29 +1192,6 @@
 
     <span class="k">pass</span></div>
 
-
-<div class="viewcode-block" id="JailCommandExecution"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailCommandExecution">[docs]</a><span class="k">class</span> <span class="nc">JailCommandExecution</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run command in a jail.&quot;&quot;&quot;</span>
-
-    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">,</span>
-        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
-
-<div class="viewcode-block" id="JailCommandExecution.end"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailCommandExecution.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;IocEvent&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Successfully finish an event.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
-        <span class="k">return</span> <span class="n">IocEvent</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div></div>
 
 <span class="c1"># PKG</span>
 

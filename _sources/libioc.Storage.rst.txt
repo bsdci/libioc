@@ -6,6 +6,7 @@ Submodules
 
 .. toctree::
 
+   libioc.Storage.Basejail
    libioc.Storage.NullFSBasejail
    libioc.Storage.Standalone
    libioc.Storage.ZFSBasejail

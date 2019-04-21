@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Jail module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Jail module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -203,7 +202,7 @@
 <p>iocage Jail module.</p>
 <dl class="class">
 <dt id="libioc.Jail.Jail">
-<em class="property">class </em><code class="descclassname">libioc.Jail.</code><code class="descname">Jail</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#Jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.Jail" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.Jail.</code><code class="descname">Jail</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em>, <em>skip_invalid_config=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#Jail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.Jail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Jail.JailGenerator" title="libioc.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Jail.JailGenerator</span></code></a></p>
 <p>Synchronous wrapper of JailGenerator.</p>
 <dl class="method">
@@ -236,7 +235,7 @@ requires it to be stopped.</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>command</strong> (<em>string</em>) – The command to execute in the jail.</li>
 <li><strong>passthru</strong> (<em>bool</em>) – Execute commands in an interactive shell.</li>
-<li><strong>event_scope</strong> (<em>libioc.lib.events.Scope</em>) – <p>(default=None)</p>
+<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(default=None)</p>
 <p>Provide an existing libiocage event scope or automatically
 create a new one instead.</p>
 </li>
@@ -309,7 +308,7 @@ print(list(events))</div></blockquote>
 
 <dl class="class">
 <dt id="libioc.Jail.JailGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Jail.</code><code class="descname">JailGenerator</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#JailGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.JailGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.Jail.</code><code class="descname">JailGenerator</code><span class="sig-paren">(</span><em>data={}</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>fstab=None</em>, <em>root_datasets_name=None</em>, <em>new=False</em>, <em>skip_invalid_config=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#JailGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.JailGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Jail.JailResource" title="libioc.Jail.JailResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Jail.JailResource</span></code></a></p>
 <p>iocage unit orchestrates a jail’s configuration and manages state.</p>
 <p>Jails are represented as a zfs dataset <code class="docutils literal notranslate"><span class="pre">zpool/iocage/jails/&lt;NAME&gt;</span></code></p>
@@ -557,7 +556,7 @@ CommandOutput, so that (None, None, &lt;returncode&gt;) is returned.</dd>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>command</strong> (<em>string</em>) – The command to execute in the jail.</li>
 <li><strong>passthru</strong> (<em>bool</em>) – Execute commands in an interactive shell.</li>
-<li><strong>event_scope</strong> (<em>libioc.lib.events.Scope</em>) – <p>(default=None)</p>
+<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(default=None)</p>
 <p>Provide an existing libiocage event scope or automatically
 create a new one instead.</p>
 </li>
@@ -771,6 +770,20 @@ from its release or upstream Jail (for example a Template)</p>
 <dd><p>Return the jails Provisioner instance.</p>
 <p>The provisioner itself is going to interpret the jails configuration
 dynamically, so that the Provisioner instance can be memoized.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Jail.JailGenerator.query_jid">
+<code class="descname">query_jid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#JailGenerator.query_jid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.JailGenerator.query_jid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoke update of the jails JID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -1002,7 +1015,7 @@ it).</li>
 <li><strong>single_command</strong> (<em>str</em>) – When set the jail is launched non-persistent. The startup cycle
 reduces to the <cite>prestart</cite>, <cite>command</cite> and <cite>poststop</cite> hooks with
 the singe_command being executed in a /bin/sh context.</li>
-<li><strong>event_scope</strong> (<em>libioc.lib.events.Scope</em>) – <p>(default=None)</p>
+<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(default=None)</p>
 <p>Provide an existing libiocage event scope or automatically
 create a new one instead.</p>
 </li>
@@ -1022,24 +1035,6 @@ dependants recursively.</li>
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libioc.Jail.JailGenerator.state">
-<code class="descname">state</code><a class="headerlink" href="#libioc.Jail.JailGenerator.state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Memoized JailState.</p>
-<p>This object holds information about the jail state. The information
-is memoized on first access because the lookup is expensive. Please
-keep in mind to update the object when executing operations that
-potentially change a jails state.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.JailState.html#libioc.JailState.JailState" title="libioc.JailState.JailState"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailState</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="method">
 <dt id="libioc.Jail.JailGenerator.stop">
 <code class="descname">stop</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em>, <em>log_errors=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#JailGenerator.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.JailGenerator.stop" title="Permalink to this definition">¶</a></dt>
@@ -1051,7 +1046,7 @@ potentially change a jails state.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>force</strong> (<em>bool</em>) – (default=False)
 Ignores failures and enforces teardown if True.</li>
-<li><strong>event_scope</strong> (<em>libioc.lib.events.Scope</em>) – (default=None)
+<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – (default=None)
 Provide an existing libiocage event scope or automatically
 create a new one instead.</li>
 <li><strong>log_errors</strong> (<em>bool</em>) – (default=True)
@@ -1148,7 +1143,7 @@ the jail id is used to find name the dataset</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab" title="libioc.Config.Jail.File.Fstab.Fstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fstab</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab" title="libioc.Config.Jail.File.Fstab.JailFstab"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailFstab</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -1163,6 +1158,24 @@ the jail id is used to find name the dataset</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Jail.JailResource.getstring">
+<code class="descname">getstring</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Jail.html#JailResource.getstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Jail.JailResource.getstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get any resource property as string or ‘-‘.</p>
+<p>Returns the string value, or an empty string in case of an unknown user
+config property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) – Name of the jail property to return</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
 </tr>
 </tbody>
 </table>

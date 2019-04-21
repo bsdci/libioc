@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Properties.Addresses &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Config.Jail.Properties.Addresses &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -312,6 +312,7 @@
         <span class="sd">&quot;&quot;&quot;Set the special property value.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="n">error_log_level</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">skip_on_error</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;error&quot;</span>
+        <span class="n">skip_on_error</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_on_error</span> <span class="ow">or</span> <span class="n">skip_on_error</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">parse_none</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -328,16 +329,17 @@
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">nic</span><span class="p">,</span> <span class="n">address</span> <span class="o">=</span> <span class="n">ip_address_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailConfigAddress</span><span class="p">(</span>
+                <span class="n">err</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailConfigAddress</span><span class="p">(</span>
                     <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
                     <span class="n">value</span><span class="o">=</span><span class="n">ip_address_string</span><span class="p">,</span>
                     <span class="n">property_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">property_name</span><span class="p">,</span>
                     <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
                     <span class="n">level</span><span class="o">=</span><span class="n">error_log_level</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_on_error</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_on_error</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">err</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">nic</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">skip_on_error</span><span class="o">=</span><span class="n">skip_on_error</span><span class="p">)</span>  <span class="c1"># noqa: T484</span></div>
 
@@ -397,17 +399,18 @@
             <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">AddressValueError</span><span class="p">,</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">NetmaskValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">err</span> <span class="o">=</span> <span class="n">e</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_e</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidIPAddress</span><span class="p">(</span>
-                    <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">),</span>
-                    <span class="n">ipv6</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">IP_VERSION</span> <span class="o">==</span> <span class="mi">6</span><span class="p">),</span>
-                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                    <span class="n">level</span><span class="o">=</span><span class="n">error_log_level</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="n">skip_on_error</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">_e</span>
-                <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_e</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidIPAddress</span><span class="p">(</span>
+                <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">),</span>
+                <span class="n">ipv6</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">IP_VERSION</span> <span class="o">==</span> <span class="mi">6</span><span class="p">),</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">error_log_level</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">skip_on_error</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">_e</span>
+            <span class="k">return</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_ip_addresses</span><span class="p">(</span>
             <span class="n">nic</span><span class="o">=</span><span class="n">nic</span><span class="p">,</span>
             <span class="n">addresses</span><span class="o">=</span><span class="n">_addresses</span><span class="p">,</span>

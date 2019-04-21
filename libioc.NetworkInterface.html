@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.NetworkInterface module &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.NetworkInterface module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -100,7 +100,6 @@
 <li class="toctree-l3"><a class="reference internal" href="libioc.IPAddress.html">libioc.IPAddress module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jail.html">libioc.Jail module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.JailParams.html">libioc.JailParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="libioc.JailState.html">libioc.JailState module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.Jails.html">libioc.Jails module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.LaunchableResource.html">libioc.LaunchableResource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="libioc.ListableResource.html">libioc.ListableResource module</a></li>
@@ -203,7 +202,7 @@
 <p>Model if an iocage jails network interface.</p>
 <dl class="class">
 <dt id="libioc.NetworkInterface.NetworkInterface">
-<em class="property">class </em><code class="descclassname">libioc.NetworkInterface.</code><code class="descname">NetworkInterface</code><span class="sig-paren">(</span><em>name='vnet0'</em>, <em>create=False</em>, <em>ipv4_addresses=[]</em>, <em>ipv6_addresses=[]</em>, <em>mac=None</em>, <em>mtu=None</em>, <em>description=None</em>, <em>rename=None</em>, <em>group=None</em>, <em>addm=None</em>, <em>vnet=None</em>, <em>jail=None</em>, <em>extra_settings=None</em>, <em>destroy=False</em>, <em>auto_apply=True</em>, <em>logger=None</em>, <em>insecure=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libioc.NetworkInterface.</code><code class="descname">NetworkInterface</code><span class="sig-paren">(</span><em>name='vnet0'</em>, <em>create=False</em>, <em>ipv4_addresses=[]</em>, <em>ipv6_addresses=[]</em>, <em>mac=None</em>, <em>mtu=None</em>, <em>description=None</em>, <em>rename=None</em>, <em>group=None</em>, <em>addm=None</em>, <em>vnet=None</em>, <em>jail=None</em>, <em>extra_settings=None</em>, <em>destroy=False</em>, <em>auto_apply=True</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Model if an iocage jails network interface.</p>
 <p>NetworkInterface abstracts interface configurations and commands executed
@@ -292,27 +291,6 @@ on the host or within jails. This class is internally used by Network.</p>
 <dt id="libioc.NetworkInterface.NetworkInterface.rtsold_command">
 <code class="descname">rtsold_command</code><em class="property"> = '/usr/sbin/rtsold'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.rtsold_command" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="libioc.NetworkInterface.QueuingNetworkInterface">
-<em class="property">class </em><code class="descclassname">libioc.NetworkInterface.</code><code class="descname">QueuingNetworkInterface</code><span class="sig-paren">(</span><em>name='vnet0'</em>, <em>shell_variable_nic_name=None</em>, <em>**network_interface_options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#QueuingNetworkInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.QueuingNetworkInterface" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libioc.NetworkInterface.NetworkInterface" title="libioc.NetworkInterface.NetworkInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.NetworkInterface.NetworkInterface</span></code></a>, <a class="reference internal" href="libioc.CommandQueue.html#libioc.CommandQueue.CommandQueue" title="libioc.CommandQueue.CommandQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.CommandQueue.CommandQueue</span></code></a></p>
-<p>Delay command execution for bulk execution.</p>
-<dl class="attribute">
-<dt id="libioc.NetworkInterface.QueuingNetworkInterface.current_nic_name">
-<code class="descname">current_nic_name</code><a class="headerlink" href="#libioc.NetworkInterface.QueuingNetworkInterface.current_nic_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the current NIC reference for usage in shell scripts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 </dd></dl>
 

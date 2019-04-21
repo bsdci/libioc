@@ -1,0 +1,12 @@
+Metadata-Version: 1.2
+Name: libioc
+Version: 0.7.0
+Summary: A Python library to manage jails with ioc{age,cell}
+Home-page: https://github.com/bsdci/libioc
+Author: ioc Contributors
+Author-email: authors@libioc.io
+License: BSD
+Description: UNKNOWN
+Keywords: FreeBSD jail ioc
+Platform: UNKNOWN
+Requires-Python: >=3.6

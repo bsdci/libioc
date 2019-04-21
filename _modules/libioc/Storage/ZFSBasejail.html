@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Storage.ZFSBasejail &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Storage.ZFSBasejail &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -151,7 +151,6 @@
             
   <h1>Source code for libioc.Storage.ZFSBasejail</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
-<span class="c1"># Copyright (c) 2014-2018, iocage</span>
 <span class="c1"># All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Redistribution and use in source and binary forms, with or without</span>
@@ -175,29 +174,54 @@
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage ZFS basejail storage backend.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">libioc.Storage</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">libioc.Storage.Basejail</span>
 <span class="kn">import</span> <span class="nn">libioc.helpers</span>
 
 
-<div class="viewcode-block" id="ZFSBasejailStorage"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">ZFSBasejailStorage</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Storage</span><span class="p">):</span>
+<div class="viewcode-block" id="ZFSBasejailStorage"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage">[docs]</a><span class="k">class</span> <span class="nc">ZFSBasejailStorage</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Basejail</span><span class="o">.</span><span class="n">BasejailStorage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;iocage ZFS basejail storage backend.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ZFSBasejailStorage.apply"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ZFSBasejailStorage.apply"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Attach the jail storage.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">release</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">cloned_release</span>
 
-        <span class="k">return</span> <span class="n">ZFSBasejailStorage</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">)</span></div>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">BaseJailStorageConfig</span><span class="p">(</span>
+            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ZFSBasejailStorage.setup"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ZFSBasejailStorage</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ZFSBasejailStorage.setup"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Configure the jail storage.&quot;&quot;&quot;</span>
-        <span class="n">libioc</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">Storage</span><span class="o">.</span><span class="n">Standalone</span><span class="o">.</span><span class="n">StandaloneJailStorage</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">release</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ZFSBasejailStorage.clone"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release</span><span class="p">):</span>
+<div class="viewcode-block" id="ZFSBasejailStorage.clone"><a class="viewcode-back" href="../../../libioc.Storage.ZFSBasejail.html#libioc.Storage.ZFSBasejail.ZFSBasejailStorage.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Clone ZFS basejail datasets from a release.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Release</span><span class="o">.</span><span class="n">ReleaseGenerator</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ReleaseGenerator required&quot;</span><span class="p">)</span>
         <span class="n">current_basejail_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;basejail_type&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">current_basejail_type</span> <span class="o">==</span> <span class="s2">&quot;zfs&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailConfigValue</span><span class="p">(</span>
@@ -223,7 +247,7 @@
                 <span class="n">delete_existing</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_create_mountpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_mountpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">basedir</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span> <span class="s2">&quot;etc&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">create_jail_mountpoint</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span></div>
 </pre></div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Jails &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Jails &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -185,8 +185,6 @@
 <div class="viewcode-block" id="JailsGenerator"><a class="viewcode-back" href="../../libioc.Jails.html#libioc.Jails.JailsGenerator">[docs]</a><span class="k">class</span> <span class="nc">JailsGenerator</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">ListableResource</span><span class="o">.</span><span class="n">ListableResource</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Asynchronous representation of a collection of jails.&quot;&quot;&quot;</span>
 
-    <span class="n">states</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">JailState</span><span class="o">.</span><span class="n">JailStates</span><span class="p">()</span>
-
     <span class="c1"># Keys that are stored on the Jail object, not the configuration</span>
     <span class="n">JAIL_KEYS</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;jid&quot;</span><span class="p">,</span>
@@ -196,17 +194,22 @@
         <span class="s2">&quot;ip6.addr&quot;</span>
     <span class="p">]</span>
 
+    <span class="n">resource_args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filters</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libioc</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">Terms</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Host.HostGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.ZFS.ZFS&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">resource_args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_args</span> <span class="o">=</span> <span class="n">resource_args</span>
 
         <span class="n">libioc</span><span class="o">.</span><span class="n">ListableResource</span><span class="o">.</span><span class="n">ListableResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -233,35 +236,11 @@
             <span class="p">),</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-            <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span>
+            <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_args</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">jail</span><span class="o">.</span><span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
-                <span class="n">f</span><span class="s2">&quot;Injecting pre-loaded state to &#39;</span><span class="si">{jail.humanreadable_name}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span>
-            <span class="n">jail</span><span class="o">.</span><span class="n">jail_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">jail</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span>
-
         <span class="k">return</span> <span class="n">jail</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span>
-        <span class="bp">self</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.Resource.Resource&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Iterate over all jails matching the filter criteria.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">queried</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
-
-        <span class="n">iterator</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">ListableResource</span><span class="o">.</span><span class="n">ListableResource</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">jail</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
-
-            <span class="k">if</span> <span class="n">jail</span><span class="o">.</span><span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
-                <span class="n">jail</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">jail</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">jail</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">JailState</span><span class="o">.</span><span class="n">JailState</span><span class="p">(</span>
-                    <span class="n">jail</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="p">{}</span>
-                <span class="p">)</span>
-
-            <span class="k">yield</span> <span class="n">jail</span>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the JailGenerator at a certain index position.&quot;&quot;&quot;</span>

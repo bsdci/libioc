@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Datasets &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Datasets &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -484,10 +484,8 @@
     <span class="k">def</span> <span class="nf">_read_root_datasets_from_rc_conf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;ioc_dataset_&quot;</span>
 
-        <span class="kn">import</span> <span class="nn">libioc.Config.Jail.File.RCConf</span>
-        <span class="n">rc_conf</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">RCConf</span><span class="o">.</span><span class="n">RCConf</span><span class="p">(</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-        <span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">libioc.Config.Host</span>
+        <span class="n">rc_conf</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Host</span><span class="o">.</span><span class="n">rc_conf</span>
         <span class="n">rc_conf_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">rc_conf</span><span class="p">))</span>
 
         <span class="n">output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>

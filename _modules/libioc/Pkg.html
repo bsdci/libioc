@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Pkg &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Pkg &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -149,7 +149,6 @@
             
   <h1>Source code for libioc.Pkg</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2017-2019, Stefan Grönke</span>
-<span class="c1"># Copyright (c) 2014-2018, iocage</span>
 <span class="c1"># All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Redistribution and use in source and binary forms, with or without</span>
@@ -194,10 +193,10 @@
 
 
 <div class="viewcode-block" id="Pkg"><a class="viewcode-back" href="../../libioc.Pkg.html#libioc.Pkg.Pkg">[docs]</a><span class="k">class</span> <span class="nc">Pkg</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;iocage pkg management utility.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ioc pkg management utility.&quot;&quot;&quot;</span>
 
     <span class="n">_dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span>
-    <span class="n">package_source_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/.iocage-pkg&quot;</span>
+    <span class="n">package_source_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/.ioc-pkg&quot;</span>
     <span class="n">__pkg_directory_mounted</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -206,8 +205,8 @@
         <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Host.Host&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zfs</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_zfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers_object</span><span class="o">.</span><span class="n">init_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pkg_directory_mounted</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -372,13 +371,13 @@
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;update&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;--force&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="s2">&quot;libiocage&quot;</span>
+                    <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="s2">&quot;libioc&quot;</span>
                 <span class="p">]),</span>
                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;/usr/sbin/pkg&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;install&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;--yes&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="s2">&quot;libiocage&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;--repository&quot;</span><span class="p">,</span> <span class="s2">&quot;libioc&quot;</span><span class="p">,</span>
                     <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_packages</span><span class="p">)</span>
                 <span class="p">])</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">postinstall</span><span class="p">)</span>
@@ -395,7 +394,7 @@
                     <span class="n">event_scope</span><span class="o">=</span><span class="n">packageInstallEvent</span><span class="o">.</span><span class="n">scope</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">jail_exec_events</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailLaunch</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailCommand</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">done</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                             <span class="n">stdout</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">yield</span> <span class="n">event</span>
@@ -491,13 +490,13 @@
         <span class="k">return</span> <span class="n">_packages</span>
 
     <span class="k">def</span> <span class="nf">_get_repo_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_major_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;iocage-release-</span><span class="si">{release_major_version}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;ioc-release-</span><span class="si">{release_major_version}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="nf">_config_jail_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="p">:</span> <span class="s1">&#39;libioc.Jail.JailGenerator&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">jail_directory</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/etc/pkg/repos&quot;</span>
         <span class="n">host_directory</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{jail.root_path}</span><span class="s2">/</span><span class="si">{jail_directory}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_repo_conf</span><span class="p">(</span>
-            <span class="n">repo_name</span><span class="o">=</span><span class="s2">&quot;libiocage&quot;</span><span class="p">,</span>
+            <span class="n">repo_name</span><span class="o">=</span><span class="s2">&quot;libioc&quot;</span><span class="p">,</span>
             <span class="n">url</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;file://</span><span class="si">{self.package_source_directory}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">directory</span><span class="o">=</span><span class="n">host_directory</span><span class="p">,</span>
             <span class="n">signature_type</span><span class="o">=</span><span class="s2">&quot;none&quot;</span>
@@ -576,7 +575,7 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
         <span class="kn">import</span> <span class="nn">ucl</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ucl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ucl</span><span class="o">.</span><span class="n">UCL_EMIT_JSON</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_get_release_pkg_dataset</span><span class="p">(</span>

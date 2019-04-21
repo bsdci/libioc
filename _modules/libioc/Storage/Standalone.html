@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Storage.Standalone &mdash; libioc 0.6.0 2019/02/08 documentation</title>
+  <title>libioc.Storage.Standalone &mdash; libioc 0.8.0 2019/04/13 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.8.0
               </div>
             
           
@@ -175,6 +175,8 @@
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;iocage standalone jail storage backend.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
 <span class="kn">import</span> <span class="nn">libioc.Storage</span>
 
 
@@ -183,13 +185,16 @@
 
 <div class="viewcode-block" id="StandaloneJailStorage.apply"><a class="viewcode-back" href="../../../libioc.Storage.Standalone.html#libioc.Storage.Standalone.StandaloneJailStorage.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">release</span><span class="p">:</span> <span class="s1">&#39;libioc.Release.ReleaseGenerator&#39;</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Attach the jail storage.&quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Standalone jails do not require storage operations to start&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Standalone jails do not require storage operations to start&quot;</span><span class="p">,</span>
+            <span class="n">message</span><span class="p">,</span>
             <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StandaloneJailStorage.setup"><a class="viewcode-back" href="../../../libioc.Storage.Standalone.html#libioc.Storage.Standalone.StandaloneJailStorage.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
