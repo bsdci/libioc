@@ -4,3 +4,8 @@ api/*.inv
 __pycache__/
 *.pyc
 build/
+.cache/
+libioc/
+tests/
+*.core
+*.orig
