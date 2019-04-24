@@ -82,6 +82,16 @@ class Firewall:
             logger=self.logger
         )
 
+    def rules(
+        self
+    ) -> str:
+        """Output lists of firewall rule."""
+        command = [
+            self.IPFW_COMMAND,
+            "-a", "list"
+        ]
+        self._exec(command)
+
     def delete_rule(
         self,
         rule_number: typing.Union[int, str],
@@ -130,7 +140,7 @@ class Firewall:
         ignore_error: bool=False
     ) -> None:
         try:
-            libioc.helpers.exec(command, ignore_error=ignore_error)
+            return libioc.helpers.exec(command, ignore_error=ignore_error)
         except libioc.errors.CommandFailure:
             raise libioc.errors.FirewallCommandFailure(
                 logger=self.logger
