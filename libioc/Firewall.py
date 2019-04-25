@@ -90,7 +90,7 @@ class Firewall:
             self.IPFW_COMMAND,
             "-a", "list"
         ]
-        self._exec(command)
+        return self._exec_list(command)
 
     def delete_rule(
         self,
@@ -134,13 +134,25 @@ class Firewall:
         _rule_number = int(rule_number)
         return str(_rule_number + self.IPFW_RULE_OFFSET)
 
+    def _exec_list(
+        self,
+        command: typing.List[str],
+        ignore_error: bool=False
+    ) -> str:
+        try:
+            return str(libioc.helpers.exec(command, ignore_error=ignore_error))
+        except libioc.errors.CommandFailure:
+            raise libioc.errors.FirewallCommandFailure(
+                logger=self.logger
+            )
+
     def _exec(
         self,
         command: typing.List[str],
         ignore_error: bool=False
     ) -> None:
         try:
-            return libioc.helpers.exec(command, ignore_error=ignore_error)
+            libioc.helpers.exec(command, ignore_error=ignore_error)
         except libioc.errors.CommandFailure:
             raise libioc.errors.FirewallCommandFailure(
                 logger=self.logger
