@@ -860,11 +860,13 @@ class ExportOtherDataset(ResourceBackup):
         self,
         resource: 'libioc.Resource.Resource',
         dataset: libzfs.ZFSDataset,
+        flags: typing.Set[libzfs.SendFlag]=set(),
         message: typing.Optional[str]=None,
         scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.dataset = dataset
+        self.flags = flags
         ResourceBackup.__init__(
             self,
             resource=resource,
