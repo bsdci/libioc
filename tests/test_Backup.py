@@ -104,3 +104,30 @@ class TestBackup(object):
 
         assert os.path.exists(str(work_dir / "root.zfs")) is False
         assert os.path.isdir(str(work_dir / "root")) is True
+
+    def test_import_empty_differential_backup(
+        self,
+        tmp_path: pathlib.Path,
+        new_jail: 'libioc.Jail.Jail',
+        release: 'libioc.Release.Release',
+        host: 'libioc.Host.Host'
+    ) -> None:
+        """Test if differential backups with empty root can be imported."""
+        new_jail_name = new_jail.name
+        backup_config_file = str(tmp_path / "config.json")
+        backup_config_data = dict(
+            release=release.name,
+            ip4_addr="vnet0|192.168.24.2/24",
+            interfaces="vnet0:bridge0"
+        )
+        os.makedirs(tmp_path / "root", mode=0o770)
+        with open(backup_config_file, "w") as f:
+            json.dump(backup_config_data, f)
+
+        restore_events = list(new_jail.backup.restore(tmp_path))
+
+        assert new_jail.exists
+        jail = libioc.Jail.Jail(new_jail_name, host=host)
+        assert jail.name == new_jail_name
+        for key, value in backup_config_data.items():
+            assert jail.config.data[key] == backup_config_data[key]

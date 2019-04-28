@@ -279,8 +279,8 @@ class LaunchableResourceBackup:
         yield importConfigEvent.begin()
 
         try:
-            self.resource.config.data = data
-            self.resource.config_handler.write(data)
+            self.resource.config.clone(data, skip_on_error=True)
+            self.resource.config_handler.write(self.resource.config.data)
             self.logger.verbose(
                 f"Config imported from {self.resource.config_handler.file}"
             )
