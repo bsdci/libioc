@@ -536,12 +536,22 @@ class UnknownConfigProperty(IocException, KeyError):
         self,
         key: str,
         logger: typing.Optional['libioc.Logger.Logger']=None,
-        level: str="error"
+        level: str="error",
+        jail: typing.Optional['libioc.Jail.JailGenerator']=None
     ) -> None:
-        msg = (
-            f"The config property '{key}' is unknown"
+        if jail is None:
+            msg = f"The config property '{key}' is unknown"
+        else:
+            msg = (
+                f"The config property '{key}' of jail '{jail.name}' is unknown"
+            )
+        self.jail = jail
+        IocException.__init__(
+            self,
+            message=msg,
+            logger=logger,
+            level=level
         )
-        IocException.__init__(self, message=msg, logger=logger, level=level)
 
 
 # Backup

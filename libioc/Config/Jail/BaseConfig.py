@@ -641,10 +641,15 @@ class BaseConfig(dict):
     ) -> None:
         """Set a configuration value."""
         if self._is_known_property(key, explicit=explicit) is False:
+            if "jail" in dir(self):
+                _jail = self.jail  # noqa: T484
+            else:
+                _jail = None
             err = libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger,
-                level=("warn" if skip_on_error else "error")
+                level=("warn" if skip_on_error else "error"),
+                jail=_jail
             )
             if skip_on_error is False:
                 raise err
