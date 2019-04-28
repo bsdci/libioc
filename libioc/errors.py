@@ -572,6 +572,32 @@ class ExportDestinationExists(IocException):
         IocException.__init__(self, message=msg, logger=logger)
 
 
+class BackupSourceDoesNotExist(IocException):
+    """Raised when a backup source is not available for import."""
+
+    def __init__(
+        self,
+        source: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+
+        msg = "The backup source {source} does not exists"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
+class BackupSourceUnknownFormat(IocException):
+    """Raised when a backup source is in unknown format."""
+
+    def __init__(
+        self,
+        source: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+
+        msg = "The backup source {source} has unknown type"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
 # ListableResource
 
 

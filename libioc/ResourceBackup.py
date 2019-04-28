@@ -145,7 +145,6 @@ class LaunchableResourceBackup:
     def restore(
         self,
         source: str,
-        backup_format: Format=Format.TAR,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
@@ -161,6 +160,22 @@ class LaunchableResourceBackup:
 
                 The path to the exported archive file (tar.gz)
         """
+        if os.path.exists(source) is False:
+            raise libioc.errors.BackupSourceDoesNotExist(
+                source=source,
+                logger=self.logger
+            )
+
+        if os.path.isdir(source) is True:
+            backup_format = Format.DIRECTORY
+        elif (source.endswith(".txz") or source.endswith(".tar.gz")) is True:
+            backup_format = Format.TAR
+        else:
+            raise libioc.errors.BackupSourceUnknownFormat(
+                source=source,
+                logger=self.logger
+            )
+
         resourceBackupEvent = libioc.events.ResourceBackup(
             self.resource,
             scope=event_scope
