@@ -226,13 +226,9 @@ class BaseConfig(dict):
         disallowed_characters_pattern = "([^A-Za-z0-9_\\-]|\\^)"
         invalid_characters = re.findall(disallowed_characters_pattern, name)
         if len(invalid_characters) > 0:
-            msg = (
-                f"Invalid character in name: "
-                " ".join(invalid_characters)
-            )
-            self.logger.error(msg)
             raise libioc.errors.InvalidJailName(
-                name="INVALID",
+                name=name,
+                invalid_characters=invalid_characters,
                 logger=self.logger
             )
 

@@ -385,12 +385,15 @@ class InvalidJailName(JailConfigError):
     def __init__(
         self,
         name: str,
+        invalid_characters: typing.Optional[typing.List[str]]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         msg = (
             f"Invalid jail name '{name}': "
-            "Names have to begin and end with an alphanumeric character"
+            "Names may only contain alphanumeric characters and dash"
         )
+        if invalid_characters is not None:
+            msg += ", but got " + str("".join(invalid_characters) + "")
         super().__init__(message=msg, logger=logger)
 
 
