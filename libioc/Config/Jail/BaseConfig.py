@@ -737,7 +737,9 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
-            if isinstance(
+            if existed_before is False:
+                hash_before = False
+            elif isinstance(
                 self,
                 libioc.Config.Jail.Defaults.JailConfigDefaults
             ) is True:
