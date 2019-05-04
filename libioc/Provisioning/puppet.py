@@ -178,13 +178,13 @@ def provision(
     yield from pkg.install(
         jail=self.jail,
         packages=list(pluginDefinition.pkgs),
-        event_scope=jailProvisioningEvent.scope
+        event_scope=_scope
     )
 
     puppet_env_dir = "/usr/local/etc/puppet/environments"
 
     self.jail.logger.spam("Mounting puppet environment")
-    self.jail.fstab.new_line(
+    fstab_line = self.jail.fstab.new_line(
         source=mount_source,
         destination=puppet_env_dir,
         options=mode,
@@ -196,7 +196,7 @@ def provision(
         if self.source.remote is True:
 
             r10kDeployEvent = R10kDeployEvent(
-                scope=jailProvisioningEvent.scope,
+                scope=_scope,
                 jail=self.jail
             )
 
@@ -227,7 +227,7 @@ def provision(
             yield r10kDeployEvent.end()
 
         puppetApplyEvent = PuppetApplyEvent(
-            scope=jailProvisioningEvent.scope,
+            scope=_scope,
             jail=self.jail
         )
         yield puppetApplyEvent.begin()
@@ -248,7 +248,7 @@ def provision(
         if started is True:
             jailStopEvent = libioc.events.JailStop(
                 jail=self.jail,
-                scope=jailProvisioningEvent.scope
+                scope=_scope
             )
             yield jailStopEvent.begin()
             yield from self.jail.stop(event_scope=jailStopEvent.scope)
