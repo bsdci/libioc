@@ -947,6 +947,7 @@ class JailGenerator(JailResource):
                 jid,
                 event_scope=jailStopEvent.scope
             )
+        yield from self.fstab.unmount(event_scope=jailStopEvent.scope)
         yield from self.storage_backend.teardown(
             self.storage,
             event_scope=jailStopEvent.scope
