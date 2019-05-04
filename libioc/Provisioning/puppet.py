@@ -169,12 +169,17 @@ def provision(
     else:
         started = False
 
+    # Install packages
     pkg = libioc.Pkg.Pkg(
         logger=self.jail.logger,
         zfs=self.jail.zfs,
         host=self.jail.host
     )
-
+    yield from pkg.fetch(
+        packages=list(pluginDefinition.pkgs),
+        release=self.jail.release,
+        event_scope=_scope
+    )
     yield from pkg.install(
         jail=self.jail,
         packages=list(pluginDefinition.pkgs),
