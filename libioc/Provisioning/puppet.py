@@ -30,6 +30,8 @@ import libioc.events
 import libioc.Pkg
 import libioc.Provisioning
 
+__puppet_env_dir = "/usr/local/etc/puppet/environments"
+
 
 class ControlRepoUnavailableError(libioc.errors.IocException):
     """Raised when the puppet control-repo is not available."""
@@ -186,12 +188,10 @@ def provision(
         event_scope=_scope
     )
 
-    puppet_env_dir = "/usr/local/etc/puppet/environments"
-
     self.jail.logger.spam("Mounting puppet environment")
     fstab_line = self.jail.fstab.new_line(
         source=mount_source,
-        destination=puppet_env_dir,
+        destination=__puppet_env_dir,
         options=mode,
         auto_create_destination=True,
         replace=True
@@ -199,68 +199,94 @@ def provision(
 
     try:
         if self.source.remote is True:
-
-            r10kDeployEvent = R10kDeployEvent(
-                scope=_scope,
-                jail=self.jail
-            )
-
-            yield r10kDeployEvent.begin()
-            try:
-                r10k_dir = f"{self.jail.root_path}/usr/local/etc/r10k"
-                r10k_cfg = f"{r10k_dir}/r10k.yaml"
-                if not os.path.isdir(f"{r10k_dir}"):
-                    os.mkdir(r10k_dir, mode=0o755)
-                self.jail.logger.verbose(f"Writing r10k config {r10k_cfg}")
-                with open(r10k_cfg, "w") as f:
-                    f.write("\n".join((
-                        f"---",
-                       ":sources:",
-                       "    puppet:",
-                       f"       basedir: {puppet_env_dir}",
-                       f"       remote: {self.source}\n"
-                    )))
-
-                self.jail.logger.verbose("Deploying r10k config")
-                self.jail.exec([
-                    "r10k",
-                    "deploy",
-                    "environment",
-                    "-pv"
-                ])
-            except Exception as e:
-                yield r10kDeployEvent.fail(e)
-                raise e
-            yield r10kDeployEvent.end()
-
-        puppetApplyEvent = PuppetApplyEvent(
-            scope=_scope,
-            jail=self.jail
-        )
-        yield puppetApplyEvent.begin()
-        try:
-            self.jail.exec([
-                "puppet",
-                "apply",
-                "--debug",
-                "--logdest",
-                "syslog",
-                f"{puppet_env_dir}/production/manifests/site.pp"
-            ])
-            yield puppetApplyEvent.end()
-        except Exception as e:
-            yield puppetApplyEvent.fail(e)
-            raise e
-
+            yield from __deploy_r10k(self, event_scope=_scope)
+        yield from __apply_puppet(self, event_scope=_scope)
         if started is True:
-            jailStopEvent = libioc.events.JailStop(
-                jail=self.jail,
-                scope=_scope
-            )
-            yield jailStopEvent.begin()
-            yield from self.jail.stop(event_scope=jailStopEvent.scope)
-            yield jailStopEvent.end()
+            yield from self.jail.stop(event_scope=_scope)
     finally:
         del self.jail.fstab[self.jail.fstab.index(fstab_line)]
 
     yield jailProvisioningEvent.end()
+
+
+def __apply_puppet(
+    self: 'libioc.Provisioning.Prototype',
+    event_scope: libioc.events.Scope
+) -> typing.Generator[R10kDeployEvent, None, None]:
+    puppetApplyEvent = PuppetApplyEvent(
+        scope=event_scope,
+        jail=self.jail
+    )
+    yield puppetApplyEvent.begin()
+    _, _, returncode = self.jail.exec([
+        "puppet",
+        "apply",
+        "--debug",
+        "--logdest",
+        "syslog",
+        f"{__puppet_env_dir}/production/manifests/site.pp"
+    ])
+    if returncode == 0:
+        yield puppetApplyEvent.end()
+    else:
+        yield puppetApplyEvent.fail(f"exited with {returncode}")
+
+
+def __deploy_r10k(
+    self: 'libioc.Provisioning.Prototype',
+    event_scope: libioc.events.Scope
+) -> typing.Generator[R10kDeployEvent, None, None]:
+    r10kDeployEvent = R10kDeployEvent(
+        scope=event_scope,
+        jail=self.jail
+    )
+    yield r10kDeployEvent.begin()
+    try:
+        __write_r10k_config(self.jail, __puppet_env_dir, self.source)
+        __deploy_r10k_config(self.jail)
+    except Exception as e:
+        yield r10kDeployEvent.fail(e)
+        raise e
+    yield r10kDeployEvent.end()
+
+
+def __deploy_r10k_config(jail: libioc.Jail.JailGenerator) -> None:
+    jail.logger.verbose("Deploying r10k config")
+    jail.exec([
+        "r10k",
+        "deploy",
+        "environment",
+        "-pv"
+    ])
+
+
+def __write_r10k_config(
+    jail: libioc.Jail.JailGenerator,
+    basedir: str,
+    remote: str
+) -> None:
+    with __securely_open_r10k_config(jail) as f:
+        jail.logger.verbose(f"Writing r10k config {f.name}")
+        f.write("\n".join((
+            f"---",
+            ":sources:",
+            "    puppet:",
+            f"       basedir: {basedir}",
+            f"       remote: {remote}\n"
+        )))
+
+
+def __securely_open_r10k_config(
+    jail: libioc.Jail.JailGenerator
+) -> typing.TextIO:
+    etc_dir = f"{jail.root_path}/usr/local/etc"
+    jail.require_relative_path(etc_dir)
+    r10k_config_dir = f"{etc_dir}/r10k"
+    if not os.path.isdir(f"{r10k_config_dir}"):
+        os.makedirs(r10k_config_dir, mode=0o755)
+    else:
+        jail.require_relative_path(r10k_config_dir)
+    r10k_config_file = f"{r10k_config_dir}/r10k.yaml"
+    if os.path.exists(r10k_config_file) is True:
+        jail.require_relative_path(r10k_config_file)
+    return open(r10k_config_file, "w", encoding="UTF-8")
