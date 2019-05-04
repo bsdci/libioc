@@ -478,7 +478,7 @@ class JailHookStart(JailHook):
 class JailCommand(JailHook):
     """Run command in a jail."""
 
-    pass
+    stdout: typing.Optional[str]
 
 
 class JailHookCreated(JailHook):
