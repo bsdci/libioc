@@ -654,7 +654,7 @@ class JailFstab(Fstab):
         Use save() to write changes to the fstab file.
         """
         if type(line) == FstabLine:
-            if self.jail._is_path_relative(line["destination"]) is False:
+            if self.jail.is_path_relative(line["destination"]) is False:
                 line = FstabLine(line)  # clone to prevent mutation
                 line["destination"] = libioc.Types.AbsolutePath("/".join([
                     self.jail.root_path,
@@ -687,7 +687,7 @@ class JailFstab(Fstab):
 
         if type(line) == FstabLine:
             # destination is always relative to the jail resource
-            if self.jail._is_path_relative(line["destination"]) is False:
+            if self.jail.is_path_relative(line["destination"]) is False:
                 _destination = libioc.Types.AbsolutePath("/".join([
                     self.jail.root_path,
                     line["destination"].strip("/")

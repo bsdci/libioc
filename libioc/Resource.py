@@ -369,17 +369,17 @@ class Resource(metaclass=abc.ABCMeta):
         self,
         filepath: str,
     ) -> None:
-        """Require the resolved filepath to be relative to the jail root."""
-        if self._is_path_relative(filepath) is False:
+        """Raise an error when the path is not relative to the resource."""
+        if self.is_path_relative(filepath) is False:
             raise libioc.errors.SecurityViolationConfigJailEscape(
                 file=filepath
             )
 
-    def _is_path_relative(
+    def is_path_relative(
         self,
         filepath: str
     ) -> bool:
-
+        """Return whether the path is relative to the resource."""
         real_resource_path = self._resolve_path(self.dataset.mountpoint)
         real_file_path = self._resolve_path(filepath)
 
