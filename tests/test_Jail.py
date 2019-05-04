@@ -28,9 +28,12 @@ import os
 import subprocess
 
 import pytest
+import pathlib
+
 import libzfs
 
 import libioc.Jail
+import libioc.Config.Jail.File.Fstab
 
 
 def read_jail_config_json(config_file: str) -> dict:
@@ -198,6 +201,39 @@ class TestNullFSBasejail(object):
         ).decode("utf-8")
         for basedir in basedirs:
             assert f"{root_path}/{basedir}" not in stdout
+
+    def test_fstab_mountpoints_are_unmounted_on_stop(
+        self,
+        tmp_path: pathlib.Path,
+        existing_jail: 'libioc.Jail.Jail',
+        basedirs: typing.List[str]
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.fstab.new_line(
+            source=str(tmp_path),
+            destination=str(tmp_path),
+            type="nullfs"
+        )
+        existing_jail.fstab.save()
+
+        with open(existing_jail.fstab.path, "r", encoding="UTF-8") as f:
+            fstab_content = f.read()
+            assert len(fstab_content.split("\n")) == 1
+
+        target_mountpoint = existing_jail.root_path + str(tmp_path)
+        os.makedirs(target_mountpoint)
+
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount"]
+        ).decode("utf-8")
+        assert str(target_mountpoint) in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount"]
+        ).decode("utf-8")
+        assert str(target_mountpoint) not in stdout
 
     def test_getstring_returns_empty_string_for_unknown_user_properties(
         self,
