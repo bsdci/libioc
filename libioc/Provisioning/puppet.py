@@ -252,7 +252,7 @@ def provision(
             raise e
 
         if started is True:
-            jailStopEvent = libioc.events.JailShutdown(
+            jailStopEvent = libioc.events.JailStop(
                 jail=self.jail,
                 scope=jailProvisioningEvent.scope
             )
