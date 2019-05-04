@@ -902,6 +902,9 @@ class BaseConfig(dict):
             return True
         if key in libioc.Config.Jail.Globals.DEFAULTS.keys():
             return True  # key is default
+        elif key in dict.keys(libioc.Config.Jail.Globals.DEFAULTS):
+            # key could be a dict key
+            return isinstance(libioc.Config.Jail.Globals.DEFAULTS[key], dict)
         if f"_set_{key}" in dict.__dir__(self):
             return True  # key is setter
         if f"_get_{key}" in dict.__dir__(self):
