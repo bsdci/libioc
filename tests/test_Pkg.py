@@ -26,6 +26,7 @@ import typing
 import pytest
 import os
 import os.path
+import subprocess
 
 import libzfs
 
@@ -87,3 +88,11 @@ class TestPkg(object):
 				jail_command_event = event
 		assert jail_command_event is not None
 		assert os.path.exists(f"{existing_jail.root_path}/usr/local/bin/sl")
+
+		assert existing_jail.running is False
+
+		pkg_mountpoint = existing_jail.root_path + "/.ioc-pkg"
+		stdout = subprocess.check_output(
+            [f"/sbin/mount"]
+        ).decode("utf-8")
+        assert str(pkg_mountpoint) not in stdout
