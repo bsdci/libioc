@@ -165,13 +165,7 @@ def provision(
 
     if self.jail.stopped is True:
         started = True
-        jailStartEvent = libioc.events.JailStart(
-            jail=self.jail,
-            scope=jailProvisioningEvent.scope
-        )
-        yield jailStartEvent.begin()
-        yield from self.jail.start(event_scope=jailStartEvent.scope)
-        yield jailStartEvent.end()
+        yield from self.jail.start(event_scope=_scope)
     else:
         started = False
 
