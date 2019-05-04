@@ -327,7 +327,7 @@ class Fstab(collections.MutableSequence):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Append a new line to the fstab file.
 
@@ -343,7 +343,7 @@ class Fstab(collections.MutableSequence):
             "comment": comment
         })
 
-        self.add_line(
+        return self.add_line(
             line=line,
             replace=replace,
             auto_create_destination=auto_create_destination,
@@ -361,14 +361,12 @@ class Fstab(collections.MutableSequence):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Directly append a FstabLine type.
 
         Use save() to write changes to the fstab file.
         """
-        FstabCommentLine
-        FstabAutoPlaceholderLine
         if any((
             isinstance(line, FstabLine),
             isinstance(line, FstabCommentLine),
@@ -380,6 +378,7 @@ class Fstab(collections.MutableSequence):
             )
 
         self._lines.append(line)
+        return line
 
     def index(
         self,
@@ -648,7 +647,7 @@ class JailFstab(Fstab):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Directly append a FstabLine type.
 
@@ -674,7 +673,7 @@ class JailFstab(Fstab):
                 self.logger.verbose(
                     f"Skipping existing fstab line: {line}"
                 )
-                return
+                return line
             else:
                 raise libioc.errors.FstabDestinationExists(
                     mountpoint=destination,
@@ -727,6 +726,7 @@ class JailFstab(Fstab):
                 )
 
         self._lines.append(line)
+        return line
 
     def update_release(
         self,

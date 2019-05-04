@@ -260,7 +260,6 @@ def provision(
             yield from self.jail.stop(event_scope=jailStopEvent.scope)
             yield jailStopEvent.end()
     finally:
-        # in case anything fails the fstab mount needs to be removed
-        del self.jail.fstab[-1]
+        del self.jail.fstab[self.jail.fstab.index(fstab_line)]
 
     yield jailProvisioningEvent.end()
