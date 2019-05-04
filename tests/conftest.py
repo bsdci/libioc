@@ -38,6 +38,7 @@ import libioc.Host
 import libioc.Distribution
 import libioc.Logger
 import libioc.Release
+import libioc.Pkg
 
 import release_mirror_cache
 cache_server = release_mirror_cache.BackgroundServer(8081)
@@ -221,6 +222,19 @@ def bridge_interface() -> str:
     yield bridge_name
     subprocess.check_output(
         ["/sbin/ifconfig", str(bridge_name), "destroy"]
+    )
+
+
+@pytest.fixture
+def pkg(
+    host: 'libioc.Host.Host',
+    logger: 'libioc.Logger.Logger',
+    zfs: libzfs.ZFS
+) -> 'libioc.Pkg.Pkg':
+    return libioc.Pkg.Pkg(
+        logger=self.jail.logger,
+        zfs=self.jail.zfs,
+        host=self.jail.host
     )
 
 
