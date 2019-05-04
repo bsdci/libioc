@@ -63,7 +63,7 @@ class JailResource(
     """Resource that represents a jail."""
 
     _jail: 'JailGenerator'
-    _fstab: 'libioc.Config.Jail.File.Fstab.Fstab'
+    _fstab: 'libioc.Config.Jail.File.Fstab.JailFstab'
     host: 'libioc.Host.HostGenerator'
     root_datasets_name: typing.Optional[str]
 
@@ -77,7 +77,7 @@ class JailResource(
         logger: typing.Optional['libioc.Logger.Logger']=None,
         zfs: typing.Optional[libioc.ZFS.ZFS]=None,
         host: typing.Optional['libioc.Host.HostGenerator']=None,
-        fstab: typing.Optional['libioc.Config.Jail.File.Fstab.Fstab']=None,
+        fstab: typing.Optional['libioc.Config.Jail.File.Fstab.JailFstab']=None,
         root_datasets_name: typing.Optional[str]=None,
     ) -> None:
 
