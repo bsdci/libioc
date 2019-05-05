@@ -232,9 +232,9 @@ def pkg(
     zfs: libzfs.ZFS
 ) -> 'libioc.Pkg.Pkg':
     return libioc.Pkg.Pkg(
-        logger=self.jail.logger,
-        zfs=self.jail.zfs,
-        host=self.jail.host
+        logger=logger,
+        zfs=zfs,
+        host=host
     )
 
 
