@@ -60,10 +60,6 @@ class TestPuppetProvisioner(object):
             assert isinstance(event, libioc.events.IocEvent) is True
 
         assert existing_jail.running is False
-
-        existing_jail.start()
-        stdout = subprocess.check_output(
-            ["/bin/ps", "-J", str(existing_jail.jid)]
-        ).decode("utf-8")
-
-        assert "nginx" in stdout
+        assert os.path.exists(
+            os.path.join(existing_jail.root_path, "puppet.test")
+        )
