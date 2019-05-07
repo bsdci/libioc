@@ -633,34 +633,6 @@ class JailGenerator(JailResource):
 
         yield event.end()
 
-    def __unmount_devfs(
-        self,
-        event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.UnmountDevFS', None, None]:
-
-        event = libioc.events.UnmountDevFS(
-            jail=self,
-            scope=event_scope
-        )
-        yield event.begin()
-
-        devpath = f"{self.root_path}/dev"
-
-        if os.path.ismount(devpath) is False:
-            yield event.skip()
-            return
-        try:
-            libioc.helpers.umount(
-                mountpoint=devpath,
-                logger=self.logger,
-                frce=True
-            )
-        except Exception as e:
-            yield event.fail(e)
-            raise e
-
-        yield event.end()
-
     def __mount_fdescfs(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
@@ -695,34 +667,6 @@ class JailGenerator(JailResource):
             libioc.helpers.mount(
                 destination=fdescfs_path,
                 fstype="fdescfs"
-            )
-        except Exception as e:
-            yield event.fail(e)
-            raise e
-
-        yield event.end()
-
-    def __unmount_devfs(
-        self,
-        event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.UnmountFdescfs', None, None]:
-
-        event = libioc.events.UnmountFdescfs(
-            jail=self,
-            scope=event_scope
-        )
-        yield event.begin()
-
-        fdescfs_path = f"{self.root_path}/dev/fd"
-
-        if os.path.ismount(fdescfs_path) is False:
-            yield event.skip()
-            return
-        try:
-            libioc.helpers.umount(
-                mountpoint=fdescfs_path,
-                logger=self.logger,
-                frce=True
             )
         except Exception as e:
             yield event.fail(e)
@@ -1615,10 +1559,6 @@ class JailGenerator(JailResource):
         else:
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
             return self.host.devfs[ruleset_line_position].number
-
-    @staticmethod
-    def __get_launch_command(jail_args: typing.List[str]) -> typing.List[str]:
-        return ["/usr/sbin/jail", "-c"] + jail_args
 
     @property
     def _launch_params(self) -> libjail.Jiov:
