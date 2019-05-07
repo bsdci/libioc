@@ -80,6 +80,35 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
     def _get_legacy(self) -> bool:
         return self.legacy
 
+    def _get_mount_fdescfs(self) -> bool:
+        return (self.data["mount_fdescfs"] == "1") is True
+
+    def _set_mount_fdescfs(self, value: typing.Union[str, int, bool]) -> None:
+
+        error_reason: typing.Optional[str] = None
+        if isinstance(value, bool) is True:
+            enabled = (value is True)
+        else:
+            try:
+                str_value = str(int(value))
+            except ValueError:
+                error_reason = "invalid input type (expected int or str)"
+
+            if (str_value != "0") and (str_value != "1"):
+                error_reason = f"Boolean input expected, but got {str_value}"
+
+            enabled = (str_value == "1")
+
+        if error_reason is not None:
+            raise libioc.errors.InvalidJailConfigValue(
+                jail=self.jail,
+                property_name="mount_fdescfs",
+                reason=error_reason,
+                logger=self.logger
+            )
+
+        self.data["mount_fdescfs"] = ("1" if enabled else "0")
+
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""
         try:
