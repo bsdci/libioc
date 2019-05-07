@@ -403,6 +403,18 @@ class UnmountDevFS(DevFSEvent):
     pass
 
 
+class MountFdescfs(DevFSEvent):
+    """Mount /dev/fd into a jail."""
+
+    pass
+
+
+class UnmountFdescfs(DevFSEvent):
+    """Unmount /dev/fd from a jail."""
+
+    pass
+
+
 class FstabEvent(JailEvent):
     """Group of events that occor on Fstab operations."""
 

@@ -538,6 +538,9 @@ class JailGenerator(JailResource):
         # Mount Devfs
         yield from self.__mount_devfs(jailStartEvent.scope)
 
+        # Mount Fdescfs
+        yield from self.__mount_fdescfs(jailStartEvent.scope)
+
         # Setup Network
         yield from self.__start_network(jailStartEvent.scope)
 
@@ -649,6 +652,75 @@ class JailGenerator(JailResource):
         try:
             libioc.helpers.umount(
                 mountpoint=devpath,
+                logger=self.logger,
+                frce=True
+            )
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+
+        yield event.end()
+
+    def __mount_fdescfs(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
+
+        event = libioc.events.MountFdescfs(
+            jail=self,
+            scope=event_scope
+        )
+        yield event.begin()
+
+        if self.config["allow_mount_fdescfs"] is False:
+            raise libioc.errors.InvalidJailConfigValue(
+                property_name="allow_mount_fdescfs",
+                jail=self,
+                logger=self.logger,
+                reason="fdescfs is not allowed to be mounted"
+            )
+
+        if self.config["mount_fdescfs"] is False:
+            yield event.skip("disabled")
+            return
+
+        fdescfs_path = f"{self.root_path}/dev/fd"
+
+        try:
+            if os.path.islink(fdescfs_path) is True:
+                raise libioc.errors.InsecureJailPath(
+                    path=devpath,
+                    logger=self.logger
+                )
+            libioc.helpers.mount(
+                destination=fdescfs_path,
+                fstype="fdescfs"
+            )
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+
+        yield event.end()
+
+    def __unmount_devfs(
+        self,
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator['libioc.events.UnmountFdescfs', None, None]:
+
+        event = libioc.events.UnmountFdescfs(
+            jail=self,
+            scope=event_scope
+        )
+        yield event.begin()
+
+        fdescfs_path = f"{self.root_path}/dev/fd"
+
+        if os.path.ismount(fdescfs_path) is False:
+            yield event.skip()
+            return
+        try:
+            libioc.helpers.umount(
+                mountpoint=fdescfs_path,
                 logger=self.logger,
                 frce=True
             )
