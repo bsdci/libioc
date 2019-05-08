@@ -1599,6 +1599,8 @@ class JailGenerator(JailResource):
                 value = []
                 for _, addresses in self.config["ip6_addr"].items():
                     value += [x.ip for x in addresses]
+            elif vnet and (sysctl_name.startswith("security.jail.param.ip")):
+                continue
             else:
                 config_property_name = sysctl.iocage_name
                 if self.config.is_known_property(
