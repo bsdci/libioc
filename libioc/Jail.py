@@ -649,16 +649,7 @@ class JailGenerator(JailResource):
         )
         yield _event.begin()
 
-        iocage_property_name = f"allow_mount_{filesystem}"
-        if self.config[iocage_property_name] is False:
-            raise libioc.errors.InvalidJailConfigValue(
-                property_name=iocage_property_name,
-                jail=self,
-                logger=self.logger,
-                reason="fdescfs is not allowed to be mounted"
-            )
-
-        if self.config[f"mount_{filesystem}"] is False:
+        if int(self.config[f"mount_{filesystem}"]) == 0:
             yield _event.skip("disabled")
             return
 
@@ -673,7 +664,7 @@ class JailGenerator(JailResource):
         except Exception as e:
             yield _event.fail(str(e))
             raise e
-        if os.path.isdir(_mountpoint) is None:
+        if os.path.isdir(_mountpoint) is False:
             os.makedirs(_mountpoint, mode=0o555)
 
         try:

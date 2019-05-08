@@ -80,10 +80,26 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
     def _get_legacy(self) -> bool:
         return self.legacy
 
-    def _get_mount_fdescfs(self) -> bool:
-        return (self.data["mount_fdescfs"] == "1") is True
+    def _get_mount_fdescfs(self) -> int:
+        return self.__get_mount(key="mount_fdescfs")
 
     def _set_mount_fdescfs(self, value: typing.Union[str, int, bool]) -> None:
+        self.__set_mount(key="mount_fdescfs", value=value)
+
+    def _get_mount_devfs(self) -> int:
+        return self.__get_mount(key="mount_devfs")
+
+    def _set_mount_devfs(self, value: typing.Union[str, int, bool]) -> None:
+        self.__set_mount(key="mount_devfs", value=value)
+
+    def __get_mount(self, key: str) -> int:
+        return 1 * ((int(self.data[key]) == 1) is True)
+
+    def __set_mount(
+        self,
+        key: str,
+        value: typing.Union[str, int, bool]
+    ) -> None:
 
         error_reason: typing.Optional[str] = None
         if isinstance(value, bool) is True:
@@ -92,7 +108,7 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
             try:
                 str_value = str(int(value))
             except ValueError:
-                error_reason = "invalid input type (expected int or str)"
+                error_reason = "invalid input type (expected int, str or bool)"
 
             if (str_value != "0") and (str_value != "1"):
                 error_reason = f"Boolean input expected, but got {str_value}"
@@ -107,7 +123,7 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
                 logger=self.logger
             )
 
-        self.data["mount_fdescfs"] = ("1" if enabled else "0")
+        self.data[key] = ("1" if enabled else "0")
 
     def __getitem__(self, key: str) -> typing.Any:
         """Get the value of a configuration argument or its default."""
