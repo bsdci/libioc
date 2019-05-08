@@ -92,6 +92,79 @@ class TestJail(object):
 
         assert stdout.strip().count("\n") == 0
 
+    def test_can_mount_devfs(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.config["mount_devfs"] = True
+        existing_jail.config["mount_fdescfs"] = False
+        existing_jail.save()
+
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev" in stdout
+        assert "/dev/fd" not in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev" not in stdout
+
+    def test_can_mount_fdescfs(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.config["mount_devfs"] = False
+        existing_jail.config["mount_fdescfs"] = True
+        existing_jail.save()
+
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev/fd" in stdout
+        assert "/dev (" not in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev/fd" not in stdout
+
+    def test_can_mount_devfs_and_fdescfs(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if a jail can be started."""
+        existing_jail.config["mount_devfs"] = True
+        existing_jail.config["mount_fdescfs"] = True
+        existing_jail.save()
+
+        existing_jail.start()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev (" in stdout
+        assert "/dev/fd" in stdout
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            shell=True
+        ).decode("utf-8")
+        assert "/dev (" not in stdout
+        assert "/dev/fd" not in stdout
+
     def test_can_be_stopped(
         self,
         existing_jail: 'libioc.Jail.Jail'
