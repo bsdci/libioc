@@ -31,6 +31,7 @@ import shutil
 import libzfs
 import freebsd_sysctl
 import jail as libjail
+import freebsd_sysctl.types
 
 import libioc.Types
 import libioc.errors
@@ -1577,10 +1578,6 @@ class JailGenerator(JailResource):
         value: libjail.RawIovecValue
         jail_params: typing.Dict[str, libioc.JailParams.JailParam] = {}
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
-            if sysctl.ctl_type == freebsd_sysctl.types.NODE:
-                # skip NODE
-                continue
-
             if sysctl_name == "security.jail.param.devfs_ruleset":
                 value = int(self.devfs_ruleset)
             elif sysctl_name == "security.jail.param.path":
@@ -1624,7 +1621,7 @@ class JailGenerator(JailResource):
                 else:
                     continue
 
-            jail_params[sysctl.jail_arg_name] = value
+            jail_params[sysctl.jail_arg_name.rstrip(".")] = value
 
         jail_params["persist"] = None
         return jail_params
