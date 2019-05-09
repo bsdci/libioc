@@ -137,7 +137,8 @@ class Storage:
                     continue
                 libioc.helpers.umount(
                     mountpoint=mountpoint,
-                    force=True
+                    force=True,
+                    logger=self.logger
                 )
                 has_unmounted_any = True
         except Exception:
