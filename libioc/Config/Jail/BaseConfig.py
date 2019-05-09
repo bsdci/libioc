@@ -873,6 +873,8 @@ class BaseConfig(dict):
             return True  # key is default
         if f"_set_{key}" in dict.__dir__(self):
             return True  # key is setter
+        if f"_get_{key}" in dict.__dir__(self):
+            return True  # key is getter
         if key in libioc.Config.Jail.Properties.properties:
             return True  # key is special property
         if self._key_is_mac_config(key, explicit=explicit) is True:
