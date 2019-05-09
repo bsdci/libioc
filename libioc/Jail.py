@@ -618,9 +618,9 @@ class JailGenerator(JailResource):
         yield from self.__mount_in_jail(
             filesystem="devfs",
             mountpoint="/dev",
-            opts=["devfs_ruleset=4"],
             event=libioc.events.MountDevFS,
-            event_scope=event_scope
+            event_scope=event_scope,
+            ruleset=self.config["devfs_ruleset"]
         )
 
     def __mount_fdescfs(
@@ -639,9 +639,8 @@ class JailGenerator(JailResource):
         filesystem: str,
         mountpoint: str,
         event: 'libioc.events.JailEvent',
-        opts: typing.List[str]=[],
         event_scope: typing.Optional['libioc.events.Scope']=None,
-
+        **iov_data: str
     ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
 
         _event = event(
@@ -681,8 +680,8 @@ class JailGenerator(JailResource):
             libioc.helpers.mount(
                 destination=_mountpoint,
                 fstype=filesystem,
-                opts=opts,
-                logger=self.logger
+                logger=self.logger,
+                ruleset=4
             )
         except Exception as e:
             yield _event.fail(str(e))

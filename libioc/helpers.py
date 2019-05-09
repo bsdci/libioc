@@ -540,13 +540,16 @@ def mount(
     source: str=None,
     fstype: str="nullfs",
     opts: typing.List[str]=[],
-    logger: typing.Optional['libioc.Logger.Logger']=None
+    logger: typing.Optional['libioc.Logger.Logger']=None,
+    **iov_data: typing.Any
 ) -> None:
     """Mount a filesystem using libc."""
     data: typing.Dict[str, typing.Optional[str]] = dict(
         fstype=fstype,
         fspath=destination
     )
+    for key, value in iov_data.items():
+        data[key] = str(value)
     if source is not None:
         data["target"] = source
     for opt in opts:
