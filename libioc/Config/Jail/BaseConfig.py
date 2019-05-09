@@ -621,7 +621,7 @@ class BaseConfig(dict):
     def unknown_config_parameters(self) -> typing.Iterator[str]:
         """Yield unknown config parameters already stored in the config."""
         for key in self.data.keys():
-            if self._is_known_property(key, explicit=True) is False:
+            if self.is_known_property(key, explicit=True) is False:
                 yield key
 
     def __delitem__(self, key: str) -> None:
@@ -636,7 +636,7 @@ class BaseConfig(dict):
         explicit: bool=True
     ) -> None:
         """Set a configuration value."""
-        if self._is_known_property(key, explicit=explicit) is False:
+        if self.is_known_property(key, explicit=explicit) is False:
             if "jail" in dir(self):
                 _jail = self.jail  # noqa: T484
             else:
@@ -865,7 +865,7 @@ class BaseConfig(dict):
         """Return whether the given key belongs to a custom user property."""
         return (key == "user") or (key.startswith("user.") is True)
 
-    def _is_known_property(self, key: str, explicit: bool) -> bool:
+    def is_known_property(self, key: str, explicit: bool) -> bool:
         """Return True when the key is a known config property."""
         if self._is_known_jail_param(key):
             return True
@@ -898,7 +898,7 @@ class BaseConfig(dict):
         key: str,
         explicit: bool=True
     ) -> None:
-        if self._is_known_property(key, explicit=explicit) is False:
+        if self.is_known_property(key, explicit=explicit) is False:
             raise libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger

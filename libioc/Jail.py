@@ -1609,7 +1609,7 @@ class JailGenerator(JailResource):
                     value += [x.ip for x in addresses]
             else:
                 config_property_name = sysctl.iocage_name
-                if self.config._is_known_property(
+                if self.config.is_known_property(
                     config_property_name,
                     explicit=False
                 ) is True:
