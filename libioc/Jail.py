@@ -55,6 +55,10 @@ import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.ResourceSelector
 import libioc.Config.Jail.File.Fstab
 
+import ctypes.util
+import errno
+_dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
+
 
 class JailResource(
     libioc.LaunchableResource.LaunchableResource,
@@ -518,17 +522,23 @@ class JailGenerator(JailResource):
 
         jailAttachEvent.add_rollback_step(_stop_failed_jail)
         jiov = libjail.Jiov(self._launch_params)
-        jid = libjail.dll.jail_set(jiov.pointer, len(jiov), 1)
+        jid = _dll.jail_set(jiov.pointer, len(jiov), 1)
 
         if jid > 0:
             self.__jid = jid
             yield jailAttachEvent.end()
         else:
+            error_code = ctypes.get_errno()
+            if error_code > 0:
+                error_name = errno.errorcode[error_code]
+                error_text = f"{error_code} [{error_name}]"
+            else:
+                error_text = jiov.errmsg.value.decode("UTF-8")
             error = libioc.errors.JailLaunchFailed(
                 jail=self,
+                reason=error_text,
                 logger=self.logger
             )
-            error_text = jiov.errmsg.value.decode("UTF-8")
             yield jailAttachEvent.fail(error_text)
             raise error
 
