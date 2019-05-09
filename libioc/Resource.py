@@ -365,10 +365,11 @@ class Resource(metaclass=abc.ABCMeta):
             "This needs to be implemented by the inheriting class"
         )
 
-    def _require_relative_path(
+    def require_relative_path(
         self,
         filepath: str,
     ) -> None:
+        """Require the resolved filepath to be relative to the jail root."""
         if self._is_path_relative(filepath) is False:
             raise libioc.errors.SecurityViolationConfigJailEscape(
                 file=filepath

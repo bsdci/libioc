@@ -702,7 +702,7 @@ class FreeBSD(Updater):
     def _pre_update(self) -> None:
         """Execute before executing the update command."""
         lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
-        self.resource._require_relative_path(f"{lnk}/..")
+        self.resource.require_relative_path(f"{lnk}/..")
         if os.path.islink(lnk) is True:
             os.unlink(lnk)
         os.symlink("/", lnk)
@@ -710,7 +710,7 @@ class FreeBSD(Updater):
     def _post_update(self) -> None:
         """Execute after executing the update command."""
         lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
-        self.resource._require_relative_path(f"{lnk}/..")
+        self.resource.require_relative_path(f"{lnk}/..")
         os.unlink(lnk)
 
 

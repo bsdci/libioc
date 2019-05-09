@@ -633,7 +633,7 @@ class JailFstab(Fstab):
             return self.file
         else:
             path = f"{self.jail.dataset.mountpoint}/{self.file}"
-            self.jail._require_relative_path(path)
+            self.jail.require_relative_path(path)
             return path
 
     def add_line(
@@ -692,7 +692,7 @@ class JailFstab(Fstab):
                     self.jail.root_path,
                     line["destination"].strip("/")
                 ]))
-                self.jail._require_relative_path(_destination)
+                self.jail.require_relative_path(_destination)
                 line["destination"] = _destination
 
             libioc.helpers.require_no_symlink(str(line["destination"]))
@@ -707,7 +707,7 @@ class JailFstab(Fstab):
 
             if (auto_mount_jail and self.jail.running) is True:
                 destination = line["destination"]
-                self.jail._require_relative_path(destination)
+                self.jail.require_relative_path(destination)
                 self.logger.verbose(
                     f"auto-mount {destination}"
                 )

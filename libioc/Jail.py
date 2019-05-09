@@ -665,7 +665,7 @@ class JailGenerator(JailResource):
 
         try:
             _mountpoint = str(f"{self.root_path}{mountpoint}")
-            self._require_relative_path(_mountpoint)
+            self.require_relative_path(_mountpoint)
             if os.path.islink(_mountpoint) or os.path.isfile(_mountpoint):
                 raise libioc.errors.InsecureJailPath(
                     path=_mountpoint,
