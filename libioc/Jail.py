@@ -615,75 +615,80 @@ class JailGenerator(JailResource):
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.MountDevFS', None, None]:
-
-        event = libioc.events.MountDevFS(
-            jail=self,
-            scope=event_scope
+        yield from self.__mount_in_jail(
+            filesystem="devfs",
+            mountpoint="/dev",
+            opts=["devfs_ruleset=4"],
+            event=libioc.events.MountDevFS,
+            event_scope=event_scope
         )
-        yield event.begin()
-
-        if self.config["mount_devfs"] is False:
-            yield event.skip("disabled")
-            return
-
-        devpath = f"{self.root_path}/dev"
-
-        try:
-            if os.path.islink(devpath) is True:
-                raise libioc.errors.InsecureJailPath(
-                    path=devpath,
-                    logger=self.logger
-                )
-            libioc.helpers.mount(
-                destination=devpath,
-                fstype="devfs"
-            )
-        except Exception as e:
-            yield event.fail(e)
-            raise e
-
-        yield event.end()
 
     def __mount_fdescfs(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
+        yield from self.__mount_in_jail(
+            filesystem="fdescfs",
+            mountpoint="/dev/fd",
+            event=libioc.events.MountFdescfs,
+            event_scope=event_scope
+        )
 
-        event = libioc.events.MountFdescfs(
+    def __mount_in_jail(
+        self,
+        filesystem: str,
+        mountpoint: str,
+        event: 'libioc.events.JailEvent',
+        opts: typing.List[str]=[],
+        event_scope: typing.Optional['libioc.events.Scope']=None,
+
+    ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
+
+        _event = event(
             jail=self,
             scope=event_scope
         )
-        yield event.begin()
+        yield _event.begin()
 
-        if self.config["allow_mount_fdescfs"] is False:
+        iocage_property_name = f"allow_mount_{filesystem}"
+        if self.config[iocage_property_name] is False:
             raise libioc.errors.InvalidJailConfigValue(
-                property_name="allow_mount_fdescfs",
+                property_name=iocage_property_name,
                 jail=self,
                 logger=self.logger,
                 reason="fdescfs is not allowed to be mounted"
             )
 
-        if self.config["mount_fdescfs"] is False:
-            yield event.skip("disabled")
+        if self.config[f"mount_{filesystem}"] is False:
+            yield _event.skip("disabled")
             return
 
-        fdescfs_path = f"{self.root_path}/dev/fd"
-
         try:
-            if os.path.islink(fdescfs_path) is True:
+            _mountpoint = str(f"{self.root_path}{mountpoint}")
+            self._require_relative_path(_mountpoint)
+            if os.path.islink(_mountpoint) or os.path.isfile(_mountpoint):
                 raise libioc.errors.InsecureJailPath(
-                    path=devpath,
+                    path=_mountpoint,
                     logger=self.logger
                 )
+        except Exception as e:
+            yield _event.fail(str(e))
+            raise e
+        if os.path.isdir(_mountpoint) is None:
+            os.makedirs(_mountpoint, mode=0o555)
+
+        try:
             libioc.helpers.mount(
-                destination=fdescfs_path,
-                fstype="fdescfs"
+                destination=_mountpoint,
+                fstype=filesystem,
+                opts=opts,
+                logger=self.logger
             )
         except Exception as e:
-            yield event.fail(e)
+            yield _event.fail(str(e))
             raise e
 
-        yield event.end()
+        yield _event.end()
 
     @property
     def _zfs_share_storage(
