@@ -2431,9 +2431,11 @@ class Jail(JailGenerator):
             start_dependant_jails=start_dependant_jails,
             **temporary_config_override
         )
+        stdout = ""
         for event in events:
             if isinstance(
                 event,
                 libioc.events.JailCommand
             ) and event.done:
-                return str(event.stdout)
+                stdout = event.stdout
+        return stdout
