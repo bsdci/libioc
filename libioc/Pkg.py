@@ -389,13 +389,13 @@ class Pkg:
         postinstall: typing.List[str]=[]
     ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Mirror and install packages to a jail."""
-        yield from self.bootstrap(
-            jail=jail,
-            event_scope=event_scope
-        )
         yield from self.fetch(
             packages=packages,
             release=jail.release,
+            event_scope=event_scope
+        )
+        yield from self.bootstrap(
+            jail=jail,
             event_scope=event_scope
         )
         yield from self.install(
