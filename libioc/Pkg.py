@@ -190,15 +190,19 @@ class Pkg:
 
         dataset = self.__get_jail_release_pkg_dataset(jail)
         pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
-        yield from self.__run_command(
-            jail=jail,
-            command=[
-                "/usr/sbin/pkg",
-                "add",
-                f"{self.package_source_directory}/{pkg_archive_name}"
-            ],
-            event_scope=event.scope
-        )
+        try:
+            yield from self.__run_command(
+                jail=jail,
+                command=[
+                    "/usr/sbin/pkg",
+                    "add",
+                    f"{self.package_source_directory}/{pkg_archive_name}"
+                ],
+                event_scope=event.scope
+            )
+        except Exception as e:
+            yield event.fail(e)
+            raise e
 
         yield event.end()
 

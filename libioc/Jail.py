@@ -542,10 +542,34 @@ class JailGenerator(JailResource):
             yield jailAttachEvent.fail(error_text)
             raise error
 
-        def _stop_failed_jail(
+        def _stop_jails(
         ) -> typing.Generator['libioc.events.IocEvent', None, None]:
-            import pdb; pdb.set_trace()
-            jails_to_stop = [self]
+            if single_command is None:
+                jails_to_stop = [self]
+            else:
+                jails_to_stop = []
+                if self.config["vnet"] is False:
+                    yield from self._stop_non_vimage_network(
+                        force=False,
+                        event_scope=jailStartEvent.scope
+                    )
+                yield from self.__destroy_jail(
+                    event_scope=jailStartEvent.scope
+                )
+                if (jid is not None) and (self.config["vnet"] is True):
+                    yield from self.__stop_vimage_network(
+                        jid,
+                        event_scope=jailStartEvent.scope
+                    )
+                yield from self.fstab.unmount(event_scope=jailStartEvent.scope)
+                yield from self.storage_backend.teardown(
+                    self.storage,
+                    event_scope=jailStartEvent.scope
+                )
+                yield from self.__clear_resource_limits(
+                    force=False,
+                    event_scope=jailStartEvent.scope
+                )
             if start_dependant_jails is True:
                 jails_to_stop.extend(list(reversed(dependant_jails_started)))
             for jail_to_stop in jails_to_stop:
@@ -553,7 +577,7 @@ class JailGenerator(JailResource):
                     force=True,
                     event_scope=jailAttachEvent.scope
                 )
-        jailStartEvent.add_rollback_step(_stop_failed_jail)
+        jailStartEvent.add_rollback_step(_stop_jails)
 
         # Created Hook
         yield from self.__run_hook(
@@ -589,50 +613,35 @@ class JailGenerator(JailResource):
                 )
             self._save_autoconfig()
 
-        if single_command is None:
-            # Start and Poststart Hooks
-            yield from self.__run_hook(
-                "start",
-                force=False,
-                event_scope=jailStartEvent.scope,
-                env=env
-            )
-            yield from self.__run_hook(
-                "poststart",
-                force=False,
-                event_scope=jailStartEvent.scope,
-                env=env
-            )
-        else:
-            yield from self.__run_hook(
-                "command",
-                force=False,
-                event_scope=jailStartEvent.scope,
-                script=str(single_command),
-                passthru=passthru,
-                env=env
-            )
-            if self.config["vnet"] is False:
-                yield from self._stop_non_vimage_network(
+        try:
+            if single_command is None:
+                # Start and Poststart Hooks
+                yield from self.__run_hook(
+                    "start",
                     force=False,
-                    event_scope=jailStartEvent.scope
+                    event_scope=jailStartEvent.scope,
+                    env=env
                 )
-            yield from self.__destroy_jail(event_scope=jailStartEvent.scope)
-            if (jid is not None) and (self.config["vnet"] is True):
-                yield from self.__stop_vimage_network(
-                    jid,
-                    event_scope=jailStartEvent.scope
+                yield from self.__run_hook(
+                    "poststart",
+                    force=False,
+                    event_scope=jailStartEvent.scope,
+                    env=env
                 )
-            yield from self.fstab.unmount(event_scope=jailStartEvent.scope)
-            yield from self.storage_backend.teardown(
-                self.storage,
-                event_scope=jailStartEvent.scope
-            )
-            yield from self.__clear_resource_limits(
-                force=False,
-                event_scope=jailStartEvent.scope
-            )
+            else:
+                yield from self.__run_hook(
+                    "command",
+                    force=False,
+                    event_scope=jailStartEvent.scope,
+                    script=str(single_command),
+                    passthru=passthru,
+                    env=env
+                )
+        except Exception as e:
+            yield jailStartEvent.fail(e)
+            raise e
 
+        _stop_jails()
         yield jailStartEvent.end()
 
     def __mount_devfs(
@@ -956,7 +965,7 @@ class JailGenerator(JailResource):
             if force is True:
                 yield event.skip("ERROR")
             else:
-                yield event.fail(f"exited with {code}")
+                yield event.fail(f"command exited with {code}")
                 raise libioc.errors.JailHookFailed(
                     jail=self,
                     hook=hook,
