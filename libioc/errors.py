@@ -231,9 +231,12 @@ class JailLaunchFailed(JailException):
     def __init__(
         self,
         jail: 'libioc.Jail.JailGenerator',
+        reason: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         msg = f"Launching jail {jail.full_name} failed"
+        if reason is not None:
+            msg += f": {reason}"
         JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
