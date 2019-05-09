@@ -872,7 +872,7 @@ class JailGenerator(JailResource):
         self.config.clone(original_config.data)
 
         try:
-            fork_exec_events = JailGenerator.start(
+            yield from JailGenerator.start(
                 self,
                 single_command=command,
                 passthru=passthru,
@@ -881,8 +881,6 @@ class JailGenerator(JailResource):
                 start_dependant_jails=start_dependant_jails,
                 env=env
             )
-            for event in fork_exec_events:
-                yield event
         finally:
             self.config = original_config
 
