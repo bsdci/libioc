@@ -60,6 +60,24 @@ class Pkg:
         self.host = libioc.helpers_object.init_host(self, host)
         self.__pkg_directory_mounted = False
 
+    def configure(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+        """Configure the repositories within the jail."""
+        packageConfigurationEvent = libioc.events.PackageConfiguration(
+            jail=jail,
+            scope=event_scope
+        )
+        yield packageConfigurationEvent.begin()
+        try:
+            self._config_jail_repo(jail)
+        except Exception as e:
+            yield packageConfigurationEvent.fail(e)
+            raise e
+        yield packageConfigurationEvent.end()
+
     def fetch(
         self,
         packages: typing.Union[str, typing.List[str]],
@@ -216,7 +234,6 @@ class Pkg:
         if jail.running is True:
             jailCommandEvent = libioc.events.JailCommand(
                 jail=jail,
-                logger=self.logger,
                 scope=event_scope
             )
             yield jailCommandEvent.begin()
@@ -272,19 +289,6 @@ class Pkg:
             jail=jail,
             scope=event_scope
         )
-
-        packageConfigurationEvent = libioc.events.PackageConfiguration(
-            jail=jail,
-            scope=event_scope
-        )
-
-        yield packageConfigurationEvent.begin()
-        try:
-            self._config_jail_repo(jail)
-        except Exception as e:
-            yield packageConfigurationEvent.fail(e)
-            raise e
-        yield packageConfigurationEvent.end()
 
         yield packageInstallEvent.begin()
         try:
@@ -392,6 +396,10 @@ class Pkg:
         yield from self.fetch(
             packages=packages,
             release=jail.release,
+            event_scope=event_scope
+        )
+        yield from self.configure(
+            jail=jail,
             event_scope=event_scope
         )
         yield from self.bootstrap(
