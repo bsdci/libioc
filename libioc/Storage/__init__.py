@@ -130,6 +130,13 @@ class Storage:
         )
         yield event.begin()
 
+        try:
+            for mountpoint in system_mountpoints:
+                self.jail.require_relative_path(mountpoint)
+        except Exception as e:
+            yield event.fail(str(e))
+            raise e
+
         has_unmounted_any = False
         try:
             for mountpoint in system_mountpoints:
