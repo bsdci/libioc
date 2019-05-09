@@ -1614,6 +1614,13 @@ class JailGenerator(JailResource):
                     explicit=False
                 ) is True:
                     value = config[config_property_name]
+                    if sysctl.ctl_type in (
+                        freebsd_sysctl.types.NODE,
+                        freebsd_sysctl.types.INT,
+                    ):
+                        sysctl_state_names = ["disable", "inherit", "new"]
+                        if value in sysctl_state_names:
+                            value = sysctl_state_names.index(value)
                 else:
                     continue
 
