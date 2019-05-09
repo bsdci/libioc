@@ -641,7 +641,7 @@ class JailGenerator(JailResource):
             yield jailStartEvent.fail(e)
             raise e
 
-        _stop_jails()
+        yield from _stop_jails()
         yield jailStartEvent.end()
 
     def __mount_devfs(
