@@ -357,6 +357,37 @@ class BaseConfig(dict):
 
         return self.__unique_list(tags)
 
+    @property
+    def __has_mounts_enabled(self) -> bool:
+        prefix = "allow_mount_"
+        return any((self[x] == 1) for x in self.keys() if x.startswith(prefix))
+
+    def _get_enforce_statfs(self) -> int:
+        key = "enforce_statfs"
+        if key in self.data.keys():
+            return int(self.data[key])
+
+        if self.__has_mounts_enabled:
+            self.logger.verbose(
+                "setting enforce_statfs=1 to support allowed mounts"
+            )
+            return 1
+
+        raise KeyError(f"{key} unconfigured")
+
+    def _get_allow_mount(self) -> int:
+        key = "allow_mount"
+        if key in self.data.keys():
+            return int(self.data[key])
+
+        if self.__has_mounts_enabled:
+            self.logger.verbose(
+                "inheriting allow_mount=1 from allowed mounts"
+            )
+            return 1
+
+        raise KeyError(f"{key} unconfigured")
+
     def __unique_list(self, seq: typing.List[str]) -> typing.List[str]:
         seen: typing.Set[str] = set()
         seen_add = seen.add
