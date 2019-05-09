@@ -80,15 +80,11 @@ class TestPkg(object):
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
         packages = ["sl"]
-        list(pkg.fetch(packages, release=release))
-
-        jail_command_event = None
-        for event in pkg.install(packages=packages, jail=existing_jail):
-            if isinstance(event, libioc.events.JailCommand) and event.done:
-                jail_command_event = event
-        assert jail_command_event is not None
+        list(pkg.fetch_and_install(
+            packages=packages,
+            jail=existing_jail
+        ))
         assert os.path.exists(f"{existing_jail.root_path}/usr/local/bin/sl")
-
         assert existing_jail.running is False
 
         pkg_mountpoint = existing_jail.root_path + "/.ioc-pkg"
