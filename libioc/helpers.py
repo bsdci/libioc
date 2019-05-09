@@ -558,7 +558,7 @@ def mount(
     if libjail.dll.nmount(jiov.pointer, len(jiov), 0) != 0:
         raise libioc.errors.MountFailed(
             mountpoint=destination,
-            reason=jiov.errmsg.value,
+            reason=jiov.errmsg.value.decode("UTF-8"),
             logger=logger
         )
 
