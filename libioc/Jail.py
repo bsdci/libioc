@@ -521,19 +521,6 @@ class JailGenerator(JailResource):
             scope=jailStartEvent.scope
         )
         yield jailAttachEvent.begin()
-
-        def _stop_failed_jail(
-        ) -> typing.Generator['libioc.events.IocEvent', None, None]:
-            jails_to_stop = [self]
-            if start_dependant_jails is True:
-                jails_to_stop.extend(list(reversed(dependant_jails_started)))
-            for jail_to_stop in jails_to_stop:
-                yield from jail_to_stop.stop(
-                    force=True,
-                    event_scope=jailAttachEvent.scope
-                )
-
-        jailAttachEvent.add_rollback_step(_stop_failed_jail)
         jiov = libjail.Jiov(self._launch_params)
         jid = _dll.jail_set(jiov.pointer, len(jiov), 1)
 
@@ -554,6 +541,19 @@ class JailGenerator(JailResource):
             )
             yield jailAttachEvent.fail(error_text)
             raise error
+
+        def _stop_failed_jail(
+        ) -> typing.Generator['libioc.events.IocEvent', None, None]:
+            import pdb; pdb.set_trace()
+            jails_to_stop = [self]
+            if start_dependant_jails is True:
+                jails_to_stop.extend(list(reversed(dependant_jails_started)))
+            for jail_to_stop in jails_to_stop:
+                yield from jail_to_stop.stop(
+                    force=True,
+                    event_scope=jailAttachEvent.scope
+                )
+        jailStartEvent.add_rollback_step(_stop_failed_jail)
 
         # Created Hook
         yield from self.__run_hook(
