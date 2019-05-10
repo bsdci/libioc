@@ -640,7 +640,7 @@ class JailGenerator(JailResource):
         mountpoint: str,
         event: 'libioc.events.JailEvent',
         event_scope: typing.Optional['libioc.events.Scope']=None,
-        **iov_data: str
+        **extra_args: str
     ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
 
         _event = event(
@@ -672,7 +672,7 @@ class JailGenerator(JailResource):
                 destination=_mountpoint,
                 fstype=filesystem,
                 logger=self.logger,
-                ruleset=4
+                **extra_args
             )
         except Exception as e:
             yield _event.fail(str(e))
