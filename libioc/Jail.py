@@ -410,7 +410,8 @@ class JailGenerator(JailResource):
         single_command: typing.Optional[str]=None,
         event_scope: typing.Optional['libioc.events.Scope']=None,
         dependant_jails_seen: typing.List['JailGenerator']=[],
-        start_dependant_jails: bool=True
+        start_dependant_jails: bool=True,
+        env: typing.Dict[str, str]={}
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
         Start the jail.
@@ -449,6 +450,12 @@ class JailGenerator(JailResource):
             start_dependant_jails (bool):
 
                 When disabled, no dependant jails will be started.
+
+            env (dict):
+
+                Environment variables that are available in all jail hooks.
+                Existing environment variables (provided by the system or ioc)
+                can be overridden with entries in this dictionary.
         """
         self.require_jail_existing()
         self.require_jail_stopped()
@@ -490,7 +497,12 @@ class JailGenerator(JailResource):
         )
 
         # Prestart Hook
-        yield from self.__run_hook("prestart", False, jailStartEvent.scope)
+        yield from self.__run_hook(
+            "prestart",
+            force=False,
+            event_scope=jailStartEvent.scope,
+            env=env
+        )
 
         # Basejail Actions
         if self.is_basejail is True:
@@ -544,7 +556,12 @@ class JailGenerator(JailResource):
             raise error
 
         # Created Hook
-        yield from self.__run_hook("created", False, jailStartEvent.scope)
+        yield from self.__run_hook(
+            "created",
+            force=False,
+            event_scope=jailStartEvent.scope,
+            env=env
+        )
 
         # Mount Devfs
         yield from self.__mount_devfs(jailStartEvent.scope)
@@ -574,11 +591,17 @@ class JailGenerator(JailResource):
 
         if single_command is None:
             # Start and Poststart Hooks
-            yield from self.__run_hook("start", False, jailStartEvent.scope)
+            yield from self.__run_hook(
+                "start",
+                force=False,
+                event_scope=jailStartEvent.scope,
+                env=env
+            )
             yield from self.__run_hook(
                 "poststart",
-                False,
-                jailStartEvent.scope
+                force=False,
+                event_scope=jailStartEvent.scope,
+                env=env
             )
         else:
             yield from self.__run_hook(
@@ -586,7 +609,8 @@ class JailGenerator(JailResource):
                 force=False,
                 event_scope=jailStartEvent.scope,
                 script=str(single_command),
-                passthru=passthru
+                passthru=passthru,
+                env=env
             )
             if self.config["vnet"] is False:
                 yield from self._stop_non_vimage_network(
@@ -779,6 +803,7 @@ class JailGenerator(JailResource):
         event_scope: typing.Optional['libioc.events.Scope']=None,
         start_dependant_jails: bool=True,
         dependant_jails_seen: typing.List['JailGenerator']=[],
+        env: typing.Dict[str, str]={},
         **temporary_config_override: typing.Any
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
@@ -844,12 +869,29 @@ class JailGenerator(JailResource):
                 passthru=passthru,
                 event_scope=event_scope,
                 dependant_jails_seen=dependant_jails_seen,
-                start_dependant_jails=start_dependant_jails
+                start_dependant_jails=start_dependant_jails,
+                env=env
             )
             for event in fork_exec_events:
                 yield event
         finally:
             self.config = original_config
+
+    def __merge_env(
+        self,
+        env: typing.Dict[str, str]={}
+    ) -> typing.Dict[str, str]:
+        _env = dict()
+        _env_keys = env.keys()
+        for key in _env_keys:
+            _env[key] = env[value]
+
+        global_env = self.env
+        for key, value in global_env.items():
+            if key not in _env_keys:
+                _env[key] = global_env[key]
+
+        return env
 
     def __run_hook(
         self,
@@ -857,11 +899,12 @@ class JailGenerator(JailResource):
         force: bool,
         event_scope: 'libioc.events.Scope',
         script: typing.Optional[str]=None,
-        passthru: bool=False
+        passthru: bool=False,
+        env: typing.Dict[str, str]={}
     ) -> typing.Generator['libioc.events.JailHook', None, None]:
-
+        _env = self.__merge_env(env)
         exec_func = libioc.helpers.exec
-        exec_args = dict(logger=self.logger, env=self.env)
+        exec_args = dict(logger=self.logger, env=_env)
         if hook == "prestart":
             Event = libioc.events.JailHookPrestart
         elif hook == "created":
@@ -869,11 +912,11 @@ class JailGenerator(JailResource):
         elif hook == "start":
             Event = libioc.events.JailHookStart
             exec_func = self.exec
-            exec_args = dict()
+            exec_args = dict(env=_env)
         elif hook == "command":
             Event = libioc.events.JailCommand
             exec_func = self.exec
-            exec_args = dict(passthru=passthru)
+            exec_args = dict(passthru=passthru, env=_env)
         elif hook == "poststart":
             Event = libioc.events.JailHookPoststart
         elif hook == "prestop":
@@ -886,7 +929,7 @@ class JailGenerator(JailResource):
                 yield event.skip("not running")
                 return
             exec_func = self.exec
-            exec_args = dict()
+            exec_args = dict(env=_env)
         elif hook == "poststop":
             Event = libioc.events.JailHookPoststop
         else:
@@ -926,7 +969,8 @@ class JailGenerator(JailResource):
         self,
         force: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None,
-        log_errors: bool=True
+        log_errors: bool=True,
+        env: typing.Dict[str, str]={}
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
         Stop a jail.
@@ -934,16 +978,25 @@ class JailGenerator(JailResource):
         Args:
 
             force (bool): (default=False)
+
                 Ignores failures and enforces teardown if True.
 
             event_scope (libioc.events.Scope): (default=None)
+
                 Provide an existing libiocage event scope or automatically
                 create a new one instead.
 
             log_errors (bool): (default=True)
+
                 When disabled errors are not passed to the logger. This is
                 useful in scripted contexts when then stop operation was
                 executed to enforce a defined jail state.
+
+            env (dict):
+
+                Environment variables that are available in all jail hooks.
+                Existing environment variables (provided by the system or ioc)
+                can be overridden with entries in this dictionary.
         """
         if force is False:
             self.require_jail_existing(log_errors=log_errors)
@@ -955,15 +1008,29 @@ class JailGenerator(JailResource):
         yield jailStopEvent.begin()
         jid = self.jid
 
-        yield from self.__run_hook("prestop", force, jailStopEvent.scope)
-        yield from self.__run_hook("stop", force, jailStopEvent.scope)
+        yield from self.__run_hook(
+            "prestop",
+            force=force,
+            event_scope=jailStopEvent.scope,
+            env=env
+        )
+        yield from self.__run_hook(
+            "stop",
+            force=force,
+            event_scope=jailStopEvent.scope,
+            env=env
+        )
         yield from self.__destroy_jail(jailStopEvent.scope)
         if self.config["vnet"] is False:
             yield from self._stop_non_vimage_network(
                 force=force,
                 event_scope=jailStopEvent.scope
             )
-        yield from self.__run_hook("poststop", force, jailStopEvent.scope)
+        yield from self.__run_hook(
+            "poststop",
+            force=force,
+            event_scope=jailStopEvent.scope
+        )
         if (jid is not None) and (self.config["vnet"] is True):
             yield from self.__stop_vimage_network(
                 jid,
@@ -986,7 +1053,8 @@ class JailGenerator(JailResource):
         self,
         shutdown: bool=False,
         force: bool=False,
-        event_scope: typing.Optional['libioc.events.Scope']=None
+        event_scope: typing.Optional['libioc.events.Scope']=None,
+        env: typing.Dict[str, str]={}
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Restart the jail."""
         jailRestartEvent = libioc.events.JailRestart(
@@ -1011,8 +1079,9 @@ class JailGenerator(JailResource):
             try:
                 yield from self.__run_hook(
                     "stop",
-                    force,
-                    JailSoftShutdownEvent.scope
+                    force=force,
+                    event_scope=JailSoftShutdownEvent.scope,
+                    env=env
                 )
                 yield JailSoftShutdownEvent.end()
             except libioc.errors.IocException:
@@ -1023,8 +1092,9 @@ class JailGenerator(JailResource):
             try:
                 yield from self.__run_hook(
                     "start",
-                    force,
-                    JailSoftShutdownEvent.scope
+                    force=force,
+                    event_scope=JailSoftShutdownEvent.scope,
+                    env=env
                 )
                 yield jailStartEvent.end()
             except libioc.errors.IocException:
@@ -1034,9 +1104,13 @@ class JailGenerator(JailResource):
 
             yield from self.stop(
                 force=force,
-                event_scope=jailRestartEvent.scope
+                event_scope=jailRestartEvent.scope,
+                env=env
             )
-            yield from self.start(event_scope=jailRestartEvent.scope)
+            yield from self.start(
+                event_scope=jailRestartEvent.scope,
+                env=env
+            )
 
         yield jailRestartEvent.end()
 
@@ -1396,19 +1470,25 @@ class JailGenerator(JailResource):
         """
         Execute a command in a running jail.
 
-        command (list):
-            A list of command and it's arguments
+        Args:
 
-            Example: ["/usr/bin/whoami"]
+            command (list):
 
-        env (dict):
-            The dictionary may contain env variables that will be forwarded to
-            the executed jail command.
+                A list of command and it's arguments
 
-        passthru (bool): (default=False)
-            When enabled the commands stdout and stderr are directory forwarded
-            to the attached terminal. The results will not be included in the
-            CommandOutput, so that (None, None, <returncode>) is returned.
+                Example: ["/usr/bin/whoami"]
+
+            env (dict):
+
+                The dictionary may contain env variables that will be
+                forwarded to the executed jail command.
+
+            passthru (bool): (default=False)
+
+                When enabled the commands stdout and stderr are directory
+                forwarded to the attached terminal. The results will not be
+                included in the CommandOutput, so that (None, None,
+                <returncode>) is returned.
         """
         command = ["/usr/sbin/jexec", str(self.jid)] + command
 
