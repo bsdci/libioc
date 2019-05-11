@@ -298,12 +298,21 @@ class Pkg:
         yield packageRemoveEvent.end()
 
     def _get_latest_pkg_archive(self, package_source_directory: str) -> str:
-        for package_archive in os.listdir(f"{package_source_directory}/cache"):
-            if package_archive.endswith(".txz") is False:
-                continue
-            if package_archive.startswith("pkg"):
-                return str(package_archive)
-        raise libioc.errors.PkgNotFound(logger=self.logger)
+        pattern = re.compile((
+            r"^(?P<name>[a-zA-Z0-9_\-\.]+)"
+            r"-(?P<version>[0-9](?:[0-9\.,_\-]*[0-9])?)"
+            r"(?:-(?P<hash>[0-9a-z]+))?"
+            r".txz$"
+        ))
+        cached_items = os.listdir(f"{package_source_directory}/cache")
+        pkg_archive_match = list(reversed(sorted(
+            list(filter(
+                lambda x: (x is not None) and (x["name"] == "pkg"),
+                [pattern.match(x) for x in cached_items]
+            )),
+            key=lambda x: list(map(int, x["version"].split(".")))
+        )))[0]
+        return pkg_archive_match[0]
 
     def fetch_and_install(
         self,
