@@ -176,6 +176,32 @@ class Pkg:
                 "latest"
             )
 
+    def bootstrap(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+        """Bootstrap pkg within a jail."""
+        event = libioc.events.BootstrapPkg(
+            jail=jail,
+            scope=event_scope
+        )
+        yield event.begin()
+
+        dataset = self.__get_jail_release_pkg_dataset(jail)
+        pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
+        yield from self.__run_command(
+            jail=jail,
+            command=[
+                "/usr/sbin/pkg",
+                "add",
+                f"{self.package_source_directory}/{pkg_archive_name}"
+            ],
+            event_scope=event.scope
+        )
+
+        yield event.end()
+
     def __run_command(
         self,
         jail: 'libioc.Jail.JailGenerator',
@@ -236,7 +262,6 @@ class Pkg:
     ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
-        dataset = self.__get_jail_release_pkg_dataset(jail)
 
         packageInstallEvent = libioc.events.PackageInstall(
             packages=_packages,
@@ -259,14 +284,7 @@ class Pkg:
 
         yield packageInstallEvent.begin()
         try:
-            pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
             command = "\n".join([
-                "export ASSUME_ALWAYS_YES=yes",
-                " ".join([
-                    "/usr/sbin/pkg",
-                    "add",
-                    f"{self.package_source_directory}/{pkg_archive_name}"
-                ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "update",
@@ -367,6 +385,10 @@ class Pkg:
         postinstall: typing.List[str]=[]
     ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Mirror and install packages to a jail."""
+        yield from self.bootstrap(
+            jail=jail,
+            event_scope=event_scope
+        )
         yield from self.fetch(
             packages=packages,
             release=jail.release,
