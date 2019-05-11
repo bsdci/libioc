@@ -654,7 +654,7 @@ class JailGenerator(JailResource):
             mountpoint="/dev",
             event=libioc.events.MountDevFS,
             event_scope=event_scope,
-            ruleset=self.config["devfs_ruleset"]
+            ruleset=self.devfs_ruleset
         )
 
     def __mount_fdescfs(
