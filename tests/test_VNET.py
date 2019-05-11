@@ -164,3 +164,10 @@ class TestVNET(object):
             "show"
         ]).decode("utf-8")
         assert "bpf" in stdout
+
+        # disable DHCP, but set the calculated ruleset fixed
+        existing_jail.config["devfs_ruleset"] = existing_jail.devfs_ruleset
+        existing_jail.config["ip4_addr"] = None
+
+        existing_jail.start()
+        assert os.path.exists(f"{existing_jail.root_path}/dev/bpf")
