@@ -176,6 +176,57 @@ class Pkg:
                 "latest"
             )
 
+    def __run_command(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        command: typing.List[str],
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+        env = dict(ASSUME_ALWAYS_YES="yes")
+        if jail.running is True:
+            jailCommandEvent = libioc.events.JailCommand(
+                jail=jail,
+                logger=self.logger,
+                scope=event_scope
+            )
+            yield jailCommandEvent.begin()
+            try:
+                self.__mount_pkg_directory(jail)
+                stdout, stderr, code = jail.exec(
+                    command,
+                    env=env,
+                    logger=self.logger
+                )
+                jailCommandEvent.stdout = stdout
+                jailCommandEvent.stderr = stderr
+                jailCommandEvent.code = code
+            except Exception as e:
+                yield jailCommandEvent.fail(e)
+                raise e
+            yield jailCommandEvent.end()
+        else:
+            temporary_jail = self._get_temporary_jail(jail)
+            yield from temporary_jail.fork_exec(
+                " ".join(command),
+                passthru=False,
+                event_scope=event_scope,
+                env=env
+            )
+
+    @staticmethod
+    def __get_release_major_version(
+        release: 'libioc.Release.ReleaseGenerator'
+    ) -> int:
+        return int(math.floor(release.version_number))
+
+    def __get_jail_release_pkg_dataset(
+        self,
+        jail: 'libioc.Jail.JailGenerator'
+    ) -> libzfs.ZFSDataset:
+        return self._get_release_pkg_dataset(
+            self.__get_release_major_version(jail.release)
+        )
+
     def install(
         self,
         packages: typing.Union[str, typing.List[str]],
@@ -185,8 +236,7 @@ class Pkg:
     ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
-        release_major_version = math.floor(jail.release.version_number)
-        dataset = self._get_release_pkg_dataset(release_major_version)
+        dataset = self.__get_jail_release_pkg_dataset(jail)
 
         packageInstallEvent = libioc.events.PackageInstall(
             packages=_packages,
@@ -232,22 +282,16 @@ class Pkg:
                 ])
             ] + postinstall)
 
-            if jail.running is True:
-                self.__mount_pkg_directory(jail)
-                stdout, stderr, code = jail.exec(["/bin/sh", "-c", command])
-                stdout = stdout.strip("\r\n")
-            else:
-                temporary_jail = self._get_temporary_jail(jail)
-                jail_exec_events = temporary_jail.fork_exec(
-                    command,
-                    passthru=False,
-                    event_scope=packageInstallEvent.scope
-                )
-                for event in jail_exec_events:
-                    if isinstance(event, libioc.events.JailCommand) is True:
-                        if event.done is True:
-                            stdout = event.stdout.strip("\r\n")
-                    yield event
+            for event in self.__run_command(
+                jail=jail,
+                command=["/bin/sh", "-c", command],
+                event_scope=packageInstallEvent.scope
+            ):
+                if isinstance(event, libioc.events.JailCommand) is True:
+                    if event.done is True:
+                        stdout = event.stdout.strip("\r\n")
+                yield event
+
             skipped = stdout.endswith("already installed")
             if skipped is True:
                 yield packageInstallEvent.skip()
@@ -305,11 +349,12 @@ class Pkg:
             r".txz$"
         ))
         cached_items = os.listdir(f"{package_source_directory}/cache")
+        cached_packages_list = list(filter(
+            lambda x: (x is not None) and (x["name"] == "pkg"),
+            [pattern.match(x) for x in cached_items]
+        ))
         pkg_archive_match = list(reversed(sorted(
-            list(filter(
-                lambda x: (x is not None) and (x["name"] == "pkg"),
-                [pattern.match(x) for x in cached_items]
-            )),
+            (x for x in cached_packages_list if x is not None),
             key=lambda x: list(map(int, x["version"].split(".")))
         )))[0]
         return pkg_archive_match[0]

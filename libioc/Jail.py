@@ -884,7 +884,7 @@ class JailGenerator(JailResource):
         _env = dict()
         _env_keys = env.keys()
         for key in _env_keys:
-            _env[key] = env[value]
+            _env[key] = env[key]
 
         global_env = self.env
         for key, value in global_env.items():
