@@ -182,7 +182,7 @@ def provision(
         release=self.jail.release,
         event_scope=_scope
     )
-    yield from pkg.install(
+    yield from pkg.fetch_and_install(
         jail=self.jail,
         packages=list(pluginDefinition.pkgs),
         event_scope=_scope
