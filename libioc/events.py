@@ -1050,7 +1050,13 @@ class JailProvisioningAssetDownload(JailEvent):
 # PKG
 
 
-class PackageFetch(IocEvent):
+class PkgEvent(IocEvent):
+    """Collection of events related to Pkg."""
+
+    pass
+
+
+class PackageFetch(PkgEvent):
     """Fetch packages for offline installation."""
 
     packages: typing.List[str]
@@ -1067,7 +1073,13 @@ class PackageFetch(IocEvent):
         IocEvent.__init__(self, message=message, scope=scope)
 
 
-class PackageInstall(JailEvent):
+class BootstrapPkg(JailEvent, PkgEvent):
+    """Bootstrap pkg within a jail."""
+
+    pass
+
+
+class PackageInstall(JailEvent, PkgEvent):
     """Install packages in a jail."""
 
     def __init__(
@@ -1082,7 +1094,7 @@ class PackageInstall(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
-class PackageRemove(JailEvent):
+class PackageRemove(JailEvent, PkgEvent):
     """Remove packages from a jail."""
 
     def __init__(
@@ -1097,7 +1109,7 @@ class PackageRemove(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
-class PackageConfiguration(JailEvent):
+class PackageConfiguration(JailEvent, PkgEvent):
     """Install packages in a jail."""
 
     pass

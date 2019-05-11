@@ -65,7 +65,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         release: 'libioc.Release.ReleaseGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Fetch a bunch of packages to the local mirror."""
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
@@ -182,7 +182,7 @@ class Pkg:
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
         release_major_version = math.floor(jail.release.version_number)
@@ -262,7 +262,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Remove installed packages from a jail."""
         _packages = self._normalize_packages(packages)
 
@@ -320,7 +320,7 @@ class Pkg:
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Mirror and install packages to a jail."""
         yield from self.fetch(
             packages=packages,
