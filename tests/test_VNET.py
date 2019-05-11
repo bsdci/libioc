@@ -142,3 +142,25 @@ class TestVNET(object):
             f"vnet7:{existing_jail.jid}"
         ]).decode("utf-8")
         assert mac_a in stdout
+
+    def test_devfs_ruleset_for_dhcp(
+        self,
+        existing_jail: 'libioc.Jail.Jail',
+        bridge_interface: str
+    ) -> None:
+        existing_jail.config["devfs_ruleset"] = 4
+        existing_jail.config["vnet"] = True
+        existing_jail.config["interfaces"] = f"vnet0:{bridge_interface}"
+
+        assert existing_jail.devfs_ruleset == 4
+        existing_jail.config["ip4_addr"] = "vnet0|dhcp"
+
+        assert existing_jail.devfs_ruleset > 4
+        stdout = subprocess.check_output([
+            "/sbin/devfs",
+            "rule",
+            "-s",
+            str(existing_jail.devfs_ruleset),
+            "show"
+        ]).decode("utf-8")
+        assert "bpf" in stdout
