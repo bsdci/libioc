@@ -36,7 +36,7 @@ class TestPuppetProvisioner(object):
     @pytest.fixture
     def manifest_dir(self) -> str:
         __dirname = os.path.dirname(os.path.realpath(__file__))
-        return os.path.join(__dirname, "assets/puppet-control-repo")
+        return os.path.join(__dirname, "assets/puppet-offline-repo")
 
     def test_can_provision_from_local_puppet_manifest(
         self,
