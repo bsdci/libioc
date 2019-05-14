@@ -216,12 +216,14 @@ class ReleaseGenerator(ReleaseResource):
         "sendmail_submit_enable": False,
         "sendmail_msp_queue_enable": False,
         "sendmail_outbound_enable": False,
+        "cron_flags": "-m ''",
+        "syslogd_flags": "-ss"
+    }
+    DEFAULT_PERIODIC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
         "daily_clean_hoststat_enable": False,
         "daily_status_mail_rejects_enable": False,
         "daily_status_include_submit_mailq": False,
         "daily_submit_queuerun": False,
-        "cron_flags": "-m ''",
-        "syslogd_flags": "-ss"
     }
 
     DEFAULT_SYSCTL_CONF: typing.Dict[str, int] = {
@@ -969,6 +971,13 @@ class ReleaseGenerator(ReleaseResource):
             self.rc_conf[key] = value
 
         return self.rc_conf.save() is True
+
+    def _set_default_periodic_conf(self) -> bool:
+
+        for key, value in self.DEFAULT_PERIODIC_CONF.items():
+            self.periodic_conf[key] = value
+
+        return self.periodic_conf.save() is True
 
     def _set_default_sysctl_conf(self) -> bool:
 
