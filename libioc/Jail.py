@@ -1461,11 +1461,17 @@ class JailGenerator(JailResource):
 
     def save(self) -> None:
         """Permanently save a jail's configuration."""
+        libioc.LaunchableResource.LaunchableResource.save(self)
         self._write_config(self.config.data)
         self._save_autoconfig()
 
     def _save_autoconfig(self) -> None:
-        """Save auto-generated files."""
+        """
+        Save auto-generated files.
+
+        Such files reflect changes to the JailConfig and need to be refreshed
+        before each jail start.
+        """
         self.rc_conf.save()
 
     def exec(

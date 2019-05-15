@@ -193,3 +193,10 @@ class LaunchableResource(libioc.Resource.Resource):
             )
             self._sysctl_conf = sysctl_conf
         return self._sysctl_conf
+
+    def save(self) -> None:
+        """Permanently save the resource configuration."""
+        if self._periodic_conf is not None:
+            self._periodic_conf.save()
+        if self._sysctl_conf is not None:
+            self._sysctl_conf.save()
