@@ -762,9 +762,9 @@ class ReleaseGenerator(ReleaseResource):
         yield releaseConfigurationEvent.begin()
         try:
             if any([
-               self._set_default_periodic_conf(),
-               self._set_default_rc_conf(),
-               self._set_default_sysctl_conf()
+                    self._set_default_periodic_conf(),
+                    self._set_default_rc_conf(),
+                    self._set_default_sysctl_conf()
             ]):
                 release_changed = True
                 yield releaseConfigurationEvent.end()
