@@ -219,6 +219,7 @@ class ReleaseGenerator(ReleaseResource):
         "cron_flags": "-m ''",
         "syslogd_flags": "-ss"
     }
+
     DEFAULT_PERIODIC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
         "daily_clean_hoststat_enable": False,
         "daily_status_mail_rejects_enable": False,
@@ -759,15 +760,19 @@ class ReleaseGenerator(ReleaseResource):
             )
 
         yield releaseConfigurationEvent.begin()
-        rc_conf_changed = False
-        if self._set_default_rc_conf() is True:
-            rc_conf_changed = True
-            release_changed = True
-        if (self._set_default_sysctl_conf() or rc_conf_changed) is True:
-            release_changed = True
-            yield releaseConfigurationEvent.end()
-        else:
-            yield releaseConfigurationEvent.skip()
+        try:
+            if any([
+               self._set_default_periodic_conf(),
+               self._set_default_rc_conf(),
+               self._set_default_sysctl_conf()
+            ]):
+                release_changed = True
+                yield releaseConfigurationEvent.end()
+            else:
+                yield releaseConfigurationEvent.skip()
+        except Exception as e:
+            yield releaseConfigurationEvent.fail(e)
+            raise e
 
         self.snapshot("p0")
 
