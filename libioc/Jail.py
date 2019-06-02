@@ -899,7 +899,7 @@ class JailGenerator(JailResource):
             if key not in _env_keys:
                 _env[key] = global_env[key]
 
-        return env
+        return _env
 
     def __run_hook(
         self,
