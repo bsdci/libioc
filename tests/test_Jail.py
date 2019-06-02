@@ -316,3 +316,26 @@ class TestNullFSBasejail(object):
         assert new_jail.getstring("user.unknown_propery") == ""
         with pytest.raises(libioc.errors.UnknownConfigProperty):
             new_jail.getstring("unknown_property")
+
+    def test_hooks_can_access_ioc_env_variables(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if IOC_* ENV variables can be accessed from hook scripts."""
+        jail = libioc.Jail.JailGenerator(
+            existing_jail.full_name,
+            host=existing_jail.host,
+            zfs=existing_jail.zfs,
+            logger=existing_jail.logger
+        )
+        jail.config["exec_prestart"] = "env"
+        jail.config["exec_start"] = "env"
+        jail.config["exec_poststart"] = "env"
+
+        for event in jail.start():
+            if event.done is False:
+                continue
+            if isinstance(event, libioc.events.JailHook):
+                assert "\nIOC_" in event.stdout
+            if isinstance(event, libioc.events.JailHookPoststart) is True:
+                assert f"IOC_JID={jail.jid}" in event.stdout
