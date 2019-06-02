@@ -310,7 +310,7 @@ class TestNullFSBasejail(object):
 
     def test_getstring_returns_empty_string_for_unknown_user_properties(
         self,
-        new_jail: 'libioc.Jail.Jail',
+        new_jail: 'libioc.Jail.Jail'
     ) -> None:
         """Test if getstring for an unknown user property is empty."""
         assert new_jail.getstring("user.unknown_propery") == ""
