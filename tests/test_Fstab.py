@@ -22,7 +22,13 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Fstab module."""
+import pytest
 import tempfile
+import random
+import sys
+import subprocess
+
+import libzfs
 
 import libioc.Config.Jail.File.Fstab
 
@@ -88,3 +94,32 @@ tmpfs /tmp tmpfs rw,mode=777 0 0 # {AUTO_COMMENT_IDENTIFIER}"""
 		assert type(fstab[1]).__name__ == "FstabAutoPlaceholderLine"
 		assert type(fstab[2]).__name__ == "FstabCommentLine"
 		assert str(fstab[2]) == "# yet another comment line"
+
+	@pytest.fixture(scope="function")
+	def zfs_volume(
+		self,
+		root_dataset: libzfs.ZFSDataset
+	) -> libzfs.ZFSDataset:
+
+		r = random.randint(0, sys.maxint)
+		name = f"{root_dataset.name}/zvol{r}"
+
+		root_dataset.pool.create(
+			dataset_name,
+			fsopts=dict(volsize="16M"),
+			fstype=libzfs.DatasetType.VOLUME
+		)
+
+		dataset = zfs.get_dataset(dataset_name)
+		yield dataset
+
+		dataset.delete()
+
+	def test_ufs_mount(self, zfs_volume: libzfs.ZFSDataset) -> None:
+
+		with tempfile.TemporaryDirectory() as tmpdir:
+			libioc.helpers.mount(
+				source=f"/dev/zvol/{zfs_volume.name}",
+				destination=tmpdir.name,
+				type="ufs"
+			)
