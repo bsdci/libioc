@@ -60,7 +60,7 @@ def zfs() -> libzfs.ZFS:
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def pool(
     request: typing.Any,
     zfs: libzfs.ZFS,
@@ -90,7 +90,7 @@ def logger() -> 'libioc.Logger.Logger':
     return libioc.Logger.Logger()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def root_dataset(
     zfs: libzfs.ZFS,
     pool: libzfs.ZFSPool
