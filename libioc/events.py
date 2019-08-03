@@ -72,7 +72,11 @@ class IocEvent:
         scope: typing.Optional[Scope]=None
     ) -> None:
         """Initialize an IocEvent."""
-        self.scope = scope
+        if scope is not None:
+            self.scope = scope
+        else:
+            self.scope = Scope()
+
         for event in self.scope:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
