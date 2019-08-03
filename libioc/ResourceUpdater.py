@@ -219,7 +219,7 @@ class Updater:
         if os.path.isfile(local):
             os.remove(local)
 
-        _request = urllib.request  # type: ignore
+        _request = urllib.request
         try:
             self.logger.verbose(f"Downloading update assets from {url}")
             _request.urlretrieve(url, local)  # nosec: url validated
@@ -549,7 +549,7 @@ class HardenedBSD(Updater):
             "update-latest.txt"
         ])
         local_path = f"{self.host_updates_dir}/update-latest.txt"
-        _request = urllib.request  # type: ignore
+        _request = urllib.request
         _request.urlretrieve(  # nosec: official HardenedBSD URL
             update_info_url,
             local_path
