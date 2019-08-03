@@ -54,7 +54,7 @@ def pytest_addoption(parser: typing.Any) -> None:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def zfs() -> libzfs.ZFS:
     """Make ZFS available to the tests."""
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
@@ -84,7 +84,7 @@ def pool(
     return target_pool
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def logger() -> 'libioc.Logger.Logger':
     """Make the iocage Logger available to the tests."""
     return libioc.Logger.Logger()
