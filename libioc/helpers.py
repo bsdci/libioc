@@ -551,7 +551,10 @@ def mount(
     for key, value in iov_data.items():
         data[key] = str(value)
     if source is not None:
-        data["target"] = source
+        if fstype == "nullfs":
+            data["target"] = source
+        else:
+            data["from"] = source
     for opt in opts:
         data[opt] = None
     jiov = libjail.Jiov(data)
