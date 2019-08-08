@@ -21,7 +21,20 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Pkg abstraction for Resources."""
+"""
+Abstracts offline FreeBSD/HardenedBSD package installation.
+
+ioc mirrors packages from FreeBSD and HardenedBSD to a local ZFS dataset for
+each release and ioc datasource. On each use the pkg repository matching to a
+jails release is mirrored from the quaterly releases. The host downloads wanted
+packages into this local repository, that is afterwards mounted into the jail
+(read-only) for package installation.
+
+With this module it is possible to save bandwith and shorten the time required
+for package installation. In setups that spawn disposable jails, it might be
+reasonable to seed newly created jails from latest packages, rather than
+managing a template, that tempts to outdate.
+"""
 import typing
 import math
 import os.path
