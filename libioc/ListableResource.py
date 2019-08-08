@@ -22,7 +22,16 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""ioc Resource module."""
+"""
+A ListableResource hosts child resources in a flat structure.
+
+In case of a Jail or a Release, those children are ZFS datasets nested in the
+listable resource's ZFS dataset.
+
+With filters applied to a ListableResource, all children returned listed have
+to match the input filters. Unlike Releases, that can only be filtered by their
+dataset name, it is possible to match configuration variables for Jails.
+"""
 import typing
 import libzfs
 import abc
