@@ -83,10 +83,6 @@ class Logger:
         "white",
     )
 
-    RESET_SEQ = "\033[0m"
-    BOLD_SEQ = "\033[1m"
-    LINE_UP_SEQ = "\033[F"
-
     LOG_LEVEL_SETTINGS: typing.Dict[
         str,
         typing.Dict[str, typing.Optional[
@@ -116,7 +112,7 @@ class Logger:
         "screen"
     )
 
-    INDENT_PREFIX = "  "
+    __INDENT_PREFIX = "  "
 
     PRINT_HISTORY: typing.List[LogEntry] = []
 
@@ -296,7 +292,7 @@ class Logger:
         )
 
     def _indent(self, message: str, level: int) -> str:
-        indent = Logger.INDENT_PREFIX * level
+        indent = Logger.__INDENT_PREFIX * level
         return "\n".join(map(lambda x: f"{indent}{x}", message.splitlines()))
 
     def _create_log_directory(self) -> None:
