@@ -22,7 +22,18 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""ioc Jail module."""
+"""
+A Jail defines the configuration of a FreeBSD jail managed by ioc.
+
+It consists of kernel state and configuration assets (config.json).
+
+Configuration values are in a JailConfig, that maps the Jail configuration to
+permanent disk storage. The latest version used a config.json JSON config file.
+For compatibility with older versions of iocage (shell), UCL config files and
+storage as ZFS properties on the jails ZFS dataset are supported as well.
+
+The state of a Jail is managed by the kernel, that ioc interfaces with libc.
+"""
 import typing
 import os
 import shlex
