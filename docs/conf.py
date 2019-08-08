@@ -15,7 +15,8 @@
 # import os
 # import sys
 # sys.path.insert(0, '/usr/local/src/libioc/libioc')
-import sphinx.apidoc
+import sphinx
+import sphinx.ext.apidoc
 import os.path
 from datetime import datetime
 import re
