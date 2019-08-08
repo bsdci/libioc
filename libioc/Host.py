@@ -60,7 +60,7 @@ class HostGenerator:
     datasets: libioc.Datasets.Datasets
     distribution: _distribution_types
 
-    branch_pattern = re.compile(
+    __branch_pattern = re.compile(
         r"""\(hardened/
         (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
         /
@@ -69,7 +69,7 @@ class HostGenerator:
         re.X
     )
 
-    release_name_pattern = re.compile(
+    __release_name_pattern = re.compile(
         r"^(?P<major>\d+)(?:\.(?P<minor>\d+))-(?P<type>[A-Z]+)-HBSD$",
         re.X
     )
@@ -173,11 +173,11 @@ class HostGenerator:
 
         elif self.distribution.name == "HardenedBSD":
 
-            match = re.search(self.branch_pattern, os.uname()[3])
+            match = re.search(self.__branch_pattern, os.uname()[3])
             if match is not None:
                 return match["release"].upper()
 
-            match = re.search(self.release_name_pattern, os.uname()[2])
+            match = re.search(self.__release_name_pattern, os.uname()[2])
             if match is not None:
                 return f"{match['major']}-{match['type']}"
 
