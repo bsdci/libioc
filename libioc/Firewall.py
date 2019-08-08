@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage firewall module."""
+"""ioc firewall module."""
 import typing
 
 import freebsd_sysctl
@@ -33,7 +33,7 @@ import libioc.CommandQueue
 
 
 class Firewall:
-    """iocage host firewall abstraction."""
+    """ioc host firewall abstraction."""
 
     IPFW_RULE_OFFSET: int
     IPFW_COMMAND: str = "/sbin/ipfw"

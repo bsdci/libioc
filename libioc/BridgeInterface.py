@@ -22,12 +22,12 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage host bridge interface module."""
+"""ioc host bridge interface module."""
 import typing
 
 
 class BridgeInterface:
-    """Representation of an iocage host bridge interface."""
+    """Representation of an ioc host bridge interface."""
 
     name: str
     secure_vnet: bool

@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage configuration associated with ZFS datasets."""
+"""ioc configuration associated with ZFS datasets."""
 import os.path
 import libzfs
 import typing
@@ -31,7 +31,7 @@ import libioc.Config.Prototype
 
 
 class DatasetConfig(libioc.Config.Prototype.Prototype):
-    """iocage configuration associated with ZFS datasets."""
+    """ioc configuration associated with ZFS datasets."""
 
     _dataset: libzfs.ZFSDataset
 

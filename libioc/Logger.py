@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage logging module."""
+"""ioc logging module."""
 import os
 import sys
 import typing
@@ -70,7 +70,7 @@ class LogEntry:
 
 
 class Logger:
-    """iocage Logger module."""
+    """ioc Logger module."""
 
     COLORS = (
         "black",

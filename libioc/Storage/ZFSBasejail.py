@@ -21,7 +21,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage ZFS basejail storage backend."""
+"""ioc ZFS basejail storage backend."""
 import typing
 
 import libioc.Storage.Basejail
@@ -29,7 +29,7 @@ import libioc.helpers
 
 
 class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
-    """iocage ZFS basejail storage backend."""
+    """ioc ZFS basejail storage backend."""
 
     def apply(
         self,

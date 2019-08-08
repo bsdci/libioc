@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage configuration stored in an UCL file."""
+"""ioc configuration stored in an UCL file."""
 import typing
 
 import libioc.Config
@@ -33,7 +33,7 @@ import libioc.errors
 
 
 class ConfigUCL(libioc.Config.Prototype.Prototype):
-    """iocage configuration stored in an UCL file."""
+    """ioc configuration stored in an UCL file."""
 
     config_type = "ucl"
 

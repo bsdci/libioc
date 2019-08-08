@@ -22,13 +22,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage commandline prompt module."""
+"""ioc commandline prompt module."""
 import libioc.errors
 import libioc.helpers_object
 
 
 class Prompts:
-    """iocage commandline prompt module."""
+    """ioc commandline prompt module."""
 
     def __init__(self, host=None, logger=None):
         self.logger = libioc.helpers_object.init_logger(self, logger)

@@ -22,14 +22,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage standalone jail storage backend."""
+"""ioc standalone jail storage backend."""
 import typing
 
 import libioc.Storage
 
 
 class StandaloneJailStorage(libioc.Storage.Storage):
-    """iocage standalone jail storage backend."""
+    """ioc standalone jail storage backend."""
 
     def apply(
         self,
