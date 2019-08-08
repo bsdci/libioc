@@ -29,6 +29,7 @@ import os.path
 import re
 import shutil
 import urllib
+import urllib.request
 import urllib.error
 
 import libioc.events
