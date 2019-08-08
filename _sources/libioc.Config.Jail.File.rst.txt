@@ -7,6 +7,7 @@ Submodules
 .. toctree::
 
    libioc.Config.Jail.File.Fstab
+   libioc.Config.Jail.File.PeriodicConf
    libioc.Config.Jail.File.RCConf
    libioc.Config.Jail.File.SysctlConf
 
@@ -14,6 +15,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc.Config.Jail.File
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

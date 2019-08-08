@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.JailConfig &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.JailConfig &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -229,6 +229,51 @@
 
     <span class="k">def</span> <span class="nf">_get_legacy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacy</span>
+
+    <span class="k">def</span> <span class="nf">_get_mount_fdescfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_mount</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;mount_fdescfs&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_mount_fdescfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_mount</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;mount_fdescfs&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_mount_devfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_mount</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;mount_devfs&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_mount_devfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_mount</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;mount_devfs&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__set_mount</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">error_reason</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">enabled</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">str_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">error_reason</span> <span class="o">=</span> <span class="s2">&quot;invalid input type (expected int, str or bool)&quot;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">str_value</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">str_value</span> <span class="o">!=</span> <span class="s2">&quot;1&quot;</span><span class="p">):</span>
+                <span class="n">error_reason</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Boolean input expected, but got </span><span class="si">{str_value}</span><span class="s2">&quot;</span>
+
+            <span class="n">enabled</span> <span class="o">=</span> <span class="p">(</span><span class="n">str_value</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">error_reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InvalidJailConfigValue</span><span class="p">(</span>
+                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
+                <span class="n">property_name</span><span class="o">=</span><span class="s2">&quot;mount_fdescfs&quot;</span><span class="p">,</span>
+                <span class="n">reason</span><span class="o">=</span><span class="n">error_reason</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span> <span class="k">if</span> <span class="n">enabled</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get the value of a configuration argument or its default.&quot;&quot;&quot;</span>

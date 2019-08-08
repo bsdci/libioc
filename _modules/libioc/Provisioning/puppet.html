@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Provisioning.puppet &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Provisioning.puppet &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -181,6 +181,8 @@
 <span class="kn">import</span> <span class="nn">libioc.events</span>
 <span class="kn">import</span> <span class="nn">libioc.Pkg</span>
 <span class="kn">import</span> <span class="nn">libioc.Provisioning</span>
+
+<span class="n">__puppet_env_dir</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/etc/puppet/environments&quot;</span>
 
 
 <div class="viewcode-block" id="ControlRepoUnavailableError"><a class="viewcode-back" href="../../../libioc.Provisioning.puppet.html#libioc.Provisioning.puppet.ControlRepoUnavailableError">[docs]</a><span class="k">class</span> <span class="nc">ControlRepoUnavailableError</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span><span class="p">):</span>
@@ -317,34 +319,31 @@
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">stopped</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">jailStartEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailStart</span><span class="p">(</span>
-            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
-            <span class="n">scope</span><span class="o">=</span><span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">scope</span>
-        <span class="p">)</span>
-        <span class="k">yield</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
 
+    <span class="c1"># Install packages</span>
     <span class="n">pkg</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Pkg</span><span class="o">.</span><span class="n">Pkg</span><span class="p">(</span>
         <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
         <span class="n">zfs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">zfs</span><span class="p">,</span>
         <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">host</span>
     <span class="p">)</span>
-
-    <span class="k">yield from</span> <span class="n">pkg</span><span class="o">.</span><span class="n">install</span><span class="p">(</span>
+    <span class="k">yield from</span> <span class="n">pkg</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+        <span class="n">packages</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">pluginDefinition</span><span class="o">.</span><span class="n">pkgs</span><span class="p">),</span>
+        <span class="n">release</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">release</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+    <span class="p">)</span>
+    <span class="k">yield from</span> <span class="n">pkg</span><span class="o">.</span><span class="n">fetch_and_install</span><span class="p">(</span>
         <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
         <span class="n">packages</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">pluginDefinition</span><span class="o">.</span><span class="n">pkgs</span><span class="p">),</span>
-        <span class="n">event_scope</span><span class="o">=</span><span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
     <span class="p">)</span>
 
-    <span class="n">puppet_env_dir</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/etc/puppet/environments&quot;</span>
-
     <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="s2">&quot;Mounting puppet environment&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
+    <span class="n">fstab_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">new_line</span><span class="p">(</span>
         <span class="n">source</span><span class="o">=</span><span class="n">mount_source</span><span class="p">,</span>
-        <span class="n">destination</span><span class="o">=</span><span class="n">puppet_env_dir</span><span class="p">,</span>
+        <span class="n">destination</span><span class="o">=</span><span class="n">__puppet_env_dir</span><span class="p">,</span>
         <span class="n">options</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
         <span class="n">auto_create_destination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
@@ -352,70 +351,97 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">remote</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-
-            <span class="n">r10kDeployEvent</span> <span class="o">=</span> <span class="n">R10kDeployEvent</span><span class="p">(</span>
-                <span class="n">scope</span><span class="o">=</span><span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span>
-            <span class="p">)</span>
-
-            <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">r10k_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.root_path}</span><span class="s2">/usr/local/etc/r10k&quot;</span>
-                <span class="n">r10k_cfg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{r10k_dir}</span><span class="s2">/r10k.yaml&quot;</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{r10k_dir}</span><span class="s2">&quot;</span><span class="p">):</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">r10k_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mo">0o755</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Writing r10k config </span><span class="si">{r10k_cfg}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">r10k_cfg</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s2">&quot;---&quot;</span><span class="p">,</span>
-                                       <span class="s2">&quot;:sources:&quot;</span><span class="p">,</span>
-                                       <span class="s2">&quot;    puppet:&quot;</span><span class="p">,</span>
-                                       <span class="n">f</span><span class="s2">&quot;       basedir: </span><span class="si">{puppet_env_dir}</span><span class="s2">&quot;</span><span class="p">,</span>
-                                       <span class="n">f</span><span class="s2">&quot;       remote: </span><span class="si">{self.source}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]))</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Deploying r10k config&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
-                    <span class="s2">&quot;r10k&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;deploy&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;environment&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-pv&quot;</span>
-                <span class="p">])</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">e</span>
-            <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
-
-        <span class="n">puppetApplyEvent</span> <span class="o">=</span> <span class="n">PuppetApplyEvent</span><span class="p">(</span>
-            <span class="n">scope</span><span class="o">=</span><span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span>
-        <span class="p">)</span>
-        <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
-                <span class="s2">&quot;puppet&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;apply&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;--debug&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;--logdest&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;syslog&quot;</span><span class="p">,</span>
-                <span class="n">f</span><span class="s2">&quot;</span><span class="si">{puppet_env_dir}</span><span class="s2">/production/manifests/site.pp&quot;</span>
-            <span class="p">])</span>
-            <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
-
+            <span class="k">yield from</span> <span class="n">__deploy_r10k</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="n">__apply_puppet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">started</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">jailStopEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailShutdown</span><span class="p">(</span>
-                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span>
-                <span class="n">scope</span><span class="o">=</span><span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">scope</span>
-            <span class="p">)</span>
-            <span class="k">yield</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-            <span class="k">yield</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="c1"># in case anything fails the fstab mount needs to be removed</span>
-        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">fstab</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">fstab</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fstab_line</span><span class="p">)]</span>
 
     <span class="k">yield</span> <span class="n">jailProvisioningEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">__apply_puppet</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">:</span> <span class="s1">&#39;libioc.Provisioning.Prototype&#39;</span><span class="p">,</span>
+    <span class="n">event_scope</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">Scope</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="n">R10kDeployEvent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="n">puppetApplyEvent</span> <span class="o">=</span> <span class="n">PuppetApplyEvent</span><span class="p">(</span>
+        <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+        <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span>
+    <span class="p">)</span>
+    <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
+        <span class="s2">&quot;puppet&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;apply&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--debug&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--logdest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;syslog&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;</span><span class="si">{__puppet_env_dir}</span><span class="s2">/production/manifests/site.pp&quot;</span>
+    <span class="p">])</span>
+    <span class="k">if</span> <span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">puppetApplyEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;exited with </span><span class="si">{returncode}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">__deploy_r10k</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">:</span> <span class="s1">&#39;libioc.Provisioning.Prototype&#39;</span><span class="p">,</span>
+    <span class="n">event_scope</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">Scope</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="n">R10kDeployEvent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="n">r10kDeployEvent</span> <span class="o">=</span> <span class="n">R10kDeployEvent</span><span class="p">(</span>
+        <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+        <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span>
+    <span class="p">)</span>
+    <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">__write_r10k_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">,</span> <span class="n">__puppet_env_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">__deploy_r10k_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">yield</span> <span class="n">r10kDeployEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">__deploy_r10k_config</span><span class="p">(</span><span class="n">jail</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s2">&quot;Deploying r10k config&quot;</span><span class="p">)</span>
+    <span class="n">jail</span><span class="o">.</span><span class="n">exec</span><span class="p">([</span>
+        <span class="s2">&quot;r10k&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;deploy&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;environment&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-pv&quot;</span>
+    <span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">__write_r10k_config</span><span class="p">(</span>
+    <span class="n">jail</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span><span class="p">,</span>
+    <span class="n">basedir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">remote</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">__securely_open_r10k_config</span><span class="p">(</span><span class="n">jail</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">jail</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Writing r10k config </span><span class="si">{f.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span>
+            <span class="n">f</span><span class="s2">&quot;---&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;:sources:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    puppet:&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;       basedir: </span><span class="si">{basedir}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s2">&quot;       remote: </span><span class="si">{remote}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">__securely_open_r10k_config</span><span class="p">(</span>
+    <span class="n">jail</span><span class="p">:</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">JailGenerator</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">TextIO</span><span class="p">:</span>
+    <span class="n">etc_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{jail.root_path}</span><span class="s2">/usr/local/etc&quot;</span>
+    <span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">etc_dir</span><span class="p">)</span>
+    <span class="n">r10k_config_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{etc_dir}</span><span class="s2">/r10k&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{r10k_config_dir}</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">r10k_config_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mo">0o755</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">r10k_config_dir</span><span class="p">)</span>
+    <span class="n">r10k_config_file</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{r10k_config_dir}</span><span class="s2">/r10k.yaml&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">r10k_config_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">r10k_config_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">r10k_config_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
 </pre></div>
 
            </div>

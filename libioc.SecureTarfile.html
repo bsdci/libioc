@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.SecureTarfile module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.SecureTarfile module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,66 +202,57 @@
 <p>Secure tarfile wrapper that prevents extraction of insecure paths.</p>
 <dl class="class">
 <dt id="libioc.SecureTarfile.SecureTarfile">
-<em class="property">class </em><code class="descclassname">libioc.SecureTarfile.</code><code class="descname">SecureTarfile</code><span class="sig-paren">(</span><em>file</em>, <em>compression_format=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#SecureTarfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.SecureTarfile.</code><code class="sig-name descname">SecureTarfile</code><span class="sig-paren">(</span><em class="sig-param">file</em>, <em class="sig-param">compression_format=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#SecureTarfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Secure tarfile wrapper that mitigates extraction of unsafe paths.</p>
 <dl class="method">
 <dt id="libioc.SecureTarfile.SecureTarfile.extract">
-<code class="descname">extract</code><span class="sig-paren">(</span><em>destination</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#SecureTarfile.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.extract" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extract</code><span class="sig-paren">(</span><em class="sig-param">destination</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#SecureTarfile.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.extract" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the tar file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>destination</strong> (<em>str</em>) – Path to the archive file that is going to be extracted.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>destination</strong> (<em>str</em>) – Path to the archive file that is going to be extracted.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.SecureTarfile.SecureTarfile.file_open_mode">
-<code class="descname">file_open_mode</code><em class="property"> = 'r'</em><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.file_open_mode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">file_open_mode</code><em class="property"> = 'r'</em><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.file_open_mode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.SecureTarfile.SecureTarfile.mode">
-<code class="descname">mode</code><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.mode" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#libioc.SecureTarfile.SecureTarfile.mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the file mode for opening the archive file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.SecureTarfile.extract">
-<code class="descclassname">libioc.SecureTarfile.</code><code class="descname">extract</code><span class="sig-paren">(</span><em>file</em>, <em>destination</em>, <em>compression_format=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.extract" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.SecureTarfile.</code><code class="sig-name descname">extract</code><span class="sig-paren">(</span><em class="sig-param">file</em>, <em class="sig-param">destination</em>, <em class="sig-param">compression_format=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/SecureTarfile.html#extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.SecureTarfile.extract" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate SecureTarfile and extract the archive files content.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>file</strong> (<em>str</em>) – Path to the source archive file.</li>
-<li><strong>destination</strong> (<em>str</em>) – Path to the extraction destination folder.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><em>libioc.Logger.Logger</em></a>) – Logging is enabled when a Logger instance is provided.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>str</em>) – Path to the source archive file.</p></li>
+<li><p><strong>destination</strong> (<em>str</em>) – Path to the extraction destination folder.</p></li>
+<li><p><strong>logger</strong> (<a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><em>libioc.Logger.Logger</em></a>) – Logging is enabled when a Logger instance is provided.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

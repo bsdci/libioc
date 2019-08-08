@@ -2,6 +2,6 @@ libioc.ResourceSelector module
 ==============================
 
 .. automodule:: libioc.ResourceSelector
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

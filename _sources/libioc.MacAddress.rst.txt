@@ -2,6 +2,6 @@ libioc.MacAddress module
 ========================
 
 .. automodule:: libioc.MacAddress
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Logger &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Logger &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage logging module.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc logging module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">typing</span>
@@ -220,7 +220,7 @@
 
 
 <div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../libioc.Logger.html#libioc.Logger.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;iocage Logger module.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ioc Logger module.&quot;&quot;&quot;</span>
 
     <span class="n">COLORS</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;black&quot;</span><span class="p">,</span>
@@ -232,10 +232,6 @@
         <span class="s2">&quot;cyan&quot;</span><span class="p">,</span>
         <span class="s2">&quot;white&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="n">RESET_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
-    <span class="n">BOLD_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
-    <span class="n">LINE_UP_SEQ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[F&quot;</span>
 
     <span class="n">LOG_LEVEL_SETTINGS</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span>
@@ -266,7 +262,7 @@
         <span class="s2">&quot;screen&quot;</span>
     <span class="p">)</span>
 
-    <span class="n">INDENT_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span>
+    <span class="n">__INDENT_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span>
 
     <span class="n">PRINT_HISTORY</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">LogEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -446,7 +442,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">indent</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="n">INDENT_PREFIX</span> <span class="o">*</span> <span class="n">level</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="n">__INDENT_PREFIX</span> <span class="o">*</span> <span class="n">level</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{indent}{x}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">_create_log_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

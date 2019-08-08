@@ -2,6 +2,6 @@ libioc.Resource module
 ======================
 
 .. automodule:: libioc.Resource
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -17,6 +17,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc.Config.Jail.Properties
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

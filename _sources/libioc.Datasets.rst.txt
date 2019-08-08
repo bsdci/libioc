@@ -2,6 +2,6 @@ libioc.Datasets module
 ======================
 
 .. automodule:: libioc.Datasets
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

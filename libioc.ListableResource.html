@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ListableResource module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ListableResource module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,38 +199,37 @@
             
   <div class="section" id="module-libioc.ListableResource">
 <span id="libioc-listableresource-module"></span><h1>libioc.ListableResource module<a class="headerlink" href="#module-libioc.ListableResource" title="Permalink to this headline">¶</a></h1>
-<p>iocage Resource module.</p>
+<p>A ListableResource hosts child resources in a flat structure.</p>
+<p>In case of a Jail or a Release, those children are ZFS datasets nested in the
+listable resource’s ZFS dataset.</p>
+<p>With filters applied to a ListableResource, all children returned listed have
+to match the input filters. Unlike Releases, that can only be filtered by their
+dataset name, it is possible to match configuration variables for Jails.</p>
 <dl class="class">
 <dt id="libioc.ListableResource.ListableResource">
-<em class="property">class </em><code class="descclassname">libioc.ListableResource.</code><code class="descname">ListableResource</code><span class="sig-paren">(</span><em>sources</em>, <em>namespace=None</em>, <em>filters=None</em>, <em>logger=None</em>, <em>zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ListableResource.html#ListableResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ListableResource.ListableResource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ListableResource.</code><code class="sig-name descname">ListableResource</code><span class="sig-paren">(</span><em class="sig-param">sources</em>, <em class="sig-param">namespace=None</em>, <em class="sig-param">filters=None</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ListableResource.html#ListableResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ListableResource.ListableResource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>Representation of Resources that can be listed.</p>
 <dl class="method">
 <dt id="libioc.ListableResource.ListableResource.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ListableResource.html#ListableResource.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ListableResource.ListableResource.destroy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">destroy</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ListableResource.html#ListableResource.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ListableResource.ListableResource.destroy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Listable resources by itself cannot be destroyed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ListableResource.ListableResource.filters">
-<code class="descname">filters</code><a class="headerlink" href="#libioc.ListableResource.ListableResource.filters" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">filters</code><a class="headerlink" href="#libioc.ListableResource.ListableResource.filters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the filters that are applied on the list items.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="libioc.Filter.html#libioc.Filter.Terms" title="libioc.Filter.Terms"><code class="xref py py-class docutils literal notranslate"><span class="pre">Terms</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="libioc.Filter.html#libioc.Filter.Terms" title="libioc.Filter.Terms"><code class="xref py py-class docutils literal notranslate"><span class="pre">Terms</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

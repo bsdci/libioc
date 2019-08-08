@@ -2,6 +2,6 @@ libioc.Releases module
 ======================
 
 .. automodule:: libioc.Releases
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

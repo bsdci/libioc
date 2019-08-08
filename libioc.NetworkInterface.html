@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.NetworkInterface module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.NetworkInterface module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,94 +202,79 @@
 <p>Model if an iocage jails network interface.</p>
 <dl class="class">
 <dt id="libioc.NetworkInterface.NetworkInterface">
-<em class="property">class </em><code class="descclassname">libioc.NetworkInterface.</code><code class="descname">NetworkInterface</code><span class="sig-paren">(</span><em>name='vnet0'</em>, <em>create=False</em>, <em>ipv4_addresses=[]</em>, <em>ipv6_addresses=[]</em>, <em>mac=None</em>, <em>mtu=None</em>, <em>description=None</em>, <em>rename=None</em>, <em>group=None</em>, <em>addm=None</em>, <em>vnet=None</em>, <em>jail=None</em>, <em>extra_settings=None</em>, <em>destroy=False</em>, <em>auto_apply=True</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.NetworkInterface.</code><code class="sig-name descname">NetworkInterface</code><span class="sig-paren">(</span><em class="sig-param">name='vnet0'</em>, <em class="sig-param">create=False</em>, <em class="sig-param">ipv4_addresses=[]</em>, <em class="sig-param">ipv6_addresses=[]</em>, <em class="sig-param">mac=None</em>, <em class="sig-param">mtu=None</em>, <em class="sig-param">description=None</em>, <em class="sig-param">rename=None</em>, <em class="sig-param">group=None</em>, <em class="sig-param">addm=None</em>, <em class="sig-param">vnet=None</em>, <em class="sig-param">jail=None</em>, <em class="sig-param">extra_settings=None</em>, <em class="sig-param">destroy=False</em>, <em class="sig-param">auto_apply=True</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Model if an iocage jails network interface.</p>
 <p>NetworkInterface abstracts interface configurations and commands executed
 on the host or within jails. This class is internally used by Network.</p>
 <dl class="method">
 <dt id="libioc.NetworkInterface.NetworkInterface.apply">
-<code class="descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the interface settings and configure IP address.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.NetworkInterface.NetworkInterface.apply_addresses">
-<code class="descname">apply_addresses</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply_addresses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply_addresses" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply_addresses</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply_addresses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply_addresses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the configured IP addresses.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.NetworkInterface.NetworkInterface.apply_settings">
-<code class="descname">apply_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply_settings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.apply_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.apply_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the interface settings only.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.NetworkInterface.NetworkInterface.current_nic_name">
-<code class="descname">current_nic_name</code><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.current_nic_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">current_nic_name</code><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.current_nic_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the current NIC reference for usage in shell scripts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.NetworkInterface.NetworkInterface.destroy_interface">
-<code class="descname">destroy_interface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.destroy_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.destroy_interface" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">destroy_interface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/NetworkInterface.html#NetworkInterface.destroy_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.destroy_interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Destroy the interface.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.NetworkInterface.NetworkInterface.dhclient_command">
-<code class="descname">dhclient_command</code><em class="property"> = '/sbin/dhclient'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.dhclient_command" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dhclient_command</code><em class="property"> = '/sbin/dhclient'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.dhclient_command" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.NetworkInterface.NetworkInterface.ifconfig_command">
-<code class="descname">ifconfig_command</code><em class="property"> = '/sbin/ifconfig'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.ifconfig_command" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ifconfig_command</code><em class="property"> = '/sbin/ifconfig'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.ifconfig_command" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.NetworkInterface.NetworkInterface.rtsold_command">
-<code class="descname">rtsold_command</code><em class="property"> = '/usr/sbin/rtsold'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.rtsold_command" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rtsold_command</code><em class="property"> = '/usr/sbin/rtsold'</em><a class="headerlink" href="#libioc.NetworkInterface.NetworkInterface.rtsold_command" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

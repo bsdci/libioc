@@ -2,6 +2,6 @@ libioc.Config.Jail.Defaults module
 ==================================
 
 .. automodule:: libioc.Config.Jail.Defaults
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

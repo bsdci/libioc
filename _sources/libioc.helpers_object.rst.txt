@@ -2,6 +2,6 @@ libioc.helpers\_object module
 =============================
 
 .. automodule:: libioc.helpers_object
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

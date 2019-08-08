@@ -2,6 +2,6 @@ libioc.ResourceUpdater module
 =============================
 
 .. automodule:: libioc.ResourceUpdater
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

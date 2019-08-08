@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Data module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Data module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -175,68 +175,56 @@
 <p>Internal data storage for BaseConfig objects.</p>
 <dl class="class">
 <dt id="libioc.Config.Data.Data">
-<em class="property">class </em><code class="descclassname">libioc.Config.Data.</code><code class="descname">Data</code><span class="sig-paren">(</span><em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Data.</code><code class="sig-name descname">Data</code><span class="sig-paren">(</span><em class="sig-param">data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Internal data storage for BaseConfig objects.</p>
 <dl class="attribute">
 <dt id="libioc.Config.Data.Data.delimiter">
-<code class="descname">delimiter</code><em class="property"> = '.'</em><a class="headerlink" href="#libioc.Config.Data.Data.delimiter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delimiter</code><em class="property"> = '.'</em><a class="headerlink" href="#libioc.Config.Data.Data.delimiter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Data.Data.items">
-<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.items" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over the flattened keys and values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Itemsview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Itemsview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Data.Data.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.keys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the available configuration keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Data.Data.nested">
-<code class="descname">nested</code><a class="headerlink" href="#libioc.Config.Data.Data.nested" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nested</code><a class="headerlink" href="#libioc.Config.Data.Data.nested" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the data as nested dict structure.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Data.Data.values">
-<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Data.html#Data.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Data.Data.values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all config values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Valuesview</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Valuesview</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Properties.Depends module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.Properties.Depends module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -179,48 +179,41 @@
 <p>Jail config depends property.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Depends.DependsProp">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Depends.</code><code class="descname">DependsProp</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='depends'</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Depends.</code><code class="sig-name descname">DependsProp</code><span class="sig-paren">(</span><em class="sig-param">config=None</em>, <em class="sig-param">property_name='depends'</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Filter.html#libioc.Filter.Terms" title="libioc.Filter.Terms"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Filter.Terms</span></code></a></p>
 <p>Special jail config property Depends.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Depends.DependsProp.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>term</em>, <em>notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">term</em>, <em class="sig-param">notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a Filter.Term to the depends Jail Config property.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>term</strong> (<a class="reference internal" href="libioc.Filter.html#libioc.Filter.Term" title="libioc.Filter.Term"><em>libioc.Filter.Term</em></a><em>, </em><em>str</em>) – Depends Filter.Term to add</li>
-<li><strong>notify</strong> (<em>bool</em>) – (default=True)
-Sends an update notification to the jail config instance</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>term</strong> (<a class="reference internal" href="libioc.Filter.html#libioc.Filter.Term" title="libioc.Filter.Term"><em>libioc.Filter.Term</em></a><em>, </em><em>str</em>) – Depends Filter.Term to add</p></li>
+<li><p><strong>notify</strong> (<em>bool</em>) – (default=True)
+Sends an update notification to the jail config instance</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Depends.DependsProp.delimiter">
-<code class="descname">delimiter</code><em class="property"> = ','</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.delimiter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delimiter</code><em class="property"> = ','</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.delimiter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Depends.DependsProp.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>data</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Depends.html#DependsProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Depends.DependsProp.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear and set all terms from input data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

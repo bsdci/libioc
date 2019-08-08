@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.File package &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.File package &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -179,6 +179,7 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="libioc.Config.Jail.File.Fstab.html">libioc.Config.Jail.File.Fstab module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libioc.Config.Jail.File.PeriodicConf.html">libioc.Config.Jail.File.PeriodicConf module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="libioc.Config.Jail.File.RCConf.html">libioc.Config.Jail.File.RCConf module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="libioc.Config.Jail.File.SysctlConf.html">libioc.Config.Jail.File.SysctlConf module</a></li>
 </ul>
@@ -189,84 +190,69 @@
 <p>Prototype of config files stored on the filesystem.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.File.ConfigFile">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.</code><code class="descname">ConfigFile</code><span class="sig-paren">(</span><em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ConfigFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.File.</code><code class="sig-name descname">ConfigFile</code><span class="sig-paren">(</span><em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ConfigFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Abstraction of UCL file based config files in Resources.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.File.ConfigFile.changed">
-<code class="descname">changed</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.changed" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">changed</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true when the file was changed since reading it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.File.ConfigFile.file">
-<code class="descname">file</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.file" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">file</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.file" title="Permalink to this definition">¶</a></dt>
 <dd><p>File path relative to the Resources root_dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.File.ConfigFile.path">
-<code class="descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.path" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute path to the file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.File.ConfigFile.save">
-<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ConfigFile.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ConfigFile.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ConfigFile.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the changes to the file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Jail.File.ResourceConfigFile">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.File.</code><code class="descname">ResourceConfigFile</code><span class="sig-paren">(</span><em>resource</em>, <em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ResourceConfigFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ResourceConfigFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.File.</code><code class="sig-name descname">ResourceConfigFile</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/File.html#ResourceConfigFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.File.ResourceConfigFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Config.Jail.File.ConfigFile" title="libioc.Config.Jail.File.ConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.File.ConfigFile</span></code></a></p>
 <p>Abstraction of UCL file based config files in Resources.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.File.ResourceConfigFile.path">
-<code class="descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.ResourceConfigFile.path" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#libioc.Config.Jail.File.ResourceConfigFile.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute path to the file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

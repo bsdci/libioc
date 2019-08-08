@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ResourceUpdater &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ResourceUpdater &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -179,6 +179,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">urllib.error</span>
 
 <span class="kn">import</span> <span class="nn">libioc.events</span>
@@ -369,7 +370,7 @@
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local</span><span class="p">)</span>
 
-        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>  <span class="c1"># type: ignore</span>
+        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Downloading update assets from </span><span class="si">{url}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">_request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span>  <span class="c1"># nosec: url validated</span>
@@ -699,7 +700,7 @@
             <span class="s2">&quot;update-latest.txt&quot;</span>
         <span class="p">])</span>
         <span class="n">local_path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.host_updates_dir}</span><span class="s2">/update-latest.txt&quot;</span>
-        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>  <span class="c1"># type: ignore</span>
+        <span class="n">_request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span>
         <span class="n">_request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span>  <span class="c1"># nosec: official HardenedBSD URL</span>
             <span class="n">update_info_url</span><span class="p">,</span>
             <span class="n">local_path</span>
@@ -852,7 +853,7 @@
     <span class="k">def</span> <span class="nf">_pre_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Execute before executing the update command.&quot;&quot;&quot;</span>
         <span class="n">lnk</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}{self._base_release_symlink_location}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{lnk}</span><span class="s2">/..&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{lnk}</span><span class="s2">/..&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">lnk</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">lnk</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">lnk</span><span class="p">)</span>
@@ -860,7 +861,7 @@
     <span class="k">def</span> <span class="nf">_post_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Execute after executing the update command.&quot;&quot;&quot;</span>
         <span class="n">lnk</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.resource.root_path}{self._base_release_symlink_location}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{lnk}</span><span class="s2">/..&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{lnk}</span><span class="s2">/..&quot;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">lnk</span><span class="p">)</span></div>
 
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Properties.Resolver module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.Properties.Resolver module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -179,110 +179,89 @@
 <p>Jail config resolver property.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Resolver.</code><code class="descname">ResolverProp</code><span class="sig-paren">(</span><em>config</em>, <em>property_name='resolver'</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Resolver.</code><code class="sig-name descname">ResolverProp</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">property_name='resolver'</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableSequence</span></code></p>
 <p>Handle the special jail property (DNS) Resolver.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>value</em>, <em>notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.append" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a nameserver.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.apply">
-<code class="descname">apply</code><span class="sig-paren">(</span><em>jail</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.apply" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the settings to a jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.JailResolverConfig" title="libioc.events.JailResolverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailResolverConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.JailResolverConfig" title="libioc.events.JailResolverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailResolverConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.conf_file_path">
-<code class="descname">conf_file_path</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.conf_file_path" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">conf_file_path</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.conf_file_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unconfigurable path of the config file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><em>index</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.insert" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">index</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert a nameserver at a given position.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.method">
-<code class="descname">method</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the selected configuration method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.none_matches">
-<code class="descname">none_matches</code><em class="property"> = ['/dev/null', '-', '']</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.none_matches" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">none_matches</code><em class="property"> = ['/dev/null', '-', '']</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.none_matches" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>value=None</em>, <em>notify=True</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">value=None</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Resolver.html#ResolverProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear and set all nameservers.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Properties.Resolver.ResolverProp.value">
-<code class="descname">value</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.value" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Resolver.ResolverProp.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the raw configuration string or None.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

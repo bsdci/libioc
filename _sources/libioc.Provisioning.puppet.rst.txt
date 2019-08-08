@@ -2,6 +2,6 @@ libioc.Provisioning.puppet module
 =================================
 
 .. automodule:: libioc.Provisioning.puppet
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

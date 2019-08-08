@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.events &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.events &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage events collection.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc events collection.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
 
@@ -222,7 +222,11 @@
         <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Initialize an IocEvent.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">Scope</span><span class="p">()</span>
+
         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">():</span>
                 <span class="k">return</span> <span class="n">event</span>  <span class="c1"># type: ignore</span>
@@ -547,8 +551,8 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="UnmountDevFS"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.UnmountDevFS">[docs]</a><span class="k">class</span> <span class="nc">UnmountDevFS</span><span class="p">(</span><span class="n">DevFSEvent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Unmount /dev from a jail.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MountFdescfs"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.MountFdescfs">[docs]</a><span class="k">class</span> <span class="nc">MountFdescfs</span><span class="p">(</span><span class="n">DevFSEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mount /dev/fd into a jail.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 
@@ -628,7 +632,9 @@
 <div class="viewcode-block" id="JailCommand"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailCommand">[docs]</a><span class="k">class</span> <span class="nc">JailCommand</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run command in a jail.&quot;&quot;&quot;</span>
 
-    <span class="k">pass</span></div>
+    <span class="n">stdout</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">stderr</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">code</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="JailHookCreated"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.JailHookCreated">[docs]</a><span class="k">class</span> <span class="nc">JailHookCreated</span><span class="p">(</span><span class="n">JailHook</span><span class="p">):</span>
@@ -1010,11 +1016,13 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.Resource.Resource&#39;</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">libzfs</span><span class="o">.</span><span class="n">ZFSDataset</span><span class="p">,</span>
+        <span class="n">flags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">libzfs</span><span class="o">.</span><span class="n">SendFlag</span><span class="p">]</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span>
         <span class="n">message</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Scope</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span>
         <span class="n">ResourceBackup</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
@@ -1196,7 +1204,13 @@
 <span class="c1"># PKG</span>
 
 
-<div class="viewcode-block" id="PackageFetch"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageFetch">[docs]</a><span class="k">class</span> <span class="nc">PackageFetch</span><span class="p">(</span><span class="n">IocEvent</span><span class="p">):</span>
+<div class="viewcode-block" id="PkgEvent"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PkgEvent">[docs]</a><span class="k">class</span> <span class="nc">PkgEvent</span><span class="p">(</span><span class="n">IocEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Collection of events related to Pkg.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="PackageFetch"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageFetch">[docs]</a><span class="k">class</span> <span class="nc">PackageFetch</span><span class="p">(</span><span class="n">PkgEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Fetch packages for offline installation.&quot;&quot;&quot;</span>
 
     <span class="n">packages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -1213,7 +1227,13 @@
         <span class="n">IocEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PackageInstall"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageInstall">[docs]</a><span class="k">class</span> <span class="nc">PackageInstall</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+<div class="viewcode-block" id="BootstrapPkg"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.BootstrapPkg">[docs]</a><span class="k">class</span> <span class="nc">BootstrapPkg</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">,</span> <span class="n">PkgEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bootstrap pkg within a jail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="PackageInstall"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageInstall">[docs]</a><span class="k">class</span> <span class="nc">PackageInstall</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">,</span> <span class="n">PkgEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Install packages in a jail.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -1228,7 +1248,7 @@
         <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PackageRemove"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageRemove">[docs]</a><span class="k">class</span> <span class="nc">PackageRemove</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+<div class="viewcode-block" id="PackageRemove"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageRemove">[docs]</a><span class="k">class</span> <span class="nc">PackageRemove</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">,</span> <span class="n">PkgEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Remove packages from a jail.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -1243,7 +1263,7 @@
         <span class="n">JailEvent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jail</span><span class="o">=</span><span class="n">jail</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PackageConfiguration"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageConfiguration">[docs]</a><span class="k">class</span> <span class="nc">PackageConfiguration</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">):</span>
+<div class="viewcode-block" id="PackageConfiguration"><a class="viewcode-back" href="../../libioc.events.html#libioc.events.PackageConfiguration">[docs]</a><span class="k">class</span> <span class="nc">PackageConfiguration</span><span class="p">(</span><span class="n">JailEvent</span><span class="p">,</span> <span class="n">PkgEvent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Install packages in a jail.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>

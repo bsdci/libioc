@@ -2,6 +2,6 @@ libioc.decorators module
 ========================
 
 .. automodule:: libioc.decorators
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

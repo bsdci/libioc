@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.File.Fstab &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.File.Fstab &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -479,7 +479,7 @@
         <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_create_destination</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_mount_jail</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">FstabLine</span><span class="p">,</span> <span class="n">FstabCommentLine</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append a new line to the fstab file.</span>
 
@@ -495,7 +495,7 @@
             <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="n">comment</span>
         <span class="p">})</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span>
             <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">,</span>
             <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
             <span class="n">auto_create_destination</span><span class="o">=</span><span class="n">auto_create_destination</span><span class="p">,</span>
@@ -513,14 +513,12 @@
         <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_create_destination</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_mount_jail</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">FstabLine</span><span class="p">,</span> <span class="n">FstabCommentLine</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Directly append a FstabLine type.</span>
 
 <span class="sd">        Use save() to write changes to the fstab file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">FstabCommentLine</span>
-        <span class="n">FstabAutoPlaceholderLine</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">((</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabLine</span><span class="p">),</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">FstabCommentLine</span><span class="p">),</span>
@@ -531,7 +529,8 @@
                 <span class="n">f</span><span class="s2">&quot;or FstabAutoPlaceholderLine, but was {type(line).__name__}&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">line</span></div>
 
 <div class="viewcode-block" id="Fstab.index"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.Fstab.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -786,7 +785,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.jail.dataset.mountpoint}</span><span class="s2">/</span><span class="si">{self.file}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">path</span>
 
 <div class="viewcode-block" id="JailFstab.add_line"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.add_line">[docs]</a>    <span class="k">def</span> <span class="nf">add_line</span><span class="p">(</span>
@@ -800,14 +799,14 @@
         <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_create_destination</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">auto_mount_jail</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">FstabLine</span><span class="p">,</span> <span class="n">FstabCommentLine</span><span class="p">,</span> <span class="n">FstabAutoPlaceholderLine</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Directly append a FstabLine type.</span>
 
 <span class="sd">        Use save() to write changes to the fstab file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="n">FstabLine</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_is_path_relative</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">is_path_relative</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">FstabLine</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>  <span class="c1"># clone to prevent mutation</span>
                 <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">root_path</span><span class="p">,</span>
@@ -826,7 +825,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
                     <span class="n">f</span><span class="s2">&quot;Skipping existing fstab line: </span><span class="si">{line}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
-                <span class="k">return</span>
+                <span class="k">return</span> <span class="n">line</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">FstabDestinationExists</span><span class="p">(</span>
                     <span class="n">mountpoint</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
@@ -840,12 +839,12 @@
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="n">FstabLine</span><span class="p">:</span>
             <span class="c1"># destination is always relative to the jail resource</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_is_path_relative</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">is_path_relative</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">_destination</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Types</span><span class="o">.</span><span class="n">AbsolutePath</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">root_path</span><span class="p">,</span>
                     <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
                 <span class="p">]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">_destination</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">_destination</span><span class="p">)</span>
                 <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_destination</span>
 
             <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">require_no_symlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]))</span>
@@ -860,7 +859,7 @@
 
             <span class="k">if</span> <span class="p">(</span><span class="n">auto_mount_jail</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">running</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">destination</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">_require_relative_path</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
                     <span class="n">f</span><span class="s2">&quot;auto-mount </span><span class="si">{destination}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
@@ -878,7 +877,8 @@
                     <span class="n">f</span><span class="s2">&quot;</span><span class="si">{_source}</span><span class="s2"> mounted to running jail </span><span class="si">{_jail_name}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">line</span></div>
 
 <div class="viewcode-block" id="JailFstab.update_release"><a class="viewcode-back" href="../../../../../libioc.Config.Jail.File.Fstab.html#libioc.Config.Jail.File.Fstab.JailFstab.update_release">[docs]</a>    <span class="k">def</span> <span class="nf">update_release</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

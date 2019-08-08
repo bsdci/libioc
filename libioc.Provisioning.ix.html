@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Provisioning.ix module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Provisioning.ix module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -174,63 +174,55 @@
 <p>ioc provisioner for ix-plugins.</p>
 <dl class="class">
 <dt id="libioc.Provisioning.ix.PluginDefinition">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.ix.</code><code class="descname">PluginDefinition</code><span class="sig-paren">(</span><em>name</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#PluginDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.ix.</code><code class="sig-name descname">PluginDefinition</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#PluginDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>ix-iocage-plugin definition.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.ix.PluginDefinition.name">
-<code class="descname">name</code><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the ix-iocage-plugins name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.ix.PluginDefinition.url">
-<code class="descname">url</code><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition.url" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">url</code><a class="headerlink" href="#libioc.Provisioning.ix.PluginDefinition.url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the remote URL of the ix-iocage-plugins definition file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="exception">
 <dt id="libioc.Provisioning.ix.PluginUnavailableError">
-<em class="property">exception </em><code class="descclassname">libioc.Provisioning.ix.</code><code class="descname">PluginUnavailableError</code><span class="sig-paren">(</span><em>name</em>, <em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#PluginUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.PluginUnavailableError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-prename descclassname">libioc.Provisioning.ix.</code><code class="sig-name descname">PluginUnavailableError</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">reason</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#PluginUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.PluginUnavailableError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.errors.html#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
 <p>Raised when an iX iocage plugin is not available.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Provisioning.ix.provision">
-<code class="descclassname">libioc.Provisioning.ix.</code><code class="descname">provision</code><span class="sig-paren">(</span><em>self</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.provision" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Provisioning.ix.</code><code class="sig-name descname">provision</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/ix.html#provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.ix.provision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provision the jail from an ix-iocage-plugin.</p>
 <p>Installable ix-iocage plugins can be found on the registry repository
 <a class="reference external" href="https://github.com/freenas/iocage-ix-plugins/">https://github.com/freenas/iocage-ix-plugins/</a> and may be configured
 as a jails provision.source property, e.g.:</p>
 <blockquote>
-<div>ioc set provision.method=ix provision.source=jenkins myjail</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<div><p>ioc set provision.method=ix provision.source=jenkins myjail</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

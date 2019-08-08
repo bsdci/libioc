@@ -2,6 +2,6 @@ libioc.Config.Jail.Properties.Resolver module
 =============================================
 
 .. automodule:: libioc.Config.Jail.Properties.Resolver
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

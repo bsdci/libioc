@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Jail &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Jail &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,18 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage Jail module.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A Jail defines the configuration of a FreeBSD jail managed by ioc.</span>
+
+<span class="sd">It consists of kernel state and configuration assets (config.json).</span>
+
+<span class="sd">Configuration values are in a JailConfig, that maps the Jail configuration to</span>
+<span class="sd">permanent disk storage. The latest version used a config.json JSON config file.</span>
+<span class="sd">For compatibility with older versions of iocage (shell), UCL config files and</span>
+<span class="sd">storage as ZFS properties on the jails ZFS dataset are supported as well.</span>
+
+<span class="sd">The state of a Jail is managed by the kernel, that ioc interfaces with libc.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shlex</span>
@@ -181,6 +192,7 @@
 <span class="kn">import</span> <span class="nn">libzfs</span>
 <span class="kn">import</span> <span class="nn">freebsd_sysctl</span>
 <span class="kn">import</span> <span class="nn">jail</span> <span class="k">as</span> <span class="nn">libjail</span>
+<span class="kn">import</span> <span class="nn">freebsd_sysctl.types</span>
 
 <span class="kn">import</span> <span class="nn">libioc.Types</span>
 <span class="kn">import</span> <span class="nn">libioc.errors</span>
@@ -205,6 +217,10 @@
 <span class="kn">import</span> <span class="nn">libioc.ResourceSelector</span>
 <span class="kn">import</span> <span class="nn">libioc.Config.Jail.File.Fstab</span>
 
+<span class="kn">import</span> <span class="nn">ctypes.util</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="n">_dll</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">CDLL</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_library</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">)),</span> <span class="n">use_errno</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="JailResource"><a class="viewcode-back" href="../../libioc.Jail.html#libioc.Jail.JailResource">[docs]</a><span class="k">class</span> <span class="nc">JailResource</span><span class="p">(</span>
     <span class="n">libioc</span><span class="o">.</span><span class="n">LaunchableResource</span><span class="o">.</span><span class="n">LaunchableResource</span><span class="p">,</span>
@@ -213,7 +229,7 @@
     <span class="sd">&quot;&quot;&quot;Resource that represents a jail.&quot;&quot;&quot;</span>
 
     <span class="n">_jail</span><span class="p">:</span> <span class="s1">&#39;JailGenerator&#39;</span>
-    <span class="n">_fstab</span><span class="p">:</span> <span class="s1">&#39;libioc.Config.Jail.File.Fstab.Fstab&#39;</span>
+    <span class="n">_fstab</span><span class="p">:</span> <span class="s1">&#39;libioc.Config.Jail.File.Fstab.JailFstab&#39;</span>
     <span class="n">host</span><span class="p">:</span> <span class="s1">&#39;libioc.Host.HostGenerator&#39;</span>
     <span class="n">root_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
@@ -227,7 +243,7 @@
         <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Logger.Logger&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">zfs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">libioc</span><span class="o">.</span><span class="n">ZFS</span><span class="o">.</span><span class="n">ZFS</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Host.HostGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">fstab</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Config.Jail.File.Fstab.Fstab&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fstab</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.Config.Jail.File.Fstab.JailFstab&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">root_datasets_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
@@ -555,7 +571,8 @@
         <span class="n">single_command</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Start the jail.</span>
@@ -594,6 +611,12 @@
 <span class="sd">            start_dependant_jails (bool):</span>
 
 <span class="sd">                When disabled, no dependant jails will be started.</span>
+
+<span class="sd">            env (dict):</span>
+
+<span class="sd">                Environment variables that are available in all jail hooks.</span>
+<span class="sd">                Existing environment variables (provided by the system or ioc)</span>
+<span class="sd">                can be overridden with entries in this dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_existing</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_stopped</span><span class="p">()</span>
@@ -635,7 +658,12 @@
         <span class="p">)</span>
 
         <span class="c1"># Prestart Hook</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;prestart&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+            <span class="s2">&quot;prestart&quot;</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+        <span class="p">)</span>
 
         <span class="c1"># Basejail Actions</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_basejail</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -654,10 +682,55 @@
             <span class="n">scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
         <span class="p">)</span>
         <span class="k">yield</span> <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="n">jiov</span> <span class="o">=</span> <span class="n">libjail</span><span class="o">.</span><span class="n">Jiov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_launch_params</span><span class="p">)</span>
+        <span class="n">jid</span> <span class="o">=</span> <span class="n">_dll</span><span class="o">.</span><span class="n">jail_set</span><span class="p">(</span><span class="n">jiov</span><span class="o">.</span><span class="n">pointer</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">jiov</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_stop_failed_jail</span><span class="p">(</span>
+        <span class="k">if</span> <span class="n">jid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__jid</span> <span class="o">=</span> <span class="n">jid</span>
+            <span class="k">yield</span> <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_code</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">get_errno</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">error_code</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">error_name</span> <span class="o">=</span> <span class="n">errno</span><span class="o">.</span><span class="n">errorcode</span><span class="p">[</span><span class="n">error_code</span><span class="p">]</span>
+                <span class="n">error_text</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{error_code}</span><span class="s2"> [</span><span class="si">{error_name}</span><span class="s2">]&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_text</span> <span class="o">=</span> <span class="n">jiov</span><span class="o">.</span><span class="n">errmsg</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">JailLaunchFailed</span><span class="p">(</span>
+                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">reason</span><span class="o">=</span><span class="n">error_text</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">error_text</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">error</span>
+
+        <span class="k">def</span> <span class="nf">_stop_jails</span><span class="p">(</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-            <span class="n">jails_to_stop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">single_command</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">jails_to_stop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">jails_to_stop</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_non_vimage_network</span><span class="p">(</span>
+                        <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                    <span class="p">)</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__destroy_jail</span><span class="p">(</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">jid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                    <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop_vimage_network</span><span class="p">(</span>
+                        <span class="n">jid</span><span class="p">,</span>
+                        <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                    <span class="p">)</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">unmount</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_backend</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clear_resource_limits</span><span class="p">(</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="n">start_dependant_jails</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">jails_to_stop</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">dependant_jails_started</span><span class="p">)))</span>
             <span class="k">for</span> <span class="n">jail_to_stop</span> <span class="ow">in</span> <span class="n">jails_to_stop</span><span class="p">:</span>
@@ -665,28 +738,21 @@
                     <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">event_scope</span><span class="o">=</span><span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">scope</span>
                 <span class="p">)</span>
-
-        <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_stop_failed_jail</span><span class="p">)</span>
-        <span class="n">jiov</span> <span class="o">=</span> <span class="n">libjail</span><span class="o">.</span><span class="n">Jiov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_launch_params</span><span class="p">)</span>
-        <span class="n">jid</span> <span class="o">=</span> <span class="n">libjail</span><span class="o">.</span><span class="n">dll</span><span class="o">.</span><span class="n">jail_set</span><span class="p">(</span><span class="n">jiov</span><span class="o">.</span><span class="n">pointer</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">jiov</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">jid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__jid</span> <span class="o">=</span> <span class="n">jid</span>
-            <span class="k">yield</span> <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">error</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">JailLaunchFailed</span><span class="p">(</span>
-                <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-            <span class="p">)</span>
-            <span class="n">error_text</span> <span class="o">=</span> <span class="n">jiov</span><span class="o">.</span><span class="n">errmsg</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
-            <span class="k">yield</span> <span class="n">jailAttachEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">error_text</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">error</span>
+        <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_stop_jails</span><span class="p">)</span>
 
         <span class="c1"># Created Hook</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+            <span class="s2">&quot;created&quot;</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+        <span class="p">)</span>
 
         <span class="c1"># Mount Devfs</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mount_devfs</span><span class="p">(</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+
+        <span class="c1"># Mount Fdescfs</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mount_fdescfs</span><span class="p">(</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
 
         <span class="c1"># Setup Network</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_network</span><span class="p">(</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
@@ -708,105 +774,106 @@
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_autoconfig</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">single_command</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Start and Poststart Hooks</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
-                <span class="s2">&quot;poststart&quot;</span><span class="p">,</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
-                <span class="s2">&quot;command&quot;</span><span class="p">,</span>
-                <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-                <span class="n">script</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">single_command</span><span class="p">),</span>
-                <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_non_vimage_network</span><span class="p">(</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">single_command</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Start and Poststart Hooks</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+                    <span class="s2">&quot;start&quot;</span><span class="p">,</span>
                     <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__destroy_jail</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">jid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
-                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop_vimage_network</span><span class="p">(</span>
-                    <span class="n">jid</span><span class="p">,</span>
-                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+                    <span class="s2">&quot;poststart&quot;</span><span class="p">,</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">unmount</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_backend</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
-            <span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clear_resource_limits</span><span class="p">(</span>
-                <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span>
-            <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+                    <span class="s2">&quot;command&quot;</span><span class="p">,</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">script</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">single_command</span><span class="p">),</span>
+                    <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
+        <span class="k">if</span> <span class="n">single_command</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">_stop_jails</span><span class="p">()</span>
         <span class="k">yield</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__mount_devfs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.MountDevFS&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-
-        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">MountDevFS</span><span class="p">(</span>
-            <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mount_in_jail</span><span class="p">(</span>
+            <span class="n">filesystem</span><span class="o">=</span><span class="s2">&quot;devfs&quot;</span><span class="p">,</span>
+            <span class="n">mountpoint</span><span class="o">=</span><span class="s2">&quot;/dev&quot;</span><span class="p">,</span>
+            <span class="n">event</span><span class="o">=</span><span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">MountDevFS</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
+            <span class="n">ruleset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">devfs_ruleset</span>
         <span class="p">)</span>
-        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;mount_devfs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;disabled&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
-
-        <span class="n">devpath</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.root_path}</span><span class="s2">/dev&quot;</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">devpath</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InsecureJailPath</span><span class="p">(</span>
-                    <span class="n">path</span><span class="o">=</span><span class="n">devpath</span><span class="p">,</span>
-                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
-                <span class="p">)</span>
-            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span>
-                <span class="n">destination</span><span class="o">=</span><span class="n">devpath</span><span class="p">,</span>
-                <span class="n">fstype</span><span class="o">=</span><span class="s2">&quot;devfs&quot;</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
-
-        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">__unmount_devfs</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__mount_fdescfs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.UnmountDevFS&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.MountFdescfs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mount_in_jail</span><span class="p">(</span>
+            <span class="n">filesystem</span><span class="o">=</span><span class="s2">&quot;fdescfs&quot;</span><span class="p">,</span>
+            <span class="n">mountpoint</span><span class="o">=</span><span class="s2">&quot;/dev/fd&quot;</span><span class="p">,</span>
+            <span class="n">event</span><span class="o">=</span><span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">MountFdescfs</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span>
+        <span class="p">)</span>
 
-        <span class="n">event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">UnmountDevFS</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__mount_in_jail</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filesystem</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mountpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event</span><span class="p">:</span> <span class="s1">&#39;libioc.events.JailEvent&#39;</span><span class="p">,</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">extra_args</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.MountFdescfs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+
+        <span class="n">_event</span> <span class="o">=</span> <span class="n">event</span><span class="p">(</span>
             <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
         <span class="p">)</span>
-        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">_event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-        <span class="n">devpath</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.root_path}</span><span class="s2">/dev&quot;</span>
-
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="n">devpath</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;mount_</span><span class="si">{filesystem}</span><span class="s2">&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">_event</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;disabled&quot;</span><span class="p">)</span>
             <span class="k">return</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span>
-                <span class="n">mountpoint</span><span class="o">=</span><span class="n">devpath</span><span class="p">,</span>
+            <span class="n">_mountpoint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.root_path}{mountpoint}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">_mountpoint</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">_mountpoint</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_mountpoint</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">InsecureJailPath</span><span class="p">(</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">_mountpoint</span><span class="p">,</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">_event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_mountpoint</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">_mountpoint</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mo">0o555</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span>
+                <span class="n">destination</span><span class="o">=</span><span class="n">_mountpoint</span><span class="p">,</span>
+                <span class="n">fstype</span><span class="o">=</span><span class="n">filesystem</span><span class="p">,</span>
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
-                <span class="n">frce</span><span class="o">=</span><span class="kc">True</span>
+                <span class="o">**</span><span class="n">extra_args</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">_event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">e</span>
 
-        <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">_event</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_zfs_share_storage</span><span class="p">(</span>
@@ -907,6 +974,7 @@
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">start_dependant_jails</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">dependant_jails_seen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="s1">&#39;JailGenerator&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{},</span>
         <span class="o">**</span><span class="n">temporary_config_override</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -966,18 +1034,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">original_config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">fork_exec_events</span> <span class="o">=</span> <span class="n">JailGenerator</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+            <span class="k">yield from</span> <span class="n">JailGenerator</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span>
                 <span class="n">single_command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
                 <span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span>
                 <span class="n">event_scope</span><span class="o">=</span><span class="n">event_scope</span><span class="p">,</span>
                 <span class="n">dependant_jails_seen</span><span class="o">=</span><span class="n">dependant_jails_seen</span><span class="p">,</span>
-                <span class="n">start_dependant_jails</span><span class="o">=</span><span class="n">start_dependant_jails</span>
+                <span class="n">start_dependant_jails</span><span class="o">=</span><span class="n">start_dependant_jails</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="n">env</span>
             <span class="p">)</span>
-            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">fork_exec_events</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">event</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">original_config</span></div>
+
+    <span class="k">def</span> <span class="nf">__merge_env</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">_env</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">_env_keys</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_env_keys</span><span class="p">:</span>
+            <span class="n">_env</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">env</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="n">global_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">global_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_env_keys</span><span class="p">:</span>
+                <span class="n">_env</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">global_env</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">_env</span>
 
     <span class="k">def</span> <span class="nf">__run_hook</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -985,11 +1068,12 @@
         <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">,</span>
         <span class="n">script</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">passthru</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.JailHook&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-
+        <span class="n">_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__merge_env</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
         <span class="n">exec_func</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">exec</span>
-        <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">_env</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;prestart&quot;</span><span class="p">:</span>
             <span class="n">Event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailHookPrestart</span>
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;created&quot;</span><span class="p">:</span>
@@ -997,11 +1081,11 @@
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
             <span class="n">Event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailHookStart</span>
             <span class="n">exec_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec</span>
-            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="n">_env</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;command&quot;</span><span class="p">:</span>
             <span class="n">Event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailCommand</span>
             <span class="n">exec_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec</span>
-            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">)</span>
+            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">passthru</span><span class="o">=</span><span class="n">passthru</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">_env</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;poststart&quot;</span><span class="p">:</span>
             <span class="n">Event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailHookPoststart</span>
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;prestop&quot;</span><span class="p">:</span>
@@ -1014,7 +1098,7 @@
                 <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;not running&quot;</span><span class="p">)</span>
                 <span class="k">return</span>
             <span class="n">exec_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec</span>
-            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">exec_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="n">_env</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">hook</span> <span class="o">==</span> <span class="s2">&quot;poststop&quot;</span><span class="p">:</span>
             <span class="n">Event</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailHookPoststop</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1041,7 +1125,7 @@
             <span class="k">if</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;exited with </span><span class="si">{code}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;command exited with </span><span class="si">{code}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">JailHookFailed</span><span class="p">(</span>
                     <span class="n">jail</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
                     <span class="n">hook</span><span class="o">=</span><span class="n">hook</span><span class="p">,</span>
@@ -1054,7 +1138,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">log_errors</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">log_errors</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stop a jail.</span>
@@ -1062,16 +1147,25 @@
 <span class="sd">        Args:</span>
 
 <span class="sd">            force (bool): (default=False)</span>
+
 <span class="sd">                Ignores failures and enforces teardown if True.</span>
 
 <span class="sd">            event_scope (libioc.events.Scope): (default=None)</span>
+
 <span class="sd">                Provide an existing libiocage event scope or automatically</span>
 <span class="sd">                create a new one instead.</span>
 
 <span class="sd">            log_errors (bool): (default=True)</span>
+
 <span class="sd">                When disabled errors are not passed to the logger. This is</span>
 <span class="sd">                useful in scripted contexts when then stop operation was</span>
 <span class="sd">                executed to enforce a defined jail state.</span>
+
+<span class="sd">            env (dict):</span>
+
+<span class="sd">                Environment variables that are available in all jail hooks.</span>
+<span class="sd">                Existing environment variables (provided by the system or ioc)</span>
+<span class="sd">                can be overridden with entries in this dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">require_jail_existing</span><span class="p">(</span><span class="n">log_errors</span><span class="o">=</span><span class="n">log_errors</span><span class="p">)</span>
@@ -1083,20 +1177,35 @@
         <span class="k">yield</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
         <span class="n">jid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jid</span>
 
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;prestop&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+            <span class="s2">&quot;prestop&quot;</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+        <span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+            <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+        <span class="p">)</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__destroy_jail</span><span class="p">(</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_non_vimage_network</span><span class="p">(</span>
                 <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
                 <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span>
             <span class="p">)</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span><span class="s2">&quot;poststop&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
+            <span class="s2">&quot;poststop&quot;</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">jid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vnet&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop_vimage_network</span><span class="p">(</span>
                 <span class="n">jid</span><span class="p">,</span>
                 <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span>
             <span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">fstab</span><span class="o">.</span><span class="n">unmount</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_backend</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span>
             <span class="n">event_scope</span><span class="o">=</span><span class="n">jailStopEvent</span><span class="o">.</span><span class="n">scope</span>
@@ -1113,7 +1222,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">shutdown</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Restart the jail.&quot;&quot;&quot;</span>
         <span class="n">jailRestartEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailRestart</span><span class="p">(</span>
@@ -1138,8 +1248,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
                     <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
-                    <span class="n">force</span><span class="p">,</span>
-                    <span class="n">JailSoftShutdownEvent</span><span class="o">.</span><span class="n">scope</span>
+                    <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">JailSoftShutdownEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
                 <span class="k">yield</span> <span class="n">JailSoftShutdownEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
             <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span><span class="p">:</span>
@@ -1150,8 +1261,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_hook</span><span class="p">(</span>
                     <span class="s2">&quot;start&quot;</span><span class="p">,</span>
-                    <span class="n">force</span><span class="p">,</span>
-                    <span class="n">JailSoftShutdownEvent</span><span class="o">.</span><span class="n">scope</span>
+                    <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+                    <span class="n">event_scope</span><span class="o">=</span><span class="n">JailSoftShutdownEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                    <span class="n">env</span><span class="o">=</span><span class="n">env</span>
                 <span class="p">)</span>
                 <span class="k">yield</span> <span class="n">jailStartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
             <span class="k">except</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">IocException</span><span class="p">:</span>
@@ -1161,9 +1273,13 @@
 
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
                 <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailRestartEvent</span><span class="o">.</span><span class="n">scope</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailRestartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="n">env</span>
             <span class="p">)</span>
-            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">event_scope</span><span class="o">=</span><span class="n">jailRestartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">jailRestartEvent</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="n">env</span>
+            <span class="p">)</span>
 
         <span class="k">yield</span> <span class="n">jailRestartEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
 
@@ -1506,11 +1622,17 @@
 
 <div class="viewcode-block" id="JailGenerator.save"><a class="viewcode-back" href="../../libioc.Jail.html#libioc.Jail.JailGenerator.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Permanently save a jail&#39;s configuration.&quot;&quot;&quot;</span>
+        <span class="n">libioc</span><span class="o">.</span><span class="n">LaunchableResource</span><span class="o">.</span><span class="n">LaunchableResource</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_autoconfig</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_save_autoconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Save auto-generated files.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save auto-generated files.</span>
+
+<span class="sd">        Such files reflect changes to the JailConfig and need to be refreshed</span>
+<span class="sd">        before each jail start.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rc_conf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
 <div class="viewcode-block" id="JailGenerator.exec"><a class="viewcode-back" href="../../libioc.Jail.html#libioc.Jail.JailGenerator.exec">[docs]</a>    <span class="k">def</span> <span class="nf">exec</span><span class="p">(</span>
@@ -1523,19 +1645,25 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute a command in a running jail.</span>
 
-<span class="sd">        command (list):</span>
-<span class="sd">            A list of command and it&#39;s arguments</span>
+<span class="sd">        Args:</span>
 
-<span class="sd">            Example: [&quot;/usr/bin/whoami&quot;]</span>
+<span class="sd">            command (list):</span>
 
-<span class="sd">        env (dict):</span>
-<span class="sd">            The dictionary may contain env variables that will be forwarded to</span>
-<span class="sd">            the executed jail command.</span>
+<span class="sd">                A list of command and it&#39;s arguments</span>
 
-<span class="sd">        passthru (bool): (default=False)</span>
-<span class="sd">            When enabled the commands stdout and stderr are directory forwarded</span>
-<span class="sd">            to the attached terminal. The results will not be included in the</span>
-<span class="sd">            CommandOutput, so that (None, None, &lt;returncode&gt;) is returned.</span>
+<span class="sd">                Example: [&quot;/usr/bin/whoami&quot;]</span>
+
+<span class="sd">            env (dict):</span>
+
+<span class="sd">                The dictionary may contain env variables that will be</span>
+<span class="sd">                forwarded to the executed jail command.</span>
+
+<span class="sd">            passthru (bool): (default=False)</span>
+
+<span class="sd">                When enabled the commands stdout and stderr are directory</span>
+<span class="sd">                forwarded to the attached terminal. The results will not be</span>
+<span class="sd">                included in the CommandOutput, so that (None, None,</span>
+<span class="sd">                &lt;returncode&gt;) is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/usr/sbin/jexec&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jid</span><span class="p">)]</span> <span class="o">+</span> <span class="n">command</span>
 
@@ -1693,10 +1821,6 @@
             <span class="n">ruleset_line_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">devfs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">devfs_ruleset</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">devfs</span><span class="p">[</span><span class="n">ruleset_line_position</span><span class="p">]</span><span class="o">.</span><span class="n">number</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__get_launch_command</span><span class="p">(</span><span class="n">jail_args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;/usr/sbin/jail&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">jail_args</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_launch_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">libjail</span><span class="o">.</span><span class="n">Jiov</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
@@ -1704,10 +1828,6 @@
         <span class="n">value</span><span class="p">:</span> <span class="n">libjail</span><span class="o">.</span><span class="n">RawIovecValue</span>
         <span class="n">jail_params</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">libioc</span><span class="o">.</span><span class="n">JailParams</span><span class="o">.</span><span class="n">JailParam</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">sysctl_name</span><span class="p">,</span> <span class="n">sysctl</span> <span class="ow">in</span> <span class="n">libioc</span><span class="o">.</span><span class="n">JailParams</span><span class="o">.</span><span class="n">JailParams</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">sysctl</span><span class="o">.</span><span class="n">ctl_type</span> <span class="o">==</span> <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">NODE</span><span class="p">:</span>
-                <span class="c1"># skip NODE</span>
-                <span class="k">continue</span>
-
             <span class="k">if</span> <span class="n">sysctl_name</span> <span class="o">==</span> <span class="s2">&quot;security.jail.param.devfs_ruleset&quot;</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devfs_ruleset</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">sysctl_name</span> <span class="o">==</span> <span class="s2">&quot;security.jail.param.path&quot;</span><span class="p">:</span>
@@ -1734,17 +1854,26 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">addresses</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ip6_addr&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">value</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">ip</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">addresses</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">vnet</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sysctl_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;security.jail.param.ip&quot;</span><span class="p">)):</span>
+                <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">config_property_name</span> <span class="o">=</span> <span class="n">sysctl</span><span class="o">.</span><span class="n">iocage_name</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_is_known_property</span><span class="p">(</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_known_property</span><span class="p">(</span>
                     <span class="n">config_property_name</span><span class="p">,</span>
                     <span class="n">explicit</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">config_property_name</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">sysctl</span><span class="o">.</span><span class="n">ctl_type</span> <span class="ow">in</span> <span class="p">(</span>
+                        <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">NODE</span><span class="p">,</span>
+                        <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">INT</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="n">sysctl_state_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;disable&quot;</span><span class="p">,</span> <span class="s2">&quot;inherit&quot;</span><span class="p">,</span> <span class="s2">&quot;new&quot;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sysctl_state_names</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">sysctl_state_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-            <span class="n">jail_params</span><span class="p">[</span><span class="n">sysctl</span><span class="o">.</span><span class="n">jail_arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">jail_params</span><span class="p">[</span><span class="n">sysctl</span><span class="o">.</span><span class="n">jail_arg_name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="n">jail_params</span><span class="p">[</span><span class="s2">&quot;persist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">jail_params</span>
@@ -2470,12 +2599,14 @@
             <span class="n">start_dependant_jails</span><span class="o">=</span><span class="n">start_dependant_jails</span><span class="p">,</span>
             <span class="o">**</span><span class="n">temporary_config_override</span>
         <span class="p">)</span>
+        <span class="n">stdout</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="n">event</span><span class="p">,</span>
                 <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">JailCommand</span>
             <span class="p">)</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
-                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span></div></div>
+                <span class="n">stdout</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="k">return</span> <span class="n">stdout</span></div></div>
 </pre></div>
 
            </div>

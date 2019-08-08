@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ResourceUpdater module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ResourceUpdater module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,283 +202,235 @@
 <p>Updater for Releases and other LaunchableResources like Jails.</p>
 <dl class="class">
 <dt id="libioc.ResourceUpdater.FreeBSD">
-<em class="property">class </em><code class="descclassname">libioc.ResourceUpdater.</code><code class="descname">FreeBSD</code><span class="sig-paren">(</span><em>resource</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#FreeBSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceUpdater.</code><code class="sig-name descname">FreeBSD</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#FreeBSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.ResourceUpdater.Updater</span></code></a></p>
 <p>Updater for FreeBSD.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.FreeBSD.patch_version">
-<code class="descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.patch_version" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.patch_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the latest known patch version.</p>
 <p>This version is parsed from FreeBSDs /bin/freebsd-version file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.FreeBSD.update_conf_name">
-<code class="descname">update_conf_name</code><em class="property"> = 'freebsd-update.conf'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_conf_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_conf_name</code><em class="property"> = 'freebsd-update.conf'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_conf_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.FreeBSD.update_name">
-<code class="descname">update_name</code><em class="property"> = 'freebsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_name</code><em class="property"> = 'freebsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.FreeBSD.update_script_name">
-<code class="descname">update_script_name</code><em class="property"> = 'freebsd-update.sh'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_script_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_script_name</code><em class="property"> = 'freebsd-update.sh'</em><a class="headerlink" href="#libioc.ResourceUpdater.FreeBSD.update_script_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.ResourceUpdater.HardenedBSD">
-<em class="property">class </em><code class="descclassname">libioc.ResourceUpdater.</code><code class="descname">HardenedBSD</code><span class="sig-paren">(</span><em>resource</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#HardenedBSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceUpdater.</code><code class="sig-name descname">HardenedBSD</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#HardenedBSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.ResourceUpdater.Updater</span></code></a></p>
 <p>Updater for HardenedBSD.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.HardenedBSD.patch_version">
-<code class="descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.patch_version" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.patch_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the latest known patch version.</p>
 <p>On HardenedBSD this version is published among the updated downloaded
 by hbsd-update. Right before fetching an updater this file is
 downloaded, so that the revision mentioned can be used for snapshot
 creation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.HardenedBSD.release_branch_name">
-<code class="descname">release_branch_name</code><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.release_branch_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">release_branch_name</code><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.release_branch_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the branch name of the HBSD release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.HardenedBSD.update_conf_name">
-<code class="descname">update_conf_name</code><em class="property"> = 'hbsd-update.conf'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_conf_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_conf_name</code><em class="property"> = 'hbsd-update.conf'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_conf_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.HardenedBSD.update_name">
-<code class="descname">update_name</code><em class="property"> = 'hbsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_name</code><em class="property"> = 'hbsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.ResourceUpdater.HardenedBSD.update_script_name">
-<code class="descname">update_script_name</code><em class="property"> = 'hbsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_script_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_script_name</code><em class="property"> = 'hbsd-update'</em><a class="headerlink" href="#libioc.ResourceUpdater.HardenedBSD.update_script_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.ResourceUpdater.Updater">
-<em class="property">class </em><code class="descclassname">libioc.ResourceUpdater.</code><code class="descname">Updater</code><span class="sig-paren">(</span><em>resource</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceUpdater.</code><code class="sig-name descname">Updater</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Updater for Releases and other LaunchableResources like Jails.</p>
 <dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.apply">
-<code class="descname">apply</code><span class="sig-paren">(</span><em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater.apply" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the fetched updates to the associated release or jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>], <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>], <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#Updater.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.Updater.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the update of a release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.host_updates_dataset">
-<code class="descname">host_updates_dataset</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">host_updates_dataset</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the updates dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.host_updates_dataset_name">
-<code class="descname">host_updates_dataset_name</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dataset_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">host_updates_dataset_name</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dataset_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the updates dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.host_updates_dir">
-<code class="descname">host_updates_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">host_updates_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.host_updates_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the mountpoint of the updates dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.local_release_updater_config">
-<code class="descname">local_release_updater_config</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_release_updater_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">local_release_updater_config</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_release_updater_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the local path to the release updater config.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.local_release_updates_dir">
-<code class="descname">local_release_updates_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_release_updates_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">local_release_updates_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_release_updates_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the absolute path to updater directory (os-dependend).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.local_temp_dir">
-<code class="descname">local_temp_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_temp_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">local_temp_dir</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.local_temp_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the update temp directory relative to the jail root.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.logger">
-<code class="descname">logger</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut to the resources logger.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.patch_version">
-<code class="descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.patch_version" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">patch_version</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.patch_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the latest known patch version.</p>
 <p>When no patch version is known the release was not updated yet.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.release">
-<code class="descname">release</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.release" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">release</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the associated release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceUpdater.Updater.temporary_jail">
-<code class="descname">temporary_jail</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.temporary_jail" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">temporary_jail</code><a class="headerlink" href="#libioc.ResourceUpdater.Updater.temporary_jail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Temporary jail instance that will be created to run the update.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Jail.html#libioc.Jail.JailGenerator" title="libioc.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailGenerator</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Jail.html#libioc.Jail.JailGenerator" title="libioc.Jail.JailGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailGenerator</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.ResourceUpdater.get_launchable_update_resource">
-<code class="descclassname">libioc.ResourceUpdater.</code><code class="descname">get_launchable_update_resource</code><span class="sig-paren">(</span><em>host</em>, <em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#get_launchable_update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.get_launchable_update_resource" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.ResourceUpdater.</code><code class="sig-name descname">get_launchable_update_resource</code><span class="sig-paren">(</span><em class="sig-param">host</em>, <em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceUpdater.html#get_launchable_update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceUpdater.get_launchable_update_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an updater instance for the host distribution.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

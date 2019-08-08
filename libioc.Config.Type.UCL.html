@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Type.UCL module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Type.UCL module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -174,50 +174,44 @@
             
   <div class="section" id="module-libioc.Config.Type.UCL">
 <span id="libioc-config-type-ucl-module"></span><h1>libioc.Config.Type.UCL module<a class="headerlink" href="#module-libioc.Config.Type.UCL" title="Permalink to this headline">¶</a></h1>
-<p>iocage configuration stored in an UCL file.</p>
+<p>ioc configuration stored in an UCL file.</p>
 <dl class="class">
 <dt id="libioc.Config.Type.UCL.ConfigUCL">
-<em class="property">class </em><code class="descclassname">libioc.Config.Type.UCL.</code><code class="descname">ConfigUCL</code><span class="sig-paren">(</span><em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Type.UCL.</code><code class="sig-name descname">ConfigUCL</code><span class="sig-paren">(</span><em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Config.Prototype.html#libioc.Config.Prototype.Prototype" title="libioc.Config.Prototype.Prototype"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Prototype.Prototype</span></code></a></p>
-<p>iocage configuration stored in an UCL file.</p>
+<p>ioc configuration stored in an UCL file.</p>
 <dl class="attribute">
 <dt id="libioc.Config.Type.UCL.ConfigUCL.config_type">
-<code class="descname">config_type</code><em class="property"> = 'ucl'</em><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.config_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">config_type</code><em class="property"> = 'ucl'</em><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.config_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Type.UCL.ConfigUCL.map_input">
-<code class="descname">map_input</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.map_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">map_input</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.map_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize data read from the UCL file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Type.UCL.ConfigUCL.map_output">
-<code class="descname">map_output</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL.map_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.map_output" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">map_output</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#ConfigUCL.map_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.ConfigUCL.map_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output configuration in UCL format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Type.UCL.DatasetConfigUCL">
-<em class="property">class </em><code class="descclassname">libioc.Config.Type.UCL.</code><code class="descname">DatasetConfigUCL</code><span class="sig-paren">(</span><em>dataset=None</em>, <em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#DatasetConfigUCL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.DatasetConfigUCL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Type.UCL.</code><code class="sig-name descname">DatasetConfigUCL</code><span class="sig-paren">(</span><em class="sig-param">dataset=None</em>, <em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/UCL.html#DatasetConfigUCL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.UCL.DatasetConfigUCL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Config.Dataset.html#libioc.Config.Dataset.DatasetConfig" title="libioc.Config.Dataset.DatasetConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Dataset.DatasetConfig</span></code></a>, <a class="reference internal" href="#libioc.Config.Type.UCL.ConfigUCL" title="libioc.Config.Type.UCL.ConfigUCL"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Type.UCL.ConfigUCL</span></code></a></p>
 <p>ConfigFile in UCL format.</p>
 </dd></dl>

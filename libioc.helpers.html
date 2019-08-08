@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.helpers module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.helpers module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,138 +202,110 @@
 <p>Collection of iocage helper functions.</p>
 <dl class="function">
 <dt id="libioc.helpers.exec">
-<code class="descclassname">libioc.helpers.</code><code class="descname">exec</code><span class="sig-paren">(</span><em>command</em>, <em>logger=None</em>, <em>ignore_error=False</em>, <em>**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">exec</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">ignore_error=False</em>, <em class="sig-param">**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a shell command.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.exec_generator">
-<code class="descclassname">libioc.helpers.</code><code class="descname">exec_generator</code><span class="sig-paren">(</span><em>command</em>, <em>buffer_lines=True</em>, <em>summarize=True</em>, <em>encoding='UTF-8'</em>, <em>universal_newlines=True</em>, <em>stdin=None</em>, <em>stdout=None</em>, <em>env=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec_generator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">exec_generator</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">buffer_lines=True</em>, <em class="sig-param">summarize=True</em>, <em class="sig-param">encoding='UTF-8'</em>, <em class="sig-param">universal_newlines=True</em>, <em class="sig-param">stdin=None</em>, <em class="sig-param">stdout=None</em>, <em class="sig-param">env=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec_generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a command in an interactive shell.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.exec_passthru">
-<code class="descclassname">libioc.helpers.</code><code class="descname">exec_passthru</code><span class="sig-paren">(</span><em>command</em>, <em>logger=None</em>, <em>**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec_passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec_passthru" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">exec_passthru</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">**subprocess_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#exec_passthru"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.exec_passthru" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a command in an interactive shell.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.get_basedir_list">
-<code class="descclassname">libioc.helpers.</code><code class="descname">get_basedir_list</code><span class="sig-paren">(</span><em>distribution_name='FreeBSD'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_basedir_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_basedir_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">get_basedir_list</code><span class="sig-paren">(</span><em class="sig-param">distribution_name='FreeBSD'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_basedir_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_basedir_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the list of basedirs according to the host distribution.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.get_os_version">
-<code class="descclassname">libioc.helpers.</code><code class="descname">get_os_version</code><span class="sig-paren">(</span><em>version_file='/bin/freebsd-version'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_os_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_os_version" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">get_os_version</code><span class="sig-paren">(</span><em class="sig-param">version_file='/bin/freebsd-version'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_os_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_os_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the hosts userland version.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.get_random_uuid">
-<code class="descclassname">libioc.helpers.</code><code class="descname">get_random_uuid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_random_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_random_uuid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">get_random_uuid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#get_random_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.get_random_uuid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a random UUID.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.is_uuid">
-<code class="descclassname">libioc.helpers.</code><code class="descname">is_uuid</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#is_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.is_uuid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">is_uuid</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#is_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.is_uuid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the input string is an UUID.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.makedirs_safe">
-<code class="descclassname">libioc.helpers.</code><code class="descname">makedirs_safe</code><span class="sig-paren">(</span><em>target</em>, <em>mode=448</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#makedirs_safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.makedirs_safe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">makedirs_safe</code><span class="sig-paren">(</span><em class="sig-param">target</em>, <em class="sig-param">mode=448</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#makedirs_safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.makedirs_safe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a directory without following symlinks.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.mount">
-<code class="descclassname">libioc.helpers.</code><code class="descname">mount</code><span class="sig-paren">(</span><em>destination</em>, <em>source=None</em>, <em>fstype='nullfs'</em>, <em>opts=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.mount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">mount</code><span class="sig-paren">(</span><em class="sig-param">destination</em>, <em class="sig-param">source=None</em>, <em class="sig-param">fstype='nullfs'</em>, <em class="sig-param">opts=[]</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">**iov_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.mount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mount a filesystem using libc.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.parse_bool">
-<code class="descclassname">libioc.helpers.</code><code class="descname">parse_bool</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_bool" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">parse_bool</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_bool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to parse booleans from strings.</p>
 <p>On success, it returns the parsed boolean on failure it raises a TypeError.</p>
-<dl class="docutils">
-<dt>Usage:</dt>
-<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;YES&quot;</span><span class="p">)</span>
+<dl>
+<dt>Usage:</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;YES&quot;</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parse_bool</span><span class="p">(</span><span class="s2">&quot;false&quot;</span><span class="p">)</span>
 <span class="go">False</span>
@@ -345,24 +317,20 @@
 </div>
 </dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.parse_int">
-<code class="descclassname">libioc.helpers.</code><code class="descname">parse_int</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">parse_int</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to parse integer from strings.</p>
 <p>On success, it returns the parsed integer on failure it raises a TypeError.</p>
-<dl class="docutils">
-<dt>Usage:</dt>
-<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_int</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">)</span>
+<dl>
+<dt>Usage:</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_int</span><span class="p">(</span><span class="s2">&quot;-1&quot;</span><span class="p">)</span>
 <span class="go">-1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parse_int</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="go">3</span>
@@ -378,50 +346,41 @@
 </div>
 </dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.parse_list">
-<code class="descclassname">libioc.helpers.</code><code class="descname">parse_list</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">parse_list</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a comma separated string into a list.</p>
 <p>Always returns a list of strings. This list is empty when an empty string
 is provided or the value is None. In any other case the string is split by
 comma and returned as list.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.parse_none">
-<code class="descclassname">libioc.helpers.</code><code class="descname">parse_none</code><span class="sig-paren">(</span><em>data, none_matches=['none', '-', '']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_none" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">parse_none</code><span class="sig-paren">(</span><em class="sig-param">data, none_matches=['none', '-', '']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_none" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raise if the input does not translate to None.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.parse_user_input">
-<code class="descclassname">libioc.helpers.</code><code class="descname">parse_user_input</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_user_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_user_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">parse_user_input</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#parse_user_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.parse_user_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse user input.</p>
 <p>uses parse_bool() to partially return Boolean and None values
 All other types as returned as-is</p>
@@ -437,117 +396,93 @@ All other types as returned as-is</p>
 <span class="go">{&#39;ioc&#39;: 123}</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.require_no_symlink">
-<code class="descclassname">libioc.helpers.</code><code class="descname">require_no_symlink</code><span class="sig-paren">(</span><em>path</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#require_no_symlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.require_no_symlink" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">require_no_symlink</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#require_no_symlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.require_no_symlink" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raise when the path contains a symlink.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.split_list_string">
-<code class="descclassname">libioc.helpers.</code><code class="descname">split_list_string</code><span class="sig-paren">(</span><em>data</em>, <em>separator='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#split_list_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.split_list_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">split_list_string</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">separator='</em>, <em class="sig-param">'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#split_list_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.split_list_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split by separator but keep escaped ones.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>str</em>) – Input data that will be split by the separator.</li>
-<li><strong>separator</strong> (<em>str</em>) – <p>(optional, default=”,”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>str</em>) – Input data that will be split by the separator.</p></li>
+<li><p><strong>separator</strong> (<em>str</em>) – <p>(optional, default=”,”)</p>
 <p>Input data is split by this separator.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Example</p>
 <p>&gt;&gt; split_strlist(“foo,bar,baz”)
 [“foo”, “bar,baz”]</p>
 <p>Returns a list of strings from the input data where escaped separators are
 ignored and unescaped.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.to_humanreadable_name">
-<code class="descclassname">libioc.helpers.</code><code class="descname">to_humanreadable_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_humanreadable_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_humanreadable_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">to_humanreadable_name</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_humanreadable_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_humanreadable_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a shorted UUID or the original name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.to_json">
-<code class="descclassname">libioc.helpers.</code><code class="descname">to_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a JSON string from the input data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.to_string">
-<code class="descclassname">libioc.helpers.</code><code class="descname">to_string</code><span class="sig-paren">(</span><em>data</em>, <em>true='yes'</em>, <em>false='no'</em>, <em>none='-'</em>, <em>delimiter='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">to_string</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">true='yes'</em>, <em class="sig-param">false='no'</em>, <em class="sig-param">none='-'</em>, <em class="sig-param">delimiter='</em>, <em class="sig-param">'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate complex types into a string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>true</strong> (<em>string</em>) – The expected return value when data is True</li>
-<li><strong>false</strong> (<em>string</em>) – The expected return value when data is False</li>
-<li><strong>none</strong> (<em>string</em>) – The expected return value when data is None</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true</strong> (<em>string</em>) – The expected return value when data is True</p></li>
+<li><p><strong>false</strong> (<em>string</em>) – The expected return value when data is False</p></li>
+<li><p><strong>none</strong> (<em>string</em>) – The expected return value when data is None</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Map input according to arguments or stringified input</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Usage:</dt>
-<dd><div class="first highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Map input according to arguments or stringified input</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+<dl>
+<dt>Usage:</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">&quot;yes&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 <span class="go">&quot;no&quot;</span>
@@ -559,7 +494,7 @@ ignored and unescaped.</p>
 <span class="go">&quot;nope&quot;</span>
 </pre></div>
 </div>
-<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_string</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 <span class="go">&quot;-&quot;</span>
 </pre></div>
 </div>
@@ -569,44 +504,35 @@ ignored and unescaped.</p>
 
 <dl class="function">
 <dt id="libioc.helpers.to_ucl">
-<code class="descclassname">libioc.helpers.</code><code class="descname">to_ucl</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_ucl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_ucl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">to_ucl</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#to_ucl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.to_ucl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create UCL content from the input data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.umount">
-<code class="descclassname">libioc.helpers.</code><code class="descname">umount</code><span class="sig-paren">(</span><em>mountpoint=None</em>, <em>options=None</em>, <em>force=False</em>, <em>ignore_error=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#umount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.umount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">umount</code><span class="sig-paren">(</span><em class="sig-param">mountpoint=None</em>, <em class="sig-param">options=None</em>, <em class="sig-param">force=False</em>, <em class="sig-param">ignore_error=False</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#umount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.umount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unmount a mountpoint using libc.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers.validate_name">
-<code class="descclassname">libioc.helpers.</code><code class="descname">validate_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#validate_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.validate_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers.</code><code class="sig-name descname">validate_name</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers.html#validate_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers.validate_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the name matches the naming convention.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

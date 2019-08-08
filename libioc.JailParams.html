@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.JailParams module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.JailParams module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,119 +202,98 @@
 <p>Sysctl jail params signeton.</p>
 <dl class="class">
 <dt id="libioc.JailParams.HostJailParams">
-<em class="property">class </em><code class="descclassname">libioc.JailParams.</code><code class="descname">HostJailParams</code><a class="reference internal" href="_modules/libioc/JailParams.html#HostJailParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.HostJailParams" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.JailParams.</code><code class="sig-name descname">HostJailParams</code><a class="reference internal" href="_modules/libioc/JailParams.html#HostJailParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.HostJailParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.JailParams.JailParams" title="libioc.JailParams.JailParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.JailParams.JailParams</span></code></a></p>
 <p>Read-only host jail parameters obtained from sysctl.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.JailParams.JailParam">
-<em class="property">class </em><code class="descclassname">libioc.JailParams.</code><code class="descname">JailParam</code><span class="sig-paren">(</span><em>name=None</em>, <em>oid=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParam" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.JailParams.</code><code class="sig-name descname">JailParam</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">oid=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParam" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">freebsd_sysctl.Sysctl</span></code></p>
 <p>Single jail parameter represented by sysctl.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.JailParams.JailParam.iocage_name">
-<code class="descname">iocage_name</code><a class="headerlink" href="#libioc.JailParams.JailParam.iocage_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">iocage_name</code><a class="headerlink" href="#libioc.JailParams.JailParam.iocage_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the param formatted for iocage config.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.JailParams.JailParam.jail_arg_name">
-<code class="descname">jail_arg_name</code><a class="headerlink" href="#libioc.JailParams.JailParam.jail_arg_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">jail_arg_name</code><a class="headerlink" href="#libioc.JailParams.JailParam.jail_arg_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the param formatted for the jail command.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.JailParams.JailParam.sysctl_value">
-<code class="descname">sysctl_value</code><a class="headerlink" href="#libioc.JailParams.JailParam.sysctl_value" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sysctl_value</code><a class="headerlink" href="#libioc.JailParams.JailParam.sysctl_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the original freebsd_sysctl.Sysctl value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.JailParams.JailParam.value">
-<code class="descname">value</code><a class="headerlink" href="#libioc.JailParams.JailParam.value" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#libioc.JailParams.JailParam.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user defined value of this jail parameter.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.JailParams.JailParams">
-<em class="property">class </em><code class="descclassname">libioc.JailParams.</code><code class="descname">JailParams</code><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.JailParams.</code><code class="sig-name descname">JailParams</code><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></p>
 <p>Collection of jail parameters.</p>
 <dl class="method">
 <dt id="libioc.JailParams.JailParams.items">
-<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams.items" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams.items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over the keys and values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Itemsview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#libioc.JailParams.JailParam" title="libioc.JailParams.JailParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailParam</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Itemsview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#libioc.JailParams.JailParam" title="libioc.JailParams.JailParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailParam</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.JailParams.JailParams.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams.keys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/JailParams.html#JailParams.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.JailParams.JailParams.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all jail param names.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.JailParams.JailParams.memoized_params">
-<code class="descname">memoized_params</code><a class="headerlink" href="#libioc.JailParams.JailParams.memoized_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">memoized_params</code><a class="headerlink" href="#libioc.JailParams.JailParams.memoized_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the memorized params initialized on first access.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#libioc.JailParams.JailParam" title="libioc.JailParams.JailParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailParam</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#libioc.JailParams.JailParam" title="libioc.JailParams.JailParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailParam</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

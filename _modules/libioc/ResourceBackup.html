@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ResourceBackup &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ResourceBackup &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,14 +172,23 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage Resource extension that managed exporting and importing backups.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc Resource extension that managed exporting and importing backups.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">libzfs</span>
 
 <span class="kn">import</span> <span class="nn">libioc.events</span>
+
+
+<div class="viewcode-block" id="Format"><a class="viewcode-back" href="../../libioc.ResourceBackup.html#libioc.ResourceBackup.Format">[docs]</a><span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Enum of the backup formats.&quot;&quot;&quot;</span>
+
+    <span class="n">TAR</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="n">DIRECTORY</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span></div>
 
 
 <div class="viewcode-block" id="LaunchableResourceBackup"><a class="viewcode-back" href="../../libioc.ResourceBackup.html#libioc.ResourceBackup.LaunchableResourceBackup">[docs]</a><span class="k">class</span> <span class="nc">LaunchableResourceBackup</span><span class="p">:</span>
@@ -193,7 +202,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;libioc.LaunchableResource.LaunchableResource&#39;</span>
-    <span class="n">_work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span>
+    <span class="n">_work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]]</span>
     <span class="n">_snapshot_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -218,7 +227,10 @@
     <span class="k">def</span> <span class="nf">work_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the absolute path to the current temporary directory.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="p">,</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span>
         <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unlocked_error</span>
 
     <span class="nd">@property</span>
@@ -248,22 +260,32 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return True when a temporary directory exists.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_unlocked</span><span class="p">()</span>
-        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
-            <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{work_dir.name}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="n">work_dir</span>
+        <span class="n">_work_dir</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">work_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_work_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{_work_dir.name}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_work_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">_work_dir</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">_work_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mo">0o0750</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;Resource backup temp directory created: </span><span class="si">{_work_dir}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="o">=</span> <span class="n">_work_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_name</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">ZFS</span><span class="o">.</span><span class="n">append_snapshot_datetime</span><span class="p">(</span><span class="s2">&quot;backup&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">spam</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Deleting Resource backup temp directory </span><span class="si">{work_dir}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="p">,</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_work_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_require_unlocked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -288,6 +310,22 @@
 
 <span class="sd">                The path to the exported archive file (tar.gz)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">BackupSourceDoesNotExist</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">backup_format</span> <span class="o">=</span> <span class="n">Format</span><span class="o">.</span><span class="n">DIRECTORY</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.txz&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tar.gz&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">backup_format</span> <span class="o">=</span> <span class="n">Format</span><span class="o">.</span><span class="n">TAR</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">BackupSourceUnknownFormat</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+
         <span class="n">resourceBackupEvent</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ResourceBackup</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span>
             <span class="n">scope</span><span class="o">=</span><span class="n">event_scope</span>
@@ -295,18 +333,17 @@
         <span class="n">scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">(</span>
+            <span class="n">work_dir</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="k">if</span> <span class="p">(</span><span class="n">backup_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">TAR</span><span class="p">)</span> <span class="k">else</span> <span class="n">source</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_unlock_resource_backup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_unlock</span><span class="p">()</span>
 
         <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">add_rollback_step</span><span class="p">(</span><span class="n">_unlock_resource_backup</span><span class="p">)</span>
 
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">backup_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">TAR</span><span class="p">):</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_bundle</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">event_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
 
         <span class="k">def</span> <span class="nf">_destroy_failed_import</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -392,8 +429,8 @@
         <span class="k">yield</span> <span class="n">importConfigEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config_handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">skip_on_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config_handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span>
                 <span class="n">f</span><span class="s2">&quot;Config imported from </span><span class="si">{self.resource.config_handler.file}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -533,6 +570,7 @@
         <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">standalone</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">backup_format</span><span class="p">:</span> <span class="n">Format</span><span class="o">=</span><span class="n">Format</span><span class="o">.</span><span class="n">TAR</span><span class="p">,</span>
         <span class="n">event_scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;libioc.events.Scope&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;libioc.events.IocEvent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -569,7 +607,16 @@
         <span class="n">_scope</span> <span class="o">=</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">scope</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">backup_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">TAR</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># use temporary directory and tar later</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ExportDestinationExists</span><span class="p">(</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>  <span class="c1"># directly output to this directory</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_take_resource_snapshot</span><span class="p">()</span>
 
         <span class="n">zfs_send_flags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -603,10 +650,11 @@
             <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
         <span class="p">)</span>
 
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_backup</span><span class="p">(</span>
-            <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
-            <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">backup_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">TAR</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_backup</span><span class="p">(</span>
+                <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+                <span class="n">event_scope</span><span class="o">=</span><span class="n">_scope</span>
+            <span class="p">)</span>
 
         <span class="n">_unlock_resource_backup</span><span class="p">()</span>
         <span class="k">yield</span> <span class="n">resourceBackupEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>

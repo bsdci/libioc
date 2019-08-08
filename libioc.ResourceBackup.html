@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ResourceBackup module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ResourceBackup module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,10 +199,27 @@
             
   <div class="section" id="module-libioc.ResourceBackup">
 <span id="libioc-resourcebackup-module"></span><h1>libioc.ResourceBackup module<a class="headerlink" href="#module-libioc.ResourceBackup" title="Permalink to this headline">¶</a></h1>
-<p>iocage Resource extension that managed exporting and importing backups.</p>
+<p>ioc Resource extension that managed exporting and importing backups.</p>
+<dl class="class">
+<dt id="libioc.ResourceBackup.Format">
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceBackup.</code><code class="sig-name descname">Format</code><a class="reference internal" href="_modules/libioc/ResourceBackup.html#Format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.Format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Enum of the backup formats.</p>
+<dl class="attribute">
+<dt id="libioc.ResourceBackup.Format.DIRECTORY">
+<code class="sig-name descname">DIRECTORY</code><em class="property"> = '2'</em><a class="headerlink" href="#libioc.ResourceBackup.Format.DIRECTORY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libioc.ResourceBackup.Format.TAR">
+<code class="sig-name descname">TAR</code><em class="property"> = '1'</em><a class="headerlink" href="#libioc.ResourceBackup.Format.TAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup">
-<em class="property">class </em><code class="descclassname">libioc.ResourceBackup.</code><code class="descname">LaunchableResourceBackup</code><span class="sig-paren">(</span><em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceBackup.</code><code class="sig-name descname">LaunchableResourceBackup</code><span class="sig-paren">(</span><em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Create and restore backups of a LaunchableResource.</p>
 <p>It is only possible to run one concurrent backup operation because this
@@ -211,136 +228,112 @@ removed. In fact the existence of a temp directory indicates the locked
 state.</p>
 <dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.export">
-<code class="descname">export</code><span class="sig-paren">(</span><em>destination</em>, <em>standalone=None</em>, <em>recursive=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.export" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">destination</em>, <em class="sig-param">standalone=None</em>, <em class="sig-param">recursive=False</em>, <em class="sig-param">backup_format=&lt;Format.TAR: '1'&gt;</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.export" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the resource.</p>
 <p>Resource exports contain the jails configuration and differing files
 between the jails root dataset and its release. Other datasets in the
 jails dataset are snapshotted and attached to the export entirely.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>destination</strong> (<em>str</em>) – The resource is exported to this location as archive file.</li>
-<li><strong>standalone</strong> (<em>bool</em>) – The default depends on whether the resource is forked from a
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>destination</strong> (<em>str</em>) – The resource is exported to this location as archive file.</p></li>
+<li><p><strong>standalone</strong> (<em>bool</em>) – The default depends on whether the resource is forked from a
 release or not. If there is a origin release, the export will
 contain the changed files relative to the release. Enabling
 this option will enforce ZFS dataset exports instead of rsync
 compare-dest diffs.
 Standalone exports will cause duplicated data on the importing
-host, but are independent of any release.</li>
-<li><strong>recursive</strong> (<em>bool</em>) – Includes snapshots of all exported ZFS datasets.</li>
+host, but are independent of any release.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – Includes snapshots of all exported ZFS datasets.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.full_snapshot_name">
-<code class="descname">full_snapshot_name</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.full_snapshot_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">full_snapshot_name</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.full_snapshot_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dataset name with the snapshot name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.locked">
-<code class="descname">locked</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.locked" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">locked</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.locked" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True when a temporary directory exists.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.logger">
-<code class="descname">logger</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the resources logger instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.restore">
-<code class="descname">restore</code><span class="sig-paren">(</span><em>source</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.restore" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">restore</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceBackup.html#LaunchableResourceBackup.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.restore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Import a resource from an archive.</p>
 <p>Resource archives created with libiocage backup export can be restored
 on any host. When importing a basejail the linked release needs to
 exist on the host.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source</strong> (<em>str</em>) – The path to the exported archive file (tar.gz)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – The path to the exported archive file (tar.gz)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.snapshot_name">
-<code class="descname">snapshot_name</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.snapshot_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">snapshot_name</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.snapshot_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the snapshot_name that was chosen when locking.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.work_dir">
-<code class="descname">work_dir</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.work_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">work_dir</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.work_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the absolute path to the current temporary directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceBackup.LaunchableResourceBackup.zfs">
-<code class="descname">zfs</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.zfs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">zfs</code><a class="headerlink" href="#libioc.ResourceBackup.LaunchableResourceBackup.zfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the resources ZFS instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.ZFS.html#libioc.ZFS.ZFS" title="libioc.ZFS.ZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFS</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.ZFS.html#libioc.ZFS.ZFS" title="libioc.ZFS.ZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFS</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Provisioning.puppet module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Provisioning.puppet module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -174,63 +174,57 @@
 <p>ioc provisioner for use with <cite>puppet apply</cite>.</p>
 <dl class="class">
 <dt id="libioc.Provisioning.puppet.ControlRepoDefinition">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.puppet.</code><code class="descname">ControlRepoDefinition</code><span class="sig-paren">(</span><em>source</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#ControlRepoDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.puppet.</code><code class="sig-name descname">ControlRepoDefinition</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#ControlRepoDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Puppet control-repo definition.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.puppet.ControlRepoDefinition.pkgs">
-<code class="descname">pkgs</code><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition.pkgs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pkgs</code><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition.pkgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return list of packages required for this Provisioning method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.puppet.ControlRepoDefinition.source">
-<code class="descname">source</code><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition.source" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">source</code><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoDefinition.source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the Puppet Control-Repo URL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Provisioning.html#libioc.Provisioning.Source" title="libioc.Provisioning.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Provisioning.html#libioc.Provisioning.Source" title="libioc.Provisioning.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="exception">
 <dt id="libioc.Provisioning.puppet.ControlRepoUnavailableError">
-<em class="property">exception </em><code class="descclassname">libioc.Provisioning.puppet.</code><code class="descname">ControlRepoUnavailableError</code><span class="sig-paren">(</span><em>url</em>, <em>reason</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#ControlRepoUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoUnavailableError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-prename descclassname">libioc.Provisioning.puppet.</code><code class="sig-name descname">ControlRepoUnavailableError</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">reason</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#ControlRepoUnavailableError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.ControlRepoUnavailableError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.errors.html#libioc.errors.IocException" title="libioc.errors.IocException"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.errors.IocException</span></code></a></p>
 <p>Raised when the puppet control-repo is not available.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Provisioning.puppet.PuppetApplyEvent">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.puppet.</code><code class="descname">PuppetApplyEvent</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#PuppetApplyEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.PuppetApplyEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.puppet.</code><code class="sig-name descname">PuppetApplyEvent</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">message=None</em>, <em class="sig-param">scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#PuppetApplyEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.PuppetApplyEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.events.html#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
 <p>Apply the puppet manifest.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Provisioning.puppet.R10kDeployEvent">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.puppet.</code><code class="descname">R10kDeployEvent</code><span class="sig-paren">(</span><em>jail</em>, <em>message=None</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#R10kDeployEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.R10kDeployEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.puppet.</code><code class="sig-name descname">R10kDeployEvent</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">message=None</em>, <em class="sig-param">scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#R10kDeployEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.R10kDeployEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.events.html#libioc.events.JailEvent" title="libioc.events.JailEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.events.JailEvent</span></code></a></p>
 <p>Deploy control repo and install puppet modules.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Provisioning.puppet.provision">
-<code class="descclassname">libioc.Provisioning.puppet.</code><code class="descname">provision</code><span class="sig-paren">(</span><em>self</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.provision" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Provisioning.puppet.</code><code class="sig-name descname">provision</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning/puppet.html#provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.puppet.provision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provision the jail with Puppet apply using the supplied control-repo.</p>
 <p>The repo can either be a filesystem path, or a http[s]/git URL.
 If the repo is a filesystem path, it will be mounted to
@@ -238,20 +232,17 @@ If the repo is a filesystem path, it will be mounted to
 If the repo is a URL, we will setup a ZFS dataset and mount that to
 <cite>/usr/local/etc/puppet/environments</cite>, before deploying it with <cite>r10k</cite>.</p>
 <p class="rubric">Example</p>
-<dl class="docutils">
-<dt>ioc set </dt>
-<dd>provision.method=puppet provision.source=http://github.com/bsdci/puppet-control-repo webserver</dd>
+<dl class="simple">
+<dt>ioc set </dt><dd><p>provision.method=puppet provision.source=http://github.com/bsdci/puppet-control-repo webserver</p>
+</dd>
 </dl>
 <p>This should install a webserver that listens on port 80, and delivers a
 Hello-World HTML site.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

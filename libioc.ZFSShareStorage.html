@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ZFSShareStorage module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ZFSShareStorage module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,38 +199,32 @@
             
   <div class="section" id="module-libioc.ZFSShareStorage">
 <span id="libioc-zfssharestorage-module"></span><h1>libioc.ZFSShareStorage module<a class="headerlink" href="#module-libioc.ZFSShareStorage" title="Permalink to this headline">¶</a></h1>
-<p>iocage ZFS share storage backend.</p>
+<p>ioc ZFS share storage backend.</p>
 <dl class="class">
 <dt id="libioc.ZFSShareStorage.ZFSShareStorage">
-<em class="property">class </em><code class="descclassname">libioc.ZFSShareStorage.</code><code class="descname">ZFSShareStorage</code><span class="sig-paren">(</span><em>jail</em>, <em>logger=None</em>, <em>zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ZFSShareStorage.</code><code class="sig-name descname">ZFSShareStorage</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">zfs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Storage backend for ZFS shares.</p>
 <dl class="method">
 <dt id="libioc.ZFSShareStorage.ZFSShareStorage.get_zfs_datasets">
-<code class="descname">get_zfs_datasets</code><span class="sig-paren">(</span><em>auto_create=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage.get_zfs_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage.get_zfs_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_zfs_datasets</code><span class="sig-paren">(</span><em class="sig-param">auto_create=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage.get_zfs_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage.get_zfs_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the shared ZFS datasets.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares">
-<code class="descname">mount_zfs_shares</code><span class="sig-paren">(</span><em>auto_create=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage.mount_zfs_shares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mount_zfs_shares</code><span class="sig-paren">(</span><em class="sig-param">auto_create=False</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFSShareStorage.html#ZFSShareStorage.mount_zfs_shares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFSShareStorage.ZFSShareStorage.mount_zfs_shares" title="Permalink to this definition">¶</a></dt>
 <dd><p>Invoke mounting the ZFS shares.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.JailZFSShare" title="libioc.events.JailZFSShare"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailZFSShare</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.JailZFSShare" title="libioc.events.JailZFSShare"><code class="xref py py-class docutils literal notranslate"><span class="pre">JailZFSShare</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -2,6 +2,6 @@ libioc.Network module
 =====================
 
 .. automodule:: libioc.Network
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

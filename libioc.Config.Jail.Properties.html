@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Properties package &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.Properties package &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -192,73 +192,62 @@
 <p>Dictionary of jail configuration properties.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.JailConfigProperties">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.</code><code class="descname">JailConfigProperties</code><span class="sig-paren">(</span><em>config</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.</code><code class="sig-name descname">JailConfigProperties</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Dictionary of jail configuration properties.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.JailConfigProperties.get_or_create">
-<code class="descname">get_or_create</code><span class="sig-paren">(</span><em>property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties.get_or_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties.get_or_create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_or_create</code><span class="sig-paren">(</span><em class="sig-param">property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties.get_or_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties.get_or_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a property and initialize it if it did not exist.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.JailConfigProperties.is_special_property">
-<code class="descname">is_special_property</code><span class="sig-paren">(</span><em>property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties.is_special_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties.is_special_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_special_property</code><span class="sig-paren">(</span><em class="sig-param">property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#JailConfigProperties.is_special_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.JailConfigProperties.is_special_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Signal if the property is a special property.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Config.Jail.Properties.init_property">
-<code class="descclassname">libioc.Config.Jail.Properties.</code><code class="descname">init_property</code><span class="sig-paren">(</span><em>property_name</em>, <em>config=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#init_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.init_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Config.Jail.Properties.</code><code class="sig-name descname">init_property</code><span class="sig-paren">(</span><em class="sig-param">property_name</em>, <em class="sig-param">config=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties.html#init_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.init_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a special jail config property.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>property_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="docutils">
-<dt>The name of the special property that should be instantiated:</dt>
-<dd><ul class="first last">
-<li>ip4_addr</li>
-<li>ip6_addr</li>
-<li>interfaces</li>
-<li>resolver</li>
-<li>defaultrouter</li>
-<li>defaultrouter6</li>
-<li>depends</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>property_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
+<dt>The name of the special property that should be instantiated:</dt><dd><ul>
+<li><p>ip4_addr</p></li>
+<li><p>ip6_addr</p></li>
+<li><p>interfaces</p></li>
+<li><p>resolver</p></li>
+<li><p>defaultrouter</p></li>
+<li><p>defaultrouter6</p></li>
+<li><p>depends</p></li>
 </ul>
 </dd>
 </dl>
-</li>
-<li><strong>config</strong> (<a class="reference internal" href="libioc.Config.Jail.JailConfig.html#libioc.Config.Jail.JailConfig.JailConfig" title="libioc.Config.Jail.JailConfig.JailConfig"><em>libioc.Config.Jail.JailConfig.JailConfig</em></a>) – The special property keeps reference to this JailConfig instance</li>
-<li><strong>logger</strong> (<a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><em>libioc.Logger.Logger</em></a>) – (optional):
-Logger instance that the class is initialized with</li>
+</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="libioc.Config.Jail.JailConfig.html#libioc.Config.Jail.JailConfig.JailConfig" title="libioc.Config.Jail.JailConfig.JailConfig"><em>libioc.Config.Jail.JailConfig.JailConfig</em></a>) – The special property keeps reference to this JailConfig instance</p></li>
+<li><p><strong>logger</strong> (<a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><em>libioc.Logger.Logger</em></a>) – (optional):
+Logger instance that the class is initialized with</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="libioc.Config.Jail.Properties.Addresses.html#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="libioc.Config.Jail.Properties.Addresses.AddressesProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">AddressesProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Interfaces.html#libioc.Config.Jail.Properties.Interfaces.InterfaceProp" title="libioc.Config.Jail.Properties.Interfaces.InterfaceProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterfaceProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Resolver.html#libioc.Config.Jail.Properties.Resolver.ResolverProp" title="libioc.Config.Jail.Properties.Resolver.ResolverProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResolverProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Depends.html#libioc.Config.Jail.Properties.Depends.DependsProp" title="libioc.Config.Jail.Properties.Depends.DependsProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DependsProp</span></code></a>]</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="libioc.Config.Jail.Properties.Addresses.html#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="libioc.Config.Jail.Properties.Addresses.AddressesProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">AddressesProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Interfaces.html#libioc.Config.Jail.Properties.Interfaces.InterfaceProp" title="libioc.Config.Jail.Properties.Interfaces.InterfaceProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterfaceProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Resolver.html#libioc.Config.Jail.Properties.Resolver.ResolverProp" title="libioc.Config.Jail.Properties.Resolver.ResolverProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResolverProp</span></code></a>, <a class="reference internal" href="libioc.Config.Jail.Properties.Depends.html#libioc.Config.Jail.Properties.Depends.DependsProp" title="libioc.Config.Jail.Properties.Depends.DependsProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DependsProp</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

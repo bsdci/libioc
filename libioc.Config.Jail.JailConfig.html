@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.JailConfig module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.JailConfig module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -177,55 +177,46 @@
 <p>Configuration of a Jail or other LaunchableResource.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.JailConfig.JailConfig">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.JailConfig.</code><code class="descname">JailConfig</code><span class="sig-paren">(</span><em>jail=None</em>, <em>new=False</em>, <em>logger=None</em>, <em>host=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.JailConfig.</code><code class="sig-name descname">JailConfig</code><span class="sig-paren">(</span><em class="sig-param">jail=None</em>, <em class="sig-param">new=False</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">host=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig" title="libioc.Config.Jail.BaseConfig.BaseConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.BaseConfig.BaseConfig</span></code></a></p>
 <p>The configuration of a Jail or other LaunchableResource.</p>
 <p>In extend to a BaseConfig a JailConfig is related to a Jail.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.JailConfig.JailConfig.all_properties">
-<code class="descname">all_properties</code><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.all_properties" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">all_properties</code><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.all_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all config properties (default and custom).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.JailConfig.JailConfig.get_raw">
-<code class="descname">get_raw</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig.get_raw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.get_raw" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_raw</code><span class="sig-paren">(</span><em class="sig-param">key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig.get_raw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.get_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the raw data value or its raw default.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.JailConfig.JailConfig.legacy">
-<code class="descname">legacy</code><em class="property"> = False</em><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.legacy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">legacy</code><em class="property"> = False</em><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.legacy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.JailConfig.JailConfig.update_special_property">
-<code class="descname">update_special_property</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig.update_special_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.update_special_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_special_property</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/JailConfig.html#JailConfig.update_special_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.JailConfig.JailConfig.update_special_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Triggered when a special property was updated.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

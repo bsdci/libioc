@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ZFS module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ZFS module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,166 +199,133 @@
             
   <div class="section" id="module-libioc.ZFS">
 <span id="libioc-zfs-module"></span><h1>libioc.ZFS module<a class="headerlink" href="#module-libioc.ZFS" title="Permalink to this headline">¶</a></h1>
-<p>iocage libzfs enhancement module.</p>
+<p>ioc libzfs enhancement module.</p>
 <dl class="class">
 <dt id="libioc.ZFS.ZFS">
-<em class="property">class </em><code class="descclassname">libioc.ZFS.</code><code class="descname">ZFS</code><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ZFS.</code><code class="sig-name descname">ZFS</code><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">libzfs.ZFS</span></code></p>
 <p>libzfs enhancement module.</p>
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.clone_dataset">
-<code class="descname">clone_dataset</code><span class="sig-paren">(</span><em>source</em>, <em>target</em>, <em>delete_existing=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.clone_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.clone_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clone_dataset</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">target</em>, <em class="sig-param">delete_existing=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.clone_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.clone_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clone a ZFSDataset from a source to a target dataset name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.clone_snapshot">
-<code class="descname">clone_snapshot</code><span class="sig-paren">(</span><em>snapshot</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.clone_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.clone_snapshot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clone_snapshot</code><span class="sig-paren">(</span><em class="sig-param">snapshot</em>, <em class="sig-param">target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.clone_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.clone_snapshot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clone a ZFSSnapshot to the target dataset name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.create_dataset">
-<code class="descname">create_dataset</code><span class="sig-paren">(</span><em>dataset_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.create_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.create_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Automatically get the pool and create a dataset from its name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.delete_dataset_recursive">
-<code class="descname">delete_dataset_recursive</code><span class="sig-paren">(</span><em>dataset</em>, <em>delete_snapshots=True</em>, <em>delete_origin_snapshot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.delete_dataset_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.delete_dataset_recursive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delete_dataset_recursive</code><span class="sig-paren">(</span><em class="sig-param">dataset</em>, <em class="sig-param">delete_snapshots=True</em>, <em class="sig-param">delete_origin_snapshot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.delete_dataset_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.delete_dataset_recursive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively delete a dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.get_or_create_dataset">
-<code class="descname">get_or_create_dataset</code><span class="sig-paren">(</span><em>dataset_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.get_or_create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.get_or_create_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_or_create_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.get_or_create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.get_or_create_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find or create the dataset, then return it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.get_pool">
-<code class="descname">get_pool</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.get_pool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.get_pool" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_pool</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.get_pool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.get_pool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the pool with a given name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ZFS.ZFS.logger">
-<code class="descname">logger</code><a class="headerlink" href="#libioc.ZFS.ZFS.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#libioc.ZFS.ZFS.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return logger or raise an exception when it is unavailable.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Logger.html#libioc.Logger.Logger" title="libioc.Logger.Logger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.promote_dataset">
-<code class="descname">promote_dataset</code><span class="sig-paren">(</span><em>dataset</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.promote_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.promote_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">promote_dataset</code><span class="sig-paren">(</span><em class="sig-param">dataset</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.promote_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.promote_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively promote a dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.ZFS.ZFS.rename_snapshot_recursive">
-<code class="descname">rename_snapshot_recursive</code><span class="sig-paren">(</span><em>snapshot</em>, <em>new_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.rename_snapshot_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.rename_snapshot_recursive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rename_snapshot_recursive</code><span class="sig-paren">(</span><em class="sig-param">snapshot</em>, <em class="sig-param">new_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#ZFS.rename_snapshot_recursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.ZFS.rename_snapshot_recursive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename a snapshot recursively.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.ZFS.append_snapshot_datetime">
-<code class="descclassname">libioc.ZFS.</code><code class="descname">append_snapshot_datetime</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#append_snapshot_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.append_snapshot_datetime" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.ZFS.</code><code class="sig-name descname">append_snapshot_datetime</code><span class="sig-paren">(</span><em class="sig-param">text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#append_snapshot_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.append_snapshot_datetime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append the current datetime string to a snapshot name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.ZFS.get_zfs">
-<code class="descclassname">libioc.ZFS.</code><code class="descname">get_zfs</code><span class="sig-paren">(</span><em>logger=None</em>, <em>history=True</em>, <em>history_prefix='&lt;iocage&gt;'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#get_zfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.get_zfs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.ZFS.</code><code class="sig-name descname">get_zfs</code><span class="sig-paren">(</span><em class="sig-param">logger=None</em>, <em class="sig-param">history=True</em>, <em class="sig-param">history_prefix='&lt;iocage&gt;'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ZFS.html#get_zfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ZFS.get_zfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an instance of iocages enhanced ZFS class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.ZFS.ZFS" title="libioc.ZFS.ZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFS</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#libioc.ZFS.ZFS" title="libioc.ZFS.ZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFS</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

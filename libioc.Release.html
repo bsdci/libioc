@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Release module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Release module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,605 +199,497 @@
             
   <div class="section" id="module-libioc.Release">
 <span id="libioc-release-module"></span><h1>libioc.Release module<a class="headerlink" href="#module-libioc.Release" title="Permalink to this headline">¶</a></h1>
-<p>iocage release module.</p>
+<p>ioc release module.</p>
 <dl class="class">
 <dt id="libioc.Release.Release">
-<em class="property">class </em><code class="descclassname">libioc.Release.</code><code class="descname">Release</code><span class="sig-paren">(</span><em>name</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>root_datasets_name=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em>, <em>check_hashes=True</em>, <em>check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Release.</code><code class="sig-name descname">Release</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">dataset=None</em>, <em class="sig-param">dataset_name=None</em>, <em class="sig-param">config_type='auto'</em>, <em class="sig-param">config_file=None</em>, <em class="sig-param">root_datasets_name=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">check_hashes=True</em>, <em class="sig-param">check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Release.ReleaseGenerator</span></code></a></p>
 <p>Release with synchronous interfaces.</p>
 <dl class="method">
 <dt id="libioc.Release.Release.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.destroy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">destroy</code><span class="sig-paren">(</span><em class="sig-param">force=False</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.destroy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.Release.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=False</em>, <em>fetch_updates=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">update=False</em>, <em class="sig-param">fetch_updates=False</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#Release.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.Release.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the release from the remote synchronously.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Release.ReleaseGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Release.</code><code class="descname">ReleaseGenerator</code><span class="sig-paren">(</span><em>name</em>, <em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>root_datasets_name=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em>, <em>check_hashes=True</em>, <em>check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Release.</code><code class="sig-name descname">ReleaseGenerator</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">dataset=None</em>, <em class="sig-param">dataset_name=None</em>, <em class="sig-param">config_type='auto'</em>, <em class="sig-param">config_file=None</em>, <em class="sig-param">root_datasets_name=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">check_hashes=True</em>, <em class="sig-param">check_eol=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Release.ReleaseResource" title="libioc.Release.ReleaseResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Release.ReleaseResource</span></code></a></p>
 <p>Release with generator interfaces.</p>
 <dl class="attribute">
+<dt id="libioc.Release.ReleaseGenerator.DEFAULT_PERIODIC_CONF">
+<code class="sig-name descname">DEFAULT_PERIODIC_CONF</code><em class="property"> = {'daily_clean_hoststat_enable': False, 'daily_status_include_submit_mailq': False, 'daily_status_mail_rejects_enable': False, 'daily_submit_queuerun': False}</em><a class="headerlink" href="#libioc.Release.ReleaseGenerator.DEFAULT_PERIODIC_CONF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="libioc.Release.ReleaseGenerator.DEFAULT_RC_CONF">
-<code class="descname">DEFAULT_RC_CONF</code><em class="property"> = {'cron_flags': &quot;-m ''&quot;, 'daily_clean_hoststat_enable': False, 'daily_status_include_submit_mailq': False, 'daily_status_mail_rejects_enable': False, 'daily_submit_queuerun': False, 'netif_enable': False, 'sendmail_enable': False, 'sendmail_msp_queue_enable': False, 'sendmail_outbound_enable': False, 'sendmail_submit_enable': False, 'syslogd_flags': '-ss'}</em><a class="headerlink" href="#libioc.Release.ReleaseGenerator.DEFAULT_RC_CONF" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFAULT_RC_CONF</code><em class="property"> = {'cron_flags': &quot;-m ''&quot;, 'netif_enable': False, 'sendmail_enable': False, 'sendmail_msp_queue_enable': False, 'sendmail_outbound_enable': False, 'sendmail_submit_enable': False, 'syslogd_flags': '-ss'}</em><a class="headerlink" href="#libioc.Release.ReleaseGenerator.DEFAULT_RC_CONF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Release.ReleaseGenerator.DEFAULT_SYSCTL_CONF">
-<code class="descname">DEFAULT_SYSCTL_CONF</code><em class="property"> = {'net.inet.ip.fw.enable': 0}</em><a class="headerlink" href="#libioc.Release.ReleaseGenerator.DEFAULT_SYSCTL_CONF" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFAULT_SYSCTL_CONF</code><em class="property"> = {'net.inet.ip.fw.enable': 0}</em><a class="headerlink" href="#libioc.Release.ReleaseGenerator.DEFAULT_SYSCTL_CONF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.annotated_name">
-<code class="descname">annotated_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.annotated_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">annotated_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.annotated_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the release name with annotations.</p>
 <p>Annotations inform whether a release is newer then the host or EOL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.assets">
-<code class="descname">assets</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.assets" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">assets</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of release assets.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.available">
-<code class="descname">available</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.available" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">available</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the release is available on the remote mirror.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.current_snapshot">
-<code class="descname">current_snapshot</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.current_snapshot" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">current_snapshot</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.current_snapshot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the manually configured or the latest release snapshot.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.current_snapshot_patchlevel">
-<code class="descname">current_snapshot_patchlevel</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.current_snapshot_patchlevel" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">current_snapshot_patchlevel</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.current_snapshot_patchlevel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the currently chosen patchlevel number or the latest.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><em>force=False</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.destroy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">destroy</code><span class="sig-paren">(</span><em class="sig-param">force=False</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.destroy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.download_directory">
-<code class="descname">download_directory</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.download_directory" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">download_directory</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.download_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the download directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.eol">
-<code class="descname">eol</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.eol" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">eol</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.eol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return whether the release is EOL or checks are disabled.</p>
 <p>When check_eol is disabled, None is returned, True when the release
 name was found in the distributions eol_list.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>update=False</em>, <em>fetch_updates=False</em>, <em>event_scope=None</em>, <em>update_base=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">update=False</em>, <em class="sig-param">fetch_updates=False</em>, <em class="sig-param">event_scope=None</em>, <em class="sig-param">update_base=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the release from the remote.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update</strong> (<em>bool</em>) – <p>(default=False)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update</strong> (<em>bool</em>) – <p>(default=False)</p>
 <p>When enabled, updates are applied to the release,
 unless fetching updates was without success.</p>
-</li>
-<li><strong>fetch_updates</strong> (<em>bool</em>) – <p>(default=False)</p>
+</p></li>
+<li><p><strong>fetch_updates</strong> (<em>bool</em>) – <p>(default=False)</p>
 <p>When enabled, updates are fetched.
 Disabling this option has no impact on applying updates.</p>
-</li>
-<li><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(optional)</p>
+</p></li>
+<li><p><strong>event_scope</strong> (<a class="reference internal" href="libioc.events.html#libioc.events.Scope" title="libioc.events.Scope"><em>libioc.events.Scope</em></a>) – <p>(optional)</p>
 <p>Pass on the IocEvent stack for use in higher order functions.</p>
-</li>
-<li><strong>update_base</strong> (<em>bool</em>) – <p>(optional)</p>
+</p></li>
+<li><p><strong>update_base</strong> (<em>bool</em>) – <p>(optional)</p>
 <p>When unset, the sysrc config <cite>ioc_legacy_support</cite> is taken
 into account to determine whether ZFS basejail datasets should
 be updated in case the release was created or modified.
 Those ZFS basejail datasets are required to start basejails
 created with iocage_legacy.
 A boolean value overrides the configuration from /etc/rc.conf.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.fetched">
-<code class="descname">fetched</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetched" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fetched</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.fetched" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the release is fetched locally.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.full_name">
-<code class="descname">full_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.full_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">full_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.full_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the release name including the patchlevel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.hashes">
-<code class="descname">hashes</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.hashes" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">hashes</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.hashes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases asset hashes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.hbds_release_branch">
-<code class="descname">hbds_release_branch</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.hbds_release_branch" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">hbds_release_branch</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.hbds_release_branch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate the release into a HardenedBSD release git branch name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.latest_snapshot">
-<code class="descname">latest_snapshot</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.latest_snapshot" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">latest_snapshot</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.latest_snapshot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return or create the latest version snapshot.</p>
 <p>When no snapshot was taken before <cite>p0</cite> is automatically created.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.mirror_url">
-<code class="descname">mirror_url</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.mirror_url" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">mirror_url</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.mirror_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distributions release mirror URL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.name">
-<code class="descname">name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases identifier.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.newer_than_host">
-<code class="descname">newer_than_host</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.newer_than_host" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">newer_than_host</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.newer_than_host" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the release is newer than the host.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.read_hashes">
-<code class="descname">read_hashes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.read_hashes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.read_hashes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_hashes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.read_hashes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.read_hashes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the release asset hashes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.real_name">
-<code class="descname">real_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.real_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">real_name</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.real_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map the release name on HardenedBSD.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.releases_folder">
-<code class="descname">releases_folder</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.releases_folder" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">releases_folder</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.releases_folder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the mountpoint of the iocage/releases dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.remote_url">
-<code class="descname">remote_url</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.remote_url" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">remote_url</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.remote_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases full mirror URL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.resource">
-<code class="descname">resource</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.resource" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resource</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases resource.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Resource.html#libioc.Resource.Resource" title="libioc.Resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Resource.html#libioc.Resource.Resource" title="libioc.Resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.root_dir">
-<code class="descname">root_dir</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.root_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">root_dir</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.root_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the main directory of the release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.snapshot">
-<code class="descname">snapshot</code><span class="sig-paren">(</span><em>identifier</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.snapshot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">snapshot</code><span class="sig-paren">(</span><em class="sig-param">identifier</em>, <em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.snapshot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a ZFS snapshot of the release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>identifier</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – This string specifies the snapshots name</li>
-<li><strong>force</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – (default=False)
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – This string specifies the snapshots name</p></li>
+<li><p><strong>force</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – (default=False)
 Enabling this option forces re-creation of a snapshot in case
-it already exists for the given identifier</li>
+it already exists for the given identifier</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The ZFS snapshot object found or created</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">libzfs.ZFSSnapshot</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The ZFS snapshot object found or created</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>libzfs.ZFSSnapshot</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.update_base_release">
-<code class="descname">update_base_release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.update_base_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.update_base_release" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_base_release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseGenerator.update_base_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseGenerator.update_base_release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the ZFS basejail release dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.version_number">
-<code class="descname">version_number</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.version_number" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">version_number</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.version_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the numeric release version number or 0 for CURRENT.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.version_snapshots">
-<code class="descname">version_snapshots</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.version_snapshots" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">version_snapshots</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.version_snapshots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the sorted list of taken version snapshots (e.g. p3).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSSnapshot</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseGenerator.zfs_pool">
-<code class="descname">zfs_pool</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.zfs_pool" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">zfs_pool</code><a class="headerlink" href="#libioc.Release.ReleaseGenerator.zfs_pool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases ZFS pool.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSPool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Release.ReleaseResource">
-<em class="property">class </em><code class="descclassname">libioc.Release.</code><code class="descname">ReleaseResource</code><span class="sig-paren">(</span><em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em>, <em>release=None</em>, <em>root_datasets_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseResource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Release.</code><code class="sig-name descname">ReleaseResource</code><span class="sig-paren">(</span><em class="sig-param">dataset=None</em>, <em class="sig-param">dataset_name=None</em>, <em class="sig-param">config_type='auto'</em>, <em class="sig-param">config_file=None</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">release=None</em>, <em class="sig-param">root_datasets_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Release.html#ReleaseResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Release.ReleaseResource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.LaunchableResource.html#libioc.LaunchableResource.LaunchableResource" title="libioc.LaunchableResource.LaunchableResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.LaunchableResource.LaunchableResource</span></code></a></p>
 <p>Resource that represents an iocage release.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.base_dataset">
-<code class="descname">base_dataset</code><a class="headerlink" href="#libioc.Release.ReleaseResource.base_dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">base_dataset</code><a class="headerlink" href="#libioc.Release.ReleaseResource.base_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the ZFS basejail dataset belonging to the release.</p>
 <p>base datasets are created from releases. They are required to start
 zfs-basejails.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.base_dataset_name">
-<code class="descname">base_dataset_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.base_dataset_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">base_dataset_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.base_dataset_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the ZFS basejail datasets name belonging to the release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.dataset_name">
-<code class="descname">dataset_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.dataset_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dataset_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.dataset_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the releases ZFS dataset.</p>
 <p>If the resource has no dataset or dataset_name assigned yet,
 the release id is used to find name the dataset</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.full_name">
-<code class="descname">full_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.full_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">full_name</code><a class="headerlink" href="#libioc.Release.ReleaseResource.full_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the full identifier of a jail.</p>
 <p>When more than one root dataset is managed by iocage, the full source
 and name are returned. Otherwise just the name.</p>
 <p>For example <cite>mydataset/jailname</cite> or just <cite>jailname</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.release">
-<code class="descname">release</code><a class="headerlink" href="#libioc.Release.ReleaseResource.release" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">release</code><a class="headerlink" href="#libioc.Release.ReleaseResource.release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the release instance that belongs to the resource.</p>
 <p>Usually the resource becomes inherited from the Release itself.
 It can still be used linked to a foreign ReleaseGenerator by passing
 release as named attribute to the __init__ function</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.source">
-<code class="descname">source</code><a class="headerlink" href="#libioc.Release.ReleaseResource.source" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">source</code><a class="headerlink" href="#libioc.Release.ReleaseResource.source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the releases source root datasets.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Release.ReleaseResource.source_dataset">
-<code class="descname">source_dataset</code><a class="headerlink" href="#libioc.Release.ReleaseResource.source_dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">source_dataset</code><a class="headerlink" href="#libioc.Release.ReleaseResource.source_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the releases source root dataset.</p>
 <p>iocage can manage multiple source datasets (on different ZFS pools
 for instance). This property returns the RootDatasets instance that
 belongs to the release.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Datasets.html#libioc.Datasets.RootDatasets" title="libioc.Datasets.RootDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDatasets</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Datasets.html#libioc.Datasets.RootDatasets" title="libioc.Datasets.RootDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDatasets</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

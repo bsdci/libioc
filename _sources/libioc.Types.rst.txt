@@ -2,6 +2,6 @@ libioc.Types module
 ===================
 
 .. automodule:: libioc.Types
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

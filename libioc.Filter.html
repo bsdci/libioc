@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Filter module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Filter module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,165 +199,138 @@
             
   <div class="section" id="module-libioc.Filter">
 <span id="libioc-filter-module"></span><h1>libioc.Filter module<a class="headerlink" href="#module-libioc.Filter" title="Permalink to this headline">¶</a></h1>
-<p>iocage filters for ListableResource.</p>
+<p>ioc filters for ListableResource.</p>
 <dl class="class">
 <dt id="libioc.Filter.Term">
-<em class="property">class </em><code class="descclassname">libioc.Filter.</code><code class="descname">Term</code><span class="sig-paren">(</span><em>key</em>, <em>values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Filter.</code><code class="sig-name descname">Term</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>A single filter term.</p>
 <dl class="attribute">
 <dt id="libioc.Filter.Term.glob_characters">
-<code class="descname">glob_characters</code><em class="property"> = ['*', '+']</em><a class="headerlink" href="#libioc.Filter.Term.glob_characters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">glob_characters</code><em class="property"> = ['*', '+']</em><a class="headerlink" href="#libioc.Filter.Term.glob_characters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Term.matches">
-<code class="descname">matches</code><span class="sig-paren">(</span><em>value</em>, <em>short=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term.matches" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">matches</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">short=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term.matches" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the value matches the term.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – The value that is matched against the filter term</li>
-<li><strong>short</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – When value has a length of 8 characters, this argument allows
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – The value that is matched against the filter term</p></li>
+<li><p><strong>short</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – When value has a length of 8 characters, this argument allows
 to match a jail’s shortname as well. This is required for
-selecting jails with UUIDs by the first part of the name</li>
+selecting jails with UUIDs by the first part of the name</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Term.matches_resource">
-<code class="descname">matches_resource</code><span class="sig-paren">(</span><em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term.matches_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term.matches_resource" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">matches_resource</code><span class="sig-paren">(</span><em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Term.matches_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Term.matches_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the term matches the resource.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Filter.Term.short">
-<code class="descname">short</code><a class="headerlink" href="#libioc.Filter.Term.short" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">short</code><a class="headerlink" href="#libioc.Filter.Term.short" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the short name of a UUID be used.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Filter.Terms">
-<em class="property">class </em><code class="descclassname">libioc.Filter.</code><code class="descname">Terms</code><span class="sig-paren">(</span><em>terms=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Filter.</code><code class="sig-name descname">Terms</code><span class="sig-paren">(</span><em class="sig-param">terms=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>A group of filter terms.</p>
 <p>Each item in this group must match for a resource to pass the filter.
 This can be interpreted as logical AND</p>
 <dl class="method">
 <dt id="libioc.Filter.Terms.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a Term to the list of Terms.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference internal" href="#libioc.Filter.Term" title="libioc.Filter.Term"><em>libioc.Filter.Term</em></a><em>, </em><em>str</em>) – Interface name inside the jail</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>term</strong> (<a class="reference internal" href="#libioc.Filter.Term" title="libioc.Filter.Term"><em>libioc.Filter.Term</em></a><em>, </em><em>str</em>) – Interface name inside the jail</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Terms.match_key">
-<code class="descname">match_key</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_key" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">match_key</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if a value matches for a given key.</p>
 <p>Returns True if the given value matches all terms for the specified key
 Returns Fals if one of the terms does not match</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Terms.match_resource">
-<code class="descname">match_resource</code><span class="sig-paren">(</span><em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_resource" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">match_resource</code><span class="sig-paren">(</span><em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if all Terms match the resource.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Terms.match_source">
-<code class="descname">match_source</code><span class="sig-paren">(</span><em>source_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_source" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">match_source</code><span class="sig-paren">(</span><em class="sig-param">source_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.match_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.match_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the source name matches the filter terms.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Filter.Terms.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>terms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">terms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#Terms.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.Terms.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear and set all terms from input data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Filter.match_filter">
-<code class="descclassname">libioc.Filter.</code><code class="descname">match_filter</code><span class="sig-paren">(</span><em>value</em>, <em>filter_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#match_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.match_filter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Filter.</code><code class="sig-name descname">match_filter</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">filter_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Filter.html#match_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Filter.match_filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True when the value matches the filter string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

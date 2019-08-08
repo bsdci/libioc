@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.LaunchableResource module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.LaunchableResource module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,124 +199,122 @@
             
   <div class="section" id="module-libioc.LaunchableResource">
 <span id="libioc-launchableresource-module"></span><h1>libioc.LaunchableResource module<a class="headerlink" href="#module-libioc.LaunchableResource" title="Permalink to this headline">¶</a></h1>
-<p>iocage module for launchable resources.</p>
+<p>ioc module for launchable resources.</p>
 <dl class="class">
 <dt id="libioc.LaunchableResource.LaunchableResource">
-<em class="property">class </em><code class="descclassname">libioc.LaunchableResource.</code><code class="descname">LaunchableResource</code><span class="sig-paren">(</span><em>dataset=None</em>, <em>dataset_name=None</em>, <em>config_type='auto'</em>, <em>config_file=None</em>, <em>logger=None</em>, <em>zfs=None</em>, <em>host=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/LaunchableResource.html#LaunchableResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.LaunchableResource.</code><code class="sig-name descname">LaunchableResource</code><span class="sig-paren">(</span><em class="sig-param">dataset=None</em>, <em class="sig-param">dataset_name=None</em>, <em class="sig-param">config_type='auto'</em>, <em class="sig-param">config_file=None</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">host=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/LaunchableResource.html#LaunchableResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Resource.html#libioc.Resource.Resource" title="libioc.Resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Resource.Resource</span></code></a></p>
 <p>Representation of launchable resources like jails.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.backup">
-<code class="descname">backup</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.backup" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">backup</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.backup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the lazy-loaded resource backup tool.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.dataset_name">
-<code class="descname">dataset_name</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.dataset_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dataset_name</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.dataset_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the resources dataset name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
+<dt id="libioc.LaunchableResource.LaunchableResource.periodic_conf">
+<em class="property">property </em><code class="sig-name descname">periodic_conf</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.periodic_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a lazy-loaded instance of the resources PeriodicConf.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Jail.File.PeriodicConf.html#libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf" title="libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourcePeriodicConf</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.rc_conf">
-<code class="descname">rc_conf</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.rc_conf" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rc_conf</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.rc_conf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a lazy-loaded instance of the resources RCConf.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Jail.File.RCConf.html#libioc.Config.Jail.File.RCConf.ResourceRCConf" title="libioc.Config.Jail.File.RCConf.ResourceRCConf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceRCConf</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Jail.File.RCConf.html#libioc.Config.Jail.File.RCConf.ResourceRCConf" title="libioc.Config.Jail.File.RCConf.ResourceRCConf"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceRCConf</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.root_dataset">
-<code class="descname">root_dataset</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">root_dataset</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the resources root dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.root_dataset_name">
-<code class="descname">root_dataset_name</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_dataset_name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">root_dataset_name</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_dataset_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the resources root dataset name.</p>
 <p>The root dasaset has the name <cite>root</cite> and is always a direct ancestor
 of a resources top-level dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.root_path">
-<code class="descname">root_path</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_path" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">root_path</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.root_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the absolute path to the root filesystem of a jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
+<dt id="libioc.LaunchableResource.LaunchableResource.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/LaunchableResource.html#LaunchableResource.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permanently save the resource configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.sysctl_conf">
-<code class="descname">sysctl_conf</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.sysctl_conf" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sysctl_conf</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.sysctl_conf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a lazy-loaded instance of the resources SysctlConf.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Jail.File.SysctlConf.html#libioc.Config.Jail.File.SysctlConf.SysctlConf" title="libioc.Config.Jail.File.SysctlConf.SysctlConf"><code class="xref py py-class docutils literal notranslate"><span class="pre">SysctlConf</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Jail.File.SysctlConf.html#libioc.Config.Jail.File.SysctlConf.SysctlConf" title="libioc.Config.Jail.File.SysctlConf.SysctlConf"><code class="xref py py-class docutils literal notranslate"><span class="pre">SysctlConf</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.LaunchableResource.LaunchableResource.updater">
-<code class="descname">updater</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.updater" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">updater</code><a class="headerlink" href="#libioc.LaunchableResource.LaunchableResource.updater" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the lazy-loaded resource updater.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.ResourceUpdater.html#libioc.ResourceUpdater.Updater" title="libioc.ResourceUpdater.Updater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Updater</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

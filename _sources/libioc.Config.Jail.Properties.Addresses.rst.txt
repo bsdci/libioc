@@ -2,6 +2,6 @@ libioc.Config.Jail.Properties.Addresses module
 ==============================================
 
 .. automodule:: libioc.Config.Jail.Properties.Addresses
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

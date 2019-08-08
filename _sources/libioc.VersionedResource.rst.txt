@@ -2,6 +2,6 @@ libioc.VersionedResource module
 ===============================
 
 .. automodule:: libioc.VersionedResource
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

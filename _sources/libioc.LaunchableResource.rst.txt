@@ -2,6 +2,6 @@ libioc.LaunchableResource module
 ================================
 
 .. automodule:: libioc.LaunchableResource
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

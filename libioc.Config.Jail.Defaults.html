@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Defaults module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.Defaults module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -177,91 +177,73 @@
 <p>A dataset default configuration.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Defaults.</code><code class="descname">JailConfigDefaults</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Defaults.</code><code class="sig-name descname">JailConfigDefaults</code><span class="sig-paren">(</span><em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig" title="libioc.Config.Jail.BaseConfig.BaseConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.BaseConfig.BaseConfig</span></code></a></p>
 <p>BaseConfig object filled with global defaults.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.clone">
-<code class="descname">clone</code><span class="sig-paren">(</span><em>data</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.clone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clone</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.clone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clone data from another dict.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.data">
-<code class="descname">data</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.data" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the Config.Data object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.exclusive_user_data">
-<code class="descname">exclusive_user_data</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.exclusive_user_data" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">exclusive_user_data</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.exclusive_user_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of user provided default settings.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.getitem_default">
-<code class="descname">getitem_default</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.getitem_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.getitem_default" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getitem_default</code><span class="sig-paren">(</span><em class="sig-param">key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.getitem_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.getitem_default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the interpreted hardcoded default value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.keys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Defaults.html#JailConfigDefaults.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>List all default property keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Keysview</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Defaults.JailConfigDefaults.user_properties">
-<code class="descname">user_properties</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.user_properties" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">user_properties</code><a class="headerlink" href="#libioc.Config.Jail.Defaults.JailConfigDefaults.user_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a set of user defined properties.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

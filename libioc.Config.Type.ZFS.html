@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Type.ZFS module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Type.ZFS module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -174,122 +174,101 @@
             
   <div class="section" id="module-libioc.Config.Type.ZFS">
 <span id="libioc-config-type-zfs-module"></span><h1>libioc.Config.Type.ZFS module<a class="headerlink" href="#module-libioc.Config.Type.ZFS" title="Permalink to this headline">¶</a></h1>
-<p>iocage configuration stored in ZFS properties.</p>
+<p>ioc configuration stored in ZFS properties.</p>
 <dl class="class">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS">
-<em class="property">class </em><code class="descclassname">libioc.Config.Type.ZFS.</code><code class="descname">BaseConfigZFS</code><span class="sig-paren">(</span><em>dataset=None</em>, <em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Type.ZFS.</code><code class="sig-name descname">BaseConfigZFS</code><span class="sig-paren">(</span><em class="sig-param">dataset=None</em>, <em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Config.Dataset.html#libioc.Config.Dataset.DatasetConfig" title="libioc.Config.Dataset.DatasetConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Dataset.DatasetConfig</span></code></a></p>
-<p>iocage configuration stored in ZFS properties.</p>
+<p>ioc configuration stored in ZFS properties.</p>
 <dl class="attribute">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS.config_type">
-<code class="descname">config_type</code><em class="property"> = 'zfs'</em><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.config_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">config_type</code><em class="property"> = 'zfs'</em><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.config_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS.exists">
-<code class="descname">exists</code><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.exists" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">exists</code><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Signal if iocage ZFS configuration properties were found.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS.map_input">
-<code class="descname">map_input</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.map_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">map_input</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.map_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize data read from ZFS properties.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS.read">
-<code class="descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the configuration from the ZFS dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Type.ZFS.BaseConfigZFS.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#BaseConfigZFS.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.BaseConfigZFS.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write changes to ZFS properties of the dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Type.ZFS.DatasetConfigZFS">
-<em class="property">class </em><code class="descclassname">libioc.Config.Type.ZFS.</code><code class="descname">DatasetConfigZFS</code><span class="sig-paren">(</span><em>dataset</em>, <em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#DatasetConfigZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.DatasetConfigZFS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Type.ZFS.</code><code class="sig-name descname">DatasetConfigZFS</code><span class="sig-paren">(</span><em class="sig-param">dataset</em>, <em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#DatasetConfigZFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.DatasetConfigZFS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Config.Type.ZFS.BaseConfigZFS" title="libioc.Config.Type.ZFS.BaseConfigZFS"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Type.ZFS.BaseConfigZFS</span></code></a></p>
-<p>iocage ZFS jail configuration for legacy support.</p>
-<dl class="attribute">
+<p>ioc ZFS jail configuration for legacy support.</p>
+<dl class="method">
 <dt id="libioc.Config.Type.ZFS.DatasetConfigZFS.dataset">
-<code class="descname">dataset</code><a class="headerlink" href="#libioc.Config.Type.ZFS.DatasetConfigZFS.dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dataset</code><a class="headerlink" href="#libioc.Config.Type.ZFS.DatasetConfigZFS.dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut to the config dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFSDataset</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Config.Type.ZFS.get_iocage_property_name">
-<code class="descclassname">libioc.Config.Type.ZFS.</code><code class="descname">get_iocage_property_name</code><span class="sig-paren">(</span><em>zfs_property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#get_iocage_property_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.get_iocage_property_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Config.Type.ZFS.</code><code class="sig-name descname">get_iocage_property_name</code><span class="sig-paren">(</span><em class="sig-param">zfs_property_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#get_iocage_property_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.get_iocage_property_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if a ZFS property is an iocage configuration property.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.Config.Type.ZFS.is_iocage_property">
-<code class="descclassname">libioc.Config.Type.ZFS.</code><code class="descname">is_iocage_property</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#is_iocage_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.is_iocage_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.Config.Type.ZFS.</code><code class="sig-name descname">is_iocage_property</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Type/ZFS.html#is_iocage_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Type.ZFS.is_iocage_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if a property name is prefixed as iocage configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

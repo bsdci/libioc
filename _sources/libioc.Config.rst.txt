@@ -6,9 +6,9 @@ Subpackages
 
 .. toctree::
 
-    libioc.Config.Host
-    libioc.Config.Jail
-    libioc.Config.Type
+   libioc.Config.Host
+   libioc.Config.Jail
+   libioc.Config.Type
 
 Submodules
 ----------
@@ -23,6 +23,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc.Config
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

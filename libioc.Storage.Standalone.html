@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Storage.Standalone module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Storage.Standalone module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -171,38 +171,32 @@
             
   <div class="section" id="module-libioc.Storage.Standalone">
 <span id="libioc-storage-standalone-module"></span><h1>libioc.Storage.Standalone module<a class="headerlink" href="#module-libioc.Storage.Standalone" title="Permalink to this headline">¶</a></h1>
-<p>iocage standalone jail storage backend.</p>
+<p>ioc standalone jail storage backend.</p>
 <dl class="class">
 <dt id="libioc.Storage.Standalone.StandaloneJailStorage">
-<em class="property">class </em><code class="descclassname">libioc.Storage.Standalone.</code><code class="descname">StandaloneJailStorage</code><span class="sig-paren">(</span><em>jail</em>, <em>zfs=None</em>, <em>safe_mode=True</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Storage.Standalone.</code><code class="sig-name descname">StandaloneJailStorage</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">safe_mode=True</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.Storage.html#libioc.Storage.Storage" title="libioc.Storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Storage.Storage</span></code></a></p>
-<p>iocage standalone jail storage backend.</p>
+<p>ioc standalone jail storage backend.</p>
 <dl class="method">
 <dt id="libioc.Storage.Standalone.StandaloneJailStorage.apply">
-<code class="descname">apply</code><span class="sig-paren">(</span><em>release=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage.apply" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">release=None</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attach the jail storage.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Storage.Standalone.StandaloneJailStorage.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage.setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Storage/Standalone.html#StandaloneJailStorage.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Storage.Standalone.StandaloneJailStorage.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the jail storage.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

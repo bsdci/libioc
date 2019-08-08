@@ -5,6 +5,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc.Config.Host
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

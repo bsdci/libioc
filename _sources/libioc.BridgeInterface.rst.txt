@@ -2,6 +2,6 @@ libioc.BridgeInterface module
 =============================
 
 .. automodule:: libioc.BridgeInterface
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

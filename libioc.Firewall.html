@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Firewall module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Firewall module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,57 +199,48 @@
             
   <div class="section" id="module-libioc.Firewall">
 <span id="libioc-firewall-module"></span><h1>libioc.Firewall module<a class="headerlink" href="#module-libioc.Firewall" title="Permalink to this headline">¶</a></h1>
-<p>iocage firewall module.</p>
+<p>ioc firewall module.</p>
 <dl class="class">
 <dt id="libioc.Firewall.Firewall">
-<em class="property">class </em><code class="descclassname">libioc.Firewall.</code><code class="descname">Firewall</code><span class="sig-paren">(</span><em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Firewall.</code><code class="sig-name descname">Firewall</code><span class="sig-paren">(</span><em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>iocage host firewall abstraction.</p>
+<p>ioc host firewall abstraction.</p>
 <dl class="attribute">
 <dt id="libioc.Firewall.Firewall.IPFW_COMMAND">
-<code class="descname">IPFW_COMMAND</code><em class="property"> = '/sbin/ipfw'</em><a class="headerlink" href="#libioc.Firewall.Firewall.IPFW_COMMAND" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">IPFW_COMMAND</code><em class="property"> = '/sbin/ipfw'</em><a class="headerlink" href="#libioc.Firewall.Firewall.IPFW_COMMAND" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Firewall.Firewall.add_rule">
-<code class="descname">add_rule</code><span class="sig-paren">(</span><em>rule_number</em>, <em>rule_arguments</em>, <em>insecure=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.add_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.add_rule" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_rule</code><span class="sig-paren">(</span><em class="sig-param">rule_number</em>, <em class="sig-param">rule_arguments</em>, <em class="sig-param">insecure=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.add_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.add_rule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a rule to the firewall configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Firewall.Firewall.delete_rule">
-<code class="descname">delete_rule</code><span class="sig-paren">(</span><em>rule_number</em>, <em>insecure=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.delete_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.delete_rule" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delete_rule</code><span class="sig-paren">(</span><em class="sig-param">rule_number</em>, <em class="sig-param">insecure=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.delete_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.delete_rule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a firewall rule by its number.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Firewall.Firewall.ensure_firewall_enabled">
-<code class="descname">ensure_firewall_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.ensure_firewall_enabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.ensure_firewall_enabled" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ensure_firewall_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Firewall.html#Firewall.ensure_firewall_enabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Firewall.Firewall.ensure_firewall_enabled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raise an FirewallDisabled exception if the firewall is disabled.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

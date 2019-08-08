@@ -6,8 +6,8 @@ Subpackages
 
 .. toctree::
 
-    libioc.Config.Jail.File
-    libioc.Config.Jail.Properties
+   libioc.Config.Jail.File
+   libioc.Config.Jail.Properties
 
 Submodules
 ----------
@@ -23,6 +23,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc.Config.Jail
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

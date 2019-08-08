@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Storage &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Storage &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -280,6 +280,13 @@
         <span class="p">)</span>
         <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mountpoint</span> <span class="ow">in</span> <span class="n">system_mountpoints</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jail</span><span class="o">.</span><span class="n">require_relative_path</span><span class="p">(</span><span class="n">mountpoint</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">event</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
         <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">mountpoint</span> <span class="ow">in</span> <span class="n">system_mountpoints</span><span class="p">:</span>
@@ -287,7 +294,8 @@
                     <span class="k">continue</span>
                 <span class="n">libioc</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">umount</span><span class="p">(</span>
                     <span class="n">mountpoint</span><span class="o">=</span><span class="n">mountpoint</span><span class="p">,</span>
-                    <span class="n">force</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
                 <span class="p">)</span>
                 <span class="n">has_unmounted_any</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>

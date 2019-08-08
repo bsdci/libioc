@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Distribution module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Distribution module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,195 +199,163 @@
             
   <div class="section" id="module-libioc.Distribution">
 <span id="libioc-distribution-module"></span><h1>libioc.Distribution module<a class="headerlink" href="#module-libioc.Distribution" title="Permalink to this headline">¶</a></h1>
-<p>iocage Distribution module.</p>
+<p>ioc Distribution module.</p>
 <dl class="class">
 <dt id="libioc.Distribution.Distribution">
-<em class="property">class </em><code class="descclassname">libioc.Distribution.</code><code class="descname">Distribution</code><span class="sig-paren">(</span><em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#Distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.Distribution" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Distribution.</code><code class="sig-name descname">Distribution</code><span class="sig-paren">(</span><em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#Distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.Distribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Distribution.DistributionGenerator" title="libioc.Distribution.DistributionGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Distribution.DistributionGenerator</span></code></a></p>
 <p>Synchronous wrapper of the host distribution.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Distribution.DistributionGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Distribution.</code><code class="descname">DistributionGenerator</code><span class="sig-paren">(</span><em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#DistributionGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.DistributionGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Distribution.</code><code class="sig-name descname">DistributionGenerator</code><span class="sig-paren">(</span><em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#DistributionGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.DistributionGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Asynchronous representation of the host distribution.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.eol_list">
-<code class="descname">eol_list</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.eol_list" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">eol_list</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.eol_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the (memoized) list of release names listed as EOL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.DistributionGenerator.eol_url">
-<code class="descname">eol_url</code><em class="property"> = 'https://www.freebsd.org/security/unsupported.html'</em><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.eol_url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eol_url</code><em class="property"> = 'https://www.freebsd.org/security/unsupported.html'</em><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.eol_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.fetch_releases">
-<code class="descname">fetch_releases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#DistributionGenerator.fetch_releases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.fetch_releases" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch_releases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#DistributionGenerator.fetch_releases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.fetch_releases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch and cache the available releases.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.hash_file">
-<code class="descname">hash_file</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.hash_file" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">hash_file</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.hash_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the checksum file found on the mirror.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libioc.Distribution.DistributionGenerator.mirror_link_pattern">
-<code class="descname">mirror_link_pattern</code><em class="property"> = 'a href=\\&quot;([A-z0-9\\-_\\.]+)/\\&quot;'</em><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.mirror_link_pattern" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.mirror_url">
-<code class="descname">mirror_url</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.mirror_url" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">mirror_url</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.mirror_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the mirror URL of the distribution.</p>
 <p>URL that points to the top level directory of a distributions release
 asset HTTP server.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.name">
-<code class="descname">name</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the host distribution.</p>
 <p>Often used to differentiate between operations for HardenedBSD or
 standard FreeBSD.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.DistributionGenerator.release_name_blacklist">
-<code class="descname">release_name_blacklist</code><em class="property"> = ['', '.', '..', 'ISO-IMAGES']</em><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.release_name_blacklist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">release_name_blacklist</code><em class="property"> = ['', '.', '..', 'ISO-IMAGES']</em><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.release_name_blacklist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Distribution.DistributionGenerator.releases">
-<code class="descname">releases</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.releases" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">releases</code><a class="headerlink" href="#libioc.Distribution.DistributionGenerator.releases" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of available releases.</p>
 <p>Raises an error when the releases cannot be fetched at the current time</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Distribution.EOLParser">
-<em class="property">class </em><code class="descclassname">libioc.Distribution.</code><code class="descname">EOLParser</code><span class="sig-paren">(</span><em>*</em>, <em>convert_charrefs=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Distribution.</code><code class="sig-name descname">EOLParser</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">convert_charrefs=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">html.parser.HTMLParser</span></code></p>
 <p>Parser for EOL releases.</p>
 <dl class="attribute">
 <dt id="libioc.Distribution.EOLParser.current_branch">
-<code class="descname">current_branch</code><em class="property"> = ''</em><a class="headerlink" href="#libioc.Distribution.EOLParser.current_branch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">current_branch</code><em class="property"> = ''</em><a class="headerlink" href="#libioc.Distribution.EOLParser.current_branch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.EOLParser.data">
-<code class="descname">data</code><em class="property"> = []</em><a class="headerlink" href="#libioc.Distribution.EOLParser.data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">data</code><em class="property"> = []</em><a class="headerlink" href="#libioc.Distribution.EOLParser.data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.EOLParser.eol_releases">
-<code class="descname">eol_releases</code><em class="property"> = []</em><a class="headerlink" href="#libioc.Distribution.EOLParser.eol_releases" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eol_releases</code><em class="property"> = []</em><a class="headerlink" href="#libioc.Distribution.EOLParser.eol_releases" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Distribution.EOLParser.handle_data">
-<code class="descname">handle_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">handle_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle data in HTML tags.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Distribution.EOLParser.handle_endtag">
-<code class="descname">handle_endtag</code><span class="sig-paren">(</span><em>tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_endtag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_endtag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">handle_endtag</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_endtag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_endtag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle closing HTML tags.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Distribution.EOLParser.handle_starttag">
-<code class="descname">handle_starttag</code><span class="sig-paren">(</span><em>tag</em>, <em>attrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_starttag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_starttag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">handle_starttag</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">attrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Distribution.html#EOLParser.handle_starttag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Distribution.EOLParser.handle_starttag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle opening HTML tags.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.EOLParser.in_id">
-<code class="descname">in_id</code><em class="property"> = False</em><a class="headerlink" href="#libioc.Distribution.EOLParser.in_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_id</code><em class="property"> = False</em><a class="headerlink" href="#libioc.Distribution.EOLParser.in_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Distribution.EOLParser.td_counter">
-<code class="descname">td_counter</code><em class="property"> = 0</em><a class="headerlink" href="#libioc.Distribution.EOLParser.td_counter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">td_counter</code><em class="property"> = 0</em><a class="headerlink" href="#libioc.Distribution.EOLParser.td_counter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

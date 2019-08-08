@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.JailParams &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.JailParams &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -197,13 +197,11 @@
     <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">JailParamValueType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Set the user defined value of this jail parameter.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctl_type</span> <span class="o">==</span> <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">NODE</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;sysctl NODE has no value&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctl_type</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctl_type</span> <span class="ow">in</span> <span class="p">(</span>
             <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
             <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">OPAQUE</span><span class="p">,</span>
-        <span class="p">]:</span>
+            <span class="n">freebsd_sysctl</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">NODE</span>
+        <span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -241,7 +239,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iocage_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the name of the param formatted for iocage config.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail_arg_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jail_arg_name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the jail command argument notation of the param.&quot;&quot;&quot;</span>
@@ -307,14 +305,15 @@
     <span class="k">def</span> <span class="nf">__update_sysctl_jail_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;security.jail.param&quot;</span>
         <span class="n">jail_params</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span>
-                <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span>  <span class="c1"># quick filter NODE</span>
-                <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;security.jail.allow_raw_sockets&quot;</span><span class="p">,</span>  <span class="c1"># deprecated</span>
-            <span class="p">)),</span>
+            <span class="c1"># security.jail.allow_raw_sockets deprecated</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;security.jail.allow_raw_sockets&quot;</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__base_class</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="o">.</span><span class="n">children</span>
         <span class="p">)</span>
         <span class="c1"># permanently store the queried sysctl in the singleton class</span>
-        <span class="n">JailParams</span><span class="o">.</span><span class="n">__sysctl_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">,)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">jail_params</span><span class="p">])</span></div>
+        <span class="n">JailParams</span><span class="o">.</span><span class="n">__sysctl_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">x</span><span class="p">,)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">jail_params</span>
+        <span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="HostJailParams"><a class="viewcode-back" href="../../libioc.JailParams.html#libioc.JailParams.HostJailParams">[docs]</a><span class="k">class</span> <span class="nc">HostJailParams</span><span class="p">(</span><span class="n">JailParams</span><span class="p">):</span>

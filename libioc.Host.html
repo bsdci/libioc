@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Host module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Host module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,139 +199,105 @@
             
   <div class="section" id="module-libioc.Host">
 <span id="libioc-host-module"></span><h1>libioc.Host module<a class="headerlink" href="#module-libioc.Host" title="Permalink to this headline">¶</a></h1>
-<p>iocage Host module.</p>
+<p>ioc Host module.</p>
 <dl class="class">
 <dt id="libioc.Host.Host">
-<em class="property">class </em><code class="descclassname">libioc.Host.</code><code class="descname">Host</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>datasets=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Host.html#Host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Host.Host" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Host.</code><code class="sig-name descname">Host</code><span class="sig-paren">(</span><em class="sig-param">defaults=None</em>, <em class="sig-param">datasets=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Host.html#Host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Host.Host" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Host.HostGenerator" title="libioc.Host.HostGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Host.HostGenerator</span></code></a></p>
 <p>Synchronous wrapper of HostGenerator.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Host.HostGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Host.</code><code class="descname">HostGenerator</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>datasets=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Host.html#HostGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Host.HostGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Host.</code><code class="sig-name descname">HostGenerator</code><span class="sig-paren">(</span><em class="sig-param">defaults=None</em>, <em class="sig-param">datasets=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Host.html#HostGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Host.HostGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Asynchronous representation of the jail host.</p>
-<dl class="attribute">
-<dt id="libioc.Host.HostGenerator.branch_pattern">
-<code class="descname">branch_pattern</code><em class="property"> = re.compile('\\(hardened/\n        (?P&lt;release&gt;[A-z0-9]+(?:[A-z0-9\\-]+[A-z0-9]))\n        /\n        (?P&lt;branch&gt;[A-z0-9]+)\n        \\):', re.VERBOSE)</em><a class="headerlink" href="#libioc.Host.HostGenerator.branch_pattern" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.default_config">
-<code class="descname">default_config</code><a class="headerlink" href="#libioc.Host.HostGenerator.default_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">default_config</code><a class="headerlink" href="#libioc.Host.HostGenerator.default_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the lazy-loaded default configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig" title="libioc.Config.Jail.BaseConfig.BaseConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseConfig</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Jail.BaseConfig.html#libioc.Config.Jail.BaseConfig.BaseConfig" title="libioc.Config.Jail.BaseConfig.BaseConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseConfig</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.defaults">
-<code class="descname">defaults</code><a class="headerlink" href="#libioc.Host.HostGenerator.defaults" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">defaults</code><a class="headerlink" href="#libioc.Host.HostGenerator.defaults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the lazy-loaded defaults.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Resource.html#libioc.Resource.DefaultResource" title="libioc.Resource.DefaultResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultResource</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Resource.html#libioc.Resource.DefaultResource" title="libioc.Resource.DefaultResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultResource</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.devfs">
-<code class="descname">devfs</code><a class="headerlink" href="#libioc.Host.HostGenerator.devfs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">devfs</code><a class="headerlink" href="#libioc.Host.HostGenerator.devfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the lazy-loaded DevfsRules instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules" title="libioc.DevfsRules.DevfsRules"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRules</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.DevfsRules.html#libioc.DevfsRules.DevfsRules" title="libioc.DevfsRules.DevfsRules"><code class="xref py py-class docutils literal notranslate"><span class="pre">DevfsRules</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.id">
-<code class="descname">id</code><a class="headerlink" href="#libioc.Host.HostGenerator.id" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#libioc.Host.HostGenerator.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the hostid and memoize on first lookup.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.ipfw_enabled">
-<code class="descname">ipfw_enabled</code><a class="headerlink" href="#libioc.Host.HostGenerator.ipfw_enabled" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">ipfw_enabled</code><a class="headerlink" href="#libioc.Host.HostGenerator.ipfw_enabled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if ipfw is enabled on the host system.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.processor">
-<code class="descname">processor</code><a class="headerlink" href="#libioc.Host.HostGenerator.processor" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">processor</code><a class="headerlink" href="#libioc.Host.HostGenerator.processor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the hosts processor architecture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libioc.Host.HostGenerator.release_name_pattern">
-<code class="descname">release_name_pattern</code><em class="property"> = re.compile('^(?P&lt;major&gt;\\d+)(?:\\.(?P&lt;minor&gt;\\d+))-(?P&lt;type&gt;[A-Z]+)-HBSD$', re.VERBOSE)</em><a class="headerlink" href="#libioc.Host.HostGenerator.release_name_pattern" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.release_version">
-<code class="descname">release_version</code><a class="headerlink" href="#libioc.Host.HostGenerator.release_version" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">release_version</code><a class="headerlink" href="#libioc.Host.HostGenerator.release_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the host release version.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Host.HostGenerator.userland_version">
-<code class="descname">userland_version</code><a class="headerlink" href="#libioc.Host.HostGenerator.userland_version" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">userland_version</code><a class="headerlink" href="#libioc.Host.HostGenerator.userland_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the host userland version number.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

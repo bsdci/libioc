@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Releases module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Releases module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,42 +202,36 @@
 <p>Model of multiple iocage Releases.</p>
 <dl class="class">
 <dt id="libioc.Releases.Releases">
-<em class="property">class </em><code class="descclassname">libioc.Releases.</code><code class="descname">Releases</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Releases.html#Releases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Releases.Releases" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Releases.</code><code class="sig-name descname">Releases</code><span class="sig-paren">(</span><em class="sig-param">filters=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Releases.html#Releases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Releases.Releases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Releases.ReleasesGenerator" title="libioc.Releases.ReleasesGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Releases.ReleasesGenerator</span></code></a></p>
 <p>Model of multiple iocage Releases.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Releases.ReleasesGenerator">
-<em class="property">class </em><code class="descclassname">libioc.Releases.</code><code class="descname">ReleasesGenerator</code><span class="sig-paren">(</span><em>filters=None</em>, <em>host=None</em>, <em>zfs=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Releases.html#ReleasesGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Releases.ReleasesGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Releases.</code><code class="sig-name descname">ReleasesGenerator</code><span class="sig-paren">(</span><em class="sig-param">filters=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">zfs=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Releases.html#ReleasesGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Releases.ReleasesGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="libioc.ListableResource.html#libioc.ListableResource.ListableResource" title="libioc.ListableResource.ListableResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.ListableResource.ListableResource</span></code></a></p>
 <p>Generator Model of multiple iocage Releases.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Releases.ReleasesGenerator.available">
-<code class="descname">available</code><a class="headerlink" href="#libioc.Releases.ReleasesGenerator.available" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">available</code><a class="headerlink" href="#libioc.Releases.ReleasesGenerator.available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the list of available releases.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Releases.ReleasesGenerator.local">
-<code class="descname">local</code><a class="headerlink" href="#libioc.Releases.ReleasesGenerator.local" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">local</code><a class="headerlink" href="#libioc.Releases.ReleasesGenerator.local" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the locally available releases.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="libioc.Release.html#libioc.Release.ReleaseGenerator" title="libioc.Release.ReleaseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReleaseGenerator</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

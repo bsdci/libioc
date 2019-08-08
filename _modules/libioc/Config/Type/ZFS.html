@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Type.ZFS &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Type.ZFS &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage configuration stored in ZFS properties.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc configuration stored in ZFS properties.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">libzfs</span>
 
@@ -200,7 +200,7 @@
 
 
 <div class="viewcode-block" id="BaseConfigZFS"><a class="viewcode-back" href="../../../../libioc.Config.Type.ZFS.html#libioc.Config.Type.ZFS.BaseConfigZFS">[docs]</a><span class="k">class</span> <span class="nc">BaseConfigZFS</span><span class="p">(</span><span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">DatasetConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;iocage configuration stored in ZFS properties.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ioc configuration stored in ZFS properties.&quot;&quot;&quot;</span>
 
     <span class="n">config_type</span> <span class="o">=</span> <span class="s2">&quot;zfs&quot;</span>
 
@@ -291,7 +291,7 @@
 
 
 <div class="viewcode-block" id="DatasetConfigZFS"><a class="viewcode-back" href="../../../../libioc.Config.Type.ZFS.html#libioc.Config.Type.ZFS.DatasetConfigZFS">[docs]</a><span class="k">class</span> <span class="nc">DatasetConfigZFS</span><span class="p">(</span><span class="n">BaseConfigZFS</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;iocage ZFS jail configuration for legacy support.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;ioc ZFS jail configuration for legacy support.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ListableResource &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ListableResource &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,16 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage Resource module.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A ListableResource hosts child resources in a flat structure.</span>
+
+<span class="sd">In case of a Jail or a Release, those children are ZFS datasets nested in the</span>
+<span class="sd">listable resource&#39;s ZFS dataset.</span>
+
+<span class="sd">With filters applied to a ListableResource, all children returned listed have</span>
+<span class="sd">to match the input filters. Unlike Releases, that can only be filtered by their</span>
+<span class="sd">dataset name, it is possible to match configuration variables for Jails.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">libzfs</span>
 <span class="kn">import</span> <span class="nn">abc</span>

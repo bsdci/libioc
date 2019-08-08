@@ -2,6 +2,6 @@ libioc.CommandQueue module
 ==========================
 
 .. automodule:: libioc.CommandQueue
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

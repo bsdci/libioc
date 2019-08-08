@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Release &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Release &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage release module.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc release module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -366,12 +366,15 @@
         <span class="s2">&quot;sendmail_submit_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;sendmail_msp_queue_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;sendmail_outbound_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;cron_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-m &#39;&#39;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;syslogd_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-ss&quot;</span>
+    <span class="p">}</span>
+
+    <span class="n">DEFAULT_PERIODIC_CONF</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;daily_clean_hoststat_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;daily_status_mail_rejects_enable&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;daily_status_include_submit_mailq&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;daily_submit_queuerun&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;cron_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-m &#39;&#39;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;syslogd_flags&quot;</span><span class="p">:</span> <span class="s2">&quot;-ss&quot;</span>
     <span class="p">}</span>
 
     <span class="n">DEFAULT_SYSCTL_CONF</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -907,15 +910,19 @@
             <span class="p">)</span>
 
         <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
-        <span class="n">rc_conf_changed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_rc_conf</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">rc_conf_changed</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">release_changed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_default_sysctl_conf</span><span class="p">()</span> <span class="ow">or</span> <span class="n">rc_conf_changed</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">release_changed</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_periodic_conf</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_rc_conf</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_sysctl_conf</span><span class="p">()</span>
+            <span class="p">]):</span>
+                <span class="n">release_changed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">skip</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">releaseConfigurationEvent</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="s2">&quot;p0&quot;</span><span class="p">)</span>
 
@@ -1119,6 +1126,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">rc_conf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rc_conf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_set_default_periodic_conf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PERIODIC_CONF</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic_conf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_conf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_set_default_sysctl_conf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 

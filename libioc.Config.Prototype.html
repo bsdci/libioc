@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Prototype module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Prototype module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -175,95 +175,77 @@
 <p>Prototype of a Jail configuration.</p>
 <dl class="class">
 <dt id="libioc.Config.Prototype.Prototype">
-<em class="property">class </em><code class="descclassname">libioc.Config.Prototype.</code><code class="descname">Prototype</code><span class="sig-paren">(</span><em>file=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Prototype.</code><code class="sig-name descname">Prototype</code><span class="sig-paren">(</span><em class="sig-param">file=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Prototype of a JailConfig.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.exists">
-<code class="descname">exists</code><a class="headerlink" href="#libioc.Config.Prototype.Prototype.exists" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">exists</code><a class="headerlink" href="#libioc.Config.Prototype.Prototype.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True when the configuration file exists on the filesystem.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.file">
-<code class="descname">file</code><a class="headerlink" href="#libioc.Config.Prototype.Prototype.file" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">file</code><a class="headerlink" href="#libioc.Config.Prototype.Prototype.file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the relative path to the config file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.map_input">
-<code class="descname">map_input</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.map_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">map_input</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.map_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.map_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map input data (for reading from the configuration).</p>
 <p>Implementing classes may provide individual mappings.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.map_output">
-<code class="descname">map_output</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.map_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.map_output" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">map_output</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.map_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.map_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map output data (for writing to the configuration).</p>
 <p>Implementing classes may provide individual mappings.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]]]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]]]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.read">
-<code class="descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read from the configuration file.</p>
 <p>This method may be overriden by non file-based implementations.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Config.Data.html#libioc.Config.Data.Data" title="libioc.Config.Data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Prototype.Prototype.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Prototype.html#Prototype.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Prototype.Prototype.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write changes to the config file.</p>
 <p>This method may be overriden by non file-based implementations.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

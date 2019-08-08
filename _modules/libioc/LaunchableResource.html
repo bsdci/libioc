@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.LaunchableResource &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.LaunchableResource &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage module for launchable resources.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc module for launchable resources.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">libzfs</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
@@ -186,6 +186,9 @@
 
     <span class="n">_rc_conf</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
         <span class="s1">&#39;libioc.Config.Jail.File.RCConf.ResourceRCConf&#39;</span>
+    <span class="p">]</span>
+    <span class="n">_periodic_conf</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+        <span class="s1">&#39;libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf&#39;</span>
     <span class="p">]</span>
     <span class="n">_sysctl_conf</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
         <span class="s1">&#39;libioc.Config.Jail.File.SysctlConf.SysctlConf&#39;</span>
@@ -215,6 +218,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_updater</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backup</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rc_conf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updater</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backup</span> <span class="o">=</span> <span class="kc">None</span>
@@ -313,6 +317,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rc_conf</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">periodic_conf</span><span class="p">(</span>
+        <span class="bp">self</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return a lazy-loaded instance of the resources PeriodicConf.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">libioc.Config.Jail.File.PeriodicConf</span>
+            <span class="n">PeriodicConf</span> <span class="o">=</span> <span class="n">libioc</span><span class="o">.</span><span class="n">Config</span><span class="o">.</span><span class="n">Jail</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">PeriodicConf</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span> <span class="o">=</span> <span class="n">PeriodicConf</span><span class="o">.</span><span class="n">ResourcePeriodicConf</span><span class="p">(</span>
+                <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sysctl_conf</span><span class="p">(</span>
         <span class="bp">self</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;libioc.Config.Jail.File.SysctlConf.SysctlConf&#39;</span><span class="p">:</span>
@@ -324,7 +342,14 @@
                 <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span> <span class="o">=</span> <span class="n">sysctl_conf</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span>
+
+<div class="viewcode-block" id="LaunchableResource.save"><a class="viewcode-back" href="../../libioc.LaunchableResource.html#libioc.LaunchableResource.LaunchableResource.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Permanently save the resource configuration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_conf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sysctl_conf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

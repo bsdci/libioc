@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Network module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Network module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,94 +199,79 @@
             
   <div class="section" id="module-libioc.Network">
 <span id="libioc-network-module"></span><h1>libioc.Network module<a class="headerlink" href="#module-libioc.Network" title="Permalink to this headline">¶</a></h1>
-<p>iocage network abstraction module.</p>
+<p>ioc network abstraction module.</p>
 <dl class="class">
 <dt id="libioc.Network.Network">
-<em class="property">class </em><code class="descclassname">libioc.Network.</code><code class="descname">Network</code><span class="sig-paren">(</span><em>jail</em>, <em>nic=None</em>, <em>ipv4_addresses=None</em>, <em>ipv6_addresses=None</em>, <em>mtu=None</em>, <em>bridge=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Network.</code><code class="sig-name descname">Network</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">nic=None</em>, <em class="sig-param">ipv4_addresses=None</em>, <em class="sig-param">ipv6_addresses=None</em>, <em class="sig-param">mtu=None</em>, <em class="sig-param">bridge=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Networking for VNET jails.</p>
 <p>VNET Jails may have access to different networks. Each is identified by a
 network interface name that is unique to the jail.</p>
 <p>A Network is configured with IPv4 and IPv6 addresses, a bridge interface
 and an optional MTU.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Network.Network.epair_id">
-<code class="descname">epair_id</code><a class="headerlink" href="#libioc.Network.Network.epair_id" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">epair_id</code><a class="headerlink" href="#libioc.Network.Network.epair_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a unique ID for the jail network device combination.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Network.Network.mtu">
-<code class="descname">mtu</code><a class="headerlink" href="#libioc.Network.Network.mtu" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">mtu</code><a class="headerlink" href="#libioc.Network.Network.mtu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the configured MTU.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Network.Network.nic">
-<code class="descname">nic</code><em class="property"> = 'vnet0'</em><a class="headerlink" href="#libioc.Network.Network.nic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">nic</code><em class="property"> = 'vnet0'</em><a class="headerlink" href="#libioc.Network.Network.nic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Network.Network.nic_local_description">
-<code class="descname">nic_local_description</code><a class="headerlink" href="#libioc.Network.Network.nic_local_description" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nic_local_description</code><a class="headerlink" href="#libioc.Network.Network.nic_local_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the description text of the local NIC.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Network.Network.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network.setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the network configuration.</p>
 <p>Jails call this method to create the network after being started
 and configure the interfaces on jail and host side according to the
 class attributes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.VnetInterfaceConfig" title="libioc.events.VnetInterfaceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">VnetInterfaceConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.VnetInterfaceConfig" title="libioc.events.VnetInterfaceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">VnetInterfaceConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Network.Network.teardown">
-<code class="descname">teardown</code><span class="sig-paren">(</span><em>jid=None</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network.teardown" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><em class="sig-param">jid=None</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Network.html#Network.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Network.Network.teardown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Teardown the applied changes.</p>
 <p>After Jails are stopped the devices that were used by it remain on the
 host. This method is called by jails after they terminated.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.VnetInterfaceConfig" title="libioc.events.VnetInterfaceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">VnetInterfaceConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.VnetInterfaceConfig" title="libioc.events.VnetInterfaceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">VnetInterfaceConfig</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

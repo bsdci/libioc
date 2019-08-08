@@ -6,9 +6,9 @@ Subpackages
 
 .. toctree::
 
-    libioc.Config
-    libioc.Provisioning
-    libioc.Storage
+   libioc.Config
+   libioc.Provisioning
+   libioc.Storage
 
 Submodules
 ----------
@@ -57,6 +57,6 @@ Module contents
 ---------------
 
 .. automodule:: libioc
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

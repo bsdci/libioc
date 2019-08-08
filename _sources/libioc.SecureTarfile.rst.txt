@@ -2,6 +2,6 @@ libioc.SecureTarfile module
 ===========================
 
 .. automodule:: libioc.SecureTarfile
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

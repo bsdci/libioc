@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.CommandQueue module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.CommandQueue module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,63 +202,51 @@
 <p>Class extension to queue commands for bulk executions.</p>
 <dl class="class">
 <dt id="libioc.CommandQueue.CommandQueue">
-<em class="property">class </em><code class="descclassname">libioc.CommandQueue.</code><code class="descname">CommandQueue</code><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.CommandQueue.</code><code class="sig-name descname">CommandQueue</code><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class extension that queues command for bulk execution.</p>
 <dl class="method">
 <dt id="libioc.CommandQueue.CommandQueue.append_command_queue">
-<code class="descname">append_command_queue</code><span class="sig-paren">(</span><em>*commands</em>, <em>queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.append_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.append_command_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append_command_queue</code><span class="sig-paren">(</span><em class="sig-param">*commands</em>, <em class="sig-param">queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.append_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.append_command_queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append commands to the queue with the selected name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.CommandQueue.CommandQueue.clear_command_queue">
-<code class="descname">clear_command_queue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.clear_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.clear_command_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clear_command_queue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.clear_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.clear_command_queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the command queue.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.CommandQueue.CommandQueue.get_command_queue">
-<code class="descname">get_command_queue</code><span class="sig-paren">(</span><em>queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.get_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.get_command_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_command_queue</code><span class="sig-paren">(</span><em class="sig-param">queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.get_command_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.get_command_queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create or return the queue with the given name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.CommandQueue.CommandQueue.read_commands">
-<code class="descname">read_commands</code><span class="sig-paren">(</span><em>queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.read_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.read_commands" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_commands</code><span class="sig-paren">(</span><em class="sig-param">queue_name='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/CommandQueue.html#CommandQueue.read_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.CommandQueue.CommandQueue.read_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the collected jail commands and clear the queue.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

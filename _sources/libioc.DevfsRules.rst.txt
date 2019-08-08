@@ -2,6 +2,6 @@ libioc.DevfsRules module
 ========================
 
 .. automodule:: libioc.DevfsRules
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

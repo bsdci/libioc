@@ -1,0 +1,7 @@
+libioc.Config.Jail.File.PeriodicConf module
+===========================================
+
+.. automodule:: libioc.Config.Jail.File.PeriodicConf
+   :members:
+   :undoc-members:
+   :show-inheritance:

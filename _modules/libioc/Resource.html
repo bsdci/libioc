@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Resource &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Resource &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -172,7 +172,7 @@
 <span class="c1"># STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING</span>
 <span class="c1"># IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
-<span class="sd">&quot;&quot;&quot;iocage Resource module.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;ioc Resource module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">abc</span>
@@ -515,24 +515,25 @@
             <span class="s2">&quot;This needs to be implemented by the inheriting class&quot;</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_require_relative_path</span><span class="p">(</span>
+<div class="viewcode-block" id="Resource.require_relative_path"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.require_relative_path">[docs]</a>    <span class="k">def</span> <span class="nf">require_relative_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_path_relative</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Raise an error when the path is not relative to the resource.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_path_relative</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">libioc</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SecurityViolationConfigJailEscape</span><span class="p">(</span>
                 <span class="n">file</span><span class="o">=</span><span class="n">filepath</span>
-            <span class="p">)</span>
+            <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_is_path_relative</span><span class="p">(</span>
+<div class="viewcode-block" id="Resource.is_path_relative"><a class="viewcode-back" href="../../libioc.Resource.html#libioc.Resource.Resource.is_path_relative">[docs]</a>    <span class="k">def</span> <span class="nf">is_path_relative</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-
+        <span class="sd">&quot;&quot;&quot;Return whether the path is relative to the resource.&quot;&quot;&quot;</span>
         <span class="n">real_resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mountpoint</span><span class="p">)</span>
         <span class="n">real_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">real_file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">real_resource_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">real_file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">real_resource_path</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_resolve_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span></div>

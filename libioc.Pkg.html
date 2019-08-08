@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Pkg module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Pkg module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,71 +199,90 @@
             
   <div class="section" id="module-libioc.Pkg">
 <span id="libioc-pkg-module"></span><h1>libioc.Pkg module<a class="headerlink" href="#module-libioc.Pkg" title="Permalink to this headline">¶</a></h1>
-<p>Pkg abstraction for Resources.</p>
+<p>Abstracts offline FreeBSD/HardenedBSD package installation.</p>
+<p>ioc mirrors packages from FreeBSD and HardenedBSD to a local ZFS dataset for
+each release and ioc datasource. On each use the pkg repository matching to a
+jails release is mirrored from the quaterly releases. The host downloads wanted
+packages into this local repository, that is afterwards mounted into the jail
+(read-only) for package installation.</p>
+<p>With this module it is possible to save bandwith and shorten the time required
+for package installation. In setups that spawn disposable jails, it might be
+reasonable to seed newly created jails from latest packages, rather than
+managing a template, that tempts to outdate.</p>
 <dl class="class">
 <dt id="libioc.Pkg.Pkg">
-<em class="property">class </em><code class="descclassname">libioc.Pkg.</code><code class="descname">Pkg</code><span class="sig-paren">(</span><em>zfs=None</em>, <em>host=None</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Pkg.</code><code class="sig-name descname">Pkg</code><span class="sig-paren">(</span><em class="sig-param">zfs=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>ioc pkg management utility.</p>
 <dl class="method">
+<dt id="libioc.Pkg.Pkg.bootstrap">
+<code class="sig-name descname">bootstrap</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.bootstrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.bootstrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bootstrap pkg within a jail.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="libioc.Pkg.Pkg.configure">
+<code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the repositories within the jail.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="libioc.Pkg.Pkg.fetch">
-<code class="descname">fetch</code><span class="sig-paren">(</span><em>packages</em>, <em>release</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">packages</em>, <em class="sig-param">release</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a bunch of packages to the local mirror.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Pkg.Pkg.fetch_and_install">
-<code class="descname">fetch_and_install</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>event_scope=None</em>, <em>postinstall=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.fetch_and_install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.fetch_and_install" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch_and_install</code><span class="sig-paren">(</span><em class="sig-param">packages</em>, <em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em>, <em class="sig-param">postinstall=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.fetch_and_install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.fetch_and_install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mirror and install packages to a jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Pkg.Pkg.install">
-<code class="descname">install</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>event_scope=None</em>, <em>postinstall=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.install" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">install</code><span class="sig-paren">(</span><em class="sig-param">packages</em>, <em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em>, <em class="sig-param">postinstall=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install locally mirrored packages to a jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Pkg.Pkg.package_source_directory">
-<code class="descname">package_source_directory</code><em class="property"> = '/.ioc-pkg'</em><a class="headerlink" href="#libioc.Pkg.Pkg.package_source_directory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">package_source_directory</code><em class="property"> = '/.ioc-pkg'</em><a class="headerlink" href="#libioc.Pkg.Pkg.package_source_directory" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Pkg.Pkg.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>packages</em>, <em>jail</em>, <em>event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">packages</em>, <em class="sig-param">jail</em>, <em class="sig-param">event_scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Pkg.html#Pkg.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Pkg.Pkg.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove installed packages from a jail.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.PkgEvent" title="libioc.events.PkgEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PkgEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

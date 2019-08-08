@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.helpers_ioctl module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.helpers_ioctl module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -202,61 +202,52 @@
 <p>Interface for ioctl abstraction.</p>
 <dl class="class">
 <dt id="libioc.helpers_ioctl.SOCKIO_IOCTLS">
-<em class="property">class </em><code class="descclassname">libioc.helpers_ioctl.</code><code class="descname">SOCKIO_IOCTLS</code><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#SOCKIO_IOCTLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.helpers_ioctl.</code><code class="sig-name descname">SOCKIO_IOCTLS</code><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#SOCKIO_IOCTLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>Hardcoded ioctl numbers.</p>
 <dl class="attribute">
 <dt id="libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFADDR">
-<code class="descname">SIOCGIFADDR</code><em class="property"> = -1071617759</em><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFADDR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SIOCGIFADDR</code><em class="property"> = -1071617759</em><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFADDR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFMTU">
-<code class="descname">SIOCGIFMTU</code><em class="property"> = -1071617741</em><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFMTU" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SIOCGIFMTU</code><em class="property"> = -1071617741</em><a class="headerlink" href="#libioc.helpers_ioctl.SOCKIO_IOCTLS.SIOCGIFMTU" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers_ioctl.get_interface_ip4_address">
-<code class="descclassname">libioc.helpers_ioctl.</code><code class="descname">get_interface_ip4_address</code><span class="sig-paren">(</span><em>nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_interface_ip4_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_interface_ip4_address" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers_ioctl.</code><code class="sig-name descname">get_interface_ip4_address</code><span class="sig-paren">(</span><em class="sig-param">nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_interface_ip4_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_interface_ip4_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the primary IPv4Address of a given NIC.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">IPv4Address</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">IPv4Address</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers_ioctl.get_interface_mtu">
-<code class="descclassname">libioc.helpers_ioctl.</code><code class="descname">get_interface_mtu</code><span class="sig-paren">(</span><em>nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_interface_mtu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_interface_mtu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers_ioctl.</code><code class="sig-name descname">get_interface_mtu</code><span class="sig-paren">(</span><em class="sig-param">nic_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_interface_mtu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_interface_mtu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the primary MTU of a given NIC.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="libioc.helpers_ioctl.get_sockio_ioctl">
-<code class="descclassname">libioc.helpers_ioctl.</code><code class="descname">get_sockio_ioctl</code><span class="sig-paren">(</span><em>nic_name</em>, <em>ioctl</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_sockio_ioctl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_sockio_ioctl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libioc.helpers_ioctl.</code><code class="sig-name descname">get_sockio_ioctl</code><span class="sig-paren">(</span><em class="sig-param">nic_name</em>, <em class="sig-param">ioctl</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/helpers_ioctl.html#get_sockio_ioctl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.helpers_ioctl.get_sockio_ioctl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query a sockio ioctl for a given NIC.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

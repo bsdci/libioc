@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.ResourceSelector module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.ResourceSelector module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -199,43 +199,37 @@
             
   <div class="section" id="module-libioc.ResourceSelector">
 <span id="libioc-resourceselector-module"></span><h1>libioc.ResourceSelector module<a class="headerlink" href="#module-libioc.ResourceSelector" title="Permalink to this headline">¶</a></h1>
-<p>iocage resource selector type.</p>
+<p>ioc resource selector type.</p>
 <dl class="class">
 <dt id="libioc.ResourceSelector.ResourceSelector">
-<em class="property">class </em><code class="descclassname">libioc.ResourceSelector.</code><code class="descname">ResourceSelector</code><span class="sig-paren">(</span><em>name</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceSelector.html#ResourceSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.ResourceSelector.</code><code class="sig-name descname">ResourceSelector</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceSelector.html#ResourceSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Parse and wrap resource selectors.</p>
 <dl class="attribute">
 <dt id="libioc.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN">
-<code class="descname">SOURCE_NAME_PATTERN</code><em class="property"> = re.compile('^[A-Za-z0-9]+((\\-|_)?[A-Za-z0-9]+)*$')</em><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SOURCE_NAME_PATTERN</code><em class="property"> = re.compile('^[A-Za-z0-9]+((\\-|_)?[A-Za-z0-9]+)*$')</em><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.SOURCE_NAME_PATTERN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.ResourceSelector.ResourceSelector.filter_datasets">
-<code class="descname">filter_datasets</code><span class="sig-paren">(</span><em>datasets</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceSelector.html#ResourceSelector.filter_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.filter_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">filter_datasets</code><span class="sig-paren">(</span><em class="sig-param">datasets</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/ResourceSelector.html#ResourceSelector.filter_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.filter_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter given Datasets according to the resource selector source.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="libioc.Datasets.html#libioc.Datasets.FilteredDatasets" title="libioc.Datasets.FilteredDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilteredDatasets</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="libioc.Datasets.html#libioc.Datasets.FilteredDatasets" title="libioc.Datasets.FilteredDatasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilteredDatasets</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.ResourceSelector.ResourceSelector.name">
-<code class="descname">name</code><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#libioc.ResourceSelector.ResourceSelector.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the given name without the source.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

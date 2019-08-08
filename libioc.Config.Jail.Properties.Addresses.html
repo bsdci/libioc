@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Config.Jail.Properties.Addresses module &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Config.Jail.Properties.Addresses module &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -179,130 +179,115 @@
 <p>Jail config address property.</p>
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressSet">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="descname">AddressSet</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='ip4_address'</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="sig-name descname">AddressSet</code><span class="sig-paren">(</span><em class="sig-param">config=None</em>, <em class="sig-param">property_name='ip4_address'</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></p>
 <p>Set of IP addresses.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressSet.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>value</em>, <em>notify=True</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an address to the set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressSet.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em>, <em>notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressSet.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressSet.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove an address from the set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="descname">AddressesProp</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='ip4_address'</em>, <em>logger=None</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="sig-name descname">AddressesProp</code><span class="sig-paren">(</span><em class="sig-param">config=None</em>, <em class="sig-param">property_name='ip4_address'</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Special jail config property Addresses.</p>
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>nic</em>, <em>addresses=None</em>, <em>notify=True</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">nic</em>, <em class="sig-param">addresses=None</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add one or many IP addresses to an interface.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp.delimiter">
-<code class="descname">delimiter</code><em class="property"> = ','</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.delimiter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delimiter</code><em class="property"> = ','</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.delimiter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp.networks">
-<code class="descname">networks</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.networks" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">networks</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.networks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flat list of all networks configured across all NICs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp.property_name">
-<code class="descname">property_name</code><em class="property"> = 'ip4_address'</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.property_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">property_name</code><em class="property"> = 'ip4_address'</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.property_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="libioc.Config.Jail.Properties.Addresses.AddressesProp.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>data</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#AddressesProp.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the special property value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="descname">IPv4AddressesProp</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='ip4_address'</em>, <em>logger=None</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#IPv4AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="sig-name descname">IPv4AddressesProp</code><span class="sig-paren">(</span><em class="sig-param">config=None</em>, <em class="sig-param">property_name='ip4_address'</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#IPv4AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="libioc.Config.Jail.Properties.Addresses.AddressesProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.Properties.Addresses.AddressesProp</span></code></a></p>
 <p>Special jail config for IPv4 addresses.</p>
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.ADDRESS_CLASS">
-<code class="descname">ADDRESS_CLASS</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.ADDRESS_CLASS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ADDRESS_CLASS</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.ADDRESS_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="libioc.IPAddress.html#libioc.IPAddress.IPv4Interface" title="libioc.IPAddress.IPv4Interface"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.IPAddress.IPv4Interface</span></code></a></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.IP_VERSION">
-<code class="descname">IP_VERSION</code><em class="property"> = 4</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.IP_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">IP_VERSION</code><em class="property"> = 4</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv4AddressesProp.IP_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp">
-<em class="property">class </em><code class="descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="descname">IPv6AddressesProp</code><span class="sig-paren">(</span><em>config=None</em>, <em>property_name='ip4_address'</em>, <em>logger=None</em>, <em>skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#IPv6AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Config.Jail.Properties.Addresses.</code><code class="sig-name descname">IPv6AddressesProp</code><span class="sig-paren">(</span><em class="sig-param">config=None</em>, <em class="sig-param">property_name='ip4_address'</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">skip_on_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Config/Jail/Properties/Addresses.html#IPv6AddressesProp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Config.Jail.Properties.Addresses.AddressesProp" title="libioc.Config.Jail.Properties.Addresses.AddressesProp"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Config.Jail.Properties.Addresses.AddressesProp</span></code></a></p>
 <p>Special jail config for IPv6 addresses.</p>
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.ADDRESS_CLASS">
-<code class="descname">ADDRESS_CLASS</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.ADDRESS_CLASS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ADDRESS_CLASS</code><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.ADDRESS_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="libioc.IPAddress.html#libioc.IPAddress.IPv6Interface" title="libioc.IPAddress.IPv6Interface"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.IPAddress.IPv6Interface</span></code></a></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.IP_VERSION">
-<code class="descname">IP_VERSION</code><em class="property"> = 6</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.IP_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">IP_VERSION</code><em class="property"> = 6</em><a class="headerlink" href="#libioc.Config.Jail.Properties.Addresses.IPv6AddressesProp.IP_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

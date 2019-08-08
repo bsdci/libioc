@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>libioc.Provisioning package &mdash; libioc 0.8.0 2019/04/13 documentation</title>
+  <title>libioc.Provisioning package &mdash; libioc 0.8.2 2019/08/10 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.8.2
               </div>
             
           
@@ -183,139 +183,112 @@
 <p>ioc provisioning prototype.</p>
 <dl class="class">
 <dt id="libioc.Provisioning.Prototype">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.</code><code class="descname">Prototype</code><span class="sig-paren">(</span><em>jail</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Prototype" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.</code><code class="sig-name descname">Prototype</code><span class="sig-paren">(</span><em class="sig-param">jail</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Prototype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="libioc.Provisioning.Prototype.check_requirements">
-<code class="descname">check_requirements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Prototype.check_requirements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Prototype.check_requirements" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_requirements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Prototype.check_requirements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Prototype.check_requirements" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check requirements before executing the provisioner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Prototype.method">
-<code class="descname">method</code><a class="headerlink" href="#libioc.Provisioning.Prototype.method" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#libioc.Provisioning.Prototype.method" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Prototype.rev">
-<code class="descname">rev</code><a class="headerlink" href="#libioc.Provisioning.Prototype.rev" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">rev</code><a class="headerlink" href="#libioc.Provisioning.Prototype.rev" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Prototype.source">
-<code class="descname">source</code><a class="headerlink" href="#libioc.Provisioning.Prototype.source" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#libioc.Provisioning.Source" title="libioc.Provisioning.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">source</code><a class="headerlink" href="#libioc.Provisioning.Prototype.source" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#libioc.Provisioning.Source" title="libioc.Provisioning.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Provisioning.Provisioner">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.</code><code class="descname">Provisioner</code><span class="sig-paren">(</span><em>jail</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Provisioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Provisioner" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.</code><code class="sig-name descname">Provisioner</code><span class="sig-paren">(</span><em class="sig-param">jail</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Provisioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Provisioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libioc.Provisioning.Prototype" title="libioc.Provisioning.Prototype"><code class="xref py py-class docutils literal notranslate"><span class="pre">libioc.Provisioning.Prototype</span></code></a></p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Provisioner.method">
-<code class="descname">method</code><a class="headerlink" href="#libioc.Provisioning.Provisioner.method" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#libioc.Provisioning.Provisioner.method" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libioc.Provisioning.Provisioner.provision">
-<code class="descname">provision</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Provisioner.provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Provisioner.provision" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">provision</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Provisioner.provision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Provisioner.provision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the provision method on the enabled provisioner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="libioc.events.html#libioc.events.IocEvent" title="libioc.events.IocEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">IocEvent</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="libioc.Provisioning.Source">
-<em class="property">class </em><code class="descclassname">libioc.Provisioning.</code><code class="descname">Source</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Source" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">libioc.Provisioning.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libioc/Provisioning.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libioc.Provisioning.Source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Source.local">
-<code class="descname">local</code><a class="headerlink" href="#libioc.Provisioning.Source.local" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">local</code><a class="headerlink" href="#libioc.Provisioning.Source.local" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True when the source is local.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Source.remote">
-<code class="descname">remote</code><a class="headerlink" href="#libioc.Provisioning.Source.remote" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">remote</code><a class="headerlink" href="#libioc.Provisioning.Source.remote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True when the source is a remote URL.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="libioc.Provisioning.Source.value">
-<code class="descname">value</code><a class="headerlink" href="#libioc.Provisioning.Source.value" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ParseResult</span></code>, <a class="reference internal" href="libioc.Types.html#libioc.Types.AbsolutePath" title="libioc.Types.AbsolutePath"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsolutePath</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#libioc.Provisioning.Source.value" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ParseResult</span></code>, <a class="reference internal" href="libioc.Types.html#libioc.Types.AbsolutePath" title="libioc.Types.AbsolutePath"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsolutePath</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
