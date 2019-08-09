@@ -276,7 +276,7 @@ class ReleaseGenerator(ReleaseResource):
             else:
                 root_datasets_name = resource_selector.source_name
 
-        if libioc.helpers.validate_name(resource_selector.name) is False:
+        if libioc.helpers.is_valid_name(resource_selector.name) is False:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name

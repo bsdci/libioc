@@ -1206,7 +1206,7 @@ class JailGenerator(JailResource):
         self.require_jail_stopped()
         self.require_storage_backend()
 
-        if libioc.helpers.validate_name(new_name) is False:
+        if libioc.helpers.is_valid_name(new_name) is False:
             raise libioc.errors.InvalidJailName(
                 name=new_name,
                 logger=self.logger

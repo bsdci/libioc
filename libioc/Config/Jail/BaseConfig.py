@@ -24,7 +24,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The common base of jail configurations."""
 import typing
-import re
 
 import libioc.Config.Data
 import libioc.Config.Jail.Globals
@@ -210,6 +209,15 @@ class BaseConfig(dict):
     def _get_id(self) -> str:
         return str(self.data["id"])
 
+    def __require_valid_jail_name(self, name: str) -> None:
+        is_valid_name = libioc.helpers.is_valid_name(name)
+        is_valid_uuid = libioc.helpers.is_valid_uuid(name)
+        if (is_valid_name or is_valid_uuid) is False:
+            raise libioc.errors.InvalidJailName(
+                name=name,
+                logger=self.logger
+            )
+
     def _set_id(self, name: str) -> None:
 
         if ("id" in self.data.keys()) and (self.data["id"] == name):
@@ -223,26 +231,8 @@ class BaseConfig(dict):
             self.data["id"] = None
             return
 
-        disallowed_characters_pattern = "([^A-Za-z0-9_\\-]|\\^)"
-        invalid_characters = re.findall(disallowed_characters_pattern, name)
-        if len(invalid_characters) > 0:
-            raise libioc.errors.InvalidJailName(
-                name=name,
-                invalid_characters=invalid_characters,
-                logger=self.logger
-            )
-
-        is_valid_name = libioc.helpers.validate_name(name)
-        if is_valid_name is True:
-            self.data["id"] = name
-        else:
-            if libioc.helpers.is_uuid(name) is True:
-                self.data["id"] = name
-            else:
-                raise libioc.errors.InvalidJailName(
-                    name=name,
-                    logger=self.logger
-                )
+        self.__require_valid_jail_name(name)
+        self.data["id"] = name
 
     def _get_name(self) -> str:
         return self._get_id()

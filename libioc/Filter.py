@@ -175,7 +175,7 @@ class Term(list):
             if char not in globs:
                 filter_string_without_globs += char
 
-        return libioc.helpers.validate_name(
+        return libioc.helpers.is_valid_name(
             filter_string_without_globs
         ) is True
 

@@ -339,3 +339,30 @@ class TestNullFSBasejail(object):
                 assert "\nIOC_" in event.stdout
             if isinstance(event, libioc.events.JailHookPoststart) is True:
                 assert f"IOC_JID={jail.jid}" in event.stdout
+
+    def test_jail_name_validation(self) -> None:
+        assert libioc.helpers.is_valid_name("ioc") is True
+        assert libioc.helpers.is_valid_name("ioc23") is True
+        assert libioc.helpers.is_valid_name("23ioc") is True
+        assert libioc.helpers.is_valid_name("ioc-23") is True
+        assert libioc.helpers.is_valid_name("23-ioc") is True
+        assert libioc.helpers.is_valid_name("ioc!jail") is True
+        assert libioc.helpers.is_valid_name("ci-bsd!ioc") is True
+        assert libioc.helpers.is_valid_name("IOC") is True
+        assert libioc.helpers.is_valid_name("IoC23") is True
+        assert libioc.helpers.is_valid_name("Grönke") is True
+        assert libioc.helpers.is_valid_name("jail>ioc") is True
+        assert libioc.helpers.is_valid_name("jail{ioc}23") is True
+
+        assert libioc.helpers.is_valid_name("") is False
+        assert libioc.helpers.is_valid_name("ioc\n23") is False
+        assert libioc.helpers.is_valid_name("ioc\t23") is False
+        assert libioc.helpers.is_valid_name("ioc-") is False
+        assert libioc.helpers.is_valid_name("!ioc") is False
+        assert libioc.helpers.is_valid_name("@gronke") is False
+        assert libioc.helpers.is_valid_name("stefan@gronke") is False
+        assert libioc.helpers.is_valid_name("23-ioc-") is False
+        assert libioc.helpers.is_valid_name("white space") is False
+        assert libioc.helpers.is_valid_name("ioc\\jail") is False
+        assert libioc.helpers.is_valid_name("jail{ioc}") is False
+        assert libioc.helpers.is_valid_name("we❤jails") is False
