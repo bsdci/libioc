@@ -2286,7 +2286,8 @@ class JailGenerator(JailResource):
     def identifier(self) -> str:
         """Return the jail id used in snapshots, jls, etc."""
         config = object.__getattribute__(self, 'config')
-        return f"{self.source}-{config['id']}"
+        escaped_jail_id = config['id'].replace(".", "*")
+        return f"{self.source}-{escaped_jail_id}"
 
     @property
     def release(self) -> 'libioc.Release.ReleaseGenerator':

@@ -26,6 +26,7 @@ import typing
 import json
 import os
 import subprocess
+import random
 
 import pytest
 import pathlib
@@ -353,6 +354,7 @@ class TestNullFSBasejail(object):
         assert libioc.helpers.is_valid_name("Grönke") is True
         assert libioc.helpers.is_valid_name("jail>ioc") is True
         assert libioc.helpers.is_valid_name("jail{ioc}23") is True
+        assert libioc.helpers.is_valid_name("jail.with.dots") is True
 
         assert libioc.helpers.is_valid_name("") is False
         assert libioc.helpers.is_valid_name("ioc\n23") is False
@@ -366,3 +368,27 @@ class TestNullFSBasejail(object):
         assert libioc.helpers.is_valid_name("ioc\\jail") is False
         assert libioc.helpers.is_valid_name("jail{ioc}") is False
         assert libioc.helpers.is_valid_name("we❤jails") is False
+
+    def test_jail_with_dot_in_name_can_be_created_and_started(
+        self,
+        new_jail: 'libioc.Jail.Jail',
+        local_release: 'libioc.Release.ReleaseGenerator',
+        root_dataset: libzfs.ZFSDataset,
+        zfs: libzfs.ZFS
+    ) -> None:
+        """Test if NullFS basejails can be created."""
+        jail_name_with_dots = "dot.test." + str(random.randint(1, 32768))
+        new_jail.config["name"] = jail_name_with_dots
+        new_jail.config["basejail"] = True
+
+        new_jail.create(local_release)
+        assert new_jail.exists is True
+
+        assert new_jail.running is False
+        new_jail.start()
+        assert new_jail.running is True
+
+        assert new_jail.identifier.endswith(
+            # only check suffix, because source dataset name might vary
+            "-" + jail_name_with_dots.replace(".", "*")
+        )

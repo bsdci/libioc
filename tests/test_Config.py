@@ -73,12 +73,12 @@ class TestJailConfig(object):
         assert "foobar" in data["user"].keys()
         assert isinstance(data["user"]["foobar"], str)
 
-    def test_name_may_not_contain_dots(
+    def test_name_may_contain_dots(
         self,
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
-        with pytest.raises(libioc.errors.InvalidJailName):
-            existing_jail.config["name"] = "jail.with.dots"
+        existing_jail.config["name"] = "jail.with.dots"
+        existing_jail.identifier = "jail*with*dots"
 
     def test_cannot_clone_from_dict_with_invalid_values(
         self,
