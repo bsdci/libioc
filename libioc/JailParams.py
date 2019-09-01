@@ -107,6 +107,16 @@ class JailParam(freebsd_sysctl.Sysctl):
         ))
         return f"{self.jail_arg_name}={mapped_value}"
 
+    @property
+    def serial(self) -> typing.Dict[str, typing.Any]:
+        return dict(
+            name=self.name,
+            value=self.sysctl_value,
+            description=self.description,
+            size=self.size,
+            kind=self.kind
+        )
+
 
 class JailParams(collections.abc.MutableMapping):
     """Collection of jail parameters."""
@@ -164,6 +174,14 @@ class JailParams(collections.abc.MutableMapping):
             (x.name.rstrip("."), x,)
             for x in jail_params
         ])
+
+    @property
+    def serial(self) -> typing.List[typing.Dict[str, typing.Any]]:
+        return [
+            value.serial
+            for key, value
+            in self.items()
+        ]
 
 
 class HostJailParams(JailParams):
