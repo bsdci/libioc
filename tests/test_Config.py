@@ -85,7 +85,7 @@ class TestJailConfig(object):
         new_jail: 'libioc.Jail.Jail'
     ) -> None:
         invalid_data = dict(
-            name="name.with.dots"
+            name="invalid*characters"
         )
         del new_jail.config["id"]
         with pytest.raises(libioc.errors.InvalidJailName):
