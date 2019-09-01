@@ -78,7 +78,7 @@ class TestJailConfig(object):
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
         existing_jail.config["name"] = "jail.with.dots"
-        existing_jail.identifier = "jail*with*dots"
+        assert existing_jail.identifier.endswith("jail*with*dots")
 
     def test_cannot_clone_from_dict_with_invalid_values(
         self,
