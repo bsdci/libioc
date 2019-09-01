@@ -393,8 +393,9 @@ class InvalidJailName(JailConfigError):
     ) -> None:
         msg = (
             f"Invalid jail name '{name}': "
-            "Names may only contain alphanumeric characters and may not begin "
-            "with special characters ! ^ - _ ( ) [ ] { } < > , ."
+            "Names may not begin or end with special characters, "
+            "but may contain alphanumeric and allowed special characters "
+            "! ^ - _ ( ) [ ] { } < > , ."
         )
         if invalid_characters is not None:
             msg += ", but got " + str("".join(invalid_characters) + "")
