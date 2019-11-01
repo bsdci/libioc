@@ -128,6 +128,7 @@ class Updater:
                     "release": self.release.name,
                     "exec_start": None,
                     "securelevel": "0",
+                    "devfs_ruleset": None,
                     "allow_chflags": True,
                     "vnet": False,
                     "ip4_addr": None,

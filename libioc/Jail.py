@@ -660,12 +660,16 @@ class JailGenerator(JailResource):
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.MountDevFS', None, None]:
+        extra_args = dict()
+        if self.config["devfs_ruleset"] is not None:
+            extra_args["ruleset"] = self.devfs_ruleset
+
         yield from self.__mount_in_jail(
             filesystem="devfs",
             mountpoint="/dev",
             event=libioc.events.MountDevFS,
             event_scope=event_scope,
-            ruleset=self.devfs_ruleset
+            **extra_args
         )
 
     def __mount_fdescfs(
@@ -1618,13 +1622,18 @@ class JailGenerator(JailResource):
         Users may reference a rule by numeric identifier or name. This numbers
         are automatically selected, so it's advisable to use names.1
         """
+        devfs_ruleset = self.config["devfs_ruleset"]
+
+        if devfs_ruleset is None:
+            return None
+
         try:
             configured_devfs_ruleset = self.host.devfs.find_by_number(
-                int(self.config["devfs_ruleset"])
+                int(devfs_ruleset)
             )
         except ValueError:
             configured_devfs_ruleset = self.host.devfs.find_by_name(
-                self.config["devfs_ruleset"]
+                devfs_ruleset
             )
 
         devfs_ruleset = libioc.DevfsRules.DevfsRuleset()
@@ -1679,7 +1688,10 @@ class JailGenerator(JailResource):
         jail_params: typing.Dict[str, libioc.JailParams.JailParam] = {}
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
             if sysctl_name == "security.jail.param.devfs_ruleset":
-                value = int(self.devfs_ruleset)
+                devfs_ruleset = self.devfs_ruleset
+                if devfs_ruleset is None:
+                    continue
+                value = int(devfs_ruleset)
             elif sysctl_name == "security.jail.param.path":
                 value = self.root_dataset.mountpoint
             elif sysctl_name == "security.jail.param.name":
