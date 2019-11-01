@@ -80,7 +80,7 @@ class FstabLine(dict):
 
         return output
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
@@ -125,7 +125,7 @@ class FstabCommentLine(dict):
         """Return the untouched comment line string."""
         return str(self["line"])
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """
         Return a random hash value.
 
@@ -144,7 +144,7 @@ class FstabAutoPlaceholderLine(dict):
         """Never print virtual lines."""
         raise NotImplementedError("this is a virtual fstab line")
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Do not return a hash because placeholders have none."""
         return hash(None)
 
