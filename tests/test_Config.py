@@ -26,6 +26,8 @@ import typing
 import pytest
 import json
 import os
+import uuid
+import hashlib
 
 import libzfs
 
@@ -259,6 +261,25 @@ class TestUserDefaultConfig(object):
 
         existing_jail.config["devfs_ruleset"] = None
         assert "devfs_ruleset" not in existing_jail._launch_params
+
+    def test_hostuuid_is_generated_when_not_configured(
+        self,
+        new_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        assert new_jail.config["host_hostuuid"] == None
+        assert isinstance(new_jail.hostuuid, uuid.UUID)
+
+    def test_hostuuid_can_be_configured(
+        self,
+        new_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        m = hashlib.sha1()  # nosec: B303
+        m.update(b"some random value")
+        test_uuid = uuid.UUID(m.hexdigest()[0:32])
+
+        new_jail.config["host_hostuuid"] = str(test_uuid)
+        assert isinstance(new_jail.hostuuid, uuid.UUID)
+        assert new_jail.hostuuid == test_uuid
 
 
 class TestBrokenConfig(object):

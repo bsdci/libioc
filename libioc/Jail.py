@@ -1449,8 +1449,18 @@ class JailGenerator(JailResource):
         if backend is not None:
             backend.setup(self.storage, resource)
         self.config["hostid"] = self.host.uuid
-        self.config["host_hostuuid"] = self.__generated_hostuuid
+        self.config["host_hostuuid"] = self._generated_hostuuid
         self.save()
+
+    @property
+    def hostuuid(self) -> uuid.UUID:
+        """Return the jails host.hostuuid."""
+        host_hostuuid = self.config["host_hostuuid"]
+        if host_hostuuid is None:
+            return self._generated_hostuuid
+        else:
+            _host_hostuuid = host_hostuuid  # type: uuid.UUID
+            return _host_hostuuid
 
     @property
     def is_basejail(self) -> bool:
@@ -1684,7 +1694,7 @@ class JailGenerator(JailResource):
             return self.host.devfs[ruleset_line_position].number
 
     @property
-    def __generated_hostuuid(self) -> uuid.UUID:
+    def _generated_hostuuid(self) -> uuid.UUID:
         m = hashlib.sha1()  # nosec: B303
         m.update(self.host.uuid.bytes + self.identifier.encode("UTF-8"))
         return uuid.UUID(m.hexdigest()[0:32])
@@ -1706,11 +1716,7 @@ class JailGenerator(JailResource):
             elif sysctl_name == "security.jail.param.name":
                 value = self.identifier
             elif sysctl_name == "security.jail.param.host.hostuuid":
-                host_hostuuid = self.config["host_hostuuid"]
-                if host_hostuuid is None:
-                    value = str(self.__generated_hostuuid)
-                else:
-                    value = str(host_hostuuid)
+                value = str(self.hostuuid)
             elif sysctl_name == "security.jail.param.allow.mount.zfs":
                 value = int(self._allow_mount_zfs)
             elif sysctl_name == "security.jail.param.vnet":
