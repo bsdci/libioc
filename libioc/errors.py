@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Collection of iocage errors."""
 import typing
+import uuid
 
 # MyPy
 import libzfs  # noqa: F401
@@ -495,19 +496,19 @@ class ResourceLimitActionFailed(IocException, KeyError):
         IocException.__init__(self, message=msg, logger=logger)
 
 
-class JailHostIdMismatch(JailException):
+class JailHostUUIDMismatch(JailException):
     """Raised when attempting to start a jail with mismatching hostid."""
 
     def __init__(
         self,
-        host_hostid: str,
+        hostuuid: uuid.UUID,
         jail: 'libioc.Jail.JailGenerator',
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         jail_hostid = jail.config["hostid"]
         msg = (
             f"The jail hostid '{jail_hostid}' "
-            f"does not match the hosts hostid '{host_hostid}'"
+            f"does not match the hosts hostid '{hostuuid}'"
         )
         JailException.__init__(self, message=msg, jail=jail, logger=logger)
 

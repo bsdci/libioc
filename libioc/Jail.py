@@ -38,6 +38,8 @@ import typing
 import os
 import shlex
 import shutil
+import hashlib
+import uuid
 
 import libzfs
 import freebsd_sysctl
@@ -1446,7 +1448,8 @@ class JailGenerator(JailResource):
         backend = self.storage_backend
         if backend is not None:
             backend.setup(self.storage, resource)
-        self.config["hostid"] = self.host.id
+        self.config["hostid"] = self.host.uuid
+        self.config["host_hostuuid"] = self.__generated_hostuuid
         self.save()
 
     @property
@@ -1681,6 +1684,12 @@ class JailGenerator(JailResource):
             return self.host.devfs[ruleset_line_position].number
 
     @property
+    def __generated_hostuuid(self) -> uuid.UUID:
+        m = hashlib.sha1()  # nosec: B303
+        m.update(self.host.uuid.bytes + self.identifier.encode("UTF-8"))
+        return uuid.UUID(m.hexdigest()[0:32])
+
+    @property
     def _launch_params(self) -> libjail.Jiov:
         config = self.config
         vnet = (config["vnet"] is True)
@@ -1696,6 +1705,12 @@ class JailGenerator(JailResource):
                 value = self.root_dataset.mountpoint
             elif sysctl_name == "security.jail.param.name":
                 value = self.identifier
+            elif sysctl_name == "security.jail.param.host.hostuuid":
+                host_hostuuid = self.config["host_hostuuid"]
+                if host_hostuuid is None:
+                    value = str(self.__generated_hostuuid)
+                else:
+                    value = str(host_hostuuid)
             elif sysctl_name == "security.jail.param.allow.mount.zfs":
                 value = int(self._allow_mount_zfs)
             elif sysctl_name == "security.jail.param.vnet":
@@ -2117,9 +2132,9 @@ class JailGenerator(JailResource):
     def require_jail_match_hostid(self, log_errors: bool=True) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.hostid_check_ok is False:
-            raise libioc.errors.JailHostIdMismatch(
+            raise libioc.errors.JailHostUUIDMismatch(
                 jail=self,
-                host_hostid=self.host.id,
+                hostuuid=self.host.uuid,
                 logger=(self.logger if log_errors else None)
             )
 
@@ -2130,7 +2145,7 @@ class JailGenerator(JailResource):
             self.logger.spam("hostid_strict_check is disabled")
             return True
         jail_hostid = self.config["hostid"]
-        if (jail_hostid is None) or (jail_hostid == self.host.id):
+        if (jail_hostid is None) or (jail_hostid == self.host.uuid):
             return True
         return False
 

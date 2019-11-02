@@ -28,6 +28,7 @@ import os
 import platform
 import re
 import freebsd_sysctl
+import uuid
 
 import libzfs
 
@@ -45,6 +46,7 @@ _distribution_types = typing.Union[
     libioc.Distribution.DistributionGenerator,
     libioc.Distribution.Distribution,
 ]
+UUID = uuid.UUID
 
 
 class HostGenerator:
@@ -55,7 +57,6 @@ class HostGenerator:
     _devfs: libioc.DevfsRules.DevfsRules
     _defaults: libioc.Resource.DefaultResource
     __user_provided_defaults: typing.Optional[libioc.Resource.DefaultResource]
-    __hostid: str
     releases_dataset: libzfs.ZFSDataset
     datasets: libioc.Datasets.Datasets
     distribution: _distribution_types
@@ -117,17 +118,9 @@ class HostGenerator:
         self._defaults.read_config()
 
     @property
-    def id(self) -> str:
-        """Return the hostid and memoize on first lookup."""
-        try:
-            return self.__hostid
-        except AttributeError:
-            pass
-
-        with open("/etc/hostid", "r", encoding="utf-8") as f:
-            self.__hostid = f.read().strip()
-
-        return self.__hostid
+    def uuid(self) -> UUID:
+        """Return the hostuuid and memoize on first lookup."""
+        return uuid.UUID(freebsd_sysctl.Sysctl("kern.hostuuid").value)
 
     @property
     def defaults(self) -> 'libioc.Resource.DefaultResource':

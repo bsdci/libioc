@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The common base of jail configurations."""
 import typing
+import uuid
 
 import libioc.Config.Data
 import libioc.Config.Jail.Globals
@@ -536,14 +537,25 @@ class BaseConfig(dict):
                     logger=self.logger
                 )
 
-    def _get_host_hostuuid(self) -> str:
-        try:
-            hostuuid = self.data["host_hostuuid"]
-            if hostuuid is None:
-                raise ValueError
-            return str(hostuuid)
-        except (KeyError, ValueError):
-            return str(self["id"])
+    def _get_host_hostuuid(self) -> typing.Optional[uuid.UUID]:
+        host_hostuuid = self.data["host_hostuuid"]  # type: uuid.UUID
+        return host_hostuuid
+
+    def _set_host_hostuuid(
+        self,
+        value: typing.Optional[typing.Union[str, uuid.UUID]]
+    ) -> None:
+        if (value is None) or (isinstance(value, uuid.UUID) is True):
+            self.data["host_hostuuid"] = value
+            return
+
+        if isinstance(value, str) is True:
+            _value = str(value)
+        elif isinstance(value, bytes) is True:
+            _value = value.decode("UTF-8")  # type: ignore
+        else:
+            raise ValueError("Expected UUID or string/byte representation")
+        self.data["host_hostuuid"] = uuid.UUID(_value)
 
     def _get_host_hostname(self) -> str:
         try:
