@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019, Stefan Grönke
+2# Copyright (c) 2017-2019, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -249,6 +249,16 @@ class TestUserDefaultConfig(object):
             assert "comment" in data["user"].keys()
             assert data["user"]["comment"] == "hi there!"
             assert len(data.keys()) == 2
+
+    def test_can_be_configured_without_devfs_ruleset(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        assert existing_jail.config["devfs_ruleset"] == 4
+        assert "devfs_ruleset" in existing_jail._launch_params
+
+        existing_jail.config["devfs_ruleset"] = None
+        assert "devfs_ruleset" not in existing_jail._launch_params
 
 
 class TestBrokenConfig(object):
