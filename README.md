@@ -25,7 +25,7 @@ At the current time libioc is not packaged or available in FreeBSD ports.
 
 ## Documentation
 
-- Iocage Handbook: https://bsdci.github.io/handbook
+- Ioc Handbook: https://bsdci.github.io/handbook
 - Reference Documentation: https://bsdci.github.io/libioc
 - Gitter Chat: https://gitter.im/libioc/community
 
