@@ -3,7 +3,7 @@ JAIL_NIC?=vtnet0
 JAIL_IP?=172.16.0
 JAIL_NET?=16
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
-PYTHON ?= python3.6
+PYTHON ?= python3.7
 
 pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 
