@@ -1,7 +1,6 @@
 task:
   freebsd_instance:
     matrix:
-      #image: freebsd-11-2-release-amd64
       image: freebsd-12-1-release-amd64
   pip_cache:
     folder: ~/.cache/pip
