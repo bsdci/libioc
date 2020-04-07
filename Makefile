@@ -19,7 +19,7 @@ install-python-requirements:
 install-python-requirements-dev: install-python-requirements
 	$(PYTHON) -m pip install -Ur requirements-dev.txt
 install-deps:
-	pkg install -q -y libucl py$(pyver)-ucl py$(pyver)-setuptools rsync python$(pyver) py$(pyver)-libzfs
+	pkg install -q -y libucl py$(pyver)-ucl py$(pyver)-setuptools py$(pyver)-wheel rsync python$(pyver) py$(pyver)-libzfs
 install-deps-dev: install-deps
 	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py$(pyver)-sqlite3; fi
 install-dev: install-deps-dev install-python-requirements-dev
