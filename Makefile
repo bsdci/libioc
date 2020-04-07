@@ -5,6 +5,7 @@ JAIL_NET?=16
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 PYTHON ?= python3.7
 
+# turn python3.7 -> 3.7 -> 37
 pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 
 .if $(pyver) < 35
