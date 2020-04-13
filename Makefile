@@ -27,7 +27,7 @@ install-deps-dev: install-deps
 install-dev: install-deps-dev install-python-requirements-dev
 	$(PYTHON) -m pip install -e .
 install-travis:
-	python3.6 -m pip install -IU flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit==1.5.1 bandit-high-entropy-string
+	python$(TRAVIS_PYTHON_VERSION) -m pip install -IU flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit==1.5.1 bandit-high-entropy-string
 uninstall:
 	$(PYTHON) -m pip uninstall -y ioc
 	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
