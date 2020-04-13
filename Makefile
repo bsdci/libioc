@@ -35,6 +35,7 @@ uninstall:
 	fi
 check:
 	flake8 --version
+	mypy --version
 	flake8 --exclude=".travis,.eggs,__init__.py,docs,tests" --ignore=E203,E252,W391,D107,A001,A002,A003,A004,D412,D413,T499
 	bandit --skip B404,B110 --exclude tests/ -r .
 test:
