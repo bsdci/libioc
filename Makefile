@@ -4,8 +4,8 @@ JAIL_IP?=172.16.0
 JAIL_NET?=16
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
-LATEST_PKG_PYTHON_VERSION != pkg info -g 'python3*' | cut -d'-' -f1 | sed 's/^python//' | sort -n | tail -n1 | sed -r 's/^([0-9])([0-9]+)/\1.\2/'
-PYTHON ?= python${LATEST_PKG_PYTHON_VERSION}
+PYTHON_VERSION != if [ "$(PYTHON_VERSION)" != "" ]; then echo $(PYTHON_VERSION); else pkg info -g 'python3*' | cut -d'-' -f1 | sed 's/^python//' | sort -n | tail -n1 | sed -r 's/^([0-9])([0-9]+)/\1.\2/'; fi
+PYTHON ?= python${PYTHON_VERSION}
 pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 
 .if $(pyver) < 35
