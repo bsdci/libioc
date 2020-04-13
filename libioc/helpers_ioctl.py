@@ -41,7 +41,12 @@ def get_sockio_ioctl(nic_name: str, ioctl: SOCKIO_IOCTLS) -> bytes:
     """Query a sockio ioctl for a given NIC."""
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) as sock:
         ifconf = struct.pack('256s', nic_name.encode("UTF-8")[:15])
-        return bytes(fcntl.ioctl(sock.fileno(), ioctl.value, ifconf))
+        return bytes(fcntl.ioctl(
+            sock.fileno(),
+            int(ioctl.value),
+            bytes(ifconf),
+            True
+        ))
 
 
 def get_interface_ip4_address(nic_name: str) -> ipaddress.IPv4Address:
