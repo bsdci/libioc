@@ -181,7 +181,7 @@ class Resource(metaclass=abc.ABCMeta):
     def exists(self) -> bool:
         """Return True if the resource exists on the filesystem."""
         try:
-            mountpoint = self.dataset.mountpoint
+            mountpoint = libioc.ZFS.mountpoint(self.dataset.name)
             if isinstance(mountpoint, str):
                 return os.path.isdir(mountpoint)
         except (AttributeError, libzfs.ZFSException):
@@ -293,7 +293,7 @@ class Resource(metaclass=abc.ABCMeta):
     def create_resource(self) -> None:
         """Create the dataset."""
         self.dataset = self.zfs.create_dataset(self.dataset_name)
-        os.chmod(self.dataset.mountpoint, 0o700)
+        os.chmod(libioc.ZFS.mountpoint(self.dataset.name), 0o700)
 
     def get_dataset(self, name: str) -> libzfs.ZFSDataset:
         """Get the ZFSDataset relative to the resource datasets name."""
@@ -321,7 +321,10 @@ class Resource(metaclass=abc.ABCMeta):
 
     def abspath(self, relative_path: str) -> str:
         """Return the absolute path of a path relative to the resource."""
-        return str(os.path.join(self.dataset.mountpoint, relative_path))
+        return str(os.path.join(
+            libioc.ZFS.mountpoint(self.dataset.name),
+            relative_path
+        ))
 
     def _write_config(self, data: libioc.Config.Data.Data) -> None:
         """Write the configuration to disk."""
@@ -380,9 +383,10 @@ class Resource(metaclass=abc.ABCMeta):
         filepath: str
     ) -> bool:
         """Return whether the path is relative to the resource."""
-        real_resource_path = self._resolve_path(self.dataset.mountpoint)
+        real_resource_path = self._resolve_path(
+            libioc.ZFS.mountpoint(self.dataset.name)
+        )
         real_file_path = self._resolve_path(filepath)
-
         return real_file_path.startswith(real_resource_path)
 
     def _resolve_path(self, filepath: str) -> str:

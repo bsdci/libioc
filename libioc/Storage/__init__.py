@@ -28,6 +28,7 @@ import os
 import pwd
 import typing
 
+import libioc.ZFS
 import libioc.events
 import libioc.helpers
 import libioc.helpers_object
@@ -227,13 +228,15 @@ class Storage:
 
     def create_jail_mountpoint(self, basedir: str) -> None:
         """Ensure the destination mountpoint exists relative to the jail."""
-        basedir = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+        jail_root = libioc.ZFS.mountpoint(self.jail.root_dataset.name)
+        basedir = f"{jail_root}/{basedir}"
         if os.path.islink(basedir):
             self.logger.verbose("Deleting existing symlink {basedir}")
             os.unlink(basedir)
         libioc.helpers.makedirs_safe(basedir)
 
     def _mount_procfs(self) -> None:
+        jail_root = libioc.ZFS.mountpoint(self.jail.root_dataset.name)
         try:
             if self.jail.config["mount_procfs"] is True:
                 libioc.helpers.exec([
@@ -241,7 +244,7 @@ class Storage:
                     "-t",
                     "procfs"
                     "proc"
-                    f"{self.jail.root_dataset.mountpoint}/proc"
+                    f"{jail_root}/proc"
                 ])
         except KeyError:
             raise libioc.errors.MountFailed(
@@ -281,7 +284,8 @@ class Storage:
 
         uid = pwd.getpwnam(user).pw_uid
         gid = grp.getgrnam(group).gr_gid
-        folder = f"{self.jail.root_dataset.mountpoint}{directory}"
+        jail_root = libioc.ZFS.mountpoint(self.jail.root_dataset.name)
+        folder = f"{jail_root}{directory}"
         if not os.path.isdir(folder):
             os.makedirs(folder, permissions)
             os.chown(folder, uid, gid, follow_symlinks=False)

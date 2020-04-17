@@ -209,6 +209,7 @@ class ResourceConfigFile(ConfigFile):
     @property
     def path(self) -> str:
         """Absolute path to the file."""
-        path = f"{self.resource.root_dataset.mountpoint}/{self.file}"
+        mountpoint = self.resource.root_dataset.properties["mountpoint"].value
+        path = f"{mountpoint}/{self.file}"
         self.resource.require_relative_path(path)
         return os.path.abspath(path)

@@ -32,6 +32,7 @@ import libzfs
 
 import git
 
+import libioc.ZFS
 import libioc.errors
 import libioc.events
 import libioc.Pkg
@@ -150,16 +151,18 @@ def provision(
         yield jailProvisioningAssetDownloadEvent.fail(e)
         raise e
 
+    plugin_mountpoint = libioc.ZFS.mountpoint(plugin_dataset.name)
+
     # clone plugin
     plugin_dataset_name = f"{self.jail.dataset.name}/ix-plugin"
     plugin_dataset = __get_empty_dataset(plugin_dataset_name, self.jail.zfs)
     git.Repo.clone_from(
         pluginDefinition["artifact"],
-        plugin_dataset.mountpoint
+        plugin_mountpoint
     )
 
     self.jail.fstab.new_line(
-        source=plugin_dataset.mountpoint,
+        source=plugin_mountpoint,
         destination="/.ix-plugin",
         options="ro",
         auto_create_destination=True,
@@ -179,7 +182,7 @@ def provision(
             host=self.jail.host
         )
 
-        if os.path.isfile(f"{plugin_dataset.mountpoint}/post_install.sh"):
+        if os.path.isfile(f"{plugin_mountpoint}/post_install.sh"):
             postinstall = ["/.ix-plugin/post_install.sh"]
         else:
             postinstall = []

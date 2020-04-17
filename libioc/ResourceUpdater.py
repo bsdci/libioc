@@ -34,6 +34,7 @@ import urllib.error
 
 import libioc.events
 import libioc.errors
+import libioc.ZFS
 import libioc.Jail
 
 # MyPy
@@ -89,7 +90,7 @@ class Updater:
     @property
     def host_updates_dir(self) -> str:
         """Return the mountpoint of the updates dataset."""
-        return str(self.host_updates_dataset.mountpoint)
+        return libioc.ZFS.mountpoint(self.host_updates_dataset.name)
 
     @property
     def local_temp_dir(self) -> str:

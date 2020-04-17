@@ -41,6 +41,7 @@ import os.path
 import re
 
 import libzfs
+import libioc.ZFS
 
 import libioc.events
 import libioc.helpers
@@ -130,9 +131,9 @@ class Pkg:
         return [
             "/usr/sbin/pkg",
             "--config",
-            f"{conf_ds.mountpoint}/pkg.conf",
+            f"{libioc.ZFS.mountpoint(conf_ds.name)}/pkg.conf",
             "--repo-conf-dir",
-            repos_ds.mountpoint
+            libioc.ZFS.mountpoint(repos_ds.name)
         ]
 
     def _update_host_repo(self, release_major_version: int) -> None:
@@ -183,7 +184,7 @@ class Pkg:
         libioc.helpers.exec(
             self._get_pkg_command(release_major_version) + [
                 "repo",
-                cache_ds.mountpoint
+                libioc.ZFS.mountpoint(cache_ds.name)
             ],
             env=dict(
                 ABI=self.__get_abi_string(release_major_version),
@@ -220,7 +221,9 @@ class Pkg:
         yield event.begin()
 
         dataset = self.__get_jail_release_pkg_dataset(jail)
-        pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
+        pkg_archive_name = self._get_latest_pkg_archive(
+            libioc.ZFS.mountpoint(dataset.name)
+        )
         try:
             yield from self.__run_command(
                 jail=jail,
@@ -467,19 +470,19 @@ class Pkg:
         repos_ds = self.zfs.get_or_create_dataset(f"{pkg_ds.name}/repos")
 
         self._update_pkg_conf(
-            filename=f"{conf_ds.mountpoint}/pkg.conf",
+            filename=f"{libioc.ZFS.mountpoint(conf_ds.name)}/pkg.conf",
             data=dict(
                 ABI=self.__get_abi_string(release_major_version),
-                PKG_DBDIR=db_ds.mountpoint,
-                PKG_CACHEDIR=cache_ds.mountpoint,
-                REPOS_DIR=[str(repos_ds.mountpoint)],
+                PKG_DBDIR=libioc.ZFS.mountpoint(db_ds.name),
+                PKG_CACHEDIR=libioc.ZFS.mountpoint(cache_ds.name),
+                REPOS_DIR=[str(libioc.ZFS.mountpoint(repos_ds.name))],
                 SYSLOG=False
             )
         )
 
         self._update_repo_conf(
             repo_name=repo_name,
-            directory=repos_ds.mountpoint,
+            directory=libioc.ZFS.mountpoint(repos_ds.name),
             enabled=True,
             url=f"pkg+{base_url}",
             mirror_type="srv",
@@ -549,7 +552,7 @@ class Pkg:
         repo_ds = self._get_release_pkg_dataset(release_major_version)
         cache_ds = self.zfs.get_or_create_dataset(f"{repo_ds.name}/cache")
         return libioc.Config.Jail.File.Fstab.FstabLine(dict(
-            source=cache_ds.mountpoint,
+            source=libioc.ZFS.mountpoint(cache_ds.name),
             destination=f"{destination_dir}",
             options="ro",
             type="nullfs"

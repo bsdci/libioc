@@ -29,6 +29,7 @@ import typing
 import libioc.helpers_object
 import libioc.Resource
 import libioc.ResourceBackup
+import libioc.ZFS
 
 
 class LaunchableResource(libioc.Resource.Resource):
@@ -112,7 +113,7 @@ class LaunchableResource(libioc.Resource.Resource):
         return backup
 
     def _require_dataset_mounted(self, dataset: libzfs.ZFSDataset) -> None:
-        if dataset.mountpoint is None:
+        if libioc.ZFS.mountpoint(dataset.name) is None:
             raise libioc.errors.DatasetNotMounted(
                 dataset=dataset,
                 logger=self.logger
@@ -121,7 +122,7 @@ class LaunchableResource(libioc.Resource.Resource):
     @property
     def root_path(self) -> str:
         """Return the absolute path to the root filesystem of a jail."""
-        return str(self.root_dataset.mountpoint)
+        return libioc.ZFS.mountpoint(self.root_dataset.name)
 
     @property
     def root_dataset(self) -> libzfs.ZFSDataset:

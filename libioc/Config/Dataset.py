@@ -28,7 +28,7 @@ import libzfs
 import typing
 
 import libioc.Config.Prototype
-
+import libioc.ZFS
 
 class DatasetConfig(libioc.Config.Prototype.Prototype):
     """ioc configuration associated with ZFS datasets."""
@@ -59,7 +59,10 @@ class DatasetConfig(libioc.Config.Prototype.Prototype):
     @property
     def file(self) -> str:
         """Get the absolute path to the config file."""
-        return str(os.path.join(self.dataset.mountpoint, self._file))
+        return str(os.path.join(
+            libioc.ZFS.mountpoint(self.dataset.name),
+            self._file
+        ))
 
     @file.setter
     def file(self, value: str) -> None:

@@ -32,6 +32,7 @@ import re
 import libioc.helpers
 import libioc.helpers_object
 import libioc.Types
+import libioc.ZFS
 import libioc.Config.Jail
 import libioc.Config.Jail.File
 import libioc.Storage.Basejail
@@ -637,7 +638,8 @@ class JailFstab(Fstab):
         if self.file.startswith("/") is True:
             return self.file
         else:
-            path = f"{self.jail.dataset.mountpoint}/{self.file}"
+            jail_mountpoint = libioc.ZFS.mountpoint(self.jail.dataset.name)
+            path = f"{jail_mountpoint}/{self.file}"
             self.jail.require_relative_path(path)
             return path
 
@@ -755,7 +757,7 @@ class JailFstab(Fstab):
         if filepath.startswith(_backup_prefix) is False:
             return filepath
         return "".join([
-            self.jail.dataset.mountpoint,
+            libioc.ZFS.mountpoint(self.jail.dataset.name),
             filepath[len(_backup_prefix):]
         ])
 

@@ -25,11 +25,19 @@
 """ioc libzfs enhancement module."""
 import typing
 import libzfs
+import zfs
 import datetime
 
 import libioc.Logger
 import libioc.helpers_object
 import libioc.errors
+
+
+def mountpoint(dataset_name: str) -> str:
+    """Return the ZFS dataset mountpoint."""
+    mountpoint = zfs.mountpoint(dataset_name.encode("UTF-8"))
+    print(f"Mountpoint of {dataset_name} is {mountpoint}")
+    return mountpoint.decode("UTF-8") if mountpoint is not None else None
 
 
 class ZFS(libzfs.ZFS):
@@ -60,6 +68,21 @@ class ZFS(libzfs.ZFS):
 
         dataset = self.get_dataset(dataset_name)
         dataset.mount()
+        print(
+            "YIP",
+            dataset.properties["mountpoint"].value,
+            dataset.mountpoint,
+            dataset.properties["mounted"].value,
+            mountpoint(dataset.name)
+        )
+        return dataset
+        if mountpoint(dataset.name) is None:
+            _mountpoint = libzfs.ZFSUserProperty(f"/{dataset.name}")
+            print(f"SETTING MOUNTPOINT {_mountpoint.value}")
+            dataset.properties["mountpoint"] = _mountpoint
+        dataset.mount()
+        dataset = self.get_dataset(dataset_name)
+        print(mountpoint(dataset.name))
         return dataset
 
     def get_or_create_dataset(

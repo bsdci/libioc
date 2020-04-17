@@ -25,6 +25,7 @@
 import typing
 import os.path
 
+import libioc.ZFS
 import libioc.errors
 import libioc.events
 import libioc.Pkg
@@ -160,7 +161,7 @@ def provision(
             plugin_dataset_name
         )
 
-        mount_source = plugin_dataset.mountpoint
+        mount_source = libioc.ZFS.mountpoint(plugin_dataset.name)
     else:
         mode = 'ro'
         mount_source = self.source

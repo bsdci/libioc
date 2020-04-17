@@ -347,7 +347,7 @@ class LaunchableResourceBackup:
                 "--hard-links",
                 "--safe-links",
                 f"{temp_root_dir}/",
-                f"{self.resource.root_dataset.mountpoint}/"
+                f"{libioc.ZFS.mountpoint(self.resource.root_dataset.name)}/"
             ])
         except libioc.errors.IocException as e:
             yield importRootDatasetEvent.fail(e)
@@ -562,7 +562,7 @@ class LaunchableResourceBackup:
             fstab.read_file()
             fstab.file = f"{self.work_dir}/fstab"
             fstab.replace_path(
-                self.resource.dataset.mountpoint,
+                libioc.ZFS.mountpoint(self.resource.dataset.name),
                 "backup:///"
             )
             fstab.save()
@@ -587,7 +587,7 @@ class LaunchableResourceBackup:
         try:
             temp_root_dir = f"{self.work_dir}/root"
             compare_dest = "/".join([
-                self.resource.release.root_dataset.mountpoint,
+                libioc.ZFS.mountpoint(self.resource.release.root_dataset.name),
                 f".zfs/snapshot/{self.resource.release_snapshot.snapshot_name}"
             ])
             os.mkdir(temp_root_dir)
@@ -596,8 +596,11 @@ class LaunchableResourceBackup:
             basedirs = libioc.helpers.get_basedir_list(
                 distribution_name=self.resource.host.distribution.name
             )
+            root_dataset_mountpoint = libioc.ZFS.mountpoint(
+                    self.resource.root_dataset.name
+            )
             for basedir in basedirs:
-                _exclude = f"{self.resource.root_dataset.mountpoint}/{basedir}"
+                _exclude = f"{root_dataset_mountpoint}/{basedir}"
                 excludes.append("--exclude")
                 excludes.append(_exclude)
 
@@ -613,7 +616,7 @@ class LaunchableResourceBackup:
                 "--safe-links"
             ] + excludes + [
                 f"--compare-dest={compare_dest}/",
-                f"{self.resource.root_dataset.mountpoint}/",
+                f"{root_dataset_mountpoint}/",
                 temp_root_dir,
             ], logger=self.logger)
         except libioc.errors.IocException as e:

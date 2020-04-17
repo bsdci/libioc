@@ -356,19 +356,20 @@ class ReleaseGenerator(ReleaseResource):
     @property
     def releases_folder(self) -> str:
         """Return the mountpoint of the iocage/releases dataset."""
-        return str(self.source_dataset.releases.mountpoint)
+        return libioc.ZFS.mountpoint(self.source_dataset.releases.name)
 
     @property
     def download_directory(self) -> str:
         """Return the download directory."""
-        return str(self.dataset.mountpoint)
+        return libioc.ZFS.mountpoint(self.dataset.name)
 
     @property
     def root_dir(self) -> str:
         """Return the main directory of the release."""
         try:
-            if self.root_dataset.mountpoint:
-                return str(self.root_dataset.mountpoint)
+            mountpoint = libioc.ZFS.mountpoint(self.root_dataset.name)
+            if mountpoint is not None:
+                return mountpoint
         except AttributeError:
             pass
 
@@ -553,7 +554,9 @@ class ReleaseGenerator(ReleaseResource):
             return False
 
         try:
-            root_dir_index = os.listdir(self.root_dataset.mountpoint)
+            root_dir_index = os.listdir(
+                libioc.ZFS.mountpoint(self.root_dataset.name)
+            )
         except libzfs.ZFSException:
             return False
 
@@ -632,7 +635,7 @@ class ReleaseGenerator(ReleaseResource):
                 logger=self.logger
             )
 
-        root_dataset_mountpoint = self.root_dataset.mountpoint
+        root_dataset_mountpoint = libioc.ZFS.mountpoint(self.root_dataset.name)
         source_file = f"{root_dataset_mountpoint}/etc/hbsd-update.conf"
 
         if not os.path.isfile(source_file):
@@ -826,8 +829,8 @@ class ReleaseGenerator(ReleaseResource):
                 "rsync",
                 "-a",
                 "--delete",
-                f"{self.root_dataset.mountpoint}/",
-                f"{self.base_dataset.mountpoint}"
+                f"{libioc.ZFS.mountpoint(self.root_dataset.name)}/",
+                f"{libioc.ZFS.mountpoint(self.base_dataset.name)}"
             ],
             logger=self.logger
         )
@@ -887,7 +890,7 @@ class ReleaseGenerator(ReleaseResource):
         return snapshot
 
     def _ensure_dataset_mounted(self) -> None:
-        if not self.dataset.mountpoint:
+        if not libioc.ZFS.mountpoint(self.dataset.name):
             self.dataset.mount()
 
     def _fetch_hashes(self) -> None:

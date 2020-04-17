@@ -30,6 +30,7 @@ import shlex
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
+import libioc.ZFS
 
 
 class ZFSShareStorage:
@@ -173,7 +174,7 @@ class ZFSShareStorage:
                 )
 
     def _umount_dataset(self, dataset: libzfs.ZFSDataset) -> None:
-        if dataset.mountpoint is not None:
+        if libioc.ZFS.mountpoint(dataset.name) is not None:
             dataset.umount()
 
     def _exec(

@@ -30,10 +30,10 @@ import libzfs
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
+import libioc.ZFS
 
 # MyPy
 import libioc.Types
-import libioc.ZFS
 import libioc.Logger
 
 # MyPy
@@ -95,9 +95,9 @@ class RootDatasets:
                 _create = True
 
             if _create is True:
-                pool_mountpoint = self.zfs.get_dataset(
+                pool_mountpoint = libioc.ZFS.mountpoint(
                     self.zfs.get_pool(root_dataset).name
-                ).mountpoint
+                )
                 preferred_mountpoint = "/iocage"
                 preferred_mountpoint_inuse = os.path.ismount(
                     preferred_mountpoint
@@ -121,7 +121,7 @@ class RootDatasets:
                     zfs_property = libzfs.ZFSUserProperty(mountpoint)
                     self.root.properties["mountpoint"] = zfs_property
 
-        if self.root.mountpoint is None:
+        if libioc.ZFS.mountpoint(self.root.name) is None:
             raise libioc.errors.ZFSSourceMountpoint(
                 dataset_name=self.root.name,
                 logger=self.logger
@@ -424,7 +424,7 @@ class Datasets(dict):
         self._set_pool_activation(pool, True)
         self.attach_source("iocage", f"{pool.name}/iocage")
 
-        if self.main.root.mountpoint != mountpoint:
+        if libioc.ZFS.mountpoint(self.main.root.name) != mountpoint:
             zfs_property = libzfs.ZFSUserProperty(mountpoint)
             self.main.root.properties["mountpoint"] = zfs_property
 

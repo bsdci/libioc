@@ -25,6 +25,7 @@
 import typing
 
 import libioc.Types
+import libioc.ZFS
 
 
 class BasejailStorage(libioc.Storage.Storage):
@@ -54,10 +55,11 @@ class BasejailStorage(libioc.Storage.Storage):
         )
 
         release_root_path = "/".join([
-            self.jail.release.root_dataset.mountpoint,
+            libioc.ZFS.mountpoint(self.jail.release.root_dataset.name),
             f".zfs/snapshot/{self.jail.release_snapshot.snapshot_name}"
         ])
+        jail_root = libioc.ZFS.mountpoint(self.jail.root_dataset.name)
         for basedir in basedirs:
             source = f"{release_root_path}/{basedir}"
-            destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+            destination = f"{jail_root}/{basedir}"
             yield (source, destination,)

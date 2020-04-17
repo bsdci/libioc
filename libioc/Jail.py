@@ -46,6 +46,7 @@ import freebsd_sysctl
 import jail as libjail
 import freebsd_sysctl.types
 
+import libioc.ZFS
 import libioc.Types
 import libioc.errors
 import libioc.events
@@ -1219,7 +1220,7 @@ class JailGenerator(JailResource):
             )
 
         current_id = self.config["id"]
-        current_mountpoint = self.dataset.mountpoint
+        current_mountpoint = libioc.ZFS.mountpoint(self.dataset.name)
 
         jailRenameEvent = libioc.events.JailRename(
             jail=self,
@@ -1274,7 +1275,7 @@ class JailGenerator(JailResource):
         When no new_path_prefix is provided, the jail's root dataset is used.
         """
         if new_path_prefix is None:
-            _new_path_prefix = self.dataset.mountpoint
+            _new_path_prefix = libioc.ZFS.mountpoint(self.dataset.name)
         else:
             _new_path_prefix = new_path_prefix
 
@@ -1388,7 +1389,7 @@ class JailGenerator(JailResource):
         self.save()
 
         fstab_update_generator = self._update_fstab_paths(
-            source_jail.root_dataset.mountpoint,
+            libioc.ZFS.mountpoint(source_jail.root_dataset.name),
             event_scope=event_scope
         )
         for event in fstab_update_generator:
@@ -1712,7 +1713,7 @@ class JailGenerator(JailResource):
                     continue
                 value = int(devfs_ruleset)
             elif sysctl_name == "security.jail.param.path":
-                value = self.root_dataset.mountpoint
+                value = libioc.ZFS.mountpoint(self.root_dataset.name)
             elif sysctl_name == "security.jail.param.name":
                 value = self.identifier
             elif sysctl_name == "security.jail.param.host.hostuuid":
@@ -1864,7 +1865,8 @@ class JailGenerator(JailResource):
     @property
     def launch_script_dir(self) -> str:
         """Return the launch-scripts directory path of the jail."""
-        return f"{self.jail.dataset.mountpoint}/launch-scripts"
+        mountpoint = libioc.ZFS.mountpoint(self.jail.dataset.name)
+        return f"{mountpoint}/launch-scripts"
 
     @property
     def script_env_path(self) -> str:
@@ -2302,7 +2304,9 @@ class JailGenerator(JailResource):
             prop_name = f"IOC_{prop.replace('.', '_').upper()}"
             jail_env[prop_name] = str(self.config[prop])
 
-        jail_env["IOC_JAIL_PATH"] = self.root_dataset.mountpoint
+        jail_env["IOC_JAIL_PATH"] = libioc.ZFS.mountpoint(
+            self.root_dataset.name
+        )
         jail_env["IOC_JID"] = str(self.jid)
         jail_env["PATH"] = ":".join((
             "/sbin",
