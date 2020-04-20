@@ -144,7 +144,8 @@ class Pkg:
             logger=self.logger,
             env=dict(
                 ABI=self.__get_abi_string(release_major_version),
-                SIGNATURE_TYPE="fingerprints"
+                SIGNATURE_TYPE="fingerprints",
+                IGNORE_OSVERSION="yes"
             )
         )
 
