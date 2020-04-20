@@ -280,7 +280,11 @@ def get_zfs(
     history_prefix: str="<iocage>"
 ) -> ZFS:
     """Get an instance of iocages enhanced ZFS class."""
-    zfs = ZFS(history=history, history_prefix=history_prefix)
+    zfs = ZFS(
+        history=history,
+        history_prefix=history_prefix,
+        mnttab_cache=False
+    )
     zfs.logger = libioc.helpers_object.init_logger(zfs, logger)
     return zfs
 
