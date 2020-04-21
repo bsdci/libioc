@@ -5,7 +5,7 @@ JAIL_NET?=16
 MYPYPATH = $(shell pwd)/.travis/mypy-stubs
 
 PYTHON_VERSION ?= $(TRAVIS_PYTHON_VERSION)
-SELECTED_PYTHON_VERSION != if [ "$(PYTHON_VERSION)" != "" ]; then echo $(PYTHON_VERSION); else pkg info -g 'python3*' | cut -d'-' -f1 | sed 's/^python//' | sort -n | tail -n1 | sed -r 's/^([0-9])([0-9]+)/\1.\2/'; fi
+SELECTED_PYTHON_VERSION != if [ "$(PYTHON_VERSION)" != "" ]; then echo $(PYTHON_VERSION); else pkg query '%dn' 'python3' | sort -un | sed -r 's/^python//;s/^([0-9])([0-9]+)/\1.\2/' | tail -n1 ; fi
 PYTHON ?= python${SELECTED_PYTHON_VERSION}
 # turn python3.7 -> 3.7 -> 37
 pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
