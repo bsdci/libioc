@@ -20,7 +20,7 @@ task:
     - sysrc -a
     - sysctl -a
     - mount -t fdescfs null /dev/fd
-    - pkg install -y git
+    - pkg install -y git-lite
     - make install-dev
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
