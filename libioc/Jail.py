@@ -73,7 +73,7 @@ import ctypes
 import errno
 try:
     _dll = ctypes.CDLL("libc.so.7", use_errno=True)
-except:
+except OSError:
     import ctypes.util
     _dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
 
