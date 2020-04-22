@@ -1,12 +1,9 @@
-## x.y.z - 2020-mm-DD
-
-see [changelog.md](https://changelog.md/) for how to extend this for the next release.
-
 ## 0.9.0 - 2020-04-21
 
 ### Added
 
-[This changelog!](https://github.com/bsdci/libioc/pull/757)
+- [This changelog!](https://github.com/bsdci/libioc/pull/757)
+- [Released as Port](), this means it can now be installed vith `pkg`
 
 ### Changed
 
