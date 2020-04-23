@@ -77,7 +77,12 @@ class ZFS:
     pools: Generator[ZFSPool, None, None] = ...
     snapshots: Generator[ZFSSnapshot, None, None] = ...
     __pyx_vtable__ = ... # type: Any
-    def __init__(self, history: bool=True, history_prefix: str='') -> None: ...
+    def __init__(
+        self,
+	history: bool=True,
+	history_prefix: str='',
+	mnttab_cache: bool=True
+    ) -> None: ...
     def create(
         self,
         name: str,

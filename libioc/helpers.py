@@ -139,7 +139,7 @@ def _prettify_output(output: str) -> str:
 
 def to_humanreadable_name(name: str) -> str:
     """Return a shorted UUID or the original name."""
-    return name[:8] if (is_uuid(name) is True) else name
+    return name[:8] if (is_valid_uuid(name) is True) else name
 
 
 _UUID_REGEX = re.compile(
@@ -147,18 +147,22 @@ _UUID_REGEX = re.compile(
 )
 
 
-def is_uuid(text: str) -> bool:
+def is_valid_uuid(text: str) -> bool:
     """Return True if the input string is an UUID."""
     return _UUID_REGEX.match(text) is not None
 
 
 # helper function to validate names
-_validate_name = re.compile(r"[a-z0-9][a-z0-9\.\-_]{1,31}", re.I)
+_JAIL_NAME_REGEX = re.compile(
+    r"^[A-Za-z0-9]+(?:[!\-_^\[\]\{\}\(\)<>\.,]?[A-Za-z0-9\u00C0-\u017F]+)*$"
+)
 
 
-def validate_name(name: str) -> bool:
+def is_valid_name(name: str) -> bool:
     """Return True if the name matches the naming convention."""
-    return _validate_name.fullmatch(name) is not None
+    if len(name) > 31:
+        return False
+    return _JAIL_NAME_REGEX.fullmatch(name) is not None
 
 
 def parse_none(
@@ -539,22 +543,30 @@ def mount(
     destination: str,
     source: str=None,
     fstype: str="nullfs",
-    opts: typing.List[str]=[]
+    opts: typing.List[str]=[],
+    logger: typing.Optional['libioc.Logger.Logger']=None,
+    **iov_data: typing.Any
 ) -> None:
     """Mount a filesystem using libc."""
     data: typing.Dict[str, typing.Optional[str]] = dict(
         fstype=fstype,
         fspath=destination
     )
+    for key, value in iov_data.items():
+        data[key] = str(value)
     if source is not None:
-        data["target"] = source
+        if fstype == "nullfs":
+            data["target"] = source
+        else:
+            data["from"] = source
     for opt in opts:
         data[opt] = None
     jiov = libjail.Jiov(data)
     if libjail.dll.nmount(jiov.pointer, len(jiov), 0) != 0:
         raise libioc.errors.MountFailed(
             mountpoint=destination,
-            reason=jiov.errmsg.value
+            reason=jiov.errmsg.value.decode("UTF-8"),
+            logger=logger
         )
 
 

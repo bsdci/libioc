@@ -22,14 +22,23 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage Resource extension that managed exporting and importing backups."""
+"""ioc Resource extension that managed exporting and importing backups."""
 import typing
 import tarfile
 import tempfile
 import os
+import os.path
+import enum
 import libzfs
 
 import libioc.events
+
+
+class Format(enum.Enum):
+    """Enum of the backup formats."""
+
+    TAR = "1"
+    DIRECTORY = "2"
 
 
 class LaunchableResourceBackup:
@@ -43,7 +52,7 @@ class LaunchableResourceBackup:
     """
 
     resource: 'libioc.LaunchableResource.LaunchableResource'
-    _work_dir: typing.Optional[tempfile.TemporaryDirectory]
+    _work_dir: typing.Optional[typing.Union[str, tempfile.TemporaryDirectory]]
     _snapshot_name: typing.Optional[str]
 
     def __init__(
@@ -68,7 +77,10 @@ class LaunchableResourceBackup:
     def work_dir(self) -> str:
         """Return the absolute path to the current temporary directory."""
         if self._work_dir is not None:
-            return self._work_dir.name
+            if isinstance(self._work_dir, tempfile.TemporaryDirectory):
+                return self._work_dir.name
+            else:
+                return self._work_dir
         raise self.__unlocked_error
 
     @property
@@ -98,22 +110,32 @@ class LaunchableResourceBackup:
     @property
     def locked(self) -> bool:
         """Return True when a temporary directory exists."""
-        return (self._work_dir is not None)
+        return (self._work_dir is None) is False
 
-    def _lock(self) -> None:
+    def _lock(self, work_dir: typing.Optional[str]=None) -> None:
         self._require_unlocked()
-        work_dir = tempfile.TemporaryDirectory()
-        self.logger.spam(
-            f"Resource backup temp directory created: {work_dir.name}"
-        )
-        self._work_dir = work_dir
+        _work_dir: typing.Union[str, tempfile.TemporaryDirectory]
+        if work_dir is None:
+            _work_dir = tempfile.TemporaryDirectory()
+            self.logger.spam(
+                f"Resource backup temp directory created: {_work_dir.name}"
+            )
+        else:
+            _work_dir = str(work_dir)
+            if os.path.exists(_work_dir) is False:
+                os.makedirs(_work_dir, mode=0o0750)
+                self.logger.spam(
+                    f"Resource backup temp directory created: {_work_dir}"
+                )
+        self._work_dir = _work_dir
         self._snapshot_name = libioc.ZFS.append_snapshot_datetime("backup")
 
     def _unlock(self) -> None:
         work_dir = self.work_dir
         self.logger.spam(f"Deleting Resource backup temp directory {work_dir}")
-        if self._work_dir is not None:
-            self._work_dir.cleanup()
+        if (self._work_dir is not None):
+            if isinstance(self._work_dir, tempfile.TemporaryDirectory):
+                self._work_dir.cleanup()
 
     def _require_unlocked(self) -> None:
         if self.locked is False:
@@ -138,6 +160,22 @@ class LaunchableResourceBackup:
 
                 The path to the exported archive file (tar.gz)
         """
+        if os.path.exists(source) is False:
+            raise libioc.errors.BackupSourceDoesNotExist(
+                source=source,
+                logger=self.logger
+            )
+
+        if os.path.isdir(source) is True:
+            backup_format = Format.DIRECTORY
+        elif (source.endswith(".txz") or source.endswith(".tar.gz")) is True:
+            backup_format = Format.TAR
+        else:
+            raise libioc.errors.BackupSourceUnknownFormat(
+                source=source,
+                logger=self.logger
+            )
+
         resourceBackupEvent = libioc.events.ResourceBackup(
             self.resource,
             scope=event_scope
@@ -145,18 +183,17 @@ class LaunchableResourceBackup:
         scope = resourceBackupEvent.scope
         yield resourceBackupEvent.begin()
 
-        self._lock()
+        self._lock(
+            work_dir=(None if (backup_format == Format.TAR) else source)
+        )
 
         def _unlock_resource_backup() -> None:
             self._unlock()
 
         resourceBackupEvent.add_rollback_step(_unlock_resource_backup)
 
-        try:
+        if (backup_format == Format.TAR):
             yield from self._extract_bundle(source, event_scope=scope)
-        except Exception as e:
-            yield resourceBackupEvent.fail(e)
-            raise e
 
         def _destroy_failed_import() -> None:
             try:
@@ -242,8 +279,8 @@ class LaunchableResourceBackup:
         yield importConfigEvent.begin()
 
         try:
-            self.resource.config.data = data
-            self.resource.config_handler.write(data)
+            self.resource.config.clone(data, skip_on_error=True)
+            self.resource.config_handler.write(self.resource.config.data)
             self.logger.verbose(
                 f"Config imported from {self.resource.config_handler.file}"
             )
@@ -383,6 +420,7 @@ class LaunchableResourceBackup:
         destination: str,
         standalone: typing.Optional[bool]=None,
         recursive: bool=False,
+        backup_format: Format=Format.TAR,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
@@ -419,7 +457,16 @@ class LaunchableResourceBackup:
         _scope = resourceBackupEvent.scope
         yield resourceBackupEvent.begin()
 
-        self._lock()
+        if backup_format == Format.TAR:
+            self._lock(None)  # use temporary directory and tar later
+        else:
+            if os.path.exists(destination) is True:
+                raise libioc.errors.ExportDestinationExists(
+                    destination=destination,
+                    logger=self.logger
+                )
+            self._lock(destination)  # directly output to this directory
+
         self._take_resource_snapshot()
 
         zfs_send_flags = set()
@@ -453,10 +500,11 @@ class LaunchableResourceBackup:
             event_scope=_scope
         )
 
-        yield from self._bundle_backup(
-            destination=destination,
-            event_scope=_scope
-        )
+        if backup_format == Format.TAR:
+            yield from self._bundle_backup(
+                destination=destination,
+                event_scope=_scope
+            )
 
         _unlock_resource_backup()
         yield resourceBackupEvent.end()

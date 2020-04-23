@@ -130,6 +130,13 @@ class Storage:
         )
         yield event.begin()
 
+        try:
+            for mountpoint in system_mountpoints:
+                self.jail.require_relative_path(mountpoint)
+        except Exception as e:
+            yield event.fail(str(e))
+            raise e
+
         has_unmounted_any = False
         try:
             for mountpoint in system_mountpoints:
@@ -137,7 +144,8 @@ class Storage:
                     continue
                 libioc.helpers.umount(
                     mountpoint=mountpoint,
-                    force=True
+                    force=True,
+                    logger=self.logger
                 )
                 has_unmounted_any = True
         except Exception:

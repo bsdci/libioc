@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage ZFS share storage backend."""
+"""ioc ZFS share storage backend."""
 import typing
 import libzfs
 import shlex

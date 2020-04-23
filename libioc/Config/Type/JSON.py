@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage configuration stored in a JSON file."""
+"""ioc configuration stored in a JSON file."""
 import typing
 import json
 
@@ -34,17 +34,26 @@ import libioc.helpers
 
 
 class ConfigJSON(libioc.Config.Prototype.Prototype):
-    """iocage configuration stored in a JSON file."""
+    """ioc configuration stored in a JSON file."""
 
     config_type = "json"
 
-    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+    def map_input(self, data: typing.TextIO) -> libioc.Config.Data.Data:
         """Parse and normalize JSON data."""
-        if data == "":
-            return {}
         try:
-            result = json.load(data)  # type: typing.Dict[str, typing.Any]
-            return result
+            content = data.read().strip()
+        except (FileNotFoundError, PermissionError) as e:
+            raise libioc.errors.JailConfigError(
+                message=str(e),
+                logger=self.logger
+            )
+
+        if content == "":
+            return libioc.Config.Data.Data()
+
+        try:
+            result = json.loads(content)  # type: typing.Dict[str, typing.Any]
+            return libioc.Config.Data.Data(result)
         except json.decoder.JSONDecodeError as e:
             raise libioc.errors.JailConfigError(
                 message=str(e),

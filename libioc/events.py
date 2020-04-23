@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage events collection."""
+"""ioc events collection."""
 import typing
 from timeit import default_timer as timer
 
@@ -72,7 +72,11 @@ class IocEvent:
         scope: typing.Optional[Scope]=None
     ) -> None:
         """Initialize an IocEvent."""
-        self.scope = scope
+        if scope is not None:
+            self.scope = scope
+        else:
+            self.scope = Scope()
+
         for event in self.scope:
             if event.__hash__() == self.__hash__():
                 return event  # type: ignore
@@ -337,12 +341,6 @@ class TeardownSystemMounts(JailStop):
     pass
 
 
-class TeardownJailNetwork(JailStop):
-    """Teardown a jails mountpoints."""
-
-    pass
-
-
 class JailResourceLimitAction(JailEvent):
     """Set or unset a jails resource limits."""
 
@@ -355,32 +353,32 @@ class VnetEvent(JailEvent):
     pass
 
 
-class VnetSetup(VnetEvent):
+class JailNetworkSetup(VnetEvent):
     """Start VNET networks."""
 
     pass
 
 
-class VnetTeardown(VnetEvent):
-    """Teardown VNET networks."""
+class JailNetworkTeardown(JailStop):
+    """Teardown a jails network."""
 
     pass
 
 
-class VnetInterfaceConfig(VnetSetup):
+class VnetInterfaceConfig(JailNetworkSetup):
     """Configure VNET network interfaces and firewall."""
 
     pass
 
 
-class VnetSetupLocalhost(VnetSetup):
-    """Configure VNET network interfaces and firewall."""
+class VnetSetupLocalhost(JailNetworkSetup):
+    """Configure a VNET jails localhost."""
 
     pass
 
 
-class VnetSetRoutes(VnetSetup):
-    """Configure VNET network interfaces and firewall."""
+class VnetSetRoutes(JailNetworkSetup):
+    """Set a VNET jails network routes."""
 
     pass
 
@@ -403,8 +401,8 @@ class MountDevFS(DevFSEvent):
     pass
 
 
-class UnmountDevFS(DevFSEvent):
-    """Unmount /dev from a jail."""
+class MountFdescfs(DevFSEvent):
+    """Mount /dev/fd into a jail."""
 
     pass
 
@@ -484,7 +482,9 @@ class JailHookStart(JailHook):
 class JailCommand(JailHook):
     """Run command in a jail."""
 
-    pass
+    stdout: typing.Optional[str]
+    stderr: typing.Optional[str]
+    code: typing.Optional[int]
 
 
 class JailHookCreated(JailHook):
@@ -866,11 +866,13 @@ class ExportOtherDataset(ResourceBackup):
         self,
         resource: 'libioc.Resource.Resource',
         dataset: libzfs.ZFSDataset,
+        flags: typing.Set[libzfs.SendFlag]=set(),
         message: typing.Optional[str]=None,
         scope: typing.Optional[Scope]=None
     ) -> None:
 
         self.dataset = dataset
+        self.flags = flags
         ResourceBackup.__init__(
             self,
             resource=resource,
@@ -1052,7 +1054,13 @@ class JailProvisioningAssetDownload(JailEvent):
 # PKG
 
 
-class PackageFetch(IocEvent):
+class PkgEvent(IocEvent):
+    """Collection of events related to Pkg."""
+
+    pass
+
+
+class PackageFetch(PkgEvent):
     """Fetch packages for offline installation."""
 
     packages: typing.List[str]
@@ -1069,7 +1077,13 @@ class PackageFetch(IocEvent):
         IocEvent.__init__(self, message=message, scope=scope)
 
 
-class PackageInstall(JailEvent):
+class BootstrapPkg(JailEvent, PkgEvent):
+    """Bootstrap pkg within a jail."""
+
+    pass
+
+
+class PackageInstall(JailEvent, PkgEvent):
     """Install packages in a jail."""
 
     def __init__(
@@ -1084,7 +1098,7 @@ class PackageInstall(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
-class PackageRemove(JailEvent):
+class PackageRemove(JailEvent, PkgEvent):
     """Remove packages from a jail."""
 
     def __init__(
@@ -1099,7 +1113,7 @@ class PackageRemove(JailEvent):
         JailEvent.__init__(self, jail=jail, message=message, scope=scope)
 
 
-class PackageConfiguration(JailEvent):
+class PackageConfiguration(JailEvent, PkgEvent):
     """Install packages in a jail."""
 
     pass

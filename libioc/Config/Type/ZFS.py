@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage configuration stored in ZFS properties."""
+"""ioc configuration stored in ZFS properties."""
 import typing
 import libzfs
 
@@ -50,7 +50,7 @@ def get_iocage_property_name(zfs_property_name: str) -> str:
 
 
 class BaseConfigZFS(libioc.Config.Dataset.DatasetConfig):
-    """iocage configuration stored in ZFS properties."""
+    """ioc configuration stored in ZFS properties."""
 
     config_type = "zfs"
 
@@ -95,10 +95,12 @@ class BaseConfigZFS(libioc.Config.Dataset.DatasetConfig):
     def map_input(
         self,
         data: typing.Dict[str, str]
-    ) -> libioc.Config.Prototype.ConfigDataDict:
+    ) -> libioc.Config.Data.Data:
         """Normalize data read from ZFS properties."""
         parse_user_input = libioc.helpers.parse_user_input
-        return dict([(x, parse_user_input(y)) for (x, y) in data.items()])
+        return libioc.Config.Data.Data(
+            dict([(x, parse_user_input(y)) for (x, y) in data.items()])
+        )
 
     def _to_string(
         self,
@@ -139,7 +141,7 @@ class BaseConfigZFS(libioc.Config.Dataset.DatasetConfig):
 
 
 class DatasetConfigZFS(BaseConfigZFS):
-    """iocage ZFS jail configuration for legacy support."""
+    """ioc ZFS jail configuration for legacy support."""
 
     def __init__(
         self,

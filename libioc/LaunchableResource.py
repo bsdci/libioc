@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage module for launchable resources."""
+"""ioc module for launchable resources."""
 import libzfs
 import typing
 
@@ -36,6 +36,9 @@ class LaunchableResource(libioc.Resource.Resource):
 
     _rc_conf: typing.Optional[
         'libioc.Config.Jail.File.RCConf.ResourceRCConf'
+    ]
+    _periodic_conf: typing.Optional[
+        'libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf'
     ]
     _sysctl_conf: typing.Optional[
         'libioc.Config.Jail.File.SysctlConf.SysctlConf'
@@ -65,6 +68,7 @@ class LaunchableResource(libioc.Resource.Resource):
         self._updater = None
         self._backup = None
         self._rc_conf = None
+        self._periodic_conf = None
         self._sysctl_conf = None
         self._updater = None
         self._backup = None
@@ -163,6 +167,20 @@ class LaunchableResource(libioc.Resource.Resource):
         return self._rc_conf
 
     @property
+    def periodic_conf(
+        self
+    ) -> 'libioc.Config.Jail.File.PeriodicConf.ResourcePeriodicConf':
+        """Return a lazy-loaded instance of the resources PeriodicConf."""
+        if self._periodic_conf is None:
+            import libioc.Config.Jail.File.PeriodicConf
+            PeriodicConf = libioc.Config.Jail.File.PeriodicConf
+            self._periodic_conf = PeriodicConf.ResourcePeriodicConf(
+                resource=self,
+                logger=self.logger
+            )
+        return self._periodic_conf
+
+    @property
     def sysctl_conf(
         self
     ) -> 'libioc.Config.Jail.File.SysctlConf.SysctlConf':
@@ -175,3 +193,10 @@ class LaunchableResource(libioc.Resource.Resource):
             )
             self._sysctl_conf = sysctl_conf
         return self._sysctl_conf
+
+    def save(self) -> None:
+        """Permanently save the resource configuration."""
+        if self._periodic_conf is not None:
+            self._periodic_conf.save()
+        if self._sysctl_conf is not None:
+            self._sysctl_conf.save()

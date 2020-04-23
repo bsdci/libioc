@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage resource selector type."""
+"""ioc resource selector type."""
 import typing
 import re
 
@@ -64,8 +64,8 @@ class ResourceSelector:
             _source_name = None
 
         _name_without_globs = _name.replace("*", "").replace("+", "")
-        has_valid_name = libioc.helpers.validate_name(_name_without_globs)
-        is_valid_uuid = libioc.helpers.is_uuid(_name_without_globs)
+        has_valid_name = libioc.helpers.is_valid_name(_name_without_globs)
+        is_valid_uuid = libioc.helpers.is_valid_uuid(_name_without_globs)
         if (_name not in ["*", "+"]) and not (has_valid_name or is_valid_uuid):
             raise libioc.errors.InvalidJailName(name=_name, logger=self.logger)
 

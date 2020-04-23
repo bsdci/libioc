@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage Distribution module."""
+"""ioc Distribution module."""
 import typing
 import os
 import platform
@@ -84,7 +84,7 @@ class DistributionGenerator:
     eol_url: str = "https://www.freebsd.org/security/unsupported.html"
     _eol_list: typing.Optional[typing.List[str]]
 
-    mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
+    __mirror_link_pattern = r"a href=\"([A-z0-9\-_\.]+)/\""
     _available_releases: typing.Optional[
         typing.List['libioc.Release.ReleaseGenerator']
     ]
@@ -268,7 +268,7 @@ class DistributionGenerator:
             map(
                 lambda z: z.strip("\"/"),  # noqa: T484
                 re.findall(
-                    Distribution.mirror_link_pattern,
+                    Distribution.__mirror_link_pattern,
                     text,
                     re.MULTILINE
                 )

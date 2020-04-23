@@ -15,11 +15,17 @@ cd libioc
 make install
 ```
 
-At the current time libiocage is not packaged or available in FreeBSD ports.
+The default Python version is 3.7. If you intend to run libioc from another version, please specify it during the installation:
+
+```sh
+make PYTHON=python3.8 install
+```
+
+At the current time libioc is not packaged or available in FreeBSD ports.
 
 ## Documentation
 
-- Iocage Handbook: https://bsdci.github.io/handbook
+- Ioc Handbook: https://bsdci.github.io/handbook
 - Reference Documentation: https://bsdci.github.io/libioc
 - Gitter Chat: https://gitter.im/libioc/community
 

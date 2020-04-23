@@ -24,11 +24,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """The common base of jail configurations."""
 import typing
-import re
+import uuid
 
 import libioc.Config.Data
 import libioc.Config.Jail.Globals
 import libioc.Config.Jail.Properties
+import libioc.Config.Jail.Defaults
 import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
@@ -209,6 +210,15 @@ class BaseConfig(dict):
     def _get_id(self) -> str:
         return str(self.data["id"])
 
+    def __require_valid_jail_name(self, name: str) -> None:
+        is_valid_name = libioc.helpers.is_valid_name(name)
+        is_valid_uuid = libioc.helpers.is_valid_uuid(name)
+        if (is_valid_name or is_valid_uuid) is False:
+            raise libioc.errors.InvalidJailName(
+                name=name,
+                logger=self.logger
+            )
+
     def _set_id(self, name: str) -> None:
 
         if ("id" in self.data.keys()) and (self.data["id"] == name):
@@ -222,30 +232,8 @@ class BaseConfig(dict):
             self.data["id"] = None
             return
 
-        disallowed_characters_pattern = "([^A-Za-z0-9_\\-]|\\^)"
-        invalid_characters = re.findall(disallowed_characters_pattern, name)
-        if len(invalid_characters) > 0:
-            msg = (
-                f"Invalid character in name: "
-                " ".join(invalid_characters)
-            )
-            self.logger.error(msg)
-            raise libioc.errors.InvalidJailName(
-                name="INVALID",
-                logger=self.logger
-            )
-
-        is_valid_name = libioc.helpers.validate_name(name)
-        if is_valid_name is True:
-            self.data["id"] = name
-        else:
-            if libioc.helpers.is_uuid(name) is True:
-                self.data["id"] = name
-            else:
-                raise libioc.errors.InvalidJailName(
-                    name=name,
-                    logger=self.logger
-                )
+        self.__require_valid_jail_name(name)
+        self.data["id"] = name
 
     def _get_name(self) -> str:
         return self._get_id()
@@ -359,6 +347,37 @@ class BaseConfig(dict):
             tags.append(self.data["tag"])
 
         return self.__unique_list(tags)
+
+    @property
+    def __has_mounts_enabled(self) -> bool:
+        prefix = "allow_mount_"
+        return any((self[x] == 1) for x in self.keys() if x.startswith(prefix))
+
+    def _get_enforce_statfs(self) -> int:
+        key = "enforce_statfs"
+        if key in self.data.keys():
+            return int(self.data[key])
+
+        if self.__has_mounts_enabled:
+            self.logger.verbose(
+                "setting enforce_statfs=1 to support allowed mounts"
+            )
+            return 1
+
+        raise KeyError(f"{key} unconfigured")
+
+    def _get_allow_mount(self) -> int:
+        key = "allow_mount"
+        if key in self.data.keys():
+            return int(self.data[key])
+
+        if self.__has_mounts_enabled:
+            self.logger.verbose(
+                "inheriting allow_mount=1 from allowed mounts"
+            )
+            return 1
+
+        raise KeyError(f"{key} unconfigured")
 
     def __unique_list(self, seq: typing.List[str]) -> typing.List[str]:
         seen: typing.Set[str] = set()
@@ -518,14 +537,25 @@ class BaseConfig(dict):
                     logger=self.logger
                 )
 
-    def _get_host_hostuuid(self) -> str:
-        try:
-            hostuuid = self.data["host_hostuuid"]
-            if hostuuid is None:
-                raise ValueError
-            return str(hostuuid)
-        except (KeyError, ValueError):
-            return str(self["id"])
+    def _get_host_hostuuid(self) -> typing.Optional[uuid.UUID]:
+        host_hostuuid = self.data["host_hostuuid"]  # type: uuid.UUID
+        return host_hostuuid
+
+    def _set_host_hostuuid(
+        self,
+        value: typing.Optional[typing.Union[str, uuid.UUID]]
+    ) -> None:
+        if (value is None) or (isinstance(value, uuid.UUID) is True):
+            self.data["host_hostuuid"] = value
+            return
+
+        if isinstance(value, str) is True:
+            _value = str(value)
+        elif isinstance(value, bytes) is True:
+            _value = value.decode("UTF-8")  # type: ignore
+        else:
+            raise ValueError("Expected UUID or string/byte representation")
+        self.data["host_hostuuid"] = uuid.UUID(_value)
 
     def _get_host_hostname(self) -> str:
         try:
@@ -624,7 +654,7 @@ class BaseConfig(dict):
     def unknown_config_parameters(self) -> typing.Iterator[str]:
         """Yield unknown config parameters already stored in the config."""
         for key in self.data.keys():
-            if self._is_known_property(key, explicit=True) is False:
+            if self.is_known_property(key, explicit=True) is False:
                 yield key
 
     def __delitem__(self, key: str) -> None:
@@ -639,11 +669,16 @@ class BaseConfig(dict):
         explicit: bool=True
     ) -> None:
         """Set a configuration value."""
-        if self._is_known_property(key, explicit=explicit) is False:
+        if self.is_known_property(key, explicit=explicit) is False:
+            if "jail" in dir(self):
+                _jail = self.jail  # noqa: T484
+            else:
+                _jail = None
             err = libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger,
-                level=("warn" if skip_on_error else "error")
+                level=("warn" if skip_on_error else "error"),
+                jail=_jail
             )
             if skip_on_error is False:
                 raise err
@@ -736,7 +771,15 @@ class BaseConfig(dict):
         existed_before = (key in self.keys()) is True
 
         try:
-            hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()
+            if existed_before is False:
+                hash_before = False
+            elif isinstance(
+                self,
+                libioc.Config.Jail.Defaults.JailConfigDefaults
+            ) is True:
+                hash_before = str(self.__getitem__(key)).__hash__()
+            else:
+                hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()
         except Exception:
             if existed_before is True:
                 raise
@@ -850,22 +893,29 @@ class BaseConfig(dict):
             return True
         return (fragments[0] in self["interfaces"].keys()) is True
 
-    def _is_user_property(self, key: str) -> bool:
+    @staticmethod
+    def is_user_property(key: str) -> bool:
+        """Return whether the given key belongs to a custom user property."""
         return (key == "user") or (key.startswith("user.") is True)
 
-    def _is_known_property(self, key: str, explicit: bool) -> bool:
+    def is_known_property(self, key: str, explicit: bool) -> bool:
         """Return True when the key is a known config property."""
         if self._is_known_jail_param(key):
             return True
         if key in libioc.Config.Jail.Globals.DEFAULTS.keys():
             return True  # key is default
+        elif key in dict.keys(libioc.Config.Jail.Globals.DEFAULTS):
+            # key could be a dict key
+            return isinstance(libioc.Config.Jail.Globals.DEFAULTS[key], dict)
         if f"_set_{key}" in dict.__dir__(self):
             return True  # key is setter
+        if f"_get_{key}" in dict.__dir__(self):
+            return True  # key is getter
         if key in libioc.Config.Jail.Properties.properties:
             return True  # key is special property
         if self._key_is_mac_config(key, explicit=explicit) is True:
             return True  # nic mac config property
-        if self._is_user_property(key) is True:
+        if self.is_user_property(key) is True:
             return True  # user.* property
         return False
 
@@ -886,7 +936,7 @@ class BaseConfig(dict):
         key: str,
         explicit: bool=True
     ) -> None:
-        if self._is_known_property(key, explicit=explicit) is False:
+        if self.is_known_property(key, explicit=explicit) is False:
             raise libioc.errors.UnknownConfigProperty(
                 key=key,
                 logger=self.logger

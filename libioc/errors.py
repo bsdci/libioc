@@ -24,6 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Collection of iocage errors."""
 import typing
+import uuid
 
 # MyPy
 import libzfs  # noqa: F401
@@ -231,9 +232,12 @@ class JailLaunchFailed(JailException):
     def __init__(
         self,
         jail: 'libioc.Jail.JailGenerator',
+        reason: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         msg = f"Launching jail {jail.full_name} failed"
+        if reason is not None:
+            msg += f": {reason}"
         JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
 
@@ -385,12 +389,17 @@ class InvalidJailName(JailConfigError):
     def __init__(
         self,
         name: str,
+        invalid_characters: typing.Optional[typing.List[str]]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         msg = (
             f"Invalid jail name '{name}': "
-            "Names have to begin and end with an alphanumeric character"
+            "Names may not begin or end with special characters, "
+            "but may contain alphanumeric and allowed special characters "
+            "! ^ - _ ( ) [ ] { } < > , ."
         )
+        if invalid_characters is not None:
+            msg += ", but got " + str("".join(invalid_characters) + "")
         super().__init__(message=msg, logger=logger)
 
 
@@ -487,19 +496,19 @@ class ResourceLimitActionFailed(IocException, KeyError):
         IocException.__init__(self, message=msg, logger=logger)
 
 
-class JailHostIdMismatch(JailException):
+class JailHostUUIDMismatch(JailException):
     """Raised when attempting to start a jail with mismatching hostid."""
 
     def __init__(
         self,
-        host_hostid: str,
+        hostuuid: uuid.UUID,
         jail: 'libioc.Jail.JailGenerator',
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         jail_hostid = jail.config["hostid"]
         msg = (
             f"The jail hostid '{jail_hostid}' "
-            f"does not match the hosts hostid '{host_hostid}'"
+            f"does not match the hosts hostid '{hostuuid}'"
         )
         JailException.__init__(self, message=msg, jail=jail, logger=logger)
 
@@ -536,12 +545,22 @@ class UnknownConfigProperty(IocException, KeyError):
         self,
         key: str,
         logger: typing.Optional['libioc.Logger.Logger']=None,
-        level: str="error"
+        level: str="error",
+        jail: typing.Optional['libioc.Jail.JailGenerator']=None
     ) -> None:
-        msg = (
-            f"The config property '{key}' is unknown"
+        if jail is None:
+            msg = f"The config property '{key}' is unknown"
+        else:
+            msg = (
+                f"The config property '{key}' of jail '{jail.name}' is unknown"
+            )
+        self.jail = jail
+        IocException.__init__(
+            self,
+            message=msg,
+            logger=logger,
+            level=level
         )
-        IocException.__init__(self, message=msg, logger=logger, level=level)
 
 
 # Backup
@@ -569,6 +588,32 @@ class ExportDestinationExists(IocException):
     ) -> None:
 
         msg = "The backup destination {destination} already exists"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
+class BackupSourceDoesNotExist(IocException):
+    """Raised when a backup source is not available for import."""
+
+    def __init__(
+        self,
+        source: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+
+        msg = "The backup source {source} does not exists"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
+class BackupSourceUnknownFormat(IocException):
+    """Raised when a backup source is in unknown format."""
+
+    def __init__(
+        self,
+        source: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+
+        msg = "The backup source {source} has unknown type"
         IocException.__init__(self, message=msg, logger=logger)
 
 

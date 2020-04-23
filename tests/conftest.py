@@ -38,6 +38,7 @@ import libioc.Host
 import libioc.Distribution
 import libioc.Logger
 import libioc.Release
+import libioc.Pkg
 
 import release_mirror_cache
 cache_server = release_mirror_cache.BackgroundServer(8081)
@@ -53,13 +54,13 @@ def pytest_addoption(parser: typing.Any) -> None:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def zfs() -> libzfs.ZFS:
     """Make ZFS available to the tests."""
     return libzfs.ZFS(history=True, history_prefix="<iocage>")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def pool(
     request: typing.Any,
     zfs: libzfs.ZFS,
@@ -83,13 +84,13 @@ def pool(
     return target_pool
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def logger() -> 'libioc.Logger.Logger':
     """Make the iocage Logger available to the tests."""
     return libioc.Logger.Logger()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def root_dataset(
     zfs: libzfs.ZFS,
     pool: libzfs.ZFSPool
@@ -221,6 +222,19 @@ def bridge_interface() -> str:
     yield bridge_name
     subprocess.check_output(
         ["/sbin/ifconfig", str(bridge_name), "destroy"]
+    )
+
+
+@pytest.fixture
+def pkg(
+    host: 'libioc.Host.Host',
+    logger: 'libioc.Logger.Logger',
+    zfs: libzfs.ZFS
+) -> 'libioc.Pkg.Pkg':
+    return libioc.Pkg.Pkg(
+        logger=logger,
+        zfs=zfs,
+        host=host
     )
 
 

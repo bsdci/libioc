@@ -47,7 +47,7 @@ class _HookedModule:
         return sys.modules[name].__getattribute__(name.split(".").pop())
 
 
-class _IocageModule(sys.modules["libioc"].__class__):
+class _IocModule(sys.modules["libioc"].__class__):
 
     hooked_modules = [
         "Host",
@@ -90,4 +90,4 @@ class _IocageModule(sys.modules["libioc"].__class__):
         return module
 
 
-sys.modules["libioc"].__class__ = _IocageModule
+sys.modules["libioc"].__class__ = _IocModule

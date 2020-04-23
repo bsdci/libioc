@@ -1,5 +1,4 @@
 # Copyright (c) 2017-2019, Stefan Grönke
-# Copyright (c) 2014-2018, iocage
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -22,7 +21,20 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""Pkg abstraction for Resources."""
+"""
+Abstracts offline FreeBSD/HardenedBSD package installation.
+
+ioc mirrors packages from FreeBSD and HardenedBSD to a local ZFS dataset for
+each release and ioc datasource. On each use the pkg repository matching to a
+jails release is mirrored from the quaterly releases. The host downloads wanted
+packages into this local repository, that is afterwards mounted into the jail
+(read-only) for package installation.
+
+With this module it is possible to save bandwith and shorten the time required
+for package installation. In setups that spawn disposable jails, it might be
+reasonable to seed newly created jails from latest packages, rather than
+managing a template, that tempts to outdate.
+"""
 import typing
 import math
 import os.path
@@ -45,10 +57,10 @@ _PkgConfDataType = typing.Union[
 
 
 class Pkg:
-    """iocage pkg management utility."""
+    """ioc pkg management utility."""
 
     _dataset: libzfs.ZFSDataset
-    package_source_directory: str = "/.iocage-pkg"
+    package_source_directory: str = "/.ioc-pkg"
     __pkg_directory_mounted: bool
 
     def __init__(
@@ -57,17 +69,35 @@ class Pkg:
         host: typing.Optional['libioc.Host.Host']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.logger = libioc.helpers_object.init_logger(self, logger)
+        self.zfs = libioc.helpers_object.init_zfs(self, zfs)
         self.host = libioc.helpers_object.init_host(self, host)
         self.__pkg_directory_mounted = False
+
+    def configure(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+        """Configure the repositories within the jail."""
+        packageConfigurationEvent = libioc.events.PackageConfiguration(
+            jail=jail,
+            scope=event_scope
+        )
+        yield packageConfigurationEvent.begin()
+        try:
+            self._config_jail_repo(jail)
+        except Exception as e:
+            yield packageConfigurationEvent.fail(e)
+            raise e
+        yield packageConfigurationEvent.end()
 
     def fetch(
         self,
         packages: typing.Union[str, typing.List[str]],
         release: 'libioc.Release.ReleaseGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Fetch a bunch of packages to the local mirror."""
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
@@ -115,8 +145,9 @@ class Pkg:
             logger=self.logger,
             env=self.__mixin_env(dict(
                 ABI=self.__get_abi_string(release_major_version),
-                SIGNATURE_TYPE="fingerprints"
-            ))
+                SIGNATURE_TYPE="fingerprints",
+                IGNORE_OSVERSION="yes"
+            )
         )
 
     def __get_abi_string(self, release_major_version: int) -> str:
@@ -186,17 +217,95 @@ class Pkg:
                 "latest"
             )
 
+    def bootstrap(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+        """Bootstrap pkg within a jail."""
+        event = libioc.events.BootstrapPkg(
+            jail=jail,
+            scope=event_scope
+        )
+        yield event.begin()
+
+        dataset = self.__get_jail_release_pkg_dataset(jail)
+        pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
+        try:
+            yield from self.__run_command(
+                jail=jail,
+                command=[
+                    "/usr/sbin/pkg",
+                    "add",
+                    f"{self.package_source_directory}/{pkg_archive_name}"
+                ],
+                event_scope=event.scope
+            )
+        except Exception as e:
+            yield event.fail(e)
+            raise e
+
+        yield event.end()
+
+    def __run_command(
+        self,
+        jail: 'libioc.Jail.JailGenerator',
+        command: typing.List[str],
+        event_scope: typing.Optional['libioc.events.Scope']=None
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+        env = dict(ASSUME_ALWAYS_YES="yes")
+        if jail.running is True:
+            jailCommandEvent = libioc.events.JailCommand(
+                jail=jail,
+                scope=event_scope
+            )
+            yield jailCommandEvent.begin()
+            try:
+                self.__mount_pkg_directory(jail)
+                stdout, stderr, code = jail.exec(
+                    command,
+                    env=env,
+                    logger=self.logger
+                )
+                jailCommandEvent.stdout = stdout
+                jailCommandEvent.stderr = stderr
+                jailCommandEvent.code = code
+            except Exception as e:
+                yield jailCommandEvent.fail(e)
+                raise e
+            yield jailCommandEvent.end()
+        else:
+            temporary_jail = self._get_temporary_jail(jail)
+            yield from temporary_jail.fork_exec(
+                " ".join(command),
+                passthru=False,
+                event_scope=event_scope,
+                env=env
+            )
+
+    @staticmethod
+    def __get_release_major_version(
+        release: 'libioc.Release.ReleaseGenerator'
+    ) -> int:
+        return int(math.floor(release.version_number))
+
+    def __get_jail_release_pkg_dataset(
+        self,
+        jail: 'libioc.Jail.JailGenerator'
+    ) -> libzfs.ZFSDataset:
+        return self._get_release_pkg_dataset(
+            self.__get_release_major_version(jail.release)
+        )
+
     def install(
         self,
         packages: typing.Union[str, typing.List[str]],
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
-        release_major_version = math.floor(jail.release.version_number)
-        dataset = self._get_release_pkg_dataset(release_major_version)
 
         packageInstallEvent = libioc.events.PackageInstall(
             packages=_packages,
@@ -204,60 +313,34 @@ class Pkg:
             scope=event_scope
         )
 
-        packageConfigurationEvent = libioc.events.PackageConfiguration(
-            jail=jail,
-            scope=event_scope
-        )
-
-        yield packageConfigurationEvent.begin()
-        try:
-            self._config_jail_repo(jail)
-        except Exception as e:
-            yield packageConfigurationEvent.fail(e)
-            raise e
-        yield packageConfigurationEvent.end()
-
         yield packageInstallEvent.begin()
         try:
-            pkg_archive_name = self._get_latest_pkg_archive(dataset.mountpoint)
             command = "\n".join([
-                "export ASSUME_ALWAYS_YES=yes",
-                " ".join([
-                    "/usr/sbin/pkg",
-                    "add",
-                    f"{self.package_source_directory}/{pkg_archive_name}"
-                ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "update",
                     "--force",
-                    "--repository", "libiocage"
+                    "--repository", "libioc"
                 ]),
                 " ".join([
                     "/usr/sbin/pkg",
                     "install",
                     "--yes",
-                    "--repository", "libiocage",
+                    "--repository", "libioc",
                     " ".join(_packages)
                 ])
             ] + postinstall)
 
-            if jail.running is True:
-                self.__mount_pkg_directory(jail)
-                stdout, stderr, code = jail.exec(["/bin/sh", "-c", command])
-                stdout = stdout.strip("\r\n")
-            else:
-                temporary_jail = self._get_temporary_jail(jail)
-                jail_exec_events = temporary_jail.fork_exec(
-                    command,
-                    passthru=False,
-                    event_scope=packageInstallEvent.scope
-                )
-                for event in jail_exec_events:
-                    if isinstance(event, libioc.events.JailLaunch) is True:
-                        if event.done is True:
-                            stdout = event.stdout.strip("\r\n")
-                    yield event
+            for event in self.__run_command(
+                jail=jail,
+                command=["/bin/sh", "-c", command],
+                event_scope=packageInstallEvent.scope
+            ):
+                if isinstance(event, libioc.events.JailCommand) is True:
+                    if event.done is True:
+                        stdout = event.stdout.strip("\r\n")
+                yield event
+
             skipped = stdout.endswith("already installed")
             if skipped is True:
                 yield packageInstallEvent.skip()
@@ -272,7 +355,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Remove installed packages from a jail."""
         _packages = self._normalize_packages(packages)
 
@@ -308,12 +391,22 @@ class Pkg:
         yield packageRemoveEvent.end()
 
     def _get_latest_pkg_archive(self, package_source_directory: str) -> str:
-        for package_archive in os.listdir(f"{package_source_directory}/cache"):
-            if package_archive.endswith(".txz") is False:
-                continue
-            if package_archive.startswith("pkg"):
-                return str(package_archive)
-        raise libioc.errors.PkgNotFound(logger=self.logger)
+        pattern = re.compile((
+            r"^(?P<name>[a-zA-Z0-9_\-\.]+)"
+            r"-(?P<version>[0-9](?:[0-9\.,_\-]*[0-9])?)"
+            r"(?:-(?P<hash>[0-9a-z]+))?"
+            r".txz$"
+        ))
+        cached_items = os.listdir(f"{package_source_directory}/cache")
+        cached_packages_list = list(filter(
+            lambda x: (x is not None) and (x["name"] == "pkg"),
+            [pattern.match(x) for x in cached_items]
+        ))
+        pkg_archive_match = list(reversed(sorted(
+            (x for x in cached_packages_list if x is not None),
+            key=lambda x: list(map(int, x["version"].split(".")))
+        )))[0]
+        return pkg_archive_match[0]
 
     def fetch_and_install(
         self,
@@ -321,11 +414,19 @@ class Pkg:
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
+    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
         """Mirror and install packages to a jail."""
         yield from self.fetch(
             packages=packages,
             release=jail.release,
+            event_scope=event_scope
+        )
+        yield from self.configure(
+            jail=jail,
+            event_scope=event_scope
+        )
+        yield from self.bootstrap(
+            jail=jail,
             event_scope=event_scope
         )
         yield from self.install(
@@ -350,13 +451,13 @@ class Pkg:
         return _packages
 
     def _get_repo_name(self, release_major_version: int) -> str:
-        return f"iocage-release-{release_major_version}"
+        return f"ioc-release-{release_major_version}"
 
     def _config_jail_repo(self, jail: 'libioc.Jail.JailGenerator') -> None:
         jail_directory = "/usr/local/etc/pkg/repos"
         host_directory = f"{jail.root_path}/{jail_directory}"
         self._update_repo_conf(
-            repo_name="libiocage",
+            repo_name="libioc",
             url=f"file://{self.package_source_directory}",
             directory=host_directory,
             signature_type="none"

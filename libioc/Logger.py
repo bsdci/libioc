@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage logging module."""
+"""ioc logging module."""
 import os
 import sys
 import typing
@@ -70,7 +70,7 @@ class LogEntry:
 
 
 class Logger:
-    """iocage Logger module."""
+    """ioc Logger module."""
 
     COLORS = (
         "black",
@@ -82,10 +82,6 @@ class Logger:
         "cyan",
         "white",
     )
-
-    RESET_SEQ = "\033[0m"
-    BOLD_SEQ = "\033[1m"
-    LINE_UP_SEQ = "\033[F"
 
     LOG_LEVEL_SETTINGS: typing.Dict[
         str,
@@ -116,7 +112,7 @@ class Logger:
         "screen"
     )
 
-    INDENT_PREFIX = "  "
+    __INDENT_PREFIX = "  "
 
     PRINT_HISTORY: typing.List[LogEntry] = []
 
@@ -296,7 +292,7 @@ class Logger:
         )
 
     def _indent(self, message: str, level: int) -> str:
-        indent = Logger.INDENT_PREFIX * level
+        indent = Logger.__INDENT_PREFIX * level
         return "\n".join(map(lambda x: f"{indent}{x}", message.splitlines()))
 
     def _create_log_directory(self) -> None:

@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage Resource module."""
+"""ioc Resource module."""
 import typing
 import os.path
 import abc
@@ -323,7 +323,7 @@ class Resource(metaclass=abc.ABCMeta):
         """Return the absolute path of a path relative to the resource."""
         return str(os.path.join(self.dataset.mountpoint, relative_path))
 
-    def _write_config(self, data: dict) -> None:
+    def _write_config(self, data: libioc.Config.Data.Data) -> None:
         """Write the configuration to disk."""
         self.config_handler.write(data)
 
@@ -365,20 +365,21 @@ class Resource(metaclass=abc.ABCMeta):
             "This needs to be implemented by the inheriting class"
         )
 
-    def _require_relative_path(
+    def require_relative_path(
         self,
         filepath: str,
     ) -> None:
-        if self._is_path_relative(filepath) is False:
+        """Raise an error when the path is not relative to the resource."""
+        if self.is_path_relative(filepath) is False:
             raise libioc.errors.SecurityViolationConfigJailEscape(
                 file=filepath
             )
 
-    def _is_path_relative(
+    def is_path_relative(
         self,
         filepath: str
     ) -> bool:
-
+        """Return whether the path is relative to the resource."""
         real_resource_path = self._resolve_path(self.dataset.mountpoint)
         real_file_path = self._resolve_path(filepath)
 
@@ -437,4 +438,4 @@ class DefaultResource(Resource):
 
     def save(self) -> None:
         """Save changes to the default configuration."""
-        self._write_config(self.config.user_data.nested)
+        self._write_config(self.config.user_data)

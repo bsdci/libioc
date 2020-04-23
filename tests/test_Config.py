@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019, Stefan Grönke
+2# Copyright (c) 2017-2019, Stefan Grönke
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,8 @@ import typing
 import pytest
 import json
 import os
+import uuid
+import hashlib
 
 import libzfs
 
@@ -73,19 +75,19 @@ class TestJailConfig(object):
         assert "foobar" in data["user"].keys()
         assert isinstance(data["user"]["foobar"], str)
 
-    def test_name_may_not_contain_dots(
+    def test_name_may_contain_dots(
         self,
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
-        with pytest.raises(libioc.errors.InvalidJailName):
-            existing_jail.config["name"] = "jail.with.dots"
+        existing_jail.config["name"] = "jail.with.dots"
+        assert existing_jail.identifier.endswith("jail*with*dots")
 
     def test_cannot_clone_from_dict_with_invalid_values(
         self,
         new_jail: 'libioc.Jail.Jail'
     ) -> None:
         invalid_data = dict(
-            name="name.with.dots"
+            name="invalid*characters"
         )
         del new_jail.config["id"]
         with pytest.raises(libioc.errors.InvalidJailName):
@@ -165,11 +167,14 @@ class TestUserDefaultConfig(object):
         root_dataset: libzfs.ZFSDataset,
         zfs: libzfs.ZFS,
     ) -> 'libioc.Resource.DefaultResource':
-        return libioc.Resource.DefaultResource(
+        default_resource = libioc.Resource.DefaultResource(
             dataset=root_dataset,
             logger=logger,
             zfs=zfs
         )
+        yield default_resource
+        if os.path.isfile(default_resource.config_handler.file):
+            os.remove(default_resource.config_handler.file)
 
     def test_default_config_path(
         self,
@@ -224,6 +229,57 @@ class TestUserDefaultConfig(object):
         # check that valid properties still can be set
         default_resource.config["user.valid-property"] = "ok"
         assert default_resource.config.data["user.valid-property"] == "ok"
+
+    def test_can_set_default_config(
+        self,
+        default_resource: 'libioc.Resource.DefaultResource'
+    ) -> None:
+        defaults_config_path = default_resource.config_handler.file
+
+        default_resource.config.set("vnet", True);
+        default_resource.save()
+        with open(defaults_config_path, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            assert data["vnet"] == "yes"
+            assert len(data.keys()) == 1
+
+        default_resource.config.set("user.comment", "hi there!");
+        default_resource.save()
+        with open(defaults_config_path, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            assert "user" in data.keys()
+            assert "comment" in data["user"].keys()
+            assert data["user"]["comment"] == "hi there!"
+            assert len(data.keys()) == 2
+
+    def test_can_be_configured_without_devfs_ruleset(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        assert existing_jail.config["devfs_ruleset"] == 4
+        assert "devfs_ruleset" in existing_jail._launch_params
+
+        existing_jail.config["devfs_ruleset"] = None
+        assert "devfs_ruleset" not in existing_jail._launch_params
+
+    def test_hostuuid_is_generated_when_not_configured(
+        self,
+        new_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        assert new_jail.config["host_hostuuid"] == None
+        assert isinstance(new_jail.hostuuid, uuid.UUID)
+
+    def test_hostuuid_can_be_configured(
+        self,
+        new_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        m = hashlib.sha1()  # nosec: B303
+        m.update(b"some random value")
+        test_uuid = uuid.UUID(m.hexdigest()[0:32])
+
+        new_jail.config["host_hostuuid"] = str(test_uuid)
+        assert isinstance(new_jail.hostuuid, uuid.UUID)
+        assert new_jail.hostuuid == test_uuid
 
 
 class TestBrokenConfig(object):

@@ -1,4 +1,3 @@
-ucl==0.8.0
 gitpython
-freebsd_sysctl==0.0.5
-jail==0.0.7
+freebsd_sysctl==0.0.7
+jail==0.0.11

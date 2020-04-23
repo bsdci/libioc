@@ -22,12 +22,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage Host module."""
+"""ioc Host module."""
 import typing
 import os
 import platform
 import re
 import freebsd_sysctl
+import uuid
 
 import libzfs
 
@@ -45,6 +46,7 @@ _distribution_types = typing.Union[
     libioc.Distribution.DistributionGenerator,
     libioc.Distribution.Distribution,
 ]
+UUID = uuid.UUID
 
 
 class HostGenerator:
@@ -55,12 +57,11 @@ class HostGenerator:
     _devfs: libioc.DevfsRules.DevfsRules
     _defaults: libioc.Resource.DefaultResource
     __user_provided_defaults: typing.Optional[libioc.Resource.DefaultResource]
-    __hostid: str
     releases_dataset: libzfs.ZFSDataset
     datasets: libioc.Datasets.Datasets
     distribution: _distribution_types
 
-    branch_pattern = re.compile(
+    __branch_pattern = re.compile(
         r"""\(hardened/
         (?P<release>[A-z0-9]+(?:[A-z0-9\-]+[A-z0-9]))
         /
@@ -69,7 +70,7 @@ class HostGenerator:
         re.X
     )
 
-    release_name_pattern = re.compile(
+    __release_name_pattern = re.compile(
         r"^(?P<major>\d+)(?:\.(?P<minor>\d+))-(?P<type>[A-Z]+)-HBSD$",
         re.X
     )
@@ -117,17 +118,9 @@ class HostGenerator:
         self._defaults.read_config()
 
     @property
-    def id(self) -> str:
-        """Return the hostid and memoize on first lookup."""
-        try:
-            return self.__hostid
-        except AttributeError:
-            pass
-
-        with open("/etc/hostid", "r", encoding="utf-8") as f:
-            self.__hostid = f.read().strip()
-
-        return self.__hostid
+    def uuid(self) -> UUID:
+        """Return the hostuuid and memoize on first lookup."""
+        return uuid.UUID(freebsd_sysctl.Sysctl("kern.hostuuid").value)
 
     @property
     def defaults(self) -> 'libioc.Resource.DefaultResource':
@@ -173,11 +166,11 @@ class HostGenerator:
 
         elif self.distribution.name == "HardenedBSD":
 
-            match = re.search(self.branch_pattern, os.uname()[3])
+            match = re.search(self.__branch_pattern, os.uname()[3])
             if match is not None:
                 return match["release"].upper()
 
-            match = re.search(self.release_name_pattern, os.uname()[2])
+            match = re.search(self.__release_name_pattern, os.uname()[2])
             if match is not None:
                 return f"{match['major']}-{match['type']}"
 

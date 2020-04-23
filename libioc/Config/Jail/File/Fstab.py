@@ -80,7 +80,7 @@ class FstabLine(dict):
 
         return output
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
@@ -125,7 +125,7 @@ class FstabCommentLine(dict):
         """Return the untouched comment line string."""
         return str(self["line"])
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """
         Return a random hash value.
 
@@ -144,7 +144,7 @@ class FstabAutoPlaceholderLine(dict):
         """Never print virtual lines."""
         raise NotImplementedError("this is a virtual fstab line")
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Do not return a hash because placeholders have none."""
         return hash(None)
 
@@ -276,7 +276,12 @@ class Fstab(collections.MutableSequence):
                 "comment": comment
             })
 
-            self.add_line(new_line, skip_existing=True, auto_mount_jail=False)
+            self.add_line(
+                new_line,
+                skip_existing=True,
+                auto_create_destination=False,
+                auto_mount_jail=False
+            )
 
     def __replace_magic_path(self, filepath: str) -> str:
         return filepath
@@ -284,13 +289,13 @@ class Fstab(collections.MutableSequence):
     def read_file(self) -> None:
         """Read the fstab file."""
         if os.path.isfile(self.path):
-            with open(self.path, "r") as f:
+            with open(self.path, "r", encoding="UTF-8") as f:
                 self._read_file_handle(f)
                 self.logger.debug(f"fstab loaded from {self.path}")
 
     def save(self) -> None:
         """Update or create the fstab file."""
-        with open(self.path, "w") as f:
+        with open(self.path, "w", encoding="UTF-8") as f:
             self._save_file_handle(f)
             self.logger.verbose(f"{self.path} written")
 
@@ -306,11 +311,11 @@ class Fstab(collections.MutableSequence):
     ) -> None:
         """Read file and then write changes."""
         if os.path.isfile(self.path):
-            f = open(self.path, "r+")
+            f = open(self.path, "r+", encoding="UTF-8")
             self._read_file_handle(f)
             f.seek(0)
         else:
-            f = open(self.path, "w")
+            f = open(self.path, "w", encoding="UTF-8")
 
         self._save_file_handle(f)
         f.close()
@@ -327,7 +332,7 @@ class Fstab(collections.MutableSequence):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Append a new line to the fstab file.
 
@@ -343,7 +348,7 @@ class Fstab(collections.MutableSequence):
             "comment": comment
         })
 
-        self.add_line(
+        return self.add_line(
             line=line,
             replace=replace,
             auto_create_destination=auto_create_destination,
@@ -361,14 +366,12 @@ class Fstab(collections.MutableSequence):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Directly append a FstabLine type.
 
         Use save() to write changes to the fstab file.
         """
-        FstabCommentLine
-        FstabAutoPlaceholderLine
         if any((
             isinstance(line, FstabLine),
             isinstance(line, FstabCommentLine),
@@ -380,6 +383,7 @@ class Fstab(collections.MutableSequence):
             )
 
         self._lines.append(line)
+        return line
 
     def index(
         self,
@@ -634,7 +638,7 @@ class JailFstab(Fstab):
             return self.file
         else:
             path = f"{self.jail.dataset.mountpoint}/{self.file}"
-            self.jail._require_relative_path(path)
+            self.jail.require_relative_path(path)
             return path
 
     def add_line(
@@ -648,14 +652,14 @@ class JailFstab(Fstab):
         replace: bool=False,
         auto_create_destination: bool=False,
         auto_mount_jail: bool=True
-    ) -> None:
+    ) -> typing.Union[FstabLine, FstabCommentLine, FstabAutoPlaceholderLine]:
         """
         Directly append a FstabLine type.
 
         Use save() to write changes to the fstab file.
         """
         if type(line) == FstabLine:
-            if self.jail._is_path_relative(line["destination"]) is False:
+            if self.jail.is_path_relative(line["destination"]) is False:
                 line = FstabLine(line)  # clone to prevent mutation
                 line["destination"] = libioc.Types.AbsolutePath("/".join([
                     self.jail.root_path,
@@ -674,7 +678,7 @@ class JailFstab(Fstab):
                 self.logger.verbose(
                     f"Skipping existing fstab line: {line}"
                 )
-                return
+                return line
             else:
                 raise libioc.errors.FstabDestinationExists(
                     mountpoint=destination,
@@ -688,12 +692,12 @@ class JailFstab(Fstab):
 
         if type(line) == FstabLine:
             # destination is always relative to the jail resource
-            if self.jail._is_path_relative(line["destination"]) is False:
+            if self.jail.is_path_relative(line["destination"]) is False:
                 _destination = libioc.Types.AbsolutePath("/".join([
                     self.jail.root_path,
                     line["destination"].strip("/")
                 ]))
-                self.jail._require_relative_path(_destination)
+                self.jail.require_relative_path(_destination)
                 line["destination"] = _destination
 
             libioc.helpers.require_no_symlink(str(line["destination"]))
@@ -708,10 +712,19 @@ class JailFstab(Fstab):
 
             if (auto_mount_jail and self.jail.running) is True:
                 destination = line["destination"]
-                self.jail._require_relative_path(destination)
+                self.jail.require_relative_path(destination)
                 self.logger.verbose(
                     f"auto-mount {destination}"
                 )
+                if os.path.exists(destination) is False:
+                    os.makedirs(destination)
+                elif any((
+                    os.path.isdir(destination) is False,
+                    os.path.islink(destination) is True,
+                    os.path.ismount(destination) is True,
+                )):
+                    raise libioc.errors.InvalidMountpoint(destination)
+
                 mount_command = [
                     "/sbin/mount",
                     "-o", line["options"],
@@ -727,6 +740,7 @@ class JailFstab(Fstab):
                 )
 
         self._lines.append(line)
+        return line
 
     def update_release(
         self,

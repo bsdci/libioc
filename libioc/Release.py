@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage release module."""
+"""ioc release module."""
 import typing
 import hashlib
 import os
@@ -216,12 +216,15 @@ class ReleaseGenerator(ReleaseResource):
         "sendmail_submit_enable": False,
         "sendmail_msp_queue_enable": False,
         "sendmail_outbound_enable": False,
+        "cron_flags": "-m ''",
+        "syslogd_flags": "-ss"
+    }
+
+    DEFAULT_PERIODIC_CONF: typing.Dict[str, typing.Union[str, bool]] = {
         "daily_clean_hoststat_enable": False,
         "daily_status_mail_rejects_enable": False,
         "daily_status_include_submit_mailq": False,
         "daily_submit_queuerun": False,
-        "cron_flags": "-m ''",
-        "syslogd_flags": "-ss"
     }
 
     DEFAULT_SYSCTL_CONF: typing.Dict[str, int] = {
@@ -273,7 +276,7 @@ class ReleaseGenerator(ReleaseResource):
             else:
                 root_datasets_name = resource_selector.source_name
 
-        if libioc.helpers.validate_name(resource_selector.name) is False:
+        if libioc.helpers.is_valid_name(resource_selector.name) is False:
             raise NameError(f"Invalid 'name' for Release: '{name}'")
 
         self.name = name
@@ -757,15 +760,19 @@ class ReleaseGenerator(ReleaseResource):
             )
 
         yield releaseConfigurationEvent.begin()
-        rc_conf_changed = False
-        if self._set_default_rc_conf() is True:
-            rc_conf_changed = True
-            release_changed = True
-        if (self._set_default_sysctl_conf() or rc_conf_changed) is True:
-            release_changed = True
-            yield releaseConfigurationEvent.end()
-        else:
-            yield releaseConfigurationEvent.skip()
+        try:
+            if any([
+                    self._set_default_periodic_conf(),
+                    self._set_default_rc_conf(),
+                    self._set_default_sysctl_conf()
+            ]):
+                release_changed = True
+                yield releaseConfigurationEvent.end()
+            else:
+                yield releaseConfigurationEvent.skip()
+        except Exception as e:
+            yield releaseConfigurationEvent.fail(e)
+            raise e
 
         self.snapshot("p0")
 
@@ -969,6 +976,13 @@ class ReleaseGenerator(ReleaseResource):
             self.rc_conf[key] = value
 
         return self.rc_conf.save() is True
+
+    def _set_default_periodic_conf(self) -> bool:
+
+        for key, value in self.DEFAULT_PERIODIC_CONF.items():
+            self.periodic_conf[key] = value
+
+        return self.periodic_conf.save() is True
 
     def _set_default_sysctl_conf(self) -> bool:
 

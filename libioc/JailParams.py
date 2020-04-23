@@ -47,13 +47,11 @@ class JailParam(freebsd_sysctl.Sysctl):
     @value.setter
     def value(self, value: JailParamValueType) -> None:
         """Set the user defined value of this jail parameter."""
-        if self.ctl_type == freebsd_sysctl.types.NODE:
-            raise TypeError("sysctl NODE has no value")
-
-        if self.ctl_type in [
+        if self.ctl_type in (
             freebsd_sysctl.types.STRING,
             freebsd_sysctl.types.OPAQUE,
-        ]:
+            freebsd_sysctl.types.NODE
+        ):
             if (isinstance(value, int) or isinstance(value, str)) is False:
                 try:
                     value = str(value)
@@ -91,7 +89,7 @@ class JailParam(freebsd_sysctl.Sysctl):
     @property
     def iocage_name(self) -> str:
         """Return the name of the param formatted for iocage config."""
-        return self.jail_arg_name.replace(".", "_")
+        return self.jail_arg_name.rstrip(".").replace(".", "_")
 
     def __str__(self) -> str:
         """Return the jail command argument notation of the param."""
@@ -157,14 +155,15 @@ class JailParams(collections.abc.MutableMapping):
     def __update_sysctl_jail_params(self) -> None:
         prefix = "security.jail.param"
         jail_params = filter(
-            lambda x: not any((
-                x.name.endswith("."),  # quick filter NODE
-                x.name == "security.jail.allow_raw_sockets",  # deprecated
-            )),
+            # security.jail.allow_raw_sockets deprecated
+            lambda x: x.name != "security.jail.allow_raw_sockets",
             self.__base_class(prefix).children
         )
         # permanently store the queried sysctl in the singleton class
-        JailParams.__sysctl_params = dict([(x.name, x,) for x in jail_params])
+        JailParams.__sysctl_params = dict([
+            (x.name.rstrip("."), x,)
+            for x in jail_params
+        ])
 
 
 class HostJailParams(JailParams):

@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage filters for ListableResource."""
+"""ioc filters for ListableResource."""
 import re
 import typing
 
@@ -175,7 +175,7 @@ class Term(list):
             if char not in globs:
                 filter_string_without_globs += char
 
-        return libioc.helpers.validate_name(
+        return libioc.helpers.is_valid_name(
             filter_string_without_globs
         ) is True
 

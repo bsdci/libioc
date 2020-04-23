@@ -22,7 +22,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Fstab module."""
+import pytest
 import tempfile
+import random
+import sys
+import os.path
+import subprocess
+
+import libzfs
 
 import libioc.Config.Jail.File.Fstab
 
@@ -88,3 +95,71 @@ tmpfs /tmp tmpfs rw,mode=777 0 0 # {AUTO_COMMENT_IDENTIFIER}"""
 		assert type(fstab[1]).__name__ == "FstabAutoPlaceholderLine"
 		assert type(fstab[2]).__name__ == "FstabCommentLine"
 		assert str(fstab[2]) == "# yet another comment line"
+
+	@pytest.fixture(scope="function")
+	def zfs_volume(
+		self,
+		root_dataset: libzfs.ZFSDataset,
+		zfs: libzfs.ZFS
+	) -> libzfs.ZFSDataset:
+
+		r = random.randint(0, sys.maxsize)
+		dataset_name = f"{root_dataset.name}/zvol{r}"
+
+		root_dataset.pool.create(
+			dataset_name,
+			fsopts=dict(volsize="16M"),
+			fstype=libzfs.DatasetType.VOLUME
+		)
+
+		dataset = zfs.get_dataset(dataset_name)
+		yield dataset
+
+		dataset.delete()
+
+	@pytest.fixture(scope="function")
+	def zfs_volume_ufs(
+		self,
+		zfs_volume: libzfs.ZFSDataset
+	) -> libzfs.ZFSDataset:
+
+		subprocess.Popen(
+			[
+				"/sbin/newfs",
+				f"/dev/zvol/{zfs_volume.name}"
+			]
+		).wait()
+
+		return zfs_volume
+
+	def test_ufs_mount(self, zfs_volume_ufs: libzfs.ZFSDataset) -> None:
+
+		with tempfile.TemporaryDirectory() as tmpdir:
+
+			assert os.path.isdir(tmpdir)
+			libioc.helpers.mount(
+				source=f"/dev/zvol/{zfs_volume_ufs.name}",
+				destination=tmpdir,
+				fstype="ufs"
+			)
+
+			try:
+				stdout = subprocess.check_output(
+					[f"/sbin/mount | grep {tmpdir} | wc -l"],
+					shell=True
+				).decode("utf-8").strip()
+				assert stdout == "1"
+
+				assert os.path.isdir(tmpdir)
+
+				testfile = os.path.join(tmpdir, "test.txt")
+				with open(testfile, "w+") as f:
+					f.write("Test the ability to mount ZFS volumes with UFS")
+
+				assert os.path.exists(testfile) is True
+			finally:
+				subprocess.Popen([
+					f"/sbin/umount", tmpdir
+				]).wait()
+
+			assert os.path.exists(testfile) is False

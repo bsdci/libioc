@@ -29,6 +29,7 @@ import os.path
 import re
 import shutil
 import urllib
+import urllib.request
 import urllib.error
 
 import libioc.events
@@ -127,6 +128,7 @@ class Updater:
                     "release": self.release.name,
                     "exec_start": None,
                     "securelevel": "0",
+                    "devfs_ruleset": None,
                     "allow_chflags": True,
                     "vnet": False,
                     "ip4_addr": None,
@@ -219,7 +221,7 @@ class Updater:
         if os.path.isfile(local):
             os.remove(local)
 
-        _request = urllib.request  # type: ignore
+        _request = urllib.request
         try:
             self.logger.verbose(f"Downloading update assets from {url}")
             _request.urlretrieve(url, local)  # nosec: url validated
@@ -549,7 +551,7 @@ class HardenedBSD(Updater):
             "update-latest.txt"
         ])
         local_path = f"{self.host_updates_dir}/update-latest.txt"
-        _request = urllib.request  # type: ignore
+        _request = urllib.request
         _request.urlretrieve(  # nosec: official HardenedBSD URL
             update_info_url,
             local_path
@@ -702,7 +704,7 @@ class FreeBSD(Updater):
     def _pre_update(self) -> None:
         """Execute before executing the update command."""
         lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
-        self.resource._require_relative_path(f"{lnk}/..")
+        self.resource.require_relative_path(f"{lnk}/..")
         if os.path.islink(lnk) is True:
             os.unlink(lnk)
         os.symlink("/", lnk)
@@ -710,7 +712,7 @@ class FreeBSD(Updater):
     def _post_update(self) -> None:
         """Execute after executing the update command."""
         lnk = f"{self.resource.root_path}{self._base_release_symlink_location}"
-        self.resource._require_relative_path(f"{lnk}/..")
+        self.resource.require_relative_path(f"{lnk}/..")
         os.unlink(lnk)
 
 

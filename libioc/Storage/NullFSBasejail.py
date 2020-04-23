@@ -22,7 +22,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-"""iocage NullFS basejail storage backend."""
+"""ioc NullFS basejail storage backend."""
 import typing
 import os.path
 
@@ -35,7 +35,7 @@ BasejailStorage = libioc.Storage.Basejail.BasejailStorage
 
 
 class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
-    """iocage NullFS basejail storage backend."""
+    """ioc NullFS basejail storage backend."""
 
     def apply(
         self,
