@@ -38,6 +38,8 @@ import typing
 import os
 import shlex
 import shutil
+import hashlib
+import uuid
 
 import libzfs
 import freebsd_sysctl
@@ -67,9 +69,13 @@ import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.ResourceSelector
 import libioc.Config.Jail.File.Fstab
 
-import ctypes.util
+import ctypes
 import errno
-_dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
+try:
+    _dll = ctypes.CDLL("libc.so.7", use_errno=True)
+except OSError:
+    import ctypes.util
+    _dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
 
 
 class JailResource(
@@ -660,12 +666,16 @@ class JailGenerator(JailResource):
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.MountDevFS', None, None]:
+        extra_args = dict()
+        if self.config["devfs_ruleset"] is not None:
+            extra_args["ruleset"] = self.devfs_ruleset
+
         yield from self.__mount_in_jail(
             filesystem="devfs",
             mountpoint="/dev",
             event=libioc.events.MountDevFS,
             event_scope=event_scope,
-            ruleset=self.devfs_ruleset
+            **extra_args
         )
 
     def __mount_fdescfs(
@@ -1442,8 +1452,19 @@ class JailGenerator(JailResource):
         backend = self.storage_backend
         if backend is not None:
             backend.setup(self.storage, resource)
-        self.config["hostid"] = self.host.id
+        self.config["hostid"] = self.host.uuid
+        self.config["host_hostuuid"] = self._generated_hostuuid
         self.save()
+
+    @property
+    def hostuuid(self) -> uuid.UUID:
+        """Return the jails host.hostuuid."""
+        host_hostuuid = self.config["host_hostuuid"]
+        if host_hostuuid is None:
+            return self._generated_hostuuid
+        else:
+            _host_hostuuid = host_hostuuid  # type: uuid.UUID
+            return _host_hostuuid
 
     @property
     def is_basejail(self) -> bool:
@@ -1618,13 +1639,18 @@ class JailGenerator(JailResource):
         Users may reference a rule by numeric identifier or name. This numbers
         are automatically selected, so it's advisable to use names.1
         """
+        devfs_ruleset = self.config["devfs_ruleset"]
+
+        if devfs_ruleset is None:
+            return None
+
         try:
             configured_devfs_ruleset = self.host.devfs.find_by_number(
-                int(self.config["devfs_ruleset"])
+                int(devfs_ruleset)
             )
         except ValueError:
             configured_devfs_ruleset = self.host.devfs.find_by_name(
-                self.config["devfs_ruleset"]
+                devfs_ruleset
             )
 
         devfs_ruleset = libioc.DevfsRules.DevfsRuleset()
@@ -1672,6 +1698,12 @@ class JailGenerator(JailResource):
             return self.host.devfs[ruleset_line_position].number
 
     @property
+    def _generated_hostuuid(self) -> uuid.UUID:
+        m = hashlib.sha1()  # nosec: B303
+        m.update(self.host.uuid.bytes + self.identifier.encode("UTF-8"))
+        return uuid.UUID(m.hexdigest()[0:32])
+
+    @property
     def _launch_params(self) -> libjail.Jiov:
         config = self.config
         vnet = (config["vnet"] is True)
@@ -1679,11 +1711,16 @@ class JailGenerator(JailResource):
         jail_params: typing.Dict[str, libioc.JailParams.JailParam] = {}
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
             if sysctl_name == "security.jail.param.devfs_ruleset":
-                value = int(self.devfs_ruleset)
+                devfs_ruleset = self.devfs_ruleset
+                if devfs_ruleset is None:
+                    continue
+                value = int(devfs_ruleset)
             elif sysctl_name == "security.jail.param.path":
                 value = self.root_dataset.mountpoint
             elif sysctl_name == "security.jail.param.name":
                 value = self.identifier
+            elif sysctl_name == "security.jail.param.host.hostuuid":
+                value = str(self.hostuuid)
             elif sysctl_name == "security.jail.param.allow.mount.zfs":
                 value = int(self._allow_mount_zfs)
             elif sysctl_name == "security.jail.param.vnet":
@@ -2105,9 +2142,9 @@ class JailGenerator(JailResource):
     def require_jail_match_hostid(self, log_errors: bool=True) -> None:
         """Raise JailIsTemplate exception if the jail is a template."""
         if self.hostid_check_ok is False:
-            raise libioc.errors.JailHostIdMismatch(
+            raise libioc.errors.JailHostUUIDMismatch(
                 jail=self,
-                host_hostid=self.host.id,
+                hostuuid=self.host.uuid,
                 logger=(self.logger if log_errors else None)
             )
 
@@ -2118,7 +2155,7 @@ class JailGenerator(JailResource):
             self.logger.spam("hostid_strict_check is disabled")
             return True
         jail_hostid = self.config["hostid"]
-        if (jail_hostid is None) or (jail_hostid == self.host.id):
+        if (jail_hostid is None) or (jail_hostid == self.host.uuid):
             return True
         return False
 

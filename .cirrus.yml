@@ -1,8 +1,7 @@
 task:
   freebsd_instance:
     matrix:
-      #image: freebsd-11-2-release-amd64
-      image: freebsd-12-0-release-amd64
+      image: freebsd-12-1-release-amd64
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: cat requirements*
@@ -15,8 +14,13 @@ task:
     zpool create -m "/.ioc-test-`uname -r`" "ioc-test-`uname -r`" "/pools/ioc-test-`uname -r`.img"
     zfs set compression=lz4 "ioc-test-`uname -r`"
   install_script:
+    - uname -a
+    - uname -KU
+    - kldstat
+    - sysrc -a
+    - sysctl -a
     - mount -t fdescfs null /dev/fd
-    - pkg install -y git
+    - pkg install -y python3
     - make install-dev
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test

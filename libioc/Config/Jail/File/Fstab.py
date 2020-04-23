@@ -80,7 +80,7 @@ class FstabLine(dict):
 
         return output
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Compare FstabLine by its destination."""
         return hash(self["destination"])
 
@@ -125,7 +125,7 @@ class FstabCommentLine(dict):
         """Return the untouched comment line string."""
         return str(self["line"])
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """
         Return a random hash value.
 
@@ -144,7 +144,7 @@ class FstabAutoPlaceholderLine(dict):
         """Never print virtual lines."""
         raise NotImplementedError("this is a virtual fstab line")
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore
         """Do not return a hash because placeholders have none."""
         return hash(None)
 
@@ -276,7 +276,12 @@ class Fstab(collections.MutableSequence):
                 "comment": comment
             })
 
-            self.add_line(new_line, skip_existing=True, auto_mount_jail=False)
+            self.add_line(
+                new_line,
+                skip_existing=True,
+                auto_create_destination=False,
+                auto_mount_jail=False
+            )
 
     def __replace_magic_path(self, filepath: str) -> str:
         return filepath
@@ -711,6 +716,15 @@ class JailFstab(Fstab):
                 self.logger.verbose(
                     f"auto-mount {destination}"
                 )
+                if os.path.exists(destination) is False:
+                    os.makedirs(destination)
+                elif any((
+                    os.path.isdir(destination) is False,
+                    os.path.islink(destination) is True,
+                    os.path.ismount(destination) is True,
+                )):
+                    raise libioc.errors.InvalidMountpoint(destination)
+
                 mount_command = [
                     "/sbin/mount",
                     "-o", line["options"],

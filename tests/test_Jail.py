@@ -87,7 +87,7 @@ class TestJail(object):
         assert existing_jail.running is True
 
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
 
@@ -104,7 +104,7 @@ class TestJail(object):
 
         existing_jail.start()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev" in stdout
@@ -112,7 +112,7 @@ class TestJail(object):
 
         existing_jail.stop()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev" not in stdout
@@ -128,7 +128,7 @@ class TestJail(object):
 
         existing_jail.start()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev/fd" in stdout
@@ -136,7 +136,7 @@ class TestJail(object):
 
         existing_jail.stop()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev/fd" not in stdout
@@ -152,7 +152,7 @@ class TestJail(object):
 
         existing_jail.start()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev (" in stdout
@@ -160,7 +160,7 @@ class TestJail(object):
 
         existing_jail.stop()
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "/dev (" not in stdout
@@ -242,9 +242,9 @@ class TestNullFSBasejail(object):
         existing_jail.start()
         assert existing_jail.running is True
 
-        root_path = existing_jail.root_dataset.name
+        root_path = existing_jail.root_dataset.mountpoint
         stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
+            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
             shell=True
         ).decode("utf-8")
         assert "launch-scripts in stdout"
@@ -268,7 +268,7 @@ class TestNullFSBasejail(object):
                 [f"/usr/sbin/jls", "-j", existing_jail.identifier]
             ).decode("utf-8")
 
-        root_path = existing_jail.root_dataset.name
+        root_path = existing_jail.root_dataset.mountpoint
         stdout = subprocess.check_output(
             [f"/sbin/mount | grep {root_path}"],
             shell=True

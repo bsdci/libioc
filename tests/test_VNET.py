@@ -22,6 +22,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for VNET."""
+import pytest
 import json
 import os
 import subprocess
@@ -31,6 +32,21 @@ import libzfs
 
 import libioc.Jail
 
+
+def is_epair_enabled() -> bool:
+    proc = subprocess.Popen(
+        ["/sbin/kldstat", "-n", "if_epair"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    proc.communicate()
+    return (proc.returncode == 0)
+
+
+@pytest.mark.skipif(
+    (is_epair_enabled() is False),
+    reason="if_epair is not loaded"
+)
 class TestVNET(object):
     """Run tests for VNET networking."""
 
