@@ -69,9 +69,13 @@ import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.ResourceSelector
 import libioc.Config.Jail.File.Fstab
 
-import ctypes.util
+import ctypes
 import errno
-_dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
+try:
+    _dll = ctypes.CDLL("libc.so.7", use_errno=True)
+except OSError:
+    import ctypes.util
+    _dll = ctypes.CDLL(str(ctypes.util.find_library("c")), use_errno=True)
 
 
 class JailResource(
