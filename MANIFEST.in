@@ -3,3 +3,4 @@ include *.md
 include Makefile
 include *.py
 recursive-include libioc *.py
+include libioc/VERSION
