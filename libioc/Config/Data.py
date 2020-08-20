@@ -150,7 +150,7 @@ class Data(dict):
         return typing.cast(typing.ValuesView[typing.Any], self.__values())
 
     def __values(self) -> typing.Iterator[typing.Any]:
-        yield from (value for _, value in self.__iter__())
+        yield from (value for _, value in self.items())
 
     def items(self) -> typing.ItemsView[str, typing.Any]:
         """Iterate over the flattened keys and values."""
