@@ -140,7 +140,7 @@ class DistributionGenerator:
             release_path = f"/ftp/releases/{processor}/{processor}"
             return f"https://download.freebsd.org{release_path}"
         elif distribution == "HardenedBSD":
-            return f"https://jenkins.hardenedbsd.org/builds"
+            return "https://jenkins.hardenedbsd.org/builds"
         else:
             raise libioc.errors.DistributionUnknown(distribution)
 
