@@ -47,14 +47,10 @@ def _resolve_requirement(req: typing.Any) -> str:
 
 def _read_requirements(
     filename: str="requirements.txt"
-) -> typing.Dict[str, typing.List[str]]:
+) -> typing.List[str]:
     reqs = list(parse_requirements(filename, session="libioc"))
-    return dict(
-        install_requires=[_resolve_requirement(req) for req in reqs]
-    )
+    return [_resolve_requirement(req) for req in reqs]
 
-
-ioc_requirements = _read_requirements("requirements.txt")
 
 if sys.version_info < (3, 6):
     exit("Only Python 3.6 and higher is supported.")
@@ -75,7 +71,7 @@ setup(
     packages=find_packages(include=["libioc", "libioc.*"]),
     package_data={'': ['VERSION']},
     include_package_data=True,
-    install_requires=ioc_requirements["install_requires"],
+    install_requires=_read_requirements("requirements.txt"),
     # setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
 )
