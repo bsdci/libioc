@@ -38,16 +38,19 @@ except ImportError:
     pass
 
 
+def _resolve_requirement(req: typing.Any) -> str:
+    if req.__class__.__name__ == "ParsedRequirement":
+        return str(req.requirement)
+    else:
+        return f"{req.name}{req.specifier}"
+
+
 def _read_requirements(
     filename: str="requirements.txt"
 ) -> typing.Dict[str, typing.List[str]]:
     reqs = list(parse_requirements(filename, session="libioc"))
     return dict(
-        install_requires=list(map(lambda x: f"{x.name}{x.specifier}", reqs)),
-        dependency_links=list(map(
-            lambda x: str(x.link),
-            filter(lambda x: x.link, reqs)
-        ))
+        install_requires=[_resolve_requirement(req) for req in reqs]
     )
 
 
@@ -73,7 +76,6 @@ setup(
     package_data={'': ['VERSION']},
     include_package_data=True,
     install_requires=ioc_requirements["install_requires"],
-    dependency_links=ioc_requirements["dependency_links"],
     # setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
 )

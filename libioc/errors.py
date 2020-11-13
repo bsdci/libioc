@@ -158,7 +158,7 @@ class JailNotSupplied(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Please supply a jail"
+        msg = "No jail supplied"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -292,7 +292,7 @@ class JailStateUpdateFailed(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"JLS query failed"
+        msg = "JLS query failed"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -306,7 +306,7 @@ class VirtualFstabLineHasNoRealIndex(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"The virtual fstab line does not have a real list index"
+        msg = "The virtual fstab line does not have a real list index"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -480,7 +480,7 @@ class ResourceLimitUnknown(IocException, KeyError):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"The specified resource limit is unknown"
+        msg = "The specified resource limit is unknown"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -627,7 +627,7 @@ class ListableResourceNamespaceUndefined(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"The ListableResource needs a namespace for this operation"
+        msg = "The ListableResource needs a namespace for this operation"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -754,7 +754,7 @@ class HostReleaseUnknown(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"The host release is unknown"
+        msg = "The host release is unknown"
         super().__init__(message=msg, logger=logger)
 
 
@@ -765,7 +765,7 @@ class HostUserlandVersionUnknown(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Could not determine the hosts userland version"
+        msg = "Could not determine the hosts userland version"
         super().__init__(message=msg, logger=logger)
 
 
@@ -1156,7 +1156,7 @@ class ReleaseListUnavailable(IocException):
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
-        msg = f"The releases list is unavailable"
+        msg = "The releases list is unavailable"
         super().__init__(message=msg, logger=logger)
 
 
@@ -1168,7 +1168,7 @@ class ReleaseAssetHashesUnavailable(IocException):
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
-        msg = f"The releases asset hashes are unavailable"
+        msg = "The releases asset hashes are unavailable"
         super().__init__(message=msg, logger=logger)
 
 
@@ -1216,7 +1216,7 @@ class NonReleaseUpdateFetch(UpdateFailure):
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
-        msg = f"Updates can only be fetched for releases"
+        msg = "Updates can only be fetched for releases"
         UpdateFailure.__init__(
             self,
             name=resource.name,
@@ -1448,7 +1448,7 @@ class UndefinedProvisionerSource(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Missing provisioner source"
+        msg = "Missing provisioner source"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -1459,7 +1459,7 @@ class UndefinedProvisionerMethod(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Missing provisioner method"
+        msg = "Missing provisioner method"
         IocException.__init__(self, message=msg, logger=logger)
 
 
@@ -1487,5 +1487,5 @@ class SourceNotFound(IocException):
         self,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
-        msg = f"Jail source not found"
+        msg = "Jail source not found"
         super().__init__(message=msg, logger=logger)

@@ -268,7 +268,7 @@ def __write_r10k_config(
     with __securely_open_r10k_config(jail) as f:
         jail.logger.verbose(f"Writing r10k config {f.name}")
         f.write("\n".join((
-            f"---",
+            "---",
             ":sources:",
             "    puppet:",
             f"       basedir: {basedir}",
