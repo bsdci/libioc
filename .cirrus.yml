@@ -21,6 +21,6 @@ task:
     - sysctl -a
     - mount -t fdescfs null /dev/fd
     - pkg install -y python3
-    - make install-dev
+    - make install
   test_script:
     - env ZPOOL="ioc-test-`uname -r`" make test
