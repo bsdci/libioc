@@ -22,6 +22,7 @@ task:
     - sysctl -a
     - mount -t fdescfs null /dev/fd
     - pkg install -y python3
+    - python3 -m ensurepip
     - python3 -m pip install -U setuptools
     - make install
   test_script:
