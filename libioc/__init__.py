@@ -59,7 +59,7 @@ class _IocModule(sys.modules["libioc"].__class__):
     ]
 
     def __getattribute__(self, key: str) -> typing.Any:
-        if key == "VERSION":
+        if (key == "VERSION") or (key == "__version__"):
             return _get_version()
         if key.startswith("_") is True:
             return super().__getattribute__(key)

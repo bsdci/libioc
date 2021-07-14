@@ -763,6 +763,9 @@ class JailGenerator(JailResource):
             yield jailDependantsStartEvent.skip("No dependant jails")
             return
 
+        def _sort(x: JailResource) -> int:
+            return int(x.config["priority"])
+
         dependant_jails = sorted(
             libioc.Jails.JailsGenerator(
                 filters=_depends,
@@ -770,7 +773,7 @@ class JailGenerator(JailResource):
                 logger=self.logger,
                 zfs=self.zfs
             ),
-            key=lambda x: x.config["priority"]
+            key=_sort
         )
 
         for dependant_jail in dependant_jails:

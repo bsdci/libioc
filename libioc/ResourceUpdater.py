@@ -589,14 +589,13 @@ class FreeBSD(Updater):
         filename: str
     ) -> str:
 
-        if release.name == "11.0-RELEASE":
-            release_name = "11.0.1"
-        else:
-            fragments = release.name.split("-", maxsplit=1)
-            release_name = f"{fragments[0]}.0"
+        fragments = release.name.split("-", maxsplit=1)
+        release_name = f"{fragments[0]}"
 
-        base_url = "https://svn.freebsd.org/base/release"
-        return f"{base_url}/{release_name}/{filename}"
+        base_url = "https://cgit.freebsd.org/src/plain/"
+        query_string = f"?h=releng/{release_name}"
+
+        return f"{base_url}{filename}{query_string}"
 
     @property
     def _base_release_symlink_location(self) -> str:

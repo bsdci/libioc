@@ -14,26 +14,10 @@ pyver= ${PYTHON:S/^python//:S/.//:C/\([0-9]+\)/\1/}
 . error "libioc cannot run with a Python version < 3.5"
 .endif
 
-install: install-deps install-python-requirements
-	$(PYTHON) -m pip install -U .
-install-python-requirements:
-	$(PYTHON) -m ensurepip
-	$(PYTHON) -m pip install -Ur requirements.txt
-install-python-requirements-dev: install-python-requirements
-	$(PYTHON) -m pip install -Ur requirements-dev.txt
-install-deps:
-	pkg install -q -y libucl rsync git py$(pyver)-ucl py$(pyver)-libzfs
-install-deps-dev: install-deps
-	if [ "`uname`" = "FreeBSD" ]; then pkg install -y gmake py$(pyver)-setuptools py$(pyver)-sqlite3; fi
-install-dev: install-deps-dev install-python-requirements-dev
-	$(PYTHON) -m pip install -e .
+install:
+	$(PYTHON) setup.py install
 install-travis:
 	python$(TRAVIS_PYTHON_VERSION) -m pip install -IU flake8-mutable flake8-docstrings flake8-builtins flake8-mypy bandit==1.5.1 bandit-high-entropy-string
-uninstall:
-	$(PYTHON) -m pip uninstall -y ioc
-	@if [ -f /usr/local/etc/rc.d/ioc ]; then \
-		rm /usr/local/etc/rc.d/ioc; \
-	fi
 check:
 	flake8 --version
 	mypy --version
@@ -47,11 +31,9 @@ docs:
 help:
 	@echo "    install"
 	@echo "        Installs libioc"
-	@echo "    uninstall"
-	@echo "        Removes libioc"
 	@echo "    test"
 	@echo "        Run unit tests with pytest"
 	@echo "    check"
 	@echo "        Run static linters & other static analysis tests"
-	@echo "    install-dev"
-	@echo "        Install dependencies needed to run `check`"
+	@echo "    docs"
+	@echo "        Generate documentation"

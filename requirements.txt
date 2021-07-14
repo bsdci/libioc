@@ -1,3 +1,0 @@
-gitpython
-freebsd_sysctl==0.0.7
-jail==0.0.12
