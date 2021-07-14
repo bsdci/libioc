@@ -170,7 +170,7 @@ class ZFS(libzfs.ZFS):
         except libzfs.ZFSException as e:
             snapshot_error = e
 
-        if delete_snapshot is True:
+        if (delete_snapshot is True) and (snapshot_error is not None):
             snapshot.delete(recursive=True)
 
         if snapshot_error is not None:
