@@ -338,8 +338,8 @@ class Resource(metaclass=abc.ABCMeta):
     @property
     def config_handler(self) -> 'libioc.Config.Prototype.Prototype':
         """Return the config handler according to the detected config_type."""
-        handler = typing.cast(
-            'libioc.Config.Prototype.Prototype',
+        # dynamic lookup of the config_<config_type> property
+        handler: 'libioc.Config.Prototype.Prototype' = (
             object.__getattribute__(self, f"config_{self.config_type}")
         )
         return handler

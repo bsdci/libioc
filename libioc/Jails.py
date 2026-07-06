@@ -35,7 +35,9 @@ if typing.TYPE_CHECKING:
     import libzfs
 
 
-class JailsGenerator(libioc.ListableResource.ListableResource):
+class JailsGenerator(
+    libioc.ListableResource.ListableResource['libioc.Jail.JailGenerator']
+):
     """Asynchronous representation of a collection of jails."""
 
     # Keys that are stored on the Jail object, not the configuration
@@ -88,24 +90,11 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
                 dataset.name
             ),
             logger=self.logger,
-            host=typing.cast('libioc.Host.Host', self.host),
+            host=self.host,
             zfs=self.zfs,
             **self.resource_args
         )
 
-        return jail
-
-    # unlike list, this collection is only subscriptable by index
-    def __getitem__(  # type: ignore[override]
-        self,
-        index: int
-    ) -> 'libioc.Jail.JailGenerator':
-        """Return the JailGenerator at a certain index position."""
-        _getitem = libioc.ListableResource.ListableResource.__getitem__
-        jail = typing.cast(
-            'libioc.Jail.JailGenerator',
-            _getitem(self, index)
-        )
         return jail
 
 
@@ -124,6 +113,7 @@ class Jails(JailsGenerator):
         """Return the Jail object at a certain index position."""
         _getitem = JailsGenerator.__getitem__
         jail = typing.cast(
+            # _class_jail creates sync Jail instances in this class
             'libioc.Jail.Jail',
             _getitem(self, index)
         )

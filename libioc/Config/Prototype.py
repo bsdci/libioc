@@ -45,7 +45,7 @@ class Prototype:
     """Prototype of a JailConfig."""
 
     logger: 'libioc.Logger.Logger'
-    data: ConfigDataDict
+    data: libioc.Config.Data.Data
     _file: str
 
     def __init__(
@@ -81,7 +81,7 @@ class Prototype:
         except FileNotFoundError:
             return {}
 
-    def write(self, data: ConfigDataDict) -> None:
+    def write(self, data: libioc.Config.Data.Data) -> None:
         """
         Write changes to the config file.
 
@@ -94,12 +94,13 @@ class Prototype:
 
     def map_input(
         self,
-        data: typing.Union[typing.TextIO, ConfigDataDict]
+        data: typing.Any
     ) -> typing.Dict[str, typing.Any]:
         """
         Map input data (for reading from the configuration).
 
-        Implementing classes may provide individual mappings.
+        Implementing classes may provide individual mappings and
+        narrow the input type they accept.
         """
         if not isinstance(data, typing.TextIO):
             return libioc.Config.Data.Data(data)
@@ -108,8 +109,8 @@ class Prototype:
 
     def map_output(
         self,
-        data: ConfigDataDict
-    ) -> typing.Union[str, ConfigDataDict]:
+        data: libioc.Config.Data.Data
+    ) -> typing.Union[str, libioc.Config.Data.Data]:
         """
         Map output data (for writing to the configuration).
 

@@ -93,7 +93,7 @@ class ControlRepoDefinition(dict):
     @source.setter
     def source(self, source: 'libioc.Provisioning.Source') -> None:
         """Set the Puppet Control-Repo URL."""
-        if isinstance(source, libioc.Provisioning.Source) is False:
+        if not isinstance(source, libioc.Provisioning.Source):
             raise TypeError("Source must be libioc.Provisioning.Source")
         self.__source = source
 
@@ -248,6 +248,7 @@ def __deploy_r10k(
         __write_r10k_config(
             self.jail,
             __puppet_env_dir,
+            # provision() raised earlier when the source was None
             typing.cast('libioc.Provisioning.Source', self.source)
         )
         __deploy_r10k_config(self.jail)

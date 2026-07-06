@@ -70,6 +70,8 @@ class SecureTarfile:
 
                 Path to the archive file that is going to be extracted.
         """
+        # tarfile.open only accepts literal mode strings, while the mode
+        # is composed from the configured compression format
         mode = typing.cast(
             'typing.Literal["r", "r:gz", "r:bz2", "r:xz"]',
             self.mode

@@ -153,8 +153,7 @@ class Updater:
                 new=True,
                 logger=self.resource.logger,
                 zfs=self.resource.zfs,
-                # jails accept any HostGenerator at runtime
-                host=typing.cast('libioc.Host.Host', self.resource.host),
+                host=self.resource.host,
                 dataset=self.resource.dataset
             )
             # JailConfig offers no file attribute, so this assignment is
@@ -214,6 +213,8 @@ class Updater:
     def _clean_create_dir(self, directory: str) -> None:
         if os.path.ismount(directory) is True:
             libioc.helpers.umount(
+                # the mountpoints handled here are absolute paths, but
+                # remain plain strings at runtime
                 typing.cast('libioc.Types.AbsolutePath', directory),
                 force=True,
                 logger=self.logger
@@ -294,7 +295,7 @@ class Updater:
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Fetch the update of a release."""
         ReleaseGenerator = libioc.Release.ReleaseGenerator
-        if isinstance(self.resource, ReleaseGenerator) is False:
+        if not isinstance(self.resource, ReleaseGenerator):
             raise libioc.errors.NonReleaseUpdateFetch(
                 resource=self.resource,
                 logger=self.logger
@@ -455,16 +456,14 @@ class Updater:
                 start_dependant_jails=False,
                 event_scope=_scope
             ):
-                if isinstance(event, libioc.events.JailCommand) is True:
+                if isinstance(event, libioc.events.JailCommand):
                     if (event.done is True) and (event.error is None):
                         _skipped_text = "No updates are available to install."
-                        skipped = (_skipped_text in typing.cast(
+                        # stdout is set on a successfully finished command
+                        skipped = _skipped_text in typing.cast(
                             str,
-                            typing.cast(
-                                'libioc.events.JailCommand',
-                                event
-                            ).stdout
-                        )) is True
+                            event.stdout
+                        )
                 yield event
             self.logger.debug(
                 f"Update of resource '{self.resource.name}' finished"

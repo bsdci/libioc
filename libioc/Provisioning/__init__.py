@@ -60,28 +60,27 @@ class Source(str):
     @value.setter
     def value(self, value: _SourceInputType) -> None:
 
-        if isinstance(value, libioc.Types.AbsolutePath) is True:
-            self._value = typing.cast(libioc.Types.AbsolutePath, value)
+        if isinstance(value, libioc.Types.AbsolutePath):
+            self._value = value
             return
-        elif isinstance(value, urllib.parse.ParseResult) is True:
-            url = typing.cast(urllib.parse.ParseResult, value)
-            self.__require_valid_url(url)
-            self._value = url
+        elif isinstance(value, urllib.parse.ParseResult):
+            self.__require_valid_url(value)
+            self._value = value
             return
-        elif isinstance(value, str) is False:
+        elif not isinstance(value, str):
             raise TypeError(
                 f"Input must be URL, AbsolutePath or str, "
                 "but was {type(value)}"
             )
 
         try:
-            self._value = libioc.Types.AbsolutePath(typing.cast(str, value))
+            self._value = libioc.Types.AbsolutePath(value)
             return
         except ValueError:
             pass
 
         try:
-            url = urllib.parse.urlparse(typing.cast(str, value))
+            url = urllib.parse.urlparse(value)
             self.__require_valid_url(url)
             self._value = url
             return
@@ -93,7 +92,7 @@ class Source(str):
     @property
     def local(self) -> bool:
         """Return True when the source is local."""
-        return (isinstance(self.value, libioc.Types.AbsolutePath) is True)
+        return (isinstance(self.value, libioc.Types.AbsolutePath))
 
     @property
     def remote(self) -> bool:
@@ -107,8 +106,8 @@ class Source(str):
     def __str__(self) -> str:
         """Return the Provisioning Source as string."""
         value = self.value
-        if isinstance(value, urllib.parse.ParseResult) is True:
-            return typing.cast(urllib.parse.ParseResult, value).geturl()
+        if isinstance(value, urllib.parse.ParseResult):
+            return value.geturl()
         else:
             return str(value)
 
@@ -157,9 +156,10 @@ class Provisioner(Prototype):
 
     @property
     def method(self) -> str:
-        method = self.jail.config["provision.method"]
+        # the config value is the provisioning method name string
+        method: str = self.jail.config["provision.method"]
         if method in self.__available_provisioning_modules:
-            return typing.cast(str, method)
+            return method
         # InvalidProvisionerMethod is missing from libioc.errors, so that
         # this raise statement fails with an AttributeError when reached
         raise libioc.errors.InvalidProvisionerMethod(  # type: ignore[attr-defined] # noqa: E501

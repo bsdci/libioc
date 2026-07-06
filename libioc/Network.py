@@ -139,6 +139,7 @@ class Network:
             return
 
         if jid is None:
+            # cast for mypy: the jail is still running, so it has a JID
             jid = typing.cast(int, self.jail.jid)
 
         try:
@@ -191,6 +192,7 @@ class Network:
     @property
     def __autodetected_bridge_mtu(self) -> int:
         self.__require_bridge()
+        # cast for mypy: __require_bridge() raised if bridge was None
         bridge = typing.cast(
             libioc.BridgeInterface.BridgeInterface,
             self.bridge
@@ -263,7 +265,7 @@ class Network:
             create=True,
             logger=self.logger
         )
-        nic_b_name = typing.cast(str, nic_a.name)[:-1] + "b"
+        nic_b_name = nic_a.name[:-1] + "b"
 
         nic_a = libioc.NetworkInterface.NetworkInterface(
             name=nic_a.name,
@@ -316,6 +318,7 @@ class Network:
         )
 
         self.__require_bridge()
+        # cast for mypy: __require_bridge() raised if bridge was None
         bridge = typing.cast(
             libioc.BridgeInterface.BridgeInterface,
             self.bridge
@@ -351,8 +354,8 @@ class Network:
             libioc.NetworkInterface.NetworkInterface(
                 name=sec_bridge.name,
                 addm=[
-                    typing.cast(str, nic_a.name),
-                    typing.cast(str, nic_d.name)
+                    nic_a.name,
+                    nic_d.name
                 ],
                 logger=self.logger
             )
@@ -395,6 +398,7 @@ class Network:
         self.logger.verbose(
             f"Configuring Secure VNET Firewall for {self._escaped_nic_name}"
         )
+        # cast for mypy: the jail was started before, so it has a JID
         firewall_rule_number = typing.cast(int, self.jail.jid)
 
         for protocol in ["ipv4", "ipv6"]:

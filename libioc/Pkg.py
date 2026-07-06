@@ -354,13 +354,10 @@ class Pkg:
                 command=["/bin/sh", "-c", command],
                 event_scope=packageInstallEvent.scope
             ):
-                if isinstance(event, libioc.events.JailCommand) is True:
+                if isinstance(event, libioc.events.JailCommand):
                     if event.done is True:
-                        _stdout = typing.cast(
-                            libioc.events.JailCommand,
-                            event
-                        ).stdout
-                        stdout = typing.cast(str, _stdout).strip("\r\n")
+                        # stdout is set on a finished command
+                        stdout = typing.cast(str, event.stdout).strip("\r\n")
                 yield event
 
             skipped = stdout.endswith("already installed")
@@ -609,7 +606,7 @@ class Pkg:
             fstab=source_jail.fstab,
             logger=self.logger,
             zfs=source_jail.zfs,
-            host=typing.cast('libioc.Host.Host', source_jail.host),
+            host=source_jail.host,
             dataset=source_jail.dataset
         )
         temporary_jail.config.ignore_source_config = True

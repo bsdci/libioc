@@ -96,6 +96,8 @@ class LaunchableResource(libioc.Resource.Resource):
             return self._updater
 
         updater = libioc.ResourceUpdater.get_launchable_update_resource(
+            # updaters are only requested from jails and releases, that
+            # extend this class with the name and release properties
             resource=typing.cast(
                 'libioc.ResourceUpdater.UpdateableResource',
                 self

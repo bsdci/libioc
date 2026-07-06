@@ -35,7 +35,8 @@ import libioc.errors
 class ZFS(libzfs.ZFS):
     """libzfs enhancement module."""
 
-    _logger: typing.Optional['libioc.Logger.Logger']
+    # only assigned by the logger setter, but may be unset
+    _logger: 'libioc.Logger.Logger'
 
     @property
     def logger(self) -> 'libioc.Logger.Logger':
@@ -43,7 +44,7 @@ class ZFS(libzfs.ZFS):
         Logger = libioc.Logger.Logger
         if not (self._has_logger or isinstance(self._logger, Logger)):
             raise Exception("The logger is unavailable")
-        return typing.cast('libioc.Logger.Logger', self._logger)
+        return self._logger
 
     @logger.setter
     def logger(self, logger: 'libioc.Logger.Logger') -> None:

@@ -298,9 +298,30 @@ def parse_int(data: typing.Optional[typing.Union[str, int]]) -> int:
     raise TypeError(f"Value is not an integer: {data}")
 
 
+_UserInputType = typing.TypeVar("_UserInputType")
+
+
+@typing.overload
 def parse_user_input(
-    data: typing.Optional[typing.Union[str, bool]]
+    data: typing.Union[str, bool]
 ) -> typing.Optional[typing.Union[str, bool]]:
+    """Map boolean and none-like strings to their value."""
+    ...
+
+
+@typing.overload
+def parse_user_input(data: None) -> None:
+    """Pass through None input."""
+    ...
+
+
+@typing.overload
+def parse_user_input(data: _UserInputType) -> _UserInputType:
+    """Return input of any other type unchanged."""
+    ...
+
+
+def parse_user_input(data: typing.Any) -> typing.Any:
     """
     Parse user input.
 
@@ -375,7 +396,7 @@ def to_string(
         bool,
         int,
         None,
-        typing.List[typing.Union[str, bool, int]]
+        typing.Sequence[typing.Union[str, bool, int]]
     ],
     true: str="yes",
     false: str="no",
@@ -416,10 +437,10 @@ def to_string(
     if data is None:
         return none
 
-    elif isinstance(data, list) is True:
+    elif isinstance(data, list):
         children = [
             to_string(x, true, false, none, delimiter)
-            for x in list(data)  # type: ignore
+            for x in list(data)
             if x is not None
         ]
         if len(children) == 0:
@@ -581,11 +602,8 @@ def umount(
 ) -> None:
     """Unmount a mountpoint using libc."""
     import jail as libjail
-    if isinstance(mountpoint, list) is True:
-        for entry in typing.cast(
-            typing.List[libioc.Types.AbsolutePath],
-            mountpoint
-        ):
+    if isinstance(mountpoint, list):
+        for entry in mountpoint:
             try:
                 umount(
                     mountpoint=entry,
@@ -602,7 +620,8 @@ def umount(
                     raise
         return
 
-    # a single mountpoint remains after the list case returned above
+    # a single mountpoint remains after the list case returned above;
+    # mypy cannot rule out None, which AbsolutePath rejects at runtime
     mountpoint = typing.cast(libioc.Types.AbsolutePath, mountpoint)
     mountpoint_path = libioc.Types.AbsolutePath(mountpoint)
 

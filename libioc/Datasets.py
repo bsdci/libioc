@@ -162,7 +162,7 @@ class RootDatasets:
         return _asset
 
 
-class Datasets(dict):
+class Datasets(dict[str, RootDatasets]):
     """
     All source datasets managed by libioc.
 
@@ -245,7 +245,7 @@ class Datasets(dict):
         """Return the source that was attached first."""
         if self.main_datasets_name is None:
             raise libioc.errors.IocageNotActivated(logger=self.logger)
-        return typing.cast(RootDatasets, self[self.main_datasets_name])
+        return self[self.main_datasets_name]
 
     def find_root_datasets_name(self, dataset_name: str) -> str:
         """Return the name of the source containing the matching dataset."""
@@ -276,7 +276,7 @@ class Datasets(dict):
         """
         if source_name is None:
             return self.main
-        return typing.cast(RootDatasets, self[source_name])
+        return self[source_name]
 
     def attach_sources(
         self,
@@ -341,6 +341,7 @@ class Datasets(dict):
         output: typing.Dict[str, str] = {}
         for rc_conf_key in rc_conf_keys:
             datasets_name = rc_conf_key[len(prefix):]
+            # cast for mypy: ioc_dataset_* values are dataset name strings
             output[datasets_name] = typing.cast(str, rc_conf[rc_conf_key])
         return output
 

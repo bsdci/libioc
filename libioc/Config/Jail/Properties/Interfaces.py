@@ -53,6 +53,8 @@ class InterfaceProp(dict):
         dict.__init__(self, {})
         self.logger = logger
         if config is not None:
+            # any BaseConfig is accepted, but the property is bound
+            # to a JailConfig whenever the config is consulted
             self.config = typing.cast(
                 'libioc.Config.Jail.JailConfig.JailConfig',
                 config
@@ -133,6 +135,8 @@ class InterfaceProp(dict):
                 bridge_if
             )
         except TypeError:
+            # the TypeError above proves that bridge_if was not None,
+            # which mypy cannot derive from the exception flow
             bridge = libioc.BridgeInterface.BridgeInterface(
                 typing.cast(str, bridge_if)
             )

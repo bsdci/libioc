@@ -61,12 +61,11 @@ class Storage:
         resource: 'libioc.Resource.Resource'
     ) -> None:
         """Clone another resource to a the current dataset_name."""
-        if isinstance(resource, libioc.Release.ReleaseGenerator) is True:
-            self._clone_release(
-                typing.cast('libioc.Release.ReleaseGenerator', resource)
-            )
+        if isinstance(resource, libioc.Release.ReleaseGenerator):
+            self._clone_release(resource)
         else:
             self._clone_jail(
+                # resources cloned here are either releases or jails
                 typing.cast('libioc.Jail.JailGenerator', resource)
             )
 

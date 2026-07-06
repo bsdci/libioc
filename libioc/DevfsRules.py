@@ -77,7 +77,7 @@ class DevfsRuleset(list):
         if value is None and number is None:
             # name and number will be assigned later
             name = None
-        elif (number is None) and (isinstance(value, str) is True):
+        elif (number is None) and (isinstance(value, str)):
             name, number, comment = self._parse_line(str(value))
 
         self.name = name

@@ -142,6 +142,7 @@ def provision(
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = PluginDefinition(
+            # Provisioner.provision checks the source before dispatching
             typing.cast('libioc.Provisioning.Source', self.source),
             logger=self.jail.logger
         )
