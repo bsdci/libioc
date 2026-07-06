@@ -37,6 +37,7 @@ import os.path
 import sys
 import subprocess
 import random
+import time
 import pytest
 
 import helper_functions
@@ -251,7 +252,15 @@ def new_jail(
     yield new_jail
     if new_jail.exists is True:
         new_jail.stop(force=True)
-        new_jail.destroy()
+        # unmounting can race with the stopping jail for a moment
+        for attempt in range(5):
+            try:
+                new_jail.destroy()
+                break
+            except libzfs.ZFSException:
+                if attempt == 4:
+                    raise
+                time.sleep(2)
 
 
 @pytest.fixture(scope="function")
