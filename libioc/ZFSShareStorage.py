@@ -53,7 +53,7 @@ class ZFSShareStorage:
         self,
         auto_create: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.JailZFSShare', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Invoke mounting the ZFS shares."""
         event = libioc.events.JailZFSShare(
             jail=self.jail,
@@ -108,7 +108,7 @@ class ZFSShareStorage:
         self,
         auto_create: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.AttachZFSDataset', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         for dataset in self.get_zfs_datasets():
 
@@ -182,12 +182,12 @@ class ZFSShareStorage:
     def _exec(
         self,
         command: typing.List[str],
-        **exec_arguments: typing.Dict[str, typing.Any]
+        **exec_arguments: typing.Any
     ) -> 'libioc.helpers.CommandOutput':
         return libioc.helpers.exec(command, **exec_arguments)
 
     def _exec_jail(
         self,
         command: typing.List[str]
-    ) -> 'libioc.helpers.CommandOutput':
+    ) -> None:
         self.jail.exec(command)

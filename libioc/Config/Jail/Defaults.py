@@ -122,7 +122,8 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
         """Return the number of default config properties."""
         return len(self.keys())
 
-    def keys(self) -> typing.KeysView[str]:
+    # the view combines user and hardcoded defaults, unlike that of dict
+    def keys(self) -> typing.KeysView[str]:  # type: ignore[override]
         """List all default property keys."""
         return typing.cast(
             typing.KeysView[str],

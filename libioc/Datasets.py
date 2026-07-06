@@ -241,11 +241,11 @@ class Datasets(dict):
         self.logger.spam(f"Found active ZFS pool {self.active_pool.name}")
 
     @property
-    def main(self) -> 'libioc.Datasets.Datasets':
+    def main(self) -> 'RootDatasets':
         """Return the source that was attached first."""
         if self.main_datasets_name is None:
             raise libioc.errors.IocageNotActivated(logger=self.logger)
-        return self[self.main_datasets_name]
+        return typing.cast(RootDatasets, self[self.main_datasets_name])
 
     def find_root_datasets_name(self, dataset_name: str) -> str:
         """Return the name of the source containing the matching dataset."""
@@ -268,7 +268,7 @@ class Datasets(dict):
     def get_root_source(
         self,
         source_name: typing.Optional[str]=None
-    ) -> 'libioc.Datasets.Datasets':
+    ) -> 'RootDatasets':
         """
         Get the root source with a certain name.
 
@@ -276,7 +276,7 @@ class Datasets(dict):
         """
         if source_name is None:
             return self.main
-        return self[source_name]
+        return typing.cast(RootDatasets, self[source_name])
 
     def attach_sources(
         self,
@@ -341,7 +341,7 @@ class Datasets(dict):
         output: typing.Dict[str, str] = {}
         for rc_conf_key in rc_conf_keys:
             datasets_name = rc_conf_key[len(prefix):]
-            output[datasets_name] = rc_conf[rc_conf_key]
+            output[datasets_name] = typing.cast(str, rc_conf[rc_conf_key])
         return output
 
     @property
@@ -559,7 +559,7 @@ class FilteredDatasets(Datasets):
     @property
     def source_filters(self) -> OptionalSourceFilterType:
         """Return the active source filters or None."""
-        return self._source_filters  # noqa: T484
+        return self._source_filters
 
     @source_filters.setter
     def source_filters(self, value: OptionalSourceFilterType) -> None:

@@ -171,11 +171,11 @@ class ZFSDataset(ZFSObject):
         fd: int,
         fromname: Optional[str]=None,
         toname: Optional[str]=None,
-        flags: Set[str]=set()
+        flags: Set[SendFlag]=set()
     ) -> None: ...
     def snapshot(
         self,
-        name: str, 
+        name: str,
         fsopts: Optional[Dict[str, str]]=None,
         recursive: bool=False
     ) -> None: ...
@@ -308,7 +308,7 @@ class ZFSSnapshot(ZFSObject):
         self,
         fd: int,
         fromname: Optional[str]=None,
-        flags: Set[str]=set()
+        flags: Set[SendFlag]=set()
     ) -> None: ...
     def __getstate__(self) -> Dict[str, str]: ...
 

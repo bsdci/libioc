@@ -55,7 +55,8 @@ class NetworkInterface:
             str,
             int,
             typing.List[str],
-            typing.List[int]
+            typing.List[int],
+            'libioc.MacAddress.MacAddress'
         ]
     ]
     extra_settings: typing.List[str]
@@ -67,8 +68,14 @@ class NetworkInterface:
         self,
         name: typing.Optional[str]="vnet0",
         create: bool=False,
-        ipv4_addresses: typing.List[ipaddress.IPv4Interface]=[],
-        ipv6_addresses: typing.List[ipaddress.IPv6Interface]=[],
+        ipv4_addresses: typing.Union[
+            typing.List[str],
+            typing.List[ipaddress.IPv4Interface]
+        ]=[],
+        ipv6_addresses: typing.Union[
+            typing.List[str],
+            typing.List[ipaddress.IPv6Interface]
+        ]=[],
         mac: typing.Optional[
             typing.Union[str, 'libioc.MacAddress.MacAddress']
         ]=None,
@@ -186,7 +193,8 @@ class NetworkInterface:
 
     def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
         for nic_name_to_destroy in nic_names:
-            libioc.helper.exec([
+            # there is no libioc.helper module, so this raises
+            libioc.helper.exec([  # type: ignore[attr-defined]
                 self.ifconfig_command,
                 nic_name_to_destroy,
                 "destroy"
@@ -207,12 +215,13 @@ class NetworkInterface:
     def __apply_addresses(
         self,
         addresses: typing.Union[
+            typing.List[str],
             typing.List[ipaddress.IPv4Interface],
             typing.List[ipaddress.IPv6Interface]
         ]
     ) -> None:
 
-        for i, address in enumerate(list(addresses)):  # noqa: T484
+        for i, address in enumerate(list(addresses)):
             name = self.current_nic_name
 
             if str(address).lower() == "dhcp":
@@ -241,7 +250,7 @@ class NetworkInterface:
         else:
             stdout, _, _ = libioc.helpers.exec(command, logger=self.logger)
 
-        self._handle_exec_stdout(stdout)
+        self._handle_exec_stdout(typing.cast(str, stdout))
 
         return str(stdout)
 

@@ -38,7 +38,7 @@ class LogEntry:
         message: str,
         level: str,
         indent: int=0,
-        logger: 'libioc.Logger.Logger'=None
+        logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         self.message = message
         self.level = level
@@ -47,8 +47,8 @@ class LogEntry:
 
     def edit(
         self,
-        message: str=None,
-        indent: int=None
+        message: typing.Optional[str]=None,
+        indent: typing.Optional[int]=None
     ) -> None:
         """Change the log entry."""
         if self.logger is None:

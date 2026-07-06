@@ -35,6 +35,7 @@ import libioc.events
 
 if typing.TYPE_CHECKING:
     import libioc.Config.Data
+    import libioc.Jail
     import libioc.LaunchableResource
     import libioc.ZFS
 
@@ -57,7 +58,10 @@ class LaunchableResourceBackup:
     """
 
     resource: 'libioc.LaunchableResource.LaunchableResource'
-    _work_dir: typing.Optional[typing.Union[str, tempfile.TemporaryDirectory]]
+    _work_dir: typing.Optional[typing.Union[
+        str,
+        'tempfile.TemporaryDirectory[str]'
+    ]]
     _snapshot_name: typing.Optional[str]
 
     def __init__(
@@ -119,7 +123,7 @@ class LaunchableResourceBackup:
 
     def _lock(self, work_dir: typing.Optional[str]=None) -> None:
         self._require_unlocked()
-        _work_dir: typing.Union[str, tempfile.TemporaryDirectory]
+        _work_dir: typing.Union[str, 'tempfile.TemporaryDirectory[str]']
         if work_dir is None:
             _work_dir = tempfile.TemporaryDirectory()
             self.logger.spam(
@@ -218,6 +222,8 @@ class LaunchableResourceBackup:
         has_release = ("release" in archived_config.keys()) is True
 
         try:
+            # restoring is only supported for jail resources
+            _jail = typing.cast('libioc.Jail.JailGenerator', self.resource)
             if has_release and not is_standalone:
                 release = libioc.Release.ReleaseGenerator(
                     name=archived_config["release"],
@@ -225,9 +231,9 @@ class LaunchableResourceBackup:
                     zfs=self.zfs,
                     host=self.resource.host
                 )
-                self.resource.create_from_release(release)
+                _jail.create_from_release(release)
             else:
-                self.resource.create_from_scratch()
+                _jail.create_from_scratch()
 
             if is_standalone is False:
                 yield from self._import_root_dataset(event_scope=scope)
@@ -312,7 +318,11 @@ class LaunchableResourceBackup:
             return
 
         try:
-            fstab = self.resource.fstab
+            # only jail resources provide an fstab file
+            fstab = typing.cast(
+                'libioc.Jail.JailGenerator',
+                self.resource
+            ).fstab
             _old_fstab_file = fstab.file
             fstab.file = fstab_file_path
             fstab.read_file()
@@ -560,7 +570,11 @@ class LaunchableResourceBackup:
 
         try:
             fstab = libioc.Config.Jail.File.Fstab.JailFstab(
-                jail=self.resource,
+                # fstab files only exist on jail resources
+                jail=typing.cast(
+                    'libioc.Jail.JailGenerator',
+                    self.resource
+                ),
                 logger=self.resource.logger,
                 host=self.resource.host
             )
@@ -591,9 +605,12 @@ class LaunchableResourceBackup:
 
         try:
             temp_root_dir = f"{self.work_dir}/root"
+            # exporting a root dataset delta requires a jail resource
+            # that is forked from a release
+            _jail = typing.cast('libioc.Jail.JailGenerator', self.resource)
             compare_dest = "/".join([
-                self.resource.release.root_dataset.mountpoint,
-                f".zfs/snapshot/{self.resource.release_snapshot.snapshot_name}"
+                _jail.release.root_dataset.mountpoint,
+                f".zfs/snapshot/{_jail.release_snapshot.snapshot_name}"
             ])
             os.mkdir(temp_root_dir)
 

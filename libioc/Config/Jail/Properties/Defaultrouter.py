@@ -62,7 +62,10 @@ class DefaultrouterMixin:
     ) -> None:
 
         self.logger = logger
-        self.config = config
+        self.config = typing.cast(
+            'libioc.Config.Jail.JailConfig.JailConfig',
+            config
+        )
         self.property_name = property_name
         self.static_interface = None
 
@@ -81,7 +84,9 @@ class DefaultrouterMixin:
         static_interface = None
 
         if isinstance(data, str) is True:
-            data = libioc.helpers.parse_user_input(data)
+            data = typing.cast(IPAddressInput, libioc.helpers.parse_user_input(
+                typing.cast(str, data)
+            ))
 
         if data is None:
             gateway = None
@@ -97,15 +102,18 @@ class DefaultrouterMixin:
                 gateway = self._ipaddress_class(address)
             else:
                 gateway = data
-            self._ipaddress_class.__init__(self, gateway)  # noqa: T484
+            self._ipaddress_class.__init__(
+                typing.cast(typing.Any, self),
+                gateway
+            )
             self.static_interface = static_interface
 
         self.__notify(notify)
 
     @property
     def _ipaddress_class(self) -> typing.Union[
-        typing.Callable[..., ipaddress.IPv4Address],
-        typing.Callable[..., ipaddress.IPv6Address]
+        typing.Type[ipaddress.IPv4Address],
+        typing.Type[ipaddress.IPv6Address]
     ]:
         return self.__class__.__bases__[-1]
 
@@ -116,7 +124,9 @@ class DefaultrouterMixin:
     @property
     def _gateway_address(self) -> typing.Optional[str]:
         try:
-            return self._ipaddress_class.__str__(self)  # noqa: T484
+            return self._ipaddress_class.__str__(
+                typing.cast(typing.Any, self)
+            )
         except Exception:
             return None
 

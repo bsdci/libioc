@@ -184,7 +184,8 @@ class DevfsRules(list):
         # will automatically read from file - needs to be the last item
         self.rules_file = rules_file
 
-    def append(  # noqa: T484
+    # DevfsRules.append intentionally extends and diverges from list.append
+    def append(  # type: ignore[override]
         self,
         ruleset: typing.Union[DevfsRuleset, str],
         is_system_rule: bool=False

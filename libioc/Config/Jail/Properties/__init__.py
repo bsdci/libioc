@@ -32,12 +32,16 @@ import libioc.Config.Jail.Properties.Defaultrouter
 import libioc.Config.Jail.Properties.Depends
 
 if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
     import libioc.Config.Jail.JailConfig
 
 Property = typing.Union[
     'libioc.Config.Jail.Properties.Addresses.AddressesProp',
     'libioc.Config.Jail.Properties.Interfaces.InterfaceProp',
     'libioc.Config.Jail.Properties.Resolver.ResolverProp',
+    'libioc.Config.Jail.Properties.Defaultrouter.DefaultrouterProp',
+    'libioc.Config.Jail.Properties.Defaultrouter.Defaultrouter6Prop',
+    'libioc.Config.Jail.Properties.ResourceLimit.ResourceLimitProp',
     'libioc.Config.Jail.Properties.Depends.DependsProp'
 ]
 
@@ -51,7 +55,7 @@ properties: typing.List[str] = [
     "depends"
 ] + _ResourceLimit.properties
 
-def _get_class(property_name: str) -> Property:
+def _get_class(property_name: str) -> typing.Type[Property]:
 
     ResourceLimit = libioc.Config.Jail.Properties.ResourceLimit
     DefaultrouterModule = libioc.Config.Jail.Properties.Defaultrouter
@@ -79,7 +83,7 @@ def _get_class(property_name: str) -> Property:
 def init_property(
     property_name: str,
     config: typing.Optional[
-        'libioc.Config.Jail.JailConfig.JailConfig'
+        'libioc.Config.Jail.BaseConfig.BaseConfig'
     ]=None,
     logger: typing.Optional['libioc.Logger.Logger']=None
 ) -> Property:
@@ -98,8 +102,8 @@ def init_property(
                 - defaultrouter6
                 - depends
 
-        config (libioc.Config.Jail.JailConfig.JailConfig):
-            The special property keeps reference to this JailConfig instance
+        config (libioc.Config.Jail.BaseConfig.BaseConfig):
+            The special property keeps reference to this config instance
 
         logger (libioc.Logger.Logger): (optional):
             Logger instance that the class is initialized with

@@ -47,13 +47,13 @@ class IovecValue:
     @property
     def iovec(self) -> Iovec: ...
 
-class ByteDict(dict):  # type: ignore[type-arg]
+class ByteDict(dict):
     def __init__(
         self,
         data: typing.Dict[typing.Union[bytes, str], typing.Any],
     ) -> None: ...
 
-class JiovData(dict):  # type: ignore[type-arg]
+class JiovData(dict):
     def __init__(
         self,
         data: typing.Dict[

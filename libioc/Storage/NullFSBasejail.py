@@ -42,7 +42,7 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
     def apply(
         self,
-        release: 'libioc.Release.ReleaseGenerator'=None,
+        release: typing.Optional['libioc.Release.ReleaseGenerator']=None,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Attach the jail storage."""
@@ -110,12 +110,12 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
     def setup(
         self,
-        release: 'libioc.Release.ReleaseGenerator'=None
+        release: typing.Optional['libioc.Resource.Resource']=None
     ) -> None:
         """Prepare the jail storage."""
         libioc.Storage.Standalone.StandaloneJailStorage.setup(
             self,
-            release
+            typing.cast('libioc.Resource.Resource', release)
         )
 
     def _create_nullfs_directories(self) -> None:

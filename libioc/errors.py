@@ -829,7 +829,7 @@ class MountFailed(IocException):
 
     def __init__(
         self,
-        mountpoint: libioc.Types.AbsolutePath,
+        mountpoint: str,
         reason: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
@@ -1225,7 +1225,8 @@ class NonReleaseUpdateFetch(UpdateFailure):
         msg = "Updates can only be fetched for releases"
         UpdateFailure.__init__(
             self,
-            name=resource.name,
+            # the Resource subclasses reaching this error provide a name
+            name=resource.name,  # type: ignore[attr-defined]
             reason=msg
         )
 

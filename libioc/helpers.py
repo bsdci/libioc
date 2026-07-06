@@ -92,7 +92,7 @@ def exec(
     subprocess_args["stderr"] = subprocess_args.get("stderr", subprocess.PIPE)
     subprocess_args["shell"] = subprocess_args.get("shell", False)
 
-    child = subprocess.Popen(  # nosec: TODO: #113
+    child = subprocess.Popen(  # nosec: B603 command from library code
         command,
         **subprocess_args
     )
@@ -337,7 +337,7 @@ def _normalize_data(
 ) -> typing.Dict[str, typing.Any]:
     output_data: typing.Dict[str, typing.Any] = {}
     for key, value in data.items():
-        if type(value) == dict:
+        if type(value) is dict:
             output_data[key] = _normalize_data(value)
         else:
             output_data[key] = to_string(
@@ -472,7 +472,7 @@ def exec_generator(
     stdout_result = b""
     stdout_line_buf = b""
     try:
-        child = subprocess.Popen(  # nosec: TODO: #113
+        child = subprocess.Popen(  # nosec: B603 command from library code
             command,
             encoding=encoding,
             stdin=stdin,
@@ -539,7 +539,7 @@ def exec_passthru(
 
 def mount(
     destination: str,
-    source: str=None,
+    source: typing.Optional[str]=None,
     fstype: str="nullfs",
     opts: typing.List[str]=[],
     logger: typing.Optional['libioc.Logger.Logger']=None,
@@ -602,6 +602,8 @@ def umount(
                     raise
         return
 
+    # a single mountpoint remains after the list case returned above
+    mountpoint = typing.cast(libioc.Types.AbsolutePath, mountpoint)
     mountpoint_path = libioc.Types.AbsolutePath(mountpoint)
 
     if force is False:

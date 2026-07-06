@@ -26,10 +26,11 @@
 import sys
 import os.path
 import importlib
+import types
 import typing
 
 
-def _get_version():
+def _get_version() -> str:
     __dirname = os.path.dirname(__file__)
     __version_file = os.path.join(__dirname, 'VERSION')
     with open(__version_file, "r", encoding="utf-8") as f:
@@ -38,7 +39,9 @@ def _get_version():
 
 class _HookedModule:
 
-    def __call__(self, *args, **kwargs) -> None:
+    __name__: str
+
+    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         return self.main_module(*args, **kwargs)
 
     @property
@@ -47,7 +50,7 @@ class _HookedModule:
         return sys.modules[name].__getattribute__(name.split(".").pop())
 
 
-class _IocModule(sys.modules["libioc"].__class__):
+class _IocModule(types.ModuleType):
 
     hooked_modules = [
         "Host",
@@ -79,9 +82,10 @@ class _IocModule(sys.modules["libioc"].__class__):
         module = importlib.import_module(f"libioc.{name}")
         sys.modules[name] = self.__hook_module(module)
 
-    def __hook_module(self, module: typing.Any) -> None:
+    def __hook_module(self, module: types.ModuleType) -> types.ModuleType:
 
-        class _Module(module.__class__, _HookedModule):
+        # the base classes of the swapped-in class are only known at runtime
+        class _Module(module.__class__, _HookedModule):  # type: ignore[name-defined] # noqa: E501
 
             pass
 

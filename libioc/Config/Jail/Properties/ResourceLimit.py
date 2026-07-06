@@ -169,7 +169,10 @@ class ResourceLimitProp(ResourceLimitValue):
     ) -> None:
 
         self.logger = logger
-        self.config = config
+        self.config = typing.cast(
+            'libioc.Config.Jail.JailConfig.JailConfig',
+            config
+        )
         self.property_name = property_name
 
         if property_name not in properties:

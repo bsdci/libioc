@@ -64,6 +64,7 @@ class Term(list):
     ) -> None:
         self.key = key
 
+        data: typing.Sequence[typing.Union[str, _ResourceSelector]]
         if isinstance(values, str):
             data = self._split_filter_values(values)
         elif isinstance(values, list):

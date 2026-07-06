@@ -34,7 +34,7 @@ def init_zfs(
 ) -> 'libioc.ZFS.ZFS':
     """Attach or initialize a ZFS object."""
     try:
-        return self.zfs
+        return typing.cast('libioc.ZFS.ZFS', self.zfs)
     except AttributeError:
         pass
 
@@ -45,7 +45,10 @@ def init_zfs(
         new_zfs = libioc.ZFS.get_zfs(logger=self.logger)
         object.__setattr__(self, 'zfs', new_zfs)
 
-    return object.__getattribute__(self, 'zfs')
+    return typing.cast(
+        'libioc.ZFS.ZFS',
+        object.__getattribute__(self, 'zfs')
+    )
 
 
 def init_host(
@@ -54,7 +57,7 @@ def init_host(
 ) -> 'libioc.Host.HostGenerator':
     """Attach or initialize a Host object."""
     try:
-        return self.host
+        return typing.cast('libioc.Host.HostGenerator', self.host)
     except AttributeError:
         pass
 
@@ -79,7 +82,10 @@ def init_distribution(
 ) -> 'libioc.Distribution.DistributionGenerator':
     """Attach or initialize a Distribution object."""
     try:
-        return self.distribution
+        return typing.cast(
+            'libioc.Distribution.DistributionGenerator',
+            self.distribution
+        )
     except AttributeError:
         pass
 
@@ -101,7 +107,7 @@ def init_logger(
 ) -> 'libioc.Logger.Logger':
     """Attach or initialize a Logger object."""
     try:
-        return self.logger
+        return typing.cast('libioc.Logger.Logger', self.logger)
     except AttributeError:
         pass
 
@@ -110,7 +116,7 @@ def init_logger(
         return logger
     else:
         try:
-            return self.logger
+            return typing.cast('libioc.Logger.Logger', self.logger)
         except AttributeError:
             new_logger = libioc.Logger.Logger()
             object.__setattr__(self, 'logger', new_logger)

@@ -65,7 +65,7 @@ class IocEvent:
     skipped: bool
     done: bool
     reverted: bool
-    error: typing.Optional[typing.Union[bool, BaseException]]
+    error: typing.Optional[typing.Union[bool, str, BaseException]]
     _rollback_steps: typing.List[typing.Callable[[], typing.Optional[
         typing.Generator['IocEvent', None, None]
     ]]]
@@ -142,7 +142,7 @@ class IocEvent:
 
     def rollback(
         self
-    ) -> typing.Optional[typing.Generator['IocEvent', None, None]]:
+    ) -> typing.Generator['IocEvent', None, None]:
         """Rollback all rollback steps in reverse order."""
         if self.reverted is True:
             return
@@ -251,7 +251,7 @@ class IocEvent:
 
     def fail(
         self,
-        exception: bool=True,
+        exception: typing.Union[bool, str, BaseException]=True,
         message: typing.Optional[str]=None
     ) -> 'IocEvent':
         """End an event with a failure."""
@@ -260,7 +260,7 @@ class IocEvent:
 
     def fail_generator(
         self,
-        exception: bool=True,
+        exception: typing.Union[bool, str, BaseException]=True,
         message: typing.Optional[str]=None
     ) -> typing.Generator['IocEvent', None, None]:
         """End an event with a failure via a generator of rollback steps."""
@@ -460,11 +460,11 @@ class JailHook(JailEvent):
 
     def fail(
         self,
-        exception: bool=True,
+        exception: typing.Union[bool, str, BaseException]=True,
         message: typing.Optional[str]=None,
         stdout: str=""
     ) -> 'IocEvent':
-        """Successfully finish an event."""
+        """End an event with a failure."""
         self.stdout = stdout
         return super().fail(
             exception=exception,
@@ -679,7 +679,8 @@ class ResourceEvent(IocEvent):
         scope: typing.Optional[Scope]=None
     ) -> None:
 
-        self.identifier = resource.full_name
+        # the Resource subclasses used with this event provide a full_name
+        self.identifier = resource.full_name  # type: ignore[attr-defined]
         IocEvent.__init__(self, message)
 
 
@@ -827,7 +828,8 @@ class ResourceBackup(IocEvent):
     ) -> None:
 
         if "name" in resource.__dir__():
-            self.identifier = resource.name
+            # the name attribute was dynamically checked above
+            self.identifier = resource.name  # type: ignore[attr-defined]
         else:
             self.identifier = resource.dataset_name
         self.resource = resource

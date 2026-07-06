@@ -89,7 +89,7 @@ class ResourceSelector:
     def filter_datasets(
         self,
         datasets: 'libioc.Datasets.Datasets'
-    ) -> 'libioc.Datasets.FilteredDatasets':
+    ) -> 'libioc.Datasets.Datasets':
         """Filter given Datasets according to the resource selector source."""
         import libioc.Datasets
         if self.source_name is None:

@@ -43,14 +43,14 @@ class ZFS(libzfs.ZFS):
         Logger = libioc.Logger.Logger
         if not (self._has_logger or isinstance(self._logger, Logger)):
             raise Exception("The logger is unavailable")
-        return self._logger
+        return typing.cast('libioc.Logger.Logger', self._logger)
 
     @logger.setter
     def logger(self, logger: 'libioc.Logger.Logger') -> None:
         """Set the ZFS objects logger."""
         self._logger = logger
 
-    def create_dataset(  # noqa: T484
+    def create_dataset(
         self,
         dataset_name: str
     ) -> libzfs.ZFSDataset:

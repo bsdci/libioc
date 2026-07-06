@@ -37,14 +37,25 @@ class ConfigUCL(libioc.Config.Prototype.Prototype):
 
     config_type = "ucl"
 
-    def map_input(self, data: typing.TextIO) -> typing.Dict[str, typing.Any]:
+    def map_input(
+        self,
+        data: typing.Union[
+            typing.TextIO,
+            'libioc.Config.Prototype.ConfigDataDict'
+        ]
+    ) -> typing.Dict[str, typing.Any]:
         """Normalize data read from the UCL file."""
         import ucl
-        result = ucl.load(data.read())  # type: typing.Dict[str, typing.Any]
+        result = ucl.load(
+            typing.cast(typing.TextIO, data).read()
+        )  # type: typing.Dict[str, typing.Any]
         result["legacy"] = True
         return result
 
-    def map_output(self, data: libioc.Config.Data.Data) -> str:
+    def map_output(
+        self,
+        data: 'libioc.Config.Prototype.ConfigDataDict'
+    ) -> str:
         """Output configuration in UCL format."""
         return str(libioc.helpers.to_ucl(data))
 

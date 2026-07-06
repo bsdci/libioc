@@ -39,6 +39,17 @@ import libioc.Jail
 # MyPy
 import libzfs
 
+if typing.TYPE_CHECKING:
+    import libioc.Host
+    import libioc.Release
+
+# Updaters operate on jails and releases, that both provide the name
+# and release properties beyond the LaunchableResource base class.
+UpdateableResource = typing.Union[
+    'libioc.Jail.JailGenerator',
+    'libioc.Release.ReleaseGenerator'
+]
+
 
 class Updater:
     """Updater for Releases and other LaunchableResources like Jails."""
@@ -47,11 +58,13 @@ class Updater:
     update_script_name: str
     update_conf_name: str
 
+    resource: 'UpdateableResource'
+    host: 'libioc.Host.HostGenerator'
     _temporary_jail: 'libioc.Jail.JailGenerator'
 
     def __init__(
         self,
-        resource: 'libioc.LaunchableResource.LaunchableResource',
+        resource: 'UpdateableResource',
         host: 'libioc.Host.HostGenerator'
     ) -> None:
         self.resource = resource
@@ -140,10 +153,15 @@ class Updater:
                 new=True,
                 logger=self.resource.logger,
                 zfs=self.resource.zfs,
-                host=self.resource.host,
+                # jails accept any HostGenerator at runtime
+                host=typing.cast('libioc.Host.Host', self.resource.host),
                 dataset=self.resource.dataset
             )
-            temporary_jail.config.file = "config_update.json"
+            # JailConfig offers no file attribute, so this assignment is
+            # without effect (suspected leftover)
+            temporary_jail.config.file = (  # type: ignore[attr-defined]
+                "config_update.json"
+            )
             temporary_jail.config.ignore_source_config = True
 
             root_path = temporary_jail.root_path
@@ -195,7 +213,11 @@ class Updater:
 
     def _clean_create_dir(self, directory: str) -> None:
         if os.path.ismount(directory) is True:
-            libioc.helpers.umount(directory, force=True, logger=self.logger)
+            libioc.helpers.umount(
+                typing.cast('libioc.Types.AbsolutePath', directory),
+                force=True,
+                logger=self.logger
+            )
         if os.path.isdir(directory) is True:
             self.logger.verbose(f"Deleting existing directory {directory}")
             shutil.rmtree(directory)
@@ -332,7 +354,11 @@ class Updater:
 
             self._create_download_dir()
             libioc.helpers.exec(
-                self._wrap_command(" ".join(self._fetch_command), "fetch"),
+                # helpers.exec wraps command strings in a list itself
+                self._wrap_command(  # type: ignore[arg-type]
+                    " ".join(self._fetch_command),
+                    "fetch"
+                ),
                 shell=True,  # nosec: B604
                 logger=self.logger,
                 env=env
@@ -432,7 +458,13 @@ class Updater:
                 if isinstance(event, libioc.events.JailCommand) is True:
                     if (event.done is True) and (event.error is None):
                         _skipped_text = "No updates are available to install."
-                        skipped = (_skipped_text in event.stdout) is True
+                        skipped = (_skipped_text in typing.cast(
+                            str,
+                            typing.cast(
+                                'libioc.events.JailCommand',
+                                event
+                            ).stdout
+                        )) is True
                 yield event
             self.logger.debug(
                 f"Update of resource '{self.resource.name}' finished"
@@ -716,9 +748,9 @@ class FreeBSD(Updater):
         os.unlink(lnk)
 
 
-def get_launchable_update_resource(  # noqa: T484
+def get_launchable_update_resource(
     host: 'libioc.Host.HostGenerator',
-    resource: 'libioc.Resource.Resource'
+    resource: 'UpdateableResource'
 ) -> Updater:
     """Return an updater instance for the host distribution."""
     _class: typing.Type[Updater]

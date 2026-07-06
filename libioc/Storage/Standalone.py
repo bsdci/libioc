@@ -36,19 +36,22 @@ class StandaloneJailStorage(libioc.Storage.Storage):
 
     def apply(
         self,
-        release: 'libioc.Release.ReleaseGenerator'=None,
+        release: typing.Optional['libioc.Release.ReleaseGenerator']=None,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Attach the jail storage."""
         message = "Standalone jails do not require storage operations to start"
-        self.logger.warn(
+        # Logger.warn accepts no jail argument, so this call crashes
+        # with a TypeError when reached (suspected leftover)
+        self.logger.warn(  # type: ignore[call-arg]
             message,
             jail=self.jail
         )
         raise NotImplementedError(message)
 
     def setup(
-        self,
+        # basejail storages call this method unbound on their instances
+        self: 'libioc.Storage.Storage',
         resource: 'libioc.Resource.Resource'
     ) -> None:
         """Configure the jail storage."""

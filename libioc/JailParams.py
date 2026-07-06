@@ -60,7 +60,8 @@ class JailParam(freebsd_sysctl.Sysctl):
         else:
             if (isinstance(value, int) or isinstance(value, bool)) is False:
                 try:
-                    value = int(value)  # noqa: T484
+                    # cast for mypy: invalid values raise and are handled
+                    value = int(typing.cast(str, value))
                 except Exception:
                     self.__raise_value_type_error()
         self.user_value = value
@@ -128,7 +129,7 @@ class JailParams(collections.abc.MutableMapping):
 
     def keys(self) -> typing.KeysView[str]:
         """Return a list of all jail param names."""
-        return collections.abc.KeysView(list(self.__iter__()))  # noqa: T484
+        return collections.abc.KeysView(list(self.__iter__()))
 
     def __getitem__(self, key: str) -> typing.Any:
         """Set of jail params sysctl is not implemented."""
@@ -157,7 +158,11 @@ class JailParams(collections.abc.MutableMapping):
         jail_params = filter(
             # security.jail.allow_raw_sockets deprecated
             lambda x: x.name != "security.jail.allow_raw_sockets",
-            self.__base_class(prefix).children
+            # cast for mypy: Sysctl.children yields the subclass type
+            typing.cast(
+                typing.Iterator[JailParam],
+                self.__base_class(prefix).children
+            )
         )
         # permanently store the queried sysctl in the singleton class
         JailParams.__sysctl_params = dict([

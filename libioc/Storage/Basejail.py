@@ -33,8 +33,10 @@ if typing.TYPE_CHECKING:
 class BasejailStorage(libioc.Storage.Storage):
     """Prototype class of Basejail Storage."""
 
-    def _get_basejail_mounts(self) -> typing.Iterator[
-        typing.Tuple[libioc.Types.AbsolutePath, libioc.Types.AbsolutePath]
+    def _get_basejail_mounts(self) -> typing.Generator[
+        typing.Tuple[libioc.Types.AbsolutePath, libioc.Types.AbsolutePath],
+        None,
+        typing.Any
     ]:
         """
         Auto-generate lines of NullFS basejails.
@@ -63,4 +65,10 @@ class BasejailStorage(libioc.Storage.Storage):
         for basedir in basedirs:
             source = f"{release_root_path}/{basedir}"
             destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
-            yield (source, destination,)
+            yield typing.cast(
+                typing.Tuple[
+                    libioc.Types.AbsolutePath,
+                    libioc.Types.AbsolutePath
+                ],
+                (source, destination,)
+            )

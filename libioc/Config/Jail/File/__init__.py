@@ -167,7 +167,9 @@ class ConfigFile(dict):
     ) -> None:
         """Set a value in the config file."""
         val = libioc.helpers.to_string(
-            libioc.helpers.parse_user_input(value),
+            libioc.helpers.parse_user_input(
+                typing.cast(typing.Optional[typing.Union[str, bool]], value)
+            ),
             true="YES",
             false="NO"
         )

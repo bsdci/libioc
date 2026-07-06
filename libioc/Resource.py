@@ -248,7 +248,7 @@ class Resource(metaclass=abc.ABCMeta):
         return self.CONFIG_TYPES[self._config_type]
 
     @config_type.setter
-    def config_type(self, value: typing.Optional[int]) -> None:
+    def config_type(self, value: typing.Optional[str]) -> None:
         """Set the resources config type enum index (JSON, UCL or ZFS)."""
         if value is None:
             self._config_type = None
@@ -338,7 +338,10 @@ class Resource(metaclass=abc.ABCMeta):
     @property
     def config_handler(self) -> 'libioc.Config.Prototype.Prototype':
         """Return the config handler according to the detected config_type."""
-        handler = object.__getattribute__(self, f"config_{self.config_type}")
+        handler = typing.cast(
+            'libioc.Config.Prototype.Prototype',
+            object.__getattribute__(self, f"config_{self.config_type}")
+        )
         return handler
 
     def get(self, key: str) -> typing.Any:

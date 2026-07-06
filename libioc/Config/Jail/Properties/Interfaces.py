@@ -29,6 +29,7 @@ import libioc.helpers
 import libioc.BridgeInterface
 
 if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
     import libioc.Config.Jail.JailConfig
 
 
@@ -43,7 +44,7 @@ class InterfaceProp(dict):
     def __init__(
         self,
         config: typing.Optional[
-            'libioc.Config.Jail.JailConfig.JailConfig'
+            'libioc.Config.Jail.BaseConfig.BaseConfig'
         ]=None,
         property_name: str="interfaces",
         logger: typing.Optional['libioc.Logger.Logger']=None
@@ -52,7 +53,10 @@ class InterfaceProp(dict):
         dict.__init__(self, {})
         self.logger = logger
         if config is not None:
-            self.config = config
+            self.config = typing.cast(
+                'libioc.Config.Jail.JailConfig.JailConfig',
+                config
+            )
 
     def set(
         self,
@@ -122,10 +126,16 @@ class InterfaceProp(dict):
             notify (bool): (default=True)
                 Sends an update notification to the jail config instance
         """
+        bridge: typing.Optional[libioc.BridgeInterface.BridgeInterface]
         try:
-            bridge = libioc.helpers.parse_none(bridge_if)
+            # parse_none returns None or raises TypeError
+            bridge = libioc.helpers.parse_none(  # type: ignore[func-returns-value] # noqa: E501
+                bridge_if
+            )
         except TypeError:
-            bridge = libioc.BridgeInterface.BridgeInterface(bridge_if)
+            bridge = libioc.BridgeInterface.BridgeInterface(
+                typing.cast(str, bridge_if)
+            )
 
         dict.__setitem__(self, jail_if, bridge)
 

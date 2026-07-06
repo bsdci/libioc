@@ -39,6 +39,7 @@ import libioc.JailParams
 import libioc.Logger
 
 if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
     import libioc.Config.Jail.Properties
 InputData = typing.Dict[str, typing.Union[
     libioc.Config.Jail.Properties.Property,
@@ -115,7 +116,7 @@ class BaseConfig(dict):
         new_data_keys = new_data.keys()
         old_data = self._data
         try:
-            self._data = dict()
+            self._data = typing.cast(libioc.Config.Data.Data, dict())
             identifier_keys = ["id", "name", "uuid"]
             for key in identifier_keys:
                 if key in new_data_keys:
@@ -327,7 +328,14 @@ class BaseConfig(dict):
         if isinstance(value, str) is True:
             self.data["vnet_interfaces"] = value
         else:
-            self.data["vnet_interfaces"] = libioc.helpers.to_string(value)
+            self.data["vnet_interfaces"] = libioc.helpers.to_string(
+                typing.cast(
+                    typing.Optional[
+                        typing.List[typing.Union[str, bool, int]]
+                    ],
+                    value
+                )
+            )
 
     def _get_exec_clean(self) -> bool:
         return (self.data["exec_clean"] == 1) is True
@@ -620,7 +628,10 @@ class BaseConfig(dict):
         if key in self:
             special_property = self.special_properties.get_or_create(key)
             special_property.set(data[key], skip_on_error=False)
-            return special_property
+            return typing.cast(
+                'libioc.Config.Jail.Properties.Property',
+                special_property
+            )
         elif key in libioc.Config.Jail.Properties.ResourceLimit.properties:
             raise KeyError(f"Resource-Limit unconfigured: {key}")
         else:
@@ -664,7 +675,7 @@ class BaseConfig(dict):
         """Delete a setting from the configuration."""
         self.data.__delitem__(key)
 
-    def __setitem__(  # noqa: T400
+    def __setitem__(
         self,
         key: str,
         value: typing.Any,
@@ -674,7 +685,10 @@ class BaseConfig(dict):
         """Set a configuration value."""
         if self.is_known_property(key, explicit=explicit) is False:
             if "jail" in dir(self):
-                _jail = self.jail  # noqa: T484
+                _jail = typing.cast(
+                    'libioc.Config.Jail.JailConfig.JailConfig',
+                    self
+                ).jail
             else:
                 _jail = None
             err = libioc.errors.UnknownConfigProperty(
@@ -744,7 +758,7 @@ class BaseConfig(dict):
     def __get_default_type(self, key: str) -> typing.Optional[type]:
         return type(libioc.Config.Jail.Globals.DEFAULTS[key])
 
-    def set(  # noqa: T484
+    def set(
         self,
         key: str,
         value: typing.Any,
@@ -788,7 +802,8 @@ class BaseConfig(dict):
                 raise
             hash_before = None
 
-        self.__setitem__(  # noqa: T484
+        # mypy checks dunder calls against the sliced operator signature
+        self.__setitem__(  # type: ignore[call-arg]
             key,
             value,
             skip_on_error=skip_on_error,
@@ -848,20 +863,18 @@ class BaseConfig(dict):
 
         return list(properties)
 
-    def keys(self) -> typing.KeysView[str]:
+    # the views expose the Data storage, unlike those of dict
+    def keys(self) -> typing.KeysView[str]:  # type: ignore[override]
         """Return the available configuration keys."""
-        return typing.cast(typing.KeysView[typing.Any], self.data.keys())
+        return self.data.keys()
 
-    def values(self) -> typing.ValuesView[typing.Any]:
+    def values(self) -> typing.ValuesView[typing.Any]:  # type: ignore[override] # noqa: E501
         """Return all config values."""
-        return typing.cast(typing.ValuesView[typing.Any], self.data.values())
+        return self.data.values()
 
-    def items(self) -> typing.ItemsView[str, typing.Any]:
+    def items(self) -> typing.ItemsView[str, typing.Any]:  # type: ignore[override] # noqa: E501
         """Return the combined config properties."""
-        return typing.cast(
-            typing.ItemsView[str, typing.Any],
-            self.data.items()
-        )
+        return self.data.items()
 
     def __contains__(self, key: typing.Any) -> bool:
         """Return whether a (nested) key is included in the dict."""
@@ -869,10 +882,7 @@ class BaseConfig(dict):
 
     def __iter__(self) -> typing.Iterator[str]:
         """Return the combined config properties."""
-        return typing.cast(
-            typing.Iterator[str],
-            self.data.__iter__()
-        )
+        return self.data.__iter__()
 
     def __len__(self) -> int:
         """Return the number of user configuration properties."""
