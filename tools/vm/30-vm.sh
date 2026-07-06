@@ -13,17 +13,7 @@ case "${1:-}" in
             echo "VM is already running (pid $(cat "${PID_FILE}"))."
             exit 0
         fi
-        qemu-system-x86_64 \
-            -machine pc -accel tcg,thread=multi -cpu max \
-            -smp "${VM_CPUS}" -m "${VM_MEMORY_MB}" \
-            -display none -vga std \
-            -monitor "unix:${CACHE_DIR}/mon.sock,server,nowait" \
-            -serial "unix:${SERIAL_SOCKET},server,nowait" \
-            -netdev "user,id=n0,hostfwd=tcp:127.0.0.1:${SSH_PORT}-:22" \
-            -device virtio-net-pci,netdev=n0 \
-            -drive "if=virtio,file=${WORK_IMAGE},format=qcow2" \
-            -rtc base=utc \
-            -daemonize -pidfile "${PID_FILE}"
+        start_qemu
         echo "VM starting; waiting for SSH on port ${SSH_PORT}."
         i=0
         while [ "$i" -lt 120 ]; do

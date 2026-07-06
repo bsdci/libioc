@@ -2,6 +2,7 @@
 
 The scripts in this directory run the libioc test suite inside a QEMU virtual machine with FreeBSD 13.5-RELEASE.
 FreeBSD 13.5 is the newest release whose binary packages are still served for the 13.x branch, while staying close to the FreeBSD 12.1 environment that the original CI used.
+The VM boots the official BASIC-CI image, which ships with a serial console, DHCP, growfs and an sshd that accepts root with an empty password on the first boot, so the whole setup runs over SSH.
 
 The host in this repository has no KVM device, so QEMU runs in TCG software emulation.
 Measured on a 12-core host: a boot takes one to two minutes, the guest setup with package installation ten to fifteen minutes, the first tier 2 run about six minutes including the release download, and the full suite about eight minutes once the release is fetched.
@@ -12,8 +13,8 @@ The scripts are numbered in the order they are needed.
 
 ```sh
 sh tools/vm/00-host-setup.sh    # install qemu, generate the SSH key
-sh tools/vm/10-fetch-image.sh   # download, verify and unpack the VM image
-sh tools/vm/20-provision.sh     # first boot: enable sshd via the VGA console
+sh tools/vm/10-fetch-image.sh   # download, verify and unpack the CI image
+sh tools/vm/20-provision.sh     # first boot: install the SSH key over SSH
 sh tools/vm/40-guest-setup.sh   # packages, fdescfs, ZFS pool, venv
 sh tools/vm/50-run-tests.sh tier0   # import sweep
 sh tools/vm/50-run-tests.sh tier1   # fast platform tests
@@ -27,12 +28,13 @@ sh tools/vm/30-vm.sh down
 `30-vm.sh ssh [command]` opens a shell or runs a command inside the guest.
 `30-vm.sh console` attaches to the serial console through the unix socket, which requires socat.
 
-The official VM images route the console to the emulated VGA device, and the serial port stays silent during the first boot.
-The provisioning script therefore types blindly into the VGA console through the QEMU monitor (`monitor_type.py`), and one of its first actions is persisting `console="comconsole"` in loader.conf, so every later boot is observable over the serial socket.
-When something goes wrong, a screenshot of the VGA console shows the current state:
+Provisioning waits for sshd, logs in as root with the empty password the BASIC-CI image ships with, installs the SSH key and closes the empty-password access again.
+The forwarded SSH port only binds to 127.0.0.1, so the empty-password window is not reachable from outside the host.
+The BASIC-CI image routes its console to both the serial port and the VGA device, so `30-vm.sh console` shows the boot from the very first second.
+When even the serial console stays quiet, the QEMU monitor socket saves a screenshot of the VGA display:
 
 ```sh
-python3 tools/vm/monitor_type.py tools/vm/cache/mon.sock screendump /tmp/screen.png
+printf 'screendump /tmp/screen.png -f png\n' | socat - UNIX-CONNECT:tools/vm/cache/mon.sock
 ```
 
 ## Design notes
