@@ -33,7 +33,7 @@ jobs:
           python-version: "3.13"
       - name: Install dependencies
         run: |
-          pip install -r requirements-dev.txt
+          pip install -r requirements-test.txt
           pip install gitpython freebsd_sysctl==0.0.7
           pip install --no-build-isolation jail==0.0.12
       - name: Run the platform-independent tests
