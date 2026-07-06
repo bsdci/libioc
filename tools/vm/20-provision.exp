@@ -1,0 +1,109 @@
+#!/usr/bin/expect -f
+# First-boot provisioning of the FreeBSD VM over the serial console.
+#
+# The official VM images boot with the video console, so the script
+# interrupts the boot loader, switches the console to the serial port
+# and persists that choice in /boot/loader.conf.
+# It then logs in as root (no password on the official images),
+# installs the SSH key, enables sshd and powers the machine off.
+#
+# usage: 20-provision.exp <work-image> <ssh-pubkey-file>
+
+set timeout 1800
+set image [lindex $argv 0]
+set pubkey_file [lindex $argv 1]
+
+set fp [open $pubkey_file r]
+set pubkey [string trim [read $fp]]
+close $fp
+
+spawn qemu-system-x86_64 \
+    -machine q35 -accel tcg,thread=multi -cpu max \
+    -smp 4 -m 4096 \
+    -nographic \
+    -netdev user,id=n0 -device virtio-net-pci,netdev=n0 \
+    -drive if=virtio,file=$image,format=qcow2 \
+    -rtc base=utc
+
+# Interrupt the boot menu and escape to the loader prompt.
+expect {
+    -re "Autoboot in .* seconds" {
+        # Option 3 of the welcome menu escapes to the loader prompt.
+        send "3"
+    }
+    "Welcome to FreeBSD" {
+        send "3"
+    }
+    timeout {
+        puts "\nTimed out waiting for the boot menu on the serial console."
+        exit 1
+    }
+}
+
+expect {
+    -re "OK ?$" {}
+    "Type '?' for a list of commands" {}
+    timeout {
+        puts "\nTimed out waiting for the loader prompt."
+        exit 1
+    }
+}
+
+send "set console=comconsole\r"
+expect -re "OK ?$"
+send "boot\r"
+
+# The kernel now boots with the serial console attached.
+expect {
+    -re "login: $" {}
+    timeout {
+        puts "\nTimed out waiting for the login prompt."
+        exit 1
+    }
+}
+
+send "root\r"
+expect {
+    -re "Password:" {
+        send "\r"
+        exp_continue
+    }
+    -re "root@.*(#|\\$) $" {}
+    -re "(#|\\$) $" {}
+    timeout {
+        puts "\nTimed out waiting for the root shell."
+        exit 1
+    }
+}
+
+proc run {cmd} {
+    send "$cmd\r"
+    expect {
+        -re "(#|\\$) $" {}
+        timeout {
+            puts "\nTimed out running: $cmd"
+            exit 1
+        }
+    }
+}
+
+# Make the serial console permanent for all future boots.
+run "printf 'console=\"comconsole\"\\n' >> /boot/loader.conf"
+
+run "mkdir -p /root/.ssh && chmod 700 /root/.ssh"
+run "echo '$pubkey' > /root/.ssh/authorized_keys"
+run "chmod 600 /root/.ssh/authorized_keys"
+run "sysrc sshd_enable=YES"
+run "printf 'PermitRootLogin without-password\\n' >> /etc/ssh/sshd_config"
+run "service sshd start || service sshd restart"
+run "df -h /"
+
+send "shutdown -p now\r"
+expect {
+    eof {}
+    timeout {
+        puts "\nTimed out waiting for power-off."
+        exit 1
+    }
+}
+puts "\nProvisioning finished."
