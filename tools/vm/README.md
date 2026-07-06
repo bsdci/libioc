@@ -4,7 +4,7 @@ The scripts in this directory run the libioc test suite inside a QEMU virtual ma
 FreeBSD 13.5 is the newest release whose binary packages are still served for the 13.x branch, while staying close to the FreeBSD 12.1 environment that the original CI used.
 
 The host in this repository has no KVM device, so QEMU runs in TCG software emulation.
-Expect a boot to take a few minutes and the full test suite several hours.
+Measured on a 12-core host: a boot takes one to two minutes, the guest setup with package installation ten to fifteen minutes, the first tier 2 run about six minutes including the release download, and the full suite about eight minutes once the release is fetched.
 
 ## Usage
 

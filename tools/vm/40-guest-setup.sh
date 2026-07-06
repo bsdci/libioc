@@ -42,6 +42,15 @@ grep -q fdescfs /etc/fstab || \
     echo "fdesc /dev/fd fdescfs rw 0 0" >> /etc/fstab
 mount | grep -q "/dev/fd" || mount -t fdescfs null /dev/fd
 
+echo "Enabling resource accounting for the rctl tests."
+grep -q "kern.racct.enable" /boot/loader.conf || \
+    echo 'kern.racct.enable=1' >> /boot/loader.conf
+
+echo "Loading if_epair for the VNET tests."
+grep -q "if_epair_load" /boot/loader.conf || \
+    echo 'if_epair_load="YES"' >> /boot/loader.conf
+kldload if_epair 2>/dev/null || true
+
 echo "Creating the file-backed ZFS pool."
 kldload zfs 2>/dev/null || true
 sysrc zfs_enable=YES
@@ -52,6 +61,13 @@ if ! zpool list ioc-test > /dev/null 2>&1; then
     zfs set compression=lz4 ioc-test
 fi
 zpool list ioc-test
+
+# file-backed pools are not always reimported at boot
+cat > /etc/rc.local <<'RCLOCAL'
+#!/bin/sh
+zpool list ioc-test > /dev/null 2>&1 || zpool import -d /pools ioc-test
+RCLOCAL
+chmod +x /etc/rc.local
 
 echo "Creating the Python virtual environment."
 PYBIN="$(ls /usr/local/bin/ | grep -E '^python3\.[0-9]+$' | head -n 1)"
