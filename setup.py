@@ -23,43 +23,22 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Installs libioc using setuptools."""
-import sys
 import typing
 from setuptools import find_packages, setup
-try:
-    from pip._internal.req import parse_requirements
-except ModuleNotFoundError:
-    from pip.req import parse_requirements
-
-try:
-    import setuptools_scm.integration
-    setuptools_scm.integration.find_files = lambda _: []
-except ImportError:
-    pass
-
-
-def _resolve_requirement(req: typing.Any) -> str:
-    if req.__class__.__name__ == "ParsedRequirement":
-        return str(req.requirement)
-    else:
-        return f"{req.name}{req.specifier}"
 
 
 def _read_requirements(
     filename: str="requirements.txt"
-) -> typing.Dict[str, typing.List[str]]:
-    reqs = list(parse_requirements(filename, session="libioc"))
-    return dict(
-        install_requires=[_resolve_requirement(req) for req in reqs]
-    )
+) -> typing.List[str]:
+    with open(filename, "r", encoding="utf-8") as f:
+        stripped_lines = (line.strip() for line in f)
+        return [
+            line for line in stripped_lines
+            if line and not line.startswith(("#", "-"))
+        ]
 
 
-ioc_requirements = _read_requirements("requirements.txt")
-
-if sys.version_info < (3, 6):
-    exit("Only Python 3.6 and higher is supported.")
-
-with open("libioc/VERSION", "r") as f:
+with open("libioc/VERSION", "r", encoding="utf-8") as f:
     version = f.read().split()[0]
 
 setup(
@@ -71,12 +50,10 @@ setup(
     author='ioc Contributors',
     author_email='authors@libioc.io',
     url='https://github.com/bsdci/libioc',
-    python_requires='>=3.6',
+    python_requires='>=3.11',
     packages=find_packages(include=["libioc", "libioc.*"]),
     package_data={'': ['VERSION']},
     include_package_data=True,
-    install_requires=ioc_requirements["install_requires"],
-    # setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-cov', 'pytest-pep8']
+    install_requires=_read_requirements("requirements.txt")
 )
 

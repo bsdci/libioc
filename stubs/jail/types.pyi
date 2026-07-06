@@ -1,0 +1,13 @@
+import ctypes
+import ipaddress
+
+MAX_INT: int
+MIN_INT: int
+
+in_addr_t = ctypes.c_uint32
+
+class in_addr(ctypes.BigEndianStructure): ...
+class in6_addr_U(ctypes.Union): ...
+class in6_addr(ctypes.Structure): ...
+
+def in6_addr_U_from_ip(ip6_address: ipaddress.IPv6Address) -> in6_addr_U: ...
