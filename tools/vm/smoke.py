@@ -106,10 +106,10 @@ def main() -> int:
         jail.create(release)
         print("Starting jail")
         jail.start()
-        print("Executing /bin/ps inside the jail")
-        stdout, _, code = jail.exec(["/bin/ps"])
+        print("Executing a command inside the jail")
+        stdout, _, code = jail.exec(["/bin/sh", "-c", "echo smoke-ok"])
         print(stdout)
-        if code != 0:
+        if (code != 0) or ("smoke-ok" not in str(stdout)):
             raise RuntimeError("process inside the jail failed")
         print("Stopping jail")
         jail.stop()
