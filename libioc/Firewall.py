@@ -119,7 +119,7 @@ class Firewall:
             raise NotImplementedError(
                 "Insecure rule numbers supported by Firewall"
             )
-        if isinstance(rule_number, str) is True:
+        if isinstance(rule_number, str):
             raise ValueError("Firewall rule_number must be a number")
         _rule_number = int(rule_number)
         return str(_rule_number + self.IPFW_RULE_OFFSET)

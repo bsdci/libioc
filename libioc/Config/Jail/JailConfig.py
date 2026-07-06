@@ -105,7 +105,7 @@ class JailConfig(libioc.Config.Jail.BaseConfig.BaseConfig):
     ) -> None:
 
         error_reason: typing.Optional[str] = None
-        if isinstance(value, bool) is True:
+        if isinstance(value, bool):
             enabled = (value is True)
         else:
             try:

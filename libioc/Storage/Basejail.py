@@ -65,6 +65,8 @@ class BasejailStorage(libioc.Storage.Storage):
         for basedir in basedirs:
             source = f"{release_root_path}/{basedir}"
             destination = f"{self.jail.root_dataset.mountpoint}/{basedir}"
+            # both paths derive from absolute dataset mountpoints, but
+            # remain plain strings at runtime
             yield typing.cast(
                 typing.Tuple[
                     libioc.Types.AbsolutePath,

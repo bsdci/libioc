@@ -140,7 +140,7 @@ class JailConfigProperties(dict):
     def get_or_create(
         self,
         property_name: str
-    ) -> typing.Any:
+    ) -> Property:
         """Get a property and initialize it if it did not exist."""
         if property_name not in self.keys():
             self[property_name] = init_property(
@@ -148,4 +148,5 @@ class JailConfigProperties(dict):
                 config=self.config,
                 logger=self.logger
             )
-        return self[property_name]
+        special_property: Property = self[property_name]
+        return special_property

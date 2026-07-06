@@ -53,7 +53,7 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
     @data.setter
     def data(self, value: libioc.Config.Data.Data) -> None:
         """Override the Config.Data object."""
-        if isinstance(value, libioc.Config.Data.Data) is False:
+        if not isinstance(value, libioc.Config.Data.Data):
             raise ValueError("expecting Config.Data structure")
         self.user_data = value
 
@@ -125,6 +125,8 @@ class JailConfigDefaults(libioc.Config.Jail.BaseConfig.BaseConfig):
     # the view combines user and hardcoded defaults, unlike that of dict
     def keys(self) -> typing.KeysView[str]:  # type: ignore[override]
         """List all default property keys."""
+        # a plain list stands in for the declared KeysView interface,
+        # which mypy cannot express
         return typing.cast(
             typing.KeysView[str],
             list(self.user_properties.union(_DEFAULTS.keys()))

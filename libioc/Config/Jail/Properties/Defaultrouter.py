@@ -34,8 +34,11 @@ if typing.TYPE_CHECKING:
     import libioc.Config.Jail.JailConfig
     import libioc.Jail
 
+# bool occurs when boolean-like strings were parsed from user input;
+# the ipaddress classes validate such raw input at runtime
 IPAddressInput = typing.Optional[typing.Union[
     str,
+    bool,
     ipaddress.IPv4Address,
     ipaddress.IPv6Address
 ]]
@@ -62,6 +65,8 @@ class DefaultrouterMixin:
     ) -> None:
 
         self.logger = logger
+        # any BaseConfig (or None) is accepted, but the property is
+        # bound to a JailConfig whenever the config is consulted
         self.config = typing.cast(
             'libioc.Config.Jail.JailConfig.JailConfig',
             config
@@ -76,24 +81,18 @@ class DefaultrouterMixin:
         skip_on_error: bool=False
     ) -> None:
         """Set the defaultrouter property."""
-        gateway: typing.Optional[typing.Union[
-            str,
-            ipaddress.IPv4Address,
-            ipaddress.IPv6Address
-        ]]
+        gateway: IPAddressInput
         static_interface = None
 
-        if isinstance(data, str) is True:
-            data = typing.cast(IPAddressInput, libioc.helpers.parse_user_input(
-                typing.cast(str, data)
-            ))
+        if isinstance(data, str):
+            data = libioc.helpers.parse_user_input(data)
 
         if data is None:
             gateway = None
             self._ip = None
             return
         else:
-            if isinstance(data, str) is True:
+            if isinstance(data, str):
                 _data = str(data)
                 if "@" in _data:
                     address, static_interface = _data.split("@", maxsplit=1)
@@ -102,6 +101,8 @@ class DefaultrouterMixin:
                 gateway = self._ipaddress_class(address)
             else:
                 gateway = data
+            # mypy cannot express that self mixes into the ipaddress
+            # class returned by the _ipaddress_class property
             self._ipaddress_class.__init__(
                 typing.cast(typing.Any, self),
                 gateway
@@ -124,6 +125,8 @@ class DefaultrouterMixin:
     @property
     def _gateway_address(self) -> typing.Optional[str]:
         try:
+            # mypy cannot express that self mixes into the ipaddress
+            # class returned by the _ipaddress_class property
             return self._ipaddress_class.__str__(
                 typing.cast(typing.Any, self)
             )

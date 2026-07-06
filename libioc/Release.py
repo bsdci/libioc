@@ -187,9 +187,8 @@ class ReleaseResource(libioc.LaunchableResource.LaunchableResource):
             return self.host.datasets.main
         else:
             try:
-                return typing.cast(
-                    'libioc.Datasets.RootDatasets',
-                    self.host.datasets.__getitem__(self.root_datasets_name)
+                return self.host.datasets.__getitem__(
+                    self.root_datasets_name
                 )
             except KeyError:
                 raise libioc.errors.SourceNotFound(logger=self.logger)

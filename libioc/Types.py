@@ -39,7 +39,7 @@ class Path(str):
         self,
         sequence: str
     ) -> None:
-        if isinstance(sequence, str) is False:
+        if not isinstance(sequence, str):
             raise TypeError("Path must be a string")
 
         if len(self.blacklist.findall(sequence)) > 0:
@@ -55,7 +55,7 @@ class AbsolutePath(Path):
         self,
         sequence: str
     ) -> None:
-        if isinstance(sequence, str) is False:
+        if not isinstance(sequence, str):
             raise TypeError("AbsolutePath must be a string or Path")
 
         if str(sequence).startswith("/") is False:

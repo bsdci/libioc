@@ -59,6 +59,8 @@ class ResolverProp(collections.abc.MutableSequence):
     ) -> None:
         self.property_name = property_name
         self.logger = libioc.helpers_object.init_logger(self, logger)
+        # any BaseConfig (or None) is accepted, but the property is
+        # bound to a JailConfig whenever the config is consulted
         self.config = typing.cast(
             'libioc.Config.Jail.JailConfig.JailConfig',
             config
@@ -233,10 +235,7 @@ class ResolverProp(collections.abc.MutableSequence):
     def __str__(self) -> str:
         """Return semicolon separated list of nameservers."""
         return str(libioc.helpers.to_string(
-            typing.cast(
-                typing.List[typing.Union[str, bool, int]],
-                self._entries
-            ),
+            self._entries,
             delimiter=";"
         ))
 

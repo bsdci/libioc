@@ -111,11 +111,13 @@ class BaseConfig(dict):
     @data.setter
     def data(self, new_data: libioc.Config.Data.Data) -> None:
         """Validate and set the data object."""
-        if isinstance(new_data, libioc.Config.Data.Data) is False:
+        if not isinstance(new_data, libioc.Config.Data.Data):
             raise TypeError("data needs to be a flat dict structure")
         new_data_keys = new_data.keys()
         old_data = self._data
         try:
+            # deliberately a plain dict, repopulated below through the
+            # __setitem__ calls; mypy cannot express this transition
             self._data = typing.cast(libioc.Config.Data.Data, dict())
             identifier_keys = ["id", "name", "uuid"]
             for key in identifier_keys:
@@ -325,17 +327,10 @@ class BaseConfig(dict):
         except TypeError:
             pass
 
-        if isinstance(value, str) is True:
+        if isinstance(value, str):
             self.data["vnet_interfaces"] = value
         else:
-            self.data["vnet_interfaces"] = libioc.helpers.to_string(
-                typing.cast(
-                    typing.Optional[
-                        typing.List[typing.Union[str, bool, int]]
-                    ],
-                    value
-                )
-            )
+            self.data["vnet_interfaces"] = libioc.helpers.to_string(value)
 
     def _get_exec_clean(self) -> bool:
         return (self.data["exec_clean"] == 1) is True
@@ -556,14 +551,14 @@ class BaseConfig(dict):
         self,
         value: typing.Optional[typing.Union[str, uuid.UUID]]
     ) -> None:
-        if (value is None) or (isinstance(value, uuid.UUID) is True):
+        if (value is None) or (isinstance(value, uuid.UUID)):
             self.data["host_hostuuid"] = value
             return
 
-        if isinstance(value, str) is True:
+        if isinstance(value, str):
             _value = str(value)
-        elif isinstance(value, bytes) is True:
-            _value = value.decode("UTF-8")  # type: ignore
+        elif isinstance(value, bytes):
+            _value = value.decode("UTF-8")
         else:
             raise ValueError("Expected UUID or string/byte representation")
         self.data["host_hostuuid"] = uuid.UUID(_value)
@@ -628,10 +623,7 @@ class BaseConfig(dict):
         if key in self:
             special_property = self.special_properties.get_or_create(key)
             special_property.set(data[key], skip_on_error=False)
-            return typing.cast(
-                'libioc.Config.Jail.Properties.Property',
-                special_property
-            )
+            return special_property
         elif key in libioc.Config.Jail.Properties.ResourceLimit.properties:
             raise KeyError(f"Resource-Limit unconfigured: {key}")
         else:
@@ -685,6 +677,7 @@ class BaseConfig(dict):
         """Set a configuration value."""
         if self.is_known_property(key, explicit=explicit) is False:
             if "jail" in dir(self):
+                # mypy cannot narrow self from the dir() lookup above
                 _jail = typing.cast(
                     'libioc.Config.Jail.JailConfig.JailConfig',
                     self
@@ -700,6 +693,7 @@ class BaseConfig(dict):
             if skip_on_error is False:
                 raise err
 
+        error: typing.Optional[libioc.errors.IocException]
         try:
             if self.special_properties.is_special_property(key):
                 special_property = self.special_properties.get_or_create(key)
@@ -718,7 +712,7 @@ class BaseConfig(dict):
             self.data[key] = self.__sanitize_value(key, parsed_value)
             error = None
         except ValueError as err:
-            if isinstance(err, libioc.errors.IocException) is True:
+            if isinstance(err, libioc.errors.IocException):
                 error = err
             else:
                 error = libioc.errors.InvalidJailConfigValue(
@@ -793,7 +787,7 @@ class BaseConfig(dict):
             elif isinstance(
                 self,
                 libioc.Config.Jail.Defaults.JailConfigDefaults
-            ) is True:
+            ):
                 hash_before = str(self.__getitem__(key)).__hash__()
             else:
                 hash_before = str(BaseConfig.__getitem__(self, key)).__hash__()

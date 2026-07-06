@@ -334,7 +334,7 @@ class JailGenerator(JailResource):
         config_file: typing.Optional[str]=None,
         logger: typing.Optional['libioc.Logger.Logger']=None,
         zfs: typing.Optional['libioc.ZFS.ZFS']=None,
-        host: typing.Optional['libioc.Host.Host']=None,
+        host: typing.Optional['libioc.Host.HostGenerator']=None,
         fstab: typing.Optional[
             'libioc.Config.Jail.File.Fstab.JailFstab'
         ]=None,
@@ -503,12 +503,9 @@ class JailGenerator(JailResource):
                 event_scope=jailStartEvent.scope,
                 dependant_jails_seen=dependant_jails_seen
             ):
-                if isinstance(event, DependantsStartEvent) is True:
+                if isinstance(event, DependantsStartEvent):
                     if event.done and (event.error is None):
-                        dependant_jails_started.extend(typing.cast(
-                            libioc.events.JailDependantsStart,
-                            event
-                        ).started_jails)
+                        dependant_jails_started.extend(event.started_jails)
                 yield event
 
         # Apply Resolver Config
@@ -782,15 +779,11 @@ class JailGenerator(JailResource):
             return
 
         dependant_jails = sorted(
-            # cast for mypy: JailsGenerator iterates JailGenerator resources
-            typing.cast(
-                typing.Iterable['JailGenerator'],
-                libioc.Jails.JailsGenerator(
-                    filters=_depends,
-                    host=self.host,
-                    logger=self.logger,
-                    zfs=self.zfs
-                )
+            libioc.Jails.JailsGenerator(
+                filters=_depends,
+                host=self.host,
+                logger=self.logger,
+                zfs=self.zfs
             ),
             key=lambda x: x.config["priority"]
         )
@@ -1738,6 +1731,7 @@ class JailGenerator(JailResource):
             return new_ruleset_number
         else:
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
+            # cast for mypy: rulesets read from devfs.rules have a number
             return typing.cast(
                 int,
                 self.host.devfs[ruleset_line_position].number

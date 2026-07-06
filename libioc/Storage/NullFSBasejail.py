@@ -115,6 +115,8 @@ class NullFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
         """Prepare the jail storage."""
         libioc.Storage.Standalone.StandaloneJailStorage.setup(
             self,
+            # StandaloneJailStorage.setup requires a resource, while the
+            # storage backend interface makes the argument optional
             typing.cast('libioc.Resource.Resource', release)
         )
 

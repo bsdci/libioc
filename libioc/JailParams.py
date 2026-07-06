@@ -69,10 +69,9 @@ class JailParam(freebsd_sysctl.Sysctl):
     @property
     def sysctl_value(self) -> JailParamValueType:
         """Return the original freebsd_sysctl.Sysctl value."""
-        return typing.cast(
-            JailParamValueType,
-            super().value
-        )
+        # Sysctl.value is untyped (Any)
+        value: JailParamValueType = super().value
+        return value
 
     def __raise_value_type_error(self) -> None:
         type_name = self.ctl_type.__name__
@@ -158,11 +157,7 @@ class JailParams(collections.abc.MutableMapping):
         jail_params = filter(
             # security.jail.allow_raw_sockets deprecated
             lambda x: x.name != "security.jail.allow_raw_sockets",
-            # cast for mypy: Sysctl.children yields the subclass type
-            typing.cast(
-                typing.Iterator[JailParam],
-                self.__base_class(prefix).children
-            )
+            self.__base_class(prefix).children
         )
         # permanently store the queried sysctl in the singleton class
         JailParams.__sysctl_params = dict([

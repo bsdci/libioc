@@ -41,6 +41,8 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Attach the jail storage."""
         if release is None:
+            # cloned_release resolves dynamically through
+            # JailGenerator.__getattribute__
             release = typing.cast(
                 'libioc.Release.ReleaseGenerator',
                 self.jail.cloned_release
@@ -68,6 +70,8 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
         """Configure the jail storage."""
         libioc.Storage.Standalone.StandaloneJailStorage.setup(
             self,
+            # StandaloneJailStorage.setup requires a resource, while the
+            # storage backend interface makes the argument optional
             typing.cast('libioc.Resource.Resource', release)
         )
 
@@ -76,7 +80,7 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
         release: 'libioc.Release.ReleaseGenerator'
     ) -> None:
         """Clone ZFS basejail datasets from a release."""
-        if isinstance(release, libioc.Release.ReleaseGenerator) is False:
+        if not isinstance(release, libioc.Release.ReleaseGenerator):
             raise ValueError("ReleaseGenerator required")
         current_basejail_type = self.jail.config["basejail_type"]
         if not current_basejail_type == "zfs":

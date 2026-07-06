@@ -48,7 +48,7 @@ class NetworkInterface:
     dhclient_command = "/sbin/dhclient"
     rtsold_command = "/usr/sbin/rtsold"
 
-    name: typing.Optional[str]
+    name: str
     settings: typing.Dict[
         str,
         typing.Union[
@@ -66,7 +66,7 @@ class NetworkInterface:
 
     def __init__(
         self,
-        name: typing.Optional[str]="vnet0",
+        name: str="vnet0",
         create: bool=False,
         ipv4_addresses: typing.Union[
             typing.List[str],
@@ -155,7 +155,7 @@ class NetworkInterface:
         values: typing.List[str]
         for key in self.settings:
             value = self.settings[key]
-            if isinstance(value, list) is True:
+            if isinstance(value, list):
                 _value: typing.Any = value
                 values = [str(x) for x in _value]
             else:
@@ -229,7 +229,7 @@ class NetworkInterface:
             elif str(address).lower() == "accept_rtadv":
                 command = [self.rtsold_command, name]
             else:
-                is_ipv6 = isinstance(address, ipaddress.IPv6Interface) is True
+                is_ipv6 = isinstance(address, ipaddress.IPv6Interface)
                 family = "inet6" if is_ipv6 else "inet"
                 command = [self.ifconfig_command, name, family]
 
@@ -250,6 +250,7 @@ class NetworkInterface:
         else:
             stdout, _, _ = libioc.helpers.exec(command, logger=self.logger)
 
+        # cast for mypy: output is piped (not passthru), so never None
         self._handle_exec_stdout(typing.cast(str, stdout))
 
         return str(stdout)

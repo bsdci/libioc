@@ -61,7 +61,7 @@ class Data(dict):
                 if current not in keys:
                     raise KeyError(f"User property not found: {current}")
                 data = data[current]
-                if isinstance(data, dict) is False:
+                if not isinstance(data, dict):
                     raise KeyError(f"User property is not nested: {current}")
 
     def __setitem__(
@@ -86,7 +86,7 @@ class Data(dict):
 
     def __contains__(self, key: typing.Any) -> bool:
         """Return whether a (nested) key is included in the dict."""
-        if isinstance(key, str) is False:
+        if not isinstance(key, str):
             return False
         data = self
         while True:
@@ -164,7 +164,7 @@ class Data(dict):
         """Return the flattened dict iterator."""
         for key in dict.__iter__(self):
             value = dict.__getitem__(self, key)
-            if isinstance(value, Data) is True:
+            if isinstance(value, Data):
                 for subkey in value.__iter__():
                     yield f"{key}.{subkey}"
             else:

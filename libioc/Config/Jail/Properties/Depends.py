@@ -52,6 +52,8 @@ class DependsProp(libioc.Filter.Terms):
         self.property_name = property_name
         self.logger = logger
         if config is not None:
+            # any BaseConfig is accepted, but the property is bound
+            # to a JailConfig whenever the config is consulted
             self.config = typing.cast(
                 'libioc.Config.Jail.JailConfig.JailConfig',
                 config

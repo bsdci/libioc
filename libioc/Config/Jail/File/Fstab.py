@@ -96,6 +96,8 @@ class FstabLine(dict):
         ]
     ) -> None:
         """Set an item of the FstabLine."""
+        # mypy cannot bind the value type to the key; both path
+        # constructors validate their raw input at runtime
         if key == "source":
             dict.__setitem__(self, key, FstabFsSpec(
                 typing.cast(str, value)
@@ -593,11 +595,11 @@ class JailFstab(Fstab):
                 List of destination strings that is skipped
         """
         BasejailStorage = libioc.Storage.Basejail.BasejailStorage
-        if isinstance(self.jail.storage_backend, BasejailStorage) is True:
+        if isinstance(self.jail.storage_backend, BasejailStorage):
             skip_destinations += list(map(
                 lambda x: str(x[1]),
                 # only _get_basejail_mounts exists, so this raises
-                self.jail.storage_backend.basejail_mounts  # type: ignore[union-attr] # noqa: E501
+                self.jail.storage_backend.basejail_mounts
             ))
         Fstab.parse_lines(
             self,
@@ -628,7 +630,7 @@ class JailFstab(Fstab):
         ] = []
 
         for line in self._lines:
-            if isinstance(line, FstabAutoPlaceholderLine) is False:
+            if not isinstance(line, FstabAutoPlaceholderLine):
                 output.append(line)
 
         return iter(output)

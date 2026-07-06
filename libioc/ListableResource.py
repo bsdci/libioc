@@ -44,8 +44,13 @@ import libioc.helpers_object
 if typing.TYPE_CHECKING:
     import libzfs
 
+_ResourceType = typing.TypeVar(
+    "_ResourceType",
+    bound='libioc.Resource.Resource'
+)
 
-class ListableResource(list):
+
+class ListableResource(list, typing.Generic[_ResourceType]):
     """Representation of Resources that can be listed."""
 
     _filters: typing.Optional['libioc.Filter.Terms'] = None
@@ -95,7 +100,7 @@ class ListableResource(list):
 
     def __iter__(
         self
-    ) -> typing.Generator['libioc.Resource.Resource', None, None]:
+    ) -> typing.Generator[_ResourceType, None, None]:
         """Return an iterator over the child datasets."""
         if self.namespace is None:
             raise libioc.errors.ListableResourceNamespaceUndefined(
@@ -103,7 +108,6 @@ class ListableResource(list):
             )
 
         filters = self._filters
-        has_filters = (filters is not None)
 
         for root_name, root_datasets in self.sources.items():
             if (filters is not None):
@@ -113,10 +117,9 @@ class ListableResource(list):
             children = root_datasets.__getattribute__(self.namespace).children
             for child_dataset in children:
                 name = self._get_asset_name_from_dataset(child_dataset)
-                if has_filters and (typing.cast(
-                    'libioc.Filter.Terms',
-                    filters
-                ).match_key("name", name) is False):
+                if (filters is not None) and (
+                    filters.match_key("name", name) is False
+                ):
                     # Skip all jails that do not even match the name
                     continue
 
@@ -130,7 +133,7 @@ class ListableResource(list):
     def __getitem__(  # type: ignore[override]
         self,
         index: int
-    ) -> 'libioc.Resource.Resource':
+    ) -> _ResourceType:
         """Return the resource at a certain index position."""
         items = self.__iter__()
         try:
@@ -168,7 +171,7 @@ class ListableResource(list):
     def _get_resource_from_dataset(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> 'libioc.Resource.Resource':
+    ) -> _ResourceType:
 
         return self._create_resource_instance(dataset)
 
@@ -176,6 +179,6 @@ class ListableResource(list):
     def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset
-    ) -> 'libioc.Resource.Resource':
+    ) -> _ResourceType:
         pass
 

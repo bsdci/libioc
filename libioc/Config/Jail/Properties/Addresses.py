@@ -156,6 +156,8 @@ class AddressesProp(dict):
         dict.__init__(self, {})
 
         self.logger = logger
+        # any BaseConfig (or None) is accepted, but the property is
+        # bound to a JailConfig whenever the config is consulted
         self.config = typing.cast(
             'libioc.Config.Jail.JailConfig.JailConfig',
             config
@@ -235,7 +237,9 @@ class AddressesProp(dict):
         skip_on_error: bool=False
     ) -> None:
         """Add one or many IP addresses to an interface."""
-        if isinstance(addresses, list) is False:
+        if not isinstance(addresses, list):
+            # mypy cannot rule out None here; it fails address parsing
+            # within the recursive call below like any invalid input
             _address: IPAddressInput = typing.cast(IPAddressInput, addresses)
             self.add(
                 nic=nic,
@@ -254,7 +258,7 @@ class AddressesProp(dict):
             typing.Callable[..., libioc.IPAddress.IPv6Interface]
         ] = own_class
         try:
-            _addresses = [_class(x) for x in list(addresses)]  # type: ignore
+            _addresses = [_class(x) for x in list(addresses)]
             err = None
         except (ipaddress.AddressValueError, ipaddress.NetmaskValueError) as e:
             err = e

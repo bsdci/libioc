@@ -28,12 +28,22 @@ import typing
 import libioc.Logger
 
 
+class _DistributionMemo(typing.Protocol):
+    """Typing protocol of objects memoizing a Distribution instance."""
+
+    logger: 'libioc.Logger.Logger'
+    zfs: 'libioc.ZFS.ZFS'
+    distribution: 'libioc.Distribution.DistributionGenerator'
+
+
 def init_zfs(
     self: typing.Any,
     zfs: typing.Optional['libioc.ZFS.ZFS']=None
 ) -> 'libioc.ZFS.ZFS':
     """Attach or initialize a ZFS object."""
     try:
+        # a structurally typed self would cause attribute inference
+        # cycles in callers, so the memoized value is typed by hand
         return typing.cast('libioc.ZFS.ZFS', self.zfs)
     except AttributeError:
         pass
@@ -45,6 +55,7 @@ def init_zfs(
         new_zfs = libioc.ZFS.get_zfs(logger=self.logger)
         object.__setattr__(self, 'zfs', new_zfs)
 
+    # the dynamic object.__getattribute__ lookup returns Any
     return typing.cast(
         'libioc.ZFS.ZFS',
         object.__getattribute__(self, 'zfs')
@@ -57,6 +68,8 @@ def init_host(
 ) -> 'libioc.Host.HostGenerator':
     """Attach or initialize a Host object."""
     try:
+        # self stays typing.Any because some callers lack the zfs
+        # attribute probed below, which no Protocol can express
         return typing.cast('libioc.Host.HostGenerator', self.host)
     except AttributeError:
         pass
@@ -77,15 +90,12 @@ def init_host(
 
 
 def init_distribution(
-    self: typing.Any,
+    self: _DistributionMemo,
     distribution: typing.Optional['libioc.Distribution.Distribution']=None
 ) -> 'libioc.Distribution.DistributionGenerator':
     """Attach or initialize a Distribution object."""
     try:
-        return typing.cast(
-            'libioc.Distribution.DistributionGenerator',
-            self.distribution
-        )
+        return self.distribution
     except AttributeError:
         pass
 
@@ -107,6 +117,8 @@ def init_logger(
 ) -> 'libioc.Logger.Logger':
     """Attach or initialize a Logger object."""
     try:
+        # a structurally typed self would cause attribute inference
+        # cycles in callers, so the memoized value is typed by hand
         return typing.cast('libioc.Logger.Logger', self.logger)
     except AttributeError:
         pass

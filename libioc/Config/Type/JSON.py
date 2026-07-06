@@ -40,14 +40,11 @@ class ConfigJSON(libioc.Config.Prototype.Prototype):
 
     def map_input(
         self,
-        data: typing.Union[
-            typing.TextIO,
-            'libioc.Config.Prototype.ConfigDataDict'
-        ]
+        data: typing.TextIO
     ) -> libioc.Config.Data.Data:
         """Parse and normalize JSON data."""
         try:
-            content = typing.cast(typing.TextIO, data).read().strip()
+            content = data.read().strip()
         except (FileNotFoundError, PermissionError) as e:
             raise libioc.errors.JailConfigError(
                 message=str(e),
@@ -68,12 +65,10 @@ class ConfigJSON(libioc.Config.Prototype.Prototype):
 
     def map_output(
         self,
-        data: 'libioc.Config.Prototype.ConfigDataDict'
+        data: libioc.Config.Data.Data
     ) -> str:
         """Output configuration data as JSON string."""
-        return str(libioc.helpers.to_json(
-            typing.cast(libioc.Config.Data.Data, data).nested
-        ))
+        return str(libioc.helpers.to_json(data.nested))
 
 
 class DatasetConfigJSON(
