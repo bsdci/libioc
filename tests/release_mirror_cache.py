@@ -65,7 +65,7 @@ class CacheHandler(SimpleHTTPRequestHandler):
             try:
                 self.__urlretrieve(self.path, cache_filename)
                 print(f"{self.path} saved to {cache_filename}")
-            except urllib.error.HTTPError:  # noqa: T484
+            except urllib.error.HTTPError as e:
                 self.send_error(e.getcode())
                 return
 

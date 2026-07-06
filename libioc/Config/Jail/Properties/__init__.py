@@ -27,7 +27,7 @@ import typing
 import libioc.Config.Jail.Properties.Addresses
 import libioc.Config.Jail.Properties.Interfaces
 import libioc.Config.Jail.Properties.Resolver
-import libioc.Config.Jail.Properties.ResourceLimit
+import libioc.Config.Jail.Properties.ResourceLimit as _ResourceLimit
 import libioc.Config.Jail.Properties.Defaultrouter
 import libioc.Config.Jail.Properties.Depends
 
@@ -49,7 +49,7 @@ properties: typing.List[str] = [
     "defaultrouter6",
     "resolver",
     "depends"
-] + libioc.Config.Jail.Properties.ResourceLimit.properties
+] + _ResourceLimit.properties
 
 def _get_class(property_name: str) -> Property:
 
@@ -82,7 +82,7 @@ def init_property(
         'libioc.Config.Jail.JailConfig.JailConfig'
     ]=None,
     logger: typing.Optional['libioc.Logger.Logger']=None
-) -> Property:  # noqa: T484
+) -> Property:
     """
     Instantiate a special jail config property.
 
