@@ -79,7 +79,7 @@ class ControlRepoDefinition(dict):
         self.logger = logger
 
         self.source = source
-        self._pkgs = ['puppet6']  # make this a Global Varialbe
+        self._pkgs = ['puppet8']  # make this a Global Varialbe
         if source.remote is True:
             self._pkgs += ['rubygem-r10k', 'git-lite']
 

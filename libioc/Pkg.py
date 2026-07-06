@@ -149,6 +149,7 @@ class Pkg:
             logger=self.logger,
             env=dict(
                 ABI=self.__get_abi_string(release_major_version),
+                OSVERSION=self.__get_osversion_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints",
                 IGNORE_OSVERSION="yes"
             )
@@ -156,6 +157,10 @@ class Pkg:
 
     def __get_abi_string(self, release_major_version: int) -> str:
         return f"FreeBSD:{release_major_version}:{self.host.processor}"
+
+    def __get_osversion_string(self, release_major_version: int) -> str:
+        # pkg requires OSVERSION whenever ABI is overridden
+        return f"{release_major_version}00000"
 
     def _mirror_packages(
         self,
@@ -173,7 +178,9 @@ class Pkg:
             logger=self.logger,
             env=dict(
                 ABI=self.__get_abi_string(release_major_version),
-                SIGNATURE_TYPE="fingerprints"
+                OSVERSION=self.__get_osversion_string(release_major_version),
+                SIGNATURE_TYPE="fingerprints",
+                IGNORE_OSVERSION="yes"
             )
         )
 
@@ -193,10 +200,25 @@ class Pkg:
             ],
             env=dict(
                 ABI=self.__get_abi_string(release_major_version),
+                OSVERSION=self.__get_osversion_string(release_major_version),
                 SIGNATURE_TYPE="fingerprints",
-                FINGERPRINTS="/usr/share/keys/pkg"
+                FINGERPRINTS="/usr/share/keys/pkg",
+                IGNORE_OSVERSION="yes"
             ),
             logger=self.logger
+        )
+
+        # the pkg bootstrap wrapper looks for Latest/pkg.pkg in the repo
+        pkg_archive_name = self._get_latest_pkg_archive(pkg_ds.mountpoint)
+        latest_directory = os.path.join(str(cache_ds.mountpoint), "Latest")
+        if os.path.isdir(latest_directory) is False:
+            os.makedirs(latest_directory)
+        bootstrap_archive = os.path.join(latest_directory, "pkg.pkg")
+        if os.path.isfile(bootstrap_archive) is True:
+            os.remove(bootstrap_archive)
+        os.link(
+            os.path.join(str(cache_ds.mountpoint), pkg_archive_name),
+            bootstrap_archive
         )
 
     def _get_base_url(self, release_major_version: int) -> str:
@@ -395,7 +417,7 @@ class Pkg:
             r"^(?P<name>[a-zA-Z0-9_\-\.]+)"
             r"-(?P<version>[0-9](?:[0-9\.,_\-]*[0-9])?)"
             r"(?:-(?P<hash>[0-9a-z]+))?"
-            r".txz$"
+            r"\.(?:pkg|txz)$"
         ))
         cached_items = os.listdir(f"{package_source_directory}/cache")
         cached_packages_list = list(filter(
