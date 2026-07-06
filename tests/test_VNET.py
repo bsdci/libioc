@@ -34,11 +34,14 @@ import libioc.Jail
 
 
 def is_epair_enabled() -> bool:
-    proc = subprocess.Popen(
-        ["/sbin/kldstat", "-n", "if_epair"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    try:
+        proc = subprocess.Popen(
+            ["/sbin/kldstat", "-n", "if_epair"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+    except (FileNotFoundError, PermissionError):
+        return False
     proc.communicate()
     return (proc.returncode == 0)
 

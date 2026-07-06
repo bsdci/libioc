@@ -22,6 +22,8 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Fstab module."""
+import typing
+
 import pytest
 import tempfile
 import random
@@ -36,8 +38,17 @@ import libioc.Config.Jail.File.Fstab
 class TestFstab(object):
 	"""Run Fstab unit tests."""
 
+	@pytest.fixture(autouse=True)
+	def mocked_host(self, mocker: typing.Any) -> None:
+		"""Replace the host so that parsing works without ZFS."""
+		mocker.patch(
+			"libioc.helpers_object.init_host",
+			return_value=mocker.MagicMock()
+		)
+
 	def test_can_read_files_with_utf8(
-		self
+		self,
+		logger: 'libioc.Logger.Logger'
 	) -> None:
 
 		temp_file = tempfile.NamedTemporaryFile()
@@ -45,12 +56,16 @@ class TestFstab(object):
 		temp_file.write(content.encode("utf-8"))
 		temp_file.seek(0)
 
-		fstab = libioc.Config.Jail.File.Fstab.Fstab(file=temp_file.name)
+		fstab = libioc.Config.Jail.File.Fstab.Fstab(
+			file=temp_file.name,
+			logger=logger
+		)
 
 		assert len(fstab) == 1
 
 	def test_can_read_files_with_comment_and_fstab_line(
-		self
+		self,
+		logger: 'libioc.Logger.Logger'
 	) -> None:
 
 		temp_file = tempfile.NamedTemporaryFile()
@@ -61,7 +76,10 @@ fdescfs /dev/fd fdescfs rw	0 0"""
 		temp_file.write(content.encode("utf-8"))
 		temp_file.seek(0)
 
-		fstab = libioc.Config.Jail.File.Fstab.Fstab(file=temp_file.name)
+		fstab = libioc.Config.Jail.File.Fstab.Fstab(
+			file=temp_file.name,
+			logger=logger
+		)
 
 		assert len(fstab) == 2
 		assert type(fstab[0]).__name__ == "FstabCommentLine"
@@ -70,7 +88,8 @@ fdescfs /dev/fd fdescfs rw	0 0"""
 		assert str(fstab[1]) == "fdescfs\t/dev/fd\tfdescfs\trw\t0\t0"
 
 	def test_parses_auto_lines(
-		self
+		self,
+		logger: 'libioc.Logger.Logger'
 	) -> None:
 
 		AUTO_COMMENT_IDENTIFIER = "iocage-auto"
@@ -85,7 +104,10 @@ tmpfs /tmp tmpfs rw,mode=777 0 0 # {AUTO_COMMENT_IDENTIFIER}"""
 		temp_file.write(content.encode("utf-8"))
 		temp_file.seek(0)
 
-		fstab = libioc.Config.Jail.File.Fstab.Fstab(file=temp_file.name)
+		fstab = libioc.Config.Jail.File.Fstab.Fstab(
+			file=temp_file.name,
+			logger=logger
+		)
 
 		# only 3 lines are expected
 		assert len(fstab) == 3

@@ -22,12 +22,17 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Jail and Default Config."""
+import subprocess
+
 import pytest
 import json
 
 import libioc.Jail
+import libioc.Storage.NullFSBasejail
 
-class Storage(object):
+
+class TestStorage(object):
+    """Run tests for jail storage backends."""
 
     def test_nullfs_basejail_is_default(
         self,
