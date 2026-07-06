@@ -40,3 +40,42 @@ jobs:
           pip install --no-build-isolation jail==0.0.12
       - name: Run the platform-independent tests
         run: pytest --cov=libioc --cov-report=term
+
+  freebsd:
+    name: Test suite (FreeBSD 13.5)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - name: Boot the FreeBSD VM
+        uses: gronke/freebsd-ci/.github/actions/setup-vm@main
+        with:
+          version: 13.5-RELEASE
+      - name: Prepare the guest
+        uses: gronke/freebsd-ci/.github/actions/run@main
+        with:
+          sync-workspace: "false"
+          run: |
+            mkdir -p /usr/local/etc/pkg/repos
+            echo 'FreeBSD: { url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repos/FreeBSD.conf
+            env ASSUME_ALWAYS_YES=yes pkg bootstrap -f
+            pkg update -f
+            PYPKG="$(pkg search -q '^py3[0-9]*-libzfs' | head -n 1 | sed 's/-libzfs.*//')"
+            pkg install -y python3 "${PYPKG}-libzfs" "${PYPKG}-ucl" "${PYPKG}-sqlite3" "${PYPKG}-setuptools" "${PYPKG}-pip" git
+            mount -t fdescfs null /dev/fd
+            kldload if_epair 2>/dev/null || true
+            kldload zfs 2>/dev/null || true
+            mkdir -p /pools
+            truncate -s 8G /pools/ioc-test.img
+            zpool create -m /.ioc-test ioc-test /pools/ioc-test.img
+            zfs set compression=lz4 ioc-test
+            PYBIN="$(ls /usr/local/bin/ | grep -E '^python3\.[0-9]+$' | head -n 1)"
+            "/usr/local/bin/${PYBIN}" -m venv --system-site-packages /root/venv
+            /root/venv/bin/pip install -q -U pip setuptools wheel
+      - name: Run the test suite
+        uses: gronke/freebsd-ci/.github/actions/run@main
+        with:
+          run: |
+            /root/venv/bin/pip install -q --no-build-isolation -r requirements.txt -r requirements-test.txt
+            /root/venv/bin/pip install -q --no-build-isolation -e .
+            /root/venv/bin/pytest tests --zpool ioc-test
