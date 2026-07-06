@@ -34,6 +34,10 @@ import libioc.IPAddress
 import libioc.Config.Jail
 import libioc.Logger
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
+    import libioc.Config.Jail.JailConfig
+
 IPv4Interface = libioc.IPAddress.IPv4Interface
 IPv6Interface = libioc.IPAddress.IPv6Interface
 

@@ -27,6 +27,9 @@ import typing
 
 import libioc.Storage
 
+if typing.TYPE_CHECKING:
+    import libioc.Release
+
 
 class StandaloneJailStorage(libioc.Storage.Storage):
     """ioc standalone jail storage backend."""

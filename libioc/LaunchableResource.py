@@ -23,12 +23,17 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc module for launchable resources."""
-import libzfs
+from __future__ import annotations
 import typing
 
 import libioc.helpers_object
 import libioc.Resource
 import libioc.ResourceBackup
+
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
+    import libioc.ResourceUpdater
+    import libzfs
 
 
 class LaunchableResource(libioc.Resource.Resource):
@@ -45,7 +50,7 @@ class LaunchableResource(libioc.Resource.Resource):
     ]
     host: 'libioc.Host.HostGenerator'
     _updater: typing.Optional[
-        'libioc.ResourceUpdater.LaunchableResourceUpdate'
+        'libioc.ResourceUpdater.Updater'
     ]
     _backup: typing.Optional[
         'libioc.ResourceBackup.LaunchableResourceBackup'

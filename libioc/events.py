@@ -23,13 +23,18 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc events collection."""
+from __future__ import annotations
 import typing
 from timeit import default_timer as timer
 
 import libioc.errors
 
-# MyPy
-import libzfs
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.Release
+    import libioc.Resource
+    import libzfs
+
 
 EVENT_STATUS = (
     "pending",

@@ -71,6 +71,9 @@ import libioc.Config.Jail.File.Fstab
 
 import ctypes
 import errno
+
+if typing.TYPE_CHECKING:
+    import libioc.Provisioning
 try:
     _dll = ctypes.CDLL("libc.so.7", use_errno=True)
 except OSError:
@@ -404,7 +407,7 @@ class JailGenerator(JailResource):
                 self.config["id"] = self.dataset_name.split("/").pop()
 
     @property
-    def provisioner(self) -> 'libioc.Provisioning.prototype.Provisioner':
+    def provisioner(self) -> 'libioc.Provisioning.Provisioner':
         """
         Return the jails Provisioner instance.
 
@@ -1895,7 +1898,7 @@ class JailGenerator(JailResource):
     def __start_network(
         self,
         event_scope: 'libioc.events.Scope'
-    ) -> typing.Generator['libioc.events.IocEvnet', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         if self.config["vnet"] is True:
             yield from self.__start_vimage_network(event_scope)
             yield from self.__configure_localhost_commands(event_scope)
@@ -1910,8 +1913,8 @@ class JailGenerator(JailResource):
 
     def _start_non_vimage_network(
         self,
-        event_scope: 'libioc.event.Scope'
-    ) -> typing.Generator['libioc.events.IocEvnet', None, None]:
+        event_scope: 'libioc.events.Scope'
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         yield from self.__apply_non_vnet_network(
             force=False,
             event=libioc.events.JailNetworkSetup,
@@ -1934,7 +1937,7 @@ class JailGenerator(JailResource):
     def __apply_non_vnet_network(
         self,
         force: bool,
-        event: 'libioc.event.IocEvent',
+        event: 'libioc.events.IocEvent',
         event_scope: 'libioc.events.Scope',
         teardown: bool=False
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
@@ -2010,7 +2013,7 @@ class JailGenerator(JailResource):
     def _apply_resource_limits(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.IocageEvent', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         event = libioc.events.JailResourceLimitAction(
             jail=self,

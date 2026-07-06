@@ -31,6 +31,9 @@ import libioc.Config.Jail.Properties.ResourceLimit
 import libioc.Config.Jail.Properties.Defaultrouter
 import libioc.Config.Jail.Properties.Depends
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
+
 Property = typing.Union[
     'libioc.Config.Jail.Properties.Addresses.AddressesProp',
     'libioc.Config.Jail.Properties.Interfaces.InterfaceProp',
@@ -46,7 +49,7 @@ properties: typing.List[str] = [
     "defaultrouter6",
     "resolver",
     "depends"
-] + ResourceLimit.properties
+] + libioc.Config.Jail.Properties.ResourceLimit.properties
 
 def _get_class(property_name: str) -> Property:
 
@@ -129,8 +132,6 @@ class JailConfigProperties(dict):
             return True
         except ValueError:
             return False
-
-        return (property_name in CLASSES.keys()) is True
 
     def get_or_create(
         self,

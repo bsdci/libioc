@@ -35,6 +35,9 @@ import libioc.Firewall
 import libioc.errors
 import libioc.helpers_object
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+
 CreatedCommandList = typing.List[str]
 PoststopCommandList = typing.List[str]
 StartCommandList = typing.List[str]

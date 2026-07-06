@@ -26,6 +26,10 @@
 import typing
 import libioc.errors
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
+    import libioc.Config.Jail.JailConfig
+
 properties: typing.List[str] = [
     "cputime",
     "datasize",

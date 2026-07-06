@@ -32,14 +32,17 @@ With filters applied to a ListableResource, all children returned listed have
 to match the input filters. Unlike Releases, that can only be filtered by their
 dataset name, it is possible to match configuration variables for Jails.
 """
+from __future__ import annotations
 import typing
-import libzfs
 import abc
 import itertools
 
 import libioc.Filter
 import libioc.Resource
 import libioc.helpers_object
+
+if typing.TYPE_CHECKING:
+    import libzfs
 
 
 class ListableResource(list):

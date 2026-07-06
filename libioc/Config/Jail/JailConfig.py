@@ -28,6 +28,9 @@ import typing
 import libioc.helpers_object
 import libioc.Config.Jail.BaseConfig
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+
 BaseConfig = libioc.Config.Jail.BaseConfig.BaseConfig
 
 

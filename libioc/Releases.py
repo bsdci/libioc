@@ -23,6 +23,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Model of multiple iocage Releases."""
+from __future__ import annotations
 import libioc.Release
 import libioc.ListableResource
 import libioc.Filter
@@ -30,8 +31,9 @@ import libioc.helpers_object
 
 import typing
 
-# MyPy
-import libzfs
+if typing.TYPE_CHECKING:
+    import libzfs
+
 ReleaseListType = typing.List['libioc.Release.ReleaseGenerator']
 
 

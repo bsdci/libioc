@@ -31,6 +31,9 @@ import libioc.Storage.Basejail
 import libioc.Storage.Standalone
 import libioc.helpers
 
+if typing.TYPE_CHECKING:
+    import libioc.Release
+
 BasejailStorage = libioc.Storage.Basejail.BasejailStorage
 
 

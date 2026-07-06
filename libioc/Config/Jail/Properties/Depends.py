@@ -28,6 +28,9 @@ import typing
 import libioc.helpers
 import libioc.Filter
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
+
 
 class DependsProp(libioc.Filter.Terms):
     """Special jail config property Depends."""

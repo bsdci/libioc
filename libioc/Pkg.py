@@ -35,18 +35,23 @@ for package installation. In setups that spawn disposable jails, it might be
 reasonable to seed newly created jails from latest packages, rather than
 managing a template, that tempts to outdate.
 """
+from __future__ import annotations
 import typing
 import math
 import os.path
 import re
 
-import libzfs
 
 import libioc.events
 import libioc.helpers
 import libioc.helpers_object
 import libioc.LaunchableResource
 import libioc.Config.Jail.File.Fstab
+
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.Release
+    import libzfs
 
 _PkgConfDataType = typing.Union[
     str, int, bool,

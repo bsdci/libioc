@@ -33,6 +33,9 @@ import html.parser
 import libioc.errors
 import libioc.helpers_object
 
+if typing.TYPE_CHECKING:
+    import libioc.Release
+
 
 class EOLParser(html.parser.HTMLParser):
     """Parser for EOL releases."""

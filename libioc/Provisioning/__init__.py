@@ -32,6 +32,9 @@ import libioc.helpers
 import libioc.Provisioning.ix
 import libioc.Provisioning.puppet
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+
 _SourceType = typing.Union[
     urllib.parse.ParseResult,
     libioc.Types.AbsolutePath,

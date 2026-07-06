@@ -32,6 +32,10 @@ import libioc.events
 import libioc.helpers
 import libioc.helpers_object
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.Release
+
 
 class Storage:
     """Abstraction of jail storage operations."""

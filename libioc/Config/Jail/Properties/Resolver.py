@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Jail config resolver property."""
 import typing
-import collections
+import collections.abc
 import os.path
 import shutil
 
@@ -35,8 +35,12 @@ import libioc.Config.Jail
 # mypy
 import libioc.Logger
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
+    import libioc.Jail
 
-class ResolverProp(collections.MutableSequence):
+
+class ResolverProp(collections.abc.MutableSequence):
     """Handle the special jail property (DNS) Resolver."""
 
     property_name: str
