@@ -23,18 +23,28 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc commandline prompt module."""
+import typing
+
 import libioc.errors
 import libioc.helpers_object
+
+if typing.TYPE_CHECKING:
+    import libioc.Host
+    import libioc.Release
 
 
 class Prompts:
     """ioc commandline prompt module."""
 
-    def __init__(self, host=None, logger=None):
+    def __init__(
+        self,
+        host: typing.Optional['libioc.Host.HostGenerator']=None,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
         self.logger = libioc.helpers_object.init_logger(self, logger)
         self.host = libioc.helpers_object.init_host(self, host)
 
-    def release(self):
+    def release(self) -> 'libioc.Release.ReleaseGenerator':
         """Prompt for a release."""
         default = None
         available_releases = self.host.distribution.releases

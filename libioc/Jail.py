@@ -73,6 +73,7 @@ import ctypes
 import errno
 
 if typing.TYPE_CHECKING:
+    import libioc.Jails
     import libioc.Provisioning
 try:
     _dll = ctypes.CDLL("libc.so.7", use_errno=True)
@@ -214,7 +215,10 @@ class JailResource(
                 self.root_datasets_name
             ).jails.name
 
-        self.dataset_name = f"{base_name}/{self.name}"
+        # cast for mypy: only jails (with a name) auto-set the dataset_name
+        self.dataset_name = (
+            f"{base_name}/{typing.cast('JailGenerator', self).name}"
+        )
 
     @property
     def _dataset_name_from_jail_name(self) -> str:
@@ -318,7 +322,7 @@ class JailGenerator(JailResource):
     """
 
     _class_storage = libioc.Storage.Storage
-    _provisioner: 'libioc.Provisioning.Prototype'
+    _provisioner: 'libioc.Provisioning.Provisioner'
     __jid: typing.Optional[int]
 
     def __init__(
@@ -331,7 +335,9 @@ class JailGenerator(JailResource):
         logger: typing.Optional['libioc.Logger.Logger']=None,
         zfs: typing.Optional['libioc.ZFS.ZFS']=None,
         host: typing.Optional['libioc.Host.Host']=None,
-        fstab: typing.Optional['libioc.Config.Jail.File.Fstab.Fstab']=None,
+        fstab: typing.Optional[
+            'libioc.Config.Jail.File.Fstab.JailFstab'
+        ]=None,
         root_datasets_name: typing.Optional[str]=None,
         new: bool=False,
         skip_invalid_config: bool=False
@@ -499,7 +505,10 @@ class JailGenerator(JailResource):
             ):
                 if isinstance(event, DependantsStartEvent) is True:
                     if event.done and (event.error is None):
-                        dependant_jails_started.extend(event.started_jails)
+                        dependant_jails_started.extend(typing.cast(
+                            libioc.events.JailDependantsStart,
+                            event
+                        ).started_jails)
                 yield event
 
         # Apply Resolver Config
@@ -526,7 +535,8 @@ class JailGenerator(JailResource):
 
         # Basejail Actions
         if self.is_basejail is True:
-            yield from self.storage_backend.apply(
+            # cast for mypy: unbound backend methods take Storage as self
+            yield from typing.cast(typing.Any, self.storage_backend).apply(
                 self.storage,
                 self.release,
                 event_scope=jailStartEvent.scope
@@ -582,7 +592,11 @@ class JailGenerator(JailResource):
                         event_scope=jailStartEvent.scope
                     )
                 yield from self.fstab.unmount(event_scope=jailStartEvent.scope)
-                yield from self.storage_backend.teardown(
+                # cast for mypy: unbound backend methods take Storage as self
+                yield from typing.cast(
+                    typing.Any,
+                    self.storage_backend
+                ).teardown(
                     self.storage,
                     event_scope=jailStartEvent.scope
                 )
@@ -597,7 +611,8 @@ class JailGenerator(JailResource):
                     force=True,
                     event_scope=jailAttachEvent.scope
                 )
-        jailStartEvent.add_rollback_step(_stop_jails)
+        # cast for mypy: rollback steps may yield events (IocEvent.rollback)
+        jailStartEvent.add_rollback_step(typing.cast(typing.Any, _stop_jails))
 
         # Created Hook
         yield from self.__run_hook(
@@ -668,8 +683,8 @@ class JailGenerator(JailResource):
     def __mount_devfs(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.MountDevFS', None, None]:
-        extra_args = dict()
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
+        extra_args: typing.Dict[str, typing.Any] = dict()
         if self.config["devfs_ruleset"] is not None:
             extra_args["ruleset"] = self.devfs_ruleset
 
@@ -684,7 +699,7 @@ class JailGenerator(JailResource):
     def __mount_fdescfs(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         yield from self.__mount_in_jail(
             filesystem="fdescfs",
             mountpoint="/dev/fd",
@@ -696,10 +711,10 @@ class JailGenerator(JailResource):
         self,
         filesystem: str,
         mountpoint: str,
-        event: 'libioc.events.JailEvent',
+        event: typing.Type['libioc.events.JailEvent'],
         event_scope: typing.Optional['libioc.events.Scope']=None,
-        **extra_args: str
-    ) -> typing.Generator['libioc.events.MountFdescfs', None, None]:
+        **extra_args: typing.Any
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         _event = event(
             jail=self,
@@ -767,11 +782,15 @@ class JailGenerator(JailResource):
             return
 
         dependant_jails = sorted(
-            libioc.Jails.JailsGenerator(
-                filters=_depends,
-                host=self.host,
-                logger=self.logger,
-                zfs=self.zfs
+            # cast for mypy: JailsGenerator iterates JailGenerator resources
+            typing.cast(
+                typing.Iterable['JailGenerator'],
+                libioc.Jails.JailsGenerator(
+                    filters=_depends,
+                    host=self.host,
+                    logger=self.logger,
+                    zfs=self.zfs
+                )
             ),
             key=lambda x: x.config["priority"]
         )
@@ -822,9 +841,11 @@ class JailGenerator(JailResource):
                 ]:
                     yield from jail.stop(force=True)
                 return revert_method
-            jailDependantsStartEvent.add_rollback_step(
+            # cast for mypy: rollback steps may yield events
+            jailDependantsStartEvent.add_rollback_step(typing.cast(
+                typing.Any,
                 _revert_start(dependant_jail)
-            )
+            ))
 
         yield jailDependantsStartEvent.end(
             started_jails=started_jails
@@ -933,10 +954,18 @@ class JailGenerator(JailResource):
         script: typing.Optional[str]=None,
         passthru: bool=False,
         env: typing.Dict[str, str]={}
-    ) -> typing.Generator['libioc.events.JailHook', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         _env = self.__merge_env(env)
-        exec_func = libioc.helpers.exec
-        exec_args = dict(logger=self.logger, env=_env)
+        exec_func: typing.Callable[
+            ...,
+            libioc.helpers.CommandOutput
+        ] = libioc.helpers.exec
+        exec_args: typing.Dict[str, typing.Any] = dict(
+            logger=self.logger,
+            env=_env
+        )
+        Event: typing.Type[libioc.events.JailHook]
+        event: libioc.events.JailHook
         if hook == "prestart":
             Event = libioc.events.JailHookPrestart
         elif hook == "created":
@@ -982,8 +1011,9 @@ class JailGenerator(JailResource):
             **exec_args
         )
         event.stdout = stdout
-        event.stderr = stderr
-        event.code = code
+        # stderr and code are only declared on the JailCommand event
+        event.stderr = stderr  # type: ignore[union-attr]
+        event.code = code  # type: ignore[union-attr]
         if code > 0:
             if force is True:
                 yield event.skip("ERROR")
@@ -995,7 +1025,8 @@ class JailGenerator(JailResource):
                     logger=self.logger
                 )
         else:
-            yield event.end(stdout=stdout)
+            # cast for mypy: JailHook.end() tolerates None stdout (passthru)
+            yield event.end(stdout=typing.cast(str, stdout))
 
     def stop(
         self,
@@ -1069,7 +1100,8 @@ class JailGenerator(JailResource):
                 event_scope=jailStopEvent.scope
             )
         yield from self.fstab.unmount(event_scope=jailStopEvent.scope)
-        yield from self.storage_backend.teardown(
+        # cast for mypy: unbound backend methods take Storage as self
+        yield from typing.cast(typing.Any, self.storage_backend).teardown(
             self.storage,
             event_scope=jailStopEvent.scope
         )
@@ -1246,7 +1278,8 @@ class JailGenerator(JailResource):
         jailRenameEvent.add_rollback_step(revert_id_change)
 
         try:
-            events = self.storage_backend.rename(
+            # cast for mypy: unbound backend methods take Storage as self
+            events = typing.cast(typing.Any, self.storage_backend).rename(
                 self.storage,
                 new_name=new_name,
                 event_scope=jailRenameEvent.scope
@@ -1320,7 +1353,8 @@ class JailGenerator(JailResource):
                 If no resource is specified, an empty dataset will be created
         """
         if isinstance(resource, str):
-            resource = libioc.Release(resource)
+            # the libioc module hook makes its submodules callable at runtime
+            resource = libioc.Release(resource)  # type: ignore[operator]
 
         if isinstance(resource, JailGenerator):
             self.create_from_template(template=resource)
@@ -1421,8 +1455,9 @@ class JailGenerator(JailResource):
                 delete_existing=delete_existing
             )
         except Exception as e:
+            # cast for mypy: libzfs exceptions carry one message argument
             err = libioc.errors.ZFSException(
-                *e.args,
+                *typing.cast(typing.Tuple[str], e.args),
                 logger=self.logger
             )
             yield jailCloneEvent.fail(err)
@@ -1454,7 +1489,8 @@ class JailGenerator(JailResource):
         self._create_skeleton()
         backend = self.storage_backend
         if backend is not None:
-            backend.setup(self.storage, resource)
+            # cast for mypy: unbound backend methods take Storage as self
+            typing.cast(typing.Any, backend).setup(self.storage, resource)
         self.config["hostid"] = self.host.uuid
         self.config["host_hostuuid"] = self._generated_hostuuid
         self.save()
@@ -1480,7 +1516,9 @@ class JailGenerator(JailResource):
         return self.config.get("basejail", False) is True
 
     @property
-    def storage_backend(self) -> libioc.Storage.Storage:
+    def storage_backend(self) -> typing.Optional[
+        typing.Type[libioc.Storage.Storage]
+    ]:
         """
         Return the jail storage abstraction class.
 
@@ -1493,6 +1531,8 @@ class JailGenerator(JailResource):
             return libioc.Storage.NullFSBasejail.NullFSBasejailStorage
         if self.config["basejail_type"] == "zfs":
             return libioc.Storage.ZFSBasejail.ZFSBasejailStorage
+        # unknown basejail_type (checked by require_storage_backend)
+        return None
 
     def save(self) -> None:
         """Permanently save a jail's configuration."""
@@ -1590,7 +1630,7 @@ class JailGenerator(JailResource):
     def __destroy_jail(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.JailStop', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         jailRemoveEvent = libioc.events.JailRemove(
             jail=self,
@@ -1630,7 +1670,7 @@ class JailGenerator(JailResource):
         return ("dhcp" in self.config["ip4_addr"].networks) is True
 
     @property
-    def devfs_ruleset(self) -> libioc.DevfsRules.DevfsRuleset:
+    def devfs_ruleset(self) -> typing.Optional[int]:
         """
         Return the number of the jail's devfs ruleset.
 
@@ -1698,20 +1738,23 @@ class JailGenerator(JailResource):
             return new_ruleset_number
         else:
             ruleset_line_position = self.host.devfs.index(devfs_ruleset)
-            return self.host.devfs[ruleset_line_position].number
+            return typing.cast(
+                int,
+                self.host.devfs[ruleset_line_position].number
+            )
 
     @property
     def _generated_hostuuid(self) -> uuid.UUID:
-        m = hashlib.sha1()  # nosec: B303
+        m = hashlib.sha1(usedforsecurity=False)
         m.update(self.host.uuid.bytes + self.identifier.encode("UTF-8"))
         return uuid.UUID(m.hexdigest()[0:32])
 
     @property
-    def _launch_params(self) -> libjail.Jiov:
+    def _launch_params(self) -> typing.Dict[str, 'libjail.IovevValueInput']:
         config = self.config
         vnet = (config["vnet"] is True)
-        value: libjail.RawIovecValue
-        jail_params: typing.Dict[str, libioc.JailParams.JailParam] = {}
+        value: libjail.IovevValueInput
+        jail_params: typing.Dict[str, 'libjail.IovevValueInput'] = {}
         for sysctl_name, sysctl in libioc.JailParams.JailParams().items():
             if sysctl_name == "security.jail.param.devfs_ruleset":
                 devfs_ruleset = self.devfs_ruleset
@@ -1795,7 +1838,7 @@ class JailGenerator(JailResource):
                         )
                 except StopIteration as return_statement:
                     output: libioc.helpers.CommandOutput
-                    output = return_statement.value  # noqa: T484
+                    output = return_statement.value
                     return output
         except (KeyboardInterrupt, SystemExit):
             raise libioc.errors.JailExecutionAborted(
@@ -1885,7 +1928,7 @@ class JailGenerator(JailResource):
     def __start_vimage_network(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.JailNetworkSetup', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         event = libioc.events.JailNetworkSetup(
             jail=self,
             scope=event_scope
@@ -1926,7 +1969,7 @@ class JailGenerator(JailResource):
         self,
         force: bool,
         event_scope: 'libioc.events.Scope'
-    ) -> typing.Generator['libioc.events.JailNetworkTeardown', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         yield from self.__apply_non_vnet_network(
             force=force,
             event=libioc.events.JailNetworkTeardown,
@@ -1937,7 +1980,7 @@ class JailGenerator(JailResource):
     def __apply_non_vnet_network(
         self,
         force: bool,
-        event: 'libioc.events.IocEvent',
+        event: typing.Type['libioc.events.JailEvent'],
         event_scope: 'libioc.events.Scope',
         teardown: bool=False
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
@@ -1982,7 +2025,7 @@ class JailGenerator(JailResource):
         self,
         jid: int,
         event_scope: 'libioc.events.Scope'
-    ) -> typing.Generator['libioc.events.JailNetworkTeardown', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         event = libioc.events.JailNetworkTeardown(
             jail=self,
             scope=event_scope
@@ -1997,7 +2040,7 @@ class JailGenerator(JailResource):
     def __configure_localhost_commands(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         event = libioc.events.VnetSetupLocalhost(
             jail=self,
             scope=event_scope
@@ -2058,7 +2101,7 @@ class JailGenerator(JailResource):
         self,
         force: bool,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.JailResourceLimitAction', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         jailResourceLimitActionEvent = libioc.events.JailResourceLimitAction(
             jail=self,
             scope=event_scope
@@ -2071,18 +2114,22 @@ class JailGenerator(JailResource):
             return
 
         self.logger.verbose("Clearing resource limits")
+        # cast for mypy: exec() also accepts a str command when shell=True
         stdout, _, returncode = libioc.helpers.exec(
-            " ".join([
+            typing.cast(typing.Any, " ".join([
                 "/usr/bin/rctl",
                 "-r",
                 f"jail:{self.identifier}",
                 "2>&1"
-            ]),
+            ])),
             ignore_error=True,
             shell=True  # nosec: B604
         )
 
-        if (returncode > 0) and ("No such process" not in stdout):
+        # cast for mypy: piped rctl output is never None
+        if (returncode > 0) and (
+            "No such process" not in typing.cast(str, stdout)
+        ):
             yield jailResourceLimitActionEvent.fail()
             if force is False:
                 raise libioc.errors.ResourceLimitActionFailed(
@@ -2107,7 +2154,7 @@ class JailGenerator(JailResource):
     def __configure_routes_commands(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         event = libioc.events.VnetSetRoutes(
             jail=self,
             scope=event_scope
@@ -2384,39 +2431,40 @@ class JailGenerator(JailResource):
 class Jail(JailGenerator):
     """Synchronous wrapper of JailGenerator."""
 
-    def start(  # noqa: T484
+    # the synchronous wrappers intentionally collapse generators to lists
+    def start(  # type: ignore[override]
         self,
-        *args,
-        **kwargs
+        *args: typing.Any,
+        **kwargs: typing.Any
     ) -> typing.List['libioc.events.IocEvent']:
         """Start the jail."""
         return list(JailGenerator.start(self, *args, **kwargs))
 
-    def stop(  # noqa: T484
+    def stop(  # type: ignore[override]
         self,
-        *args,
-        **kwargs
+        *args: typing.Any,
+        **kwargs: typing.Any
     ) -> typing.List['libioc.events.IocEvent']:
         """Stop the jail."""
         return list(JailGenerator.stop(self, *args, **kwargs))
 
-    def rename(  # noqa: T484
+    def rename(  # type: ignore[override]
         self,
-        *args,
-        **kwargs
+        *args: typing.Any,
+        **kwargs: typing.Any
     ) -> typing.List['libioc.events.IocEvent']:
         """Rename the jail."""
         return list(JailGenerator.rename(self, *args, **kwargs))
 
-    def _update_fstab_paths(  # noqa: T484
+    def _update_fstab_paths(  # type: ignore[override]
         self,
-        *args,
-        **kwargs
+        *args: typing.Any,
+        **kwargs: typing.Any
     ) -> typing.List['libioc.events.IocEvent']:
         """Update a path in the whole fstab file."""
         return list(JailGenerator._update_fstab_paths(self, *args, **kwargs))
 
-    def destroy(  # noqa: T484
+    def destroy(  # type: ignore[override]
         self,
         force: bool=False
     ) -> typing.List['libioc.events.IocEvent']:
@@ -2432,15 +2480,15 @@ class Jail(JailGenerator):
         """
         return list(JailGenerator.destroy(self, force=force))
 
-    def fork_exec(  # noqa: T484
+    def fork_exec(  # type: ignore[override]
         self,
         command: str,
         passthru: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None,
         dependant_jails_seen: typing.List['JailGenerator']=[],
         start_dependant_jails: bool=True,
-        **temporary_config_override
-    ) -> str:
+        **temporary_config_override: typing.Any
+    ) -> typing.Optional[str]:
         """
         Start a jail, run a command and shut it down immediately.
 
@@ -2490,7 +2538,7 @@ class Jail(JailGenerator):
             start_dependant_jails=start_dependant_jails,
             **temporary_config_override
         )
-        stdout = ""
+        stdout: typing.Optional[str] = ""
         for event in events:
             if isinstance(
                 event,

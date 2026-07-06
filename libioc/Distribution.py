@@ -46,10 +46,10 @@ class EOLParser(html.parser.HTMLParser):
     td_counter: int = 0
     current_branch: str = ""
 
-    def handle_starttag(  # noqa: T484
+    def handle_starttag(
         self,
         tag: str,
-        attrs: typing.Dict[str, str]
+        attrs: typing.List[typing.Tuple[str, typing.Optional[str]]]
     ) -> None:
         """Handle opening HTML tags."""
         if tag == "td":
@@ -98,7 +98,7 @@ class DistributionGenerator:
 
     def __init__(
         self,
-        host: typing.Optional['libioc.Host.Host']=None,
+        host: typing.Optional['libioc.Host.HostGenerator']=None,
         zfs: typing.Optional['libioc.ZFS.ZFS']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
@@ -109,10 +109,9 @@ class DistributionGenerator:
         self._available_releases = None
 
     @property
-    def _class_release(self) -> typing.Union[
-        'libioc.Release.ReleaseGenerator',
-        'libioc.Release.Release'
-    ]:
+    def _class_release(
+        self
+    ) -> typing.Type['libioc.Release.ReleaseGenerator']:
         return libioc.Release.ReleaseGenerator
 
     @property
@@ -164,7 +163,7 @@ class DistributionGenerator:
 
         # the mirror_url @property is validated (enforced) @property, so:
         resource = urllib.request.urlopen(self.mirror_url)  # nosec
-        charset = resource.headers.get_content_charset()  # noqa: T484
+        charset = resource.headers.get_content_charset()
         response = resource.read().decode(charset if charset else "UTF-8")
 
         found_releases = self._parse_links(response)
@@ -189,7 +188,7 @@ class DistributionGenerator:
         )
 
         self._available_releases = list(map(
-            lambda x: self._class_release(  # noqa: T484
+            lambda x: self._class_release(
                 name=x,
                 host=self.host,
                 zfs=self.zfs,
@@ -235,8 +234,10 @@ class DistributionGenerator:
         with urllib.request.urlopen(request) as response:  # nosec: B310
 
             response_code = response.getcode()
-            if response_code != 200:  # noqa: T484
-                libioc.errors.DownloadFailed(
+            if response_code != 200:
+                # DownloadFailed takes no topic argument, so that this
+                # call raises a TypeError when it is reached
+                libioc.errors.DownloadFailed(  # type: ignore[call-arg]
                     topic="EOL Warnings",
                     code=response_code,
                     logger=self.logger,
@@ -269,7 +270,7 @@ class DistributionGenerator:
         matches = filter(
             lambda y: y not in blacklisted_releases,
             map(
-                lambda z: z.strip("\"/"),  # noqa: T484
+                lambda z: z.strip("\"/"),
                 re.findall(
                     Distribution.__mirror_link_pattern,
                     text,
@@ -284,8 +285,7 @@ class Distribution(DistributionGenerator):
     """Synchronous wrapper of the host distribution."""
 
     @property
-    def _class_release(self) -> typing.Union[
-        'libioc.Release.ReleaseGenerator',
-        'libioc.Release.Release'
-    ]:
+    def _class_release(
+        self
+    ) -> typing.Type['libioc.Release.Release']:
         return libioc.Release.Release

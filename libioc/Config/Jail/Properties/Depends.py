@@ -29,6 +29,7 @@ import libioc.helpers
 import libioc.Filter
 
 if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
     import libioc.Config.Jail.JailConfig
 
 
@@ -43,7 +44,7 @@ class DependsProp(libioc.Filter.Terms):
     def __init__(
         self,
         config: typing.Optional[
-            'libioc.Config.Jail.JailConfig.JailConfig'
+            'libioc.Config.Jail.BaseConfig.BaseConfig'
         ]=None,
         property_name: str="depends",
         logger: typing.Optional['libioc.Logger.Logger']=None
@@ -51,7 +52,10 @@ class DependsProp(libioc.Filter.Terms):
         self.property_name = property_name
         self.logger = logger
         if config is not None:
-            self.config = config
+            self.config = typing.cast(
+                'libioc.Config.Jail.JailConfig.JailConfig',
+                config
+            )
         libioc.Filter.Terms.__init__(self, logger=logger)
 
     def set(
@@ -96,11 +100,13 @@ class DependsProp(libioc.Filter.Terms):
 
     def __delitem__(self, key: typing.Any) -> None:
         """Remove a jail dependency."""
-        dict.__delitem__(self, key)
+        # DependsProp is no dict subclass, so this raises TypeError
+        dict.__delitem__(self, key)  # type: ignore[arg-type]
         self.__notify()
 
     def __notify(self) -> None:
         self.config.update_special_property(self.property_name)
 
     def __empty_prop(self, key: str) -> None:
-        dict.__setitem__(self, key, None)
+        # DependsProp is no dict subclass, so this raises TypeError
+        dict.__setitem__(self, key, None)  # type: ignore[index]

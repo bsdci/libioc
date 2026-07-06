@@ -36,6 +36,7 @@ import libioc.Config.Jail
 import libioc.Logger
 
 if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
     import libioc.Config.Jail.JailConfig
     import libioc.Jail
 
@@ -50,13 +51,18 @@ class ResolverProp(collections.abc.MutableSequence):
 
     def __init__(
         self,
-        config: 'libioc.Config.Jail.JailConfig.JailConfig',
+        config: typing.Optional[
+            'libioc.Config.Jail.BaseConfig.BaseConfig'
+        ],
         property_name: str="resolver",
         logger: typing.Optional['libioc.Logger.Logger']=None,
     ) -> None:
         self.property_name = property_name
         self.logger = libioc.helpers_object.init_logger(self, logger)
-        self.config = config
+        self.config = typing.cast(
+            'libioc.Config.Jail.JailConfig.JailConfig',
+            config
+        )
         self.config.attach_special_property(
             name="resolver",
             special_property=self
@@ -94,7 +100,7 @@ class ResolverProp(collections.abc.MutableSequence):
         self,
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.JailResolverConfig', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Apply the settings to a jail."""
         self.logger.verbose(
             f"Configuring nameserver for Jail '{jail.humanreadable_name}'"
@@ -152,9 +158,9 @@ class ResolverProp(collections.abc.MutableSequence):
         method = self._get_method(value)
         if method == "manual":
             if isinstance(value, str):
-                self._entries += str(value).split(";")  # noqa: T484
+                self._entries += str(value).split(";")
             elif isinstance(value, list):
-                self._entries += list(value)  # noqa: T484
+                self._entries += list(value)
             else:
                 jail = self.config.jail if "jail" in dir(self.config) else None
                 raise libioc.errors.InvalidJailConfigValue(
@@ -209,18 +215,30 @@ class ResolverProp(collections.abc.MutableSequence):
         """Return the number of nameservers."""
         return self._entries.__len__()
 
-    def __setitem__(  # noqa: T484
+    # accepts a single index only, unlike MutableSequence
+    def __setitem__(  # type: ignore[override]
         self,
         key: int,
         value: str
     ) -> None:
         """Set the nameserver at a given position."""
-        list.__setitem__(self, key, value)  # noqa: T484
+        # ResolverProp is no list subclass, so this raises TypeError
+        list.__setitem__(  # type: ignore[call-overload]
+            self,
+            key,
+            value
+        )
         self.__notify()
 
     def __str__(self) -> str:
         """Return semicolon separated list of nameservers."""
-        return str(libioc.helpers.to_string(self._entries, delimiter=";"))
+        return str(libioc.helpers.to_string(
+            typing.cast(
+                typing.List[typing.Union[str, bool, int]],
+                self._entries
+            ),
+            delimiter=";"
+        ))
 
     def __notify(self, notify: bool=True) -> None:
         if notify is True:

@@ -74,7 +74,7 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
         )
 
     @property
-    def _class_jail(self) -> libioc.Jail.JailGenerator:
+    def _class_jail(self) -> typing.Type[libioc.Jail.JailGenerator]:
         return libioc.Jail.JailGenerator
 
     def _create_resource_instance(
@@ -88,17 +88,24 @@ class JailsGenerator(libioc.ListableResource.ListableResource):
                 dataset.name
             ),
             logger=self.logger,
-            host=self.host,
+            host=typing.cast('libioc.Host.Host', self.host),
             zfs=self.zfs,
             **self.resource_args
         )
 
         return jail
 
-    def __getitem__(self, index: int) -> 'libioc.Jail.JailGenerator':
+    # unlike list, this collection is only subscriptable by index
+    def __getitem__(  # type: ignore[override]
+        self,
+        index: int
+    ) -> 'libioc.Jail.JailGenerator':
         """Return the JailGenerator at a certain index position."""
         _getitem = libioc.ListableResource.ListableResource.__getitem__
-        jail = _getitem(self, index)  # type: libioc.Jail.JailGenerator
+        jail = typing.cast(
+            'libioc.Jail.JailGenerator',
+            _getitem(self, index)
+        )
         return jail
 
 
@@ -106,11 +113,18 @@ class Jails(JailsGenerator):
     """Synchronous wrapper ofs JailsGenerator."""
 
     @property
-    def _class_jail(self) -> libioc.Jail.Jail:
+    def _class_jail(self) -> typing.Type[libioc.Jail.Jail]:
         return libioc.Jail.Jail
 
-    def __getitem__(self, index: int) -> 'libioc.Jail.Jail':
+    # unlike list, this collection is only subscriptable by index
+    def __getitem__(  # type: ignore[override]
+        self,
+        index: int
+    ) -> 'libioc.Jail.Jail':
         """Return the Jail object at a certain index position."""
         _getitem = JailsGenerator.__getitem__
-        jail = _getitem(self, index)  # type: libioc.Jail.Jail
+        jail = typing.cast(
+            'libioc.Jail.Jail',
+            _getitem(self, index)
+        )
         return jail

@@ -4,6 +4,11 @@
 set -e
 cd "$(dirname "$0")/.."
 
+# prefer the local development venv when it exists
+if [ -x ".venv/bin/flake8" ]; then
+    PATH="$(pwd)/.venv/bin:${PATH}"
+fi
+
 flake8 --version
 mypy --version
 bandit --version 2>&1 | head -n 1

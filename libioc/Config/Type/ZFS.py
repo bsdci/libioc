@@ -94,12 +94,16 @@ class BaseConfigZFS(libioc.Config.Dataset.DatasetConfig):
 
     def map_input(
         self,
-        data: typing.Dict[str, str]
+        data: typing.Union[
+            typing.TextIO,
+            'libioc.Config.Prototype.ConfigDataDict'
+        ]
     ) -> libioc.Config.Data.Data:
         """Normalize data read from ZFS properties."""
         parse_user_input = libioc.helpers.parse_user_input
+        properties = typing.cast(typing.Dict[str, str], data)
         return libioc.Config.Data.Data(
-            dict([(x, parse_user_input(y)) for (x, y) in data.items()])
+            dict([(x, parse_user_input(y)) for (x, y) in properties.items()])
         )
 
     def _to_string(

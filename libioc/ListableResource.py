@@ -78,7 +78,10 @@ class ListableResource(list):
     @filters.setter
     def filters(
         self,
-        value: typing.Iterable[typing.Union['libioc.Filter.Term', str]]
+        value: typing.Optional[typing.Union[
+            'libioc.Filter.Terms',
+            typing.Iterable[typing.Union['libioc.Filter.Term', str]]
+        ]]
     ) -> None:
         """Set the filters that are applied on the list items."""
         if isinstance(value, libioc.Filter.Terms):
@@ -110,7 +113,10 @@ class ListableResource(list):
             children = root_datasets.__getattribute__(self.namespace).children
             for child_dataset in children:
                 name = self._get_asset_name_from_dataset(child_dataset)
-                if has_filters and (filters.match_key("name", name) is False):
+                if has_filters and (typing.cast(
+                    'libioc.Filter.Terms',
+                    filters
+                ).match_key("name", name) is False):
                     # Skip all jails that do not even match the name
                     continue
 
@@ -120,7 +126,8 @@ class ListableResource(list):
                     if self._filters.match_resource(resource):
                         yield resource
 
-    def __getitem__(  # noqa: T484
+    # subclasses list with different item access semantics
+    def __getitem__(  # type: ignore[override]
         self,
         index: int
     ) -> 'libioc.Resource.Resource':
@@ -140,7 +147,10 @@ class ListableResource(list):
 
     def __repr__(self) -> str:
         """Return the resource list string representation."""
-        resource_names = ", ".join([x.name for x in self.__iter__()])
+        # every resource yielded by the subclasses provides a name
+        resource_names = ", ".join(
+            [x.name for x in self.__iter__()]  # type: ignore[attr-defined]
+        )
         return f"[{resource_names}]"
 
     def _get_asset_name_from_dataset(
@@ -163,7 +173,7 @@ class ListableResource(list):
         return self._create_resource_instance(dataset)
 
     @abc.abstractmethod
-    def _create_resource_instance(  # noqa: T484
+    def _create_resource_instance(
         self,
         dataset: libzfs.ZFSDataset
     ) -> 'libioc.Resource.Resource':

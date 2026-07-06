@@ -36,14 +36,19 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
     def apply(
         self,
-        release: 'libioc.Release.ReleaseGenerator'=None,
+        release: typing.Optional['libioc.Release.ReleaseGenerator']=None,
         event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Attach the jail storage."""
         if release is None:
-            release = self.jail.cloned_release
+            release = typing.cast(
+                'libioc.Release.ReleaseGenerator',
+                self.jail.cloned_release
+            )
 
-        event = libioc.events.BaseJailStorageConfig(
+        # libioc.events only offers BasejailStorageConfig, so this line
+        # raises an AttributeError when reached (suspected typo)
+        event = libioc.events.BaseJailStorageConfig(  # type: ignore[attr-defined] # noqa: E501
             jail=self.jail,
         )
         yield event.begin()
@@ -58,12 +63,12 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
 
     def setup(
         self,
-        release: 'libioc.Release.ReleaseGenerator'=None
+        release: typing.Optional['libioc.Resource.Resource']=None
     ) -> None:
         """Configure the jail storage."""
         libioc.Storage.Standalone.StandaloneJailStorage.setup(
             self,
-            release
+            typing.cast('libioc.Resource.Resource', release)
         )
 
     def clone(

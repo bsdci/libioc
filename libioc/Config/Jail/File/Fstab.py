@@ -91,13 +91,19 @@ class FstabLine(dict):
     def __setitem__(
         self,
         key: str,
-        value: typing.Union[str, libioc.Types.AbsolutePath]
+        value: typing.Optional[
+            typing.Union[str, int, libioc.Types.AbsolutePath]
+        ]
     ) -> None:
         """Set an item of the FstabLine."""
         if key == "source":
-            dict.__setitem__(self, key, FstabFsSpec(value))
+            dict.__setitem__(self, key, FstabFsSpec(
+                typing.cast(str, value)
+            ))
         elif key == "destination":
-            dict.__setitem__(self, key, libioc.Types.AbsolutePath(value))
+            dict.__setitem__(self, key, libioc.Types.AbsolutePath(
+                typing.cast(str, value)
+            ))
         elif key in ["type", "options", "freq", "passno", "comment"]:
             dict.__setitem__(self, key, value)
         else:
@@ -412,13 +418,9 @@ class Fstab(collections.abc.MutableSequence):
                 break
         raise ValueError("Fstab line does not exist")
 
-    def __contains__(  # noqa: T484
+    def __contains__(
         self,
-        line: typing.Union[
-            FstabLine,
-            FstabCommentLine,
-            FstabAutoPlaceholderLine
-        ]
+        line: typing.Any
     ) -> bool:
         """Return True when the FstabLine already exists."""
         try:
@@ -438,7 +440,8 @@ class Fstab(collections.abc.MutableSequence):
         """Return the number of lines in the fstab file."""
         return list.__len__(list(self.__iter__()))
 
-    def __delitem__(self, index: int) -> None:  # noqa: T484
+    # accepts a single index only, unlike MutableSequence
+    def __delitem__(self, index: int) -> None:  # type: ignore[override]
         """Delete an FstabLine at the given index."""
         deletion_target_line = self.__getitem__(index)
         source = deletion_target_line["source"]
@@ -450,7 +453,8 @@ class Fstab(collections.abc.MutableSequence):
         real_index = self._get_real_index(index)
         self._lines.__delitem__(real_index)
 
-    def __getitem__(self, index: int) -> typing.Union[  # noqa: T484
+    # accepts a single index only, unlike MutableSequence
+    def __getitem__(self, index: int) -> typing.Union[  # type: ignore[override] # noqa: E501
         FstabLine,
         FstabCommentLine,
         FstabAutoPlaceholderLine
@@ -458,7 +462,8 @@ class Fstab(collections.abc.MutableSequence):
         """Get the FstabLine at the given index."""
         return list(self.__iter__())[index]
 
-    def __setitem__(  # noqa: T484
+    # accepts a single index only, unlike MutableSequence
+    def __setitem__(  # type: ignore[override]
         self,
         index: int,
         value: typing.Union[
@@ -591,7 +596,8 @@ class JailFstab(Fstab):
         if isinstance(self.jail.storage_backend, BasejailStorage) is True:
             skip_destinations += list(map(
                 lambda x: str(x[1]),
-                self.jail.storage_backend.basejail_mounts
+                # only _get_basejail_mounts exists, so this raises
+                self.jail.storage_backend.basejail_mounts  # type: ignore[union-attr] # noqa: E501
             ))
         Fstab.parse_lines(
             self,
@@ -662,7 +668,7 @@ class JailFstab(Fstab):
 
         Use save() to write changes to the fstab file.
         """
-        if type(line) == FstabLine:
+        if type(line) is FstabLine:
             if self.jail.is_path_relative(line["destination"]) is False:
                 line = FstabLine(line)  # clone to prevent mutation
                 line["destination"] = libioc.Types.AbsolutePath("/".join([
@@ -694,7 +700,7 @@ class JailFstab(Fstab):
             else:
                 self.logger.debug(f"Adding line to fstab: {line}")
 
-        if type(line) == FstabLine:
+        if type(line) is FstabLine:
             # destination is always relative to the jail resource
             if self.jail.is_path_relative(line["destination"]) is False:
                 _destination = libioc.Types.AbsolutePath("/".join([
@@ -751,7 +757,8 @@ class JailFstab(Fstab):
         release: typing.Optional['libioc.Release.ReleaseGenerator'] = None
     ) -> None:
         """Set a new release and save the updated file."""
-        self.jail.release = release
+        # JailGenerator.release has no setter, so this raises AttributeError
+        self.jail.release = release  # type: ignore[misc, assignment]
         self.update_and_save()
 
     def __replace_magic_path(self, filepath: str) -> str:
@@ -763,7 +770,8 @@ class JailFstab(Fstab):
             filepath[len(_backup_prefix):]
         ])
 
-    def __delitem__(self, index: int) -> None:  # noqa: T484
+    # accepts a single index only, unlike MutableSequence
+    def __delitem__(self, index: int) -> None:  # type: ignore[override]
         """Delete an FstabLine at the given index of the jails fstab file."""
         deletion_target_line = self.__getitem__(index)
         source = deletion_target_line["source"]
@@ -788,7 +796,7 @@ class JailFstab(Fstab):
     def mount(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.MountFstab', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Mount all fstab entries to the jail."""
         event = libioc.events.MountFstab(
             jail=self.jail,
@@ -812,7 +820,7 @@ class JailFstab(Fstab):
     def unmount(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.MountFstab', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Unmount all fstab entries from the jail."""
         event = libioc.events.MountFstab(
             jail=self.jail,

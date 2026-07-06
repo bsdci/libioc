@@ -62,9 +62,13 @@ class Storage:
     ) -> None:
         """Clone another resource to a the current dataset_name."""
         if isinstance(resource, libioc.Release.ReleaseGenerator) is True:
-            self._clone_release(resource)
+            self._clone_release(
+                typing.cast('libioc.Release.ReleaseGenerator', resource)
+            )
         else:
-            self._clone_jail(resource)
+            self._clone_jail(
+                typing.cast('libioc.Jail.JailGenerator', resource)
+            )
 
     def _clone_release(
         self,
@@ -97,7 +101,7 @@ class Storage:
     def rename(
         self,
         new_name: str,
-        event_scope: typing.Optional[int]=None
+        event_scope: typing.Optional['libioc.events.Scope']=None
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Rename the dataset and its snapshots."""
         for event in self._rename_dataset(new_name, event_scope=event_scope):
@@ -108,7 +112,7 @@ class Storage:
     def teardown(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.TeardownSystemMounts', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """Unmount system mountpoints and devices from a jail."""
 
         system_mountpoints = list(filter(
@@ -170,7 +174,7 @@ class Storage:
     def _rename_dataset(
         self,
         new_name: str,
-        event_scope: typing.Optional[int]
+        event_scope: typing.Optional['libioc.events.Scope']
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         current_dataset_name = self.jail.dataset.name
@@ -199,7 +203,7 @@ class Storage:
     def _rename_snapshot(
         self,
         new_name: str,
-        event_scope: typing.Optional[int]
+        event_scope: typing.Optional['libioc.events.Scope']
     ) -> typing.Generator['libioc.events.IocEvent', None, None]:
 
         root_dataset_properties = self.jail.root_dataset.properties

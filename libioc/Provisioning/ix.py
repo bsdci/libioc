@@ -107,7 +107,7 @@ class PluginDefinition(dict):
                 reason=str(e),
                 logger=self.logger
             )
-        charset = resource.headers.get_content_charset()  # noqa: T484
+        charset = resource.headers.get_content_charset()
         response = resource.read().decode(charset if charset else "UTF-8")
         data: typing.Dict[str, typing.Any] = json.loads(response)
         return data
@@ -142,7 +142,7 @@ def provision(
     try:
         yield jailProvisioningAssetDownloadEvent.begin()
         pluginDefinition = PluginDefinition(
-            self.source,
+            typing.cast('libioc.Provisioning.Source', self.source),
             logger=self.jail.logger
         )
         yield jailProvisioningAssetDownloadEvent.end()

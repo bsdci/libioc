@@ -57,10 +57,10 @@ IPAddressInput = typing.Union[
     libioc.IPAddress.IPv6Interface
 ]
 
-IPInterfaceList = typing.Union[
-    typing.List[libioc.IPAddress.IPv4Interface],
-    typing.List[libioc.IPAddress.IPv6Interface]
-]
+IPInterfaceList = typing.List[typing.Union[
+    libioc.IPAddress.IPv4Interface,
+    libioc.IPAddress.IPv6Interface
+]]
 
 
 class AddressSet(set):
@@ -131,13 +131,17 @@ _AddressSetInputType = typing.Union[str, typing.Dict[str, AddressSet]]
 class AddressesProp(dict):
     """Special jail config property Addresses."""
 
-    logger: 'libioc.Logger.Logger'
+    logger: typing.Optional['libioc.Logger.Logger']
     config: 'libioc.Config.Jail.JailConfig.JailConfig'
     property_name: str = "ip4_address"
     skip_on_error: bool
     delimiter: str = ","
 
     IP_VERSION: int
+    ADDRESS_CLASS: typing.Union[
+        typing.Type[libioc.IPAddress.IPv4Interface],
+        typing.Type[libioc.IPAddress.IPv6Interface]
+    ]
 
     def __init__(
         self,
@@ -152,7 +156,10 @@ class AddressesProp(dict):
         dict.__init__(self, {})
 
         self.logger = logger
-        self.config = config
+        self.config = typing.cast(
+            'libioc.Config.Jail.JailConfig.JailConfig',
+            config
+        )
         self.property_name = property_name
         self.skip_on_error = skip_on_error
 
@@ -193,7 +200,7 @@ class AddressesProp(dict):
             if (err is not None) and (self.skip_on_error is False):
                 raise err
 
-            self.add(nic, address, skip_on_error=skip_on_error)  # noqa: T484
+            self.add(nic, address, skip_on_error=skip_on_error)
 
     def _add_ip_addresses(
         self,
@@ -220,16 +227,16 @@ class AddressesProp(dict):
     def add(
         self,
         nic: str,
-        addresses: typing.Union[
+        addresses: typing.Optional[typing.Union[
             IPAddressInput,
             typing.List[IPAddressInput]
-        ]=None,
+        ]]=None,
         notify: bool=True,
         skip_on_error: bool=False
     ) -> None:
         """Add one or many IP addresses to an interface."""
         if isinstance(addresses, list) is False:
-            _address: IPAddressInput = addresses  # noqa: T484
+            _address: IPAddressInput = typing.cast(IPAddressInput, addresses)
             self.add(
                 nic=nic,
                 addresses=[_address],
@@ -241,7 +248,7 @@ class AddressesProp(dict):
 
         error_log_level = "warn" if (skip_on_error is True) else "error"
 
-        own_class = self.ADDRESS_CLASS  # noqa: T484
+        own_class = self.ADDRESS_CLASS
         _class: typing.Union[
             typing.Callable[..., libioc.IPAddress.IPv4Interface],
             typing.Callable[..., libioc.IPAddress.IPv6Interface]

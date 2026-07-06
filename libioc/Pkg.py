@@ -70,7 +70,7 @@ class Pkg:
     def __init__(
         self,
         zfs: typing.Optional[libioc.ZFS.ZFS]=None,
-        host: typing.Optional['libioc.Host.Host']=None,
+        host: typing.Optional['libioc.Host.HostGenerator']=None,
         logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
         self.logger = libioc.helpers_object.init_logger(self, logger)
@@ -82,7 +82,7 @@ class Pkg:
         self,
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Configure the repositories within the jail."""
         packageConfigurationEvent = libioc.events.PackageConfiguration(
             jail=jail,
@@ -101,7 +101,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         release: 'libioc.Release.ReleaseGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Fetch a bunch of packages to the local mirror."""
         _packages = self._normalize_packages(packages)
         _packages.append("pkg")
@@ -217,7 +217,7 @@ class Pkg:
         self,
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Bootstrap pkg within a jail."""
         event = libioc.events.BootstrapPkg(
             jail=jail,
@@ -299,7 +299,7 @@ class Pkg:
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Install locally mirrored packages to a jail."""
         _packages = self._normalize_packages(packages)
 
@@ -334,7 +334,11 @@ class Pkg:
             ):
                 if isinstance(event, libioc.events.JailCommand) is True:
                     if event.done is True:
-                        stdout = event.stdout.strip("\r\n")
+                        _stdout = typing.cast(
+                            libioc.events.JailCommand,
+                            event
+                        ).stdout
+                        stdout = typing.cast(str, _stdout).strip("\r\n")
                 yield event
 
             skipped = stdout.endswith("already installed")
@@ -351,7 +355,7 @@ class Pkg:
         packages: typing.Union[str, typing.List[str]],
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Remove installed packages from a jail."""
         _packages = self._normalize_packages(packages)
 
@@ -410,7 +414,7 @@ class Pkg:
         jail: 'libioc.Jail.JailGenerator',
         event_scope: typing.Optional['libioc.events.Scope']=None,
         postinstall: typing.List[str]=[]
-    ) -> typing.Generator[libioc.events.PkgEvent, None, None]:
+    ) -> typing.Generator[libioc.events.IocEvent, None, None]:
         """Mirror and install packages to a jail."""
         yield from self.fetch(
             packages=packages,
@@ -583,7 +587,7 @@ class Pkg:
             fstab=source_jail.fstab,
             logger=self.logger,
             zfs=source_jail.zfs,
-            host=source_jail.host,
+            host=typing.cast('libioc.Host.Host', source_jail.host),
             dataset=source_jail.dataset
         )
         temporary_jail.config.ignore_source_config = True

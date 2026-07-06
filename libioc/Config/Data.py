@@ -141,18 +141,19 @@ class Data(dict):
                 else:
                     raise KeyError(original_key[:-(len(key) - 1)])
 
-    def keys(self) -> typing.KeysView[str]:
+    # the views intentionally flatten nested data, unlike those of dict
+    def keys(self) -> typing.KeysView[str]:  # type: ignore[override]
         """Return the available configuration keys."""
-        return collections.abc.KeysView(list(self.__iter__()))  # noqa: T484
+        return collections.abc.KeysView(list(self.__iter__()))
 
-    def values(self) -> typing.ValuesView[typing.Any]:
+    def values(self) -> typing.ValuesView[typing.Any]:  # type: ignore[override] # noqa: E501
         """Return all config values."""
         return typing.cast(typing.ValuesView[typing.Any], self.__values())
 
     def __values(self) -> typing.Iterator[typing.Any]:
         yield from (value for _, value in self.items())
 
-    def items(self) -> typing.ItemsView[str, typing.Any]:
+    def items(self) -> typing.ItemsView[str, typing.Any]:  # type: ignore[override] # noqa: E501
         """Iterate over the flattened keys and values."""
         return typing.cast(
             typing.ItemsView[str, typing.Any],

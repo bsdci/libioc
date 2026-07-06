@@ -68,7 +68,7 @@ class PuppetApplyEvent(libioc.events.JailEvent):
 class ControlRepoDefinition(dict):
     """Puppet control-repo definition."""
 
-    __source: str
+    __source: 'libioc.Provisioning.Source'
     _pkgs: typing.List[str]
 
     def __init__(
@@ -215,7 +215,7 @@ def provision(
 def __apply_puppet(
     self: 'libioc.Provisioning.Prototype',
     event_scope: libioc.events.Scope
-) -> typing.Generator[R10kDeployEvent, None, None]:
+) -> typing.Generator['libioc.events.IocEvent', None, None]:
     puppetApplyEvent = PuppetApplyEvent(
         scope=event_scope,
         jail=self.jail
@@ -238,14 +238,18 @@ def __apply_puppet(
 def __deploy_r10k(
     self: 'libioc.Provisioning.Prototype',
     event_scope: libioc.events.Scope
-) -> typing.Generator[R10kDeployEvent, None, None]:
+) -> typing.Generator['libioc.events.IocEvent', None, None]:
     r10kDeployEvent = R10kDeployEvent(
         scope=event_scope,
         jail=self.jail
     )
     yield r10kDeployEvent.begin()
     try:
-        __write_r10k_config(self.jail, __puppet_env_dir, self.source)
+        __write_r10k_config(
+            self.jail,
+            __puppet_env_dir,
+            typing.cast('libioc.Provisioning.Source', self.source)
+        )
         __deploy_r10k_config(self.jail)
     except Exception as e:
         yield r10kDeployEvent.fail(e)

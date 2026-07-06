@@ -24,7 +24,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Installs libioc using setuptools."""
 import typing
-from setuptools import find_packages, setup
+# no types-setuptools in the development environment
+from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 
 def _read_requirements(

@@ -25,22 +25,27 @@
 """Collection of ioc Python decorators."""
 import functools
 import time
+import typing
 
 import libioc.helpers
 
 
-def json(fn):
+def json(
+    fn: typing.Callable[..., typing.Any]
+) -> typing.Callable[..., str]:
     """Return the functions output as JSON string."""
     @functools.wraps(fn)
-    def wrapped(*args, **kwargs):  # noqa: T484
+    def wrapped(*args: typing.Any, **kwargs: typing.Any) -> str:
         return libioc.helpers.to_json(fn(*args, **kwargs))
     return wrapped
 
 
-def timeit(fn):
+def timeit(
+    fn: typing.Callable[..., typing.Any]
+) -> typing.Callable[..., typing.Any]:
     """Measure and print the functions execution time."""
     @functools.wraps(fn)
-    def wrapped(*args, **kwargs):  # noqa: T484
+    def wrapped(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         startTime = time.time()
         try:
             output = fn(*args, **kwargs)

@@ -96,7 +96,10 @@ class LaunchableResource(libioc.Resource.Resource):
             return self._updater
 
         updater = libioc.ResourceUpdater.get_launchable_update_resource(
-            resource=self,
+            resource=typing.cast(
+                'libioc.ResourceUpdater.UpdateableResource',
+                self
+            ),
             host=self.host
         )
         self._updater = updater
@@ -105,7 +108,7 @@ class LaunchableResource(libioc.Resource.Resource):
     @property
     def backup(
         self
-    ) -> 'libioc.ResourceUpdater.Updater':
+    ) -> 'libioc.ResourceBackup.LaunchableResourceBackup':
         """Return the lazy-loaded resource backup tool."""
         if self._backup is not None:
             return self._backup

@@ -103,7 +103,12 @@ class ResourceSnapshots:
     def _ensure_dataset_unlocked(self) -> None:
         """Prevent operations on datasets in use (e.g. running jails)."""
         if isinstance(self, libioc.Jail.JailGenerator):
-            self.resource.require_jail_stopped()
+            # only reachable when self is a JailGenerator, whose linked
+            # resource then offers require_jail_stopped
+            typing.cast(
+                'libioc.Jail.JailGenerator',
+                self.resource
+            ).require_jail_stopped()
 
 
 class VersionedResource(libioc.Resource.Resource):

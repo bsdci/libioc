@@ -36,6 +36,7 @@ import libioc.errors
 import libioc.helpers_object
 
 if typing.TYPE_CHECKING:
+    import libioc.helpers_ioctl
     import libioc.Jail
 
 CreatedCommandList = typing.List[str]
@@ -69,7 +70,7 @@ class Network:
         bridge: typing.Optional[
             'libioc.BridgeInterface.BridgeInterface'
         ]=None,
-        logger: 'libioc.Logger.Logger'=None
+        logger: typing.Optional['libioc.Logger.Logger']=None
     ) -> None:
 
         self.logger = libioc.helpers_object.init_logger(self, logger)
@@ -91,7 +92,7 @@ class Network:
     def setup(
         self,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
         Apply the network configuration.
 
@@ -120,7 +121,7 @@ class Network:
         self,
         jid: typing.Optional[int]=None,
         event_scope: typing.Optional['libioc.events.Scope']=None
-    ) -> typing.Generator['libioc.events.VnetInterfaceConfig', None, None]:
+    ) -> typing.Generator['libioc.events.IocEvent', None, None]:
         """
         Teardown the applied changes.
 
@@ -138,7 +139,7 @@ class Network:
             return
 
         if jid is None:
-            jid = self.jail.jid
+            jid = typing.cast(int, self.jail.jid)
 
         try:
             self.__down_host_interface(jid)
@@ -190,7 +191,10 @@ class Network:
     @property
     def __autodetected_bridge_mtu(self) -> int:
         self.__require_bridge()
-        bridge = self.bridge  # type: libioc.BridgeInterface.BridgeInterface
+        bridge = typing.cast(
+            libioc.BridgeInterface.BridgeInterface,
+            self.bridge
+        )
         try:
             mtu = int(libioc.helpers_ioctl.get_interface_mtu(bridge.name))
             self.logger.debug(f"Bridge {bridge.name} MTU detected: {mtu}")
@@ -259,7 +263,7 @@ class Network:
             create=True,
             logger=self.logger
         )
-        nic_b_name = nic_a.name[:-1] + "b"
+        nic_b_name = typing.cast(str, nic_a.name)[:-1] + "b"
 
         nic_a = libioc.NetworkInterface.NetworkInterface(
             name=nic_a.name,
@@ -312,7 +316,10 @@ class Network:
         )
 
         self.__require_bridge()
-        bridge = self.bridge  # type: libioc.BridgeInterface.BridgeInterface
+        bridge = typing.cast(
+            libioc.BridgeInterface.BridgeInterface,
+            self.bridge
+        )
 
         if self._is_secure_vnet_bridge is False:
             libioc.NetworkInterface.NetworkInterface(
@@ -344,8 +351,8 @@ class Network:
             libioc.NetworkInterface.NetworkInterface(
                 name=sec_bridge.name,
                 addm=[
-                    nic_a.name,
-                    nic_d.name
+                    typing.cast(str, nic_a.name),
+                    typing.cast(str, nic_d.name)
                 ],
                 logger=self.logger
             )
@@ -388,7 +395,7 @@ class Network:
         self.logger.verbose(
             f"Configuring Secure VNET Firewall for {self._escaped_nic_name}"
         )
-        firewall_rule_number = self.jail.jid
+        firewall_rule_number = typing.cast(int, self.jail.jid)
 
         for protocol in ["ipv4", "ipv6"]:
             addresses = self.__getattribute__(f"{protocol}_addresses")
@@ -442,7 +449,7 @@ class Network:
         m.update(self.jail.name.encode("utf-8"))
         m.update(self.nic.encode("utf-8", errors="ignore"))
         prefix = self.jail.config["mac_prefix"]
-        return f"{prefix}{m.hexdigest()[0:12-len(prefix)]}"
+        return f"{prefix}{m.hexdigest()[0:12 - len(prefix)]}"
 
     def __generate_mac_address_pair(
         self

@@ -66,15 +66,20 @@ class ReleasesGenerator(libioc.ListableResource.ListableResource):
         )
 
     @property
-    def _class_release(self) -> 'libioc.Release.ReleaseGenerator':
+    def _class_release(
+        self
+    ) -> typing.Type['libioc.Release.ReleaseGenerator']:
         return libioc.Release.ReleaseGenerator
 
     @property
     def local(self) -> ReleaseListType:
         """Return the locally available releases."""
-        datasets = libioc.ListableResource.ListableResource.__iter__(self)
+        datasets = typing.cast(
+            typing.Iterator['libioc.Release.ReleaseGenerator'],
+            libioc.ListableResource.ListableResource.__iter__(self)
+        )
         return list(map(
-            lambda x: self._class_release(  # noqa: T484
+            lambda x: self._class_release(
                 name=x.name.split("/").pop(),
                 root_datasets_name=self.host.datasets.find_root_datasets_name(
                     x.name
@@ -107,10 +112,17 @@ class ReleasesGenerator(libioc.ListableResource.ListableResource):
             zfs=self.zfs
         )
 
-    def __getitem__(self, index: int) -> 'libioc.Release.ReleaseGenerator':
+    # subclasses list with different item access semantics
+    def __getitem__(  # type: ignore[override]
+        self,
+        index: int
+    ) -> 'libioc.Release.ReleaseGenerator':
         """Return the ReleaseGenerator at a certain index position."""
         _getitem = libioc.ListableResource.ListableResource.__getitem__
-        r = _getitem(self, index)  # type: libioc.Release.ReleaseGenerator
+        r = typing.cast(
+            'libioc.Release.ReleaseGenerator',
+            _getitem(self, index)
+        )
         return r
 
 
@@ -118,11 +130,18 @@ class Releases(ReleasesGenerator):
     """Model of multiple iocage Releases."""
 
     @property
-    def _class_release(self) -> 'libioc.Release.Release':
+    def _class_release(self) -> typing.Type['libioc.Release.Release']:
         return libioc.Release.Release
 
-    def __getitem__(self, index: int) -> 'libioc.Release.Release':
+    # subclasses list with different item access semantics
+    def __getitem__(  # type: ignore[override]
+        self,
+        index: int
+    ) -> 'libioc.Release.Release':
         """Return the Jail object at a certain index position."""
         _getitem = ReleasesGenerator.__getitem__
-        release = _getitem(self, index)  # type: libioc.Release.Release
+        release = typing.cast(
+            'libioc.Release.Release',
+            _getitem(self, index)
+        )
         return release

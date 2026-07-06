@@ -55,6 +55,7 @@ import libioc.Config.Jail.File.SysctlConf
 class ReleaseResource(libioc.LaunchableResource.LaunchableResource):
     """Resource that represents an iocage release."""
 
+    name: str
     _release: typing.Optional['ReleaseGenerator']
     _hashes: typing.Optional[typing.Dict[str, str]]
     host: libioc.Host.HostGenerator
@@ -186,7 +187,10 @@ class ReleaseResource(libioc.LaunchableResource.LaunchableResource):
             return self.host.datasets.main
         else:
             try:
-                return self.host.datasets.__getitem__(self.root_datasets_name)
+                return typing.cast(
+                    'libioc.Datasets.RootDatasets',
+                    self.host.datasets.__getitem__(self.root_datasets_name)
+                )
             except KeyError:
                 raise libioc.errors.SourceNotFound(logger=self.logger)
 
@@ -541,7 +545,7 @@ class ReleaseGenerator(ReleaseResource):
         try:
             request = urllib.request.Request(self.remote_url, method="HEAD")
             resource = urllib.request.urlopen(request)  # nosec: trusted URL
-            return (resource.getcode() == 200) is True  # noqa: T484
+            return (resource.getcode() == 200) is True
         except urllib.error.URLError:
             pass
         return False
@@ -597,7 +601,10 @@ class ReleaseGenerator(ReleaseResource):
             root_pool = self.root_dataset.pool  # type: libzfs.ZFSPool
             return root_pool
         except AttributeError:
-            pool = self.host.datasets.releases.pool  # type: libzfs.ZFSPool
+            # Datasets has no releases attribute, so this line raises
+            # (suspected leftover; a RootDatasets source seems intended)
+            pool: libzfs.ZFSPool = \
+                self.host.datasets.releases.pool  # type: ignore[attr-defined]
             return pool
 
     @property
@@ -776,6 +783,7 @@ class ReleaseGenerator(ReleaseResource):
 
         self.snapshot("p0")
 
+        event: typing.Union['libioc.events.IocEvent', bool]
         if fetch_updates is True:
             try:
                 for event in self.updater.fetch(event_scope=_scope):
@@ -834,7 +842,9 @@ class ReleaseGenerator(ReleaseResource):
 
     @property
     def _base_resource(self) -> ReleaseResource:
-        return ReleaseResource(
+        # ReleaseResource inherits the abstract destroy method, so this
+        # instantiation raises a TypeError when actually executed
+        return ReleaseResource(  # type: ignore[abstract]
             release=self.release,
             logger=self.logger,
             host=self.host,
@@ -993,7 +1003,11 @@ class ReleaseGenerator(ReleaseResource):
 
     def _update_name_from_dataset(self) -> None:
         if self.dataset is not None:
-            self.name = self.dataset.name.split("/")[-2:-1]
+            # the slice yields a list, so the name setter receives a list
+            # instead of the second to last name fragment (suspected bug)
+            self.name = self.dataset.name.split(  # type: ignore[assignment]
+                "/"
+            )[-2:-1]
 
     def update_base_release(self) -> None:
         """Update the ZFS basejail release dataset."""
@@ -1026,7 +1040,9 @@ class ReleaseGenerator(ReleaseResource):
                 f"Asset {asset_name}.txz has an invalid signature"
                 f"(was '{local_file_hash}' but expected '{expected_hash}')"
             )
-            raise libioc.errors.InvalidReleaseAssetSignature(
+            # InvalidReleaseAssetSignature expects the keyword name, so
+            # this raise crashes with a TypeError when reached
+            raise libioc.errors.InvalidReleaseAssetSignature(  # type: ignore[call-arg] # noqa: E501
                 release_name=self.name,
                 asset_name=asset_name,
                 logger=self.logger
@@ -1073,7 +1089,8 @@ class ReleaseGenerator(ReleaseResource):
 class Release(ReleaseGenerator):
     """Release with synchronous interfaces."""
 
-    def fetch(  # noqa: T484
+    # the synchronous variant intentionally returns a list of events
+    def fetch(  # type: ignore[override]
         self,
         update: bool=False,
         fetch_updates: bool=False,
@@ -1087,7 +1104,8 @@ class Release(ReleaseGenerator):
             event_scope=event_scope
         ))
 
-    def destroy(  # noqa: T484
+    # the synchronous variant intentionally returns a list of events
+    def destroy(  # type: ignore[override]
         self,
         force: bool=False,
         event_scope: typing.Optional['libioc.events.Scope']=None

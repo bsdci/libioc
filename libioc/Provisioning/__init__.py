@@ -33,6 +33,8 @@ import libioc.Provisioning.ix
 import libioc.Provisioning.puppet
 
 if typing.TYPE_CHECKING:
+    import types
+
     import libioc.Jail
 
 _SourceType = typing.Union[
@@ -73,13 +75,13 @@ class Source(str):
             )
 
         try:
-            self._value = libioc.Types.AbsolutePath(value)
+            self._value = libioc.Types.AbsolutePath(typing.cast(str, value))
             return
         except ValueError:
             pass
 
         try:
-            url = urllib.parse.urlparse(value)
+            url = urllib.parse.urlparse(typing.cast(str, value))
             self.__require_valid_url(url)
             self._value = url
             return
@@ -106,7 +108,7 @@ class Source(str):
         """Return the Provisioning Source as string."""
         value = self.value
         if isinstance(value, urllib.parse.ParseResult) is True:
-            return value.geturl()
+            return typing.cast(urllib.parse.ParseResult, value).geturl()
         else:
             return str(value)
 
@@ -157,8 +159,10 @@ class Provisioner(Prototype):
     def method(self) -> str:
         method = self.jail.config["provision.method"]
         if method in self.__available_provisioning_modules:
-            return method
-        raise libioc.errors.InvalidProvisionerMethod(
+            return typing.cast(str, method)
+        # InvalidProvisionerMethod is missing from libioc.errors, so that
+        # this raise statement fails with an AttributeError when reached
+        raise libioc.errors.InvalidProvisionerMethod(  # type: ignore[attr-defined] # noqa: E501
             method,
             logger=self.jail.logger
         )
@@ -166,15 +170,15 @@ class Provisioner(Prototype):
     @property
     def __available_provisioning_modules(
             self
-    ) -> typing.Dict[str, Prototype]:
+    ) -> typing.Dict[str, 'types.ModuleType']:
         return dict(
             ix=libioc.Provisioning.ix,
             puppet=libioc.Provisioning.puppet
         )
 
     @property
-    def __provisioning_module(self) -> 'libioc.Provisioning.Provisioner':
-        """Return the class of the currently configured provisioner."""
+    def __provisioning_module(self) -> 'types.ModuleType':
+        """Return the module of the currently configured provisioner."""
         return self.__available_provisioning_modules[self.method]
 
     def provision(

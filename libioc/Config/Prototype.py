@@ -44,7 +44,7 @@ ConfigDataDict = typing.Dict[str, typing.Optional[typing.Union[
 class Prototype:
     """Prototype of a JailConfig."""
 
-    logger: typing.Type['libioc.Logger.Logger']
+    logger: 'libioc.Logger.Logger'
     data: ConfigDataDict
     _file: str
 
@@ -69,7 +69,7 @@ class Prototype:
     def file(self, value: str) -> None:
         self._file = value
 
-    def read(self) -> libioc.Config.Data.Data:
+    def read(self) -> typing.Dict[str, typing.Any]:
         """
         Read from the configuration file.
 
@@ -95,7 +95,7 @@ class Prototype:
     def map_input(
         self,
         data: typing.Union[typing.TextIO, ConfigDataDict]
-    ) -> libioc.Config.Data.Data:
+    ) -> typing.Dict[str, typing.Any]:
         """
         Map input data (for reading from the configuration).
 

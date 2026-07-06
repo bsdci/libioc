@@ -70,11 +70,18 @@ class SecureTarfile:
 
                 Path to the archive file that is going to be extracted.
         """
-        with tarfile.open(self.file, self.mode) as tar:
+        mode = typing.cast(
+            'typing.Literal["r", "r:gz", "r:bz2", "r:xz"]',
+            self.mode
+        )
+        with tarfile.open(self.file, mode) as tar:
             self._log(f"Verifying file structure in {self.file}")
             self._check_tar_members(tar.getmembers())
             self._log(f"Extracting {self.file}")
-            tar.extractall(destination)
+            # _check_tar_members already rejected absolute paths and
+            # path traversal; jail archives legitimately contain setuid
+            # binaries and device nodes, so no restrictive filter applies.
+            tar.extractall(destination, filter="fully_trusted")  # nosec: B202
             self._log(f"{self.file} was extracted to {destination}")
 
     def _check_tar_members(
