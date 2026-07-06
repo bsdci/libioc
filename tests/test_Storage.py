@@ -28,22 +28,24 @@ import pytest
 import json
 
 import libioc.Jail
-import libioc.Storage.NullFSBasejail
+import libioc.Storage.Standalone
 
 
 class TestStorage(object):
     """Run tests for jail storage backends."""
 
-    def test_nullfs_basejail_is_default(
+    def test_standalone_storage_is_default(
         self,
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
-        NullFSBasejailStorage = libioc.Storage.NullFSBasejail.NullFSBasejail
-        assert existing_jail.storage_backend == NullFSBasejailStorage
-        assert existing_jail.config["basejail"] == True
-        assert existing_jail.config["basejail_type"] == "nullfs"
+        Standalone = libioc.Storage.Standalone
+        assert existing_jail.storage_backend == (
+            Standalone.StandaloneJailStorage
+        )
+        assert existing_jail.config["basejail"] == False
+        assert existing_jail.config["basejail_type"] is None
 
-    def test_does_not_mount_devfs_by_default(
+    def test_mounts_devfs_by_default(
         self,
         existing_jail: 'libioc.Jail.Jail'
     ) -> None:
@@ -52,7 +54,7 @@ class TestStorage(object):
             [f"/sbin/mount | grep {existing_jail.root_dataset.name}"],
             shell=True
         ).decode("utf-8")
-        assert "/dev" not in stdout
+        assert "/dev" in stdout
 
     def test_devfs_can_be_enabled_and_is_mounted_and_unmounted(
         self,

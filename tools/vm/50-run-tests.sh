@@ -19,6 +19,7 @@ echo "Synchronizing the repository into the guest."
 rsync -a --delete \
     --exclude=.git \
     --exclude=.venv \
+    --exclude=.cache \
     --exclude=.mypy_cache \
     --exclude=.pytest_cache \
     --exclude=tools/vm/cache \
