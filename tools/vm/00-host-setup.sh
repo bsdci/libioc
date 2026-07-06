@@ -6,7 +6,7 @@ set -e
 
 sudo apt-get update -qq
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    qemu-system-x86 qemu-utils expect xz-utils rsync openssh-client
+    qemu-system-x86 qemu-utils sshpass xz-utils rsync openssh-client
 
 mkdir -p "${CACHE_DIR}"
 

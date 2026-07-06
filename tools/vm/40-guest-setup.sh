@@ -85,4 +85,21 @@ mkdir -p "${CACHE_DIR}/pkg-cache"
 rsync -a -e "ssh ${SSH_OPTS}" \
     root@127.0.0.1:/var/cache/pkg/ "${CACHE_DIR}/pkg-cache/"
 
+# the resource accounting tunable only applies at boot
+if [ "$(${VM_SSH} 'sysctl -n kern.racct.enable')" != "1" ]; then
+    echo "Rebooting the guest to enable resource accounting."
+    ${VM_SSH} 'shutdown -r now' 2>/dev/null || true
+    sleep 30
+    i=0
+    while [ "$i" -lt 60 ]; do
+        if ${VM_SSH} -o ConnectTimeout=5 -o BatchMode=yes \
+                'sysctl -n kern.racct.enable' 2>/dev/null \
+                | grep -q 1; then
+            break
+        fi
+        i=$((i + 1))
+        sleep 10
+    done
+fi
+
 echo "Guest setup complete."

@@ -2091,9 +2091,20 @@ class JailGenerator(JailResource):
     def __resource_limits_enabled(self) -> bool:
         rlimits = self.config["rlimits"]
         if rlimits is None:
-            # unset means auto: rules apply when limit properties are set
-            return True
+            # unset means auto: rules apply when limit properties are
+            # set and the kernel runs with rctl support
+            return self.__rctl_supported
         return (rlimits is True)
+
+    @property
+    def __rctl_supported(self) -> bool:
+        # kern.features.rctl only reports compiled-in support, while
+        # rctl fails unless racct was enabled at boot
+        try:
+            racct = freebsd_sysctl.Sysctl("kern.racct.enable").value
+            return (int(racct) == 1)
+        except Exception:
+            return False
 
     def __clear_resource_limits(
         self,
