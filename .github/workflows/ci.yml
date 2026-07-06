@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install toolchain
+        run: |
+          pip install -r requirements-dev.txt
+          pip install gitpython freebsd_sysctl==0.0.7
+          pip install --no-build-isolation jail==0.0.12
+      - name: Run static checks
+        run: sh scripts/check.sh
+
+  unit:
+    name: Unit tests (Linux subset)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+          pip install gitpython freebsd_sysctl==0.0.7
+          pip install --no-build-isolation jail==0.0.12
+      - name: Run the platform-independent tests
+        run: pytest --cov=libioc --cov-report=term

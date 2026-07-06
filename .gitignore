@@ -123,3 +123,4 @@ ENV/
 .pytest_cache/
 .vscode/
 docs/_build/
+tools/vm/cache/
