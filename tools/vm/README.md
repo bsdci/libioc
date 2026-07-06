@@ -11,10 +11,9 @@ Expect a boot to take a few minutes and the full test suite several hours.
 The scripts are numbered in the order they are needed.
 
 ```sh
-sh tools/vm/00-host-setup.sh    # install qemu and expect, generate the SSH key
+sh tools/vm/00-host-setup.sh    # install qemu, generate the SSH key
 sh tools/vm/10-fetch-image.sh   # download, verify and unpack the VM image
-expect tools/vm/20-provision.exp tools/vm/cache/work.qcow2 tools/vm/cache/id_ed25519.pub
-sh tools/vm/30-vm.sh up         # boot the VM and wait for SSH
+sh tools/vm/20-provision.sh     # first boot: enable sshd via the VGA console
 sh tools/vm/40-guest-setup.sh   # packages, fdescfs, ZFS pool, venv
 sh tools/vm/50-run-tests.sh tier0   # import sweep
 sh tools/vm/50-run-tests.sh tier1   # fast platform tests
@@ -24,8 +23,17 @@ sh tools/vm/50-run-tests.sh smoke   # end-to-end jail lifecycle
 sh tools/vm/30-vm.sh down
 ```
 
+`20-provision.sh` leaves the VM running, so `30-vm.sh up` is only needed for subsequent boots.
 `30-vm.sh ssh [command]` opens a shell or runs a command inside the guest.
 `30-vm.sh console` attaches to the serial console through the unix socket, which requires socat.
+
+The official VM images route the console to the emulated VGA device, and the serial port stays silent during the first boot.
+The provisioning script therefore types blindly into the VGA console through the QEMU monitor (`monitor_type.py`), and one of its first actions is persisting `console="comconsole"` in loader.conf, so every later boot is observable over the serial socket.
+When something goes wrong, a screenshot of the VGA console shows the current state:
+
+```sh
+python3 tools/vm/monitor_type.py tools/vm/cache/mon.sock screendump /tmp/screen.png
+```
 
 ## Design notes
 

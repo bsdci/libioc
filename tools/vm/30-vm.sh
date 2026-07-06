@@ -14,9 +14,10 @@ case "${1:-}" in
             exit 0
         fi
         qemu-system-x86_64 \
-            -machine q35 -accel tcg,thread=multi -cpu max \
+            -machine pc -accel tcg,thread=multi -cpu max \
             -smp "${VM_CPUS}" -m "${VM_MEMORY_MB}" \
-            -display none \
+            -display none -vga std \
+            -monitor "unix:${CACHE_DIR}/mon.sock,server,nowait" \
             -serial "unix:${SERIAL_SOCKET},server,nowait" \
             -netdev "user,id=n0,hostfwd=tcp:127.0.0.1:${SSH_PORT}-:22" \
             -device virtio-net-pci,netdev=n0 \
