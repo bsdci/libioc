@@ -27,6 +27,9 @@ import typing
 import libioc.Storage.Basejail
 import libioc.helpers
 
+if typing.TYPE_CHECKING:
+    import libioc.Release
+
 
 class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
     """ioc ZFS basejail storage backend."""

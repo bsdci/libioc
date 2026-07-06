@@ -29,6 +29,11 @@ import ipaddress
 # mypy
 import libioc.Logger
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.BaseConfig
+    import libioc.Config.Jail.JailConfig
+    import libioc.Jail
+
 IPAddressInput = typing.Optional[typing.Union[
     str,
     ipaddress.IPv4Address,

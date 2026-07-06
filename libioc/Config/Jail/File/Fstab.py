@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Manage fstab files."""
 import typing
-import collections
+import collections.abc
 import os.path
 import random
 import re
@@ -35,6 +35,10 @@ import libioc.Types
 import libioc.Config.Jail
 import libioc.Config.Jail.File
 import libioc.Storage.Basejail
+
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.Release
 
 
 class FstabFsSpec(libioc.Types.AbsolutePath):
@@ -149,7 +153,7 @@ class FstabAutoPlaceholderLine(dict):
         return hash(None)
 
 
-class Fstab(collections.MutableSequence):
+class Fstab(collections.abc.MutableSequence):
     """
     Fstab configuration file wrapper.
 

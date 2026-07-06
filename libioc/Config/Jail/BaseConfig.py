@@ -37,6 +37,9 @@ import libioc.JailParams
 
 # mypy
 import libioc.Logger
+
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.Properties
 InputData = typing.Dict[str, typing.Union[
     libioc.Config.Jail.Properties.Property,
     str,
@@ -82,7 +85,7 @@ class BaseConfig(dict):
     """
 
     _data: libioc.Config.Data.Data
-    special_properties: 'libioc.Config.Jail.Properties.Properties'
+    special_properties: 'libioc.Config.Jail.Properties.JailConfigProperties'
 
     def __init__(
         self,

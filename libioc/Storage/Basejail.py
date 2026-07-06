@@ -26,6 +26,9 @@ import typing
 
 import libioc.Types
 
+if typing.TYPE_CHECKING:
+    import libioc.Storage
+
 
 class BasejailStorage(libioc.Storage.Storage):
     """Prototype class of Basejail Storage."""

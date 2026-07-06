@@ -23,13 +23,16 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc module of jail collections."""
-import libzfs
+from __future__ import annotations
 import typing
 
 import libioc.Jail
 import libioc.Filter
 import libioc.ListableResource
 import libioc.helpers_object
+
+if typing.TYPE_CHECKING:
+    import libzfs
 
 
 class JailsGenerator(libioc.ListableResource.ListableResource):

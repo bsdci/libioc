@@ -31,6 +31,10 @@ import libioc.helpers
 import libioc.helpers_object
 import libioc.CommandQueue
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.MacAddress
+
 
 class NetworkInterface:
     """

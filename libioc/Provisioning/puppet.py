@@ -30,6 +30,9 @@ import libioc.events
 import libioc.Pkg
 import libioc.Provisioning
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+
 __puppet_env_dir = "/usr/local/etc/puppet/environments"
 
 

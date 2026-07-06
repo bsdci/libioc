@@ -26,7 +26,11 @@
 import typing
 import re
 
-import libioc.Datasets
+import libioc.errors
+import libioc.helpers
+
+if typing.TYPE_CHECKING:
+    import libioc.Datasets
 
 
 class ResourceSelector:
@@ -87,6 +91,7 @@ class ResourceSelector:
         datasets: 'libioc.Datasets.Datasets'
     ) -> 'libioc.Datasets.FilteredDatasets':
         """Filter given Datasets according to the resource selector source."""
+        import libioc.Datasets
         if self.source_name is None:
             return datasets
 

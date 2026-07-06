@@ -31,6 +31,9 @@ import libioc.errors
 import libioc.helpers
 import libioc.helpers_object
 
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+
 
 class ZFSShareStorage:
     """Storage backend for ZFS shares."""

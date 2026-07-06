@@ -33,6 +33,11 @@ import libzfs
 
 import libioc.events
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Data
+    import libioc.LaunchableResource
+    import libioc.ZFS
+
 
 class Format(enum.Enum):
     """Enum of the backup formats."""

@@ -23,11 +23,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc configuration associated with ZFS datasets."""
+from __future__ import annotations
 import os.path
-import libzfs
 import typing
 
 import libioc.Config.Prototype
+
+if typing.TYPE_CHECKING:
+    import libzfs
 
 
 class DatasetConfig(libioc.Config.Prototype.Prototype):

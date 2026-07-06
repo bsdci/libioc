@@ -23,13 +23,19 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Collection of iocage errors."""
+from __future__ import annotations
 import typing
 import uuid
 
 # MyPy
-import libzfs  # noqa: F401
 import libioc.Types  # noqa: F401
 import libioc.Logger
+
+if typing.TYPE_CHECKING:
+    import libioc.Jail
+    import libioc.Resource
+    import libioc.events
+    import libzfs
 
 
 class IocException(Exception):

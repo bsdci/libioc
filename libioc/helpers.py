@@ -34,8 +34,6 @@ import sys
 import pty
 import select
 
-import jail as libjail
-
 import libioc.errors
 import libioc.Logger
 
@@ -48,7 +46,7 @@ def get_os_version(
     version_file: str="/bin/freebsd-version"
 ) -> typing.Dict[str, typing.Union[str, int, float]]:
     """Get the hosts userland version."""
-    f = open(version_file, "r", re.MULTILINE, encoding="utf-8")
+    f = open(version_file, "r", encoding="utf-8")
     # ToDo: move out of the function
     pattern = re.compile(
         r"USERLAND_VERSION=\""
@@ -548,6 +546,7 @@ def mount(
     **iov_data: typing.Any
 ) -> None:
     """Mount a filesystem using libc."""
+    import jail as libjail
     data: typing.Dict[str, typing.Optional[str]] = dict(
         fstype=fstype,
         fspath=destination
@@ -581,6 +580,7 @@ def umount(
     logger: typing.Optional['libioc.Logger.Logger']=None
 ) -> None:
     """Unmount a mountpoint using libc."""
+    import jail as libjail
     if isinstance(mountpoint, list) is True:
         for entry in typing.cast(
             typing.List[libioc.Types.AbsolutePath],

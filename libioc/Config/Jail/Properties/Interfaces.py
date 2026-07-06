@@ -28,6 +28,9 @@ import typing
 import libioc.helpers
 import libioc.BridgeInterface
 
+if typing.TYPE_CHECKING:
+    import libioc.Config.Jail.JailConfig
+
 
 class InterfaceProp(dict):
     """Special jail config property Interfaces."""

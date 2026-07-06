@@ -23,6 +23,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """ioc Host module."""
+from __future__ import annotations
 import typing
 import os
 import platform
@@ -30,7 +31,6 @@ import re
 import freebsd_sysctl
 import uuid
 
-import libzfs
 
 import libioc.Datasets
 import libioc.DevfsRules
@@ -42,6 +42,9 @@ import libioc.helpers_object
 # MyPy
 import libioc.Config.Jail.BaseConfig  # noqa: F401
 import libioc.DevfsRules
+
+if typing.TYPE_CHECKING:
+    import libzfs
 _distribution_types = typing.Union[
     libioc.Distribution.DistributionGenerator,
     libioc.Distribution.Distribution,
