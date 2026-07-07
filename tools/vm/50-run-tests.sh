@@ -23,6 +23,7 @@ rsync -a --delete \
     --exclude=.mypy_cache \
     --exclude=.pytest_cache \
     --exclude=tools/vm/cache \
+    --exclude=tools/vm/freebsd-ci \
     -e "ssh ${SSH_OPTS}" \
     "${REPO_DIR}/" root@127.0.0.1:/root/libioc/
 

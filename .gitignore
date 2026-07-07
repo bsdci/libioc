@@ -124,3 +124,4 @@ ENV/
 .vscode/
 docs/_build/
 tools/vm/cache/
+tools/vm/freebsd-ci/
