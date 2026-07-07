@@ -10,17 +10,18 @@ In CI the same tooling is consumed as composite actions, see `.github/workflows/
 ## Usage
 
 ```sh
-sh tools/vm/00-bootstrap.sh                     # host deps + shared tooling
-sh tools/vm/freebsd-ci/scripts/fetch-image.sh   # download and verify the image
-sh tools/vm/freebsd-ci/scripts/provision.sh     # first boot, install the SSH key
-sh tools/vm/40-guest-setup.sh                   # packages, fdescfs, ZFS pool, venv
-sh tools/vm/50-run-tests.sh tier0               # import sweep
-sh tools/vm/50-run-tests.sh tier1               # fast platform tests
-sh tools/vm/50-run-tests.sh tier2               # jail lifecycle tests
-sh tools/vm/50-run-tests.sh tier3               # full suite
-sh tools/vm/50-run-tests.sh smoke               # end-to-end jail lifecycle
+sh tools/vm/00-bootstrap.sh                # host deps + shared tooling
+sh tools/vm/freebsd-ci/scripts/setup.sh    # image download, boot, provisioning
+sh tools/vm/40-guest-setup.sh              # packages, fdescfs, ZFS pool, venv
+sh tools/vm/50-run-tests.sh tier0          # import sweep
+sh tools/vm/50-run-tests.sh tier1          # fast platform tests
+sh tools/vm/50-run-tests.sh tier2          # jail lifecycle tests
+sh tools/vm/50-run-tests.sh tier3          # full suite
+sh tools/vm/50-run-tests.sh smoke          # end-to-end jail lifecycle
 sh tools/vm/freebsd-ci/scripts/vm.sh down
 ```
+
+The guest setup composes the shared guest helpers (`guest.sh` verbs for packages, kernel modules, tunables, fdescfs, the pool and the package cache mirror) and only defines the libioc package set, pool name and venv itself.
 
 The shared scripts read their configuration from the environment; `tools/vm/config.sh` exports the libioc defaults (release 13.5-RELEASE, cache in `tools/vm/cache/`) before delegating, and the numbered scripts here source it.
 When calling the shared scripts directly, export `FREEBSD_VERSION=13.5-RELEASE` and `FREEBSD_CI_CACHE=$(pwd)/tools/vm/cache` first, or accept their defaults with a separate cache under `~/.cache/freebsd-ci`.
