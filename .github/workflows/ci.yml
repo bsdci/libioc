@@ -61,7 +61,7 @@ jobs:
             env ASSUME_ALWAYS_YES=yes pkg bootstrap -f
             pkg update -f
             PYPKG="$(pkg search -q '^py3[0-9]*-libzfs' | head -n 1 | sed 's/-libzfs.*//')"
-            pkg install -y python3 "${PYPKG}-libzfs" "${PYPKG}-ucl" "${PYPKG}-sqlite3" "${PYPKG}-setuptools" "${PYPKG}-pip" git
+            pkg install -y python3 "${PYPKG}-libzfs" "${PYPKG}-ucl" "${PYPKG}-sqlite3" "${PYPKG}-setuptools" "${PYPKG}-pip" git rsync
             mount -t fdescfs null /dev/fd
             kldload if_epair 2>/dev/null || true
             kldload zfs 2>/dev/null || true
