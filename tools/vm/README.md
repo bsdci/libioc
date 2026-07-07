@@ -4,8 +4,9 @@ The scripts in this directory run the libioc test suite inside a QEMU virtual ma
 FreeBSD 13.5 is the newest release whose binary packages are still served for the 13.x branch, while staying close to the FreeBSD 12.1 environment that the original CI used.
 
 The generic VM plumbing comes from the shared freebsd-ci tooling, which boots the official BASIC-CI images and provisions root SSH access.
-`00-bootstrap.sh` installs the host packages and pins that tooling into `tools/vm/freebsd-ci/`; only the libioc-specific guest setup and test runner live here.
-In CI the same tooling is consumed as composite actions, see `.github/workflows/ci.yml`.
+`00-bootstrap.sh` installs the host packages and clones that tooling into `tools/vm/freebsd-ci/`, following the upstream main branch so that updates arrive without changes to this repository; `FREEBSD_CI_REF=<commit>` reproduces a historic state.
+In CI the same tooling is consumed as composite actions on `@main`, see `.github/workflows/ci.yml`; both references move to `v1` once upstream tags it.
+Only the libioc-specific guest setup and test runner live here.
 
 ## Usage
 

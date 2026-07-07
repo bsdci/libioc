@@ -1,12 +1,15 @@
 #!/bin/sh
 # Install the host packages and fetch the shared FreeBSD CI tooling.
-# The generic VM plumbing lives in the freebsd-ci repository and is
-# pinned here; only the libioc-specific setup stays in this directory.
+# The generic VM plumbing lives in the freebsd-ci repository; only the
+# libioc-specific setup stays in this directory.
+# The tooling follows the upstream main branch, so updates arrive
+# without changes here; set FREEBSD_CI_REF to a commit to reproduce a
+# historic state.
 set -e
 VM_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 FREEBSD_CI_REPO="https://github.com/gronke/freebsd-ci.git"
-FREEBSD_CI_REF="ee9770828ffa9dc1e58641874b5ec020b11a14e9"
+FREEBSD_CI_REF="${FREEBSD_CI_REF:-main}"
 
 sudo apt-get update -qq
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
@@ -17,6 +20,9 @@ if [ ! -d "${VM_DIR}/freebsd-ci/.git" ]; then
 fi
 git -C "${VM_DIR}/freebsd-ci" remote set-url origin "${FREEBSD_CI_REPO}"
 git -C "${VM_DIR}/freebsd-ci" fetch -q origin
-git -C "${VM_DIR}/freebsd-ci" checkout -q "${FREEBSD_CI_REF}"
+git -C "${VM_DIR}/freebsd-ci" checkout -q --detach \
+    "origin/${FREEBSD_CI_REF}" 2>/dev/null \
+    || git -C "${VM_DIR}/freebsd-ci" checkout -q --detach \
+        "${FREEBSD_CI_REF}"
 
-echo "Bootstrap complete; freebsd-ci at ${FREEBSD_CI_REF}."
+echo "Bootstrap complete; freebsd-ci at $(git -C "${VM_DIR}/freebsd-ci" rev-parse HEAD)."
