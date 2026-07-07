@@ -6,7 +6,7 @@ set -e
 VM_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 FREEBSD_CI_REPO="https://github.com/gronke/freebsd-ci.git"
-FREEBSD_CI_REF="16b835a34634c4d68d7f382df7f107f227aae26b"
+FREEBSD_CI_REF="ee9770828ffa9dc1e58641874b5ec020b11a14e9"
 
 sudo apt-get update -qq
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
