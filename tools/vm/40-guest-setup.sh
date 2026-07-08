@@ -29,7 +29,7 @@ sh "${GUEST}" pkg-install python3 \
 
 echo "Preparing the system."
 sh "${GUEST}" fdescfs
-sh "${GUEST}" kld if_epair
+sh "${GUEST}" kld if_epair fusefs
 sh "${GUEST}" zpool ioc-test 16G
 
 echo "Creating the Python virtual environment."
