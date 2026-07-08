@@ -23,12 +23,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Jail and Default Config."""
 import subprocess
+import unittest.mock
 
 import pytest
 import json
 
 import libioc.Jail
 import libioc.Storage.Standalone
+import libioc.ZFS
 
 
 class TestStorage(object):
@@ -76,3 +78,20 @@ class TestStorage(object):
             shell=True
         ).decode("utf-8")
         assert "/dev" not in stdout
+
+
+class TestStorageErrorPaths(object):
+    """Run tests for the storage backend error paths."""
+
+    def test_standalone_apply_is_not_implemented(
+        self,
+        logger: 'libioc.Logger.Logger'
+    ) -> None:
+        storage = libioc.Storage.Standalone.StandaloneJailStorage(
+            jail=unittest.mock.Mock(),
+            zfs=unittest.mock.Mock(spec=libioc.ZFS.ZFS),
+            logger=logger
+        )
+
+        with pytest.raises(NotImplementedError):
+            storage.apply()
