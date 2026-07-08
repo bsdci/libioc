@@ -3,7 +3,7 @@ JAIL_NIC?=vtnet0
 JAIL_IP?=172.16.0
 JAIL_NET?=16
 
-PYTHON_VERSION ?= $(TRAVIS_PYTHON_VERSION)
+PYTHON_VERSION ?=
 SELECTED_PYTHON_VERSION != if [ "$(PYTHON_VERSION)" != "" ]; then echo $(PYTHON_VERSION); else pkg query '%dn' 'python3' | sort -un | sed -r 's/^python//;s/^([0-9])([0-9]+)/\1.\2/' | tail -n1 ; fi
 PYTHON ?= python${SELECTED_PYTHON_VERSION}
 # turn python3.7 -> 3.7 -> 37
