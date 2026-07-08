@@ -242,41 +242,48 @@ class Storage:
 
     def _mount_procfs(self) -> None:
         try:
-            if self.jail.config["mount_procfs"] is True:
-                libioc.helpers.exec([
-                    "mount"
-                    "-t",
-                    "procfs"
-                    "proc"
-                    f"{self.jail.root_dataset.mountpoint}/proc"
-                ])
+            if self.jail.config["mount_procfs"] is not True:
+                return
         except KeyError:
-            raise libioc.errors.MountFailed(
+            return
+
+        mountpoint = f"{self.jail.root_dataset.mountpoint}/proc"
+        try:
+            libioc.helpers.exec([
+                "mount",
+                "-t",
                 "procfs",
+                "proc",
+                mountpoint
+            ])
+        except libioc.errors.CommandFailure:
+            raise libioc.errors.MountFailed(
+                mountpoint=mountpoint,
                 logger=self.logger
             )
 
     # ToDo: Remove unused function?
     def _mount_linprocfs(self) -> None:
         try:
-            if not self.jail.config["mount_linprocfs"]:
+            if self.jail.config["mount_linprocfs"] is not True:
                 return
         except KeyError:
-            pass
+            return
 
         linproc_path = self._jail_mkdirp("/compat/linux/proc")
-
         try:
-            if self.jail.config["mount_procfs"] is True:
-                libioc.helpers.exec([
-                    "mount"
-                    "-t",
-                    "linprocfs",
-                    "linproc",
-                    linproc_path
-                ])
-        except KeyError:
-            raise libioc.errors.MountFailed("linprocfs")
+            libioc.helpers.exec([
+                "mount",
+                "-t",
+                "linprocfs",
+                "linproc",
+                linproc_path
+            ])
+        except libioc.errors.CommandFailure:
+            raise libioc.errors.MountFailed(
+                mountpoint=linproc_path,
+                logger=self.logger
+            )
 
     def _jail_mkdirp(
         self,
