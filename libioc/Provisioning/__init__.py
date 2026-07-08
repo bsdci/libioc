@@ -160,9 +160,7 @@ class Provisioner(Prototype):
         method: str = self.jail.config["provision.method"]
         if method in self.__available_provisioning_modules:
             return method
-        # InvalidProvisionerMethod is missing from libioc.errors, so that
-        # this raise statement fails with an AttributeError when reached
-        raise libioc.errors.InvalidProvisionerMethod(  # type: ignore[attr-defined] # noqa: E501
+        raise libioc.errors.InvalidProvisionerMethod(
             method,
             logger=self.jail.logger
         )

@@ -25,10 +25,13 @@
 import typing
 import os.path
 import subprocess
+import unittest.mock
 import pytest
 
+import libioc.errors
 import libioc.Jail
 import libioc.Pkg
+import libioc.Provisioning
 
 class TestPuppetProvisioner(object):
     """Run Puppet Provisioner tests."""
@@ -63,3 +66,20 @@ class TestPuppetProvisioner(object):
         assert os.path.exists(
             os.path.join(existing_jail.root_path, "puppet.test")
         )
+
+
+class TestProvisionerMethod(object):
+    """Run tests for the provisioner method lookup."""
+
+    def test_unknown_method_raises_invalid_provisioner_method(
+        self,
+        logger: 'libioc.Logger.Logger'
+    ) -> None:
+        jail = unittest.mock.Mock()
+        jail.config = {"provision.method": "unknown-provisioner"}
+        jail.logger = logger
+
+        provisioner = libioc.Provisioning.Provisioner(jail=jail)
+
+        with pytest.raises(libioc.errors.InvalidProvisionerMethod):
+            provisioner.method

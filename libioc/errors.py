@@ -1470,6 +1470,18 @@ class UndefinedProvisionerMethod(IocException):
         IocException.__init__(self, message=msg, logger=logger)
 
 
+class InvalidProvisionerMethod(IocException):
+    """Raised when a provisioner method is unknown."""
+
+    def __init__(
+        self,
+        method: str,
+        logger: typing.Optional['libioc.Logger.Logger']=None
+    ) -> None:
+        msg = f"Invalid provisioner method: {method}"
+        IocException.__init__(self, message=msg, logger=logger)
+
+
 # Sources
 
 
