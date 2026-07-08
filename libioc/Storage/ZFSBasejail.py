@@ -48,10 +48,9 @@ class ZFSBasejailStorage(libioc.Storage.Basejail.BasejailStorage):
                 self.jail.cloned_release
             )
 
-        # libioc.events only offers BasejailStorageConfig, so this line
-        # raises an AttributeError when reached (suspected typo)
-        event = libioc.events.BaseJailStorageConfig(  # type: ignore[attr-defined] # noqa: E501
+        event = libioc.events.BasejailStorageConfig(
             jail=self.jail,
+            scope=event_scope
         )
         yield event.begin()
 

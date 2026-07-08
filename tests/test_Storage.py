@@ -28,8 +28,10 @@ import unittest.mock
 import pytest
 import json
 
+import libioc.events
 import libioc.Jail
 import libioc.Storage.Standalone
+import libioc.Storage.ZFSBasejail
 import libioc.ZFS
 
 
@@ -95,3 +97,17 @@ class TestStorageErrorPaths(object):
 
         with pytest.raises(NotImplementedError):
             storage.apply()
+
+    def test_zfs_basejail_apply_yields_the_config_event(
+        self,
+        logger: 'libioc.Logger.Logger'
+    ) -> None:
+        storage = libioc.Storage.ZFSBasejail.ZFSBasejailStorage(
+            jail=unittest.mock.Mock(),
+            zfs=unittest.mock.Mock(spec=libioc.ZFS.ZFS),
+            logger=logger
+        )
+
+        events = storage.apply(release=unittest.mock.Mock())
+
+        assert isinstance(next(events), libioc.events.BasejailStorageConfig)
