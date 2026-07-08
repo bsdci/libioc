@@ -235,13 +235,12 @@ class DistributionGenerator:
 
             response_code = response.getcode()
             if response_code != 200:
-                # DownloadFailed takes no topic argument, so that this
-                # call raises a TypeError when it is reached
-                libioc.errors.DownloadFailed(  # type: ignore[call-arg]
-                    topic="EOL Warnings",
+                # constructing the error logs the warning without raising
+                libioc.errors.DownloadFailed(
+                    url=self.eol_url,
                     code=response_code,
                     logger=self.logger,
-                    level="warning"
+                    level="warn"
                 )
                 return []
 
