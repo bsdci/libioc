@@ -1209,7 +1209,8 @@ class InvalidReleaseAssetSignature(UpdateFailure):
         UpdateFailure.__init__(
             self,
             name=name,
-            reason=msg
+            reason=msg,
+            logger=logger
         )
 
 
