@@ -759,8 +759,7 @@ class JailFstab(Fstab):
         release: typing.Optional['libioc.Release.ReleaseGenerator'] = None
     ) -> None:
         """Set a new release and save the updated file."""
-        # JailGenerator.release has no setter, so this raises AttributeError
-        self.jail.release = release  # type: ignore[misc, assignment]
+        self.release = release
         self.update_and_save()
 
     def __replace_magic_path(self, filepath: str) -> str:
