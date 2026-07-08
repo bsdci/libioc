@@ -22,12 +22,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Jail and Default Config."""
+import typing
 import subprocess
 import unittest.mock
 
 import pytest
 import json
 
+import libioc.errors
 import libioc.events
 import libioc.Jail
 import libioc.Storage.Standalone
@@ -111,3 +113,90 @@ class TestStorageErrorPaths(object):
         events = storage.apply(release=unittest.mock.Mock())
 
         assert isinstance(next(events), libioc.events.BasejailStorageConfig)
+
+
+class TestJailProcMounts(object):
+    """Run tests for the procfs and linprocfs mount helpers."""
+
+    @pytest.fixture
+    def proc_jail(self) -> 'unittest.mock.Mock':
+        jail = unittest.mock.Mock()
+        jail.config = {}
+        jail.root_dataset.mountpoint = "/iocage/jails/proc-test/root"
+        return jail
+
+    @pytest.fixture
+    def proc_storage(
+        self,
+        proc_jail: 'unittest.mock.Mock',
+        logger: 'libioc.Logger.Logger'
+    ) -> 'libioc.Storage.Storage':
+        return libioc.Storage.Storage(
+            jail=proc_jail,
+            zfs=unittest.mock.Mock(spec=libioc.ZFS.ZFS),
+            logger=logger
+        )
+
+    def test_mount_procfs_runs_a_valid_mount_command(
+        self,
+        proc_jail: 'unittest.mock.Mock',
+        proc_storage: 'libioc.Storage.Storage',
+        mocker: 'typing.Any'
+    ) -> None:
+        proc_jail.config["mount_procfs"] = True
+        exec_mock = mocker.patch(
+            "libioc.helpers.exec",
+            return_value=("", "", 0)
+        )
+
+        proc_storage._mount_procfs()
+
+        exec_mock.assert_called_once_with([
+            "mount",
+            "-t",
+            "procfs",
+            "proc",
+            "/iocage/jails/proc-test/root/proc"
+        ])
+
+    def test_mount_linprocfs_runs_a_valid_mount_command(
+        self,
+        proc_jail: 'unittest.mock.Mock',
+        proc_storage: 'libioc.Storage.Storage',
+        mocker: 'typing.Any'
+    ) -> None:
+        proc_jail.config["mount_linprocfs"] = True
+        linproc_path = "/iocage/jails/proc-test/root/compat/linux/proc"
+        mocker.patch(
+            "libioc.Storage.Storage._jail_mkdirp",
+            return_value=linproc_path
+        )
+        exec_mock = mocker.patch(
+            "libioc.helpers.exec",
+            return_value=("", "", 0)
+        )
+
+        proc_storage._mount_linprocfs()
+
+        exec_mock.assert_called_once_with([
+            "mount",
+            "-t",
+            "linprocfs",
+            "linproc",
+            linproc_path
+        ])
+
+    def test_failed_procfs_mount_raises_mount_failed(
+        self,
+        proc_jail: 'unittest.mock.Mock',
+        proc_storage: 'libioc.Storage.Storage',
+        mocker: 'typing.Any'
+    ) -> None:
+        proc_jail.config["mount_procfs"] = True
+        mocker.patch(
+            "libioc.helpers.exec",
+            side_effect=libioc.errors.CommandFailure(returncode=1)
+        )
+
+        with pytest.raises(libioc.errors.MountFailed):
+            proc_storage._mount_procfs()
