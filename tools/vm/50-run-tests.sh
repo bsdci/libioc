@@ -29,8 +29,8 @@ rsync -a --delete \
     "${REPO_DIR}/" root@127.0.0.1:/root/libioc/
 
 echo "Installing libioc into the guest venv."
-run_guest 'cd /root/libioc && /root/venv/bin/pip install -q --no-build-isolation -r requirements.txt -r requirements-test.txt'
-run_guest 'cd /root/libioc && /root/venv/bin/pip install -q --no-build-isolation -e .'
+run_guest 'cd /root/libioc && /root/venv/bin/pip install -q -r requirements.txt -r requirements-test.txt'
+run_guest 'cd /root/libioc && /root/venv/bin/pip install -q -e .'
 
 case "${TIER}" in
     tier0)
