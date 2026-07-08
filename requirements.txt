@@ -1,3 +1,3 @@
 gitpython
-freebsd_sysctl==0.0.7
-jail==0.0.12
+freebsd_sysctl @ git+https://github.com/gronke/py-freebsd_sysctl.git@92f6cf5dd4cab3a9b7e4ef04c4ca0dbeec74e181
+jail @ git+https://github.com/gronke/py-jail.git@8f935ed34e447216599e4f8964c64c89c708ad40

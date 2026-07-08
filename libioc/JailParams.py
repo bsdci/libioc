@@ -160,8 +160,11 @@ class JailParams(collections.abc.MutableMapping):
             self.__base_class(prefix).children
         )
         # permanently store the queried sysctl in the singleton class
+        # cast for mypy: Sysctl.children constructs type(self), so the
+        # items are JailParam instances at runtime while the upstream
+        # annotation stays with the base class
         JailParams.__sysctl_params = dict([
-            (x.name.rstrip("."), x,)
+            (x.name.rstrip("."), typing.cast(JailParam, x),)
             for x in jail_params
         ])
 
