@@ -228,19 +228,12 @@ class TestNullFSBasejail(object):
         if "basejail_type" in data:
             assert data["basejail_type"] == "nullfs"
 
-    @pytest.mark.xfail(
-        reason=(
-            "enabling basejail after jail creation does not regenerate "
-            "the fstab basejail lines, so no nullfs mounts appear"
-        ),
-        strict=False
-    )
     def test_can_be_started(
         self,
         existing_jail: 'libioc.Jail.Jail',
         basedirs: typing.List[str]
     ) -> None:
-        """Test if a jail can be started."""
+        """Test if enabling basejail on an existing jail mounts the base."""
         existing_jail.config["mount_devfs"] = False
         existing_jail.config["basejail"] = True
         existing_jail.save()
@@ -249,15 +242,24 @@ class TestNullFSBasejail(object):
         existing_jail.start()
         assert existing_jail.running is True
 
+        # nullfs mounts from ZFS snapshot directories do not appear in
+        # getfsstat output on FreeBSD 13, so statfs proves each mount
         root_path = existing_jail.root_dataset.mountpoint
-        stdout = subprocess.check_output(
-            [f"/sbin/mount | grep {existing_jail.root_dataset.mountpoint}"],
-            shell=True
-        ).decode("utf-8")
-        assert "launch-scripts in stdout"
-        assert stdout.strip().count("\n") == len(basedirs)
         for basedir in basedirs:
-            assert f"{root_path}/{basedir}" in stdout
+            stdout = subprocess.check_output(
+                ["/bin/df", "-T", f"{root_path}/{basedir}"]
+            ).decode("utf-8")
+            assert "nullfs" in stdout
+
+        with pytest.raises(OSError):
+            with open(f"{root_path}/bin/.ioc-write-test", "w"):
+                pass
+
+        existing_jail.stop()
+        stdout = subprocess.check_output(
+            ["/bin/df", "-T", f"{root_path}/bin"]
+        ).decode("utf-8")
+        assert "nullfs" not in stdout
 
     def test_can_be_stopped(
         self,
