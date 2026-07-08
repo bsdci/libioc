@@ -595,11 +595,18 @@ class JailFstab(Fstab):
                 List of destination strings that is skipped
         """
         BasejailStorage = libioc.Storage.Basejail.BasejailStorage
-        if isinstance(self.jail.storage_backend, BasejailStorage):
-            skip_destinations += list(map(
+        storage_backend = self.jail.storage_backend
+        if (storage_backend is not None) and issubclass(
+            storage_backend,
+            BasejailStorage
+        ):
+            # rebinding keeps the callers (default) list unchanged
+            skip_destinations = skip_destinations + list(map(
                 lambda x: str(x[1]),
-                # only _get_basejail_mounts exists, so this raises
-                self.jail.storage_backend.basejail_mounts
+                # cast for mypy: unbound backend methods take Storage as self
+                typing.cast(typing.Any, storage_backend)._get_basejail_mounts(
+                    self.jail.storage
+                )
             ))
         Fstab.parse_lines(
             self,

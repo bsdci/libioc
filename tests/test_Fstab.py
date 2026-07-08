@@ -35,6 +35,7 @@ import unittest.mock
 import libzfs
 
 import libioc.Config.Jail.File.Fstab
+import libioc.Storage.NullFSBasejail
 
 class TestFstab(object):
 	"""Run Fstab unit tests."""
@@ -239,3 +240,41 @@ class TestJailFstab(object):
 
 		assert fstab.release is release
 		assert os.path.isfile(fstab.path) is True
+
+	def test_parse_lines_skips_basejail_destinations(
+		self,
+		jail_stub: typing.Any,
+		logger: 'libioc.Logger.Logger'
+	) -> None:
+		NullFSBasejailStorage = (
+			libioc.Storage.NullFSBasejail.NullFSBasejailStorage
+		)
+		root = f"{jail_stub.dataset.mountpoint}/root"
+		basejail = unittest.mock.Mock()
+		basejail.config = {"basejail_type": "nullfs"}
+		basejail.host.distribution.name = "FreeBSD"
+		basejail.release.root_dataset.mountpoint = (
+			"/iocage/releases/13.5-RELEASE/root"
+		)
+		basejail.release_snapshot.snapshot_name = "p0"
+		basejail.root_dataset.mountpoint = root
+		jail_stub.storage_backend = NullFSBasejailStorage
+		jail_stub.storage = unittest.mock.Mock()
+		jail_stub.storage.jail = basejail
+
+		fstab = libioc.Config.Jail.File.Fstab.JailFstab(
+			jail=jail_stub,
+			logger=logger
+		)
+		fstab.parse_lines(
+			f"/iocage/releases/13.5-RELEASE/root/bin {root}/bin nullfs ro 0 0\n"
+			f"/tmp/data {root}/data nullfs rw 0 0\n"
+		)
+
+		destinations = [
+			str(line["destination"])
+			for line in fstab
+			if isinstance(line, libioc.Config.Jail.File.Fstab.FstabLine)
+		]
+		assert f"{root}/data" in destinations
+		assert f"{root}/bin" not in destinations
