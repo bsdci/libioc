@@ -404,3 +404,68 @@ class TestNullFSBasejail(object):
             # only check suffix, because source dataset name might vary
             "-" + jail_name_with_dots.replace(".", "*")
         )
+
+
+class TestJailParamDefaults(object):
+    """Run tests for jail params sourced from the config defaults."""
+
+    def test_mlock_reaches_the_launch_params(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if the mlock param appears in the launch parameters."""
+        # a None default would act as a set flag in the iovec launch path
+        assert existing_jail._launch_params["allow.mlock"] == 0
+
+        existing_jail.config["allow_mlock"] = 1
+        assert existing_jail._launch_params["allow.mlock"] == 1
+
+    def test_allow_mlock_applies_to_a_started_jail(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if the mlock param arrives in the running jail."""
+        existing_jail.config["allow_mlock"] = 1
+        existing_jail.save()
+
+        existing_jail.start()
+        assert existing_jail.running is True
+
+        stdout = subprocess.check_output([
+            "/usr/sbin/jls",
+            "-j", str(existing_jail.jid),
+            "allow.mlock"
+        ]).decode("utf-8")
+        assert stdout.strip() == "true"
+
+    def test_allow_mount_fusefs_applies_to_a_started_jail(
+        self,
+        existing_jail: 'libioc.Jail.Jail'
+    ) -> None:
+        """Test if the fusefs mount param arrives in the running jail."""
+        try:
+            subprocess.check_call(
+                [
+                    "/sbin/sysctl", "-N",
+                    "security.jail.param.allow.mount.fusefs"
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        except subprocess.CalledProcessError:
+            pytest.skip(
+                "allow.mount.fusefs registers only when fusefs is loaded"
+            )
+
+        existing_jail.config["allow_mount_fusefs"] = 1
+        existing_jail.save()
+
+        existing_jail.start()
+        assert existing_jail.running is True
+
+        stdout = subprocess.check_output([
+            "/usr/sbin/jls",
+            "-j", str(existing_jail.jid),
+            "allow.mount.fusefs"
+        ]).decode("utf-8")
+        assert stdout.strip() == "true"
