@@ -23,6 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for Jail."""
 import typing
+import errno
 import json
 import os
 import subprocess
@@ -251,15 +252,17 @@ class TestNullFSBasejail(object):
             ).decode("utf-8")
             assert "nullfs" in stdout
 
-        with pytest.raises(OSError):
+        with pytest.raises(OSError) as excinfo:
             with open(f"{root_path}/bin/.ioc-write-test", "w"):
                 pass
+        assert excinfo.value.errno == errno.EROFS
 
         existing_jail.stop()
-        stdout = subprocess.check_output(
-            ["/bin/df", "-T", f"{root_path}/bin"]
-        ).decode("utf-8")
-        assert "nullfs" not in stdout
+        for basedir in basedirs:
+            stdout = subprocess.check_output(
+                ["/bin/df", "-T", f"{root_path}/{basedir}"]
+            ).decode("utf-8")
+            assert "nullfs" not in stdout
 
     def test_can_be_stopped(
         self,
