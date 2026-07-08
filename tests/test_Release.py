@@ -24,6 +24,9 @@
 """Unit tests for the Release module."""
 import os.path
 
+import pytest
+
+import libioc.errors
 import libioc.Release
 
 class TestRelease(object):
@@ -42,3 +45,28 @@ class TestRelease(object):
             assert "daily_status_mail_rejects_enable=\"NO\"" in content
             assert "daily_status_include_submit_mailq=\"NO\"" in content
             assert "daily_submit_queuerun=\"NO\"" in content
+
+
+class TestAssetSignature(object):
+    """Run tests for release asset signature verification."""
+
+    def test_hash_mismatch_raises_invalid_release_asset_signature(
+        self,
+        logger: 'libioc.Logger.Logger'
+    ) -> None:
+
+        class ReleaseStub:
+
+            name = "13.5-RELEASE"
+            hashes = dict(base="expected-hash")
+
+            def __init__(self, logger: 'libioc.Logger.Logger') -> None:
+                self.logger = logger
+
+            def _read_asset_hash(self, asset_name: str) -> str:
+                return "mismatching-hash"
+
+        stub = ReleaseStub(logger)
+
+        with pytest.raises(libioc.errors.InvalidReleaseAssetSignature):
+            libioc.Release.ReleaseGenerator._check_asset_hash(stub, "base")

@@ -1039,10 +1039,8 @@ class ReleaseGenerator(ReleaseResource):
                 f"Asset {asset_name}.txz has an invalid signature"
                 f"(was '{local_file_hash}' but expected '{expected_hash}')"
             )
-            # InvalidReleaseAssetSignature expects the keyword name, so
-            # this raise crashes with a TypeError when reached
-            raise libioc.errors.InvalidReleaseAssetSignature(  # type: ignore[call-arg] # noqa: E501
-                release_name=self.name,
+            raise libioc.errors.InvalidReleaseAssetSignature(
+                name=self.name,
                 asset_name=asset_name,
                 logger=self.logger
             )
