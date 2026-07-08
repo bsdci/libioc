@@ -22,10 +22,12 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 """Unit tests for non-VNET jails."""
+import typing
 import ipaddress
 import subprocess
 
 import libioc.Jail
+import libioc.NetworkInterface
 
 class TestNetwork(object):
     """Run tests for non-VNET networking."""
@@ -103,3 +105,30 @@ class TestNetwork(object):
         assert str(ip4_addr2.ip) not in stdout
         assert str(ip6_addr1.ip) not in stdout
         assert str(ip6_addr2.ip) not in stdout
+
+
+class TestNetworkInterfaceDestroy(object):
+    """Run tests for network interface destruction."""
+
+    def test_destroy_runs_ifconfig_destroy_on_the_host(
+        self,
+        logger: 'libioc.Logger.Logger',
+        mocker: typing.Any
+    ) -> None:
+        nic = libioc.NetworkInterface.NetworkInterface(
+            name="bridge0",
+            rename="bridge0",
+            auto_apply=False,
+            logger=logger
+        )
+        exec_mock = mocker.patch(
+            "libioc.helpers.exec",
+            return_value=("", "", 0)
+        )
+
+        nic.destroy_interface()
+
+        exec_mock.assert_called_once_with(
+            ["/sbin/ifconfig", "bridge0", "destroy"],
+            logger=logger
+        )
