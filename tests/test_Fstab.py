@@ -30,6 +30,7 @@ import random
 import sys
 import os.path
 import subprocess
+import unittest.mock
 
 import libzfs
 
@@ -185,3 +186,56 @@ tmpfs /tmp tmpfs rw,mode=777 0 0 # {AUTO_COMMENT_IDENTIFIER}"""
 				]).wait()
 
 			assert os.path.exists(testfile) is False
+
+
+class TestJailFstab(object):
+	"""Run JailFstab unit tests."""
+
+	@pytest.fixture(autouse=True)
+	def mocked_host(self, mocker: typing.Any) -> None:
+		"""Replace the host so that parsing works without ZFS."""
+		mocker.patch(
+			"libioc.helpers_object.init_host",
+			return_value=mocker.MagicMock()
+		)
+
+	@pytest.fixture
+	def jail_stub(self, tmp_path: typing.Any) -> typing.Any:
+		"""Return a minimal jail double for JailFstab."""
+
+		class JailStub:
+
+			storage_backend: typing.Any = None
+			storage: typing.Any = None
+
+			def __init__(self, dataset_mountpoint: str) -> None:
+				self.dataset = unittest.mock.Mock()
+				self.dataset.mountpoint = dataset_mountpoint
+
+			@property
+			def release(self) -> typing.Any:
+				return None
+
+			def require_relative_path(self, path: str) -> None:
+				pass
+
+			def is_path_relative(self, path: str) -> bool:
+				return True
+
+		return JailStub(str(tmp_path))
+
+	def test_update_release_saves_the_file(
+		self,
+		jail_stub: typing.Any,
+		logger: 'libioc.Logger.Logger'
+	) -> None:
+		fstab = libioc.Config.Jail.File.Fstab.JailFstab(
+			jail=jail_stub,
+			logger=logger
+		)
+		release = unittest.mock.Mock()
+
+		fstab.update_release(release)
+
+		assert fstab.release is release
+		assert os.path.isfile(fstab.path) is True
