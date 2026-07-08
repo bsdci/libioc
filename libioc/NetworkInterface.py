@@ -193,12 +193,14 @@ class NetworkInterface:
 
     def _destroy_interfaces(self, nic_names: typing.List[str]) -> None:
         for nic_name_to_destroy in nic_names:
-            # there is no libioc.helper module, so this raises
-            libioc.helper.exec([  # type: ignore[attr-defined]
-                self.ifconfig_command,
-                nic_name_to_destroy,
-                "destroy"
-            ])
+            libioc.helpers.exec(
+                [
+                    self.ifconfig_command,
+                    nic_name_to_destroy,
+                    "destroy"
+                ],
+                logger=self.logger
+            )
 
     def apply_addresses(self) -> None:
         """Apply the configured IP addresses."""
