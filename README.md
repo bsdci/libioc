@@ -114,6 +114,13 @@ make install-dev
 make check
 ```
 
+### Releases
+
+We try to *manually* keep a [Changelog](CHANGELOG.md), following the style on [changelog.md](https://changelog.md).
+New releases are tagged according to [Semver](https://semver.org/), released on [PyPi](https://pypi.org/project/libioc/), and published as [port](https://github.com/bsdci/ports).
+
+To get a port published, we need to [create a Bugzilla Issue in the Ports category](https://bugs.freebsd.org/bugzilla/enter_bug.cgi?component=Individual%20Port%28s%29&product=Ports%20%26%20Packages)
+
 ---
 
 ### Project Status (Archive)
